@@ -1,0 +1,14 @@
+name: Org Repository Standards
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  standards:
+    uses: Lucid-Studios/.github/.github/workflows/repository-standards.yml@main
