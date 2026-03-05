@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a defect in the active OAN Tech Stack build or workflow surface.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the defect and its user-visible impact.
+      placeholder: Build/test/runtime behavior is incorrect because...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include branch, SDK version, OS, and any relevant runtime context.
+      placeholder: |
+        Branch:
+        SDK:
+        OS:
+        Runtime root:
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the exact commands or actions needed to reproduce the issue.
+      placeholder: |
+        1. Run...
+        2. Open...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs and evidence
+      description: Paste only sanitized logs. Do not include private corpus paths or local absolute paths outside the repo root.
