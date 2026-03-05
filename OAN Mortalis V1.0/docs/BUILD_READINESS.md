@@ -14,11 +14,11 @@ It is intended to answer three questions:
 
 Active build:
 
-- `D:\OAN Tech Stack\OAN Mortalis V1.0\Oan.sln`
+- `OAN Mortalis V1.0/Oan.sln`
 
 Out of scope:
 
-- `D:\OAN Tech Stack\OAN Mortalis V0.1 Archive`
+- `OAN Mortalis V0.1 Archive/`
 
 Assessment date:
 
@@ -134,7 +134,7 @@ Recommended wrappers:
 - architectural boundaries are documented and enforced
 - release artifacts are versioned
 - experimental projects are clearly separated from production runtime projects
-- tracked managed files do not reveal absolute paths outside `D:\OAN Tech Stack`
+- tracked managed files do not reveal absolute paths outside the repository root
 
 ### 7. Foundational Corpus Safety
 
