@@ -1,0 +1,42 @@
+name: Active Build Verification
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: OAN Mortalis V1.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Show SDK info
+        run: dotnet --info
+        working-directory: .
+
+      - name: Verify workspace path hygiene
+        run: powershell -ExecutionPolicy Bypass -File tools\verify-private-corpus.ps1
+
+      - name: Restore
+        run: dotnet restore Oan.sln
+
+      - name: Build
+        run: dotnet build Oan.sln -c Release --no-restore -v minimal
+
+      - name: Test
+        run: dotnet test Oan.sln -c Release --no-build -v minimal

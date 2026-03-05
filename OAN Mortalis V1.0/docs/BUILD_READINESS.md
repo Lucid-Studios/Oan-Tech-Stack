@@ -46,9 +46,10 @@ Observed repository conditions:
 
 - The active solution currently contains `29` source projects
 - The repository currently contains `6` test projects
-- No GitHub Actions workflow exists under `.github/workflows`
+- `global.json` now pins the verified .NET SDK version for the repository
+- A GitHub Actions workflow now exists to restore, build, test, and verify path hygiene for the active build
 - `build_error.txt` reflects an older failure and is not current truth
-- `.THIS_IS_THE_ACTIVE_BUILD` references `docs/WORKSPACE_RULES.md`, but that file is not present
+- `.THIS_IS_THE_ACTIVE_BUILD` now resolves to a present `docs/WORKSPACE_RULES.md` bridge document
 - Foundational research documents may be indexed from a local private corpus root outside the repository, but that path must remain local-only and never be committed into tracked files
 
 ## Ready State
@@ -81,7 +82,7 @@ Definition:
 
 Current status:
 
-- **Partially met**
+- **Largely met locally; pending CI execution history**
 
 ## Build Completion Criteria
 
