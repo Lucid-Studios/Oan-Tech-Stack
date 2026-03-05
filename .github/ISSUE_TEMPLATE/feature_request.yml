@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a capability, subsystem improvement, or governance enhancement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What gap does this feature address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the proposed implementation at a high level.
+    validations:
+      required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Architecture layer
+      options:
+        - CradleTek
+        - SoulFrame
+        - AgentiCore
+        - SLI Engine
+        - Infrastructure
+        - Crosscutting
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected impact
+      description: Describe build, runtime, governance, or developer workflow impact.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and contracts
+      description: Note any Build Contract, workspace, or governance constraints that apply.

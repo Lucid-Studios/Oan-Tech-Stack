@@ -2,7 +2,7 @@
 
 This active build follows the canonical workspace rules defined in:
 
-- `D:\OAN Tech Stack\Build Contracts\Crosscutting\WORKSPACE_RULES.md`
+- `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
 
 ## Active Build Interpretation
 
@@ -22,13 +22,13 @@ Forbidden write surface:
 
 - `Build Contracts/**`
 - `OAN Mortalis V0.1 Archive/**`
-- any external path outside `D:\OAN Tech Stack`
+- any external path outside the repository root
 
 ## Local-Only Foundations
 
 Foundational private corpus material may be indexed from a local external root, including:
 
-- `D:\Copyright Publications\Current Publications\Lucid Technologies Work`
+- the Lucid Technologies foundational publications corpus
 
 That root must remain:
 
