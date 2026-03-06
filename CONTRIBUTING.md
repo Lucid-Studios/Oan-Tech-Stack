@@ -17,6 +17,7 @@ Reference-only material:
 
 Read:
 
+- `AGENTS.md`
 - `OAN Mortalis V1.0/docs/WORKSPACE_RULES.md`
 - `OAN Mortalis V1.0/docs/BUILD_READINESS.md`
 
@@ -27,6 +28,13 @@ Use the canonical repo-root commands:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release
 powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release
+```
+
+These wrappers now run the workspace path hygiene preflight automatically.
+
+Manual hygiene verification remains available when needed:
+
+```powershell
 powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.0\tools\verify-private-corpus.ps1
 ```
 

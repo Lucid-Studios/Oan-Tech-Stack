@@ -132,6 +132,8 @@ Recommended wrappers:
 ### 6. Governance Readiness
 
 - architectural boundaries are documented and enforced
+- family ownership boundaries are documented and enforced
+- canonical terminology is defined in a single glossary contract
 - release artifacts are versioned
 - experimental projects are clearly separated from production runtime projects
 - tracked managed files do not reveal absolute paths outside the repository root
@@ -172,6 +174,14 @@ Current status:
 Primary risk:
 
 - the solution appears conceptually rich but assembly boundaries are still broad and overlapping
+
+Supporting document:
+
+- `docs/PROJECT_CLASSIFICATION_MATRIX.md`
+- `docs/NAMESPACE_CONVERGENCE_PLAN.md`
+- `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
+- `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
+- `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
 
 ### Stage 3. Operable
 
