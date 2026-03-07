@@ -196,3 +196,8 @@ The Holographic Data Tool is the foundation for a new class of governed symbolic
 It begins with trustworthy packaging and lawful relation.
 
 It is intended to grow into a carrier system capable of supporting structured cognitive, identity, and runtime forms without abandoning trust, inspection, or governance.
+
+Future operator-facing relation:
+
+- later phases may use HDT as a lawful projection surface for the custody-aware operator telemetry visibility lattice defined in `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`
+- that projection role remains subordinate to runtime policy, audit, authorization, and disclosure law

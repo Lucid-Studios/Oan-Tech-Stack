@@ -113,3 +113,7 @@ This phase is complete when:
 - an operator can list pending recovery and explicitly resume or retry a publication lane
 - malformed evidence surfaces as explicit failed-safe output
 - `evaluate` remains unchanged
+
+Future extension:
+
+- richer custody-aware operator telemetry remains deferred to the visibility lattice defined in `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`
