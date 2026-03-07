@@ -168,6 +168,20 @@ Rules:
 - summary-only evidence must say that it is summary-only
 - unimplemented or withheld outputs must be named explicitly
 
+## Verification Serialization Note
+
+Audit and verification runs should avoid overlapping build and test touches against the same intermediate outputs where practical.
+
+Preferred rule:
+
+- serialize verification steps that write to shared `obj` and `bin` paths
+
+Fallback rule:
+
+- isolate intermediate output paths when overlap is intentional
+
+Transient file-lock noise must be treated as infrastructure contention, not as architectural proof or disproof.
+
 ## Pass Order
 
 ### Pass 0. Baseline Truth
