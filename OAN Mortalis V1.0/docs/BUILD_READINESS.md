@@ -22,7 +22,7 @@ Out of scope:
 
 Assessment date:
 
-- March 5, 2026
+- March 6, 2026
 
 ## Current Verified State
 
@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `26` tests passed across `5` discovered test assemblies
+- `53` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -48,6 +48,16 @@ Observed repository conditions:
 - The repository currently contains `6` test projects
 - `global.json` now pins the verified .NET SDK version for the repository
 - A GitHub Actions workflow now exists to restore, build, test, and verify path hygiene for the active build
+- The first lawful `GEL` contract seam now exists as `src/GEL.Contracts`
+- The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
+- The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
+- SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
+- The first real AgentiCore membrane caller now exists as a bounded handle-only consumer with one positive and one negative misuse test
+- The AgentiCore cognition cycle now invokes that bounded membrane worker as a thin stage without widening the worker into custody, orchestration, or publication access
+- The first governance-first Golden Path loop is now implemented through `StackManager` with explicit governance adjudication, governed Cryptic re-Engrammitization, and governed Prime derivative publication
+- The v1.1 runtime hardening layer now exists as explicit journal contracts, typed loop-state contracts, and replay-aware Golden Path orchestration
+- The first internal operational control plane now exists as journal-first status views, deferred-review actions, pending-recovery resume actions, and same-loop local execution guards
+- The first local operator surface now exists in `src/Oan.Runtime.Headless` as a CLI-first shell for status, deferred review, and recovery actions over the live control-plane contracts
 - `build_error.txt` reflects an older failure and is not current truth
 - `.THIS_IS_THE_ACTIVE_BUILD` now resolves to a present `docs/WORKSPACE_RULES.md` bridge document
 - Foundational research documents may be indexed from a local private corpus root outside the repository, but that path must remain local-only and never be committed into tracked files
@@ -177,6 +187,21 @@ Primary risk:
 
 Supporting document:
 
+- `docs/SYSTEM_ONTOLOGY.md`
+- `docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
+- `docs/PRIME_CRYPTIC_DATA_TOPOLOGY.md`
+- `docs/CORE_SYSTEMS_MATURATION_PLAN.md`
+- `docs/OPERATIONAL_GOLDEN_PATH.md`
+- `docs/RUNTIME_HARDENING_PLAN.md`
+- `docs/OPERATIONAL_CONTROL_AND_RECOVERY_PLAN.md`
+- `docs/RUNTIME_OPERATOR_SURFACE_PLAN.md`
+- `docs/HOLOGRAPHIC_DATA_TOOL.md`
+- `docs/DEPENDENCY_AUDIT.md`
+- `docs/refactors/GEL_SPLIT_PLAN.md`
+- `docs/refactors/GEL_CONTRACTS_EXTRACTION_PROMPT.md`
+- `docs/refactors/CRYPTIC_CUSTODY_SOULFRAME_MEMBRANE_SPEC.md`
+- `docs/refactors/SOULFRAME_PAYLOAD_AND_INTAKE_TIGHTENING_SPEC.md`
+- `docs/refactors/FIRST_MEMBRANE_CALLER_RULES.md`
 - `docs/PROJECT_CLASSIFICATION_MATRIX.md`
 - `docs/NAMESPACE_CONVERGENCE_PLAN.md`
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
@@ -191,11 +216,11 @@ Meaning:
 
 Current status:
 
-- **Partial**
+- **In progress**
 
 Primary risk:
 
-- runtime documentation exists, but canonical execution paths are not yet formalized as build gates
+- the Golden Path now supports local operator control, but broader operational adoption, concurrency beyond one process, and CI-backed proof are still incomplete
 
 ### Stage 4. Governed
 

@@ -1,10 +1,11 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Oan.Common;
 
 namespace SoulFrame.Host;
 
-public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice
+public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMembrane
 {
     private readonly HttpClient _httpClient;
     private readonly SoulFrameTelemetryAdapter? _telemetry;
@@ -91,6 +92,47 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice
         SoulFrameInferenceRequest request,
         CancellationToken cancellationToken = default)
         => ExecuteTaskAsync("/embedding", request, cancellationToken);
+
+    public Task<ISelfStateProjection> ProjectMitigatedAsync(
+        SoulFrameProjectionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.CMEId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceCustodyDomain);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.RequestedTheater);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.PolicyHandle);
+
+        ISelfStateProjection projection = new SelfStateProjection(
+            request.IdentityId,
+            ProjectionHandle: BuildProjectionHandle(request.IdentityId),
+            SessionHandle: BuildSessionHandle(request.CMEId, request.IdentityId),
+            request.RequestedTheater,
+            IsMitigated: true,
+            WorkingStateHandle: BuildWorkingStateHandle(request.CMEId, request.IdentityId),
+            ProvenanceMarker: BuildProjectionProvenance(request.CMEId, request.PolicyHandle));
+
+        return Task.FromResult(projection);
+    }
+
+    public Task<SoulFrameReturnIntakeReceipt> ReceiveReturnIntakeAsync(
+        SoulFrameReturnIntakeRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.CMEId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SessionHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceTheater);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.ReturnCandidatePointer);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.ProvenanceMarker);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.IntakeIntent);
+
+        return Task.FromResult(new SoulFrameReturnIntakeReceipt(
+            request.IdentityId,
+            IntakeHandle: BuildReturnIntakeHandle(request.IdentityId),
+            Accepted: true,
+            Disposition: "return-candidate-recorded"));
+    }
 
     private async Task<SoulFrameInferenceResponse> ExecuteTaskAsync(
         string route,
@@ -271,6 +313,21 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice
             ? parsed
             : new Uri("http://127.0.0.1:8181");
     }
+
+    private static string BuildProjectionHandle(Guid identityId) =>
+        $"soulframe://projection/{identityId:D}/{Guid.NewGuid():N}";
+
+    private static string BuildSessionHandle(string cmeId, Guid identityId) =>
+        $"soulframe-session://{cmeId}/{identityId:D}";
+
+    private static string BuildWorkingStateHandle(string cmeId, Guid identityId) =>
+        $"soulframe-working://{cmeId}/{identityId:D}";
+
+    private static string BuildProjectionProvenance(string cmeId, string policyHandle) =>
+        $"membrane-derived:cme:{cmeId}|policy:{policyHandle}";
+
+    private static string BuildReturnIntakeHandle(Guid identityId) =>
+        $"soulframe://return/{identityId:D}/{Guid.NewGuid():N}";
 
     private sealed class SoulFrameApiRequest
     {

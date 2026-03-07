@@ -20,7 +20,7 @@ namespace Oan.Sli
     public sealed class RoutingEngine : IRoutingEngine
     {
         private readonly SoulFrameAuthority _authority;
-        private readonly IPublicPlaneStores _publicStores;
+        private readonly IPrimeDerivativePublisher _primeDerivativePublisher;
         private readonly ICrypticPlaneStores _crypticStores;
         private readonly IDeterministicHarness _harness;
 
@@ -30,14 +30,23 @@ namespace Oan.Sli
 
         public RoutingEngine(
             SoulFrameAuthority authority,
-            IPublicPlaneStores publicStores,
+            IPrimeDerivativePublisher primeDerivativePublisher,
             ICrypticPlaneStores crypticStores,
             IDeterministicHarness harness)
         {
             _authority = authority ?? throw new ArgumentNullException(nameof(authority));
-            _publicStores = publicStores ?? throw new ArgumentNullException(nameof(publicStores));
+            _primeDerivativePublisher = primeDerivativePublisher ?? throw new ArgumentNullException(nameof(primeDerivativePublisher));
             _crypticStores = crypticStores ?? throw new ArgumentNullException(nameof(crypticStores));
             _harness = harness ?? throw new ArgumentNullException(nameof(harness));
+        }
+
+        public RoutingEngine(
+            SoulFrameAuthority authority,
+            IPublicPlaneStores publicStores,
+            ICrypticPlaneStores crypticStores,
+            IDeterministicHarness harness)
+            : this(authority, new LegacyPrimeDerivativePublisher(publicStores), crypticStores, harness)
+        {
         }
 
         public async Task AppendAsync(string plane, string engramHash, object payload, bool isIncident = false)
@@ -49,9 +58,12 @@ namespace Oan.Sli
             // 2. Resolve Plane & Append
             if (plane == "Standard")
             {
-                // Note: Standard lineage enforcement would typically happen here.
-                // For this sprint, we treat GEL as the standard lineage.
-                await _publicStores.AppendToGELAsync(engramHash, payload);
+                await _primeDerivativePublisher.PublishPointerAsync(
+                    new PrimeDerivativePointerPublication(
+                        IdentityId: Guid.Empty,
+                        Pointer: engramHash,
+                        Classification: "standard-derivative"),
+                    CancellationToken.None);
                 _standardTip = engramHash;
             }
             else if (plane == "Cryptic")
@@ -79,8 +91,12 @@ namespace Oan.Sli
                 throw new InvalidOperationException("Promotion to Standard denied by SoulFrame.");
 
             // 4. Commit to Standard (GEL + GoA)
-            await _publicStores.AppendToGELAsync(receipt.ResultingStandardHash, payload);
-            await _publicStores.AppendToGoAAsync(receipt.ResultingStandardHash, payload);
+            await _primeDerivativePublisher.PublishPointerAsync(
+                new PrimeDerivativePointerPublication(
+                    IdentityId: Guid.Empty,
+                    Pointer: receipt.ResultingStandardHash,
+                    Classification: "promotion-derivative"),
+                CancellationToken.None);
 
             _standardTip = receipt.ResultingStandardHash;
         }
@@ -118,6 +134,35 @@ namespace Oan.Sli
             _crypticTip = responseHash;
 
             return response;
+        }
+    }
+
+    internal sealed class LegacyPrimeDerivativePublisher : IPrimeDerivativePublisher
+    {
+        private readonly IPublicPlaneStores _publicStores;
+
+        public LegacyPrimeDerivativePublisher(IPublicPlaneStores publicStores)
+        {
+            _publicStores = publicStores ?? throw new ArgumentNullException(nameof(publicStores));
+        }
+
+        public async Task PublishPointerAsync(PrimeDerivativePointerPublication publication, CancellationToken cancellationToken = default)
+        {
+            await _publicStores.AppendToGELAsync(publication.Pointer, new { classification = publication.Classification, pointer = publication.Pointer });
+            await _publicStores.AppendToGoAAsync(publication.Pointer, new { classification = publication.Classification, pointer = publication.Pointer });
+        }
+
+        public async Task PublishRedactedAsync(PrimeDerivativeRedactedPublication publication, CancellationToken cancellationToken = default)
+        {
+            var pointer = $"prime://{Guid.NewGuid():N}";
+            await _publicStores.AppendToGELAsync(pointer, new { classification = publication.Classification, redacted_payload = publication.RedactedPayload });
+            await _publicStores.AppendToGoAAsync(pointer, new { classification = publication.Classification, redacted_payload = publication.RedactedPayload });
+        }
+
+        public async Task PublishEncryptedAsync(PrimeDerivativeEncryptedPublication publication, CancellationToken cancellationToken = default)
+        {
+            await _publicStores.AppendToGELAsync(publication.Pointer, new { classification = "encrypted-pointer", encrypted_payload = publication.EncryptedPayload, pointer = publication.Pointer });
+            await _publicStores.AppendToGoAAsync(publication.Pointer, new { classification = "encrypted-pointer", encrypted_payload = publication.EncryptedPayload, pointer = publication.Pointer });
         }
     }
 }

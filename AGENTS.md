@@ -33,6 +33,9 @@ Follow these governing documents before inventing new structure:
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
 - `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
 - `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
+- `OAN Mortalis V1.0/docs/SYSTEM_ONTOLOGY.md`
+- `OAN Mortalis V1.0/docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
+- `OAN Mortalis V1.0/docs/HOLOGRAPHIC_DATA_TOOL.md`
 - `OAN Mortalis V1.0/docs/PROJECT_CLASSIFICATION_MATRIX.md`
 - `OAN Mortalis V1.0/docs/NAMESPACE_CONVERGENCE_PLAN.md`
 - `OAN Mortalis V1.0/docs/BUILD_READINESS.md`

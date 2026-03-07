@@ -46,4 +46,3 @@ public sealed class ParticipatoryEngram
     public required IReadOnlyList<string> InteractionRules { get; init; }
     public required IReadOnlyList<string> CapabilitySet { get; init; }
 }
-

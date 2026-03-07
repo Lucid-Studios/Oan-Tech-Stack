@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AgentiCore\AgentiCore.csproj" />
     <ProjectReference Include="..\..\src\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\..\src\Oan.SoulFrame\Oan.SoulFrame.csproj" />
     <ProjectReference Include="..\..\src\Oan.Sli\Oan.Sli.csproj" />

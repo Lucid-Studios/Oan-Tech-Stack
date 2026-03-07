@@ -2,161 +2,251 @@
 
 ## Purpose
 
-This document classifies the active `OAN Mortalis V1.0` solution by family ownership, architectural position, dependency posture, and terminology quality.
+This document classifies the active `OAN Mortalis V1.0` solution as an operational placement matrix.
 
-It is intended to reduce build drift by answering:
+It exists to bridge:
 
-- which family owns each project
-- whether that project is composition-level, foundational, sibling-domain, or cross-cutting
-- whether the project appears to be placed in the correct family
-- where dependency and naming pressure suggest future movement
+- system ontology
+- authority and mutation law
+- Theater law
+- project boundaries
+- dependency enforcement
+- eventual CI policy
+
+This matrix is intentionally finite-vocabulary and enforcement-oriented.
+
+It should answer:
+
+1. Which family and layer owns each project?
+2. What authority does that project hold?
+3. Which Theaters may it operate in?
+4. Which references are lawful or unlawful?
+5. What is the remediation path for each out-of-law project?
 
 Assessment date:
 
-- March 5, 2026
+- March 6, 2026
 
-## Governing Model
+## Governing Documents
 
-This matrix follows the canonical family constitution:
-
-- `Oan.*` is the umbrella composition and stack-level contract family
-- `CradleTek.*` is the infrastructure and substrate family
-- `SoulFrame.*` is the operator and identity-facing workflow family
-- `AgentiCore.*` is the agent runtime family
-- `SLI.*` is the cross-cutting symbolic interoperability family
-
-Primary governing documents:
-
+- `docs/SYSTEM_ONTOLOGY.md`
+- `docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
+- `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
 - `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
-- `docs/NAMESPACE_CONVERGENCE_PLAN.md`
+- `docs/DEPENDENCY_AUDIT.md`
 
-## Naming And Notation Baseline
+## Controlled Vocabulary
 
-| Surface | Canonical Target | Policy |
+### Family
+
+- `Oan`
+- `CradleTek`
+- `SoulFrame`
+- `AgentiCore`
+- `SLI`
+- `Governance`
+- `Compatibility`
+- `Tooling`
+- `Test`
+
+### Layer
+
+- `Composition`
+- `StackContract`
+- `RuntimeSubstrate`
+- `GovernanceBoundary`
+- `IdentityKernel`
+- `SymbolicTransport`
+- `SharedInvariant`
+- `CrypticCustody`
+- `Observability`
+- `Tooling`
+- `Test`
+
+### Theater Scope
+
+- `StackWide`
+- `CrossTheater`
+- `Prime`
+- `Cryptic`
+- `Dream`
+- `TheaterNeutral`
+
+### Authority Class
+
+- `ComposeOnly`
+- `RuntimeAuthoritative`
+- `LegalityAuthoritative`
+- `ProposalAuthoritative`
+- `TransportAuthoritative`
+- `SharedInvariantAuthoritative`
+- `ObserveOnly`
+- `Transitional`
+- `TestOnly`
+
+### Memory / Identity Impact
+
+- `None`
+- `ContextOnly`
+- `CrypticCustody`
+- `IdentityAdjacent`
+- `IdentityBearing`
+- `SharedInvariant`
+- `Mixed`
+
+### Mutation Rights
+
+- `None`
+- `RuntimeOnly`
+- `GateOnly`
+- `ProposalOnly`
+- `TransportOnly`
+- `AppendOnly`
+- `CrypticCustodyOnly`
+- `LocalOverlayOnly`
+- `TestOnly`
+- `Transitional`
+
+### Remediation Action
+
+- `Keep`
+- `ClarifyOwner`
+- `RestrictDeps`
+- `ShimInterface`
+- `SplitSurface`
+- `RenameOrExpand`
+- `MoveFamily`
+- `RetireLegacy`
+- `RescopeTests`
+
+### Target State
+
+- `Canonical`
+- `Transitional`
+- `ExceptionDocumented`
+
+## Violation Codes
+
+| Code | Meaning | Priority Band |
 | --- | --- | --- |
-| Umbrella composition family | `Oan.*` | Use for stack composition roots, stack-level contracts, and umbrella integration surfaces. |
-| Infrastructure family | `CradleTek.*` | Use for hosting, storage, substrate, and low-level runtime services. |
-| Operator family | `SoulFrame.*` | Use for operator, review, approval, and identity-facing workflow surfaces. |
-| Agent runtime family | `AgentiCore.*` | Use for orchestration, policy-bound task execution, and agent runtime behavior. |
-| Symbolic family | `SLI.*` | Use for symbolic protocol, parsing, transform, and symbolic interoperability. |
-| Product name in prose | `OAN Mortalis` | Keep uppercase acronym form in product-facing text. |
-| Stack composition root | `Oan.Runtime.Headless` | Keep as the single documented stack composition root. |
-| JSON field notation | `snake_case` | Keep canonical interchange JSON in `snake_case`. |
-| CLR naming | PascalCase | Keep types, members, and namespace segments in PascalCase. |
+| `IV1` | Identity-bearing or shared-invariant surface depends on an out-of-law authority path. | identity violation |
+| `GB1` | Governance boundary or foundational layer is bypassed or inverted. | governance bypass |
+| `TB1` | Theater-local boundary is blurred or cross-Theater discipline is missing. | theater bleed |
+| `SR1` | Symbolic and runtime concerns are coupled in the wrong direction. | symbolic/runtime mixing |
+| `NC1` | Naming, acronym, or placement is ambiguous but not immediately unsafe. | naming cleanup |
 
-## Family Ownership Matrix
+## Source Project Matrix
 
-| Project | Owning Family | Architectural Position | Current Role | Key References | Placement Status | Drift Risk | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `Oan.Runtime.Headless` | `Oan.*` | Composition | stack composition root | `Oan.Spinal`, `Oan.Sli`, `Oan.Cradle`, `Oan.SoulFrame`, `Oan.AgentiCore`, `Oan.Place`, `Oan.Storage`, `Oan.Common` | correct | low | Canonical stack entrypoint. |
-| `Oan.Common` | `Oan.*` | Stack Contract | cross-stack utility and contract support | none | probably correct | medium | Keep small; avoid turning it into a second base layer. |
-| `Oan.Spinal` | `Oan.*` | Stack Contract | deterministic stack substrate contract | none | ambiguous | medium | Could remain umbrella-level substrate contract, but overlaps conceptually with `OAN.Core` and infrastructure concerns. |
-| `Oan.Cradle` | `Oan.*` | Composition | stack orchestration surface | `Oan.Sli`, `Oan.Spinal`, `Oan.Common`, `Oan.SoulFrame`, `Oan.AgentiCore` | probably correct | medium | Good fit if treated as umbrella orchestration rather than infrastructure implementation. |
-| `Oan.SoulFrame` | `Oan.*` | Stack Contract | umbrella SoulFrame contract or integration surface | `Oan.Spinal`, `Oan.Common` | probably correct | medium | Best used for stack-level SoulFrame integration, not to replace the whole `SoulFrame.*` family. |
-| `Oan.AgentiCore` | `Oan.*` | Stack Contract | umbrella AgentiCore integration surface | `Oan.Sli`, `Oan.Spinal`, `Oan.SoulFrame` | probably correct | medium | Best used for stack-level integration, not family-local agent implementation. |
-| `Oan.Sli` | `Oan.*` | Stack Contract | umbrella SLI integration surface | `Oan.Spinal`, `Oan.Common`, `Oan.SoulFrame` | ambiguous | medium | May be acceptable as a stack-facing SLI contract surface, but must not erase `SLI.*` family ownership. |
-| `Oan.Place` | `Oan.*` | Stack Contract | stack-level external module placement boundary | `Oan.Spinal`, `Oan.Cradle` | probably correct | medium | Keep if it remains stack-facing and not infrastructure-local. |
-| `Oan.Storage` | `Oan.*` | Stack Contract | stack-level storage contract or adapter façade | `Oan.Spinal`, `Oan.SoulFrame`, `Oan.Cradle` | ambiguous | medium | Storage ownership may belong partly in `CradleTek.*`; clarify whether this is façade or implementation. |
-| `Oan.Fgs` | `Oan.*` | Stack Domain | focused stack domain module | `Oan.Spinal` | unclear | medium | Term needs explicit expansion and owning-domain definition. |
-| `CradleTek.Host` | `CradleTek.*` | Foundational Infrastructure | host contract and orchestration core | `OAN.Core`, `AgentiCore.Runtime`, `SoulFrame.Identity` | correct | medium | Valid as infrastructure family surface if dependency direction is tightened. |
-| `CradleTek.Runtime` | `CradleTek.*` | Foundational Infrastructure | infrastructure runtime activation service | `AgentiCore`, `CradleTek.CognitionHost`, `CradleTek.Host`, `SLI.Engine`, `Telemetry.GEL` | ambiguous | high | Acceptable as family-local runtime, but must not compete with `Oan.Runtime.Headless` as stack root. |
-| `CradleTek.CognitionHost` | `CradleTek.*` | Foundational Infrastructure | cognition host interface or service hub | none | correct | low | Good low-level infrastructure position. |
-| `CradleTek.Memory` | `CradleTek.*` | Foundational Infrastructure | memory substrate or registry service | `CradleTek.CognitionHost` | correct | medium | Reasonable infrastructure ownership. |
-| `CradleTek.Public` | `CradleTek.*` | Foundational Infrastructure | public operational layer service | `CradleTek.Host` | probably correct | medium | Valid if the public operational surface is infrastructure-hosted. |
-| `CradleTek.Cryptic` | `CradleTek.*` | Foundational Infrastructure | cryptic operational layer service | `CradleTek.Host` | probably correct | medium | Valid if cryptic persistence is infrastructure-owned. |
-| `CradleTek.Mantle` | `CradleTek.*` | Foundational Infrastructure | governance or sovereignty service | `CradleTek.Host` | unclear | medium | Needs sharper definition to justify infrastructure ownership. |
-| `SoulFrame.Identity` | `SoulFrame.*` | Sibling Domain | identity models and services | `OAN.Core` | correct | medium | Good family ownership. |
-| `SoulFrame.Host` | `SoulFrame.*` | Sibling Domain | session or workflow host support | `OAN.Core`, `Telemetry.GEL` | probably correct | medium | Valid if it is family-local workflow hosting rather than stack composition. |
-| `AgentiCore` | `AgentiCore.*` | Sibling Domain | agent cognition and orchestration service | `CradleTek.CognitionHost`, `CradleTek.Host`, `CradleTek.Memory`, `EngramGovernance`, `GEL`, `OAN.Core`, `SoulFrame.Identity`, `Telemetry.GEL`, `SLI.Ingestion`, `SoulFrame.Host` | correct but over-coupled | high | Real family ownership, but dependency fan-in is too broad. |
-| `AgentiCore.Runtime` | `AgentiCore.*` | Sibling Domain | family-local runtime service | `OAN.Core` | correct | medium | Acceptable as family-local runtime if kept distinct from stack composition. |
-| `SLI.Engine` | `SLI.*` | Cross-Cutting | symbolic engine | `AgentiCore`, `CradleTek.CognitionHost`, `CradleTek.Host`, `CradleTek.Memory`, `GEL`, `OAN.Core`, `SLI.Lisp`, `SoulFrame.Host` | correct but over-coupled | high | Legitimate cross-family engine; needs upward dependency discipline. |
-| `SLI.Ingestion` | `SLI.*` | Cross-Cutting | symbolic ingestion services | `CradleTek.Memory`, `GEL`, `SoulFrame.Host` | correct | medium | Good cross-cutting ownership if kept independent from sibling-family internals. |
-| `SLI.Lisp` | `SLI.*` | Cross-Cutting | symbolic representation library | none | correct | low | Good representation-specific package. |
-| `Telemetry.GEL` | unresolved | Cross-Cutting | telemetry support | `OAN.Core` | unclear | high | Needs owning family and full acronym expansion. |
-| `GEL` | unresolved | Cross-Cutting | domain or telemetry-linked surface | `CradleTek.Host`, `OAN.Core`, `Telemetry.GEL` | unclear | high | Unexplained acronym and unclear family owner. |
-| `EngramGovernance` | unresolved | Cross-Cutting | governance around engrams | `CradleTek.Memory`, `CradleTek.Host`, `OAN.Core`, `Telemetry.GEL` | unclear | medium | Domain is clear; family ownership is not. |
-| `Data.Cryptic` | unresolved | Foundational Infrastructure | cryptic data surface | none | unclear | medium | Likely infrastructure-adjacent, but current family naming is incomplete. |
-| `OAN.Core` | compatibility root | Foundational Infrastructure | legacy or transitional base contracts | none | transitional | high | Casing and role overlap with `Oan.Spinal` need an explicit resolution. |
+| Project | Path | Family | Layer | Theater Scope | Authority Class | Runtime Role | Memory / Identity Impact | Mutation Rights | May Reference | May Not Reference | Observed Violations | Remediation Action | Target State |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `Oan.Runtime.Headless` | `src/Oan.Runtime.Headless` | `Oan` | `Composition` | `StackWide` | `ComposeOnly` | canonical Sanctuary stack composition root | `None` | `None` | `Oan` stack contracts and documented family entry surfaces | sibling-family internals acting as alternate stack roots | none | `Keep` | `Canonical` |
+| `Oan.Common` | `src/Oan.Common` | `Oan` | `StackContract` | `CrossTheater` | `ComposeOnly` | cross-stack contract and vocabulary support, including custody, membrane, and Prime-derivative law interfaces | `None` | `None` | low-level stack contracts and policy-neutral law interfaces only | identity-bearing stores, runtime authority, Theater-specific implementations | none | `Keep` | `Canonical` |
+| `Oan.Spinal` | `src/Oan.Spinal` | `Oan` | `StackContract` | `StackWide` | `ComposeOnly` | deterministic stack substrate contract | `None` | `None` | stack contracts and deterministic abstractions | runtime authorities, shared invariant implementations | `NC1` | `ClarifyOwner` | `Canonical` |
+| `Oan.Cradle` | `src/Oan.Cradle` | `Oan` | `Composition` | `StackWide` | `ComposeOnly` | umbrella CradleTek integration and orchestration facade | `ContextOnly` | `None` | `Oan` stack contracts and lawful family entry surfaces | direct cryptic custody or sibling-family private internals | none | `Keep` | `Canonical` |
+| `Oan.Place` | `src/Oan.Place` | `Oan` | `StackContract` | `StackWide` | `ComposeOnly` | external module placement boundary | `None` | `None` | stack contracts and placement abstractions | identity-bearing or cryptic custody implementations | none | `Keep` | `Canonical` |
+| `Oan.Sli` | `src/Oan.Sli` | `Oan` | `StackContract` | `CrossTheater` | `TransportAuthoritative` | umbrella SLI integration surface | `ContextOnly` | `TransportOnly` | stack contracts and SLI-facing abstractions | direct identity-bearing commit surfaces | none | `Keep` | `Canonical` |
+| `Oan.SoulFrame` | `src/Oan.SoulFrame` | `Oan` | `StackContract` | `CrossTheater` | `LegalityAuthoritative` | umbrella SoulFrame integration surface | `ContextOnly` | `GateOnly` | stack contracts and governance abstractions | direct identity-kernel implementation | none | `Keep` | `Canonical` |
+| `Oan.AgentiCore` | `src/Oan.AgentiCore` | `Oan` | `StackContract` | `CrossTheater` | `ProposalAuthoritative` | umbrella AgentiCore integration surface | `IdentityAdjacent` | `ProposalOnly` | stack contracts and admitted symbolic surfaces | direct shared-invariant commit surfaces | none | `Keep` | `Canonical` |
+| `Oan.Storage` | `src/Oan.Storage` | `Oan` | `StackContract` | `CrossTheater` | `ComposeOnly` | stack storage facade or adapter boundary | `Mixed` | `None` | stack contracts and documented storage abstractions | direct cryptic custody ownership without family clarification | `NC1` | `ClarifyOwner` | `Canonical` |
+| `Oan.Fgs` | `src/Oan.Fgs` | `Oan` | `StackContract` | `TheaterNeutral` | `ComposeOnly` | unresolved stack domain surface | `None` | `None` | `Oan.Spinal` and owning-domain contracts | new dependency growth until term is expanded | `NC1` | `RenameOrExpand` | `Transitional` |
+| `OAN.Core` | `src/OAN.Core` | `Compatibility` | `StackContract` | `TheaterNeutral` | `Transitional` | legacy base-contract root | `None` | `Transitional` | compatibility dependents only | new active architecture surfaces | `NC1` | `RetireLegacy` | `Transitional` |
+| `GEL.Contracts` | `src/GEL.Contracts` | `Governance` | `StackContract` | `CrossTheater` | `ComposeOnly` | policy-neutral shared GEL language surface | `IdentityAdjacent` | `None` | shared DTOs, identifiers, envelopes, and neutral state shapes | storage, governance, telemetry adapters, graph logic, runtime publication | none | `Keep` | `Canonical` |
+| `CradleTek.CognitionHost` | `src/CradleTek.CognitionHost` | `CradleTek` | `RuntimeSubstrate` | `CrossTheater` | `RuntimeAuthoritative` | low-level cognition host boundary | `None` | `RuntimeOnly` | substrate and hosting abstractions | direct identity-bearing stores or Prime publication surfaces | none | `Keep` | `Canonical` |
+| `CradleTek.Memory` | `src/CradleTek.Memory` | `CradleTek` | `RuntimeSubstrate` | `Cryptic` | `RuntimeAuthoritative` | memory substrate and registry support | `CrypticCustody` | `CrypticCustodyOnly` | CradleTek substrate contracts | Prime publication or legality authority surfaces | none | `Keep` | `Canonical` |
+| `CradleTek.Host` | `src/CradleTek.Host` | `CradleTek` | `RuntimeSubstrate` | `CrossTheater` | `RuntimeAuthoritative` | foundational host contract and orchestration core | `ContextOnly` | `RuntimeOnly` | CradleTek substrate, compatibility contracts | direct sibling-family runtime implementations and identity-facing services | `GB1`, `SR1` | `ShimInterface` | `Canonical` |
+| `CradleTek.Runtime` | `src/CradleTek.Runtime` | `CradleTek` | `RuntimeSubstrate` | `CrossTheater` | `RuntimeAuthoritative` | family-local runtime activation and hosting | `Mixed` | `RuntimeOnly` | CradleTek substrate and SLI-facing infrastructure seams | direct AgentiCore domain ownership and shared-state observability bypass | `GB1`, `SR1` | `RestrictDeps` | `Canonical` |
+| `CradleTek.Public` | `src/CradleTek.Public` | `CradleTek` | `RuntimeSubstrate` | `Prime` | `RuntimeAuthoritative` | Prime-side hosting surface | `ContextOnly` | `RuntimeOnly` | CradleTek host surfaces | direct Cryptic custody or Dream semantics without law | none | `Keep` | `Canonical` |
+| `CradleTek.Cryptic` | `src/CradleTek.Cryptic` | `CradleTek` | `CrypticCustody` | `Cryptic` | `RuntimeAuthoritative` | cryptic-side hosting and custody surface | `CrypticCustody` | `CrypticCustodyOnly` | CradleTek host and cryptic storage surfaces | Prime release surfaces and shared invariant authorship | none | `Keep` | `Canonical` |
+| `CradleTek.Mantle` | `src/CradleTek.Mantle` | `CradleTek` | `CrypticCustody` | `Cryptic` | `RuntimeAuthoritative` | Mantle / sovereignty-aligned custody service | `IdentityAdjacent` | `CrypticCustodyOnly` | CradleTek host and cryptic custody surfaces | public canonical truth surfaces | `NC1` | `ClarifyOwner` | `Canonical` |
+| `SoulFrame.Identity` | `src/SoulFrame.Identity` | `SoulFrame` | `GovernanceBoundary` | `CrossTheater` | `LegalityAuthoritative` | identity-facing legality and selection surface | `IdentityAdjacent` | `GateOnly` | SoulFrame family, compatibility contracts | direct runtime substrate authority or identity-kernel rewrite | `NC1` | `RetireLegacy` | `Canonical` |
+| `SoulFrame.Host` | `src/SoulFrame.Host` | `SoulFrame` | `GovernanceBoundary` | `CrossTheater` | `LegalityAuthoritative` | session and workflow host support | `ContextOnly` | `GateOnly` | SoulFrame family, observability abstractions | direct shared-invariant mutation or runtime seizure | `NC1` | `RestrictDeps` | `Canonical` |
+| `AgentiCore.Runtime` | `src/AgentiCore.Runtime` | `AgentiCore` | `IdentityKernel` | `CrossTheater` | `ProposalAuthoritative` | family-local runtime shell | `IdentityAdjacent` | `ProposalOnly` | AgentiCore contracts and compatibility surfaces | direct stack composition or shared invariant commit | `NC1` | `RetireLegacy` | `Canonical` |
+| `AgentiCore` | `src/AgentiCore` | `AgentiCore` | `IdentityKernel` | `CrossTheater` | `ProposalAuthoritative` | agent cognition, bonded runtime behavior, self-state formation | `IdentityBearing` | `ProposalOnly` | AgentiCore family, admitted SoulFrame gates, SLI interfaces, approved substrate seams | direct shared-invariant commit, broad sibling-family host coupling | `GB1`, `SR1` | `RestrictDeps` | `Canonical` |
+| `SLI.Lisp` | `src/SLI.Lisp` | `SLI` | `SymbolicTransport` | `CrossTheater` | `TransportAuthoritative` | symbolic representation library | `None` | `TransportOnly` | symbolic parsing and representation surfaces | runtime authority and identity-kernel internals | none | `Keep` | `Canonical` |
+| `SLI.Ingestion` | `src/SLI.Ingestion` | `SLI` | `SymbolicTransport` | `CrossTheater` | `TransportAuthoritative` | symbolic ingestion surface | `ContextOnly` | `TransportOnly` | SLI family, storage-facing and memory-facing interfaces | sibling-family host internals | `GB1`, `TB1` | `ShimInterface` | `Canonical` |
+| `SLI.Engine` | `src/SLI.Engine` | `SLI` | `SymbolicTransport` | `CrossTheater` | `TransportAuthoritative` | symbolic engine and routing core | `Mixed` | `TransportOnly` | SLI family, substrate interfaces, admitted shared-state abstractions | direct sibling-family host and identity-kernel internals | `GB1`, `TB1`, `SR1` | `RestrictDeps` | `Canonical` |
+| `Telemetry.GEL` | `src/Telemetry.GEL` | `Governance` | `Observability` | `CrossTheater` | `ObserveOnly` | GEL-oriented observability surface | `IdentityAdjacent` | `None` | observability abstractions and read-only governance contracts | direct commit or authority-bearing surfaces | `NC1` | `ClarifyOwner` | `Transitional` |
+| `GEL` | `src/GEL` | `Governance` | `SharedInvariant` | `Prime` | `SharedInvariantAuthoritative` | shared invariant identity-bearing domain | `SharedInvariant` | `AppendOnly` | `GEL.Contracts`, governance contracts, admitted observability, compatibility until migrated | direct host ownership or telemetry-defined authority | `IV1`, `GB1` | `SplitSurface` | `Canonical` |
+| `EngramGovernance` | `src/EngramGovernance` | `Governance` | `SharedInvariant` | `CrossTheater` | `LegalityAuthoritative` | governed engram policy and admission surface | `IdentityAdjacent` | `GateOnly` | governance contracts, observability, approved storage abstractions | direct runtime host authority and unexplained compatibility sprawl | `GB1`, `NC1` | `ClarifyOwner` | `Canonical` |
+| `Data.Cryptic` | `src/Data.Cryptic` | `Governance` | `CrypticCustody` | `Cryptic` | `ObserveOnly` | cryptic data boundary or custody model surface | `CrypticCustody` | `CrypticCustodyOnly` | cryptic custody contracts and storage abstractions | Prime publication and direct shared invariant authorship | `NC1` | `MoveFamily` | `Transitional` |
 
-## Test Matrix
+## Test Project Matrix
 
-| Project | Intended Coverage | Current References | Status | Notes |
-| --- | --- | --- | --- | --- |
-| `Oan.Runtime.IntegrationTests` | stack composition | `Oan.Runtime.Headless` | correct | Best canonical end-to-end suite. |
-| `Oan.Audit.Tests` | stack governance and contract audits | `Oan.Common`, `Oan.SoulFrame`, `Oan.Sli`, `Oan.Spinal`, `Oan.Storage`, `Oan.Cradle` | correct | Good cross-stack governance surface. |
-| `Oan.Spinal.Tests` | stack substrate tests | `Oan.Spinal` | correct | Clean ownership. |
-| `Oan.Fgs.Tests` | stack domain tests | `Oan.Fgs`, `Oan.Spinal` | probably correct | Needs `FGS` glossary clarity. |
-| `Oan.Sli.Tests` | symbolic stack tests | `Oan.Sli`, `SLI.Engine`, `SLI.Ingestion` | mixed | Tests both umbrella and family-local symbolic surfaces. |
-| `Oan.SoulFrame.Tests` | SoulFrame stack and family behavior | `SoulFrame.Host`, `SLI.Engine`, `CradleTek.Memory` | mixed | Rename or re-scope to state whether this is family-local or stack integration coverage. |
+| Project | Path | Family | Layer | Theater Scope | Authority Class | Runtime Role | Memory / Identity Impact | Mutation Rights | May Reference | May Not Reference | Observed Violations | Remediation Action | Target State |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `Oan.Runtime.IntegrationTests` | `tests/Oan.Runtime.IntegrationTests` | `Test` | `Test` | `StackWide` | `TestOnly` | end-to-end composition verification | `None` | `TestOnly` | canonical stack root and public testing seams | private undocumented runtime shortcuts | none | `Keep` | `Canonical` |
+| `Oan.Audit.Tests` | `tests/Oan.Audit.Tests` | `Test` | `Test` | `CrossTheater` | `TestOnly` | governance and contract audit coverage | `None` | `TestOnly` | stack contracts and audit seams | production-only private internals | none | `Keep` | `Canonical` |
+| `Oan.Spinal.Tests` | `tests/Oan.Spinal.Tests` | `Test` | `Test` | `TheaterNeutral` | `TestOnly` | deterministic substrate verification | `None` | `TestOnly` | `Oan.Spinal` only | unrelated runtime or identity internals | none | `Keep` | `Canonical` |
+| `Oan.Fgs.Tests` | `tests/Oan.Fgs.Tests` | `Test` | `Test` | `TheaterNeutral` | `TestOnly` | unresolved domain coverage | `None` | `TestOnly` | `Oan.Fgs`, `Oan.Spinal` | broad sibling-family reach | `NC1` | `RenameOrExpand` | `Transitional` |
+| `Oan.Sli.Tests` | `tests/Oan.Sli.Tests` | `Test` | `Test` | `CrossTheater` | `TestOnly` | symbolic stack and family-local integration coverage | `None` | `TestOnly` | `Oan.Sli`, `SLI.Engine`, `SLI.Ingestion` | identity-kernel or runtime mutation shortcuts | none | `Keep` | `Canonical` |
+| `Oan.SoulFrame.Tests` | `tests/Oan.SoulFrame.Tests` | `Test` | `Test` | `CrossTheater` | `TestOnly` | SoulFrame-oriented mixed integration coverage | `None` | `TestOnly` | lawful SoulFrame seams and supporting test doubles | permanent dependence on CradleTek or SLI internals by convenience | `NC1` | `RescopeTests` | `Canonical` |
 
-## Main Structural Findings
+## Tools Outside The Active Solution
 
-### 1. The multi-family model is viable
+The following project-space tools exist but are not currently part of `Oan.sln`:
 
-The solution does not need to collapse everything into `Oan.*`.
+- `tools/CorpusGraphAnalysis`
+- `tools/CorpusGraphVisualizer`
+- `tools/CorpusIndexer`
+- `tools/EngramResolver`
 
-A stronger reading is:
+These should be classified separately later as `Tooling` surfaces, not mixed into the current solution-law matrix.
 
-- `Oan.*` as umbrella stack composition
-- `CradleTek.*` as infrastructure family
-- `SoulFrame.*` as operator family
-- `AgentiCore.*` as agent runtime family
-- `SLI.*` as transversal symbolic family
+## Ranking Rule For Remediation
 
-### 2. The current risk is boundary blur, not family plurality
+Apply remediation in this order:
 
-The actual drift problems are:
+1. `IV1`
+2. `GB1`
+3. `TB1`
+4. `SR1`
+5. `NC1`
 
-- unresolved ownership for `GEL`, `Telemetry.GEL`, `EngramGovernance`, and `Data.Cryptic`
-- ambiguous placement of some `Oan.*` projects that may be façade surfaces rather than true owners
-- host and runtime names that are not always qualified by family purpose
+## Immediate Refactor Queue
 
-### 3. `Oan.*` should own composition, not everything
+### Priority 1
 
-The safest interpretation is:
+- `GEL`
+  - reason: `IV1`, `GB1`
+  - action: split shared-invariant contract from host-coupled implementation and remove host-owned authority inversion
 
-- `Oan.Runtime.Headless` remains the only stack composition root
-- `Oan.*` projects can own stack contracts and umbrella integration façades
-- family-local implementation can remain under `CradleTek.*`, `SoulFrame.*`, `AgentiCore.*`, and `SLI.*`
+### Priority 2
 
-### 4. `SLI.*` is a cross-cutting family, not a child family
+- `CradleTek.Host`
+- `CradleTek.Runtime`
+- `AgentiCore`
+- `SLI.Engine`
+- `SLI.Ingestion`
+  - reason: governance bypass, Theater bleed, or symbolic/runtime mixing
+  - action: replace direct sibling-family references with governed interfaces or braids
 
-`SLI.*` should serve:
+### Priority 3
 
-- `CradleTek.*`
-- `SoulFrame.*`
-- `AgentiCore.*`
-- `Oan.*` composition
+- `Telemetry.GEL`
+- `EngramGovernance`
+- `Data.Cryptic`
+- `Oan.Storage`
+- `CradleTek.Mantle`
+  - reason: ownership is plausible but still underdefined
+  - action: clarify owning family and move or split if necessary
 
-It should avoid upward dependence on sibling-family internals wherever possible.
+### Priority 4
 
-## Realistic Maintenance Path
-
-### Immediate
-
-- keep `Oan.Runtime.Headless` as the only documented stack composition root
-- adopt the family constitution as the governing model
-- stop describing `CradleTek.*`, `SoulFrame.*`, `AgentiCore.*`, and `SLI.*` as legacy by default
-- define the owner for unresolved families and acronyms
-
-### Near-Term
-
-- write a dependency contract aligned to the family constitution
-- clarify which `Oan.*` projects are stack façades versus family-owned implementations
-- rename or document ambiguous runtime, host, core, and engine surfaces
-- split mixed-family tests where the current naming obscures coverage intent
-
-### Mature-State
-
-- one umbrella composition family
-- clear sibling-family ownership
-- one transversal symbolic family
-- one documented stack composition root
-- family-qualified runtime names with low ambiguity
+- `OAN.Core`
+- `Oan.Fgs`
+- `Oan.Fgs.Tests`
+  - reason: compatibility or acronym ambiguity
+  - action: expand, document, retire, or replace
 
 ## Verdict
 
-The solution is healthier when treated as a composed family architecture rather than a failed single-family architecture.
+The active solution is no longer blocked by missing constitutional language.
 
-The next governance step is not forced collapse into `Oan.*`. It is to enforce family ownership, dependency direction, and stack-composition boundaries under the constitutional family model.
+The first lawful `GEL` seam now exists in `GEL.Contracts`.
+
+The first explicit source-domain, membrane, and derivative-domain law interfaces now exist in `Oan.Common`.
+
+The active solution is still blocked by a finite set of out-of-law project placements and dependency edges in the remaining `GEL` core and its surrounding governance and runtime surfaces.
+
+That is a much healthier engineering problem.

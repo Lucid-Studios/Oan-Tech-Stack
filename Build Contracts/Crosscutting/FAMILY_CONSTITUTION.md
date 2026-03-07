@@ -64,10 +64,12 @@ Rule:
 
 Role:
 
-- substrate and infrastructure family
+- primary application, orchestration, and infrastructure family
 
 Owns:
 
+- application composition for active services
+- swarm coordination
 - system hosting
 - storage substrates
 - infrastructure services
@@ -82,10 +84,13 @@ Rule:
 
 Role:
 
-- operator experience and identity-facing workflow family
+- self-state membrane and identity-facing workflow family
 
 Owns:
 
+- mitigated self-state projection
+- collapse and return intake shaping
+- identity-safe service mediation
 - review surfaces
 - approval surfaces
 - operator interaction layers
@@ -100,18 +105,19 @@ Rule:
 
 Role:
 
-- agent runtime and orchestration family
+- extended cognitive workspace and bounded agent runtime family
 
 Owns:
 
 - policy-bound task execution
-- orchestration behavior
 - cognitive runtime operations
 - agent labor routing
+- local reflective and private operational cognition space
 
 Rule:
 
 - `AgentiCore.*` is a first-class active family and should own agent runtime behavior directly
+- it should operate on SoulFrame-mediated state rather than sovereign custody directly
 
 ### `SLI.*`
 
@@ -137,9 +143,10 @@ Rule:
 ### Allowed High-Level Flow
 
 - `Oan.*` may compose all families
-- `CradleTek.*` is foundational infrastructure
+- `CradleTek.*` is the application and orchestration fabric over infrastructure
 - `SoulFrame.*` may depend on `CradleTek.*`
-- `AgentiCore.*` may depend on `CradleTek.*`
+- `AgentiCore.*` may depend on `SoulFrame.*`
+- `AgentiCore.*` may depend on `CradleTek.*` through lawful service and substrate seams
 - `CradleTek.*` may consume `SLI.*`
 - `SoulFrame.*` may consume `SLI.*`
 - `AgentiCore.*` may consume `SLI.*`
@@ -157,6 +164,8 @@ Rule:
 - only `Oan.*` owns stack composition roots
 - family-local runtime services may exist inside each family
 - family-local runtime services must not present themselves as stack-level composition roots
+- `CradleTek.*` may act as the primary application and swarm fabric without becoming the sovereign source of identity law
+- `SoulFrame.*` may provision and mediate AgentiCore runtime self-state without becoming a generic everything-service host
 
 ## Naming Constitution
 

@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 namespace Oan.Common
 {
     /// <summary>
-    /// Surface for public plane storage operations.
+    /// Legacy coarse-grain surface for public plane storage operations.
+    /// Prefer Prime derivative publication contracts for new extension points.
     /// </summary>
     public interface IPublicPlaneStores
     {
@@ -12,7 +13,8 @@ namespace Oan.Common
     }
 
     /// <summary>
-    /// Surface for cryptic plane storage operations.
+    /// Legacy coarse-grain surface for cryptic plane storage operations.
+    /// Prefer Cryptic custody and SoulFrame membrane contracts for new extension points.
     /// </summary>
     public interface ICrypticPlaneStores
     {
