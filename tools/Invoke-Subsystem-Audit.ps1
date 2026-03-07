@@ -241,6 +241,47 @@ function Get-SubsystemPayloadWitnesses {
         )
     }
 
+    if ($SubsystemName -eq 'SLI') {
+        return @(
+            [ordered]@{
+                witness = 'sli-ingestion-structure'
+                classification = 'payload_present'
+                note = 'SLI ingestion produces canonical program expressions, symbol trees, constructor graphs, and candidate tokens rather than only wrapping lower-layer inputs.'
+                references = @(
+                    'OAN Mortalis V1.0/src/SLI.Ingestion/SliIngestionEngine.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliIngestionTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'symbolic-cognition-trace'
+                classification = 'payload_present'
+                note = 'The SLI cognition engine emits non-empty decision branches, cleave residue, confidence, and symbolic traces, showing real symbolic execution rather than ceremonial naming.'
+                references = @(
+                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliCognitionEngineTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'lisp-bridge-roundtrip'
+                classification = 'payload_present'
+                note = 'The Lisp bridge accepts and returns structured packet content in memory, proving the current symbolic bridge is carrying routing material rather than existing only as an architectural placeholder.'
+                references = @(
+                    'OAN Mortalis V1.0/src/SLI.Engine/LispSliBridgeStub.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliEngineBridgeTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'authority-boundary'
+                classification = 'empty_by_design'
+                note = 'SLI does not adjudicate governance, widen custody access, or impersonate the SoulFrame membrane in the currently proven paths; its role remains symbolic ingestion, routing, and execution.'
+                references = @(
+                    'OAN Mortalis V1.0/src/Oan.Sli/RoutingEngine.cs',
+                    'OAN Mortalis V1.0/src/SLI.Ingestion/SliIngestionEngine.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliIngestionTests.cs'
+                )
+            }
+        )
+    }
+
     $classification = if ($OwnedProjects.Count -gt 0) { 'summary_only' } else { 'unimplemented' }
     $note = if ($OwnedProjects.Count -gt 0) {
         'Subsystem audit v1 is using build and test evidence plus targeted probes; runtime payload content remains a bounded summary until a deeper pass measures subsystem-specific outputs directly.'
@@ -332,6 +373,11 @@ $subsystemDefinitions = @{
         Inputs = @('Core runtime requests', 'Symbolic payloads', 'Deterministic harness inputs')
         Outputs = @('Symbolic execution results', 'Routing decisions', 'Ingestion artifacts')
         Placement = 'SLI should attach to proven runtime paths and not compensate for unclear lower-layer truth.'
+        SymbolicContribution = @(
+            'Canonical SLI expressions and symbol trees that do not already exist in lower-layer inputs',
+            'Non-empty symbolic traces, decision branches, and cleave residue from SLI cognition execution',
+            'In-memory Lisp packet bridge behavior that proves current symbolic routing is more than naming ceremony'
+        )
     }
 }
 
@@ -474,7 +520,13 @@ foreach ($subsystemName in $requestedSubsystems) {
         '',
         '## Placement',
         '',
-        ('- {0}' -f $definition.Placement),
+        ('- {0}' -f $definition.Placement)
+    )
+    if ($definition.ContainsKey('SymbolicContribution')) {
+        $summaryLines += @('', '## Symbolic Contribution', '')
+        foreach ($item in $definition.SymbolicContribution) { $summaryLines += ('- {0}' -f $item) }
+    }
+    $summaryLines += @(
         '',
         '## Owned Projects',
         '',
