@@ -259,6 +259,15 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             ["confidence"] = cognitionResult.Confidence
         });
 
+        var selfGelWorkingPool = AgentiSelfGelWorkingPoolFactory.Create(
+            sessionHandle: boundedWorkerState.SessionHandle,
+            workingStateHandle: boundedWorkerState.WorkingStateHandle,
+            provenanceMarker: boundedWorkerState.ProvenanceMarker,
+            cSelfGelHandle: boundedWorkerState.MediatedSelfState.CSelfGelHandle,
+            activeConcepts: context.ActiveConcepts,
+            workingMemory: context.WorkingMemory);
+        context.SelfGelWorkingPool = selfGelWorkingPool;
+
         var returnReceipt = await _boundedMembraneWorker.SubmitReturnCandidateAsync(
                 boundedWorkerState,
                 sourceTheater: "prime",
@@ -270,12 +279,39 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         context.WorkingMemory["membrane_return_disposition"] = returnReceipt.Disposition;
         EmitTelemetry("membrane-return-candidate", context.ContextId, context.CMEId);
 
+        var symbolicTrace = new AgentiSymbolicTrace(
+            TraceId: cognitionResult.TraceId,
+            DecisionBranch: cognitionResult.DecisionBranch,
+            SheafDomain: sheafPlan.Domain,
+            Classification: "symbolic-trace",
+            Steps: cognitionResult.SymbolicTrace.ToArray(),
+            Tokens: cognitionResult.SliTokens.ToArray());
+
+        var engramCandidate = new AgentiEngramCandidate(
+            Decision: cognitionResult.Decision,
+            CommitRequired: requiresCommit,
+            ReturnCandidatePointer: BuildReturnCandidatePointer(context.ContextId, cognitionResult.TraceId),
+            Classification: requiresCommit ? "candidate-engram-structure" : "candidate-engram-denied",
+            EngramReferences: ingestionResult.SliExpression.EngramReferences.ToArray(),
+            ConstructorDomains: ingestionResult.ConstructorEngrams.Select(record => record.Domain).Distinct(StringComparer.Ordinal).ToArray());
+
+        var transientResidue = new AgentiTransientResidue(
+            CleaveResidue: cognitionResult.CleaveResidue,
+            HostedSemanticDecision: hostedSemanticResponse.Decision,
+            Classification: string.IsNullOrWhiteSpace(cognitionResult.CleaveResidue)
+                ? "transient-residue-empty-by-observation"
+                : "transient-residue");
+
         return new AgentiResult
         {
             ContextId = context.ContextId,
             ResultType = requiresCommit ? "cognition-accepted" : "cognition-rejected",
             ResultPayload = cognitionPayload,
-            EngramCommitRequired = requiresCommit
+            EngramCommitRequired = requiresCommit,
+            SelfGelWorkingPool = selfGelWorkingPool,
+            SymbolicTrace = symbolicTrace,
+            EngramCandidate = engramCandidate,
+            TransientResidue = transientResidue
         };
     }
 

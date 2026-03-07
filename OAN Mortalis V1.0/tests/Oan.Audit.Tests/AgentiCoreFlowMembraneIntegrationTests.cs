@@ -46,12 +46,26 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
 
         Assert.Equal(context.ContextId, result.ContextId);
         Assert.Equal("cognition-accepted", result.ResultType);
+        Assert.NotNull(context.SelfGelWorkingPool);
+        Assert.Same(context.SelfGelWorkingPool, result.SelfGelWorkingPool);
+        Assert.Equal("bounded-selfgel-working-pool", result.SelfGelWorkingPool.Classification);
+        Assert.StartsWith("soulframe-cselfgel://", result.SelfGelWorkingPool.CSelfGelHandle, StringComparison.Ordinal);
+        Assert.Equal("symbolic-trace", result.SymbolicTrace.Classification);
+        Assert.Equal("candidate-engram-structure", result.EngramCandidate.Classification);
+        Assert.Equal("residue", result.TransientResidue.CleaveResidue);
         Assert.Equal("prime", context.WorkingMemory["membrane_target_theater"]);
         Assert.StartsWith("soulframe-session://", context.WorkingMemory["membrane_session_handle"], StringComparison.Ordinal);
         Assert.StartsWith("soulframe-working://", context.WorkingMemory["membrane_working_state_handle"], StringComparison.Ordinal);
         Assert.StartsWith("membrane-derived:", context.WorkingMemory["membrane_provenance_marker"], StringComparison.Ordinal);
         Assert.StartsWith("soulframe://return/", context.WorkingMemory["membrane_return_handle"], StringComparison.Ordinal);
         Assert.Equal("return-candidate-recorded", context.WorkingMemory["membrane_return_disposition"]);
+        Assert.Equal(context.WorkingMemory["membrane_working_state_handle"], result.SelfGelWorkingPool.WorkingStateHandle);
+        Assert.Equal(context.WorkingMemory["membrane_provenance_marker"], result.SelfGelWorkingPool.ProvenanceMarker);
+        Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
+        Assert.Equal(["step-a", "step-b"], result.SymbolicTrace.Steps);
+        Assert.Equal(["token-a"], result.SymbolicTrace.Tokens);
+        Assert.StartsWith("agenticore-return://", result.EngramCandidate.ReturnCandidatePointer, StringComparison.Ordinal);
+        Assert.DoesNotContain("cmos://", result.SelfGelWorkingPool.CSelfGelHandle, StringComparison.OrdinalIgnoreCase);
 
         Assert.NotNull(membrane.LastProjectionRequest);
         Assert.NotNull(membrane.LastReturnRequest);

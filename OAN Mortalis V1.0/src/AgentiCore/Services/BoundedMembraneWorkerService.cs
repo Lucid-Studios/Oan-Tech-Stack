@@ -15,7 +15,8 @@ public sealed record BoundedWorkerState(
     string SessionHandle,
     string WorkingStateHandle,
     string ProvenanceMarker,
-    string TargetTheater);
+    string TargetTheater,
+    IMediatedSelfStateContour MediatedSelfState);
 
 public sealed class BoundedMembraneWorkerService
 {
@@ -54,7 +55,8 @@ public sealed class BoundedMembraneWorkerService
             projection.SessionHandle,
             projection.WorkingStateHandle,
             projection.ProvenanceMarker,
-            projection.TargetTheater);
+            projection.TargetTheater,
+            projection.MediatedSelfState);
     }
 
     public Task<SoulFrameReturnIntakeReceipt> SubmitReturnCandidateAsync(

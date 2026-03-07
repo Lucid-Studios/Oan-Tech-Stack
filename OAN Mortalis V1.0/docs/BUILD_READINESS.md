@@ -55,6 +55,7 @@ Observed repository conditions:
 - SoulFrame membrane contracts now name explicit mediated `cSelfGEL` issuance and explicit collapse-evaluation receipt shapes without widening the membrane into custody, orchestration, or publication authority
 - The first real AgentiCore membrane caller now exists as a bounded handle-only consumer with one positive and one negative misuse test
 - The AgentiCore cognition cycle now invokes that bounded membrane worker as a thin stage without widening the worker into custody, orchestration, or publication access
+- AgentiCore now names an explicit bounded `SelfGEL` working pool and explicitly distinguishes symbolic trace, candidate engram structure, and transient residue instead of leaving those runtime shapes implicit inside stringly working memory and one JSON blob
 - The first governance-first Golden Path loop is now implemented through `StackManager` with explicit governance adjudication, governed Cryptic re-Engrammitization, and governed Prime derivative publication
 - The v1.1 runtime hardening layer now exists as explicit journal contracts, typed loop-state contracts, and replay-aware Golden Path orchestration
 - The first internal operational control plane now exists as journal-first status views, deferred-review actions, pending-recovery resume actions, and same-loop local execution guards

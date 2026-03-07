@@ -8,4 +8,5 @@ public sealed class AgentiContext
     public required List<string> ActiveConcepts { get; init; }
     public required Dictionary<string, string> WorkingMemory { get; init; }
     public required DateTime ExecutionTimestamp { get; set; }
+    public AgentiSelfGelWorkingPool? SelfGelWorkingPool { get; set; }
 }
