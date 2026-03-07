@@ -155,12 +155,13 @@ Failure semantics:
 
 Ontological class:
 
-- operational cognition workspace and bounded service layer
+- bounded personification, actualization, and operational cognition layer
 
 Primary purpose:
 
 - perform active bounded cognition for a CME or bonded runtime
 - pairbond with operator-bounded CME work
+- actualize SoulFrame-mediated protected self-state into bounded working self-state
 - use SoulFrame-mediated `SelfGEL` and `cSelfGEL` working-state
 - emit action proposals and cognition outputs under mission law
 
@@ -202,11 +203,12 @@ Failure semantics:
 
 Ontological class:
 
-- symbolic interoperability and spline service layer
+- symbolic interoperability, native Engrammitization, and spline service layer
 
 Primary purpose:
 
 - move meaning lawfully across stack layers
+- provide the native morphological and Engrammitizing computational organ for Engineered Cognition inside AgentiCore runtime
 - packetize, route, transform, tensorize, and gate symbolic material
 - enable lawful interaction with protected stores, modules, certifications, and future stack services
 
@@ -221,8 +223,9 @@ Identity relation:
 
 Mutation rights:
 
-- may transform, route, and packetize symbolic forms
-- may produce gate evidence, gate decisions, and commit intents
+- may transform, route, packetize, tensorize, and morph symbolic forms
+- may produce symbolic traces, decision structures, and candidate engram structures inside bounded runtime cognition
+- may not directly commit identity, governance, or custody change by itself
 
 Read rights:
 
@@ -230,7 +233,7 @@ Read rights:
 
 Write path:
 
-- may emit symbolic packets, evidence, refusals, and routing outputs
+- may emit symbolic packets, evidence, refusals, routing outputs, symbolic traces, and candidate engram-bearing structures
 - may not directly crystallize identity without governed commit flow
 
 Prohibited actions:
@@ -238,6 +241,7 @@ Prohibited actions:
 - must not silently reinterpret itself as identity or runtime authority
 - must not seize sibling-family authority
 - must not directly mutate GEL or runtime state outside lawful gate paths
+- must not be treated as a generic symbolic helper detached from native runtime cognition
 
 Failure semantics:
 
@@ -450,7 +454,7 @@ Ontological class:
 
 Primary purpose:
 
-- provide self-oriented state formation for a bonded agent instance under CME guidance and governed registry recovery
+- provide mediated protected self-state and bounded working self-state for a CME runtime under SoulFrame and AgentiCore law
 
 Authority status:
 
@@ -459,6 +463,12 @@ Authority status:
 Identity relation:
 
 - identity-coupled and potentially identity-bearing only where governance admits it
+
+Placement default:
+
+- `cSelfGEL` is issued through SoulFrame as mediated protected self-state
+- `SelfGEL` is the active bounded working self-state in AgentiCore
+- neither surface is the same thing as direct sovereign custody
 
 ### CME
 
