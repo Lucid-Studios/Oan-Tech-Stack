@@ -30,13 +30,13 @@ The repo has a coarse plane split, but not a lawful custody or membrane split.
 
 Current evidence:
 
-- [`src/Oan.Common/IPlaneStores.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\Oan.Common\IPlaneStores.cs)
+- `src/Oan.Common/IPlaneStores.cs`
   - distinguishes public and cryptic appends, but not sovereignty, membrane law, or governed re-Engrammitization
-- [`src/CradleTek.Cryptic/CrypticLayerService.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\CradleTek.Cryptic\CrypticLayerService.cs)
+- `src/CradleTek.Cryptic/CrypticLayerService.cs`
   - models cryptic storage as pointer storage only
-- [`src/CradleTek.Mantle/MantleOfSovereigntyService.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\CradleTek.Mantle\MantleOfSovereigntyService.cs)
+- `src/CradleTek.Mantle/MantleOfSovereigntyService.cs`
   - already hints at shadow and restore semantics, but not full custody law
-- [`src/SoulFrame.Host/SoulFrameSession.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\SoulFrame.Host\SoulFrameSession.cs)
+- `src/SoulFrame.Host/SoulFrameSession.cs`
   - models session behavior, but not mitigated self-state membrane transfer
 
 That means the repo still lacks explicit interfaces for:

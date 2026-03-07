@@ -104,11 +104,11 @@ Do not move in pass 1:
 
 Evidence for mixed concerns in the current core:
 
-- [`src/GEL/Runtime/SheafMasterEngramService.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\GEL\Runtime\SheafMasterEngramService.cs)
+- `src/GEL/Runtime/SheafMasterEngramService.cs`
   - mixes execution planning with `IPublicStore` publication and telemetry usage
-- [`src/Telemetry.GEL/GelTelemetryAdapter.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\Telemetry.GEL\GelTelemetryAdapter.cs)
+- `src/Telemetry.GEL/GelTelemetryAdapter.cs`
   - observe-only witness surface, should remain outside contracts
-- [`src/EngramGovernance/Services/LedgerWriter.cs`](D:\OAN%20Tech%20Stack\OAN%20Mortalis%20V1.0\src\EngramGovernance\Services\LedgerWriter.cs)
+- `src/EngramGovernance/Services/LedgerWriter.cs`
   - governed mutation path, should remain outside contracts
 
 ## Implementation Sequence
