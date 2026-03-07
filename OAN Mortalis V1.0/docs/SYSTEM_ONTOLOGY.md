@@ -50,6 +50,8 @@ The same stack is also a governed bundle of local operational universes, called 
 
 Within that bundle, Cryptic is the source domain of identity-bearing inscription and Prime is the processed derivative domain of lawful expression.
 
+Within that same stack, Sanctuary provides a collective symbolic nervous system through SLI, while `OE` and `cOE` preserve the individuated continuity and custody of each CME.
+
 ## Primary Stack Objects
 
 ### CradleTek

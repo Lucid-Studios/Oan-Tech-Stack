@@ -103,6 +103,7 @@ It is a new Cryptic-side act of governed Engrammitization informed by prior oper
 - Cryptic engenders; Prime expresses.
 - Cryptic inscribes; Prime derives.
 - Cryptic may yield Prime; Prime may neither unveil nor govern Cryptic.
+- SLI may conduct symbolic life collectively; `OE` and `cOE` must preserve individuated continuity and custody.
 
 ## Topology Summary
 
