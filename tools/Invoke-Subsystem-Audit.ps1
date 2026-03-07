@@ -184,6 +184,63 @@ function Get-SubsystemPayloadWitnesses {
         )
     }
 
+    if ($SubsystemName -eq 'GovernanceConnective') {
+        return @(
+            [ordered]@{
+                witness = 'governance-decision-receipt'
+                classification = 'payload_present'
+                note = 'Governance adjudication emits non-empty decision receipts with explicit decision, adjudicator identity, rationale code, and downstream authorization state.'
+                references = @(
+                    'OAN Mortalis V1.0/src/EngramGovernance/Services/StewardAgent.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/StewardAgentGovernanceTests.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'approved-reengrammitization'
+                classification = 'payload_present'
+                note = 'Approved governance outcomes produce a governed reengrammitization request and accepted Cryptic receipt, proving that residue admission is carrying real payload input rather than only advancing loop state.'
+                references = @(
+                    'OAN Mortalis V1.0/src/CradleTek.Mantle/MantleOfSovereigntyService.cs',
+                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'rejected-deferred-downstream-suppression'
+                classification = 'empty_by_policy'
+                note = 'Rejected and deferred decisions explicitly authorize no Cryptic mutation and no Prime publication; emptiness here is policy-enforced rather than an accidental absence of work.'
+                references = @(
+                    'OAN Mortalis V1.0/src/EngramGovernance/Services/StewardAgent.cs',
+                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/StewardAgentGovernanceTests.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'prime-publication-lanes'
+                classification = 'payload_present'
+                note = 'Prime publication lanes are independently materialized and tracked: approved loops publish pointer and checked-view outputs separately, while replay and retry preserve lane-aware completion without duplicating already completed acts.'
+                references = @(
+                    'OAN Mortalis V1.0/src/CradleTek.Public/PublicLayerService.cs',
+                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceOperationalControlIntegrationTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'replay-and-recovery-status'
+                classification = 'summary_only'
+                note = 'Journal-first replay returns explicit loop stage, failure, and lane-completion truth for status and recovery control, proving that continuation is based on recorded evidence rather than implicit state-machine assumption.'
+                references = @(
+                    'OAN Mortalis V1.0/src/Oan.Storage/GovernanceReceiptJournal.cs',
+                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceOperationalControlIntegrationTests.cs'
+                )
+            }
+        )
+    }
+
     $classification = if ($OwnedProjects.Count -gt 0) { 'summary_only' } else { 'unimplemented' }
     $note = if ($OwnedProjects.Count -gt 0) {
         'Subsystem audit v1 is using build and test evidence plus targeted probes; runtime payload content remains a bounded summary until a deeper pass measures subsystem-specific outputs directly.'
