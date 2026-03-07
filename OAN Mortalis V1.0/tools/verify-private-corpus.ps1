@@ -37,13 +37,13 @@ function Get-LocalCorpusPath {
         return $ExplicitPath
     }
 
-    if (-not [string]::IsNullOrWhiteSpace($env:OAN_REFERENCE_CORPUS)) {
-        return $env:OAN_REFERENCE_CORPUS
-    }
-
     $localConfigPath = Join-Path (Get-RepoRoot) "OAN Mortalis V1.0\.local\private_corpus_root.txt"
     if (Test-Path -LiteralPath $localConfigPath -PathType Leaf) {
         return (Get-Content -LiteralPath $localConfigPath -TotalCount 1).Trim()
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($env:OAN_REFERENCE_CORPUS)) {
+        return $env:OAN_REFERENCE_CORPUS
     }
 
     return $null

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Oan.Common;
 using Telemetry.GEL;
 using SoulFrame.Host;
 
@@ -143,6 +144,53 @@ public sealed class SoulFrameHostClientTests
         Assert.True(response.Accepted);
         Assert.Contains(telemetry.Records, record => record.RuntimeState == "soulframe-host:inferencerequested");
         Assert.Contains(telemetry.Records, record => record.RuntimeState == "soulframe-host:inferencecompleted");
+    }
+
+    [Fact]
+    public async Task MembraneProjection_ProjectMitigated_ReturnsBoundedWorkingState()
+    {
+        var client = CreateClient((_, _) => throw new InvalidOperationException("Membrane projection should not call transport."));
+        var identityId = Guid.NewGuid();
+        var request = new SoulFrameProjectionRequest(
+            identityId,
+            CMEId: "cme-alpha",
+            SourceCustodyDomain: "cmos",
+            RequestedTheater: "prime",
+            PolicyHandle: "policy-17");
+
+        var projection = await client.ProjectMitigatedAsync(request);
+
+        Assert.Equal(identityId, projection.IdentityId);
+        Assert.Equal("prime", projection.TargetTheater);
+        Assert.True(projection.IsMitigated);
+        Assert.StartsWith("soulframe://projection/", projection.ProjectionHandle, StringComparison.Ordinal);
+        Assert.StartsWith("soulframe-session://cme-alpha/", projection.SessionHandle, StringComparison.Ordinal);
+        Assert.StartsWith("soulframe-working://cme-alpha/", projection.WorkingStateHandle, StringComparison.Ordinal);
+        Assert.StartsWith("membrane-derived:cme:cme-alpha|policy:policy-17", projection.ProvenanceMarker, StringComparison.Ordinal);
+        Assert.DoesNotContain("cmos", projection.SessionHandle, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("cmos", projection.WorkingStateHandle, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task MembraneIntake_ReceiveReturnIntake_RecordsCandidateWithoutTransport()
+    {
+        var client = CreateClient((_, _) => throw new InvalidOperationException("Membrane intake should not call transport."));
+        var identityId = Guid.NewGuid();
+        var request = new SoulFrameReturnIntakeRequest(
+            identityId,
+            CMEId: "cme-alpha",
+            SessionHandle: $"soulframe-session://cme-alpha/{identityId:D}",
+            SourceTheater: "prime",
+            ReturnCandidatePointer: "return-candidate://delta/42",
+            ProvenanceMarker: "worker:agenticore/session:cme-alpha",
+            IntakeIntent: "candidate-return-evaluation");
+
+        var receipt = await client.ReceiveReturnIntakeAsync(request);
+
+        Assert.Equal(identityId, receipt.IdentityId);
+        Assert.True(receipt.Accepted);
+        Assert.Equal("return-candidate-recorded", receipt.Disposition);
+        Assert.StartsWith("soulframe://return/", receipt.IntakeHandle, StringComparison.Ordinal);
     }
 
     private static SoulFrameHostClient CreateClient(

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repository may use a private local reference corpus for architecture reasoning through the `OAN_REFERENCE_CORPUS` environment variable.
+This repository may use a private local reference corpus for architecture reasoning through ignored repo-local configuration or the `OAN_REFERENCE_CORPUS` environment variable.
 
 The corpus is referenced as:
 
@@ -35,6 +35,16 @@ Never include absolute or relative corpus filesystem locations in citations.
 ## Portability Constraint
 
 Build outputs and repository artifacts must remain independent of private local paths.
+
+## Resolution Order
+
+To reduce ambient shell drift, the private corpus root should resolve in this order:
+
+1. explicit tool argument
+2. ignored repo-local config at `.local/private_corpus_root.txt`
+3. `OAN_REFERENCE_CORPUS` environment variable
+
+Use the ignored repo-local config as the preferred project-specific setting.
 
 ## Verification
 

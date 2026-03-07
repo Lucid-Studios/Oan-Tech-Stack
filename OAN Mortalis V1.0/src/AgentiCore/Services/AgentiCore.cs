@@ -7,17 +7,19 @@ using CradleTek.Memory.Models;
 using CradleTek.Memory.Services;
 using GEL.Runtime;
 using OAN.Core.Telemetry;
+using Oan.Common;
 using SLI.Ingestion;
 using SoulFrame.Host;
 using SoulFrame.Identity.Models;
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Text.Json;
 using Telemetry.GEL;
 using SoulFrameModel = SoulFrame.Identity.Models.SoulFrame;
 
 namespace AgentiCore.Services;
 
-public sealed class AgentiCore
+public sealed class AgentiCore : IGovernanceCycleCognitionService
 {
     private readonly ICognitionEngine _sliCognitionEngine;
     private readonly IEngramResolver _engramResolver;
@@ -30,6 +32,7 @@ public sealed class AgentiCore
     private readonly SheafMasterEngramService _sheafMasterEngrams;
     private readonly SliIngestionEngine _sliIngestionEngine;
     private readonly SoulFrameHostClient _soulFrameHostClient;
+    private readonly BoundedMembraneWorkerService _boundedMembraneWorker;
 
     public AgentiCore(
         ICognitionEngine sliCognitionEngine,
@@ -42,7 +45,8 @@ public sealed class AgentiCore
         IRootOntologicalCleaver? rootOntologicalCleaver = null,
         SheafMasterEngramService? sheafMasterEngrams = null,
         SliIngestionEngine? sliIngestionEngine = null,
-        SoulFrameHostClient? soulFrameHostClient = null)
+        SoulFrameHostClient? soulFrameHostClient = null,
+        BoundedMembraneWorkerService? boundedMembraneWorker = null)
     {
         _sliCognitionEngine = sliCognitionEngine;
         _engramResolver = engramResolver;
@@ -56,6 +60,7 @@ public sealed class AgentiCore
         _sliIngestionEngine = sliIngestionEngine ?? new SliIngestionEngine();
         _soulFrameHostClient = soulFrameHostClient ?? new SoulFrameHostClient(
             telemetry: new SoulFrameTelemetryAdapter(telemetry));
+        _boundedMembraneWorker = boundedMembraneWorker ?? new BoundedMembraneWorkerService(_soulFrameHostClient);
     }
 
     public AgentiContext InitializeContext(SoulFrameModel soulFrame, IEnumerable<string>? activeConcepts = null)
@@ -91,6 +96,7 @@ public sealed class AgentiCore
         ArgumentNullException.ThrowIfNull(context);
 
         context.ExecutionTimestamp = DateTime.UtcNow;
+        var boundedWorkerState = await RunBoundedMembraneStageAsync(context, cancellationToken).ConfigureAwait(false);
         var publicPointers = await _publicStore.ListPublishedPointersAsync(cancellationToken).ConfigureAwait(false);
         var crypticPointers = await _crypticStore.ListPointersAsync(cancellationToken).ConfigureAwait(false);
         context.WorkingMemory["public_pointer_count"] = publicPointers.Count.ToString();
@@ -253,6 +259,17 @@ public sealed class AgentiCore
             ["confidence"] = cognitionResult.Confidence
         });
 
+        var returnReceipt = await _boundedMembraneWorker.SubmitReturnCandidateAsync(
+                boundedWorkerState,
+                sourceTheater: "prime",
+                returnCandidatePointer: BuildReturnCandidatePointer(context.ContextId, cognitionResult.TraceId),
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        context.WorkingMemory["membrane_return_candidate_pointer"] = BuildReturnCandidatePointer(context.ContextId, cognitionResult.TraceId);
+        context.WorkingMemory["membrane_return_handle"] = returnReceipt.IntakeHandle;
+        context.WorkingMemory["membrane_return_disposition"] = returnReceipt.Disposition;
+        EmitTelemetry("membrane-return-candidate", context.ContextId, context.CMEId);
+
         return new AgentiResult
         {
             ContextId = context.ContextId,
@@ -279,6 +296,58 @@ public sealed class AgentiCore
         await _engramCommit.CommitAsync(context.CMEId, context.SoulFrameId, context.ContextId, result.ResultPayload, metadata, cancellationToken)
             .ConfigureAwait(false);
         EmitTelemetry("engram-commit", context.ContextId, context.CMEId);
+    }
+
+    public async Task<GovernanceCycleWorkResult> ExecuteGovernanceCycleAsync(
+        GovernanceCycleStartRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.CMEId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceCustodyDomain);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceTheater);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.RequestedTheater);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.PolicyHandle);
+
+        var soulFrame = new SoulFrameModel
+        {
+            SoulFrameId = request.SoulFrameId,
+            CMEId = request.CMEId,
+            OpalEngramId = request.IdentityId.ToString("D"),
+            CreationTimestamp = DateTime.UtcNow,
+            RuntimePolicy = RuntimePolicy.Default,
+            OperatorBondReference = "governance-cycle",
+            SelfGelReference = "selfgel://bounded",
+            cSelfGelReference = "cselfgel://bounded"
+        };
+
+        var context = InitializeContext(soulFrame);
+        var result = await ExecuteCognitionCycleAsync(context, request.OperatorInput, cancellationToken).ConfigureAwait(false);
+
+        var sessionHandle = RequireWorkingMemoryValue(context, "membrane_session_handle");
+        var workingStateHandle = RequireWorkingMemoryValue(context, "membrane_working_state_handle");
+        var provenanceMarker = RequireWorkingMemoryValue(context, "membrane_provenance_marker");
+        var returnCandidatePointer = RequireWorkingMemoryValue(context, "membrane_return_candidate_pointer");
+        var intakeIntent = "candidate-return-evaluation";
+
+        var candidateId = CreateDeterministicCandidateId(request, provenanceMarker);
+
+        return new GovernanceCycleWorkResult(
+            CandidateId: candidateId,
+            IdentityId: request.IdentityId,
+            SoulFrameId: request.SoulFrameId,
+            ContextId: context.ContextId,
+            CMEId: request.CMEId,
+            SourceTheater: request.SourceTheater,
+            RequestedTheater: request.RequestedTheater,
+            SessionHandle: sessionHandle,
+            WorkingStateHandle: workingStateHandle,
+            ProvenanceMarker: provenanceMarker,
+            ReturnCandidatePointer: returnCandidatePointer,
+            IntakeIntent: intakeIntent,
+            CandidatePayload: result.ResultPayload,
+            ResultType: result.ResultType,
+            EngramCommitRequired: result.EngramCommitRequired);
     }
 
     private static IReadOnlyDictionary<string, string> BuildCommitMetadata(AgentiResult result)
@@ -439,5 +508,52 @@ public sealed class AgentiCore
             Timestamp = DateTime.UtcNow
         };
         _telemetry.AppendAsync(telemetryEvent, stage).GetAwaiter().GetResult();
+    }
+
+    private async Task<BoundedWorkerState> RunBoundedMembraneStageAsync(
+        AgentiContext context,
+        CancellationToken cancellationToken)
+    {
+        var state = await _boundedMembraneWorker.BeginBoundedWorkAsync(
+                new BoundedWorkerProjectionRequest(
+                    context.SoulFrameId,
+                    context.CMEId,
+                    SourceCustodyDomain: "cmos",
+                    RequestedTheater: "prime",
+                    PolicyHandle: "agenticore.cognition.cycle"),
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        context.WorkingMemory["membrane_session_handle"] = state.SessionHandle;
+        context.WorkingMemory["membrane_working_state_handle"] = state.WorkingStateHandle;
+        context.WorkingMemory["membrane_provenance_marker"] = state.ProvenanceMarker;
+        context.WorkingMemory["membrane_target_theater"] = state.TargetTheater;
+        EmitTelemetry("membrane-projection", context.ContextId, context.CMEId);
+        return state;
+    }
+
+    private static string BuildReturnCandidatePointer(Guid contextId, string traceId) =>
+        $"agenticore-return://{contextId:D}/{traceId}";
+
+    private static Guid CreateDeterministicCandidateId(
+        GovernanceCycleStartRequest request,
+        string provenanceMarker)
+    {
+        var material =
+            $"{request.IdentityId:D}|{request.SoulFrameId:D}|{request.CMEId}|{request.SourceTheater}|{request.RequestedTheater}|{request.PolicyHandle}|{request.OperatorInput}|{provenanceMarker}";
+        var hash = SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(material));
+        var guidBytes = new byte[16];
+        Buffer.BlockCopy(hash, 0, guidBytes, 0, 16);
+        return new Guid(guidBytes);
+    }
+
+    private static string RequireWorkingMemoryValue(AgentiContext context, string key)
+    {
+        if (!context.WorkingMemory.TryGetValue(key, out var value) || string.IsNullOrWhiteSpace(value))
+        {
+            throw new InvalidOperationException($"AgentiCore governance cycle is missing required working memory key '{key}'.");
+        }
+
+        return value;
     }
 }

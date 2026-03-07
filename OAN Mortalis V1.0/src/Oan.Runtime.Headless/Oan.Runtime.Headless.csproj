@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\AgentiCore\AgentiCore.csproj" />
+    <ProjectReference Include="..\CradleTek.Cryptic\CradleTek.Cryptic.csproj" />
+    <ProjectReference Include="..\CradleTek.Mantle\CradleTek.Mantle.csproj" />
+    <ProjectReference Include="..\CradleTek.Public\CradleTek.Public.csproj" />
+    <ProjectReference Include="..\EngramGovernance\EngramGovernance.csproj" />
     <ProjectReference Include="..\Oan.Spinal\Oan.Spinal.csproj" />
     <ProjectReference Include="..\Oan.Sli\Oan.Sli.csproj" />
     <ProjectReference Include="..\Oan.Cradle\Oan.Cradle.csproj" />
@@ -9,6 +14,8 @@
     <ProjectReference Include="..\Oan.Place\Oan.Place.csproj" />
     <ProjectReference Include="..\Oan.Storage\Oan.Storage.csproj" />
     <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />
+    <ProjectReference Include="..\SoulFrame.Host\SoulFrame.Host.csproj" />
+    <ProjectReference Include="..\Telemetry.GEL\Telemetry.GEL.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

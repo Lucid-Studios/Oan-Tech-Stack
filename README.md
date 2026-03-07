@@ -272,22 +272,24 @@ English input now bridges into a structured middle layer before formal math logi
 
 Run Symbolic Language Engine validation and Flow telemetry generation:
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Validate-SLE.ps1"`
-2. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\build.ps1"`
-3. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Generate-SCAR.ps1"`
+Run from the repository root:
+
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Validate-SLE.ps1"`
+2. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\build.ps1"`
+3. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Generate-SCAR.ps1"`
 
 Strict reserved key mode (semantic indices only):
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\build.ps1" -StrictReservedKeyCheck`
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\build.ps1" -StrictReservedKeyCheck`
 
 Telemetry outputs:
 
-1. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\flow_metrics.json`
-2. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\cognition_telemetry.json`
-3. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_bias_spec.json`
-4. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_head_gate.json`
-5. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_kv_anchor.json`
-6. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_telemetry.json`
+1. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\flow_metrics.json`
+2. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\cognition_telemetry.json`
+3. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_bias_spec.json`
+4. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_head_gate.json`
+5. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_kv_anchor.json`
+6. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_telemetry.json`
 
 Hard build gates:
 
@@ -299,11 +301,11 @@ Hard build gates:
 
 Domain sheaf + glue map assets:
 
-1. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\gel.sheaf_package.v0.1.0.json`
-2. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\gel.glue_map.v0.1.0.json`
-3. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\package.medicine.cardiology.v0.1.0.json`
-4. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\package.medicine.pharmacology.v0.1.0.json`
-5. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\glue.map.medicine_cardiology_pharm.v0.1.0.json`
+1. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\gel.sheaf_package.v0.1.0.json`
+2. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\gel.glue_map.v0.1.0.json`
+3. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\package.medicine.cardiology.v0.1.0.json`
+4. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\package.medicine.pharmacology.v0.1.0.json`
+5. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\glue.map.medicine_cardiology_pharm.v0.1.0.json`
 
 # License
 
@@ -319,33 +321,33 @@ Trademark usage without authorization is strictly prohibited.
 
 Audit and determinism gate:
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-SLE-Audit.ps1"`
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-SLE-Audit.ps1"`
 
 Coverage diagnostics:
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Test-TokenNodeCoverage.ps1" -MinCoverage 0.70`
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Test-TokenNodeCoverage.ps1" -MinCoverage 0.70`
 
 Governance dry-run:
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-Governance-DryRun.ps1"`
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-Governance-DryRun.ps1"`
 
 SCAR adapter conformance:
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Test-SCAR-Conformance.ps1"`
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Test-SCAR-Conformance.ps1"`
 
 Training gate:
 
-1. `powershell -ExecutionPolicy Bypass -File "D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-Training-Gate.ps1"`
+1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-Training-Gate.ps1"`
 
 Additional telemetry outputs:
 
-1. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\token_node_coverage.json`
-2. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_conformance.json`
-3. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\governance_boot_dryrun.json`
-4. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\training_gate_report.json`
-5. `D:\OAN Tech Stack\Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\audit_report.json`
+1. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\token_node_coverage.json`
+2. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_conformance.json`
+3. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\governance_boot_dryrun.json`
+4. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\training_gate_report.json`
+5. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\audit_report.json`
 
 Tracked reports:
 
-1. `D:\OAN Tech Stack\docs\audits\PHASE2_AUDIT.md`
-2. `D:\OAN Tech Stack\docs\audits\TRAINING_GATE_REPORT.md`
+1. [`docs/audits/PHASE2_AUDIT.md`](docs/audits/PHASE2_AUDIT.md)
+2. [`docs/audits/TRAINING_GATE_REPORT.md`](docs/audits/TRAINING_GATE_REPORT.md)

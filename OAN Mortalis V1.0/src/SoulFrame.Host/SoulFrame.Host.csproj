@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OAN.Core\OAN.Core.csproj" />
+    <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\Telemetry.GEL\Telemetry.GEL.csproj" />
   </ItemGroup>
 

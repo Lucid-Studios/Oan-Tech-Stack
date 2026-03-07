@@ -1,0 +1,14 @@
+name: Org Docs Link Check
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  links:
+    uses: Lucid-Studios/.github/.github/workflows/docs-link-check.yml@main
