@@ -98,6 +98,110 @@ function Get-LatestAuditBundlePath {
     return $latest.FullName
 }
 
+function Get-SubsystemPayloadWitnesses {
+    param(
+        [string] $SubsystemName,
+        [object[]] $OwnedProjects
+    )
+
+    if ($SubsystemName -eq 'SoulFrame') {
+        return @(
+            [ordered]@{
+                witness = 'projection-shape'
+                classification = 'summary_only'
+                note = 'Bounded projection is proven by contract and tests to carry non-empty SessionHandle, WorkingStateHandle, and ProvenanceMarker while withholding custody-shaped payload material.'
+                references = @(
+                    'OAN Mortalis V1.0/src/Oan.Common/SoulFrameMembraneContracts.cs',
+                    'OAN Mortalis V1.0/src/SoulFrame.Host/SoulFrameHostClient.cs',
+                    'OAN Mortalis V1.0/tests/Oan.SoulFrame.Tests/SoulFrameHostClientTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'return-candidate-shape'
+                classification = 'summary_only'
+                note = 'Return intake is candidate-only by contract and tests, with SessionHandle, ReturnCandidatePointer, ProvenanceMarker, and IntakeIntent but no patch or write-back semantics.'
+                references = @(
+                    'OAN Mortalis V1.0/src/Oan.Common/SoulFrameMembraneContracts.cs',
+                    'OAN Mortalis V1.0/src/SoulFrame.Host/SoulFrameHostClient.cs',
+                    'OAN Mortalis V1.0/tests/Oan.SoulFrame.Tests/SoulFrameHostClientTests.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreMembraneCallerTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'authority-boundary'
+                classification = 'empty_by_design'
+                note = 'SoulFrame intentionally does not expose custody mutation, broad store access, orchestration control, or Prime publication payloads through the membrane surface.'
+                references = @(
+                    'OAN Mortalis V1.0/src/Oan.Common/SoulFrameMembraneContracts.cs',
+                    'OAN Mortalis V1.0/src/SoulFrame.Host/SoulFrameHostClient.cs'
+                )
+            }
+        )
+    }
+
+    if ($SubsystemName -eq 'AgentiCore') {
+        return @(
+            [ordered]@{
+                witness = 'bounded-worker-state'
+                classification = 'summary_only'
+                note = 'Bounded worker state is proven by code and tests to carry non-empty SessionHandle, WorkingStateHandle, and ProvenanceMarker while rejecting custody-shaped widening.'
+                references = @(
+                    'OAN Mortalis V1.0/src/AgentiCore/Services/BoundedMembraneWorkerService.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreMembraneCallerTests.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreFlowMembraneIntegrationTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'return-candidate-pointer'
+                classification = 'payload_present'
+                note = 'AgentiCore emits explicit candidate-shaped return pointers on the bounded membrane path, and tests prove those pointers are non-empty and remain in the agenticore-return:// namespace.'
+                references = @(
+                    'OAN Mortalis V1.0/src/AgentiCore/Services/BoundedMembraneWorkerService.cs',
+                    'OAN Mortalis V1.0/src/AgentiCore/Services/AgentiCore.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreMembraneCallerTests.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreFlowMembraneIntegrationTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'governance-cycle-candidate-payload'
+                classification = 'payload_present'
+                note = 'The governance-cycle path returns a non-empty candidate payload derived from bounded cognition results, rather than only emitting an empty shell or state transition marker.'
+                references = @(
+                    'OAN Mortalis V1.0/src/AgentiCore/Services/AgentiCore.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/StewardAgentGovernanceTests.cs'
+                )
+            }
+            [ordered]@{
+                witness = 'authority-boundary'
+                classification = 'empty_by_design'
+                note = 'AgentiCore intentionally does not widen WorkingStateHandle into custody access and does not gain publication or orchestration authority through the bounded worker stage.'
+                references = @(
+                    'OAN Mortalis V1.0/src/AgentiCore/Services/BoundedMembraneWorkerService.cs',
+                    'OAN Mortalis V1.0/src/AgentiCore/Services/AgentiCore.cs',
+                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreFlowMembraneIntegrationTests.cs'
+                )
+            }
+        )
+    }
+
+    $classification = if ($OwnedProjects.Count -gt 0) { 'summary_only' } else { 'unimplemented' }
+    $note = if ($OwnedProjects.Count -gt 0) {
+        'Subsystem audit v1 is using build and test evidence plus targeted probes; runtime payload content remains a bounded summary until a deeper pass measures subsystem-specific outputs directly.'
+    }
+    else {
+        'No owned projects were identified for this subsystem in the current audit bundle.'
+    }
+
+    return @(
+        [ordered]@{
+            witness = 'runtime-payload-truth'
+            classification = $classification
+            note = $note
+            references = @('summary.md')
+        }
+    )
+}
+
 $repoRoot = (Resolve-Path -LiteralPath (Split-Path -Parent $MyInvocation.MyCommand.Path)).Path | Split-Path -Parent
 $bundleRoot = Join-Path $repoRoot $OutputRoot
 
@@ -223,14 +327,6 @@ foreach ($subsystemName in $requestedSubsystems) {
         }
     )
 
-    $runtimePayloadClassification = if ($ownedProjects.Count -gt 0) { 'summary_only' } else { 'unimplemented' }
-    $runtimePayloadNote = if ($ownedProjects.Count -gt 0) {
-        'Subsystem audit v1 is using build and test evidence plus targeted probes; runtime payload content remains a bounded summary until a deeper pass measures subsystem-specific outputs directly.'
-    }
-    else {
-        'No owned projects were identified for this subsystem in the current audit bundle.'
-    }
-
     $probeResults = New-Object System.Collections.Generic.List[object]
     foreach ($testName in $definition.Tests) {
         $testProbe = $associatedTests | Where-Object projectName -eq $testName | Select-Object -First 1
@@ -254,16 +350,41 @@ foreach ($subsystemName in $requestedSubsystems) {
         }
     }
 
-    $payloads = @(
-        [ordered]@{
+    $payloads = @(@(
+        Get-SubsystemPayloadWitnesses -SubsystemName $subsystemName -OwnedProjects $ownedProjects
+    ) | ForEach-Object {
+        [pscustomobject][ordered]@{
             subsystem = $subsystemName
-            classification = $runtimePayloadClassification
-            note = $runtimePayloadNote
-            references = @('summary.md')
+            witness = $_.witness
+            classification = $_.classification
+            note = $_.note
+            references = @($_.references)
         }
-    )
+    })
 
     Write-JsonFile -Path $payloadsPath -Value $payloads
+    foreach ($payload in $payloads) {
+        Add-NdjsonLine -Path $eventsPath -Value ([ordered]@{
+            eventType = 'PAYLOAD_WITNESS_CAPTURED'
+            subsystem = $subsystemName
+            timestampUtc = (Get-Date).ToUniversalTime().ToString('o')
+            witness = $payload.witness
+            classification = $payload.classification
+        })
+    }
+
+    $primaryPayloadClassification = if ($payloads.Count -gt 0) {
+        ($payloads | Select-Object -First 1).classification
+    }
+    else {
+        'unimplemented'
+    }
+    $primaryPayloadNote = if ($payloads.Count -gt 0) {
+        ($payloads | Select-Object -First 1).note
+    }
+    else {
+        'No payload witness records were emitted.'
+    }
 
     $summaryLines = @(
         '# Subsystem Audit Summary',
@@ -283,8 +404,16 @@ foreach ($subsystemName in $requestedSubsystems) {
         '',
         '## Payload Truth',
         '',
-        ('- Classification: `{0}`' -f $runtimePayloadClassification),
-        ('- Note: {0}' -f $runtimePayloadNote),
+        ('- Primary classification: `{0}`' -f $primaryPayloadClassification),
+        ('- Note: {0}' -f $primaryPayloadNote),
+        '',
+        '| Witness | Classification | Note |',
+        '| --- | --- | --- |'
+    )
+    foreach ($payload in $payloads) {
+        $summaryLines += ('| {0} | {1} | {2} |' -f $payload.witness, $payload.classification, $payload.note)
+    }
+    $summaryLines += @(
         '',
         '## Placement',
         '',
@@ -320,7 +449,7 @@ foreach ($subsystemName in $requestedSubsystems) {
         timestampUtc = (Get-Date).ToUniversalTime().ToString('o')
         ownedProjectCount = $ownedProjects.Count
         testProbeCount = $probeResults.Count
-        payloadClassification = $runtimePayloadClassification
+        payloadClassification = $primaryPayloadClassification
     })
 
     $results.Add([ordered]@{
@@ -328,7 +457,7 @@ foreach ($subsystemName in $requestedSubsystems) {
         ownedProjectCount = $ownedProjects.Count
         testProbeCount = $probeResults.Count
         summaryPath = Get-RelativePathString -BasePath $repoRoot -TargetPath $summaryPath
-        payloadClassification = $runtimePayloadClassification
+        payloadClassification = $primaryPayloadClassification
     }) | Out-Null
 }
 
