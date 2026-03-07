@@ -135,6 +135,40 @@ That distinction should remain constitutional.
 
 Inspection visibility must not imply unrestricted mutation or release rights.
 
+## Bounded Build Integration
+
+The active build may reference the Holographic Data Tool as a bounded toolchain dependency for `.hopng` validation and inspection.
+
+Current integration posture:
+
+- optional only
+- local and operator-scoped only
+- never constitutive of Sanctuary founding, bonding, re-entry, or OE binding in v0.1
+
+The approved build path is:
+
+- root `build.ps1` and `test.ps1` may run optional `.hopng` validation through `tools/verify-hopng-toolchain.ps1`
+- HDT discovery must come from:
+  - `-HdtRoot`
+  - `HDT_ROOT`
+  - ignored local config under `.local/`
+- no tracked file may hard-code an external HDT root
+
+The optional validation lane may use HDT for:
+
+- `.hopng` artifact validation
+- Prime-safe inspection
+- artifact surface comparison
+
+It must not use HDT in this phase for:
+
+- Sanctuary founding gates
+- re-entry gates
+- constitutive OE binding
+- runtime authority or continuity truth
+
+That boundary remains in force until later-phase commands such as `Invoke-HOPNGFormation` and `Bind-HOPNGToOE` are implemented and explicitly admitted by runtime law.
+
 ## Future Growth Constraints
 
 Later semantic growth must remain governed.

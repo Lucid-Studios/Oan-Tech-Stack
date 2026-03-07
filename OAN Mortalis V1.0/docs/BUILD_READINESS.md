@@ -61,6 +61,7 @@ Observed repository conditions:
 - `build_error.txt` reflects an older failure and is not current truth
 - `.THIS_IS_THE_ACTIVE_BUILD` now resolves to a present `docs/WORKSPACE_RULES.md` bridge document
 - Foundational research documents may be indexed from a local private corpus root outside the repository, but that path must remain local-only and never be committed into tracked files
+- optional `.hopng` validation may now be run through the external Holographic Data Tool as a bounded local toolchain lane, but Sanctuary founding and re-entry remain independent of that tool in v0.1
 
 ## Ready State
 
@@ -220,7 +221,7 @@ Current status:
 
 Primary risk:
 
-- the Golden Path now supports local operator control, but broader operational adoption, concurrency beyond one process, and CI-backed proof are still incomplete
+- the Golden Path now supports local operator control, and `.hopng` validation can be integrated as an optional toolchain lane, but broader operational adoption, concurrency beyond one process, and CI-backed proof are still incomplete
 
 ### Stage 4. Governed
 
