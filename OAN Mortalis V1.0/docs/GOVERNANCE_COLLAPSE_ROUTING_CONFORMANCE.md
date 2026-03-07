@@ -130,6 +130,11 @@ The routing semantics currently live in these objects:
 
 What is still missing is an explicit collapse-disposition object that names, in one runtime vocabulary, where the formed substance is going.
 
+That gap is now partially closed for the two routing paths that are already fully real:
+
+- `RetainInMos`
+- `DeferReview`
+
 ## Forbidden Paths Already Enforced
 
 The following remain out of law today:
@@ -155,6 +160,7 @@ What it does have is:
 
 - explicit `retain_in_mos`
 - explicit `defer_review`
+- explicit minimal runtime collapse-disposition vocabulary for those two paths
 - partial `discard_transient`
 - partial `route_to_cgoa`
 - absent `eligible_for_dream_seed`
@@ -165,16 +171,16 @@ So the collapse model is no longer purely aspirational, but it is still only par
 
 The next bounded implementation cut should not implement all five dispositions at once.
 
-It should make the strongest current reality explicit first:
+The strongest current reality has now been made explicit first:
 
 1. `retain_in_mos`
 2. `defer_review`
 
-And, if the code is already close enough, also add:
+The next candidate, if the code is already close enough, is:
 
 3. `discard_transient`
 
-That would let the runtime name the current custody-retention and review paths explicitly without prematurely pulling `cGoA` and Dream-seed routing into the Golden Path.
+That keeps the runtime honest by naming only the current custody-retention and review paths explicitly while still deferring `cGoA` and Dream-seed routing.
 
 ## Completion Condition
 

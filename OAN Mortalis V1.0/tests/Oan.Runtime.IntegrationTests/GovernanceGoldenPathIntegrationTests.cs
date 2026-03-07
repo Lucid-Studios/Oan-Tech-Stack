@@ -59,6 +59,9 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernanceLoopStage.LoopCompleted, result.Stage);
         Assert.NotNull(result.ReengrammitizationReceipt);
         Assert.True(result.ReengrammitizationReceipt!.Accepted);
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RetainInMos, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal("cMoS", result.CollapseRoutingDecision.TargetClass);
         Assert.Equal(
             GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView,
             result.PublishedLanes);
@@ -110,6 +113,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernanceDecision.Rejected, result.DecisionReceipt.Decision);
         Assert.Equal(GovernanceLoopStage.GovernanceDecisionRejected, result.Stage);
         Assert.Null(result.ReengrammitizationReceipt);
+        Assert.Null(result.CollapseRoutingDecision);
         Assert.Equal(GovernedPrimeDerivativeLane.Neither, result.PublishedLanes);
         Assert.Empty(derivativeViews);
         Assert.Single(crypticRecords);
@@ -158,6 +162,9 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernanceDecision.Deferred, result.DecisionReceipt.Decision);
         Assert.Equal(GovernanceLoopStage.GovernanceDecisionDeferred, result.Stage);
         Assert.Null(result.ReengrammitizationReceipt);
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.DeferReview, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal("deferred-review-backlog", result.CollapseRoutingDecision.TargetClass);
         Assert.Equal(GovernedPrimeDerivativeLane.Neither, result.PublishedLanes);
         Assert.Empty(derivativeViews);
         Assert.Single(crypticRecords);
@@ -248,6 +255,8 @@ public sealed class GovernanceGoldenPathIntegrationTests
 
         Assert.Equal(GovernanceLoopStage.PendingRecovery, first.Stage);
         Assert.Equal(GovernedPrimeDerivativeLane.Pointer, first.PublishedLanes);
+        Assert.NotNull(first.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RetainInMos, first.CollapseRoutingDecision!.Disposition);
         Assert.Single(firstViews);
         Assert.Equal(GovernanceLoopStage.LoopCompleted, second.Stage);
         Assert.Equal(

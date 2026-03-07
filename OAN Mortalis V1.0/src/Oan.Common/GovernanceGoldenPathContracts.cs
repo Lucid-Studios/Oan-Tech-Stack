@@ -59,6 +59,12 @@ public enum GovernanceLoopControlState
     Failed = 5
 }
 
+public enum CmeCollapseDisposition
+{
+    RetainInMos = 0,
+    DeferReview = 1
+}
+
 public sealed record GovernanceCycleStartRequest(
     Guid IdentityId,
     Guid SoulFrameId,
@@ -141,6 +147,14 @@ public sealed record GovernanceAdjudicationResult(
     GovernedReengrammitizationRequest? ReengrammitizationRequest,
     GovernedPrimePublicationRequest? PrimePublicationRequest);
 
+public sealed record CmeCollapseRoutingDecision(
+    CmeCollapseDisposition Disposition,
+    string ReasonCode,
+    string IssuedBy,
+    DateTime IssuedAt,
+    string TargetClass,
+    bool ReviewRequired);
+
 public sealed record GovernanceGoldenPathResult(
     Guid CandidateId,
     string LoopKey,
@@ -148,7 +162,8 @@ public sealed record GovernanceGoldenPathResult(
     GovernanceDecisionReceipt DecisionReceipt,
     CrypticReengrammitizationReceipt? ReengrammitizationReceipt,
     GovernedPrimeDerivativeLane PublishedLanes,
-    string? FailureCode);
+    string? FailureCode,
+    CmeCollapseRoutingDecision? CollapseRoutingDecision = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -548,6 +563,32 @@ public static class GovernanceLoopStateModel
             GovernanceLoopStage.PrimeDerivativePublished => next is GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.PendingRecovery,
             GovernanceLoopStage.PendingRecovery => next is GovernanceLoopStage.CrypticReengrammitizationCompleted or GovernanceLoopStage.PrimeDerivativePublished or GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.LoopFailed,
             _ => false
+        };
+    }
+
+    public static CmeCollapseRoutingDecision? BuildCollapseRoutingDecision(
+        GovernanceDecisionReceipt decisionReceipt,
+        bool reengrammitizationCompleted)
+    {
+        ArgumentNullException.ThrowIfNull(decisionReceipt);
+
+        return decisionReceipt.Decision switch
+        {
+            GovernanceDecision.Deferred => new CmeCollapseRoutingDecision(
+                Disposition: CmeCollapseDisposition.DeferReview,
+                ReasonCode: decisionReceipt.RationaleCode,
+                IssuedBy: decisionReceipt.AdjudicatorIdentity,
+                IssuedAt: decisionReceipt.Timestamp,
+                TargetClass: "deferred-review-backlog",
+                ReviewRequired: true),
+            GovernanceDecision.Approved when reengrammitizationCompleted => new CmeCollapseRoutingDecision(
+                Disposition: CmeCollapseDisposition.RetainInMos,
+                ReasonCode: decisionReceipt.RationaleCode,
+                IssuedBy: decisionReceipt.AdjudicatorIdentity,
+                IssuedAt: decisionReceipt.Timestamp,
+                TargetClass: "cMoS",
+                ReviewRequired: false),
+            _ => null
         };
     }
 }

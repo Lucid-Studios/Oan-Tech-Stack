@@ -436,7 +436,8 @@ namespace Oan.Cradle
                         DecisionReceipt: decisionReceipt,
                         ReengrammitizationReceipt: null,
                         PublishedLanes: snapshot.PublishedLanes,
-                        FailureCode: $"reengrammitization-failed:{ex.GetType().Name}");
+                        FailureCode: $"reengrammitization-failed:{ex.GetType().Name}",
+                        CollapseRoutingDecision: null);
                 }
             }
             else
@@ -517,7 +518,10 @@ namespace Oan.Cradle
                         DecisionReceipt: decisionReceipt,
                         ReengrammitizationReceipt: reengrammitizationReceipt,
                         PublishedLanes: publishedLanes,
-                        FailureCode: $"publication-failed:{lane}:{ex.GetType().Name}");
+                        FailureCode: $"publication-failed:{lane}:{ex.GetType().Name}",
+                        CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
+                            decisionReceipt,
+                            reengrammitizationCompleted: true));
                 }
             }
 
@@ -555,7 +559,10 @@ namespace Oan.Cradle
                 DecisionReceipt: decisionReceipt,
                 ReengrammitizationReceipt: reengrammitizationReceipt,
                 PublishedLanes: publishedLanes,
-                FailureCode: null);
+                FailureCode: null,
+                CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
+                    decisionReceipt,
+                    reengrammitizationCompleted: true));
         }
 
         private IGovernanceCycleCognitionService RequireGovernanceCognitionService() =>
@@ -614,7 +621,10 @@ namespace Oan.Cradle
                 DecisionReceipt: snapshot.DecisionReceipt,
                 ReengrammitizationReceipt: snapshot.ReengrammitizationReceipt,
                 PublishedLanes: snapshot.PublishedLanes,
-                FailureCode: snapshot.FailureCode);
+                FailureCode: snapshot.FailureCode,
+                CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
+                    snapshot.DecisionReceipt,
+                    snapshot.ReengrammitizationCompleted));
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
