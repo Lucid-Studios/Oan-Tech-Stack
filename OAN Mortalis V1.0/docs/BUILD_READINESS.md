@@ -58,6 +58,7 @@ Observed repository conditions:
 - The v1.1 runtime hardening layer now exists as explicit journal contracts, typed loop-state contracts, and replay-aware Golden Path orchestration
 - The first internal operational control plane now exists as journal-first status views, deferred-review actions, pending-recovery resume actions, and same-loop local execution guards
 - The first local operator surface now exists in `src/Oan.Runtime.Headless` as a CLI-first shell for status, deferred review, and recovery actions over the live control-plane contracts
+- The first build audit lane now exists through root `tools/Invoke-Build-Audit.ps1` and `tools/Invoke-Subsystem-Audit.ps1`, emitting local structured audit bundles under `.audit/runs/`
 - `build_error.txt` reflects an older failure and is not current truth
 - `.THIS_IS_THE_ACTIVE_BUILD` now resolves to a present `docs/WORKSPACE_RULES.md` bridge document
 - Foundational research documents may be indexed from a local private corpus root outside the repository, but that path must remain local-only and never be committed into tracked files
@@ -198,6 +199,7 @@ Supporting document:
 - `docs/RUNTIME_OPERATOR_SURFACE_PLAN.md`
 - `docs/SANCTUARY_FOUNDING_RUNTIME_BRIEF.md`
 - `docs/HOLOGRAPHIC_DATA_TOOL.md`
+- `../docs/BUILD_AUDIT_PATH.md`
 - `docs/DEPENDENCY_AUDIT.md`
 - `docs/refactors/GEL_SPLIT_PLAN.md`
 - `docs/refactors/GEL_CONTRACTS_EXTRACTION_PROMPT.md`
