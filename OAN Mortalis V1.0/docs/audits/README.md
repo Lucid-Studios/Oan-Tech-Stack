@@ -133,8 +133,8 @@ They are observational surfaces only.
 
 This document is subordinate to:
 
-- [SPINE_CONSTITUTION.md](../SPINE_CONSTITUTION.md)
-- [AUTHORITY_CONTRACTS.md](../AUTHORITY_CONTRACTS.md)
+- [SPINE_CONSTITUTION.md](../../../Build%20Contracts/Crosscutting/spine/SPINE_CONSTITUTION.md)
+- [AUTHORITY_CONTRACTS.md](../../../Build%20Contracts/Crosscutting/authority/AUTHORITY_CONTRACTS.md)
 
 If an audit artifact is ever used as a governance input,
 the system is in constitutional violation and must fail closed.
