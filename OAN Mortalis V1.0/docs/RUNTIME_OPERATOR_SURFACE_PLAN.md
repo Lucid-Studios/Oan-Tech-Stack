@@ -117,3 +117,50 @@ This phase is complete when:
 Future extension:
 
 - richer custody-aware operator telemetry remains deferred to the visibility lattice defined in `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`
+
+## Visibility Lattice Conformance
+
+The operator surface is now bound to the future visibility lattice as a conformance item, not as a full implementation phase.
+
+### Model claim
+
+Operator telemetry must remain custody-aware and tiered by disclosure class rather than drifting into default content visibility.
+
+### Current code surface
+
+- `IGovernanceLoopStatusReader`
+- `IDeferredReviewQueue`
+- `IPendingRecoveryCoordinator`
+- `GovernanceLoopStatusView`
+- `GovernanceDecisionView`
+- `PublicationLaneStatusView`
+- the local CLI surface in `src/Oan.Runtime.Headless`
+
+### Proven now
+
+- the current operator surface is descriptive only
+- no control-plane query surface widens custody, membrane, or publication authority
+- malformed evidence already fails safe instead of silently appearing complete
+- the current CLI remains Prime-safe by default because it exposes status and workflow metadata only
+
+### Missing now
+
+The current status models do not yet explicitly carry visibility-lattice metadata such as:
+
+- visibility class
+- consent state
+- governed access state
+- privileged access state
+- protection or classification posture
+- disclosure eligibility summary
+
+### Next cut
+
+The next bounded operator-surface conformance cut should add explicit visibility-lattice metadata fields to the internal status and read models and validate that the default CLI surface remains Prime-safe.
+
+That cut must still avoid:
+
+- protected content previews
+- HDT-backed runtime projection
+- new authority paths through the operator shell
+- deeper privileged or classified handling logic

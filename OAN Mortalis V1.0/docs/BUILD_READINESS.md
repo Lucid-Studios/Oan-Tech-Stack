@@ -60,6 +60,7 @@ Observed repository conditions:
 - The v1.1 runtime hardening layer now exists as explicit journal contracts, typed loop-state contracts, and replay-aware Golden Path orchestration
 - The first internal operational control plane now exists as journal-first status views, deferred-review actions, pending-recovery resume actions, and same-loop local execution guards
 - The first local operator surface now exists in `src/Oan.Runtime.Headless` as a CLI-first shell for status, deferred review, and recovery actions over the live control-plane contracts
+- The operator/control-plane surface is now explicitly tied to a bounded future visibility-lattice conformance item so later telemetry growth does not drift into accidental content exposure or ad hoc access semantics
 - The first build audit lane now exists through root `tools/Invoke-Build-Audit.ps1` and `tools/Invoke-Subsystem-Audit.ps1`, emitting local structured audit bundles under `.audit/runs/`
 - `build_error.txt` reflects an older failure and is not current truth
 - `.THIS_IS_THE_ACTIVE_BUILD` now resolves to a present `docs/WORKSPACE_RULES.md` bridge document
