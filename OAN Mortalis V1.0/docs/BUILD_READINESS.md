@@ -52,6 +52,7 @@ Observed repository conditions:
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
+- SoulFrame membrane contracts now name explicit mediated `cSelfGEL` issuance and explicit collapse-evaluation receipt shapes without widening the membrane into custody, orchestration, or publication authority
 - The first real AgentiCore membrane caller now exists as a bounded handle-only consumer with one positive and one negative misuse test
 - The AgentiCore cognition cycle now invokes that bounded membrane worker as a thin stage without widening the worker into custody, orchestration, or publication access
 - The first governance-first Golden Path loop is now implemented through `StackManager` with explicit governance adjudication, governed Cryptic re-Engrammitization, and governed Prime derivative publication

@@ -74,7 +74,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                 TargetTheater: "prime",
                 IsMitigated: true,
                 WorkingStateHandle: "cmos://raw-state/forged",
-                ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle")
+                ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle",
+                MediatedSelfState: CreateMediatedSelfState("cme-alpha", "agenticore.cognition.cycle"))
         };
         var boundedWorker = new BoundedMembraneWorkerService(membrane);
         var cognition = new AgentiCoreService(
@@ -94,6 +95,12 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             cognition.ExecuteCognitionCycleAsync(CreateContext(), "solve bounded task"));
     }
+
+    private static MediatedSelfStateContour CreateMediatedSelfState(string cmeId, string policyHandle) =>
+        new(
+            CSelfGelHandle: $"soulframe-cselfgel://{cmeId}/{Guid.NewGuid():D}",
+            Classification: "mediated-cselfgel-issue",
+            PolicyHandle: policyHandle);
 
     private static AgentiContext CreateContext()
     {
@@ -285,7 +292,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             TargetTheater: "prime",
             IsMitigated: true,
             WorkingStateHandle: "soulframe-working://cme-alpha/default",
-            ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle");
+            ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle",
+            MediatedSelfState: CreateMediatedSelfState("cme-alpha", "agenticore.cognition.cycle"));
 
         public Task<ISelfStateProjection> ProjectMitigatedAsync(
             SoulFrameProjectionRequest request,
@@ -304,8 +312,14 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                 request.IdentityId,
                 IntakeHandle: "soulframe://return/integration",
                 Accepted: true,
-                Disposition: "return-candidate-recorded"));
+                Disposition: "return-candidate-recorded",
+                Evaluation: new SoulFrameCollapseEvaluation(
+                    Classification: "candidate-collapse-evaluation",
+                    RequiresReview: true,
+                    CanRouteToCustody: false,
+                    CanPublishPrime: false)));
         }
+
     }
 
     private sealed class DelegatingHandlerStub : HttpMessageHandler

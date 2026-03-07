@@ -167,8 +167,12 @@ public sealed class SoulFrameHostClientTests
         Assert.StartsWith("soulframe-session://cme-alpha/", projection.SessionHandle, StringComparison.Ordinal);
         Assert.StartsWith("soulframe-working://cme-alpha/", projection.WorkingStateHandle, StringComparison.Ordinal);
         Assert.StartsWith("membrane-derived:cme:cme-alpha|policy:policy-17", projection.ProvenanceMarker, StringComparison.Ordinal);
+        Assert.StartsWith("soulframe-cselfgel://cme-alpha/", projection.MediatedSelfState.CSelfGelHandle, StringComparison.Ordinal);
+        Assert.Equal("mediated-cselfgel-issue", projection.MediatedSelfState.Classification);
+        Assert.Equal("policy-17", projection.MediatedSelfState.PolicyHandle);
         Assert.DoesNotContain("cmos", projection.SessionHandle, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("cmos", projection.WorkingStateHandle, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("cmos", projection.MediatedSelfState.CSelfGelHandle, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -190,6 +194,10 @@ public sealed class SoulFrameHostClientTests
         Assert.Equal(identityId, receipt.IdentityId);
         Assert.True(receipt.Accepted);
         Assert.Equal("return-candidate-recorded", receipt.Disposition);
+        Assert.Equal("candidate-collapse-evaluation", receipt.Evaluation.Classification);
+        Assert.True(receipt.Evaluation.RequiresReview);
+        Assert.False(receipt.Evaluation.CanRouteToCustody);
+        Assert.False(receipt.Evaluation.CanPublishPrime);
         Assert.StartsWith("soulframe://return/", receipt.IntakeHandle, StringComparison.Ordinal);
     }
 

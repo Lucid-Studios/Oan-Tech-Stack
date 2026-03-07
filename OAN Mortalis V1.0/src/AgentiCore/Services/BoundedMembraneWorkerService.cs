@@ -100,6 +100,9 @@ public sealed class BoundedMembraneWorkerService
             throw new InvalidOperationException("Membrane projection provenance must remain witness-only and membrane-derived.");
         }
 
+        EnsureHandlePrefix(projection.MediatedSelfState.CSelfGelHandle, "soulframe-cselfgel://", "MediatedSelfState.CSelfGelHandle");
+        EnsureNoCustodyLeak(projection.MediatedSelfState.CSelfGelHandle, "MediatedSelfState.CSelfGelHandle");
+
         EnsureNoCustodyLeak(projection.SessionHandle, "SessionHandle");
         EnsureNoCustodyLeak(projection.WorkingStateHandle, "WorkingStateHandle");
     }
