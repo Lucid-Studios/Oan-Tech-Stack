@@ -45,6 +45,13 @@ The bootstrap run must use one pinned `RootAtlas` object with:
 
 No ambient atlas collections are allowed.
 
+That pinned object may come from:
+
+- a repo-local atlas surface
+- or a bounded local Atlas-source normalization pass where the canonical external ingest target is the normalized root-to-variant Atlas surface and the supporting symbol/constructor files act only as reconciliation and validation layers
+
+The bootstrap experiment still operates on the pinned canonical `RootAtlas`, not on the raw source-layer files directly.
+
 ## Minimum Draft Path
 
 The first lawful path is:

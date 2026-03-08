@@ -70,6 +70,21 @@ Minimum identity requirements:
 
 No validator path may rely on heuristic best-match atlas resolution.
 
+## Atlas Source Layering
+
+The repo now also recognizes a bounded external Atlas-source layering rule:
+
+- the normalized root-to-variant Atlas surface is the canonical external ingest target
+- root symbol dictionaries remain reconciliation layers
+- prefix and suffix indexes remain constructor-law layers
+- reserved symbol policy remains constitution/collision law
+
+The source layers may normalize into one canonical `RootAtlas`, but they must not become rival Atlas meaning models.
+
+Supporting note:
+
+- `docs/ATLAS_SOURCE_LAYERING.md`
+
 ## Epistemic Mapping
 
 The canonical epistemic mapping is:
