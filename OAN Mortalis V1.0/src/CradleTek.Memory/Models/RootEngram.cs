@@ -1,3 +1,5 @@
+using GEL.Models;
+
 namespace CradleTek.Memory.Models;
 
 public sealed class RootEngram
@@ -8,4 +10,6 @@ public sealed class RootEngram
     public required IReadOnlyList<string> VariantForms { get; init; }
     public required double FrequencyWeight { get; init; }
     public required string DictionaryPointer { get; init; }
+    public PredicateRoot? CanonicalRoot { get; init; }
+    public RootAtlasEntry? CanonicalAtlasEntry { get; init; }
 }

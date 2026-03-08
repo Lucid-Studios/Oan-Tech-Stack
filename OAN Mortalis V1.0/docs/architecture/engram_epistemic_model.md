@@ -20,9 +20,10 @@ Role and interaction frameworks reserved for future subsystem implementation.
 
 ## Legacy Compatibility Mapping
 
-- `Legendary Engram` -> `System Propositional Engram`
-- `Constructor Engram` -> `Propositional Engram`
-- `Master Engram` -> `Procedural Engram`
+- `Master Engram` -> `Propositional Engram`
+- `Legendary Engram` -> `Procedural Engram`
+- `Mythic Engram` -> `Perspectival Engram`
+- `Peerless Engram` -> `Participatory Engram`
 
 ## Layered Cognition Interpretation
 
@@ -33,8 +34,11 @@ Role and interaction frameworks reserved for future subsystem implementation.
 
 ## Implementation Notes
 
+- `GEL.Contracts` is the canonical owner of Atlas and Engram meaning contracts.
+- `EngramDraft` is pre-closure and must not be treated as a lawful Engram.
+- `Engram` is the closure-valid canonical meaning object.
+- `Oan.Spinal.EngramEnvelope` remains a runtime-event envelope and not the canonical meaning object.
 - Existing runtime classes remain stable to preserve compatibility.
 - Legacy labels are retained where needed for persisted payload continuity.
 - New terminology is expressed in documentation, inline comments, and additive schema labels.
 - No operational logic changes are introduced by this normalization patch.
-

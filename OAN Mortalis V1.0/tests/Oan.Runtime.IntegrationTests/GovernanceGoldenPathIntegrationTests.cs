@@ -13,6 +13,7 @@ using CradleTek.Memory.Models;
 using CradleTek.Memory.Services;
 using CradleTek.Public;
 using EngramGovernance.Services;
+using GEL.Models;
 using Oan.Common;
 using Oan.Cradle;
 using Oan.Storage;
@@ -784,7 +785,8 @@ public sealed class GovernanceGoldenPathIntegrationTests
                     UnknownRatio = 1.0,
                     ConceptDensity = "sparse",
                     ContextStability = "stable"
-                }
+                },
+                CanonicalRootAtlas = RootAtlas.Create("stub.root-atlas.v1", Array.Empty<RootAtlasEntry>())
             });
         }
     }

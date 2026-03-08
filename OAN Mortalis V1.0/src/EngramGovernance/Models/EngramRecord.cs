@@ -1,3 +1,5 @@
+using Oan.Spinal;
+
 namespace EngramGovernance.Models;
 
 public sealed class EngramRecord
@@ -8,4 +10,5 @@ public sealed class EngramRecord
     public required string DecisionSpline { get; init; }
     public required string SymbolicTrace { get; init; }
     public required EngramCompassState CompassState { get; init; }
+    public EngramId? CanonicalEngramId { get; init; }
 }

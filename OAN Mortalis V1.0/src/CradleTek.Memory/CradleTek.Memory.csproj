@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CradleTek.CognitionHost\CradleTek.CognitionHost.csproj" />
+    <ProjectReference Include="..\GEL.Contracts\GEL.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

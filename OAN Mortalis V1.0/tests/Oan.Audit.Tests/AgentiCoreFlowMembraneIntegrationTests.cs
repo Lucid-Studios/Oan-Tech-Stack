@@ -10,6 +10,7 @@ using CradleTek.Memory.Interfaces;
 using CradleTek.Memory.Models;
 using CradleTek.Memory.Services;
 using EngramGovernance.Services;
+using GEL.Models;
 using Oan.Common;
 using SoulFrame.Host;
 using Telemetry.GEL;
@@ -253,7 +254,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                     UnknownRatio = 1.0,
                     ConceptDensity = "sparse",
                     ContextStability = "stable"
-                }
+                },
+                CanonicalRootAtlas = RootAtlas.Create("stub.root-atlas.v1", Array.Empty<RootAtlasEntry>())
             });
         }
     }

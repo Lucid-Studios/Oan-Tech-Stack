@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\CradleTek.Memory\CradleTek.Memory.csproj" />
+    <ProjectReference Include="..\..\src\GEL.Contracts\GEL.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Oan.Sli\Oan.Sli.csproj" />
     <ProjectReference Include="..\..\src\SLI.Engine\SLI.Engine.csproj" />
     <ProjectReference Include="..\..\src\SLI.Ingestion\SLI.Ingestion.csproj" />

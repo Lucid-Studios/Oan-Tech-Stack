@@ -20,6 +20,19 @@ Lisp-based SLI and Engineered Cognition are the native computational organism th
 
 Sanctuary provides the collective nervous system of SLI, while `OE` and `cOE` preserve the individuated continuity and identity custody of each CME.
 
+## Canonical Contract Owner
+
+The canonical Atlas and Engram meaning contracts now live in:
+
+- `src/GEL.Contracts`
+
+This means:
+
+- `EngramDraft` is the bounded pre-closure candidate object
+- `Engram` is the closure-valid canonical meaning object
+- Lisp-based SLI and Engineered Cognition may form candidate Engram structures, but they do not bypass closure validation or custody law
+- `Oan.Spinal.EngramEnvelope` remains a runtime-event envelope rather than the canonical meaning object
+
 ## What Native Engrammitization Means
 
 Native Engrammitization is not mere logging, tracing, or symbolic ornament.
@@ -153,6 +166,13 @@ Candidate engram formation is not equivalent to:
 - unclassified symbolic residues
 
 Candidate engram formation becomes collapse-relevant only when native Engrammitization has explicitly produced candidate engram structure suitable for SoulFrame mediation.
+
+That candidate structure now has a canonical contract path:
+
+- Atlas binding
+- `EngramDraft`
+- closure validation
+- later governed memory movement
 
 ## Output Classes
 
