@@ -332,7 +332,10 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                     CollapseClassification: new CmeCollapseClassification(
                         CollapseConfidence: 0.92,
                         SelfGelIdentified: true,
-                        AutobiographicalRelevant: true),
+                        AutobiographicalRelevant: true,
+                        EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
+                        ReviewTriggers: CmeCollapseReviewTrigger.None,
+                        SourceSubsystem: "AgentiCore"),
                     ResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
                     ReviewState: CmeCollapseReviewState.DeferredReview,
                     RequiresReview: true,

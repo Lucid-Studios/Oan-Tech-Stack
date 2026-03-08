@@ -191,7 +191,10 @@ public sealed class SoulFrameHostClientTests
             CollapseClassification: new CmeCollapseClassification(
                 CollapseConfidence: 0.91,
                 SelfGelIdentified: true,
-                AutobiographicalRelevant: true));
+                AutobiographicalRelevant: true,
+                EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
+                ReviewTriggers: CmeCollapseReviewTrigger.None,
+                SourceSubsystem: "AgentiCore"));
 
         var receipt = await client.ReceiveReturnIntakeAsync(request);
 

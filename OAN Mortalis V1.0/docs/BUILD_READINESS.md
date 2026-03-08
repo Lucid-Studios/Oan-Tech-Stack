@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `53` tests passed across `5` discovered test assemblies
+- `56` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -58,6 +58,7 @@ Observed repository conditions:
 - AgentiCore now names an explicit bounded `SelfGEL` working pool and explicitly distinguishes symbolic trace, candidate engram structure, and transient residue instead of leaving those runtime shapes implicit inside stringly working memory and one JSON blob
 - The first governance-first Golden Path loop is now implemented through `StackManager` with explicit governance adjudication, governed Cryptic re-Engrammitization, and governed Prime derivative publication
 - The Golden Path now names explicit first-route collapse vocabulary for the two routing paths that are already runtime-real today: `RouteToCMoS` and `RouteToCGoA`, with `DeferredReview` modeled separately as review state over first protected holding rather than as a peer routing destination
+- The Golden Path now also records collapse qualification evidence so the runtime can explain first protected destination by classification confidence, evidence flags, review triggers, and source subsystem provenance without changing current routing behavior
 - The v1.1 runtime hardening layer now exists as explicit journal contracts, typed loop-state contracts, and replay-aware Golden Path orchestration
 - The first internal operational control plane now exists as journal-first status views, deferred-review actions, pending-recovery resume actions, and same-loop local execution guards
 - The first local operator surface now exists in `src/Oan.Runtime.Headless` as a CLI-first shell for status, deferred review, and recovery actions over the live control-plane contracts
@@ -197,6 +198,7 @@ Supporting document:
 - `docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
 - `docs/PRIME_CRYPTIC_DATA_TOPOLOGY.md`
 - `docs/CME_RUNTIME_LIFECYCLE_AND_COLLAPSE_MODEL.md`
+- `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`
 - `docs/CME_CRYPTIC_FIRST_COLLAPSE_CLARIFICATION.md`
 - `docs/GOVERNANCE_COLLAPSE_ROUTING_CONFORMANCE.md`
 - `docs/CME_MODULE_CONFORMANCE_QUEUE.md`

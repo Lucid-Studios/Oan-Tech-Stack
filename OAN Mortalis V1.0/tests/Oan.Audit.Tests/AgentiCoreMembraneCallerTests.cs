@@ -123,5 +123,13 @@ public sealed class AgentiCoreMembraneCallerTests
         double confidence = 0.92,
         bool selfGelIdentified = true,
         bool autobiographicalRelevant = true) =>
-        new(confidence, selfGelIdentified, autobiographicalRelevant);
+        new(
+            confidence,
+            selfGelIdentified,
+            autobiographicalRelevant,
+            autobiographicalRelevant || selfGelIdentified
+                ? CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal
+                : CmeCollapseEvidenceFlag.ContextualSignal | CmeCollapseEvidenceFlag.ProceduralSignal | CmeCollapseEvidenceFlag.SkillMethodSignal,
+            CmeCollapseReviewTrigger.None,
+            "AgentiCore");
 }

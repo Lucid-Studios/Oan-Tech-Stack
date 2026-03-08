@@ -101,7 +101,10 @@ public sealed class StewardAgentGovernanceTests
             CollapseClassification: new CmeCollapseClassification(
                 CollapseConfidence: 0.92,
                 SelfGelIdentified: true,
-                AutobiographicalRelevant: true));
+                AutobiographicalRelevant: true,
+                EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
+                ReviewTriggers: CmeCollapseReviewTrigger.None,
+                SourceSubsystem: "AgentiCore"));
     }
 
     private sealed class RecordingPublicStore : IPublicStore

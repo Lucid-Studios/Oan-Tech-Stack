@@ -46,6 +46,9 @@ public sealed class GovernanceOperationalControlIntegrationTests
         Assert.True(status.ReengrammitizationCompleted);
         Assert.True(status.Publication.PointerPublished);
         Assert.True(status.Publication.CheckedViewPublished);
+        Assert.NotNull(status.LatestCollapseQualification);
+        Assert.Equal("cMoS", status.LatestCollapseQualification!.Destination);
+        Assert.True(status.LatestCollapseQualification.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.AutobiographicalSignal));
         Assert.False(status.ResumeEligible);
     }
 
@@ -260,7 +263,15 @@ public sealed class GovernanceOperationalControlIntegrationTests
         bool autobiographicalRelevant,
         bool selfGelIdentified,
         double collapseConfidence = 0.92) =>
-        new(collapseConfidence, selfGelIdentified, autobiographicalRelevant);
+        new(
+            collapseConfidence,
+            selfGelIdentified,
+            autobiographicalRelevant,
+            autobiographicalRelevant || selfGelIdentified
+                ? CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal
+                : CmeCollapseEvidenceFlag.ContextualSignal | CmeCollapseEvidenceFlag.ProceduralSignal,
+            CmeCollapseReviewTrigger.None,
+            "AgentiCore");
 
     private static StoreRegistry CreateStoreRegistry(
         PublicLayerService publicLayer,
@@ -286,7 +297,8 @@ public sealed class GovernanceOperationalControlIntegrationTests
             crypticCustodyStore: mantle,
             crypticReengrammitizationGate: reengrammitizationGate ?? mantle,
             governedPrimePublicationSink: governedPrimePublicationSink,
-            governanceReceiptJournal: governanceReceiptJournal);
+            governanceReceiptJournal: governanceReceiptJournal,
+            cmeCollapseQualifier: new CmeCollapseQualifier());
     }
 
     private static StewardAgent CreateSteward(

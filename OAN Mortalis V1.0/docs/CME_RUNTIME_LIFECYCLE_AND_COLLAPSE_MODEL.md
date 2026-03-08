@@ -19,6 +19,8 @@ This document extends the already-implemented governance-first runtime. It does 
 - the current SoulFrame membrane contracts
 - the bounded AgentiCore worker pattern
 
+Qualification criteria for first-route holding are defined in `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`.
+
 ## Root Runtime Sentence
 
 A CME instantiates from lawful mediated continuity, thinks in bounded `SelfGEL` inside AgentiCore, uses Lisp-based SLI and Engineered Cognition as the native morphological and engrammitizing organism during runtime, and collapses Cryptic-first by mediated transfer from `SelfGEL` into `cSelfGEL`, then first into `cGoA` or `cMoS` according to protected classification, with any later `MoS` promotion or Dream eligibility occurring only after deeper curation.
@@ -150,6 +152,24 @@ Later-stage promotion or exploration classes are:
 - `final_cgoa_enrichment`
 
 The current runtime does not yet implement all of these later-stage promotion or exploration classes as first-class vocabulary.
+
+## Qualification Boundary
+
+First-route holding in the current runtime is qualified by evidence, not by later promotion semantics.
+
+The current runtime may record:
+
+- classification confidence
+- route evidence flags
+- review-trigger evidence
+- source subsystem provenance
+
+Those signals explain why a first-route hold used `cMoS` or `cGoA`, but they do not yet authorize:
+
+- final `MoS` promotion
+- Dream routing
+- discard authority
+- later `cGoA` enrichment transitions
 
 ## 1. Lawful Admission
 
@@ -335,6 +355,18 @@ Dream-eligible material must be explicitly classified as:
 - not a substitute for Cryptic custody
 
 Material not explicitly classified for Dream may not silently route there.
+
+## Engram-Forward Attach Points
+
+Later cognition-facing phases may attach richer evaluation layers here, including:
+
+- salience evaluators
+- anomaly detectors
+- engram lenses
+- contextual dopants
+- typed knowledge localization
+
+These remain reserved attach points only in the current phase.
 
 ## 8. Close Conditions
 

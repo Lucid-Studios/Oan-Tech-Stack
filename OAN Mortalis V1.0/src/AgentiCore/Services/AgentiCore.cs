@@ -594,10 +594,21 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
 
     private static CmeCollapseClassification BuildCollapseClassification(double confidence, bool commitRequired)
     {
+        var evidenceFlags = commitRequired
+            ? CmeCollapseEvidenceFlag.AutobiographicalSignal |
+              CmeCollapseEvidenceFlag.SelfGelIdentitySignal |
+              CmeCollapseEvidenceFlag.WitnessBearingSignal
+            : CmeCollapseEvidenceFlag.ContextualSignal |
+              CmeCollapseEvidenceFlag.ProceduralSignal |
+              CmeCollapseEvidenceFlag.SkillMethodSignal;
+
         return new CmeCollapseClassification(
             CollapseConfidence: confidence,
             SelfGelIdentified: commitRequired,
-            AutobiographicalRelevant: commitRequired);
+            AutobiographicalRelevant: commitRequired,
+            EvidenceFlags: evidenceFlags,
+            ReviewTriggers: CmeCollapseReviewTrigger.None,
+            SourceSubsystem: "AgentiCore");
     }
 
     private static string RequireWorkingMemoryValue(AgentiContext context, string key)

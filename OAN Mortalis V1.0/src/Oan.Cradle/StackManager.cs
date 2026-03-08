@@ -309,7 +309,8 @@ namespace Oan.Cradle
                 return BuildResult(reviewRequest.CandidateId, loopKey, snapshot);
             }
 
-            var collapseRoutingDecision = GovernanceLoopStateModel.BuildCollapseRoutingDecision(decisionReceipt, reviewRequest)
+            var collapseQualification = RequireCmeCollapseQualifier().Qualify(reviewRequest.CollapseClassification);
+            var collapseRoutingDecision = GovernanceLoopStateModel.BuildCollapseRoutingDecision(decisionReceipt, collapseQualification)
                 ?? throw new InvalidOperationException("Approved or deferred governance decisions must produce a collapse routing decision.");
 
             if (decisionReceipt.Decision == GovernanceDecision.Deferred)
@@ -380,7 +381,8 @@ namespace Oan.Cradle
             var adjudicator = RequireReturnGovernanceAdjudicator();
             var publicationSink = RequireGovernedPrimePublicationSink();
             var journal = RequireGovernanceReceiptJournal();
-            var collapseRoutingDecision = GovernanceLoopStateModel.BuildCollapseRoutingDecision(decisionReceipt, reviewRequest)
+            var collapseQualification = RequireCmeCollapseQualifier().Qualify(reviewRequest.CollapseClassification);
+            var collapseRoutingDecision = GovernanceLoopStateModel.BuildCollapseRoutingDecision(decisionReceipt, collapseQualification)
                 ?? throw new InvalidOperationException("Approved governance decision must produce a collapse routing decision.");
             var publicationRequest = adjudicator.CreatePrimePublicationRequest(reviewRequest, decisionReceipt)
                 ?? throw new InvalidOperationException("Approved governance decision must authorize Prime publication.");
@@ -425,7 +427,13 @@ namespace Oan.Cradle
                                     reengrammitizationReceipt.Timestamp,
                                     PublishedLanes: GovernedPrimeDerivativeLane.Neither,
                                     ReceiptPointer: reengrammitizationReceipt.ReceiptPointer,
-                                    RequestFingerprint: ComputeFingerprint(reengrammitizationRequest)),
+                                    RequestFingerprint: ComputeFingerprint(reengrammitizationRequest),
+                                    TargetClass: collapseRoutingDecision.TargetClass,
+                                    ResidueClass: collapseRoutingDecision.ResidueClass,
+                                    ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
+                                    EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
+                                    ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
+                                    SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
                                 ReviewRequest: reviewRequest,
                                 Annotation: null),
                             cancellationToken).ConfigureAwait(false);
@@ -450,7 +458,13 @@ namespace Oan.Cradle
                                     DateTime.UtcNow,
                                     PublishedLanes: snapshot.PublishedLanes,
                                     ReceiptPointer: null,
-                                    RequestFingerprint: ComputeFingerprint(reengrammitizationRequest)),
+                                    RequestFingerprint: ComputeFingerprint(reengrammitizationRequest),
+                                    TargetClass: collapseRoutingDecision.TargetClass,
+                                    ResidueClass: collapseRoutingDecision.ResidueClass,
+                                    ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
+                                    EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
+                                    ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
+                                    SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
                                 ReviewRequest: reviewRequest,
                                 Annotation: null),
                             cancellationToken).ConfigureAwait(false);
@@ -642,6 +656,10 @@ namespace Oan.Cradle
             _stores.GovernanceReceiptJournal
             ?? throw new InvalidOperationException("Golden Path hardening requires a governance receipt journal.");
 
+        private ICmeCollapseQualifier RequireCmeCollapseQualifier() =>
+            _stores.CmeCollapseQualifier
+            ?? throw new InvalidOperationException("Golden Path qualification requires a CME collapse qualifier.");
+
         private static ReturnCandidateReviewRequest CreateReviewRequest(GovernanceCycleWorkResult workResult)
         {
             return new ReturnCandidateReviewRequest(
@@ -662,7 +680,7 @@ namespace Oan.Cradle
                 CollapseClassification: workResult.CollapseClassification);
         }
 
-        private static GovernanceGoldenPathResult BuildResult(
+        private GovernanceGoldenPathResult BuildResult(
             Guid candidateId,
             string loopKey,
             GovernanceLoopStateSnapshot snapshot)
@@ -680,9 +698,7 @@ namespace Oan.Cradle
                 ReengrammitizationReceipt: snapshot.ReengrammitizationReceipt,
                 PublishedLanes: snapshot.PublishedLanes,
                 FailureCode: snapshot.FailureCode,
-                CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
-                    snapshot.DecisionReceipt,
-                    snapshot.ReviewRequest ?? throw new InvalidOperationException("Loop snapshot is missing a review request.")));
+                CollapseRoutingDecision: BuildCollapseRoutingDecision(snapshot));
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -713,6 +729,7 @@ namespace Oan.Cradle
                 latestDecision,
                 snapshot.ReengrammitizationCompleted,
                 BuildPublicationLaneStatus(snapshot.PublishedLanes),
+                snapshot.LatestCollapseQualification,
                 snapshot.FailureCode,
                 snapshot.FailureStage,
                 ResumeEligible: snapshot.DecisionReceipt?.Decision == GovernanceDecision.Approved &&
@@ -755,6 +772,37 @@ namespace Oan.Cradle
             var json = System.Text.Json.JsonSerializer.Serialize(payload);
             var bytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(json));
             return Convert.ToHexString(bytes).ToLowerInvariant();
+        }
+
+        private CmeCollapseRoutingDecision? BuildCollapseRoutingDecision(GovernanceLoopStateSnapshot snapshot)
+        {
+            if (snapshot.DecisionReceipt is null)
+            {
+                return null;
+            }
+
+            if (snapshot.LatestCollapseQualification is not null)
+            {
+                return new CmeCollapseRoutingDecision(
+                    snapshot.LatestCollapseQualification.Destination == "cMoS"
+                        ? CmeCollapseDisposition.RouteToCMoS
+                        : CmeCollapseDisposition.RouteToCGoA,
+                    snapshot.LatestCollapseQualification.ResidueClass,
+                    snapshot.LatestCollapseQualification.ReviewState,
+                    snapshot.DecisionReceipt.RationaleCode,
+                    snapshot.DecisionReceipt.AdjudicatorIdentity,
+                    snapshot.DecisionReceipt.Timestamp,
+                    snapshot.LatestCollapseQualification.Destination,
+                    snapshot.LatestCollapseQualification.ClassificationConfidence,
+                    snapshot.LatestCollapseQualification.EvidenceFlags,
+                    snapshot.LatestCollapseQualification.ReviewTriggers,
+                    snapshot.LatestCollapseQualification.SourceSubsystem);
+            }
+
+            var reviewRequest = snapshot.ReviewRequest
+                ?? throw new InvalidOperationException("Loop snapshot is missing a review request.");
+            var qualification = RequireCmeCollapseQualifier().Qualify(reviewRequest.CollapseClassification);
+            return GovernanceLoopStateModel.BuildCollapseRoutingDecision(snapshot.DecisionReceipt, qualification);
         }
 
         private async Task<GovernanceGoldenPathResult?> EnsureDeferredHoldAsync(
@@ -833,7 +881,13 @@ namespace Oan.Cradle
                             record.Timestamp,
                             publishedLanes,
                             ReceiptPointer: record.Pointer,
-                            RequestFingerprint: ComputeFingerprint(appendRequest)),
+                            RequestFingerprint: ComputeFingerprint(appendRequest),
+                            TargetClass: collapseRoutingDecision.TargetClass,
+                            ResidueClass: collapseRoutingDecision.ResidueClass,
+                            ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
+                            EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
+                            ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
+                            SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
                         ReviewRequest: reviewRequest,
                         Annotation: null),
                     cancellationToken).ConfigureAwait(false);
@@ -861,7 +915,13 @@ namespace Oan.Cradle
                             DateTime.UtcNow,
                             publishedLanes,
                             ReceiptPointer: null,
-                            RequestFingerprint: ComputeFingerprint(appendRequest)),
+                            RequestFingerprint: ComputeFingerprint(appendRequest),
+                            TargetClass: collapseRoutingDecision.TargetClass,
+                            ResidueClass: collapseRoutingDecision.ResidueClass,
+                            ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
+                            EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
+                            ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
+                            SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
                         ReviewRequest: reviewRequest,
                         Annotation: null),
                     cancellationToken).ConfigureAwait(false);

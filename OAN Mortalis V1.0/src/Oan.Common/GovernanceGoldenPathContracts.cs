@@ -79,10 +79,45 @@ public enum CmeCollapseResidueClass
     ContextualProtected = 1
 }
 
+ [Flags]
+public enum CmeCollapseEvidenceFlag
+{
+    None = 0,
+    AutobiographicalSignal = 1,
+    SelfGelIdentitySignal = 2,
+    ContextualSignal = 4,
+    ProceduralSignal = 8,
+    SkillMethodSignal = 16,
+    WitnessBearingSignal = 32,
+    MixedSignal = 64
+}
+
+[Flags]
+public enum CmeCollapseReviewTrigger
+{
+    None = 0,
+    LowConfidence = 1,
+    MixedIdentityContext = 2,
+    PolicyReviewRequired = 4,
+    InsufficientEvidence = 8
+}
+
 public sealed record CmeCollapseClassification(
     double CollapseConfidence,
     bool SelfGelIdentified,
-    bool AutobiographicalRelevant);
+    bool AutobiographicalRelevant,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    string SourceSubsystem);
+
+public sealed record CmeCollapseQualificationResult(
+    CmeCollapseDisposition Disposition,
+    CmeCollapseResidueClass ResidueClass,
+    double ClassificationConfidence,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    string SourceSubsystem,
+    string TargetClass);
 
 public sealed record GovernanceCycleStartRequest(
     Guid IdentityId,
@@ -175,7 +210,20 @@ public sealed record CmeCollapseRoutingDecision(
     string ReasonCode,
     string IssuedBy,
     DateTime IssuedAt,
-    string TargetClass);
+    string TargetClass,
+    double ClassificationConfidence,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    string SourceSubsystem);
+
+public sealed record CmeCollapseQualificationView(
+    string Destination,
+    CmeCollapseResidueClass ResidueClass,
+    double ClassificationConfidence,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    CmeCollapseReviewState ReviewState,
+    string SourceSubsystem);
 
 public sealed record GovernanceGoldenPathResult(
     Guid CandidateId,
@@ -212,6 +260,7 @@ public sealed record GovernanceLoopStatusView(
     GovernanceDecisionView? LatestDecision,
     bool ReengrammitizationCompleted,
     PublicationLaneStatusView Publication,
+    CmeCollapseQualificationView? LatestCollapseQualification,
     string? FailureCode,
     GovernanceLoopStage? FailureStage,
     bool ResumeEligible,
@@ -288,7 +337,13 @@ public sealed record GovernanceActReceipt(
     DateTime Timestamp,
     GovernedPrimeDerivativeLane PublishedLanes,
     string? ReceiptPointer,
-    string? RequestFingerprint);
+    string? RequestFingerprint,
+    string? TargetClass = null,
+    CmeCollapseResidueClass? ResidueClass = null,
+    double? ClassificationConfidence = null,
+    CmeCollapseEvidenceFlag EvidenceFlags = CmeCollapseEvidenceFlag.None,
+    CmeCollapseReviewTrigger ReviewTriggers = CmeCollapseReviewTrigger.None,
+    string? SourceSubsystem = null);
 
 public sealed record GovernanceJournalEntry(
     string LoopKey,
@@ -320,6 +375,7 @@ public sealed record GovernanceLoopStateSnapshot(
     GovernedPrimeDerivativeLane PublishedLanes,
     bool FirstRouteCompleted,
     CmeCollapseDisposition? FirstRouteDisposition,
+    CmeCollapseQualificationView? LatestCollapseQualification,
     bool ReengrammitizationCompleted,
     bool IsTerminal,
     string? FailureCode,
@@ -346,6 +402,11 @@ public interface IReturnGovernanceAdjudicator
     GovernedPrimePublicationRequest? CreatePrimePublicationRequest(
         ReturnCandidateReviewRequest request,
         GovernanceDecisionReceipt receipt);
+}
+
+public interface ICmeCollapseQualifier
+{
+    CmeCollapseQualificationResult Qualify(CmeCollapseClassification classification);
 }
 
 public interface IGovernanceReceiptJournal
@@ -469,6 +530,7 @@ public static class GovernanceLoopStateModel
         var publishedLanes = GovernedPrimeDerivativeLane.Neither;
         var firstRouteCompleted = false;
         CmeCollapseDisposition? firstRouteDisposition = null;
+        CmeCollapseQualificationView? latestCollapseQualification = null;
         var reengrammitizationCompleted = false;
         var stage = GovernanceLoopStage.SourceCustodyAvailable;
         string? failureCode = null;
@@ -514,16 +576,52 @@ public static class GovernanceLoopStateModel
                     }
                 }
 
+                if (entry.ActReceipt.ActKind == GovernanceActKind.Reengrammitization)
+                {
+                    latestCollapseQualification = BuildCollapseQualificationView(
+                        entry.ActReceipt,
+                        defaultTargetClass: "cMoS",
+                        defaultResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                        defaultReviewState: stage == GovernanceLoopStage.GovernanceDecisionDeferred
+                            ? CmeCollapseReviewState.DeferredReview
+                            : CmeCollapseReviewState.None,
+                        defaultSourceSubsystem: reviewRequest?.CollapseClassification.SourceSubsystem);
+                }
+
                 if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCMoS && entry.ActReceipt.Succeeded)
                 {
                     firstRouteCompleted = true;
                     firstRouteDisposition = CmeCollapseDisposition.RouteToCMoS;
                 }
 
+                if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCMoS)
+                {
+                    latestCollapseQualification = BuildCollapseQualificationView(
+                        entry.ActReceipt,
+                        defaultTargetClass: "cMoS",
+                        defaultResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                        defaultReviewState: stage == GovernanceLoopStage.GovernanceDecisionDeferred
+                            ? CmeCollapseReviewState.DeferredReview
+                            : CmeCollapseReviewState.None,
+                        defaultSourceSubsystem: reviewRequest?.CollapseClassification.SourceSubsystem);
+                }
+
                 if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCGoA && entry.ActReceipt.Succeeded)
                 {
                     firstRouteCompleted = true;
                     firstRouteDisposition = CmeCollapseDisposition.RouteToCGoA;
+                }
+
+                if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCGoA)
+                {
+                    latestCollapseQualification = BuildCollapseQualificationView(
+                        entry.ActReceipt,
+                        defaultTargetClass: "cGoA",
+                        defaultResidueClass: CmeCollapseResidueClass.ContextualProtected,
+                        defaultReviewState: stage == GovernanceLoopStage.GovernanceDecisionDeferred
+                            ? CmeCollapseReviewState.DeferredReview
+                            : CmeCollapseReviewState.None,
+                        defaultSourceSubsystem: reviewRequest?.CollapseClassification.SourceSubsystem);
                 }
             }
         }
@@ -544,6 +642,7 @@ public static class GovernanceLoopStateModel
             publishedLanes,
             firstRouteCompleted,
             firstRouteDisposition,
+            latestCollapseQualification,
             reengrammitizationCompleted,
             isTerminal,
             failureCode,
@@ -610,32 +709,46 @@ public static class GovernanceLoopStateModel
 
     public static CmeCollapseRoutingDecision? BuildCollapseRoutingDecision(
         GovernanceDecisionReceipt decisionReceipt,
-        ReturnCandidateReviewRequest reviewRequest)
+        CmeCollapseQualificationResult qualification)
     {
         ArgumentNullException.ThrowIfNull(decisionReceipt);
-        ArgumentNullException.ThrowIfNull(reviewRequest);
+        ArgumentNullException.ThrowIfNull(qualification);
 
         if (decisionReceipt.Decision == GovernanceDecision.Rejected)
         {
             return null;
         }
 
-        var residueClass = reviewRequest.CollapseClassification.AutobiographicalRelevant || reviewRequest.CollapseClassification.SelfGelIdentified
-            ? CmeCollapseResidueClass.AutobiographicalProtected
-            : CmeCollapseResidueClass.ContextualProtected;
-        var disposition = residueClass == CmeCollapseResidueClass.AutobiographicalProtected
-            ? CmeCollapseDisposition.RouteToCMoS
-            : CmeCollapseDisposition.RouteToCGoA;
-
         return new CmeCollapseRoutingDecision(
-            Disposition: disposition,
-            ResidueClass: residueClass,
+            Disposition: qualification.Disposition,
+            ResidueClass: qualification.ResidueClass,
             ReviewState: decisionReceipt.Decision == GovernanceDecision.Deferred
                 ? CmeCollapseReviewState.DeferredReview
                 : CmeCollapseReviewState.None,
             ReasonCode: decisionReceipt.RationaleCode,
             IssuedBy: decisionReceipt.AdjudicatorIdentity,
             IssuedAt: decisionReceipt.Timestamp,
-            TargetClass: disposition == CmeCollapseDisposition.RouteToCMoS ? "cMoS" : "cGoA");
+            TargetClass: qualification.TargetClass,
+            ClassificationConfidence: qualification.ClassificationConfidence,
+            EvidenceFlags: qualification.EvidenceFlags,
+            ReviewTriggers: qualification.ReviewTriggers,
+            SourceSubsystem: qualification.SourceSubsystem);
+    }
+
+    private static CmeCollapseQualificationView? BuildCollapseQualificationView(
+        GovernanceActReceipt receipt,
+        string defaultTargetClass,
+        CmeCollapseResidueClass defaultResidueClass,
+        CmeCollapseReviewState defaultReviewState,
+        string? defaultSourceSubsystem)
+    {
+        return new CmeCollapseQualificationView(
+            Destination: receipt.TargetClass ?? defaultTargetClass,
+            ResidueClass: receipt.ResidueClass ?? defaultResidueClass,
+            ClassificationConfidence: receipt.ClassificationConfidence ?? 0d,
+            EvidenceFlags: receipt.EvidenceFlags,
+            ReviewTriggers: receipt.ReviewTriggers,
+            ReviewState: defaultReviewState,
+            SourceSubsystem: receipt.SourceSubsystem ?? defaultSourceSubsystem ?? "unknown");
     }
 }

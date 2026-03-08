@@ -15,6 +15,7 @@ Its job is to answer five questions:
 5. which direct paths remain forbidden
 
 This document must now be read together with `docs/CME_CRYPTIC_FIRST_COLLAPSE_CLARIFICATION.md`.
+Qualification criteria for first-route holding are defined in `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`.
 
 ## Current Routing Path
 
@@ -126,6 +127,7 @@ That proves the concepts exist in code, but not yet as the full later-stage rout
 The routing semantics currently live in these objects:
 
 - `CmeCollapseClassification`
+- `CmeCollapseQualificationResult`
 - `CmeCollapseReviewState`
 - `CmeCollapseRoutingDecision`
 - `SoulFrameCollapseEvaluation`
@@ -136,6 +138,13 @@ The routing semantics currently live in these objects:
 - `GovernedPrimePublicationRequest`
 - `DeferredReviewRecord`
 - `GovernanceActReceipt`
+
+The runtime can now explain not only first protected destination, but also the evidence basis for that destination:
+
+- classification confidence
+- evidence flags
+- review-trigger evidence
+- source subsystem provenance
 
 What is still missing is the later-stage routing lattice beyond first protected hold.
 
@@ -196,6 +205,12 @@ The strongest current reality has now been made explicit first:
 3. `DeferredReview`
 
 That keeps the runtime honest under the corrected model by naming first protected destinations before later Dream or `MoS` promotion.
+
+The next qualification layer is now also explicit:
+
+- route explains **where**
+- evidence explains **why**
+- review state explains **whether later adjudication is still required**
 
 ## Completion Condition
 

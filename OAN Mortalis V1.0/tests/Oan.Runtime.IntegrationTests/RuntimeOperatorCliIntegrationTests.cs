@@ -43,6 +43,12 @@ public sealed class RuntimeOperatorCliIntegrationTests
         Assert.Equal(
             "Completed",
             payload.RootElement.GetProperty("result").GetProperty("controlState").GetString());
+        Assert.Equal(
+            "cMoS",
+            payload.RootElement.GetProperty("result").GetProperty("latestCollapseQualification").GetProperty("destination").GetString());
+        Assert.Equal(
+            "AutobiographicalSignal, SelfGelIdentitySignal",
+            payload.RootElement.GetProperty("result").GetProperty("latestCollapseQualification").GetProperty("evidenceFlags").GetString());
     }
 
     [Fact]
@@ -349,7 +355,15 @@ public sealed class RuntimeOperatorCliIntegrationTests
         bool autobiographicalRelevant,
         bool selfGelIdentified,
         double collapseConfidence = 0.92) =>
-        new(collapseConfidence, selfGelIdentified, autobiographicalRelevant);
+        new(
+            collapseConfidence,
+            selfGelIdentified,
+            autobiographicalRelevant,
+            autobiographicalRelevant || selfGelIdentified
+                ? CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal
+                : CmeCollapseEvidenceFlag.ContextualSignal | CmeCollapseEvidenceFlag.ProceduralSignal | CmeCollapseEvidenceFlag.SkillMethodSignal,
+            CmeCollapseReviewTrigger.None,
+            "AgentiCore");
 
     private static StoreRegistry CreateStoreRegistry(
         PublicLayerService publicLayer,
@@ -375,7 +389,8 @@ public sealed class RuntimeOperatorCliIntegrationTests
             crypticCustodyStore: mantle,
             crypticReengrammitizationGate: reengrammitizationGate ?? mantle,
             governedPrimePublicationSink: governedPrimePublicationSink,
-            governanceReceiptJournal: governanceReceiptJournal);
+            governanceReceiptJournal: governanceReceiptJournal,
+            cmeCollapseQualifier: new CmeCollapseQualifier());
     }
 
     private static StewardAgent CreateSteward(
