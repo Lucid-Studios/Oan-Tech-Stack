@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CradleTek.Memory\CradleTek.Memory.csproj" />
+    <ProjectReference Include="..\GEL.Contracts\GEL.Contracts.csproj" />
     <ProjectReference Include="..\GEL\GEL.csproj" />
     <ProjectReference Include="..\SoulFrame.Host\SoulFrame.Host.csproj" />
   </ItemGroup>

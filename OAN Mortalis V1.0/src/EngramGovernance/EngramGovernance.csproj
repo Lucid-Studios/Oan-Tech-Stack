@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CradleTek.Memory\CradleTek.Memory.csproj" />
     <ProjectReference Include="..\CradleTek.Host\CradleTek.Host.csproj" />
+    <ProjectReference Include="..\GEL.Contracts\GEL.Contracts.csproj" />
     <ProjectReference Include="..\OAN.Core\OAN.Core.csproj" />
     <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\Telemetry.GEL\Telemetry.GEL.csproj" />

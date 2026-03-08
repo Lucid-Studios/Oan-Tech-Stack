@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
 using GEL.Graphs;
+using GEL.Models;
+using Oan.Spinal;
 
 namespace SLI.Ingestion;
 
@@ -88,6 +90,50 @@ public sealed partial class ConstructorEngramBuilder
         };
     }
 
+    public IReadOnlyList<EngramDraft> BuildCanonicalDrafts(IReadOnlyList<ConstructorEngramRecord> records)
+    {
+        ArgumentNullException.ThrowIfNull(records);
+
+        return records.Select(record =>
+        {
+            var rootKey = record.RootReferences.FirstOrDefault() ?? record.Domain;
+            var requestedGrade = record.RootReferences.Count > 1
+                ? EngramClosureGrade.Closed
+                : EngramClosureGrade.BootstrapClosed;
+
+            return new EngramDraft
+            {
+                ProposedId = new EngramId(BuildDraftId(record)),
+                RootKey = rootKey,
+                EpistemicClass = MapLevel(record.Level),
+                Trunk = new EngramTrunk
+                {
+                    Segments = [record.SymbolicStructure],
+                    Summary = $"{record.Domain}:{record.Level}"
+                },
+                Branches = record.RootReferences
+                    .Skip(1)
+                    .Select((reference, index) => new EngramBranch
+                    {
+                        Name = $"branch-{index + 1}",
+                        RootKey = reference,
+                        ReferencedEngramId = null,
+                        SymbolicHandle = reference
+                    })
+                    .ToArray(),
+                Invariants =
+                [
+                    new EngramInvariant
+                    {
+                        Key = "constructor.symbolic_structure",
+                        Statement = $"Constructor structure retained for {record.Domain}."
+                    }
+                ],
+                RequestedClosureGrade = requestedGrade
+            };
+        }).ToArray();
+    }
+
     private static bool TryParseLinearEquation(string expression, out LinearEquationDescriptor? equation)
     {
         var match = LinearEquationRegex().Match(expression);
@@ -108,6 +154,20 @@ public sealed partial class ConstructorEngramBuilder
 
     [GeneratedRegex(@"^\s*(?<coef>[-+]?\d+)\s*(?<var>[a-zA-Z])\s*(?<op>[+\-])\s*(?<constant>[-+]?\d+)\s*=\s*(?<rhs>[-+]?\d+)\s*$", RegexOptions.Compiled)]
     private static partial Regex LinearEquationRegex();
+
+    private static string BuildDraftId(ConstructorEngramRecord record)
+    {
+        var projection = $"{record.Domain}|{record.Level}|{record.SymbolicStructure}|{string.Join("|", record.RootReferences)}";
+        return Primitives.ComputeHash(projection);
+    }
+
+    private static EngramEpistemicClass MapLevel(ConstructorEngramLevel level) => level switch
+    {
+        ConstructorEngramLevel.Basic => EngramEpistemicClass.Propositional,
+        ConstructorEngramLevel.Intermediate => EngramEpistemicClass.Procedural,
+        ConstructorEngramLevel.Advanced => EngramEpistemicClass.Perspectival,
+        _ => EngramEpistemicClass.Participatory
+    };
 }
 
 public enum ConstructorEngramLevel

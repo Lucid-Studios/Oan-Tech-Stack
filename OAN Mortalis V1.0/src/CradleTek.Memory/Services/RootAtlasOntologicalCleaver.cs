@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using CradleTek.Memory.Interfaces;
 using CradleTek.Memory.Models;
+using GEL.Models;
 
 namespace CradleTek.Memory.Services;
 
@@ -9,9 +10,10 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
 {
     private readonly object _loadGate = new();
     private bool _loaded;
-    private readonly Dictionary<string, RootAtlasEntry> _entriesByRoot = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, RootAtlasEntry> _entriesByVariant = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, LoadedRootAtlasEntry> _entriesByRoot = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, LoadedRootAtlasEntry> _entriesByVariant = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _symbolsByRoot = new(StringComparer.OrdinalIgnoreCase);
+    private RootAtlas? _canonicalRootAtlas;
 
     public Task<OntologicalCleaverResult> CleaveAsync(string inputText, CancellationToken cancellationToken = default)
     {
@@ -133,24 +135,41 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
                 UnknownRatio = Math.Round(unknownRatio, 6),
                 ConceptDensity = conceptDensity,
                 ContextStability = contextStability
-            }
+            },
+            CanonicalRootAtlas = _canonicalRootAtlas ?? RootAtlas.Create("public_root.gel.v1", Array.Empty<RootAtlasEntry>())
         });
     }
 
-    private RootEngram BuildRootEngram(RootAtlasEntry entry)
+    private RootEngram BuildRootEngram(LoadedRootAtlasEntry entry)
     {
         var symbolId = _symbolsByRoot.TryGetValue(entry.RootTerm, out var symbol) && !string.IsNullOrWhiteSpace(symbol)
             ? $"ATLAS.SYM.{symbol}"
             : $"ATLAS.ROOT.{entry.RootTerm.ToUpperInvariant().Replace('-', '_')}";
+        var canonicalRoot = new PredicateRoot
+        {
+            Key = entry.RootTerm,
+            DisplayLabel = entry.RootTerm,
+            AtlasDomain = $"atlas.root.{entry.RootTerm[0]}",
+            SymbolicHandle = symbolId,
+            DictionaryPointer = $"atlas://root/{entry.RootTerm}"
+        };
+        var canonicalEntry = new RootAtlasEntry
+        {
+            Root = canonicalRoot,
+            VariantForms = entry.Variants.ToList(),
+            FrequencyWeight = entry.FrequencyWeight
+        };
 
         return new RootEngram
         {
             SymbolicId = symbolId,
-            AtlasDomain = $"atlas.root.{entry.RootTerm[0]}",
+            AtlasDomain = canonicalRoot.AtlasDomain,
             RootTerm = entry.RootTerm,
             VariantForms = entry.Variants.ToList(),
             FrequencyWeight = entry.FrequencyWeight,
-            DictionaryPointer = $"atlas://root/{entry.RootTerm}"
+            DictionaryPointer = canonicalRoot.DictionaryPointer!,
+            CanonicalRoot = canonicalRoot,
+            CanonicalAtlasEntry = canonicalEntry
         };
     }
 
@@ -169,6 +188,7 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
             }
 
             LoadPrimeGelRoots();
+            _canonicalRootAtlas = BuildCanonicalRootAtlas();
             _loaded = true;
         }
     }
@@ -266,7 +286,7 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
                 }
             }
 
-            var entry = new RootAtlasEntry(
+            var entry = new LoadedRootAtlasEntry(
                 rootTerm,
                 variants.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(v => v, StringComparer.OrdinalIgnoreCase).ToArray(),
                 maxFrequency);
@@ -423,9 +443,50 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
 
     [GeneratedRegex("\\((?<count>\\d+)\\)\\s*$", RegexOptions.Compiled)]
     private static partial Regex FrequencyRegex();
+
+    private RootAtlas BuildCanonicalRootAtlas()
+    {
+        var entries = _entriesByRoot.Values
+            .OrderBy(entry => entry.RootTerm, StringComparer.OrdinalIgnoreCase)
+            .Select(entry =>
+            {
+                var symbolId = _symbolsByRoot.TryGetValue(entry.RootTerm, out var symbol) && !string.IsNullOrWhiteSpace(symbol)
+                    ? $"ATLAS.SYM.{symbol}"
+                    : $"ATLAS.ROOT.{entry.RootTerm.ToUpperInvariant().Replace('-', '_')}";
+
+                return new RootAtlasEntry
+                {
+                    Root = new PredicateRoot
+                    {
+                        Key = entry.RootTerm,
+                        DisplayLabel = entry.RootTerm,
+                        AtlasDomain = $"atlas.root.{entry.RootTerm[0]}",
+                        SymbolicHandle = symbolId,
+                        DictionaryPointer = $"atlas://root/{entry.RootTerm}"
+                    },
+                    VariantForms = entry.Variants.ToList(),
+                    FrequencyWeight = entry.FrequencyWeight
+                };
+            })
+            .ToArray();
+
+        var domains = entries
+            .Select(entry => entry.Root.AtlasDomain)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(domain => domain, StringComparer.OrdinalIgnoreCase)
+            .Select(domain => new DomainDescriptor
+            {
+                DomainName = domain,
+                Description = $"Prime GEL Root Atlas domain {domain}.",
+                Tags = ["prime-root-atlas", "canonical-root-atlas"]
+            })
+            .ToArray();
+
+        return RootAtlas.Create("public_root.gel.v1", entries, domainDescriptors: domains);
+    }
 }
 
-internal sealed record RootAtlasEntry(
+internal sealed record LoadedRootAtlasEntry(
     string RootTerm,
     IReadOnlyList<string> Variants,
     double FrequencyWeight);

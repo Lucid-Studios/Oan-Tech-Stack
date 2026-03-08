@@ -1,3 +1,5 @@
+using Oan.Spinal;
+
 namespace EngramGovernance.Models;
 
 public sealed class EngramCandidate
@@ -9,4 +11,6 @@ public sealed class EngramCandidate
     public required string CognitionBody { get; init; }
     public required IReadOnlyDictionary<string, string> Metadata { get; init; }
     public required DateTime Timestamp { get; init; }
+    public EngramId? CanonicalEngramId { get; init; }
+    public string? CanonicalRootKey { get; init; }
 }

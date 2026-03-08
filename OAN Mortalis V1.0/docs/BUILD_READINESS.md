@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `56` tests passed across `5` discovered test assemblies
+- `64` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -49,6 +49,7 @@ Observed repository conditions:
 - `global.json` now pins the verified .NET SDK version for the repository
 - A GitHub Actions workflow now exists to restore, build, test, and verify path hygiene for the active build
 - The first lawful `GEL` contract seam now exists as `src/GEL.Contracts`
+- `GEL.Contracts` now owns the canonical Atlas and Engram contract surface, with `RootAtlas`, `EngramDraft`, `Engram`, and one bounded `IEngramClosureValidator` seam instead of parallel meaning models
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -199,6 +200,8 @@ Supporting document:
 - `docs/PRIME_CRYPTIC_DATA_TOPOLOGY.md`
 - `docs/CME_RUNTIME_LIFECYCLE_AND_COLLAPSE_MODEL.md`
 - `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`
+- `docs/ATLAS_ENGRAM_CANONICALIZATION_NOTE.md`
+- `docs/FIRST_ENGRAM_BOOTSTRAP_EXPERIMENT.md`
 - `docs/CME_CRYPTIC_FIRST_COLLAPSE_CLARIFICATION.md`
 - `docs/GOVERNANCE_COLLAPSE_ROUTING_CONFORMANCE.md`
 - `docs/CME_MODULE_CONFORMANCE_QUEUE.md`
