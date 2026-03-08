@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `67` tests passed across `5` discovered test assemblies
+- `70` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -52,6 +52,7 @@ Observed repository conditions:
 - `GEL.Contracts` now owns the canonical Atlas and Engram contract surface, with `RootAtlas`, `EngramDraft`, `Engram`, and one bounded `IEngramClosureValidator` seam instead of parallel meaning models
 - the repo now also has a bounded Atlas-source normalization seam that can ingest a canonical external `RootAtlas` surface and validate supporting root symbol, constructor, and reserved-symbol law layers without changing Golden Path behavior
 - canonical `RootAtlas` entries now preserve symbolic constructor triplets beside lexical variant strings so prefix/root/suffix structure survives normalization instead of being reduced to legality checks alone
+- the repo now also has a bounded symbolic-governance contract seam above the atlas for reserved grammar, reserved disciplinary domains, governance/meta symbols, experimental extension space, and explicit known/unknown extension states
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -205,6 +206,10 @@ Supporting document:
 - `docs/ATLAS_ENGRAM_CANONICALIZATION_NOTE.md`
 - `docs/ATLAS_SOURCE_LAYERING.md`
 - `docs/FIRST_ENGRAM_BOOTSTRAP_EXPERIMENT.md`
+- `docs/SYMBOLIC_DOMAIN_CONSTITUTION.md`
+- `docs/ROOT_MANIFOLD_COMPOSITION_MODEL.md`
+- `docs/SEED_GEL_BOOTSTRAP_MANIFEST.md`
+- `docs/KNOWN_UNKNOWN_EXTENSION_SEMANTICS.md`
 - `docs/CME_CRYPTIC_FIRST_COLLAPSE_CLARIFICATION.md`
 - `docs/GOVERNANCE_COLLAPSE_ROUTING_CONFORMANCE.md`
 - `docs/CME_MODULE_CONFORMANCE_QUEUE.md`

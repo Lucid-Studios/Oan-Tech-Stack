@@ -29,6 +29,7 @@ The experiment assumes:
 
 - canonical Atlas and Engram contracts in `GEL.Contracts`
 - deterministic `RootAtlas` identity
+- explicit symbolic domain constitution
 - bounded `IEngramClosureValidator`
 - current governance-first Golden Path remains unchanged
 - current `SelfGEL` / `cSelfGEL` law remains unchanged
@@ -44,6 +45,14 @@ The bootstrap run must use one pinned `RootAtlas` object with:
 - optional domain descriptors
 
 No ambient atlas collections are allowed.
+
+The bootstrap run must also use one pinned symbolic constitution object that reserves:
+
+- grammar operator space
+- root-native symbolic core space
+- governance/meta space
+- disciplinary reserved domains
+- experimental extension space
 
 That pinned object may come from:
 
@@ -90,6 +99,7 @@ The protocol must keep the following classes separate:
 - OE/cOE admission
 - `SelfGEL` / `cSelfGEL` effects
 - any GEL/cGEL consequence
+- symbolic domain collision or bridge diagnostics
 
 Symbolic trace must not be silently treated as a candidate Engram.
 
@@ -113,7 +123,9 @@ The bootstrap experiment only reserves them.
 The bootstrap phase is successful when:
 
 - the `RootAtlas` used for evaluation is deterministic and pinned
+- the symbolic domain constitution used for evaluation is deterministic and pinned
 - `EngramDraft` and `Engram` are no longer conflated
+- the symbolic world is reserved before contextualization generation
 - closure validation is explicit, repeatable, and non-heuristic
 - the repo can distinguish trace, draft, closed Engram, and downstream governance DTOs
 

@@ -10,6 +10,10 @@ The canonical owner is now:
 
 - `src/GEL.Contracts`
 
+The symbolic governance layer above that atlas is now defined separately in:
+
+- `docs/SYMBOLIC_DOMAIN_CONSTITUTION.md`
+
 This phase does not introduce a new cognition subsystem, append engine, or OE/cOE mutation path.
 
 ## Canonical Owner
@@ -84,6 +88,14 @@ The source layers may normalize into one canonical `RootAtlas`, but they must no
 Supporting note:
 
 - `docs/ATLAS_SOURCE_LAYERING.md`
+
+The symbolic space above that normalized atlas is not open by default. It now distinguishes:
+
+- grammar operator space
+- atlas-owned root core space
+- reserved disciplinary domains
+- governance/meta space
+- experimental extension space
 
 ## Canonical Symbolic Constructor Bodies
 
@@ -161,6 +173,7 @@ It may still exist for legacy sheaf/runtime surfaces, but it must no longer be r
 The repo now says plainly:
 
 - Atlas first
+- symbolic domain law above atlas
 - then Engram draft
 - then closure validation
 - then only later governed memory movement

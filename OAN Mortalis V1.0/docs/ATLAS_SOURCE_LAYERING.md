@@ -54,6 +54,12 @@ The intended layering is:
   - variants
   - symbolic constructor triplets
   - stable canonical identity
+- symbolic governance layer
+  - reserved grammar operators
+  - atlas-owned root-native cores
+  - reserved disciplinary domains
+  - governance/meta symbols
+  - experimental extension space
 
 ## Normalization Rule
 
@@ -64,7 +70,8 @@ The repo should treat the source layers in this order:
 3. validate prefix/suffix constructor references
 4. validate reserved symbol and collision policy
 5. preserve canonical prefix-root-suffix constructor bodies
-6. produce one canonical `RootAtlas`
+6. validate symbolic domain reservation and bridge policy
+7. produce one canonical `RootAtlas`
 
 The supporting source files are not co-equal meaning models.
 
@@ -112,3 +119,8 @@ The triplet is the canonical object.
 The merged glyph, if present, is only a rendered artifact.
 
 No symbolic contextualization generation should proceed from this Atlas layer unless the constructor body is structurally represented, not merely validated.
+
+That rule now sits under:
+
+- `docs/SYMBOLIC_DOMAIN_CONSTITUTION.md`
+- `docs/KNOWN_UNKNOWN_EXTENSION_SEMANTICS.md`
