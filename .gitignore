@@ -12,6 +12,7 @@
 # Logs and diagnostics
 *.log
 *.binlog
+/.audit/
 
 # Build status artifacts with machine-local paths
 OAN Mortalis V1.0/audit_results.txt

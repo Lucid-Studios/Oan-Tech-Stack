@@ -631,6 +631,7 @@ public static class HeadlessRuntimeBootstrap
             crypticLayer,
             telemetry,
             governanceJournal: journal);
+        var collapseQualifier = new CmeCollapseQualifier();
 
         var stores = new StoreRegistry(
             governanceTelemetry: govTelemetry,
@@ -647,7 +648,8 @@ public static class HeadlessRuntimeBootstrap
             crypticCustodyStore: mantle,
             crypticReengrammitizationGate: mantle,
             governedPrimePublicationSink: publicLayer,
-            governanceReceiptJournal: journal);
+            governanceReceiptJournal: journal,
+            cmeCollapseQualifier: collapseQualifier);
 
         var manager = new StackManager(stores);
         return new RuntimeOperatorContext(manager, steward, manager);

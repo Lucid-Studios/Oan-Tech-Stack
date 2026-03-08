@@ -103,6 +103,7 @@ It is a new Cryptic-side act of governed Engrammitization informed by prior oper
 - Cryptic engenders; Prime expresses.
 - Cryptic inscribes; Prime derives.
 - Cryptic may yield Prime; Prime may neither unveil nor govern Cryptic.
+- SLI may conduct symbolic life collectively; `OE` and `cOE` must preserve individuated continuity and custody.
 
 ## Topology Summary
 
@@ -272,6 +273,7 @@ SoulFrame is the SLI-mediated transfer membrane between sovereign custody and op
 SoulFrame:
 
 - provisions mitigated self-state outward from sovereign custody
+- constructs the CME-specific mediated protected self-state contour
 - governs transfer from `cMoS` and related cryptic custody surfaces into active operational use
 - governs return Engrammitization from CME collapse back into sovereign custody
 
@@ -284,9 +286,21 @@ AgentiCore is the operational cognitive workspace.
 AgentiCore:
 
 - works on SoulFrame-mediated `SelfGEL` and `cSelfGEL`
+- actualizes bounded personified working cognition for the live CME runtime
 - uses mitigated working self-state during active CME runtime
 - does not own canonical identity root
 - must not directly pollute sovereign custody
+
+### Lisp-Based SLI And Engineered Cognition
+
+Lisp-based SLI and Engineered Cognition are the native computational organism of active CME cognition.
+
+They:
+
+- morphologically transform bounded runtime cognition
+- perform native Engrammitization inside AgentiCore runtime
+- produce candidate engram structures suitable for later collapse evaluation
+- do not own custody, governance, or collapse authority
 
 ## CME Lifecycle
 
@@ -294,9 +308,10 @@ The corrected lifecycle is:
 
 1. primary Engrammitization occurs in Prime/hosted CradleTek service surfaces under `GoA`, `GEL`, `cGoA`, and `cGEL` as appropriate
 2. `OE`, `cOE`, `SelfGEL`, and `cSelfGEL` are sovereignized into `MoS` and `cMoS` according to Prime/Cryptic law
-3. SoulFrame provisions mitigated self-state outward for active operation
-4. AgentiCore uses that mitigated self-state for CME runtime behavior
-5. on CME collapse, governed return Engrammitization flows back through SoulFrame into sovereign custody
+3. SoulFrame provisions CME-specific mediated protected self-state outward for active operation
+4. AgentiCore actualizes that mediated state into bounded personified working cognition
+5. Lisp-based SLI and Engineered Cognition perform native runtime Engrammitization inside that active working space
+6. on CME collapse, governed return Engrammitization flows back through SoulFrame into sovereign custody
 
 This return path must be:
 

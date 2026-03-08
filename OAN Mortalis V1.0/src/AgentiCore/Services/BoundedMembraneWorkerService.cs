@@ -15,7 +15,8 @@ public sealed record BoundedWorkerState(
     string SessionHandle,
     string WorkingStateHandle,
     string ProvenanceMarker,
-    string TargetTheater);
+    string TargetTheater,
+    IMediatedSelfStateContour MediatedSelfState);
 
 public sealed class BoundedMembraneWorkerService
 {
@@ -54,19 +55,22 @@ public sealed class BoundedMembraneWorkerService
             projection.SessionHandle,
             projection.WorkingStateHandle,
             projection.ProvenanceMarker,
-            projection.TargetTheater);
+            projection.TargetTheater,
+            projection.MediatedSelfState);
     }
 
     public Task<SoulFrameReturnIntakeReceipt> SubmitReturnCandidateAsync(
         BoundedWorkerState state,
         string sourceTheater,
         string returnCandidatePointer,
+        CmeCollapseClassification collapseClassification,
         string intakeIntent = "candidate-return-evaluation",
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceTheater);
         ArgumentException.ThrowIfNullOrWhiteSpace(returnCandidatePointer);
+        ArgumentNullException.ThrowIfNull(collapseClassification);
         ArgumentException.ThrowIfNullOrWhiteSpace(intakeIntent);
 
         EnsureBoundedState(state);
@@ -79,7 +83,8 @@ public sealed class BoundedMembraneWorkerService
                 sourceTheater,
                 returnCandidatePointer,
                 state.ProvenanceMarker,
-                intakeIntent),
+                intakeIntent,
+                collapseClassification),
             cancellationToken);
     }
 
@@ -99,6 +104,9 @@ public sealed class BoundedMembraneWorkerService
         {
             throw new InvalidOperationException("Membrane projection provenance must remain witness-only and membrane-derived.");
         }
+
+        EnsureHandlePrefix(projection.MediatedSelfState.CSelfGelHandle, "soulframe-cselfgel://", "MediatedSelfState.CSelfGelHandle");
+        EnsureNoCustodyLeak(projection.MediatedSelfState.CSelfGelHandle, "MediatedSelfState.CSelfGelHandle");
 
         EnsureNoCustodyLeak(projection.SessionHandle, "SessionHandle");
         EnsureNoCustodyLeak(projection.WorkingStateHandle, "WorkingStateHandle");

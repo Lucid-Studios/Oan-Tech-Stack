@@ -110,7 +110,11 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
             request.RequestedTheater,
             IsMitigated: true,
             WorkingStateHandle: BuildWorkingStateHandle(request.CMEId, request.IdentityId),
-            ProvenanceMarker: BuildProjectionProvenance(request.CMEId, request.PolicyHandle));
+            ProvenanceMarker: BuildProjectionProvenance(request.CMEId, request.PolicyHandle),
+            MediatedSelfState: new MediatedSelfStateContour(
+                CSelfGelHandle: BuildCSelfGelHandle(request.CMEId, request.IdentityId),
+                Classification: "mediated-cselfgel-issue",
+                PolicyHandle: request.PolicyHandle));
 
         return Task.FromResult(projection);
     }
@@ -131,7 +135,19 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
             request.IdentityId,
             IntakeHandle: BuildReturnIntakeHandle(request.IdentityId),
             Accepted: true,
-            Disposition: "return-candidate-recorded"));
+            Disposition: "return-candidate-recorded",
+            Evaluation: new SoulFrameCollapseEvaluation(
+                Classification: "candidate-collapse-evaluation",
+                CollapseClassification: request.CollapseClassification,
+                ResidueClass: request.CollapseClassification.AutobiographicalRelevant || request.CollapseClassification.SelfGelIdentified
+                    ? CmeCollapseResidueClass.AutobiographicalProtected
+                    : CmeCollapseResidueClass.ContextualProtected,
+                ReviewState: request.IntakeIntent.Contains("defer", StringComparison.OrdinalIgnoreCase)
+                    ? CmeCollapseReviewState.DeferredReview
+                    : CmeCollapseReviewState.None,
+                RequiresReview: request.IntakeIntent.Contains("defer", StringComparison.OrdinalIgnoreCase),
+                CanRouteToCustody: false,
+                CanPublishPrime: false)));
     }
 
     private async Task<SoulFrameInferenceResponse> ExecuteTaskAsync(
@@ -322,6 +338,9 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
     private static string BuildWorkingStateHandle(string cmeId, Guid identityId) =>
         $"soulframe-working://{cmeId}/{identityId:D}";
+
+    private static string BuildCSelfGelHandle(string cmeId, Guid identityId) =>
+        $"soulframe-cselfgel://{cmeId}/{identityId:D}";
 
     private static string BuildProjectionProvenance(string cmeId, string policyHandle) =>
         $"membrane-derived:cme:{cmeId}|policy:{policyHandle}";

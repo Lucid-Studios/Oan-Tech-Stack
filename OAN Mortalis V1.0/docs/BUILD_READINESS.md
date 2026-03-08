@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `53` tests passed across `5` discovered test assemblies
+- `56` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -52,12 +52,18 @@ Observed repository conditions:
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
+- SoulFrame membrane contracts now name explicit mediated `cSelfGEL` issuance and explicit collapse-evaluation receipt shapes without widening the membrane into custody, orchestration, or publication authority
 - The first real AgentiCore membrane caller now exists as a bounded handle-only consumer with one positive and one negative misuse test
 - The AgentiCore cognition cycle now invokes that bounded membrane worker as a thin stage without widening the worker into custody, orchestration, or publication access
+- AgentiCore now names an explicit bounded `SelfGEL` working pool and explicitly distinguishes symbolic trace, candidate engram structure, and transient residue instead of leaving those runtime shapes implicit inside stringly working memory and one JSON blob
 - The first governance-first Golden Path loop is now implemented through `StackManager` with explicit governance adjudication, governed Cryptic re-Engrammitization, and governed Prime derivative publication
+- The Golden Path now names explicit first-route collapse vocabulary for the two routing paths that are already runtime-real today: `RouteToCMoS` and `RouteToCGoA`, with `DeferredReview` modeled separately as review state over first protected holding rather than as a peer routing destination
+- The Golden Path now also records collapse qualification evidence so the runtime can explain first protected destination by classification confidence, evidence flags, review triggers, and source subsystem provenance without changing current routing behavior
 - The v1.1 runtime hardening layer now exists as explicit journal contracts, typed loop-state contracts, and replay-aware Golden Path orchestration
 - The first internal operational control plane now exists as journal-first status views, deferred-review actions, pending-recovery resume actions, and same-loop local execution guards
 - The first local operator surface now exists in `src/Oan.Runtime.Headless` as a CLI-first shell for status, deferred review, and recovery actions over the live control-plane contracts
+- The operator/control-plane surface is now explicitly tied to a bounded future visibility-lattice conformance item so later telemetry growth does not drift into accidental content exposure or ad hoc access semantics
+- The first build audit lane now exists through root `tools/Invoke-Build-Audit.ps1` and `tools/Invoke-Subsystem-Audit.ps1`, emitting local structured audit bundles under `.audit/runs/`
 - `build_error.txt` reflects an older failure and is not current truth
 - `.THIS_IS_THE_ACTIVE_BUILD` now resolves to a present `docs/WORKSPACE_RULES.md` bridge document
 - Foundational research documents may be indexed from a local private corpus root outside the repository, but that path must remain local-only and never be committed into tracked files
@@ -191,13 +197,21 @@ Supporting document:
 - `docs/SYSTEM_ONTOLOGY.md`
 - `docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
 - `docs/PRIME_CRYPTIC_DATA_TOPOLOGY.md`
+- `docs/CME_RUNTIME_LIFECYCLE_AND_COLLAPSE_MODEL.md`
+- `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`
+- `docs/CME_CRYPTIC_FIRST_COLLAPSE_CLARIFICATION.md`
+- `docs/GOVERNANCE_COLLAPSE_ROUTING_CONFORMANCE.md`
+- `docs/CME_MODULE_CONFORMANCE_QUEUE.md`
+- `docs/SLI_NATIVE_ENGRAMMITIZATION_MODEL.md`
 - `docs/CORE_SYSTEMS_MATURATION_PLAN.md`
 - `docs/OPERATIONAL_GOLDEN_PATH.md`
 - `docs/RUNTIME_HARDENING_PLAN.md`
 - `docs/OPERATIONAL_CONTROL_AND_RECOVERY_PLAN.md`
 - `docs/RUNTIME_OPERATOR_SURFACE_PLAN.md`
+- `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`
 - `docs/SANCTUARY_FOUNDING_RUNTIME_BRIEF.md`
 - `docs/HOLOGRAPHIC_DATA_TOOL.md`
+- `../docs/BUILD_AUDIT_PATH.md`
 - `docs/DEPENDENCY_AUDIT.md`
 - `docs/refactors/GEL_SPLIT_PLAN.md`
 - `docs/refactors/GEL_CONTRACTS_EXTRACTION_PROMPT.md`

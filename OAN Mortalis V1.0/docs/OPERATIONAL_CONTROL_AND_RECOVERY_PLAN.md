@@ -134,3 +134,20 @@ This phase is complete when:
 - same-loop concurrent execution is suppressed locally
 - malformed journal evidence fails safe
 - build, tests, and hygiene remain green
+
+## Next Bounded Conformance Item
+
+The next control-plane conformance target is alignment with the operator telemetry visibility lattice in `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`.
+
+This does not yet require a richer operator experience or privileged display logic.
+
+It only requires that future status/read models be extended carefully enough to carry descriptive metadata for:
+
+- visibility class
+- consent state
+- governed access state
+- privileged access state
+- protection or classification posture
+- disclosure eligibility summary
+
+The intent is to keep the live control plane consistent with the later lattice without prematurely implementing tiered disclosure behavior.

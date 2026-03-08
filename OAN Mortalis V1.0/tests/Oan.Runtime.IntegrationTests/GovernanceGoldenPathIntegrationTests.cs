@@ -59,6 +59,14 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernanceLoopStage.LoopCompleted, result.Stage);
         Assert.NotNull(result.ReengrammitizationReceipt);
         Assert.True(result.ReengrammitizationReceipt!.Accepted);
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RouteToCMoS, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal(CmeCollapseReviewState.None, result.CollapseRoutingDecision.ReviewState);
+        Assert.Equal("cMoS", result.CollapseRoutingDecision.TargetClass);
+        Assert.Equal(1.0, result.CollapseRoutingDecision.ClassificationConfidence);
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.AutobiographicalSignal));
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.SelfGelIdentitySignal));
+        Assert.Equal(CmeCollapseReviewTrigger.None, result.CollapseRoutingDecision.ReviewTriggers);
         Assert.Equal(
             GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView,
             result.PublishedLanes);
@@ -96,6 +104,9 @@ public sealed class GovernanceGoldenPathIntegrationTests
             ReturnCandidatePointer: "agenticore-return://candidate/rejected",
             IntakeIntent: "candidate-return-evaluation",
             CandidatePayload: "{\"decision\":\"accept\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: true,
+                selfGelIdentified: true),
             ResultType: "cognition-accepted",
             EngramCommitRequired: true));
 
@@ -110,6 +121,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernanceDecision.Rejected, result.DecisionReceipt.Decision);
         Assert.Equal(GovernanceLoopStage.GovernanceDecisionRejected, result.Stage);
         Assert.Null(result.ReengrammitizationReceipt);
+        Assert.Null(result.CollapseRoutingDecision);
         Assert.Equal(GovernedPrimeDerivativeLane.Neither, result.PublishedLanes);
         Assert.Empty(derivativeViews);
         Assert.Single(crypticRecords);
@@ -143,6 +155,9 @@ public sealed class GovernanceGoldenPathIntegrationTests
             ReturnCandidatePointer: "agenticore-return://candidate/deferred",
             IntakeIntent: "defer-review",
             CandidatePayload: "{\"decision\":\"accept\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: true,
+                selfGelIdentified: true),
             ResultType: "cognition-accepted",
             EngramCommitRequired: true));
 
@@ -158,10 +173,148 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernanceDecision.Deferred, result.DecisionReceipt.Decision);
         Assert.Equal(GovernanceLoopStage.GovernanceDecisionDeferred, result.Stage);
         Assert.Null(result.ReengrammitizationReceipt);
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RouteToCMoS, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal(CmeCollapseReviewState.DeferredReview, result.CollapseRoutingDecision.ReviewState);
+        Assert.Equal("cMoS", result.CollapseRoutingDecision.TargetClass);
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.AutobiographicalSignal));
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.SelfGelIdentitySignal));
         Assert.Equal(GovernedPrimeDerivativeLane.Neither, result.PublishedLanes);
         Assert.Empty(derivativeViews);
-        Assert.Single(crypticRecords);
+        Assert.Equal(2, crypticRecords.Count);
         Assert.Single(deferred);
+    }
+
+    [Fact]
+    public async Task GoldenPath_ApprovedContextualCycle_HoldsInCGoA_WithoutReengrammitization()
+    {
+        var telemetry = new GelTelemetryAdapter();
+        var publicLayer = new PublicLayerService();
+        var crypticLayer = new CrypticLayerService();
+        var mantle = new MantleOfSovereigntyService();
+        var steward = CreateSteward(publicLayer, crypticLayer, telemetry);
+        var identityId = Guid.NewGuid();
+        var request = CreateGoldenPathRequest(identityId);
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+
+        await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
+
+        var cognition = new FakeGovernanceCognitionService(CreateApprovedContextualWorkResult(identityId, request));
+        var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, soulFrameMembrane: null, cognition, steward);
+        var manager = new StackManager(stores);
+
+        var result = await manager.RunGovernanceGoldenPathAsync(request);
+        var derivativeViews = await publicLayer.ListDerivativeViewsAsync();
+        var replay = await journal.ReplayLoopAsync(result.LoopKey);
+
+        Assert.Equal(GovernanceDecision.Approved, result.DecisionReceipt.Decision);
+        Assert.Equal(GovernanceLoopStage.LoopCompleted, result.Stage);
+        Assert.Null(result.ReengrammitizationReceipt);
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RouteToCGoA, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal(CmeCollapseReviewState.None, result.CollapseRoutingDecision.ReviewState);
+        Assert.Equal("cGoA", result.CollapseRoutingDecision.TargetClass);
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.ContextualSignal));
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.ProceduralSignal));
+        Assert.Equal(
+            GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView,
+            result.PublishedLanes);
+        Assert.Contains(
+            replay,
+            entry => entry.ActReceipt?.ActKind == GovernanceActKind.CollapseHoldToCGoA && entry.ActReceipt.Succeeded);
+        Assert.Contains(derivativeViews, view => view.RepresentationKind == "pointer");
+        Assert.Contains(derivativeViews, view => view.RepresentationKind == "checked-view");
+    }
+
+    [Fact]
+    public async Task GoldenPath_DeferredContextualCycle_HoldsInCGoA_AndPersistsReview()
+    {
+        var telemetry = new GelTelemetryAdapter();
+        var publicLayer = new PublicLayerService();
+        var mantle = new MantleOfSovereigntyService();
+        var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
+        var identityId = Guid.NewGuid();
+        var request = CreateGoldenPathRequest(identityId);
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+
+        await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
+
+        var cognition = new FakeGovernanceCognitionService(CreateDeferredContextualWorkResult(identityId, request));
+        var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, soulFrameMembrane: null, cognition, steward);
+        var manager = new StackManager(stores);
+
+        var result = await manager.RunGovernanceGoldenPathAsync(request);
+        var derivativeViews = await publicLayer.ListDerivativeViewsAsync();
+        var replay = await journal.ReplayLoopAsync(result.LoopKey);
+        var deferred = await steward.ListDeferredCandidatesAsync();
+
+        Assert.Equal(GovernanceDecision.Deferred, result.DecisionReceipt.Decision);
+        Assert.Equal(GovernanceLoopStage.GovernanceDecisionDeferred, result.Stage);
+        Assert.Null(result.ReengrammitizationReceipt);
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RouteToCGoA, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal(CmeCollapseReviewState.DeferredReview, result.CollapseRoutingDecision.ReviewState);
+        Assert.Equal("cGoA", result.CollapseRoutingDecision.TargetClass);
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.ContextualSignal));
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.ProceduralSignal));
+        Assert.Equal(GovernedPrimeDerivativeLane.Neither, result.PublishedLanes);
+        Assert.Empty(derivativeViews);
+        Assert.Contains(
+            replay,
+            entry => entry.ActReceipt?.ActKind == GovernanceActKind.CollapseHoldToCGoA && entry.ActReceipt.Succeeded);
+        Assert.Single(deferred);
+    }
+
+    [Fact]
+    public async Task GoldenPath_LowConfidenceMixedSignals_RecordReviewTriggers_WithoutChangingRoute()
+    {
+        var telemetry = new GelTelemetryAdapter();
+        var publicLayer = new PublicLayerService();
+        var mantle = new MantleOfSovereigntyService();
+        var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
+        var identityId = Guid.NewGuid();
+        var request = CreateGoldenPathRequest(identityId);
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+
+        await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
+
+        var cognition = new FakeGovernanceCognitionService(new GovernanceCycleWorkResult(
+            CandidateId: Guid.NewGuid(),
+            IdentityId: identityId,
+            SoulFrameId: request.SoulFrameId,
+            ContextId: Guid.NewGuid(),
+            CMEId: request.CMEId,
+            SourceTheater: "prime",
+            RequestedTheater: "prime",
+            SessionHandle: "soulframe-session://cme-runtime/mixed",
+            WorkingStateHandle: "soulframe-working://cme-runtime/mixed",
+            ProvenanceMarker: "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle",
+            ReturnCandidatePointer: "agenticore-return://candidate/mixed",
+            IntakeIntent: "candidate-return-evaluation",
+            CandidatePayload: "{\"decision\":\"accept\"}",
+            CollapseClassification: new CmeCollapseClassification(
+                CollapseConfidence: 0.51,
+                SelfGelIdentified: true,
+                AutobiographicalRelevant: false,
+                EvidenceFlags: CmeCollapseEvidenceFlag.SelfGelIdentitySignal |
+                               CmeCollapseEvidenceFlag.ContextualSignal |
+                               CmeCollapseEvidenceFlag.ProceduralSignal,
+                ReviewTriggers: CmeCollapseReviewTrigger.None,
+                SourceSubsystem: "AgentiCore"),
+            ResultType: "cognition-mixed",
+            EngramCommitRequired: true));
+
+        var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, soulFrameMembrane: null, cognition, steward);
+        var manager = new StackManager(stores);
+
+        var result = await manager.RunGovernanceGoldenPathAsync(request);
+
+        Assert.NotNull(result.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RouteToCMoS, result.CollapseRoutingDecision!.Disposition);
+        Assert.Equal(CmeCollapseReviewState.None, result.CollapseRoutingDecision.ReviewState);
+        Assert.True(result.CollapseRoutingDecision.ReviewTriggers.HasFlag(CmeCollapseReviewTrigger.LowConfidence));
+        Assert.True(result.CollapseRoutingDecision.ReviewTriggers.HasFlag(CmeCollapseReviewTrigger.MixedIdentityContext));
+        Assert.True(result.CollapseRoutingDecision.EvidenceFlags.HasFlag(CmeCollapseEvidenceFlag.MixedSignal));
     }
 
     [Fact]
@@ -248,6 +401,9 @@ public sealed class GovernanceGoldenPathIntegrationTests
 
         Assert.Equal(GovernanceLoopStage.PendingRecovery, first.Stage);
         Assert.Equal(GovernedPrimeDerivativeLane.Pointer, first.PublishedLanes);
+        Assert.NotNull(first.CollapseRoutingDecision);
+        Assert.Equal(CmeCollapseDisposition.RouteToCMoS, first.CollapseRoutingDecision!.Disposition);
+        Assert.Equal(CmeCollapseReviewState.None, first.CollapseRoutingDecision.ReviewState);
         Assert.Single(firstViews);
         Assert.Equal(GovernanceLoopStage.LoopCompleted, second.Stage);
         Assert.Equal(
@@ -294,7 +450,8 @@ public sealed class GovernanceGoldenPathIntegrationTests
             crypticCustodyStore: mantle,
             crypticReengrammitizationGate: reengrammitizationGate ?? mantle,
             governedPrimePublicationSink: governedPrimePublicationSink,
-            governanceReceiptJournal: governanceReceiptJournal);
+            governanceReceiptJournal: governanceReceiptJournal,
+            cmeCollapseQualifier: new CmeCollapseQualifier());
     }
 
     private static GovernanceCycleWorkResult CreateApprovedWorkResult(Guid identityId, GovernanceCycleStartRequest request)
@@ -313,9 +470,73 @@ public sealed class GovernanceGoldenPathIntegrationTests
             ReturnCandidatePointer: "agenticore-return://candidate/approved",
             IntakeIntent: "candidate-return-evaluation",
             CandidatePayload: "{\"decision\":\"accept\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: true,
+                selfGelIdentified: true),
             ResultType: "cognition-accepted",
             EngramCommitRequired: true);
     }
+
+    private static GovernanceCycleWorkResult CreateApprovedContextualWorkResult(Guid identityId, GovernanceCycleStartRequest request)
+    {
+        return new GovernanceCycleWorkResult(
+            CandidateId: new Guid("33333333-3333-3333-3333-333333333333"),
+            IdentityId: identityId,
+            SoulFrameId: request.SoulFrameId,
+            ContextId: Guid.NewGuid(),
+            CMEId: request.CMEId,
+            SourceTheater: "prime",
+            RequestedTheater: "prime",
+            SessionHandle: "soulframe-session://cme-runtime/contextual",
+            WorkingStateHandle: "soulframe-working://cme-runtime/contextual",
+            ProvenanceMarker: "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle",
+            ReturnCandidatePointer: "agenticore-return://candidate/contextual",
+            IntakeIntent: "candidate-return-evaluation",
+            CandidatePayload: "{\"decision\":\"contextual\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: false,
+                selfGelIdentified: false),
+            ResultType: "cognition-accepted",
+            EngramCommitRequired: false);
+    }
+
+    private static GovernanceCycleWorkResult CreateDeferredContextualWorkResult(Guid identityId, GovernanceCycleStartRequest request)
+    {
+        return new GovernanceCycleWorkResult(
+            CandidateId: new Guid("44444444-4444-4444-4444-444444444444"),
+            IdentityId: identityId,
+            SoulFrameId: request.SoulFrameId,
+            ContextId: Guid.NewGuid(),
+            CMEId: request.CMEId,
+            SourceTheater: "prime",
+            RequestedTheater: "prime",
+            SessionHandle: "soulframe-session://cme-runtime/deferred-contextual",
+            WorkingStateHandle: "soulframe-working://cme-runtime/deferred-contextual",
+            ProvenanceMarker: "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle",
+            ReturnCandidatePointer: "agenticore-return://candidate/deferred-contextual",
+            IntakeIntent: "defer-review",
+            CandidatePayload: "{\"decision\":\"contextual-review\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: false,
+                selfGelIdentified: false,
+                collapseConfidence: 0.51),
+            ResultType: "cognition-review",
+            EngramCommitRequired: false);
+    }
+
+    private static CmeCollapseClassification CreateCollapseClassification(
+        bool autobiographicalRelevant,
+        bool selfGelIdentified,
+        double collapseConfidence = 0.92) =>
+        new(
+            collapseConfidence,
+            selfGelIdentified,
+            autobiographicalRelevant,
+            autobiographicalRelevant || selfGelIdentified
+                ? CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal
+                : CmeCollapseEvidenceFlag.ContextualSignal | CmeCollapseEvidenceFlag.ProceduralSignal | CmeCollapseEvidenceFlag.SkillMethodSignal,
+            CmeCollapseReviewTrigger.None,
+            "AgentiCore");
 
     private static string CreateJournalPath() =>
         Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.governance.ndjson");

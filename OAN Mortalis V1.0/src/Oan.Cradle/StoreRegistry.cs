@@ -21,6 +21,7 @@ namespace Oan.Cradle
         public ICrypticReengrammitizationGate? CrypticReengrammitizationGate { get; }
         public IGovernedPrimePublicationSink? GovernedPrimePublicationSink { get; }
         public IGovernanceReceiptJournal? GovernanceReceiptJournal { get; }
+        public ICmeCollapseQualifier? CmeCollapseQualifier { get; }
 
         public bool PublicAvailable { get; }
         public bool CrypticAvailable { get; }
@@ -40,7 +41,8 @@ namespace Oan.Cradle
             ICrypticCustodyStore? crypticCustodyStore = null,
             ICrypticReengrammitizationGate? crypticReengrammitizationGate = null,
             IGovernedPrimePublicationSink? governedPrimePublicationSink = null,
-            IGovernanceReceiptJournal? governanceReceiptJournal = null)
+            IGovernanceReceiptJournal? governanceReceiptJournal = null,
+            ICmeCollapseQualifier? cmeCollapseQualifier = null)
         {
             GovernanceTelemetry = governanceTelemetry;
             StorageTelemetry = storageTelemetry;
@@ -57,6 +59,7 @@ namespace Oan.Cradle
             CrypticReengrammitizationGate = crypticReengrammitizationGate;
             GovernedPrimePublicationSink = governedPrimePublicationSink;
             GovernanceReceiptJournal = governanceReceiptJournal;
+            CmeCollapseQualifier = cmeCollapseQualifier;
         }
 
         public StoreRegistry(

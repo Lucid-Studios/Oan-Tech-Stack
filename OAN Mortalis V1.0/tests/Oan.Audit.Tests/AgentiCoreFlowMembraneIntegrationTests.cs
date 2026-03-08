@@ -46,12 +46,26 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
 
         Assert.Equal(context.ContextId, result.ContextId);
         Assert.Equal("cognition-accepted", result.ResultType);
+        Assert.NotNull(context.SelfGelWorkingPool);
+        Assert.Same(context.SelfGelWorkingPool, result.SelfGelWorkingPool);
+        Assert.Equal("bounded-selfgel-working-pool", result.SelfGelWorkingPool.Classification);
+        Assert.StartsWith("soulframe-cselfgel://", result.SelfGelWorkingPool.CSelfGelHandle, StringComparison.Ordinal);
+        Assert.Equal("symbolic-trace", result.SymbolicTrace.Classification);
+        Assert.Equal("candidate-engram-structure", result.EngramCandidate.Classification);
+        Assert.Equal("residue", result.TransientResidue.CleaveResidue);
         Assert.Equal("prime", context.WorkingMemory["membrane_target_theater"]);
         Assert.StartsWith("soulframe-session://", context.WorkingMemory["membrane_session_handle"], StringComparison.Ordinal);
         Assert.StartsWith("soulframe-working://", context.WorkingMemory["membrane_working_state_handle"], StringComparison.Ordinal);
         Assert.StartsWith("membrane-derived:", context.WorkingMemory["membrane_provenance_marker"], StringComparison.Ordinal);
         Assert.StartsWith("soulframe://return/", context.WorkingMemory["membrane_return_handle"], StringComparison.Ordinal);
         Assert.Equal("return-candidate-recorded", context.WorkingMemory["membrane_return_disposition"]);
+        Assert.Equal(context.WorkingMemory["membrane_working_state_handle"], result.SelfGelWorkingPool.WorkingStateHandle);
+        Assert.Equal(context.WorkingMemory["membrane_provenance_marker"], result.SelfGelWorkingPool.ProvenanceMarker);
+        Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
+        Assert.Equal(["step-a", "step-b"], result.SymbolicTrace.Steps);
+        Assert.Equal(["token-a"], result.SymbolicTrace.Tokens);
+        Assert.StartsWith("agenticore-return://", result.EngramCandidate.ReturnCandidatePointer, StringComparison.Ordinal);
+        Assert.DoesNotContain("cmos://", result.SelfGelWorkingPool.CSelfGelHandle, StringComparison.OrdinalIgnoreCase);
 
         Assert.NotNull(membrane.LastProjectionRequest);
         Assert.NotNull(membrane.LastReturnRequest);
@@ -74,7 +88,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                 TargetTheater: "prime",
                 IsMitigated: true,
                 WorkingStateHandle: "cmos://raw-state/forged",
-                ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle")
+                ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle",
+                MediatedSelfState: CreateMediatedSelfState("cme-alpha", "agenticore.cognition.cycle"))
         };
         var boundedWorker = new BoundedMembraneWorkerService(membrane);
         var cognition = new AgentiCoreService(
@@ -94,6 +109,12 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             cognition.ExecuteCognitionCycleAsync(CreateContext(), "solve bounded task"));
     }
+
+    private static MediatedSelfStateContour CreateMediatedSelfState(string cmeId, string policyHandle) =>
+        new(
+            CSelfGelHandle: $"soulframe-cselfgel://{cmeId}/{Guid.NewGuid():D}",
+            Classification: "mediated-cselfgel-issue",
+            PolicyHandle: policyHandle);
 
     private static AgentiContext CreateContext()
     {
@@ -285,7 +306,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             TargetTheater: "prime",
             IsMitigated: true,
             WorkingStateHandle: "soulframe-working://cme-alpha/default",
-            ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle");
+            ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:agenticore.cognition.cycle",
+            MediatedSelfState: CreateMediatedSelfState("cme-alpha", "agenticore.cognition.cycle"));
 
         public Task<ISelfStateProjection> ProjectMitigatedAsync(
             SoulFrameProjectionRequest request,
@@ -304,8 +326,23 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                 request.IdentityId,
                 IntakeHandle: "soulframe://return/integration",
                 Accepted: true,
-                Disposition: "return-candidate-recorded"));
+                Disposition: "return-candidate-recorded",
+                Evaluation: new SoulFrameCollapseEvaluation(
+                    Classification: "candidate-collapse-evaluation",
+                    CollapseClassification: new CmeCollapseClassification(
+                        CollapseConfidence: 0.92,
+                        SelfGelIdentified: true,
+                        AutobiographicalRelevant: true,
+                        EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
+                        ReviewTriggers: CmeCollapseReviewTrigger.None,
+                        SourceSubsystem: "AgentiCore"),
+                    ResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                    ReviewState: CmeCollapseReviewState.DeferredReview,
+                    RequiresReview: true,
+                    CanRouteToCustody: false,
+                    CanPublishPrime: false)));
         }
+
     }
 
     private sealed class DelegatingHandlerStub : HttpMessageHandler

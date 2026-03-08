@@ -23,7 +23,8 @@ public sealed class AgentiCoreMembraneCallerTests
         var receipt = await worker.SubmitReturnCandidateAsync(
             state,
             sourceTheater: "prime",
-            returnCandidatePointer: "agenticore-return://delta/42");
+            returnCandidatePointer: "agenticore-return://delta/42",
+            collapseClassification: CreateCollapseClassification());
 
         Assert.Equal(identityId, state.IdentityId);
         Assert.Equal("cme-alpha", state.CMEId);
@@ -52,7 +53,8 @@ public sealed class AgentiCoreMembraneCallerTests
                 TargetTheater: "prime",
                 IsMitigated: true,
                 WorkingStateHandle: "cmos://raw-state/forged",
-                ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:policy-17")
+                ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:policy-17",
+                MediatedSelfState: CreateMediatedSelfState("cme-alpha", "policy-17"))
         };
         var worker = new BoundedMembraneWorkerService(membrane);
 
@@ -66,6 +68,12 @@ public sealed class AgentiCoreMembraneCallerTests
                     PolicyHandle: "policy-17")));
     }
 
+    private static MediatedSelfStateContour CreateMediatedSelfState(string cmeId, string policyHandle) =>
+        new(
+            CSelfGelHandle: $"soulframe-cselfgel://{cmeId}/{Guid.NewGuid():D}",
+            Classification: "mediated-cselfgel-issue",
+            PolicyHandle: policyHandle);
+
     private sealed class RecordingMembrane : ISoulFrameMembrane
     {
         public SoulFrameProjectionRequest? LastProjectionRequest { get; private set; }
@@ -78,7 +86,8 @@ public sealed class AgentiCoreMembraneCallerTests
             TargetTheater: "prime",
             IsMitigated: true,
             WorkingStateHandle: "soulframe-working://cme-alpha/default",
-            ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:policy-17");
+            ProvenanceMarker: "membrane-derived:cme:cme-alpha|policy:policy-17",
+            MediatedSelfState: CreateMediatedSelfState("cme-alpha", "policy-17"));
 
         public Task<ISelfStateProjection> ProjectMitigatedAsync(
             SoulFrameProjectionRequest request,
@@ -97,7 +106,30 @@ public sealed class AgentiCoreMembraneCallerTests
                 request.IdentityId,
                 IntakeHandle: "soulframe://return/test",
                 Accepted: true,
-                Disposition: "return-candidate-recorded"));
+                Disposition: "return-candidate-recorded",
+                Evaluation: new SoulFrameCollapseEvaluation(
+                    Classification: "candidate-collapse-evaluation",
+                    CollapseClassification: CreateCollapseClassification(),
+                    ResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                    ReviewState: CmeCollapseReviewState.DeferredReview,
+                    RequiresReview: true,
+                    CanRouteToCustody: false,
+                    CanPublishPrime: false)));
         }
+
     }
+
+    private static CmeCollapseClassification CreateCollapseClassification(
+        double confidence = 0.92,
+        bool selfGelIdentified = true,
+        bool autobiographicalRelevant = true) =>
+        new(
+            confidence,
+            selfGelIdentified,
+            autobiographicalRelevant,
+            autobiographicalRelevant || selfGelIdentified
+                ? CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal
+                : CmeCollapseEvidenceFlag.ContextualSignal | CmeCollapseEvidenceFlag.ProceduralSignal | CmeCollapseEvidenceFlag.SkillMethodSignal,
+            CmeCollapseReviewTrigger.None,
+            "AgentiCore");
 }

@@ -87,7 +87,7 @@ Contract fields:
 ### SLI
 
 - Status: `canonical`
-- Meaning: `Symbolic Language Interconnect`, the protocol specification for deterministic symbolic governance
+- Meaning: `Symbolic Language Interconnect`, the protocol and native morphological Engrammitization surface for deterministic symbolic governance and Engineered Cognition
 - Current canonical assembly: `Oan.Sli`
 - Usage:
   - use `SLI` for the protocol name in prose and design language
@@ -97,27 +97,28 @@ Contract fields:
   - transform trace discipline
   - evaluation membrane behavior
   - symbolic routing and governance semantics
+  - native candidate Engrammitization inside bounded runtime cognition
 
 Contract fields:
 - Layer: symbolic
-- Governance domain: cross-stack transport and gate law
-- Authority relation: transport-authoritative, non-identity-authoritative
+- Governance domain: cross-stack transport, gate law, and bounded native Engrammitization
+- Authority relation: transport-authoritative and morphologically active, non-identity-authoritative
 - Identity relation: identity-neutral
-- Persistence type: packet, evidence, gate, tensor, and routing artifacts
-- Mutation rule: may transform and route; may not directly commit identity by itself
+- Persistence type: packet, evidence, gate, tensor, routing, symbolic trace, and candidate Engrammitization artifacts
+- Mutation rule: may transform, route, and native-Engrammitize inside bounded runtime cognition; may not directly commit identity by itself
 
 ### Lisp
 
 - Status: `compatibility`
-- Meaning: the current AST or symbolic representation form used to express SLI
+- Meaning: the current native representation and computational morphology used to express SLI and Engineered Cognition
 - Usage:
-  - use only when referring to the concrete representation, parser, or transform form
+  - use when referring to the concrete runtime representation, parser, transform form, or morphological execution space
   - do not use `Lisp` as a synonym for `SLI`
 
 ### SoulFrame
 
 - Status: `canonical`
-- Meaning: the final enforcement and governance authority before critical halt
+- Meaning: the CME-specific mediated self-state constructor and governance membrane before critical halt
 - Current active families:
   - `Oan.SoulFrame`
   - `SoulFrame.*`
@@ -137,7 +138,7 @@ Contract fields:
 ### AgentiCore
 
 - Status: `canonical`
-- Meaning: cognition-facing identity and engram management surface
+- Meaning: bounded personification, actualization, and operational cognition surface
 - Current active families:
   - `Oan.AgentiCore`
   - `AgentiCore.*`
@@ -148,7 +149,7 @@ Contract fields:
 
 Contract fields:
 - Layer: operational cognition
-- Governance domain: bounded mission execution and self-state formation
+- Governance domain: bounded mission execution, personified actualization, and working self-state formation
 - Authority relation: proposal-authoritative, not direct shared-state-authoritative
 - Identity relation: identity-bearing and identity-coupled
 - Persistence type: runtime state, proposal artifacts, self-state formation

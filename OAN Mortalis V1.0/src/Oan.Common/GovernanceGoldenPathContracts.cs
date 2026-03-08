@@ -24,7 +24,7 @@ public enum GovernanceLoopStage
     GovernanceDecisionApproved = 4,
     GovernanceDecisionRejected = 5,
     GovernanceDecisionDeferred = 6,
-    CrypticReengrammitizationCompleted = 7,
+    CrypticFirstRouteCompleted = 7,
     PrimeDerivativePublished = 8,
     LoopCompleted = 9,
     PendingRecovery = 10,
@@ -46,7 +46,9 @@ public enum GovernanceActKind
     PrimePointerPublication = 1,
     PrimeCheckedViewPublication = 2,
     Recovery = 3,
-    Completion = 4
+    Completion = 4,
+    CollapseHoldToCMoS = 5,
+    CollapseHoldToCGoA = 6
 }
 
 public enum GovernanceLoopControlState
@@ -58,6 +60,64 @@ public enum GovernanceLoopControlState
     PendingRecovery = 4,
     Failed = 5
 }
+
+public enum CmeCollapseDisposition
+{
+    RouteToCMoS = 0,
+    RouteToCGoA = 1
+}
+
+public enum CmeCollapseReviewState
+{
+    None = 0,
+    DeferredReview = 1
+}
+
+public enum CmeCollapseResidueClass
+{
+    AutobiographicalProtected = 0,
+    ContextualProtected = 1
+}
+
+ [Flags]
+public enum CmeCollapseEvidenceFlag
+{
+    None = 0,
+    AutobiographicalSignal = 1,
+    SelfGelIdentitySignal = 2,
+    ContextualSignal = 4,
+    ProceduralSignal = 8,
+    SkillMethodSignal = 16,
+    WitnessBearingSignal = 32,
+    MixedSignal = 64
+}
+
+[Flags]
+public enum CmeCollapseReviewTrigger
+{
+    None = 0,
+    LowConfidence = 1,
+    MixedIdentityContext = 2,
+    PolicyReviewRequired = 4,
+    InsufficientEvidence = 8
+}
+
+public sealed record CmeCollapseClassification(
+    double CollapseConfidence,
+    bool SelfGelIdentified,
+    bool AutobiographicalRelevant,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    string SourceSubsystem);
+
+public sealed record CmeCollapseQualificationResult(
+    CmeCollapseDisposition Disposition,
+    CmeCollapseResidueClass ResidueClass,
+    double ClassificationConfidence,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    string SourceSubsystem,
+    string TargetClass);
 
 public sealed record GovernanceCycleStartRequest(
     Guid IdentityId,
@@ -83,6 +143,7 @@ public sealed record GovernanceCycleWorkResult(
     string ReturnCandidatePointer,
     string IntakeIntent,
     string CandidatePayload,
+    CmeCollapseClassification CollapseClassification,
     string ResultType,
     bool EngramCommitRequired);
 
@@ -100,7 +161,8 @@ public sealed record ReturnCandidateReviewRequest(
     string ProvenanceMarker,
     string IntakeIntent,
     string SubmittedBy,
-    string CandidatePayload);
+    string CandidatePayload,
+    CmeCollapseClassification CollapseClassification);
 
 public sealed record GovernanceDecisionReceipt(
     Guid CandidateId,
@@ -141,6 +203,28 @@ public sealed record GovernanceAdjudicationResult(
     GovernedReengrammitizationRequest? ReengrammitizationRequest,
     GovernedPrimePublicationRequest? PrimePublicationRequest);
 
+public sealed record CmeCollapseRoutingDecision(
+    CmeCollapseDisposition Disposition,
+    CmeCollapseResidueClass ResidueClass,
+    CmeCollapseReviewState ReviewState,
+    string ReasonCode,
+    string IssuedBy,
+    DateTime IssuedAt,
+    string TargetClass,
+    double ClassificationConfidence,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    string SourceSubsystem);
+
+public sealed record CmeCollapseQualificationView(
+    string Destination,
+    CmeCollapseResidueClass ResidueClass,
+    double ClassificationConfidence,
+    CmeCollapseEvidenceFlag EvidenceFlags,
+    CmeCollapseReviewTrigger ReviewTriggers,
+    CmeCollapseReviewState ReviewState,
+    string SourceSubsystem);
+
 public sealed record GovernanceGoldenPathResult(
     Guid CandidateId,
     string LoopKey,
@@ -148,7 +232,8 @@ public sealed record GovernanceGoldenPathResult(
     GovernanceDecisionReceipt DecisionReceipt,
     CrypticReengrammitizationReceipt? ReengrammitizationReceipt,
     GovernedPrimeDerivativeLane PublishedLanes,
-    string? FailureCode);
+    string? FailureCode,
+    CmeCollapseRoutingDecision? CollapseRoutingDecision = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -175,6 +260,7 @@ public sealed record GovernanceLoopStatusView(
     GovernanceDecisionView? LatestDecision,
     bool ReengrammitizationCompleted,
     PublicationLaneStatusView Publication,
+    CmeCollapseQualificationView? LatestCollapseQualification,
     string? FailureCode,
     GovernanceLoopStage? FailureStage,
     bool ResumeEligible,
@@ -251,7 +337,13 @@ public sealed record GovernanceActReceipt(
     DateTime Timestamp,
     GovernedPrimeDerivativeLane PublishedLanes,
     string? ReceiptPointer,
-    string? RequestFingerprint);
+    string? RequestFingerprint,
+    string? TargetClass = null,
+    CmeCollapseResidueClass? ResidueClass = null,
+    double? ClassificationConfidence = null,
+    CmeCollapseEvidenceFlag EvidenceFlags = CmeCollapseEvidenceFlag.None,
+    CmeCollapseReviewTrigger ReviewTriggers = CmeCollapseReviewTrigger.None,
+    string? SourceSubsystem = null);
 
 public sealed record GovernanceJournalEntry(
     string LoopKey,
@@ -281,6 +373,9 @@ public sealed record GovernanceLoopStateSnapshot(
     ReturnCandidateReviewRequest? ReviewRequest,
     CrypticReengrammitizationReceipt? ReengrammitizationReceipt,
     GovernedPrimeDerivativeLane PublishedLanes,
+    bool FirstRouteCompleted,
+    CmeCollapseDisposition? FirstRouteDisposition,
+    CmeCollapseQualificationView? LatestCollapseQualification,
     bool ReengrammitizationCompleted,
     bool IsTerminal,
     string? FailureCode,
@@ -307,6 +402,11 @@ public interface IReturnGovernanceAdjudicator
     GovernedPrimePublicationRequest? CreatePrimePublicationRequest(
         ReturnCandidateReviewRequest request,
         GovernanceDecisionReceipt receipt);
+}
+
+public interface ICmeCollapseQualifier
+{
+    CmeCollapseQualificationResult Qualify(CmeCollapseClassification classification);
 }
 
 public interface IGovernanceReceiptJournal
@@ -428,6 +528,9 @@ public static class GovernanceLoopStateModel
         ReturnCandidateReviewRequest? reviewRequest = null;
         CrypticReengrammitizationReceipt? reengrammitizationReceipt = null;
         var publishedLanes = GovernedPrimeDerivativeLane.Neither;
+        var firstRouteCompleted = false;
+        CmeCollapseDisposition? firstRouteDisposition = null;
+        CmeCollapseQualificationView? latestCollapseQualification = null;
         var reengrammitizationCompleted = false;
         var stage = GovernanceLoopStage.SourceCustodyAvailable;
         string? failureCode = null;
@@ -460,6 +563,8 @@ public static class GovernanceLoopStateModel
                 if (entry.ActReceipt.ActKind == GovernanceActKind.Reengrammitization && entry.ActReceipt.Succeeded)
                 {
                     reengrammitizationCompleted = true;
+                    firstRouteCompleted = true;
+                    firstRouteDisposition = CmeCollapseDisposition.RouteToCMoS;
                     if (entry.ActReceipt.ReceiptPointer is not null && decisionReceipt is not null)
                     {
                         reengrammitizationReceipt = new CrypticReengrammitizationReceipt(
@@ -469,6 +574,54 @@ public static class GovernanceLoopStateModel
                             Accepted: true,
                             entry.ActReceipt.Timestamp);
                     }
+                }
+
+                if (entry.ActReceipt.ActKind == GovernanceActKind.Reengrammitization)
+                {
+                    latestCollapseQualification = BuildCollapseQualificationView(
+                        entry.ActReceipt,
+                        defaultTargetClass: "cMoS",
+                        defaultResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                        defaultReviewState: stage == GovernanceLoopStage.GovernanceDecisionDeferred
+                            ? CmeCollapseReviewState.DeferredReview
+                            : CmeCollapseReviewState.None,
+                        defaultSourceSubsystem: reviewRequest?.CollapseClassification.SourceSubsystem);
+                }
+
+                if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCMoS && entry.ActReceipt.Succeeded)
+                {
+                    firstRouteCompleted = true;
+                    firstRouteDisposition = CmeCollapseDisposition.RouteToCMoS;
+                }
+
+                if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCMoS)
+                {
+                    latestCollapseQualification = BuildCollapseQualificationView(
+                        entry.ActReceipt,
+                        defaultTargetClass: "cMoS",
+                        defaultResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                        defaultReviewState: stage == GovernanceLoopStage.GovernanceDecisionDeferred
+                            ? CmeCollapseReviewState.DeferredReview
+                            : CmeCollapseReviewState.None,
+                        defaultSourceSubsystem: reviewRequest?.CollapseClassification.SourceSubsystem);
+                }
+
+                if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCGoA && entry.ActReceipt.Succeeded)
+                {
+                    firstRouteCompleted = true;
+                    firstRouteDisposition = CmeCollapseDisposition.RouteToCGoA;
+                }
+
+                if (entry.ActReceipt.ActKind == GovernanceActKind.CollapseHoldToCGoA)
+                {
+                    latestCollapseQualification = BuildCollapseQualificationView(
+                        entry.ActReceipt,
+                        defaultTargetClass: "cGoA",
+                        defaultResidueClass: CmeCollapseResidueClass.ContextualProtected,
+                        defaultReviewState: stage == GovernanceLoopStage.GovernanceDecisionDeferred
+                            ? CmeCollapseReviewState.DeferredReview
+                            : CmeCollapseReviewState.None,
+                        defaultSourceSubsystem: reviewRequest?.CollapseClassification.SourceSubsystem);
                 }
             }
         }
@@ -487,6 +640,9 @@ public static class GovernanceLoopStateModel
             reviewRequest,
             reengrammitizationReceipt,
             publishedLanes,
+            firstRouteCompleted,
+            firstRouteDisposition,
+            latestCollapseQualification,
             reengrammitizationCompleted,
             isTerminal,
             failureCode,
@@ -543,11 +699,56 @@ public static class GovernanceLoopStateModel
             GovernanceLoopStage.ProjectionIssued => next == GovernanceLoopStage.BoundedCognitionCompleted,
             GovernanceLoopStage.BoundedCognitionCompleted => next == GovernanceLoopStage.ReturnCandidateSubmitted,
             GovernanceLoopStage.ReturnCandidateSubmitted => next is GovernanceLoopStage.GovernanceDecisionApproved or GovernanceLoopStage.GovernanceDecisionRejected or GovernanceLoopStage.GovernanceDecisionDeferred,
-            GovernanceLoopStage.GovernanceDecisionApproved => next is GovernanceLoopStage.CrypticReengrammitizationCompleted or GovernanceLoopStage.PendingRecovery,
-            GovernanceLoopStage.CrypticReengrammitizationCompleted => next is GovernanceLoopStage.PrimeDerivativePublished or GovernanceLoopStage.PendingRecovery,
+            GovernanceLoopStage.GovernanceDecisionApproved => next is GovernanceLoopStage.CrypticFirstRouteCompleted or GovernanceLoopStage.PendingRecovery,
+            GovernanceLoopStage.CrypticFirstRouteCompleted => next is GovernanceLoopStage.PrimeDerivativePublished or GovernanceLoopStage.PendingRecovery or GovernanceLoopStage.LoopCompleted,
             GovernanceLoopStage.PrimeDerivativePublished => next is GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.PendingRecovery,
-            GovernanceLoopStage.PendingRecovery => next is GovernanceLoopStage.CrypticReengrammitizationCompleted or GovernanceLoopStage.PrimeDerivativePublished or GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.LoopFailed,
+            GovernanceLoopStage.PendingRecovery => next is GovernanceLoopStage.CrypticFirstRouteCompleted or GovernanceLoopStage.PrimeDerivativePublished or GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.LoopFailed,
             _ => false
         };
+    }
+
+    public static CmeCollapseRoutingDecision? BuildCollapseRoutingDecision(
+        GovernanceDecisionReceipt decisionReceipt,
+        CmeCollapseQualificationResult qualification)
+    {
+        ArgumentNullException.ThrowIfNull(decisionReceipt);
+        ArgumentNullException.ThrowIfNull(qualification);
+
+        if (decisionReceipt.Decision == GovernanceDecision.Rejected)
+        {
+            return null;
+        }
+
+        return new CmeCollapseRoutingDecision(
+            Disposition: qualification.Disposition,
+            ResidueClass: qualification.ResidueClass,
+            ReviewState: decisionReceipt.Decision == GovernanceDecision.Deferred
+                ? CmeCollapseReviewState.DeferredReview
+                : CmeCollapseReviewState.None,
+            ReasonCode: decisionReceipt.RationaleCode,
+            IssuedBy: decisionReceipt.AdjudicatorIdentity,
+            IssuedAt: decisionReceipt.Timestamp,
+            TargetClass: qualification.TargetClass,
+            ClassificationConfidence: qualification.ClassificationConfidence,
+            EvidenceFlags: qualification.EvidenceFlags,
+            ReviewTriggers: qualification.ReviewTriggers,
+            SourceSubsystem: qualification.SourceSubsystem);
+    }
+
+    private static CmeCollapseQualificationView? BuildCollapseQualificationView(
+        GovernanceActReceipt receipt,
+        string defaultTargetClass,
+        CmeCollapseResidueClass defaultResidueClass,
+        CmeCollapseReviewState defaultReviewState,
+        string? defaultSourceSubsystem)
+    {
+        return new CmeCollapseQualificationView(
+            Destination: receipt.TargetClass ?? defaultTargetClass,
+            ResidueClass: receipt.ResidueClass ?? defaultResidueClass,
+            ClassificationConfidence: receipt.ClassificationConfidence ?? 0d,
+            EvidenceFlags: receipt.EvidenceFlags,
+            ReviewTriggers: receipt.ReviewTriggers,
+            ReviewState: defaultReviewState,
+            SourceSubsystem: receipt.SourceSubsystem ?? defaultSourceSubsystem ?? "unknown");
     }
 }

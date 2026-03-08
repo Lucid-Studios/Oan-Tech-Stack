@@ -7,6 +7,18 @@ public sealed record SoulFrameProjectionRequest(
     string RequestedTheater,
     string PolicyHandle);
 
+public interface IMediatedSelfStateContour
+{
+    string CSelfGelHandle { get; }
+    string Classification { get; }
+    string PolicyHandle { get; }
+}
+
+public sealed record MediatedSelfStateContour(
+    string CSelfGelHandle,
+    string Classification,
+    string PolicyHandle) : IMediatedSelfStateContour;
+
 public interface ISelfStateProjection
 {
     Guid IdentityId { get; }
@@ -16,6 +28,7 @@ public interface ISelfStateProjection
     bool IsMitigated { get; }
     string WorkingStateHandle { get; }
     string ProvenanceMarker { get; }
+    IMediatedSelfStateContour MediatedSelfState { get; }
 }
 
 public sealed record SelfStateProjection(
@@ -25,7 +38,8 @@ public sealed record SelfStateProjection(
     string TargetTheater,
     bool IsMitigated,
     string WorkingStateHandle,
-    string ProvenanceMarker) : ISelfStateProjection;
+    string ProvenanceMarker,
+    IMediatedSelfStateContour MediatedSelfState) : ISelfStateProjection;
 
 public sealed record SoulFrameReturnIntakeRequest(
     Guid IdentityId,
@@ -34,13 +48,24 @@ public sealed record SoulFrameReturnIntakeRequest(
     string SourceTheater,
     string ReturnCandidatePointer,
     string ProvenanceMarker,
-    string IntakeIntent);
+    string IntakeIntent,
+    CmeCollapseClassification CollapseClassification);
+
+public sealed record SoulFrameCollapseEvaluation(
+    string Classification,
+    CmeCollapseClassification CollapseClassification,
+    CmeCollapseResidueClass ResidueClass,
+    CmeCollapseReviewState ReviewState,
+    bool RequiresReview,
+    bool CanRouteToCustody,
+    bool CanPublishPrime);
 
 public sealed record SoulFrameReturnIntakeReceipt(
     Guid IdentityId,
     string IntakeHandle,
     bool Accepted,
-    string Disposition);
+    string Disposition,
+    SoulFrameCollapseEvaluation Evaluation);
 
 public interface ISoulFrameMembrane
 {
