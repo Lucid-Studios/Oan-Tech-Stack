@@ -21,7 +21,7 @@ This document extends the already-implemented governance-first runtime. It does 
 
 ## Root Runtime Sentence
 
-A CME instantiates from lawful mediated continuity, thinks in bounded `SelfGEL` inside AgentiCore, uses Lisp-based SLI and Engineered Cognition as the native morphological and engrammitizing organism during runtime, and collapses by mediated transfer from `SelfGEL` into `cSelfGEL`, then into `cGoA`, `MoS` or `cMoS`, Dream-seed eligibility, discard, or defer-review according to policy and governance.
+A CME instantiates from lawful mediated continuity, thinks in bounded `SelfGEL` inside AgentiCore, uses Lisp-based SLI and Engineered Cognition as the native morphological and engrammitizing organism during runtime, and collapses Cryptic-first by mediated transfer from `SelfGEL` into `cSelfGEL`, then first into `cGoA` or `cMoS` according to protected classification, with any later `MoS` promotion or Dream eligibility occurring only after deeper curation.
 
 ## Runtime Roles
 
@@ -131,13 +131,22 @@ The default runtime pool classes are:
 
 ## Collapse Disposition Classes
 
-The default collapse dispositions are:
+The corrected collapse reading is staged.
 
-- `retain_in_mos`
+Immediate Cryptic-first routing classes are first protected destinations, not final promotion outcomes:
+
 - `route_to_cgoa`
-- `eligible_for_dream_seed`
-- `discard_transient`
+- `route_to_cmos`
 - `defer_review`
+
+Later-stage promotion or exploration classes are:
+
+- `later_promote_to_mos`
+- `eligible_for_dream_seed`
+- `final_cgoa_enrichment`
+
+The current runtime does not yet implement all of these as first-class vocabulary.
+In particular, the current coarse runtime term `retain_in_mos` must not be read as immediate raw-close `MoS` routing under this corrected model.
 
 ## 1. Lawful Admission
 
@@ -287,13 +296,24 @@ SoulFrame remains the membrane on both issue and return.
 
 ### Stage C: cSelfGEL To Destination Routing
 
-Only after mediated evaluation may collapse results route into:
+Only after mediated evaluation may collapse results route first into:
 
-- `cGoA`
-- `MoS` or `cMoS`
+- `cGoA` for non-autobiographical protected contextual residue
+- `cMoS` for unresolved autobiographical or SelfGEL-identified protected residue
+- defer-review backlog where protected review must occur before further routing
+
+Only later, after deeper curation, may material be promoted toward:
+
+- `MoS`
 - Dream-seed eligibility
-- discard
-- defer-review backlog
+- later `cGoA` enrichment payloads for non-personification improvement
+
+The corrected model therefore distinguishes:
+
+- first `cGoA` peel for unresolved non-autobiographical contextual residue
+- first `cMoS` holding for unresolved autobiographical or SelfGEL-identified protected residue
+- later `cGoA` enrichment for self-improving but non-personification material
+- later `MoS` promotion only after deeper protected curation
 
 No direct active-runtime write may bypass this mediated route.
 
@@ -331,10 +351,12 @@ The default placement model is:
 ## Hard Invariants
 
 - no direct `SelfGEL -> cGoA` write
-- no direct `SelfGEL -> MoS` write
+- no direct raw-close `SelfGEL -> MoS` write
 - no direct `SelfGEL -> cMoS` write
 - no direct Lisp or SLI -> `cSelfGEL` mutation
 - no collapse without SoulFrame mediation
+- no immediate raw-close route directly to `MoS`
+- no unresolved useful residue is treated as discarded merely because it was not promoted toward `MoS`
 - no Dream-seed routing without explicit policy classification
 - no Prime publication from active runtime residue without a later governed derivative path
 - symbolic trace alone is not an engram candidate
@@ -420,7 +442,7 @@ The default placement model is:
 - active runtime cognition using bounded `SelfGEL` without custody mutation
 - native Engrammitization producing candidate engram structures, not only symbolic trace
 - collapse candidate mediation through SoulFrame
-- routing to `cGoA`, `MoS` or `cMoS`, Dream-seed eligibility, discard, or defer-review
+- routing to `cGoA`, `cMoS`, later `MoS` promotion, later Dream-seed eligibility, or defer-review
 - rejection of any direct `SelfGEL -> custody` write
 - rejection of any attempt to equate symbolic trace with candidate engram structure
 
