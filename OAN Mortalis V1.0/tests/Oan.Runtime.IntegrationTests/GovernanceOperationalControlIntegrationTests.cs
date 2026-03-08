@@ -225,6 +225,9 @@ public sealed class GovernanceOperationalControlIntegrationTests
             ReturnCandidatePointer: "agenticore-return://candidate/approved",
             IntakeIntent: "candidate-return-evaluation",
             CandidatePayload: "{\"decision\":\"accept\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: true,
+                selfGelIdentified: true),
             ResultType: "cognition-accepted",
             EngramCommitRequired: true);
     }
@@ -245,9 +248,19 @@ public sealed class GovernanceOperationalControlIntegrationTests
             ReturnCandidatePointer: "agenticore-return://candidate/deferred",
             IntakeIntent: "defer-review",
             CandidatePayload: "{\"decision\":\"review\"}",
+            CollapseClassification: CreateCollapseClassification(
+                autobiographicalRelevant: true,
+                selfGelIdentified: true,
+                collapseConfidence: 0.61),
             ResultType: "cognition-review",
             EngramCommitRequired: true);
     }
+
+    private static CmeCollapseClassification CreateCollapseClassification(
+        bool autobiographicalRelevant,
+        bool selfGelIdentified,
+        double collapseConfidence = 0.92) =>
+        new(collapseConfidence, selfGelIdentified, autobiographicalRelevant);
 
     private static StoreRegistry CreateStoreRegistry(
         PublicLayerService publicLayer,

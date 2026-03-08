@@ -329,6 +329,12 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                 Disposition: "return-candidate-recorded",
                 Evaluation: new SoulFrameCollapseEvaluation(
                     Classification: "candidate-collapse-evaluation",
+                    CollapseClassification: new CmeCollapseClassification(
+                        CollapseConfidence: 0.92,
+                        SelfGelIdentified: true,
+                        AutobiographicalRelevant: true),
+                    ResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                    ReviewState: CmeCollapseReviewState.DeferredReview,
                     RequiresReview: true,
                     CanRouteToCustody: false,
                     CanPublishPrime: false)));

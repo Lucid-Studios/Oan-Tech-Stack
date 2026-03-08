@@ -48,10 +48,14 @@ public sealed record SoulFrameReturnIntakeRequest(
     string SourceTheater,
     string ReturnCandidatePointer,
     string ProvenanceMarker,
-    string IntakeIntent);
+    string IntakeIntent,
+    CmeCollapseClassification CollapseClassification);
 
 public sealed record SoulFrameCollapseEvaluation(
     string Classification,
+    CmeCollapseClassification CollapseClassification,
+    CmeCollapseResidueClass ResidueClass,
+    CmeCollapseReviewState ReviewState,
     bool RequiresReview,
     bool CanRouteToCustody,
     bool CanPublishPrime);

@@ -23,13 +23,15 @@ The current runtime path is:
 1. AgentiCore emits a bounded governance-cycle candidate payload and return-candidate pointer.
 2. SoulFrame receives the return candidate and emits a collapse-evaluation receipt shape.
 3. Governance adjudication in `StewardAgent` decides `Approved`, `Rejected`, or `Deferred`.
-4. Approved outcomes may produce:
-   - a governed re-engrammitization request
-   - a governed Prime publication request
-5. `MantleOfSovereigntyService` re-engrammitizes approved residue into `cMoS` under the current coarse `retain_in_mos` runtime label.
-6. `PublicLayerService` publishes authorized Prime derivative lanes.
-7. Deferred outcomes enter the deferred-review backlog.
-8. Rejected and deferred outcomes suppress downstream mutation and publication.
+4. `StackManager` converts governance decision plus bounded collapse classification into:
+   - first-route holding destination
+   - residue class
+   - review state
+5. Approved autobiographical or `SelfGEL`-identified residue routes to `cMoS` through the live re-engrammitization path.
+6. Approved contextual residue routes to protected `cGoA` holding without re-engrammitization.
+7. Deferred outcomes still route to `cMoS` or `cGoA` first, then remain visible in the deferred-review backlog under `DeferredReview`.
+8. `PublicLayerService` publishes authorized Prime derivative lanes only for approved cases.
+9. Rejected outcomes suppress downstream holding and publication.
 
 ## Current Code Surfaces
 
@@ -60,7 +62,7 @@ What it cannot yet distinguish as first-class collapse objects:
 
 - Dream-seed eligibility as its own runtime class
 - explicit discard object or discard receipt
-- explicit `cGoA` routing object inside the Golden Path
+- later `MoS` promotion as distinct from first `cMoS` holding
 
 ## Where Routing Decisions Are Made Today
 
@@ -95,32 +97,37 @@ Outside the Golden Path, `StewardAgent.RouteResidueAsync(...)` also shows residu
 - `cGoA`
 - `Discard`
 
-That proves the concepts exist in code, but not yet as an explicit Golden Path collapse-disposition vocabulary.
+That proves the concepts exist in code, but not yet as the full later-stage routing lattice.
 
 ### StackManager
 
-`StackManager` currently composes the approved downstream acts and ensures:
+`StackManager` now composes first-route holding and downstream acts and ensures:
 
-- rejected and deferred paths do not continue to mutation/publication
-- approved paths move through re-engrammitization and publication under replay/idempotency law
+- rejected paths do not continue to holding or publication
+- approved autobiographical paths move through `cMoS` holding via re-engrammitization and publication under replay/idempotency law
+- approved contextual paths move through protected `cGoA` holding before any publication lane work
+- deferred paths still hold in `cMoS` or `cGoA`, then remain deferred for later review
 - pending recovery resumes only lawful missing downstream acts
 
 `StackManager` is the orchestration root, not the policy author.
 
 ## Disposition Truth Table
 
-| Disposition | Current Status | Evidence | Notes |
+| Runtime Meaning | Current Status | Evidence | Notes |
 | --- | --- | --- | --- |
-| `retain_in_mos` | explicit but coarse | `MantleOfSovereigntyService.ReengrammitizeAsync(...)` appends approved residue into `cMoS` | The current runtime name is useful, but in the corrected model it must not be read as raw close -> `MoS`. It currently corresponds more closely to first protected retention via `cMoS`. |
-| `route_to_cgoa` | implied / partial | `StewardAgent.RouteResidueAsync(...)` supports `cGoA` targeting outside the Golden Path | The concept exists, but it is not yet a first-class Golden Path collapse-disposition object. |
+| `RouteToCMoS` | explicit | `StackManager`, `GovernanceLoopStateModel`, `MantleOfSovereigntyService.ReengrammitizeAsync(...)` | This is the current first-route holding path for approved autobiographical or `SelfGEL`-identified protected residue. It is not raw close -> `MoS`. |
+| `RouteToCGoA` | explicit | `StackManager`, `GovernanceLoopStateModel`, `ICrypticCustodyStore.AppendAsync(...)` via `CustodyDomain = "cGoA"` | This is the current first-route holding path for approved or deferred contextual protected residue. |
+| `DeferredReview` review state | explicit | governance `Deferred` decision, deferred-review record, deferred backlog, routing decisions with `ReviewState = DeferredReview` | Review is now a separate axis from first-route holding destination. |
 | `eligible_for_dream_seed` | missing | no explicit runtime routing object or destination | Still doctrinal only. |
 | `discard_transient` | implied / partial | `StewardAgent.RouteResidueAsync(...)` supports `Discard`; rejected/deferred paths also suppress mutation/publication | There is no explicit discard receipt or collapse-disposition object yet, and the corrected model now prefers distinguishing `cGoA` contextual residue from `cMoS` autobiographical residue before treating discard as the governing idea. |
-| `defer_review` | explicit | governance `Deferred` decision, deferred-review record, deferred backlog, later review actions | This is the strongest current non-custody/non-publication retention path. |
 
 ## Current Runtime Objects Carrying Routing Meaning
 
 The routing semantics currently live in these objects:
 
+- `CmeCollapseClassification`
+- `CmeCollapseReviewState`
+- `CmeCollapseRoutingDecision`
 - `SoulFrameCollapseEvaluation`
 - `SoulFrameReturnIntakeReceipt`
 - `ReturnCandidateReviewRequest`
@@ -130,12 +137,16 @@ The routing semantics currently live in these objects:
 - `DeferredReviewRecord`
 - `GovernanceActReceipt`
 
-What is still missing is an explicit collapse-disposition object that names, in one runtime vocabulary, where first protected substance is going under the corrected Cryptic-first model.
+What is still missing is the later-stage routing lattice beyond first protected hold.
 
-That gap is now only partly closed for the two routing paths that are already fully real in coarse form:
+That gap is now already closed for the two first-route holdings that are runtime-real today:
 
-- `RetainInMos`
-- `DeferReview`
+- `RouteToCMoS`
+- `RouteToCGoA`
+
+And review posture is now separate:
+
+- `DeferredReview`
 
 ## Forbidden Paths Already Enforced
 
@@ -160,20 +171,19 @@ The current runtime does not yet have the full explicit collapse-disposition lat
 
 What it does have is:
 
-- explicit but coarse `retain_in_mos`
-- explicit `defer_review`
-- explicit minimal runtime collapse-disposition vocabulary for those two paths
+- explicit `RouteToCMoS`
+- explicit `RouteToCGoA`
+- explicit `DeferredReview` as a separate review-state axis
 - partial `discard_transient`
-- partial `route_to_cgoa`
 - absent `eligible_for_dream_seed`
 
 So the collapse model is no longer purely aspirational, but it is still only partly named in runtime contracts.
 
 Under the corrected Cryptic-first collapse reading:
 
-- the current `retain_in_mos` name must be treated as transitional and coarse
-- first protected collapse still lands Cryptic-first
-- the runtime does not yet explicitly distinguish first `cGoA` peel, `cMoS` protected autobiographical holding, later `cGoA` enrichment, and later `MoS` promotion
+- first protected collapse lands Cryptic-first into `cGoA` or `cMoS`
+- review state is layered over that holding decision, not substituted for it
+- the runtime does not yet explicitly distinguish later `cGoA` enrichment, discard, Dream eligibility, and later `MoS` promotion
 
 ## Recommended Next Cut
 
@@ -181,15 +191,11 @@ The next bounded implementation cut should not implement all five dispositions a
 
 The strongest current reality has now been made explicit first:
 
-1. `retain_in_mos`
-2. `defer_review`
+1. `RouteToCMoS`
+2. `RouteToCGoA`
+3. `DeferredReview`
 
-The next candidate, if the code is already close enough, is not raw discard first but truthful first-route vocabulary for:
-
-3. `route_to_cgoa`
-4. `route_to_cmos`
-
-That keeps the runtime honest under the corrected model by naming first protected destinations before later Dream or `MoS` promotion, and by preventing `retain_in_mos` from being misread as raw close -> `MoS`.
+That keeps the runtime honest under the corrected model by naming first protected destinations before later Dream or `MoS` promotion.
 
 ## Completion Condition
 
@@ -197,7 +203,7 @@ This conformance line is successful when the runtime can truthfully say, using e
 
 - routed into `cGoA`
 - routed into `cMoS`
-- deferred for review
+- held with `DeferredReview` or without review
 
 and only later, after deeper curation, whether it is:
 

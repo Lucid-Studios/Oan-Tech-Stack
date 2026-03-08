@@ -97,7 +97,11 @@ public sealed class StewardAgentGovernanceTests
             ProvenanceMarker: "membrane-derived:cme:cme-governance|policy:agenticore.cognition.cycle",
             IntakeIntent: "candidate-return-evaluation",
             SubmittedBy: "AgentiCore",
-            CandidatePayload: "{\"decision\":\"accept\"}");
+            CandidatePayload: "{\"decision\":\"accept\"}",
+            CollapseClassification: new CmeCollapseClassification(
+                CollapseConfidence: 0.92,
+                SelfGelIdentified: true,
+                AutobiographicalRelevant: true));
     }
 
     private sealed class RecordingPublicStore : IPublicStore

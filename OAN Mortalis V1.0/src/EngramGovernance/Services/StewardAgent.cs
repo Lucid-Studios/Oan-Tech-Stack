@@ -176,6 +176,8 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
         var lanes = decision == GovernanceDecision.Approved
             ? GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView
             : GovernedPrimeDerivativeLane.Neither;
+        var reengrammitizationAuthorized = decision == GovernanceDecision.Approved &&
+                                           RequiresCrypticReengrammitization(request);
 
         if (decision == GovernanceDecision.Deferred)
         {
@@ -190,7 +192,7 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
             AdjudicatorIdentity: StewardIdentity,
             RationaleCode: BuildRationaleCode(request, decision),
             Timestamp: timestamp,
-            ReengrammitizationAuthorized: decision == GovernanceDecision.Approved,
+            ReengrammitizationAuthorized: reengrammitizationAuthorized,
             PrimePublicationAuthorized: decision == GovernanceDecision.Approved,
             AuthorizedDerivativeLanes: lanes);
 
@@ -576,6 +578,13 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
         return $"checked-view:{request.CandidateId:D}:{preview}";
     }
 
+    private static bool RequiresCrypticReengrammitization(ReturnCandidateReviewRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.CollapseClassification.AutobiographicalRelevant ||
+               request.CollapseClassification.SelfGelIdentified;
+    }
+
     private async Task<GovernanceAdjudicationResult> ReviewDeferredAsync(
         ReviewDeferredCandidateRequest request,
         GovernanceDecision reviewedDecision,
@@ -600,6 +609,8 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
         }
 
         var timestamp = DateTime.UtcNow;
+        var reengrammitizationAuthorized = reviewedDecision == GovernanceDecision.Approved &&
+                                           RequiresCrypticReengrammitization(reviewRequest);
         var receipt = new GovernanceDecisionReceipt(
             CandidateId: reviewRequest.CandidateId,
             IdempotencyKey: request.LoopKey,
@@ -612,7 +623,7 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
                     : "steward.rejected.deferred-review"
                 : request.RationaleCode.Trim(),
             Timestamp: timestamp,
-            ReengrammitizationAuthorized: reviewedDecision == GovernanceDecision.Approved,
+            ReengrammitizationAuthorized: reengrammitizationAuthorized,
             PrimePublicationAuthorized: reviewedDecision == GovernanceDecision.Approved,
             AuthorizedDerivativeLanes: reviewedDecision == GovernanceDecision.Approved
                 ? GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView

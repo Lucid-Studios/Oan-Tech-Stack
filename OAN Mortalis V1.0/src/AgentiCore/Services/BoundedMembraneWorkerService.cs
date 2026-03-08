@@ -63,12 +63,14 @@ public sealed class BoundedMembraneWorkerService
         BoundedWorkerState state,
         string sourceTheater,
         string returnCandidatePointer,
+        CmeCollapseClassification collapseClassification,
         string intakeIntent = "candidate-return-evaluation",
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceTheater);
         ArgumentException.ThrowIfNullOrWhiteSpace(returnCandidatePointer);
+        ArgumentNullException.ThrowIfNull(collapseClassification);
         ArgumentException.ThrowIfNullOrWhiteSpace(intakeIntent);
 
         EnsureBoundedState(state);
@@ -81,7 +83,8 @@ public sealed class BoundedMembraneWorkerService
                 sourceTheater,
                 returnCandidatePointer,
                 state.ProvenanceMarker,
-                intakeIntent),
+                intakeIntent,
+                collapseClassification),
             cancellationToken);
     }
 

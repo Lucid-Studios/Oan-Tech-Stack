@@ -187,7 +187,11 @@ public sealed class SoulFrameHostClientTests
             SourceTheater: "prime",
             ReturnCandidatePointer: "return-candidate://delta/42",
             ProvenanceMarker: "worker:agenticore/session:cme-alpha",
-            IntakeIntent: "candidate-return-evaluation");
+            IntakeIntent: "candidate-return-evaluation",
+            CollapseClassification: new CmeCollapseClassification(
+                CollapseConfidence: 0.91,
+                SelfGelIdentified: true,
+                AutobiographicalRelevant: true));
 
         var receipt = await client.ReceiveReturnIntakeAsync(request);
 
@@ -195,7 +199,9 @@ public sealed class SoulFrameHostClientTests
         Assert.True(receipt.Accepted);
         Assert.Equal("return-candidate-recorded", receipt.Disposition);
         Assert.Equal("candidate-collapse-evaluation", receipt.Evaluation.Classification);
-        Assert.True(receipt.Evaluation.RequiresReview);
+        Assert.Equal(CmeCollapseResidueClass.AutobiographicalProtected, receipt.Evaluation.ResidueClass);
+        Assert.Equal(CmeCollapseReviewState.None, receipt.Evaluation.ReviewState);
+        Assert.False(receipt.Evaluation.RequiresReview);
         Assert.False(receipt.Evaluation.CanRouteToCustody);
         Assert.False(receipt.Evaluation.CanPublishPrime);
         Assert.StartsWith("soulframe://return/", receipt.IntakeHandle, StringComparison.Ordinal);

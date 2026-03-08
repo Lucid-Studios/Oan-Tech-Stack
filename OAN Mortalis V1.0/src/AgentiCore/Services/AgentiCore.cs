@@ -268,10 +268,13 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             workingMemory: context.WorkingMemory);
         context.SelfGelWorkingPool = selfGelWorkingPool;
 
+        var collapseClassification = BuildCollapseClassification(cognitionResult.Confidence, requiresCommit);
+
         var returnReceipt = await _boundedMembraneWorker.SubmitReturnCandidateAsync(
                 boundedWorkerState,
                 sourceTheater: "prime",
                 returnCandidatePointer: BuildReturnCandidatePointer(context.ContextId, cognitionResult.TraceId),
+                collapseClassification: collapseClassification,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         context.WorkingMemory["membrane_return_candidate_pointer"] = BuildReturnCandidatePointer(context.ContextId, cognitionResult.TraceId);
@@ -367,6 +370,11 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         var intakeIntent = "candidate-return-evaluation";
 
         var candidateId = CreateDeterministicCandidateId(request, provenanceMarker);
+        var collapseClassification = BuildCollapseClassification(
+            result.EngramCandidate is { } engramCandidate && engramCandidate.CommitRequired
+                ? 1.0
+                : 0.0,
+            result.EngramCommitRequired);
 
         return new GovernanceCycleWorkResult(
             CandidateId: candidateId,
@@ -382,6 +390,7 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             ReturnCandidatePointer: returnCandidatePointer,
             IntakeIntent: intakeIntent,
             CandidatePayload: result.ResultPayload,
+            CollapseClassification: collapseClassification,
             ResultType: result.ResultType,
             EngramCommitRequired: result.EngramCommitRequired);
     }
@@ -581,6 +590,14 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         var guidBytes = new byte[16];
         Buffer.BlockCopy(hash, 0, guidBytes, 0, 16);
         return new Guid(guidBytes);
+    }
+
+    private static CmeCollapseClassification BuildCollapseClassification(double confidence, bool commitRequired)
+    {
+        return new CmeCollapseClassification(
+            CollapseConfidence: confidence,
+            SelfGelIdentified: commitRequired,
+            AutobiographicalRelevant: commitRequired);
     }
 
     private static string RequireWorkingMemoryValue(AgentiContext context, string key)

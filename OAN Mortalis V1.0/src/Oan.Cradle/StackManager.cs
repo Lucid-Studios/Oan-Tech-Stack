@@ -304,8 +304,30 @@ namespace Oan.Cradle
                 snapshot = GovernanceLoopStateModel.Project(batch, loopKey);
             }
 
-            if (decisionReceipt.Decision is GovernanceDecision.Rejected or GovernanceDecision.Deferred)
+            if (decisionReceipt.Decision == GovernanceDecision.Rejected)
             {
+                return BuildResult(reviewRequest.CandidateId, loopKey, snapshot);
+            }
+
+            var collapseRoutingDecision = GovernanceLoopStateModel.BuildCollapseRoutingDecision(decisionReceipt, reviewRequest)
+                ?? throw new InvalidOperationException("Approved or deferred governance decisions must produce a collapse routing decision.");
+
+            if (decisionReceipt.Decision == GovernanceDecision.Deferred)
+            {
+                var deferredResult = await EnsureDeferredHoldAsync(
+                        loopKey,
+                        reviewRequest,
+                        decisionReceipt,
+                        collapseRoutingDecision,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                if (deferredResult is not null)
+                {
+                    return deferredResult;
+                }
+
+                batch = await journal.ReplayLoopBatchAsync(loopKey, cancellationToken).ConfigureAwait(false);
+                snapshot = GovernanceLoopStateModel.Project(batch, loopKey);
                 return BuildResult(reviewRequest.CandidateId, loopKey, snapshot);
             }
 
@@ -356,12 +378,10 @@ namespace Oan.Cradle
             CancellationToken cancellationToken)
         {
             var adjudicator = RequireReturnGovernanceAdjudicator();
-            var reengrammitizationGate = RequireCrypticReengrammitizationGate();
             var publicationSink = RequireGovernedPrimePublicationSink();
             var journal = RequireGovernanceReceiptJournal();
-
-            var reengrammitizationRequest = adjudicator.CreateReengrammitizationRequest(reviewRequest, decisionReceipt)
-                ?? throw new InvalidOperationException("Approved governance decision must authorize re-engrammitization.");
+            var collapseRoutingDecision = GovernanceLoopStateModel.BuildCollapseRoutingDecision(decisionReceipt, reviewRequest)
+                ?? throw new InvalidOperationException("Approved governance decision must produce a collapse routing decision.");
             var publicationRequest = adjudicator.CreatePrimePublicationRequest(reviewRequest, decisionReceipt)
                 ?? throw new InvalidOperationException("Approved governance decision must authorize Prime publication.");
 
@@ -370,79 +390,116 @@ namespace Oan.Cradle
                 : snapshot.Stage;
             var reengrammitizationReceipt = snapshot.ReengrammitizationReceipt;
 
-            if (!snapshot.ReengrammitizationCompleted)
+            if (collapseRoutingDecision.Disposition == CmeCollapseDisposition.RouteToCMoS)
             {
-                try
-                {
-                    stage = stage == GovernanceLoopStage.PendingRecovery
-                        ? GovernanceLoopStage.CrypticReengrammitizationCompleted
-                        : GovernanceLoopStateModel.EnsureAllowedTransition(stage, GovernanceLoopStage.CrypticReengrammitizationCompleted);
-                    reengrammitizationReceipt = await reengrammitizationGate
-                        .ReengrammitizeAsync(reengrammitizationRequest, cancellationToken)
-                        .ConfigureAwait(false);
+                var reengrammitizationRequest = adjudicator.CreateReengrammitizationRequest(reviewRequest, decisionReceipt)
+                    ?? throw new InvalidOperationException("Approved autobiographical protected routing must authorize re-engrammitization.");
+                var reengrammitizationGate = RequireCrypticReengrammitizationGate();
 
-                    await journal.AppendAsync(
-                        new GovernanceJournalEntry(
-                            loopKey,
-                            GovernanceJournalEntryKind.ActReceipt,
-                            GovernanceLoopStage.CrypticReengrammitizationCompleted,
-                            reengrammitizationReceipt.Timestamp,
-                            decisionReceipt,
-                            DeferredReview: null,
-                            new GovernanceActReceipt(
+                if (!snapshot.ReengrammitizationCompleted)
+                {
+                    try
+                    {
+                        stage = stage == GovernanceLoopStage.PendingRecovery
+                            ? GovernanceLoopStage.CrypticFirstRouteCompleted
+                            : GovernanceLoopStateModel.EnsureAllowedTransition(stage, GovernanceLoopStage.CrypticFirstRouteCompleted);
+                        reengrammitizationReceipt = await reengrammitizationGate
+                            .ReengrammitizeAsync(reengrammitizationRequest, cancellationToken)
+                            .ConfigureAwait(false);
+
+                        await journal.AppendAsync(
+                            new GovernanceJournalEntry(
                                 loopKey,
-                                reengrammitizationRequest.IdempotencyKey,
-                                GovernanceActKind.Reengrammitization,
-                                GovernanceLoopStage.CrypticReengrammitizationCompleted,
-                                Succeeded: true,
-                                FailureCode: null,
+                                GovernanceJournalEntryKind.ActReceipt,
+                                GovernanceLoopStage.CrypticFirstRouteCompleted,
                                 reengrammitizationReceipt.Timestamp,
-                                PublishedLanes: GovernedPrimeDerivativeLane.Neither,
-                                ReceiptPointer: reengrammitizationReceipt.ReceiptPointer,
-                                RequestFingerprint: ComputeFingerprint(reengrammitizationRequest)),
-                            ReviewRequest: reviewRequest,
-                            Annotation: null),
-                        cancellationToken).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    await journal.AppendAsync(
-                        new GovernanceJournalEntry(
-                            loopKey,
-                            GovernanceJournalEntryKind.ActReceipt,
-                            GovernanceLoopStage.PendingRecovery,
-                            DateTime.UtcNow,
-                            decisionReceipt,
-                            DeferredReview: null,
-                            new GovernanceActReceipt(
+                                decisionReceipt,
+                                DeferredReview: null,
+                                new GovernanceActReceipt(
+                                    loopKey,
+                                    reengrammitizationRequest.IdempotencyKey,
+                                    GovernanceActKind.Reengrammitization,
+                                    GovernanceLoopStage.CrypticFirstRouteCompleted,
+                                    Succeeded: true,
+                                    FailureCode: null,
+                                    reengrammitizationReceipt.Timestamp,
+                                    PublishedLanes: GovernedPrimeDerivativeLane.Neither,
+                                    ReceiptPointer: reengrammitizationReceipt.ReceiptPointer,
+                                    RequestFingerprint: ComputeFingerprint(reengrammitizationRequest)),
+                                ReviewRequest: reviewRequest,
+                                Annotation: null),
+                            cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        await journal.AppendAsync(
+                            new GovernanceJournalEntry(
                                 loopKey,
-                                reengrammitizationRequest.IdempotencyKey,
-                                GovernanceActKind.Reengrammitization,
+                                GovernanceJournalEntryKind.ActReceipt,
                                 GovernanceLoopStage.PendingRecovery,
-                                Succeeded: false,
-                                FailureCode: $"reengrammitization-failed:{ex.GetType().Name}",
                                 DateTime.UtcNow,
-                                PublishedLanes: snapshot.PublishedLanes,
-                                ReceiptPointer: null,
-                                RequestFingerprint: ComputeFingerprint(reengrammitizationRequest)),
-                            ReviewRequest: reviewRequest,
-                            Annotation: null),
-                        cancellationToken).ConfigureAwait(false);
+                                decisionReceipt,
+                                DeferredReview: null,
+                                new GovernanceActReceipt(
+                                    loopKey,
+                                    reengrammitizationRequest.IdempotencyKey,
+                                    GovernanceActKind.Reengrammitization,
+                                    GovernanceLoopStage.PendingRecovery,
+                                    Succeeded: false,
+                                    FailureCode: $"reengrammitization-failed:{ex.GetType().Name}",
+                                    DateTime.UtcNow,
+                                    PublishedLanes: snapshot.PublishedLanes,
+                                    ReceiptPointer: null,
+                                    RequestFingerprint: ComputeFingerprint(reengrammitizationRequest)),
+                                ReviewRequest: reviewRequest,
+                                Annotation: null),
+                            cancellationToken).ConfigureAwait(false);
 
-                    return new GovernanceGoldenPathResult(
-                        CandidateId: reviewRequest.CandidateId,
-                        LoopKey: loopKey,
-                        Stage: GovernanceLoopStage.PendingRecovery,
-                        DecisionReceipt: decisionReceipt,
-                        ReengrammitizationReceipt: null,
-                        PublishedLanes: snapshot.PublishedLanes,
-                        FailureCode: $"reengrammitization-failed:{ex.GetType().Name}",
-                        CollapseRoutingDecision: null);
+                        return new GovernanceGoldenPathResult(
+                            CandidateId: reviewRequest.CandidateId,
+                            LoopKey: loopKey,
+                            Stage: GovernanceLoopStage.PendingRecovery,
+                            DecisionReceipt: decisionReceipt,
+                            ReengrammitizationReceipt: null,
+                            PublishedLanes: snapshot.PublishedLanes,
+                            FailureCode: $"reengrammitization-failed:{ex.GetType().Name}",
+                            CollapseRoutingDecision: collapseRoutingDecision);
+                    }
+                }
+                else
+                {
+                    stage = GovernanceLoopStage.CrypticFirstRouteCompleted;
                 }
             }
             else
             {
-                stage = GovernanceLoopStage.CrypticReengrammitizationCompleted;
+                if (!snapshot.FirstRouteCompleted || snapshot.FirstRouteDisposition != CmeCollapseDisposition.RouteToCGoA)
+                {
+                    var cgoaResult = await TryAppendCrypticHoldAsync(
+                            loopKey,
+                            reviewRequest,
+                            decisionReceipt,
+                            collapseRoutingDecision,
+                            GovernanceLoopStage.CrypticFirstRouteCompleted,
+                            GovernanceLoopStage.PendingRecovery,
+                            snapshot.PublishedLanes,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                    if (!cgoaResult.Succeeded)
+                    {
+                        return new GovernanceGoldenPathResult(
+                            CandidateId: reviewRequest.CandidateId,
+                            LoopKey: loopKey,
+                            Stage: GovernanceLoopStage.PendingRecovery,
+                            DecisionReceipt: decisionReceipt,
+                            ReengrammitizationReceipt: null,
+                            PublishedLanes: snapshot.PublishedLanes,
+                            FailureCode: cgoaResult.FailureCode,
+                            CollapseRoutingDecision: collapseRoutingDecision);
+                    }
+                }
+
+                stage = GovernanceLoopStage.CrypticFirstRouteCompleted;
             }
 
             var publishedLanes = snapshot.PublishedLanes;
@@ -519,9 +576,7 @@ namespace Oan.Cradle
                         ReengrammitizationReceipt: reengrammitizationReceipt,
                         PublishedLanes: publishedLanes,
                         FailureCode: $"publication-failed:{lane}:{ex.GetType().Name}",
-                        CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
-                            decisionReceipt,
-                            reengrammitizationCompleted: true));
+                        CollapseRoutingDecision: collapseRoutingDecision);
                 }
             }
 
@@ -560,9 +615,7 @@ namespace Oan.Cradle
                 ReengrammitizationReceipt: reengrammitizationReceipt,
                 PublishedLanes: publishedLanes,
                 FailureCode: null,
-                CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
-                    decisionReceipt,
-                    reengrammitizationCompleted: true));
+                CollapseRoutingDecision: collapseRoutingDecision);
         }
 
         private IGovernanceCycleCognitionService RequireGovernanceCognitionService() =>
@@ -576,6 +629,10 @@ namespace Oan.Cradle
         private ICrypticReengrammitizationGate RequireCrypticReengrammitizationGate() =>
             _stores.CrypticReengrammitizationGate
             ?? throw new InvalidOperationException("Golden Path requires a Cryptic re-engrammitization gate.");
+
+        private ICrypticCustodyStore RequireCrypticCustodyStore() =>
+            _stores.CrypticCustodyStore
+            ?? throw new InvalidOperationException("Golden Path requires a Cryptic custody store.");
 
         private IGovernedPrimePublicationSink RequireGovernedPrimePublicationSink() =>
             _stores.GovernedPrimePublicationSink
@@ -601,7 +658,8 @@ namespace Oan.Cradle
                 ProvenanceMarker: workResult.ProvenanceMarker,
                 IntakeIntent: workResult.IntakeIntent,
                 SubmittedBy: "AgentiCore",
-                CandidatePayload: workResult.CandidatePayload);
+                CandidatePayload: workResult.CandidatePayload,
+                CollapseClassification: workResult.CollapseClassification);
         }
 
         private static GovernanceGoldenPathResult BuildResult(
@@ -624,7 +682,7 @@ namespace Oan.Cradle
                 FailureCode: snapshot.FailureCode,
                 CollapseRoutingDecision: GovernanceLoopStateModel.BuildCollapseRoutingDecision(
                     snapshot.DecisionReceipt,
-                    snapshot.ReengrammitizationCompleted));
+                    snapshot.ReviewRequest ?? throw new InvalidOperationException("Loop snapshot is missing a review request.")));
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -697,6 +755,118 @@ namespace Oan.Cradle
             var json = System.Text.Json.JsonSerializer.Serialize(payload);
             var bytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(json));
             return Convert.ToHexString(bytes).ToLowerInvariant();
+        }
+
+        private async Task<GovernanceGoldenPathResult?> EnsureDeferredHoldAsync(
+            string loopKey,
+            ReturnCandidateReviewRequest reviewRequest,
+            GovernanceDecisionReceipt decisionReceipt,
+            CmeCollapseRoutingDecision collapseRoutingDecision,
+            CancellationToken cancellationToken)
+        {
+            var holdResult = await TryAppendCrypticHoldAsync(
+                    loopKey,
+                    reviewRequest,
+                    decisionReceipt,
+                    collapseRoutingDecision,
+                    GovernanceLoopStage.GovernanceDecisionDeferred,
+                    GovernanceLoopStage.PendingRecovery,
+                    GovernedPrimeDerivativeLane.Neither,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            if (holdResult.Succeeded)
+            {
+                return null;
+            }
+
+            return new GovernanceGoldenPathResult(
+                CandidateId: reviewRequest.CandidateId,
+                LoopKey: loopKey,
+                Stage: GovernanceLoopStage.PendingRecovery,
+                DecisionReceipt: decisionReceipt,
+                ReengrammitizationReceipt: null,
+                PublishedLanes: GovernedPrimeDerivativeLane.Neither,
+                FailureCode: holdResult.FailureCode,
+                CollapseRoutingDecision: collapseRoutingDecision);
+        }
+
+        private async Task<(bool Succeeded, string? FailureCode)> TryAppendCrypticHoldAsync(
+            string loopKey,
+            ReturnCandidateReviewRequest reviewRequest,
+            GovernanceDecisionReceipt decisionReceipt,
+            CmeCollapseRoutingDecision collapseRoutingDecision,
+            GovernanceLoopStage successStage,
+            GovernanceLoopStage failureStage,
+            GovernedPrimeDerivativeLane publishedLanes,
+            CancellationToken cancellationToken)
+        {
+            var journal = RequireGovernanceReceiptJournal();
+            var custodyStore = RequireCrypticCustodyStore();
+            var appendRequest = new CrypticCustodyAppendRequest(
+                reviewRequest.IdentityId,
+                CustodyDomain: collapseRoutingDecision.TargetClass,
+                PayloadPointer: reviewRequest.ReturnCandidatePointer,
+                Classification: collapseRoutingDecision.ResidueClass == CmeCollapseResidueClass.AutobiographicalProtected
+                    ? "collapse-protected-autobiographical-residue"
+                    : "collapse-protected-contextual-residue");
+
+            try
+            {
+                var record = await custodyStore.AppendAsync(appendRequest, cancellationToken).ConfigureAwait(false);
+                await journal.AppendAsync(
+                    new GovernanceJournalEntry(
+                        loopKey,
+                        GovernanceJournalEntryKind.ActReceipt,
+                        successStage,
+                        record.Timestamp,
+                        decisionReceipt,
+                        DeferredReview: null,
+                        new GovernanceActReceipt(
+                            loopKey,
+                            decisionReceipt.IdempotencyKey,
+                            collapseRoutingDecision.Disposition == CmeCollapseDisposition.RouteToCMoS
+                                ? GovernanceActKind.CollapseHoldToCMoS
+                                : GovernanceActKind.CollapseHoldToCGoA,
+                            successStage,
+                            Succeeded: true,
+                            FailureCode: null,
+                            record.Timestamp,
+                            publishedLanes,
+                            ReceiptPointer: record.Pointer,
+                            RequestFingerprint: ComputeFingerprint(appendRequest)),
+                        ReviewRequest: reviewRequest,
+                        Annotation: null),
+                    cancellationToken).ConfigureAwait(false);
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                await journal.AppendAsync(
+                    new GovernanceJournalEntry(
+                        loopKey,
+                        GovernanceJournalEntryKind.ActReceipt,
+                        failureStage,
+                        DateTime.UtcNow,
+                        decisionReceipt,
+                        DeferredReview: null,
+                        new GovernanceActReceipt(
+                            loopKey,
+                            decisionReceipt.IdempotencyKey,
+                            collapseRoutingDecision.Disposition == CmeCollapseDisposition.RouteToCMoS
+                                ? GovernanceActKind.CollapseHoldToCMoS
+                                : GovernanceActKind.CollapseHoldToCGoA,
+                            failureStage,
+                            Succeeded: false,
+                            FailureCode: $"collapse-hold-failed:{collapseRoutingDecision.TargetClass}:{ex.GetType().Name}",
+                            DateTime.UtcNow,
+                            publishedLanes,
+                            ReceiptPointer: null,
+                            RequestFingerprint: ComputeFingerprint(appendRequest)),
+                        ReviewRequest: reviewRequest,
+                        Annotation: null),
+                    cancellationToken).ConfigureAwait(false);
+                return (false, $"collapse-hold-failed:{collapseRoutingDecision.TargetClass}:{ex.GetType().Name}");
+            }
         }
     }
 }

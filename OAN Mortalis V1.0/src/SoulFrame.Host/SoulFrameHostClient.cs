@@ -138,7 +138,14 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
             Disposition: "return-candidate-recorded",
             Evaluation: new SoulFrameCollapseEvaluation(
                 Classification: "candidate-collapse-evaluation",
-                RequiresReview: true,
+                CollapseClassification: request.CollapseClassification,
+                ResidueClass: request.CollapseClassification.AutobiographicalRelevant || request.CollapseClassification.SelfGelIdentified
+                    ? CmeCollapseResidueClass.AutobiographicalProtected
+                    : CmeCollapseResidueClass.ContextualProtected,
+                ReviewState: request.IntakeIntent.Contains("defer", StringComparison.OrdinalIgnoreCase)
+                    ? CmeCollapseReviewState.DeferredReview
+                    : CmeCollapseReviewState.None,
+                RequiresReview: request.IntakeIntent.Contains("defer", StringComparison.OrdinalIgnoreCase),
                 CanRouteToCustody: false,
                 CanPublishPrime: false)));
     }

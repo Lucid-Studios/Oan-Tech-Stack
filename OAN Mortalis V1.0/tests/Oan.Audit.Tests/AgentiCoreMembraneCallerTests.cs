@@ -23,7 +23,8 @@ public sealed class AgentiCoreMembraneCallerTests
         var receipt = await worker.SubmitReturnCandidateAsync(
             state,
             sourceTheater: "prime",
-            returnCandidatePointer: "agenticore-return://delta/42");
+            returnCandidatePointer: "agenticore-return://delta/42",
+            collapseClassification: CreateCollapseClassification());
 
         Assert.Equal(identityId, state.IdentityId);
         Assert.Equal("cme-alpha", state.CMEId);
@@ -108,10 +109,19 @@ public sealed class AgentiCoreMembraneCallerTests
                 Disposition: "return-candidate-recorded",
                 Evaluation: new SoulFrameCollapseEvaluation(
                     Classification: "candidate-collapse-evaluation",
+                    CollapseClassification: CreateCollapseClassification(),
+                    ResidueClass: CmeCollapseResidueClass.AutobiographicalProtected,
+                    ReviewState: CmeCollapseReviewState.DeferredReview,
                     RequiresReview: true,
                     CanRouteToCustody: false,
                     CanPublishPrime: false)));
         }
 
     }
+
+    private static CmeCollapseClassification CreateCollapseClassification(
+        double confidence = 0.92,
+        bool selfGelIdentified = true,
+        bool autobiographicalRelevant = true) =>
+        new(confidence, selfGelIdentified, autobiographicalRelevant);
 }

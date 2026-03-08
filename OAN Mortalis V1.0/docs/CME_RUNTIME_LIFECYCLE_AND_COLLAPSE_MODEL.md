@@ -137,7 +137,11 @@ Immediate Cryptic-first routing classes are first protected destinations, not fi
 
 - `route_to_cgoa`
 - `route_to_cmos`
-- `defer_review`
+
+Immediate review posture is a separate axis layered over those first protected destinations:
+
+- `no_review_required`
+- `deferred_review`
 
 Later-stage promotion or exploration classes are:
 
@@ -145,8 +149,7 @@ Later-stage promotion or exploration classes are:
 - `eligible_for_dream_seed`
 - `final_cgoa_enrichment`
 
-The current runtime does not yet implement all of these as first-class vocabulary.
-In particular, the current coarse runtime term `retain_in_mos` must not be read as immediate raw-close `MoS` routing under this corrected model.
+The current runtime does not yet implement all of these later-stage promotion or exploration classes as first-class vocabulary.
 
 ## 1. Lawful Admission
 
@@ -300,7 +303,11 @@ Only after mediated evaluation may collapse results route first into:
 
 - `cGoA` for non-autobiographical protected contextual residue
 - `cMoS` for unresolved autobiographical or SelfGEL-identified protected residue
-- defer-review backlog where protected review must occur before further routing
+
+Review state is layered on top of that first-route holding decision:
+
+- `deferred_review` means protected material is already held in `cGoA` or `cMoS` while later governance or HITL review remains required
+- `no_review_required` means the first protected hold is sufficient for the current bounded phase
 
 Only later, after deeper curation, may material be promoted toward:
 
