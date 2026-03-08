@@ -84,6 +84,7 @@ The experiment is valid only if the comparison distinguishes structure-bearing c
 The protocol must keep the following classes separate:
 
 - symbolic trace
+- canonical symbolic constructor triplets
 - candidate Engram structure
 - routed residue
 - OE/cOE admission

@@ -157,6 +157,10 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
         {
             Root = canonicalRoot,
             VariantForms = entry.Variants.ToList(),
+            SymbolicConstructors =
+            [
+                CreateRootOnlyTriplet(entry.RootTerm, symbol ?? symbolId)
+            ],
             FrequencyWeight = entry.FrequencyWeight
         };
 
@@ -465,6 +469,10 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
                         DictionaryPointer = $"atlas://root/{entry.RootTerm}"
                     },
                     VariantForms = entry.Variants.ToList(),
+                    SymbolicConstructors =
+                    [
+                        CreateRootOnlyTriplet(entry.RootTerm, symbol ?? symbolId)
+                    ],
                     FrequencyWeight = entry.FrequencyWeight
                 };
             })
@@ -483,6 +491,17 @@ public sealed partial class RootAtlasOntologicalCleaver : IRootOntologicalCleave
             .ToArray();
 
         return RootAtlas.Create("public_root.gel.v1", entries, domainDescriptors: domains);
+    }
+
+    private static SymbolicConstructorTriplet CreateRootOnlyTriplet(string rootKey, string rootSymbol)
+    {
+        return new SymbolicConstructorTriplet
+        {
+            RootKey = rootKey,
+            RootSymbol = rootSymbol,
+            CanonicalText = rootKey,
+            MergedGlyph = rootSymbol
+        };
     }
 }
 

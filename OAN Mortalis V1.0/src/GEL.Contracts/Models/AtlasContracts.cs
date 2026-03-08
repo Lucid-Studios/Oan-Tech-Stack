@@ -29,7 +29,20 @@ public sealed class RootAtlasEntry
 {
     public required PredicateRoot Root { get; init; }
     public required IReadOnlyList<string> VariantForms { get; init; }
+    public required IReadOnlyList<SymbolicConstructorTriplet> SymbolicConstructors { get; init; }
     public required double FrequencyWeight { get; init; }
+}
+
+public sealed class SymbolicConstructorTriplet
+{
+    public string? PrefixKey { get; init; }
+    public required string RootKey { get; init; }
+    public string? SuffixKey { get; init; }
+    public string? PrefixSymbol { get; init; }
+    public required string RootSymbol { get; init; }
+    public string? SuffixSymbol { get; init; }
+    public required string CanonicalText { get; init; }
+    public string? MergedGlyph { get; init; }
 }
 
 public sealed class RootAtlas
@@ -84,6 +97,23 @@ public sealed class RootAtlas
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .OrderBy(variant => variant, StringComparer.OrdinalIgnoreCase)
                     .ToArray(),
+                SymbolicConstructors = entry.SymbolicConstructors
+                    .Select(constructor => new SymbolicConstructorTriplet
+                    {
+                        PrefixKey = constructor.PrefixKey,
+                        RootKey = constructor.RootKey,
+                        SuffixKey = constructor.SuffixKey,
+                        PrefixSymbol = constructor.PrefixSymbol,
+                        RootSymbol = constructor.RootSymbol,
+                        SuffixSymbol = constructor.SuffixSymbol,
+                        CanonicalText = constructor.CanonicalText,
+                        MergedGlyph = constructor.MergedGlyph
+                    })
+                    .OrderBy(constructor => constructor.RootKey, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(constructor => constructor.PrefixKey ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(constructor => constructor.SuffixKey ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(constructor => constructor.CanonicalText, StringComparer.Ordinal)
+                    .ToArray(),
                 FrequencyWeight = entry.FrequencyWeight
             })
             .ToArray();
@@ -122,6 +152,17 @@ public sealed class RootAtlas
                     entry.Root.DictionaryPointer
                 },
                 entry.VariantForms,
+                SymbolicConstructors = entry.SymbolicConstructors.Select(constructor => new
+                {
+                    constructor.PrefixKey,
+                    constructor.RootKey,
+                    constructor.SuffixKey,
+                    constructor.PrefixSymbol,
+                    constructor.RootSymbol,
+                    constructor.SuffixSymbol,
+                    constructor.CanonicalText,
+                    constructor.MergedGlyph
+                }),
                 entry.FrequencyWeight
             }),
             RefinementEdges = normalizedEdges,

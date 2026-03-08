@@ -51,6 +51,7 @@ Observed repository conditions:
 - The first lawful `GEL` contract seam now exists as `src/GEL.Contracts`
 - `GEL.Contracts` now owns the canonical Atlas and Engram contract surface, with `RootAtlas`, `EngramDraft`, `Engram`, and one bounded `IEngramClosureValidator` seam instead of parallel meaning models
 - the repo now also has a bounded Atlas-source normalization seam that can ingest a canonical external `RootAtlas` surface and validate supporting root symbol, constructor, and reserved-symbol law layers without changing Golden Path behavior
+- canonical `RootAtlas` entries now preserve symbolic constructor triplets beside lexical variant strings so prefix/root/suffix structure survives normalization instead of being reduced to legality checks alone
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields

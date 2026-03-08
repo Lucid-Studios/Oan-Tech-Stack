@@ -85,6 +85,24 @@ Supporting note:
 
 - `docs/ATLAS_SOURCE_LAYERING.md`
 
+## Canonical Symbolic Constructor Bodies
+
+The canonical Atlas now preserves symbolic constructor bodies as structured triplets beside lexical variant strings.
+
+The canonical symbolic object is:
+
+- prefix operator
+- root core
+- suffix operator
+
+The merged glyph, if present, is only a render artifact or compression of that triplet.
+
+That means:
+
+- constructor legality may not be reduced to string validation alone
+- canonical symbolic structure must survive normalization
+- visual or merged symbolic forms must not replace the structural triplet as the meaning-bearing object
+
 ## Epistemic Mapping
 
 The canonical epistemic mapping is:

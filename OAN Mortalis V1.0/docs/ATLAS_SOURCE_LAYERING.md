@@ -52,6 +52,7 @@ The intended layering is:
 - canonical atlas layer
   - root
   - variants
+  - symbolic constructor triplets
   - stable canonical identity
 
 ## Normalization Rule
@@ -62,7 +63,8 @@ The repo should treat the source layers in this order:
 2. reconcile root symbol identity against the root symbol seed layers
 3. validate prefix/suffix constructor references
 4. validate reserved symbol and collision policy
-5. produce one canonical `RootAtlas`
+5. preserve canonical prefix-root-suffix constructor bodies
+6. produce one canonical `RootAtlas`
 
 The supporting source files are not co-equal meaning models.
 
@@ -97,3 +99,16 @@ to:
 - one canonical `RootAtlas` object in `GEL.Contracts`
 
 That is the required bedrock for later Atlas -> Engram admission without rival Atlas meanings.
+
+## Constructor Body Rule
+
+The atlas now distinguishes between:
+
+- lexical variant strings for compatibility and lookup
+- canonical symbolic constructor triplets for meaning-bearing symbolic structure
+
+The triplet is the canonical object.
+
+The merged glyph, if present, is only a rendered artifact.
+
+No symbolic contextualization generation should proceed from this Atlas layer unless the constructor body is structurally represented, not merely validated.
