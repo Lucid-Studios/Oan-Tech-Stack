@@ -15,6 +15,8 @@ Each predicate root owns:
 - one canonical root-native symbolic anchor
 - one lawful refinement position inside the atlas
 
+The canonical root key is interpreted as a lemma anchor, not a surface-word variant.
+
 Prefix and suffix operators may contextualize a root core.
 They may not replace the root core as the invariant anchor.
 

@@ -23,6 +23,7 @@ The first seed `GEL` should load only the following canonical classes:
 Canonical at first boot means:
 
 - pinned `RootAtlas`
+- lemma-root identity fixed for canonical root keys
 - pinned symbolic domain constitution
 - deterministic constructor-body law
 - explicit closure grades

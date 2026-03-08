@@ -14,6 +14,10 @@ The symbolic governance layer above that atlas is now defined separately in:
 
 - `docs/SYMBOLIC_DOMAIN_CONSTITUTION.md`
 
+The root-core interpretation of that atlas is now fixed separately in:
+
+- `docs/LEMMA_ROOT_CONSTITUTION.md`
+
 This phase does not introduce a new cognition subsystem, append engine, or OE/cOE mutation path.
 
 ## Canonical Owner
@@ -114,6 +118,7 @@ That means:
 - constructor legality may not be reduced to string validation alone
 - canonical symbolic structure must survive normalization
 - visual or merged symbolic forms must not replace the structural triplet as the meaning-bearing object
+- the root core of the constructor body is a lemma anchor rather than a surface-word form
 
 ## Epistemic Mapping
 

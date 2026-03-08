@@ -30,6 +30,7 @@ The experiment assumes:
 - canonical Atlas and Engram contracts in `GEL.Contracts`
 - deterministic `RootAtlas` identity
 - explicit symbolic domain constitution
+- explicit lemma-root constitution
 - bounded `IEngramClosureValidator`
 - current governance-first Golden Path remains unchanged
 - current `SelfGEL` / `cSelfGEL` law remains unchanged
@@ -43,6 +44,8 @@ The bootstrap run must use one pinned `RootAtlas` object with:
 - root entries
 - optional refinement edges
 - optional domain descriptors
+
+That pinned atlas must interpret root keys as lemma anchors rather than surface-word forms.
 
 No ambient atlas collections are allowed.
 

@@ -50,7 +50,7 @@ The intended layering is:
   - reserved control/meta symbols
   - uniqueness and collision rules
 - canonical atlas layer
-  - root
+  - lemma root
   - variants
   - symbolic constructor triplets
   - stable canonical identity
@@ -124,3 +124,4 @@ That rule now sits under:
 
 - `docs/SYMBOLIC_DOMAIN_CONSTITUTION.md`
 - `docs/KNOWN_UNKNOWN_EXTENSION_SEMANTICS.md`
+- `docs/LEMMA_ROOT_CONSTITUTION.md`
