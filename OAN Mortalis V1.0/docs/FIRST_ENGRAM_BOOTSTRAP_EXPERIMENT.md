@@ -64,14 +64,22 @@ That pinned object may come from:
 
 The bootstrap experiment still operates on the pinned canonical `RootAtlas`, not on the raw source-layer files directly.
 
+The first English-facing bootstrap pass must also operate over one curated seed lemma subset:
+
+- `docs/SEED_LEMMA_ROOT_SET.md`
+- `public_root/seed/SeedLemmaRoots.json`
+
+That subset is used to prove English -> lemma -> root landing before broader `EngramDraft` generation expands.
+
 ## Minimum Draft Path
 
 The first lawful path is:
 
 1. start from a pinned `RootAtlas`
-2. construct a bounded `EngramDraft`
-3. validate it through `IEngramClosureValidator`
-4. record whether it is:
+2. prove English intake lands on one admitted seed lemma root
+3. construct a bounded `EngramDraft`
+4. validate it through `IEngramClosureValidator`
+5. record whether it is:
    - `BootstrapClosed`
    - `Closed`
    - `NeedsSpecification`

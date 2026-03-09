@@ -179,8 +179,14 @@ The repo now says plainly:
 
 - Atlas first
 - symbolic domain law above atlas
+- curated seed lemma basis before broad draft expansion
 - then Engram draft
 - then closure validation
 - then only later governed memory movement
 
 That is the canonical order for future Atlas -> Engram -> GEL / OE work.
+
+Supporting seed artifacts:
+
+- `docs/SEED_LEMMA_ROOT_SET.md`
+- `public_root/seed/SeedLemmaRoots.json`

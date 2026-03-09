@@ -23,6 +23,7 @@ The first seed `GEL` should load only the following canonical classes:
 Canonical at first boot means:
 
 - pinned `RootAtlas`
+- curated seed lemma subset pinned under the canonical root surface
 - lemma-root identity fixed for canonical root keys
 - pinned symbolic domain constitution
 - deterministic constructor-body law
@@ -45,10 +46,12 @@ The intended bootstrap order is:
 
 1. load symbolic domain constitution
 2. load canonical `RootAtlas`
-3. validate constructor legality against reserved domains
-4. admit `EngramDraft` binding against canonical roots
-5. validate closure grade
-6. only later consider governed memory movement
+3. load curated seed lemma roots
+4. validate constructor legality against reserved domains
+5. prove English intake lands on admitted lemma roots
+6. admit `EngramDraft` binding against canonical roots
+7. validate closure grade
+8. only later consider governed memory movement
 
 ## Immediate Consequence
 
@@ -58,4 +61,5 @@ That means:
 
 - the symbolic world is reserved before it is extended
 - root cores are explicit before merged forms are generated
+- the first seed basis is curated before broad Engram generation begins
 - unknown space is articulated before the system pretends completeness
