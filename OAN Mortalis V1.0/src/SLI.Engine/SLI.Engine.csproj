@@ -5,8 +5,10 @@
     <ProjectReference Include="..\CradleTek.CognitionHost\CradleTek.CognitionHost.csproj" />
     <ProjectReference Include="..\CradleTek.Host\CradleTek.Host.csproj" />
     <ProjectReference Include="..\CradleTek.Memory\CradleTek.Memory.csproj" />
+    <ProjectReference Include="..\GEL.Contracts\GEL.Contracts.csproj" />
     <ProjectReference Include="..\GEL\GEL.csproj" />
     <ProjectReference Include="..\OAN.Core\OAN.Core.csproj" />
+    <ProjectReference Include="..\SLI.Ingestion\SLI.Ingestion.csproj" />
     <ProjectReference Include="..\SLI.Lisp\SLI.Lisp.csproj" />
     <ProjectReference Include="..\SoulFrame.Host\SoulFrame.Host.csproj" />
   </ItemGroup>

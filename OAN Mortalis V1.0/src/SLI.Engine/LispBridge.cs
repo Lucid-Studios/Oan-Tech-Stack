@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using CradleTek.Memory.Interfaces;
+using CradleTek.Memory.Models;
 using SLI.Engine.Cognition;
+using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SLI.Engine.Parser;
 using SLI.Engine.Runtime;
@@ -18,7 +20,8 @@ public sealed class LispBridge
         "parser.lisp",
         "reasoning.lisp",
         "engram.lisp",
-        "compass.lisp"
+        "compass.lisp",
+        "morphology.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
@@ -92,6 +95,77 @@ public sealed class LispBridge
             SymbolicTrace = trace,
             SymbolicTraceHash = traceHash,
             CompassState = compass
+        };
+    }
+
+    internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string sentence,
+        CancellationToken cancellationToken = default)
+    {
+        var state = await ExecuteMorphologyProgramAsync(symbolicProgram, sentence, cancellationToken).ConfigureAwait(false);
+        return new SliMorphologySentenceResult
+        {
+            Sentence = sentence,
+            ResolvedLemmaRoots = state.ResolvedLemmaRoots.ToArray(),
+            OperatorAnnotations = state.OperatorAnnotations
+                .Select(annotation => new SliMorphologyOperatorAnnotation
+                {
+                    Token = annotation.Token,
+                    Kind = annotation.Kind
+                })
+                .ToArray(),
+            ConstructorBodies = state.ConstructorBodies
+                .Select(body => new SliMorphologyConstructorBody
+                {
+                    Role = body.Role,
+                    RootKey = body.RootKey
+                })
+                .ToArray(),
+            DiagnosticPredicateRender = state.DiagnosticPredicateRender,
+            LaneOutcome = Enum.TryParse<SliMorphologyLaneOutcome>(state.Outcome, ignoreCase: true, out var outcome)
+                ? outcome
+                : SliMorphologyLaneOutcome.OutOfScope,
+            PredicateRoot = state.PredicateRoot,
+            Summary = state.Summary,
+            ScalarPayload = state.ScalarPayload
+        };
+    }
+
+    internal async Task<SliMorphologyParagraphResult> ExecuteMorphologyParagraphProgramAsync(
+        IReadOnlyList<SliMorphologySentenceResult> sentenceResults,
+        IReadOnlyList<string> symbolicProgram,
+        string paragraph,
+        CancellationToken cancellationToken = default)
+    {
+        var state = await ExecuteMorphologyProgramAsync(symbolicProgram, paragraph, cancellationToken).ConfigureAwait(false);
+        return new SliMorphologyParagraphResult
+        {
+            LaneOutcome = SliMorphologyLaneOutcome.Closed,
+            Paragraph = paragraph,
+            SentenceResults = sentenceResults,
+            GraphEdges = state.GraphEdges.ToArray()
+        };
+    }
+
+    internal async Task<SliMorphologyParagraphBodyResult> ExecuteMorphologyParagraphBodyProgramAsync(
+        SliMorphologyParagraphResult paragraphResult,
+        IReadOnlyList<string> symbolicProgram,
+        string paragraph,
+        CancellationToken cancellationToken = default)
+    {
+        var state = await ExecuteMorphologyProgramAsync(symbolicProgram, paragraph, cancellationToken).ConfigureAwait(false);
+        return new SliMorphologyParagraphBodyResult
+        {
+            LaneOutcome = SliMorphologyLaneOutcome.Closed,
+            Paragraph = paragraph,
+            ParagraphResult = paragraphResult,
+            ContinuityAnchors = state.ContinuityAnchors.ToArray(),
+            ParagraphInvariants = state.BodyInvariants.ToArray(),
+            ClusterDiagnosticRender = state.ClusterEntries.Count == 0
+                ? string.Empty
+                : $"cluster[{string.Join("; ", state.ClusterEntries)}]",
+            BodySummary = state.BodySummary
         };
     }
 
@@ -208,6 +282,34 @@ public sealed class LispBridge
         }
     }
 
+    private async Task<SliMorphologyState> ExecuteMorphologyProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = _parser.ParseProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "morphology-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return context.MorphologyState;
+    }
+
     private static int IndexOf(IReadOnlyList<string> traceLines, string prefix)
     {
         for (var index = 0; index < traceLines.Count; index++)
@@ -219,5 +321,34 @@ public sealed class LispBridge
         }
 
         return -1;
+    }
+
+    private sealed class NullEngramResolver : IEngramResolver
+    {
+        public static readonly NullEngramResolver Instance = new();
+
+        public Task<EngramQueryResult> ResolveRelevantAsync(CradleTek.CognitionHost.Models.CognitionContext context, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(Empty("relevant"));
+        }
+
+        public Task<EngramQueryResult> ResolveConceptAsync(string concept, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(Empty("concept"));
+        }
+
+        public Task<EngramQueryResult> ResolveClusterAsync(string clusterId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(Empty("cluster"));
+        }
+
+        private static EngramQueryResult Empty(string source)
+        {
+            return new EngramQueryResult
+            {
+                Source = source,
+                Summaries = Array.Empty<EngramSummary>()
+            };
+        }
     }
 }

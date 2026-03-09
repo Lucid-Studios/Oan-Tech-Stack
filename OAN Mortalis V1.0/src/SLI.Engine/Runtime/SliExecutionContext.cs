@@ -30,6 +30,7 @@ public sealed class SliExecutionContext
     public List<string> CandidateBranches { get; } = [];
     public List<string> PrunedBranches { get; } = [];
     public SliExecutionGraph ExecutionGraph { get; } = new();
+    internal SliMorphologyState MorphologyState { get; } = new();
     public string FinalDecision { get; set; } = "defer";
 
     public void AddTrace(string trace)

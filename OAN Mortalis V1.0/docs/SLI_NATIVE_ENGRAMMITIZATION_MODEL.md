@@ -33,6 +33,30 @@ This means:
 - Lisp-based SLI and Engineered Cognition may form candidate Engram structures, but they do not bypass closure validation or custody law
 - `Oan.Spinal.EngramEnvelope` remains a runtime-event envelope rather than the canonical meaning object
 
+## First Bridge Posture
+
+The first bounded Lisp bridge pass is now active for the fixed narrative proof corpora.
+
+This means:
+
+- Lisp-based SLI and Engineered Cognition now act as the live morphology runtime for:
+  - sentence translation proof
+  - paragraph graph proof
+  - paragraph body-cleaving proof
+- C# remains the canonical oracle for those same corpora
+- Lisp emits candidate morphology only
+- C# materializes canonical contract-shaped results, runs closure validation, and compares bridge output against the oracle
+
+This bridge is fixture-bound and corpus-gated.
+
+It does not authorize:
+
+- GEL append
+- OE/cOE mutation
+- routing changes
+- custody changes
+- chapter-level closure
+
 ## What Native Engrammitization Means
 
 Native Engrammitization is not mere logging, tracing, or symbolic ornament.
@@ -153,6 +177,23 @@ CradleTek:
 - keeps the organism situated and observable
 
 Lisp-based SLI and Engineered Cognition must not redefine CradleTek sequencing or governance posture autonomously.
+
+## Relationship To The Current C# Proof Lanes
+
+The current proof lanes in `src/SLI.Ingestion` remain the reference implementation for:
+
+- `EnglishNarrativeTranslationLane`
+- `EnglishNarrativeParagraphLane`
+- `EnglishNarrativeParagraphBodyLane`
+
+The active Lisp bridge mirrors those proof lanes through the existing `SLI.Engine/LispBridge` path.
+
+This means the current architecture reads as:
+
+- C# proof lanes define oracle behavior
+- Lisp performs the live morphological formation work
+- C# adapters materialize canonical contract-shaped outputs
+- C# validators remain the closure authority
 
 ## Candidate Engram Formation
 
@@ -282,3 +323,8 @@ Forbidden use:
 The stack must not use Lisp as a generic plugin for missing architecture.
 
 The stack must use Lisp-based SLI and Engineered Cognition where morphological cognition and native Engrammitization are actually required, while keeping governance, custody, profile, and anti-bleed law in the C# runtime skeleton.
+
+The first bridge pass therefore proves parity before authority moves:
+
+- if Lisp and C# match on sentence, paragraph graph, and paragraph body outputs for the fixed corpora, Lisp is validated as the live morphology organism for those bounded formation tasks
+- if they diverge, the divergence is treated as a bridge failure, not as new truth

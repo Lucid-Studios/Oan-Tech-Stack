@@ -1,4 +1,3 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Oan.Sli.Tests")]
-[assembly: InternalsVisibleTo("SLI.Engine")]
