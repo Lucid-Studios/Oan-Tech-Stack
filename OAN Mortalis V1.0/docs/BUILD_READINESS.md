@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `79` tests passed across `5` discovered test assemblies
+- `84` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -56,6 +56,7 @@ Observed repository conditions:
 - the atlas root-core reading is now explicitly fixed at the lemma layer so canonical root identity is no longer left implicit in surface-word forms
 - the repo now also has a first curated seed lemma basis and a tracked machine-readable seed manifest so English intake can be proven against a bounded canonical subset before broader EngramDraft expansion begins
 - the repo now also has a first fixture-backed narrative translation lane in `SLI.Ingestion` that proves English input can land on lemma roots, attach canonical constructor bodies, produce bounded `EngramDraft` objects for structurally admissible sentences, and stop at lane-level `NeedsSpecification` before structural closure when ambiguity remains
+- the repo now also has a first internal paragraph predicate-graph proof lane in `SLI.Ingestion` that reuses the sentence lane, emits a deterministic `ConstructorGraph`, records continuity only between adjacent sentence predicate roots, produces four bounded drafts with closure decisions, and keeps one ambiguous sentence structural without upgrading it into closure
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields

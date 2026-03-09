@@ -20,6 +20,7 @@ internal sealed class NarrativeTranslationLaneResult
     public required IReadOnlyList<NarrativeConstructorBody> ConstructorBodies { get; init; }
     public required string DiagnosticPredicateRender { get; init; }
     public required NarrativeTranslationLaneOutcome LaneOutcome { get; init; }
+    public string? PredicateRoot { get; init; }
     public EngramDraft? EngramDraft { get; init; }
     public EngramClosureDecision? ClosureDecision { get; init; }
 }
@@ -103,7 +104,8 @@ internal sealed class EnglishNarrativeTranslationLane
                 OperatorAnnotations = Array.Empty<NarrativeOperatorAnnotation>(),
                 ConstructorBodies = Array.Empty<NarrativeConstructorBody>(),
                 DiagnosticPredicateRender = specification.DiagnosticPredicateRender,
-                LaneOutcome = NarrativeTranslationLaneOutcome.Rejected
+                LaneOutcome = NarrativeTranslationLaneOutcome.Rejected,
+                PredicateRoot = specification.PredicateRoot
             };
         }
 
@@ -119,7 +121,8 @@ internal sealed class EnglishNarrativeTranslationLane
                 OperatorAnnotations = operatorAnnotations,
                 ConstructorBodies = constructorBodies,
                 DiagnosticPredicateRender = specification.DiagnosticPredicateRender,
-                LaneOutcome = NarrativeTranslationLaneOutcome.NeedsSpecification
+                LaneOutcome = NarrativeTranslationLaneOutcome.NeedsSpecification,
+                PredicateRoot = specification.PredicateRoot
             };
         }
 
@@ -136,6 +139,7 @@ internal sealed class EnglishNarrativeTranslationLane
             LaneOutcome = closureDecision.Grade == EngramClosureGrade.Closed
                 ? NarrativeTranslationLaneOutcome.Closed
                 : NarrativeTranslationLaneOutcome.Rejected,
+            PredicateRoot = specification.PredicateRoot,
             EngramDraft = draft,
             ClosureDecision = closureDecision
         };
@@ -356,6 +360,28 @@ internal sealed class EnglishNarrativeTranslationLane
                 LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
                 Summary = "narrative.measurement",
                 ScalarPayload = "12"
+            },
+            ["The Gate observes the hum."] = new()
+            {
+                RequiredRoots = ["gate", "observe", "hum"],
+                PredicateRoot = "observe",
+                BranchRoles = [new("subject", "gate"), new("object", "hum")],
+                ConstructorRoles = [new("subject", "gate"), new("predicate", "observe"), new("object", "hum")],
+                OperatorAnnotations = [],
+                DiagnosticPredicateRender = "observe(gate,hum)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.transitive"
+            },
+            ["The light changes the Gate."] = new()
+            {
+                RequiredRoots = ["light", "change", "gate"],
+                PredicateRoot = "change",
+                BranchRoles = [new("subject", "light"), new("object", "gate")],
+                ConstructorRoles = [new("subject", "light"), new("predicate", "change"), new("object", "gate")],
+                OperatorAnnotations = [],
+                DiagnosticPredicateRender = "change(light,gate)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.transitive"
             },
             ["The light was the first lie."] = new()
             {

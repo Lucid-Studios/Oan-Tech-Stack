@@ -96,6 +96,14 @@ The first translation proof lane is intentionally fixture-backed and limited to 
 
 The third sentence stops at lane-level `NeedsSpecification` before structural closure. Ambiguity is surfaced before validator invocation rather than being simulated through a structurally broken draft.
 
+The next bounded proof lane is an internal five-sentence paragraph fixture that reuses the sentence lane unchanged, emits a deterministic `ConstructorGraph`, and records continuity edges only between adjacent sentence predicate roots:
+
+- `remember -> observe` / `continuity:gate`
+- `observe -> increase` / `continuity:hum`
+- `change -> lie` / `continuity:light`
+
+That paragraph lane still stops the ambiguous sentence at `NeedsSpecification` before structural closure. Paragraph continuity is proved without laundering ambiguity into closure.
+
 ## Ambiguity-Resolution Protocol
 
 The bootstrap ambiguity experiment is:
