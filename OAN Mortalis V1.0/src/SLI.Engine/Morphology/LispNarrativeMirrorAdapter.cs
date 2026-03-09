@@ -24,6 +24,21 @@ internal sealed class LispNarrativeMirrorAdapter
         IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
         CancellationToken cancellationToken = default)
     {
+        var candidateResult = await TranslateSentenceCandidateAsync(
+            sentence,
+            atlas,
+            overlayRoots,
+            cancellationToken).ConfigureAwait(false);
+
+        return await FinalizeSentenceResultAsync(candidateResult, atlas, overlayRoots, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task<NarrativeTranslationLaneResult> TranslateSentenceCandidateAsync(
+        string sentence,
+        RootAtlas atlas,
+        IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
+        CancellationToken cancellationToken = default)
+    {
         ArgumentException.ThrowIfNullOrWhiteSpace(sentence);
         ArgumentNullException.ThrowIfNull(atlas);
         ArgumentNullException.ThrowIfNull(overlayRoots);
@@ -86,7 +101,6 @@ internal sealed class LispNarrativeMirrorAdapter
         }
 
         var draft = MaterializeDraft(bridgeResult, constructorBodies);
-        var closureDecision = await _closureValidator.ValidateAsync(draft, workingAtlas, cancellationToken).ConfigureAwait(false);
         return new NarrativeTranslationLaneResult
         {
             Sentence = sentence,
@@ -94,16 +108,35 @@ internal sealed class LispNarrativeMirrorAdapter
             OperatorAnnotations = operatorAnnotations,
             ConstructorBodies = constructorBodies,
             DiagnosticPredicateRender = bridgeResult.DiagnosticPredicateRender,
-            LaneOutcome = closureDecision.Grade == EngramClosureGrade.Closed
-                ? NarrativeTranslationLaneOutcome.Closed
-                : NarrativeTranslationLaneOutcome.Rejected,
+            LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
             PredicateRoot = bridgeResult.PredicateRoot,
-            EngramDraft = draft,
-            ClosureDecision = closureDecision
+            EngramDraft = draft
         };
     }
 
     public async Task<NarrativeParagraphLaneResult> TranslateParagraphAsync(
+        string paragraph,
+        RootAtlas atlas,
+        IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
+        CancellationToken cancellationToken = default)
+    {
+        var candidateResult = await TranslateParagraphCandidateAsync(
+            paragraph,
+            atlas,
+            overlayRoots,
+            cancellationToken).ConfigureAwait(false);
+
+        var finalizedSentenceResults = new List<NarrativeTranslationLaneResult>(candidateResult.SentenceResults.Count);
+        foreach (var sentenceResult in candidateResult.SentenceResults)
+        {
+            finalizedSentenceResults.Add(
+                await FinalizeSentenceResultAsync(sentenceResult, atlas, overlayRoots, cancellationToken).ConfigureAwait(false));
+        }
+
+        return BuildParagraphResult(candidateResult.Paragraph, candidateResult.ParagraphGraph.Edges, finalizedSentenceResults);
+    }
+
+    internal async Task<NarrativeParagraphLaneResult> TranslateParagraphCandidateAsync(
         string paragraph,
         RootAtlas atlas,
         IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
@@ -135,24 +168,10 @@ internal sealed class LispNarrativeMirrorAdapter
         var sentenceResults = new List<NarrativeTranslationLaneResult>(bridgeResult.SentenceResults.Count);
         foreach (var sentenceResult in bridgeResult.SentenceResults)
         {
-            sentenceResults.Add(await TranslateSentenceAsync(sentenceResult.Sentence, atlas, overlayRoots, cancellationToken).ConfigureAwait(false));
+            sentenceResults.Add(await TranslateSentenceCandidateAsync(sentenceResult.Sentence, atlas, overlayRoots, cancellationToken).ConfigureAwait(false));
         }
 
-        return new NarrativeParagraphLaneResult
-        {
-            Paragraph = paragraph,
-            SentenceResults = sentenceResults,
-            ParagraphGraph = new ConstructorGraph { Edges = bridgeResult.GraphEdges },
-            DiagnosticGraphEdges = bridgeResult.GraphEdges,
-            GeneratedDrafts = sentenceResults
-                .Where(result => result.EngramDraft is not null)
-                .Select(result => result.EngramDraft!)
-                .ToArray(),
-            ClosureDecisions = sentenceResults
-                .Where(result => result.ClosureDecision is not null)
-                .Select(result => result.ClosureDecision!)
-                .ToArray()
-        };
+        return BuildParagraphResult(paragraph, bridgeResult.GraphEdges, sentenceResults);
     }
 
     public async Task<NarrativeParagraphBody> TranslateParagraphBodyAsync(
@@ -173,44 +192,36 @@ internal sealed class LispNarrativeMirrorAdapter
 
         if (bridgeResult.LaneOutcome == SliMorphologyLaneOutcome.OutOfScope)
         {
-            return new NarrativeParagraphBody
-            {
-                Paragraph = paragraph,
-                SentenceResults = Array.Empty<NarrativeTranslationLaneResult>(),
-                ParagraphGraph = new ConstructorGraph { Edges = Array.Empty<ConstructorEdge>() },
-                ParagraphInvariants = Array.Empty<string>(),
-                ContinuityAnchors = Array.Empty<string>(),
-                BodySummary = bridgeResult.BodySummary,
-                DraftCluster = new NarrativeDraftCluster
-                {
-                    MemberDrafts = Array.Empty<EngramDraft>(),
-                    MemberClosureDecisions = Array.Empty<EngramClosureDecision>(),
-                    AmbiguousSentenceKeys = Array.Empty<string>(),
-                    ClusterDiagnosticRender = bridgeResult.ClusterDiagnosticRender
-                }
-            };
+            return CreateOutOfScopeParagraphBody(paragraph, bridgeResult);
         }
 
         var paragraphResult = await TranslateParagraphAsync(paragraph, atlas, overlayRoots, cancellationToken).ConfigureAwait(false);
-        return new NarrativeParagraphBody
+        return BuildParagraphBody(paragraph, bridgeResult, paragraphResult);
+    }
+
+    internal async Task<NarrativeParagraphBody> TranslateParagraphBodyCandidateAsync(
+        string paragraph,
+        RootAtlas atlas,
+        IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(paragraph);
+        ArgumentNullException.ThrowIfNull(atlas);
+        ArgumentNullException.ThrowIfNull(overlayRoots);
+
+        var bridgeResult = await _morphologyRuntime.TranslateParagraphBodyAsync(
+            paragraph,
+            atlas,
+            ToMorphologyOverlayRoots(overlayRoots),
+            cancellationToken).ConfigureAwait(false);
+
+        if (bridgeResult.LaneOutcome == SliMorphologyLaneOutcome.OutOfScope)
         {
-            Paragraph = paragraph,
-            SentenceResults = paragraphResult.SentenceResults,
-            ParagraphGraph = paragraphResult.ParagraphGraph,
-            ParagraphInvariants = bridgeResult.ParagraphInvariants,
-            ContinuityAnchors = bridgeResult.ContinuityAnchors,
-            BodySummary = bridgeResult.BodySummary,
-            DraftCluster = new NarrativeDraftCluster
-            {
-                MemberDrafts = paragraphResult.GeneratedDrafts,
-                MemberClosureDecisions = paragraphResult.ClosureDecisions,
-                AmbiguousSentenceKeys = paragraphResult.SentenceResults
-                    .Where(result => result.LaneOutcome == NarrativeTranslationLaneOutcome.NeedsSpecification)
-                    .Select(result => result.DiagnosticPredicateRender)
-                    .ToArray(),
-                ClusterDiagnosticRender = bridgeResult.ClusterDiagnosticRender
-            }
-        };
+            return CreateOutOfScopeParagraphBody(paragraph, bridgeResult);
+        }
+
+        var paragraphResult = await TranslateParagraphCandidateAsync(paragraph, atlas, overlayRoots, cancellationToken).ConfigureAwait(false);
+        return BuildParagraphBody(paragraph, bridgeResult, paragraphResult);
     }
 
     private static IReadOnlyList<SliMorphologyOverlayRoot> ToMorphologyOverlayRoots(IReadOnlyList<NarrativeOverlayRoot> overlayRoots)
@@ -351,5 +362,108 @@ internal sealed class LispNarrativeMirrorAdapter
         }
 
         return invariants;
+    }
+
+    private async Task<NarrativeTranslationLaneResult> FinalizeSentenceResultAsync(
+        NarrativeTranslationLaneResult candidateResult,
+        RootAtlas atlas,
+        IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
+        CancellationToken cancellationToken)
+    {
+        if (candidateResult.LaneOutcome != NarrativeTranslationLaneOutcome.Closed ||
+            candidateResult.EngramDraft is null)
+        {
+            return candidateResult;
+        }
+
+        var workingAtlas = BuildOverlayAtlas(atlas, overlayRoots);
+        var closureDecision = await _closureValidator
+            .ValidateAsync(candidateResult.EngramDraft, workingAtlas, cancellationToken)
+            .ConfigureAwait(false);
+
+        return new NarrativeTranslationLaneResult
+        {
+            Sentence = candidateResult.Sentence,
+            ResolvedLemmaRoots = candidateResult.ResolvedLemmaRoots,
+            OperatorAnnotations = candidateResult.OperatorAnnotations,
+            ConstructorBodies = candidateResult.ConstructorBodies,
+            DiagnosticPredicateRender = candidateResult.DiagnosticPredicateRender,
+            LaneOutcome = closureDecision.Grade == EngramClosureGrade.Closed
+                ? NarrativeTranslationLaneOutcome.Closed
+                : NarrativeTranslationLaneOutcome.Rejected,
+            PredicateRoot = candidateResult.PredicateRoot,
+            EngramDraft = candidateResult.EngramDraft,
+            ClosureDecision = closureDecision
+        };
+    }
+
+    private static NarrativeParagraphLaneResult BuildParagraphResult(
+        string paragraph,
+        IReadOnlyList<ConstructorEdge> graphEdges,
+        IReadOnlyList<NarrativeTranslationLaneResult> sentenceResults)
+    {
+        return new NarrativeParagraphLaneResult
+        {
+            Paragraph = paragraph,
+            SentenceResults = sentenceResults,
+            ParagraphGraph = new ConstructorGraph { Edges = graphEdges },
+            DiagnosticGraphEdges = graphEdges,
+            GeneratedDrafts = sentenceResults
+                .Where(result => result.EngramDraft is not null)
+                .Select(result => result.EngramDraft!)
+                .ToArray(),
+            ClosureDecisions = sentenceResults
+                .Where(result => result.ClosureDecision is not null)
+                .Select(result => result.ClosureDecision!)
+                .ToArray()
+        };
+    }
+
+    private static NarrativeParagraphBody BuildParagraphBody(
+        string paragraph,
+        SliMorphologyParagraphBodyResult bridgeResult,
+        NarrativeParagraphLaneResult paragraphResult)
+    {
+        return new NarrativeParagraphBody
+        {
+            Paragraph = paragraph,
+            SentenceResults = paragraphResult.SentenceResults,
+            ParagraphGraph = paragraphResult.ParagraphGraph,
+            ParagraphInvariants = bridgeResult.ParagraphInvariants,
+            ContinuityAnchors = bridgeResult.ContinuityAnchors,
+            BodySummary = bridgeResult.BodySummary,
+            DraftCluster = new NarrativeDraftCluster
+            {
+                MemberDrafts = paragraphResult.GeneratedDrafts,
+                MemberClosureDecisions = paragraphResult.ClosureDecisions,
+                AmbiguousSentenceKeys = paragraphResult.SentenceResults
+                    .Where(result => result.LaneOutcome == NarrativeTranslationLaneOutcome.NeedsSpecification)
+                    .Select(result => result.DiagnosticPredicateRender)
+                    .ToArray(),
+                ClusterDiagnosticRender = bridgeResult.ClusterDiagnosticRender
+            }
+        };
+    }
+
+    private static NarrativeParagraphBody CreateOutOfScopeParagraphBody(
+        string paragraph,
+        SliMorphologyParagraphBodyResult bridgeResult)
+    {
+        return new NarrativeParagraphBody
+        {
+            Paragraph = paragraph,
+            SentenceResults = Array.Empty<NarrativeTranslationLaneResult>(),
+            ParagraphGraph = new ConstructorGraph { Edges = Array.Empty<ConstructorEdge>() },
+            ParagraphInvariants = Array.Empty<string>(),
+            ContinuityAnchors = Array.Empty<string>(),
+            BodySummary = bridgeResult.BodySummary,
+            DraftCluster = new NarrativeDraftCluster
+            {
+                MemberDrafts = Array.Empty<EngramDraft>(),
+                MemberClosureDecisions = Array.Empty<EngramClosureDecision>(),
+                AmbiguousSentenceKeys = Array.Empty<string>(),
+                ClusterDiagnosticRender = bridgeResult.ClusterDiagnosticRender
+            }
+        };
     }
 }

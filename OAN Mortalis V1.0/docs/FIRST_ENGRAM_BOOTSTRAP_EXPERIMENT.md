@@ -116,7 +116,9 @@ In that bridge posture:
   - paragraph graph formation
   - paragraph body cleaving
 - Lisp emits candidate morphology only
-- C# materializes canonical results and runs `IEngramClosureValidator`
+- C# materializes canonical results
+- a CradleTek-hosted cryptic-to-prime admission membrane classifies mirrored candidates before any prime submission is created
+- only admitted candidates reach `IEngramClosureValidator`
 - parity is required across the fixed corpora before broader formation authority moves into Lisp
 
 This bridge remains fixture-bound and corpus-gated.
@@ -127,6 +129,7 @@ It does not authorize:
 - OE/cOE mutation
 - routing changes
 - paragraph or chapter closure
+- any Engram prior to successful admission and successful Prime closure
 
 ## Ambiguity-Resolution Protocol
 

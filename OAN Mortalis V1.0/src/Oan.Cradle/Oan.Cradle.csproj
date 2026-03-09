@@ -6,6 +6,8 @@
     <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\Oan.SoulFrame\Oan.SoulFrame.csproj" />
     <ProjectReference Include="..\Oan.AgentiCore\Oan.AgentiCore.csproj" />
+    <ProjectReference Include="..\SLI.Engine\SLI.Engine.csproj" />
+    <ProjectReference Include="..\SLI.Ingestion\SLI.Ingestion.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

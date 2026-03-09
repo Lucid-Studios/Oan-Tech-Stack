@@ -59,6 +59,7 @@ Observed repository conditions:
 - the repo now also has a first internal paragraph predicate-graph proof lane in `SLI.Ingestion` that reuses the sentence lane, emits a deterministic `ConstructorGraph`, records continuity only between adjacent sentence predicate roots, produces four bounded drafts with closure decisions, and keeps one ambiguous sentence structural without upgrading it into closure
 - the repo now also has a first internal paragraph body-cleaving proof lane in `SLI.Ingestion` that keeps graph-proven continuity anchors distinct from broader body-level invariants, derives both only from existing sentence and graph truth, and emits bounded draft clusters without producing paragraph-level `EngramDraft` objects
 - the repo now also has a first fixture-bound Lisp morphology bridge through `SLI.Engine/LispBridge` that mirrors the fixed sentence, paragraph graph, and paragraph body proof lanes while keeping C# as the oracle, contract materialization layer, and closure authority
+- the repo now also has a first explicit CradleTek-hosted cryptic-to-prime admission membrane that classifies mirrored sentence candidates as `Admit`, `Defer`, `Quarantine`, or `Reject` before any `PrimeClosureSubmission` may reach `IEngramClosureValidator`
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -201,7 +202,7 @@ Current status:
 Primary risk:
 
 - the solution appears conceptually rich but assembly boundaries are still broad and overlapping
-- the new Lisp bridge proves morphology parity on fixed corpora only; authority still rightly remains in the C# shell until broader parity is established
+- the new Lisp bridge proves morphology parity on fixed corpora only; authority still rightly remains in the C# shell, and the new admission membrane makes lawful crossing explicit before any candidate may approach Prime closure
 
 Supporting document:
 

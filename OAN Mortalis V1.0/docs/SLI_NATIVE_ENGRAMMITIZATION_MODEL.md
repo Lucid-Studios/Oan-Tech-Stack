@@ -45,7 +45,9 @@ This means:
   - paragraph body-cleaving proof
 - C# remains the canonical oracle for those same corpora
 - Lisp emits candidate morphology only
-- C# materializes canonical contract-shaped results, runs closure validation, and compares bridge output against the oracle
+- C# materializes canonical contract-shaped results, compares bridge output against the oracle, and remains the only closure authority
+- a CradleTek-hosted cryptic-to-prime admission membrane now classifies mirrored candidates before any `PrimeClosureSubmission` may reach closure
+- admitted candidates may proceed to closure, deferred candidates remain meaningful but unclosed, quarantined candidates remain observation-only, and rejected candidates remain outside the supported fixture-gated surface
 
 This bridge is fixture-bound and corpus-gated.
 
@@ -56,6 +58,7 @@ It does not authorize:
 - routing changes
 - custody changes
 - chapter-level closure
+- any Engram prior to successful admission and successful Prime closure
 
 ## What Native Engrammitization Means
 
