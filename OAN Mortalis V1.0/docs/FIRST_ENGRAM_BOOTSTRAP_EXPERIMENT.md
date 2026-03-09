@@ -77,15 +77,24 @@ The first lawful path is:
 
 1. start from a pinned `RootAtlas`
 2. prove English intake lands on one admitted seed lemma root
-3. construct a bounded `EngramDraft`
-4. validate it through `IEngramClosureValidator`
-5. record whether it is:
+3. allow a bounded fixture-backed overlay only for test-scoped narrative roots that are absent from the canonical seed set
+4. construct a bounded `EngramDraft`
+5. validate it through `IEngramClosureValidator` only for structurally admissible sentences
+6. record whether it is:
    - `BootstrapClosed`
    - `Closed`
    - `NeedsSpecification`
    - `Rejected`
 
 No GEL append or OE/cOE promotion occurs in this phase.
+
+The first translation proof lane is intentionally fixture-backed and limited to three sentences:
+
+- `The Gate remembers its makers.`
+- `The hum has increased twelve percent.`
+- `The light was the first lie.`
+
+The third sentence stops at lane-level `NeedsSpecification` before structural closure. Ambiguity is surfaced before validator invocation rather than being simulated through a structurally broken draft.
 
 ## Ambiguity-Resolution Protocol
 

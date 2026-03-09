@@ -1,0 +1,86 @@
+{
+  "sentences": [
+    {
+      "text": "The Gate remembers its makers.",
+      "expectedRoots": [ "gate", "remember", "make" ],
+      "expectedOperatorTokens": [ "its" ],
+      "expectedRender": "remember(gate,make)",
+      "expectedOutcome": "Closed",
+      "expectedClosureGrade": "Closed"
+    },
+    {
+      "text": "The hum has increased twelve percent.",
+      "expectedRoots": [ "hum", "increase", "percent" ],
+      "expectedOperatorTokens": [ "has" ],
+      "expectedRender": "increase(hum,12,percent)",
+      "expectedOutcome": "Closed",
+      "expectedClosureGrade": "Closed"
+    },
+    {
+      "text": "The light was the first lie.",
+      "expectedRoots": [ "light", "lie" ],
+      "expectedOperatorTokens": [ "was", "first" ],
+      "expectedRender": "lie(light,first)",
+      "expectedOutcome": "NeedsSpecification",
+      "expectedClosureGrade": null
+    }
+  ],
+  "overlayRoots": [
+    {
+      "lemma": "gate",
+      "symbolicCore": "atlas.core::gate",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "gate", "gates" ]
+    },
+    {
+      "lemma": "remember",
+      "symbolicCore": "atlas.core::remember",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "remember", "remembers", "remembered", "remembering" ]
+    },
+    {
+      "lemma": "make",
+      "symbolicCore": "atlas.core::make",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "make", "maker", "makers", "making" ]
+    },
+    {
+      "lemma": "hum",
+      "symbolicCore": "atlas.core::hum",
+      "operatorCompatibility": "suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "hum", "hums", "humming" ]
+    },
+    {
+      "lemma": "percent",
+      "symbolicCore": "atlas.core::percent",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "percent", "percents" ]
+    },
+    {
+      "lemma": "light",
+      "symbolicCore": "atlas.core::light",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "light", "lights" ]
+    },
+    {
+      "lemma": "lie",
+      "symbolicCore": "atlas.core::lie",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "lie", "lies", "lying" ]
+    }
+  ]
+}
