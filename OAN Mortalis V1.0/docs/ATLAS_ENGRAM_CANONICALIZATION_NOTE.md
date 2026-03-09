@@ -10,6 +10,14 @@ The canonical owner is now:
 
 - `src/GEL.Contracts`
 
+The symbolic governance layer above that atlas is now defined separately in:
+
+- `docs/SYMBOLIC_DOMAIN_CONSTITUTION.md`
+
+The root-core interpretation of that atlas is now fixed separately in:
+
+- `docs/LEMMA_ROOT_CONSTITUTION.md`
+
 This phase does not introduce a new cognition subsystem, append engine, or OE/cOE mutation path.
 
 ## Canonical Owner
@@ -85,6 +93,33 @@ Supporting note:
 
 - `docs/ATLAS_SOURCE_LAYERING.md`
 
+The symbolic space above that normalized atlas is not open by default. It now distinguishes:
+
+- grammar operator space
+- atlas-owned root core space
+- reserved disciplinary domains
+- governance/meta space
+- experimental extension space
+
+## Canonical Symbolic Constructor Bodies
+
+The canonical Atlas now preserves symbolic constructor bodies as structured triplets beside lexical variant strings.
+
+The canonical symbolic object is:
+
+- prefix operator
+- root core
+- suffix operator
+
+The merged glyph, if present, is only a render artifact or compression of that triplet.
+
+That means:
+
+- constructor legality may not be reduced to string validation alone
+- canonical symbolic structure must survive normalization
+- visual or merged symbolic forms must not replace the structural triplet as the meaning-bearing object
+- the root core of the constructor body is a lemma anchor rather than a surface-word form
+
 ## Epistemic Mapping
 
 The canonical epistemic mapping is:
@@ -143,8 +178,15 @@ It may still exist for legacy sheaf/runtime surfaces, but it must no longer be r
 The repo now says plainly:
 
 - Atlas first
+- symbolic domain law above atlas
+- curated seed lemma basis before broad draft expansion
 - then Engram draft
 - then closure validation
 - then only later governed memory movement
 
 That is the canonical order for future Atlas -> Engram -> GEL / OE work.
+
+Supporting seed artifacts:
+
+- `docs/SEED_LEMMA_ROOT_SET.md`
+- `public_root/seed/SeedLemmaRoots.json`

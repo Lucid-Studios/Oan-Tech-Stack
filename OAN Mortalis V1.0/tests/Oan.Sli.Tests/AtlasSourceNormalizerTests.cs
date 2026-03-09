@@ -74,7 +74,20 @@ public sealed class AtlasSourceNormalizerTests
         Assert.Equal(2, result.CanonicalRootAtlas!.Entries.Count);
         Assert.True(result.CanonicalRootAtlas.TryResolveRoot("accept", out var root));
         Assert.Equal("ATLAS.SYM.A1", root.SymbolicHandle);
-        Assert.Contains(result.CanonicalRootAtlas.Entries, entry => entry.Root.Key == "method" && entry.VariantForms.Contains("-ology"));
+        var acceptEntry = Assert.Single(result.CanonicalRootAtlas.Entries.Where(entry => entry.Root.Key == "accept"));
+        Assert.Contains(acceptEntry.SymbolicConstructors, constructor =>
+            constructor.PrefixKey == "un" &&
+            constructor.RootKey == "accept" &&
+            constructor.SuffixKey is null);
+        var methodEntry = Assert.Single(result.CanonicalRootAtlas.Entries.Where(entry => entry.Root.Key == "method"));
+        Assert.Contains(methodEntry.SymbolicConstructors, constructor =>
+            constructor.PrefixKey == "pre" &&
+            constructor.RootKey == "method" &&
+            constructor.SuffixKey is null);
+        Assert.Contains(methodEntry.SymbolicConstructors, constructor =>
+            constructor.PrefixKey is null &&
+            constructor.RootKey == "method" &&
+            constructor.SuffixKey == "-ology");
     }
 
     [Fact]

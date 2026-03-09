@@ -16,6 +16,9 @@ public sealed class EngramCanonicalizationAdapterTests
         Assert.True(result.CanonicalRootAtlas.TryResolveRoot("equation", out var root));
         Assert.Equal("equation", root.Key);
         Assert.Contains(result.Known.Concat(result.PartiallyKnown), entry => entry.CanonicalAtlasEntry is not null);
+        Assert.Contains(result.CanonicalRootAtlas.Entries, entry =>
+            entry.Root.Key == "equation" &&
+            entry.SymbolicConstructors.Any(constructor => constructor.RootKey == "equation"));
     }
 
     [Fact]

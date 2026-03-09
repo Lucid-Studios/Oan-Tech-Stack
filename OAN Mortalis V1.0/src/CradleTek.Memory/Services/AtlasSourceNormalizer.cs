@@ -123,8 +123,9 @@ public sealed class AtlasSourceNormalizer
             }
 
             var atlasDomain = $"atlas.root.{rootKey[0]}";
-            var symbolicHandle = rootSymbols.TryGetValue(rootKey, out var symbol)
-                ? $"ATLAS.SYM.{symbol}"
+            var hasRootSymbol = rootSymbols.TryGetValue(rootKey, out var rootSymbol);
+            var symbolicHandle = hasRootSymbol
+                ? $"ATLAS.SYM.{rootSymbol}"
                 : null;
 
             if (symbolicHandle is null)
@@ -138,6 +139,15 @@ public sealed class AtlasSourceNormalizer
                     Message = $"Atlas root '{rootKey}' does not currently resolve to a root-level symbolic assignment."
                 });
             }
+
+            var symbolicConstructors = BuildSymbolicConstructors(
+                rootKey,
+                hasRootSymbol ? rootSymbol! : rootKey,
+                hasRootSymbol ? rootSymbol : null,
+                variants,
+                prefixSymbols,
+                suffixSymbols,
+                diagnostics);
 
             entries.Add(new RootAtlasEntry
             {
@@ -153,6 +163,7 @@ public sealed class AtlasSourceNormalizer
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .OrderBy(variant => variant, StringComparer.OrdinalIgnoreCase)
                     .ToArray(),
+                SymbolicConstructors = symbolicConstructors,
                 FrequencyWeight = 1d
             });
         }
@@ -513,6 +524,189 @@ public sealed class AtlasSourceNormalizer
                 }
             }
         }
+    }
+
+    private static IReadOnlyList<SymbolicConstructorTriplet> BuildSymbolicConstructors(
+        string rootKey,
+        string canonicalRootSymbol,
+        string? renderableRootSymbol,
+        IReadOnlyList<string> variants,
+        Dictionary<string, string> prefixSymbols,
+        Dictionary<string, string> suffixSymbols,
+        List<AtlasSourceNormalizationDiagnostic> diagnostics)
+    {
+        var constructors = new List<SymbolicConstructorTriplet>
+        {
+            CreateTriplet(rootKey, canonicalRootSymbol, renderableRootSymbol)
+        };
+
+        foreach (var variant in variants
+                     .Where(candidate => !string.IsNullOrWhiteSpace(candidate))
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (!TryBuildVariantTriplet(
+                    rootKey,
+                    canonicalRootSymbol,
+                    renderableRootSymbol,
+                    variant,
+                    prefixSymbols,
+                    suffixSymbols,
+                    diagnostics,
+                    out var triplet))
+            {
+                continue;
+            }
+
+            constructors.Add(triplet);
+        }
+
+        return constructors
+            .GroupBy(constructor => constructor.CanonicalText, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .OrderBy(constructor => constructor.RootKey, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(constructor => constructor.PrefixKey ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(constructor => constructor.SuffixKey ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(constructor => constructor.CanonicalText, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static bool TryBuildVariantTriplet(
+        string rootKey,
+        string canonicalRootSymbol,
+        string? renderableRootSymbol,
+        string variant,
+        Dictionary<string, string> prefixSymbols,
+        Dictionary<string, string> suffixSymbols,
+        List<AtlasSourceNormalizationDiagnostic> diagnostics,
+        out SymbolicConstructorTriplet triplet)
+    {
+        triplet = default!;
+
+        var prefixKey = default(string);
+        var prefixSymbol = default(string);
+        var suffixKey = default(string);
+        var suffixSymbol = default(string);
+        var sawOperator = false;
+
+        foreach (var token in variant.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                continue;
+            }
+
+            if (token.EndsWith("-", StringComparison.Ordinal))
+            {
+                sawOperator = true;
+                if (prefixKey is not null)
+                {
+                    diagnostics.Add(new AtlasSourceNormalizationDiagnostic
+                    {
+                        Severity = AtlasSourceDiagnosticSeverity.Error,
+                        Code = "atlas.multiple_prefix_operators",
+                        SourceLayer = "RootAtlas",
+                        RootKey = rootKey,
+                        Message = $"Variant '{variant}' declares multiple prefix operators."
+                    });
+                    return false;
+                }
+
+                var normalizedPrefix = NormalizePrefix(token[..^1]);
+                if (!prefixSymbols.TryGetValue(normalizedPrefix, out prefixSymbol))
+                {
+                    return false;
+                }
+
+                prefixKey = normalizedPrefix;
+                continue;
+            }
+
+            if (token.StartsWith("-", StringComparison.Ordinal))
+            {
+                sawOperator = true;
+                if (suffixKey is not null)
+                {
+                    diagnostics.Add(new AtlasSourceNormalizationDiagnostic
+                    {
+                        Severity = AtlasSourceDiagnosticSeverity.Error,
+                        Code = "atlas.multiple_suffix_operators",
+                        SourceLayer = "RootAtlas",
+                        RootKey = rootKey,
+                        Message = $"Variant '{variant}' declares multiple suffix operators."
+                    });
+                    return false;
+                }
+
+                var normalizedSuffix = NormalizeSuffix(token);
+                if (!suffixSymbols.TryGetValue(normalizedSuffix, out suffixSymbol))
+                {
+                    return false;
+                }
+
+                suffixKey = normalizedSuffix;
+            }
+        }
+
+        if (!sawOperator)
+        {
+            return false;
+        }
+
+        triplet = CreateTriplet(
+            rootKey,
+            canonicalRootSymbol,
+            renderableRootSymbol,
+            prefixKey,
+            prefixSymbol,
+            suffixKey,
+            suffixSymbol);
+        return true;
+    }
+
+    private static SymbolicConstructorTriplet CreateTriplet(
+        string rootKey,
+        string canonicalRootSymbol,
+        string? renderableRootSymbol,
+        string? prefixKey = null,
+        string? prefixSymbol = null,
+        string? suffixKey = null,
+        string? suffixSymbol = null)
+    {
+        var canonicalText = BuildCanonicalText(prefixKey, rootKey, suffixKey);
+        var mergedGlyph = string.Concat(
+            prefixSymbol ?? string.Empty,
+            renderableRootSymbol ?? string.Empty,
+            suffixSymbol ?? string.Empty);
+
+        return new SymbolicConstructorTriplet
+        {
+            PrefixKey = prefixKey,
+            RootKey = rootKey,
+            SuffixKey = suffixKey,
+            PrefixSymbol = prefixSymbol,
+            RootSymbol = canonicalRootSymbol,
+            SuffixSymbol = suffixSymbol,
+            CanonicalText = canonicalText,
+            MergedGlyph = string.IsNullOrWhiteSpace(mergedGlyph) ? null : mergedGlyph
+        };
+    }
+
+    private static string BuildCanonicalText(string? prefixKey, string rootKey, string? suffixKey)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(prefixKey))
+        {
+            parts.Add($"{prefixKey}-");
+        }
+
+        parts.Add(rootKey);
+
+        if (!string.IsNullOrWhiteSpace(suffixKey))
+        {
+            parts.Add(suffixKey!);
+        }
+
+        return string.Join(" | ", parts);
     }
 
     private static string NormalizeRoot(string? value) => (value ?? string.Empty).Trim().ToLowerInvariant();

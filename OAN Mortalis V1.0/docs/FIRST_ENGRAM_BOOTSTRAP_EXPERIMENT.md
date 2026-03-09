@@ -29,6 +29,8 @@ The experiment assumes:
 
 - canonical Atlas and Engram contracts in `GEL.Contracts`
 - deterministic `RootAtlas` identity
+- explicit symbolic domain constitution
+- explicit lemma-root constitution
 - bounded `IEngramClosureValidator`
 - current governance-first Golden Path remains unchanged
 - current `SelfGEL` / `cSelfGEL` law remains unchanged
@@ -43,7 +45,17 @@ The bootstrap run must use one pinned `RootAtlas` object with:
 - optional refinement edges
 - optional domain descriptors
 
+That pinned atlas must interpret root keys as lemma anchors rather than surface-word forms.
+
 No ambient atlas collections are allowed.
+
+The bootstrap run must also use one pinned symbolic constitution object that reserves:
+
+- grammar operator space
+- root-native symbolic core space
+- governance/meta space
+- disciplinary reserved domains
+- experimental extension space
 
 That pinned object may come from:
 
@@ -52,14 +64,22 @@ That pinned object may come from:
 
 The bootstrap experiment still operates on the pinned canonical `RootAtlas`, not on the raw source-layer files directly.
 
+The first English-facing bootstrap pass must also operate over one curated seed lemma subset:
+
+- `docs/SEED_LEMMA_ROOT_SET.md`
+- `public_root/seed/SeedLemmaRoots.json`
+
+That subset is used to prove English -> lemma -> root landing before broader `EngramDraft` generation expands.
+
 ## Minimum Draft Path
 
 The first lawful path is:
 
 1. start from a pinned `RootAtlas`
-2. construct a bounded `EngramDraft`
-3. validate it through `IEngramClosureValidator`
-4. record whether it is:
+2. prove English intake lands on one admitted seed lemma root
+3. construct a bounded `EngramDraft`
+4. validate it through `IEngramClosureValidator`
+5. record whether it is:
    - `BootstrapClosed`
    - `Closed`
    - `NeedsSpecification`
@@ -84,11 +104,13 @@ The experiment is valid only if the comparison distinguishes structure-bearing c
 The protocol must keep the following classes separate:
 
 - symbolic trace
+- canonical symbolic constructor triplets
 - candidate Engram structure
 - routed residue
 - OE/cOE admission
 - `SelfGEL` / `cSelfGEL` effects
 - any GEL/cGEL consequence
+- symbolic domain collision or bridge diagnostics
 
 Symbolic trace must not be silently treated as a candidate Engram.
 
@@ -112,7 +134,9 @@ The bootstrap experiment only reserves them.
 The bootstrap phase is successful when:
 
 - the `RootAtlas` used for evaluation is deterministic and pinned
+- the symbolic domain constitution used for evaluation is deterministic and pinned
 - `EngramDraft` and `Engram` are no longer conflated
+- the symbolic world is reserved before contextualization generation
 - closure validation is explicit, repeatable, and non-heuristic
 - the repo can distinguish trace, draft, closed Engram, and downstream governance DTOs
 

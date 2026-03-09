@@ -22,6 +22,16 @@ public sealed class LocalSymbolAtlas
                     DictionaryPointer = $"atlas://local/{DomainName}/{entry.Key}"
                 },
                 VariantForms = new[] { entry.Key },
+                SymbolicConstructors =
+                [
+                    new SymbolicConstructorTriplet
+                    {
+                        RootKey = entry.Key,
+                        RootSymbol = entry.Value,
+                        CanonicalText = entry.Key,
+                        MergedGlyph = entry.Value
+                    }
+                ],
                 FrequencyWeight = 1d
             })
             .ToArray();

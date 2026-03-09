@@ -186,6 +186,16 @@ public sealed class EngramClosureValidatorTests
                         DictionaryPointer = "atlas://root/equation"
                     },
                     VariantForms = ["equation", "equations"],
+                    SymbolicConstructors =
+                    [
+                        new SymbolicConstructorTriplet
+                        {
+                            RootKey = "equation",
+                            RootSymbol = "ATLAS.ROOT.EQUATION",
+                            CanonicalText = "equation",
+                            MergedGlyph = "ATLAS.ROOT.EQUATION"
+                        }
+                    ],
                     FrequencyWeight = 4d
                 },
                 new RootAtlasEntry
@@ -199,6 +209,16 @@ public sealed class EngramClosureValidatorTests
                         DictionaryPointer = "atlas://root/variable"
                     },
                     VariantForms = ["variable", "variables"],
+                    SymbolicConstructors =
+                    [
+                        new SymbolicConstructorTriplet
+                        {
+                            RootKey = "variable",
+                            RootSymbol = "ATLAS.ROOT.VARIABLE",
+                            CanonicalText = "variable",
+                            MergedGlyph = "ATLAS.ROOT.VARIABLE"
+                        }
+                    ],
                     FrequencyWeight = 3d
                 }
             ],
