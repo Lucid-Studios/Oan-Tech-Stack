@@ -35,6 +35,15 @@ The intake path remains:
 4. operator/body compatibility
 5. only later broader `EngramDraft` expansion
 
+The first translation proof lane does not mutate this seed manifest.
+
+It uses:
+
+- the canonical `350`-root seed set as the primary atlas-facing basis
+- a test-scoped narrative overlay only for missing roots in the fixed three-sentence fixture
+
+That overlay is supplementary and non-canonical. It exists only to prove the first bounded English intake -> constructor body -> `EngramDraft` lane without contaminating the seed `GEL` foundation.
+
 ## Seed Selection Criteria
 
 The first seed is curated from the current canonical candidate pool in:
