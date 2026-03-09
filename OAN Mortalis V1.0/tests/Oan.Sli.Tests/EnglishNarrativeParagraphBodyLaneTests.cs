@@ -15,9 +15,9 @@ public sealed class EnglishNarrativeParagraphBodyLaneTests
 
         Assert.Equal(3, fixture.Paragraphs.Count);
         Assert.Equal([3, 3, 2], fixture.Paragraphs.Select(paragraph => paragraph.ExpectedSentenceCount).ToArray());
-        Assert.Equal(16, fixture.OverlayRoots.Count);
+        Assert.Equal(17, fixture.OverlayRoots.Count);
         Assert.Equal(
-            ["gate", "remember", "make", "hum", "percent", "light", "lie", "dome", "reach", "hologram", "pulse", "rhythm", "ridge", "resonate", "activity", "rise"],
+            ["gate", "remember", "make", "hum", "percent", "light", "lie", "dome", "vibrate", "hologram", "pulse", "rhythm", "ridge", "resonate", "activity", "subsurface", "rise"],
             fixture.OverlayRoots.Select(root => root.Lemma).ToArray());
     }
 
@@ -64,6 +64,26 @@ public sealed class EnglishNarrativeParagraphBodyLaneTests
         Assert.Single(result.DraftCluster.AmbiguousSentenceKeys);
         Assert.Equal("lie(light,first)", result.DraftCluster.AmbiguousSentenceKeys[0]);
         Assert.Contains(result.ParagraphGraph.Edges, edge => edge.Source == "lie" && edge.Target == "light" && edge.Relation == "subject");
+    }
+
+    [Fact]
+    public async Task TranslateAsync_UsesGraphProvenContinuityWithoutInventingExtraAnchors()
+    {
+        var fixture = LoadFixture();
+        var lane = CreateLane();
+        var atlas = await LoadCanonicalAtlasAsync();
+        var overlayRoots = ToOverlayRoots(fixture.OverlayRoots);
+
+        var paragraphA = await lane.TranslateAsync(fixture.Paragraphs[0].Paragraph, atlas, overlayRoots);
+        var paragraphB = await lane.TranslateAsync(fixture.Paragraphs[1].Paragraph, atlas, overlayRoots);
+
+        Assert.Empty(paragraphA.ContinuityAnchors);
+        Assert.DoesNotContain(paragraphA.ParagraphInvariants, value => value.StartsWith("paragraph.continuity.root:", StringComparison.Ordinal));
+
+        Assert.Equal(["activity"], paragraphB.ContinuityAnchors);
+        Assert.Equal(
+            ["paragraph.continuity.root:activity"],
+            paragraphB.ParagraphInvariants.Where(value => value.StartsWith("paragraph.continuity.root:", StringComparison.Ordinal)).ToArray());
     }
 
     private static EnglishNarrativeParagraphBodyLane CreateLane()

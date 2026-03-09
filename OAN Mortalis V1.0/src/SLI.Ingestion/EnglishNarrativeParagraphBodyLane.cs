@@ -133,11 +133,11 @@ internal sealed class EnglishNarrativeParagraphBodyLane
     private static readonly IReadOnlyDictionary<string, NarrativeParagraphSpecification> ParagraphSpecifications =
         new Dictionary<string, NarrativeParagraphSpecification>(StringComparer.Ordinal)
         {
-            ["The dome hummed. The hum reached the hologram. The hologram pulsed in rhythm."] = new()
+            ["The command dome hummed with a low and constant note. The command dome vibrated with the hum. The hologram pulsed in slow rhythm."] = new()
             {
                 FixedProofLabels = ["paragraph.environment.present", "paragraph.state.field"]
             },
-            ["The hum has increased twelve percent. The ridge resonates with the hum. The activity rises along the ridge."] = new()
+            ["The hum has increased twelve percent. Subsurface activity is rising. Subsurface activity resonates with the ridge."] = new()
             {
                 FixedProofLabels = Array.Empty<string>()
             },

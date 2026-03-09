@@ -394,6 +394,17 @@ internal sealed class EnglishNarrativeTranslationLane
                 LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
                 Summary = "narrative.environment"
             },
+            ["The command dome hummed with a low and constant note."] = new()
+            {
+                RequiredRoots = ["dome", "hum"],
+                PredicateRoot = "hum",
+                BranchRoles = [new("subject", "dome")],
+                ConstructorRoles = [new("subject", "dome"), new("predicate", "hum")],
+                OperatorAnnotations = [],
+                DiagnosticPredicateRender = "hum(dome)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.environment"
+            },
             ["The hum reached the hologram."] = new()
             {
                 RequiredRoots = ["hum", "reach", "hologram"],
@@ -405,7 +416,29 @@ internal sealed class EnglishNarrativeTranslationLane
                 LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
                 Summary = "narrative.transitive"
             },
+            ["The command dome vibrated with the hum."] = new()
+            {
+                RequiredRoots = ["dome", "vibrate", "hum"],
+                PredicateRoot = "vibrate",
+                BranchRoles = [new("subject", "dome"), new("object", "hum")],
+                ConstructorRoles = [new("subject", "dome"), new("predicate", "vibrate"), new("object", "hum")],
+                OperatorAnnotations = [],
+                DiagnosticPredicateRender = "vibrate(dome,hum)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.environment"
+            },
             ["The hologram pulsed in rhythm."] = new()
+            {
+                RequiredRoots = ["hologram", "pulse", "rhythm"],
+                PredicateRoot = "pulse",
+                BranchRoles = [new("subject", "hologram"), new("context", "rhythm")],
+                ConstructorRoles = [new("subject", "hologram"), new("predicate", "pulse"), new("context", "rhythm")],
+                OperatorAnnotations = [],
+                DiagnosticPredicateRender = "pulse(hologram,rhythm)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.environment"
+            },
+            ["The hologram pulsed in slow rhythm."] = new()
             {
                 RequiredRoots = ["hologram", "pulse", "rhythm"],
                 PredicateRoot = "pulse",
@@ -424,6 +457,28 @@ internal sealed class EnglishNarrativeTranslationLane
                 ConstructorRoles = [new("subject", "ridge"), new("predicate", "resonate"), new("object", "hum")],
                 OperatorAnnotations = [],
                 DiagnosticPredicateRender = "resonate(ridge,hum)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.measurement"
+            },
+            ["Subsurface activity is rising."] = new()
+            {
+                RequiredRoots = ["activity", "subsurface", "rise"],
+                PredicateRoot = "rise",
+                BranchRoles = [new("subject", "activity"), new("context", "subsurface")],
+                ConstructorRoles = [new("subject", "activity"), new("predicate", "rise"), new("context", "subsurface")],
+                OperatorAnnotations = [new("is", "copula")],
+                DiagnosticPredicateRender = "rise(activity,subsurface)",
+                LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
+                Summary = "narrative.measurement"
+            },
+            ["Subsurface activity resonates with the ridge."] = new()
+            {
+                RequiredRoots = ["activity", "resonate", "ridge"],
+                PredicateRoot = "resonate",
+                BranchRoles = [new("subject", "activity"), new("object", "ridge")],
+                ConstructorRoles = [new("subject", "activity"), new("predicate", "resonate"), new("object", "ridge")],
+                OperatorAnnotations = [],
+                DiagnosticPredicateRender = "resonate(activity,ridge)",
                 LaneOutcome = NarrativeTranslationLaneOutcome.Closed,
                 Summary = "narrative.measurement"
             },

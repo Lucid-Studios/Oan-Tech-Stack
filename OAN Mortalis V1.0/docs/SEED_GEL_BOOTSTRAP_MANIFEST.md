@@ -50,7 +50,7 @@ The intended bootstrap order is:
 4. validate constructor legality against reserved domains
 5. prove English intake lands on admitted lemma roots
 6. prove one fixture-backed paragraph can be lifted into deterministic predicate continuity without upgrading ambiguity into closure
-7. prove one fixed paragraph body can carry continuity anchors, body invariants, and a bounded draft cluster without paragraph-level closure
+7. prove one fixed paragraph body can carry graph-proven continuity anchors, separately derived body invariants, and a bounded draft cluster without paragraph-level closure
 8. admit `EngramDraft` binding against canonical roots
 9. validate closure grade
 10. only later consider governed memory movement
