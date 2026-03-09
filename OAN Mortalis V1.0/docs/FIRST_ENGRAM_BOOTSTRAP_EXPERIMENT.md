@@ -104,6 +104,8 @@ The next bounded proof lane is an internal five-sentence paragraph fixture that 
 
 That paragraph lane still stops the ambiguous sentence at `NeedsSpecification` before structural closure. Paragraph continuity is proved without laundering ambiguity into closure.
 
+The next bounded proof lane above that is a fixed three-paragraph body-cleaving lane. It reuses the paragraph graph lane, computes continuity anchors from explicit `continuity:<root>` edges only, derives paragraph-level body invariants, and emits one bounded draft cluster per paragraph without producing a paragraph-level `EngramDraft`.
+
 ## Ambiguity-Resolution Protocol
 
 The bootstrap ambiguity experiment is:

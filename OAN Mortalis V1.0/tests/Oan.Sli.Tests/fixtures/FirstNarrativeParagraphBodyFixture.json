@@ -1,0 +1,179 @@
+{
+  "paragraphs": [
+    {
+      "paragraph": "The dome hummed. The hum reached the hologram. The hologram pulsed in rhythm.",
+      "expectedSentenceCount": 3,
+      "expectedContinuityAnchors": [ "hum", "hologram" ],
+      "expectedInvariants": [
+        "paragraph.continuity.root:hum",
+        "paragraph.continuity.root:hologram",
+        "paragraph.environment.present",
+        "paragraph.state.field",
+        "paragraph.closed.draft.count:3"
+      ],
+      "expectedClusterRender": "cluster[hum(dome); reach(hum,hologram); pulse(hologram,rhythm)]",
+      "expectedBodySummary": "body[anchors:hum,hologram; closed:3; ambiguous:0]",
+      "expectedClosedDraftCount": 3,
+      "expectedAmbiguousSentenceCount": 0
+    },
+    {
+      "paragraph": "The hum has increased twelve percent. The ridge resonates with the hum. The activity rises along the ridge.",
+      "expectedSentenceCount": 3,
+      "expectedContinuityAnchors": [ "hum", "ridge" ],
+      "expectedInvariants": [
+        "paragraph.continuity.root:hum",
+        "paragraph.continuity.root:ridge",
+        "paragraph.measurement.present",
+        "paragraph.closed.draft.count:3"
+      ],
+      "expectedClusterRender": "cluster[increase(hum,12,percent); resonate(ridge,hum); rise(activity,ridge)]",
+      "expectedBodySummary": "body[anchors:hum,ridge; closed:3; ambiguous:0]",
+      "expectedClosedDraftCount": 3,
+      "expectedAmbiguousSentenceCount": 0
+    },
+    {
+      "paragraph": "The Gate remembers its makers. The light was the first lie.",
+      "expectedSentenceCount": 2,
+      "expectedContinuityAnchors": [],
+      "expectedInvariants": [
+        "paragraph.ambiguity.present",
+        "paragraph.closed.draft.count:1",
+        "paragraph.ambiguous.sentence.count:1"
+      ],
+      "expectedClusterRender": "cluster[remember(gate,make); ambiguous:lie(light,first)]",
+      "expectedBodySummary": "body[anchors:none; closed:1; ambiguous:1]",
+      "expectedClosedDraftCount": 1,
+      "expectedAmbiguousSentenceCount": 1
+    }
+  ],
+  "overlayRoots": [
+    {
+      "lemma": "gate",
+      "symbolicCore": "atlas.core::gate",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "gate", "gates" ]
+    },
+    {
+      "lemma": "remember",
+      "symbolicCore": "atlas.core::remember",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "remember", "remembers", "remembered", "remembering" ]
+    },
+    {
+      "lemma": "make",
+      "symbolicCore": "atlas.core::make",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "make", "maker", "makers", "making" ]
+    },
+    {
+      "lemma": "hum",
+      "symbolicCore": "atlas.core::hum",
+      "operatorCompatibility": "suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "hum", "hums", "humming" ]
+    },
+    {
+      "lemma": "percent",
+      "symbolicCore": "atlas.core::percent",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "percent", "percents" ]
+    },
+    {
+      "lemma": "light",
+      "symbolicCore": "atlas.core::light",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "light", "lights" ]
+    },
+    {
+      "lemma": "lie",
+      "symbolicCore": "atlas.core::lie",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "lie", "lies", "lying" ]
+    },
+    {
+      "lemma": "dome",
+      "symbolicCore": "atlas.core::dome",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "dome", "domes" ]
+    },
+    {
+      "lemma": "reach",
+      "symbolicCore": "atlas.core::reach",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "reach", "reached", "reaching" ]
+    },
+    {
+      "lemma": "hologram",
+      "symbolicCore": "atlas.core::hologram",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "hologram", "holograms" ]
+    },
+    {
+      "lemma": "pulse",
+      "symbolicCore": "atlas.core::pulse",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "pulse", "pulsed", "pulsing" ]
+    },
+    {
+      "lemma": "rhythm",
+      "symbolicCore": "atlas.core::rhythm",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "rhythm", "rhythms" ]
+    },
+    {
+      "lemma": "ridge",
+      "symbolicCore": "atlas.core::ridge",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "ridge", "ridges" ]
+    },
+    {
+      "lemma": "resonate",
+      "symbolicCore": "atlas.core::resonate",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "resonate", "resonates", "resonating" ]
+    },
+    {
+      "lemma": "activity",
+      "symbolicCore": "atlas.core::activity",
+      "operatorCompatibility": "core-only",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "activity", "activities" ]
+    },
+    {
+      "lemma": "rise",
+      "symbolicCore": "atlas.core::rise",
+      "operatorCompatibility": "prefix-suffix-capable",
+      "reservedDomainStatus": "none",
+      "disciplinaryReservations": [],
+      "variantExamples": [ "rise", "rises", "rising" ]
+    }
+  ]
+}
