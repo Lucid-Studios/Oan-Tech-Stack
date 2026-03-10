@@ -2,7 +2,7 @@ using Oan.Common;
 
 namespace Oan.Cradle
 {
-    internal sealed class CrypticAdmissionMembrane : ICrypticAdmissionMembrane
+    public sealed class CrypticAdmissionMembrane : ICrypticAdmissionMembrane
     {
         public Task<CrypticAdmissionResult> EvaluateAsync(
             CrypticAdmissionCandidate candidate,

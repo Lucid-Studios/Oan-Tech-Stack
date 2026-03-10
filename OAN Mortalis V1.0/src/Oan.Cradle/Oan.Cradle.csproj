@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\GEL.Contracts\GEL.Contracts.csproj" />
     <ProjectReference Include="..\Oan.Sli\Oan.Sli.csproj" />
     <ProjectReference Include="..\Oan.Spinal\Oan.Spinal.csproj" />
     <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />

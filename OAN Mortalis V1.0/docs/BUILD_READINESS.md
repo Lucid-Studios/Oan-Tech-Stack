@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `117` tests passed across `5` discovered test assemblies
+- `133` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -64,6 +64,7 @@ Observed repository conditions:
 - the repo now also has a first-boot classification and protected-intake policy layer in `Oan.Common` and the active docs, separating lawful boot class from activation state before any runtime orchestration is introduced
 - the repo now also has an explicit Sanctuary first-boot protocol and non-runtime first-boot contract stubs that distinguish normative ceremony from currently implemented runtime behavior, name dual-ledger genesis as a required architectural phase, and keep `.hopng` governance witnesses supplemental rather than constitutive in v0.1
 - the repo now also has a protected-intake security hardening baseline with immutable reusable workflow refs, live-surface path hygiene across `.github`, `Modules`, and active build surfaces, and an explicit inert boundary around the `OAN Mortalis V0.1 Archive`
+- the repo now also has a bounded hybrid protected-ingress rehearsal surface with a tracked abstract profile spec, a tracked example profile template, and a non-mutating host harness that proves masking, narrow reveal gating, membrane enforcement, and AgentiCore observation without introducing custody or routing changes
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -239,6 +240,7 @@ Supporting document:
 - `docs/FIRST_BOOT_INTERNAL_GOVERNING_CME_FORMATION.md`
 - `docs/FIRST_BOOT_CLASSIFICATION_AND_EXPANSION_POLICY.md`
 - `docs/PROTECTED_INTAKE_CLASSIFICATION_CONTRACT.md`
+- `docs/HYBRID_PROTECTED_INGRESS_TEST_PROFILE.md`
 - `../SECURITY_HARDENING.md`
 - `docs/HOLOGRAPHIC_DATA_TOOL.md`
 - `../docs/BUILD_AUDIT_PATH.md`

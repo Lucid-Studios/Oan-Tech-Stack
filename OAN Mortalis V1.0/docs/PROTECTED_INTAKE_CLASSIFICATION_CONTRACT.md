@@ -16,6 +16,10 @@ This protected-intake law operates beneath the broader first-boot ceremony defin
 
 - `docs/SANCTUARY_FIRST_BOOT_PROTOCOL.md`
 
+The bounded hybrid rehearsal profile that exercises this contract lives in:
+
+- `docs/HYBRID_PROTECTED_INGRESS_TEST_PROFILE.md`
+
 ## Protected Intake Kinds
 
 The protected intake kinds in this phase are:

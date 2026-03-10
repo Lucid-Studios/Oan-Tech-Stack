@@ -587,10 +587,11 @@ public static class HeadlessRuntimeBootstrap
         var primeDerivativePublisher = new PrimeDerivativePublisherAdapter(publicStore);
         var crypticStore = new CrypticPlaneStore(crypticRoot, storageTelemetry);
         var formationObserver = new InMemoryAgentiFormationObserver();
+        var admissionMembrane = new CrypticAdmissionMembrane();
+        var closureValidator = new EngramClosureValidator();
         var firstBootHarness = new FirstBootFormationObservationHarness(
             new DefaultFirstBootGovernancePolicy(),
             formationObserver);
-
         var stores = new StoreRegistry(
             govTelemetry,
             storageTelemetry,
@@ -600,6 +601,7 @@ public static class HeadlessRuntimeBootstrap
             true,
             crypticStore,
             true,
+            crypticAdmissionMembrane: admissionMembrane,
             formationObserver: formationObserver,
             firstBootFormationObservationHarness: firstBootHarness);
 
@@ -629,6 +631,8 @@ public static class HeadlessRuntimeBootstrap
         var telemetry = new GelTelemetryAdapter();
         var journal = new NdjsonGovernanceReceiptJournal(Path.Combine(runtimeRoot, "governance-control.ndjson"));
         var formationObserver = new InMemoryAgentiFormationObserver();
+        var admissionMembrane = new CrypticAdmissionMembrane();
+        var closureValidator = new EngramClosureValidator();
         var firstBootHarness = new FirstBootFormationObservationHarness(
             new DefaultFirstBootGovernancePolicy(),
             formationObserver);
@@ -661,7 +665,7 @@ public static class HeadlessRuntimeBootstrap
             governedPrimePublicationSink: publicLayer,
             governanceReceiptJournal: journal,
             cmeCollapseQualifier: collapseQualifier,
-            crypticAdmissionMembrane: null,
+            crypticAdmissionMembrane: admissionMembrane,
             formationObserver: formationObserver,
             firstBootFormationObservationHarness: firstBootHarness);
 
