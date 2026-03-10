@@ -6,13 +6,14 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 if ([string]::IsNullOrWhiteSpace($ModulePath)) { $ModulePath = $PSScriptRoot }
+$repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
 $script = Join-Path $ModulePath "Validate-SLI-TrainingBundle.ps1"
 & $script
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $telemetry = Join-Path $ModulePath "telemetry\training_gate_report.json"
 $data = Get-Content -Raw -Encoding utf8 $telemetry | ConvertFrom-Json
-$reportPath = "D:\OAN Tech Stack\docs\audits\TRAINING_GATE_REPORT.md"
+$reportPath = Join-Path $repoRoot "docs\audits\TRAINING_GATE_REPORT.md"
 if (-not (Test-Path -Path (Split-Path -Parent $reportPath) -PathType Container)) { New-Item -ItemType Directory -Path (Split-Path -Parent $reportPath) | Out-Null }
 
 $lines = @(

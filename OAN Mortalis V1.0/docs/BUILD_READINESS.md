@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `92` tests passed across `5` discovered test assemblies
+- `117` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -60,6 +60,10 @@ Observed repository conditions:
 - the repo now also has a first internal paragraph body-cleaving proof lane in `SLI.Ingestion` that keeps graph-proven continuity anchors distinct from broader body-level invariants, derives both only from existing sentence and graph truth, and emits bounded draft clusters without producing paragraph-level `EngramDraft` objects
 - the repo now also has a first fixture-bound Lisp morphology bridge through `SLI.Engine/LispBridge` that mirrors the fixed sentence, paragraph graph, and paragraph body proof lanes while keeping C# as the oracle, contract materialization layer, and closure authority
 - the repo now also has a first explicit CradleTek-hosted cryptic-to-prime admission membrane that classifies mirrored sentence candidates as `Admit`, `Defer`, `Quarantine`, or `Reject` before any `PrimeClosureSubmission` may reach `IEngramClosureValidator`
+- the repo now also has an explicit first-boot formation model for the internal governing CMEs so the next services-layer work can build Steward, Father, and Mother as lawful hosted offices before operator-bound CME formation is permitted
+- the repo now also has a first-boot classification and protected-intake policy layer in `Oan.Common` and the active docs, separating lawful boot class from activation state before any runtime orchestration is introduced
+- the repo now also has an explicit Sanctuary first-boot protocol and non-runtime first-boot contract stubs that distinguish normative ceremony from currently implemented runtime behavior, name dual-ledger genesis as a required architectural phase, and keep `.hopng` governance witnesses supplemental rather than constitutive in v0.1
+- the repo now also has a protected-intake security hardening baseline with immutable reusable workflow refs, live-surface path hygiene across `.github`, `Modules`, and active build surfaces, and an explicit inert boundary around the `OAN Mortalis V0.1 Archive`
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -231,6 +235,11 @@ Supporting document:
 - `docs/RUNTIME_OPERATOR_SURFACE_PLAN.md`
 - `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`
 - `docs/SANCTUARY_FOUNDING_RUNTIME_BRIEF.md`
+- `docs/SANCTUARY_FIRST_BOOT_PROTOCOL.md`
+- `docs/FIRST_BOOT_INTERNAL_GOVERNING_CME_FORMATION.md`
+- `docs/FIRST_BOOT_CLASSIFICATION_AND_EXPANSION_POLICY.md`
+- `docs/PROTECTED_INTAKE_CLASSIFICATION_CONTRACT.md`
+- `../SECURITY_HARDENING.md`
 - `docs/HOLOGRAPHIC_DATA_TOOL.md`
 - `../docs/BUILD_AUDIT_PATH.md`
 - `docs/DEPENDENCY_AUDIT.md`

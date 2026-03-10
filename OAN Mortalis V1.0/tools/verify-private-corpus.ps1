@@ -55,10 +55,22 @@ function Get-ManagedTrackedTextFiles {
     )
 
     foreach ($file in $Files) {
+        if ($file -like "OAN Mortalis V0.1 Archive/*") {
+            continue
+        }
+
         $isManagedSurface = (
             $file -eq "README.md" -or
+            $file -eq "AGENTS.md" -or
+            $file -eq "SECURITY.md" -or
+            $file -eq "SECURITY_HARDENING.md" -or
+            $file -eq "build.ps1" -or
+            $file -eq "test.ps1" -or
+            $file -eq "global.json" -or
+            $file -like ".github/*" -or
             $file -like "docs/*" -or
             $file -like "Build Contracts/*" -or
+            $file -like "Modules/*" -or
             $file -like "OAN Mortalis V1.0/*"
         )
         if (-not $isManagedSurface) {
@@ -104,25 +116,47 @@ function Test-CorpusPathLeak {
 function Test-ExternalAbsolutePathLeak {
     param(
         [Parameter(Mandatory = $true)]
-        [string] $RepoRoot,
-
-        [Parameter(Mandatory = $true)]
         [string[]] $Files
     )
 
-    $regex = [regex]'(?i)[A-Z]:\\[^`"''\r\n<>|]+'
+    $regex = [regex]'(?i)(?<![A-Za-z0-9])[A-Z]:\\[^`"''\r\n<>|]+'
     $leaks = New-Object System.Collections.Generic.List[string]
 
     foreach ($file in $Files) {
         $matches = Select-String -LiteralPath $file -Pattern $regex -AllMatches -ErrorAction SilentlyContinue
         foreach ($match in $matches) {
             foreach ($value in $match.Matches.Value) {
-                $fullPath = [System.IO.Path]::GetFullPath($value)
-                if ($fullPath.StartsWith($RepoRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-                    continue
+                try {
+                    $fullPath = [System.IO.Path]::GetFullPath($value)
+                } catch {
+                    $fullPath = $value
                 }
-
                 $leaks.Add(("{0}: {1}" -f $file, $fullPath))
+            }
+        }
+    }
+
+    return $leaks
+}
+
+function Test-MutableReusableWorkflowRef {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]] $Files
+    )
+
+    $pattern = '(?i)uses:\s+[^\s]+/\.github/workflows/[^\s@]+@(main|master)\b'
+    $leaks = New-Object System.Collections.Generic.List[string]
+
+    foreach ($file in $Files) {
+        if ($file -notlike ".github/workflows/*") {
+            continue
+        }
+
+        $matches = Select-String -LiteralPath $file -Pattern $pattern -AllMatches -ErrorAction SilentlyContinue
+        foreach ($match in $matches) {
+            foreach ($value in $match.Matches.Value) {
+                $leaks.Add(("{0}: {1}" -f $file, $value.Trim()))
             }
         }
     }
@@ -132,7 +166,6 @@ function Test-ExternalAbsolutePathLeak {
 
 $trackedFiles = Get-TrackedFiles
 $managedFiles = @(Get-ManagedTrackedTextFiles -Files $trackedFiles)
-$repoRoot = Get-RepoRoot
 $rawCorpusPath = Get-LocalCorpusPath -ExplicitPath $CorpusPath
 
 $corpusLeaks = @()
@@ -141,9 +174,10 @@ if (-not [string]::IsNullOrWhiteSpace($rawCorpusPath)) {
     $corpusLeaks = @(Test-CorpusPathLeak -CorpusPath $resolvedCorpusPath -Files $managedFiles)
 }
 
-$externalLeaks = @(Test-ExternalAbsolutePathLeak -RepoRoot $repoRoot -Files $managedFiles)
+$externalLeaks = @(Test-ExternalAbsolutePathLeak -Files $managedFiles)
+$mutableWorkflowRefs = @(Test-MutableReusableWorkflowRef -Files $managedFiles)
 
-if ($corpusLeaks.Count -gt 0 -or $externalLeaks.Count -gt 0) {
+if ($corpusLeaks.Count -gt 0 -or $externalLeaks.Count -gt 0 -or $mutableWorkflowRefs.Count -gt 0) {
     Write-Host "FAIL: Detected out-of-scope path leakage in tracked managed files."
     if ($corpusLeaks.Count -gt 0) {
         Write-Host "Reference identifier: Lucid Research Corpus"
@@ -156,6 +190,11 @@ if ($corpusLeaks.Count -gt 0 -or $externalLeaks.Count -gt 0) {
         $externalLeaks | Sort-Object -Unique | ForEach-Object { Write-Host " - $_" }
     }
 
+    if ($mutableWorkflowRefs.Count -gt 0) {
+        Write-Host "Files containing mutable reusable workflow refs:"
+        $mutableWorkflowRefs | Sort-Object -Unique | ForEach-Object { Write-Host " - $_" }
+    }
+
     exit 1
 }
 
@@ -166,5 +205,6 @@ if ([string]::IsNullOrWhiteSpace($rawCorpusPath)) {
     Write-Host "Reference identifier: Lucid Research Corpus"
 }
 
-Write-Host "PASS: No tracked managed files contain external absolute paths outside the repository root."
+Write-Host "PASS: No tracked managed files in the live hardened surface contain external absolute paths."
+Write-Host "PASS: No tracked workflows in the live hardened surface use mutable reusable workflow refs."
 exit 0

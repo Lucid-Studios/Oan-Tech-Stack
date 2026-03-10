@@ -7,8 +7,9 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-if ([string]::IsNullOrWhiteSpace($BundlePath)) { $BundlePath = "D:\OAN Tech Stack\datasets\samples\sli_training_bundle.sample.v0.1.0.json" }
-if ([string]::IsNullOrWhiteSpace($SpecPath)) { $SpecPath = "D:\OAN Tech Stack\datasets\specs\sli_training_bundle.v0.1.0.json" }
+$repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
+if ([string]::IsNullOrWhiteSpace($BundlePath)) { $BundlePath = Join-Path $repoRoot "datasets\samples\sli_training_bundle.sample.v0.1.0.json" }
+if ([string]::IsNullOrWhiteSpace($SpecPath)) { $SpecPath = Join-Path $repoRoot "datasets\specs\sli_training_bundle.v0.1.0.json" }
 if ([string]::IsNullOrWhiteSpace($OutDir)) { $OutDir = Join-Path $PSScriptRoot "telemetry" }
 if (-not (Test-Path -Path $OutDir -PathType Container)) { New-Item -ItemType Directory -Path $OutDir | Out-Null }
 
