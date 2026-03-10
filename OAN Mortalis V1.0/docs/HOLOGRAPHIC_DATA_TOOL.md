@@ -135,6 +135,20 @@ That distinction should remain constitutional.
 
 Inspection visibility must not imply unrestricted mutation or release rights.
 
+## Governance Witness Relation
+
+The first-boot protocol may use `.hopng` artifacts such as `Mother.hopng`, `Father.hopng`, or `Steward.hopng` as governance witness or sigil-identity artifacts.
+
+In v0.1 they remain:
+
+- supplemental
+- witness-only
+- non-constitutive of Sanctuary founding, readiness, or closure authority
+
+That witness role is defined in:
+
+- `docs/SANCTUARY_FIRST_BOOT_PROTOCOL.md`
+
 ## Bounded Build Integration
 
 The active build may reference the Holographic Data Tool as a bounded toolchain dependency for `.hopng` validation and inspection.
