@@ -231,7 +231,7 @@ https://orcid.org/0009-0006-8978-3364
 
 # © Licensing
 
-© 2015–2025 Robert G. Watkins Jr. (aka Illian Amerond). All rights reserved.
+© 2015–2026 Robert G. Watkins Jr. (aka Illian Amerond). All rights reserved.
 
 The following constructs and system names are protected by copyright and/or claimed trademarks.
 
