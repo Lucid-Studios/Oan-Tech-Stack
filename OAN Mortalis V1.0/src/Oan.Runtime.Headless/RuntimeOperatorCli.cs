@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AgentiCore.Observation;
 using CradleTek.Cryptic;
 using CradleTek.Mantle;
 using CradleTek.Public;
@@ -585,6 +586,10 @@ public static class HeadlessRuntimeBootstrap
         var publicStore = new PublicPlaneStore(publicRoot, storageTelemetry);
         var primeDerivativePublisher = new PrimeDerivativePublisherAdapter(publicStore);
         var crypticStore = new CrypticPlaneStore(crypticRoot, storageTelemetry);
+        var formationObserver = new InMemoryAgentiFormationObserver();
+        var firstBootHarness = new FirstBootFormationObservationHarness(
+            new DefaultFirstBootGovernancePolicy(),
+            formationObserver);
 
         var stores = new StoreRegistry(
             govTelemetry,
@@ -594,7 +599,9 @@ public static class HeadlessRuntimeBootstrap
             primeDerivativePublisher,
             true,
             crypticStore,
-            true);
+            true,
+            formationObserver: formationObserver,
+            firstBootFormationObservationHarness: firstBootHarness);
 
         var host = new CradleTekHost(stores);
         await host.InitializeAsync().ConfigureAwait(false);
@@ -621,6 +628,10 @@ public static class HeadlessRuntimeBootstrap
         var mantle = new MantleOfSovereigntyService();
         var telemetry = new GelTelemetryAdapter();
         var journal = new NdjsonGovernanceReceiptJournal(Path.Combine(runtimeRoot, "governance-control.ndjson"));
+        var formationObserver = new InMemoryAgentiFormationObserver();
+        var firstBootHarness = new FirstBootFormationObservationHarness(
+            new DefaultFirstBootGovernancePolicy(),
+            formationObserver);
         var steward = new StewardAgent(
             new OntologicalCleaver(),
             new EncryptionService(),
@@ -649,7 +660,10 @@ public static class HeadlessRuntimeBootstrap
             crypticReengrammitizationGate: mantle,
             governedPrimePublicationSink: publicLayer,
             governanceReceiptJournal: journal,
-            cmeCollapseQualifier: collapseQualifier);
+            cmeCollapseQualifier: collapseQualifier,
+            crypticAdmissionMembrane: null,
+            formationObserver: formationObserver,
+            firstBootFormationObservationHarness: firstBootHarness);
 
         var manager = new StackManager(stores);
         return new RuntimeOperatorContext(manager, steward, manager);

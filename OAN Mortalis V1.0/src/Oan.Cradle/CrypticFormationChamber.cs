@@ -33,24 +33,29 @@ namespace Oan.Cradle
         private readonly LispNarrativeMirrorAdapter _mirrorAdapter;
         private readonly ICrypticAdmissionMembrane _admissionMembrane;
         private readonly IEngramClosureValidator _closureValidator;
+        private readonly IAgentiFormationObserver? _formationObserver;
 
         public CrypticFormationChamber(
             IEngramClosureValidator closureValidator,
             ICrypticAdmissionMembrane admissionMembrane,
-            LispNarrativeMirrorAdapter mirrorAdapter)
+            LispNarrativeMirrorAdapter mirrorAdapter,
+            IAgentiFormationObserver? formationObserver = null)
         {
             _closureValidator = closureValidator ?? throw new ArgumentNullException(nameof(closureValidator));
             _admissionMembrane = admissionMembrane ?? throw new ArgumentNullException(nameof(admissionMembrane));
             _mirrorAdapter = mirrorAdapter ?? throw new ArgumentNullException(nameof(mirrorAdapter));
+            _formationObserver = formationObserver;
         }
 
         public CrypticFormationChamber(
             IEngramClosureValidator closureValidator,
-            ICrypticAdmissionMembrane admissionMembrane)
+            ICrypticAdmissionMembrane admissionMembrane,
+            IAgentiFormationObserver? formationObserver = null)
             : this(
                 closureValidator,
                 admissionMembrane,
-                new LispNarrativeMirrorAdapter(closureValidator))
+                new LispNarrativeMirrorAdapter(closureValidator),
+                formationObserver)
         {
         }
 
@@ -70,6 +75,7 @@ namespace Oan.Cradle
                 overlayRoots,
                 candidateResult,
                 CrypticOriginRuntime.Lisp,
+                AgentiFormationObservationSource.Sentence,
                 cancellationToken).ConfigureAwait(false);
         }
 
@@ -92,6 +98,7 @@ namespace Oan.Cradle
                     overlayRoots,
                     sentenceResult,
                     CrypticOriginRuntime.Lisp,
+                    AgentiFormationObservationSource.ParagraphGraph,
                     cancellationToken).ConfigureAwait(false));
             }
 
@@ -121,6 +128,7 @@ namespace Oan.Cradle
                     overlayRoots,
                     sentenceResult,
                     CrypticOriginRuntime.Lisp,
+                    AgentiFormationObservationSource.ParagraphBody,
                     cancellationToken).ConfigureAwait(false));
             }
 
@@ -137,6 +145,7 @@ namespace Oan.Cradle
             IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
             NarrativeTranslationLaneResult candidateResult,
             CrypticOriginRuntime originRuntime,
+            AgentiFormationObservationSource observationSource,
             CancellationToken cancellationToken)
         {
             var admissionCandidate = new CrypticAdmissionCandidate(
@@ -161,9 +170,20 @@ namespace Oan.Cradle
                 .EvaluateAsync(admissionCandidate, cancellationToken)
                 .ConfigureAwait(false);
 
+            await RecordAdmissionObservationAsync(
+                admissionResult,
+                observationSource,
+                cancellationToken).ConfigureAwait(false);
+
             if (admissionResult.Decision != CrypticAdmissionDecision.Admit ||
                 admissionResult.NormalizedPrimePayload is null)
             {
+                await RecordClosureObservationAsync(
+                    admissionResult,
+                    closureState: AgentiFormationClosureState.NoClosure,
+                    observationSource,
+                    cancellationToken).ConfigureAwait(false);
+
                 return new CrypticSentenceFormationResult
                 {
                     SentenceResult = candidateResult,
@@ -175,6 +195,14 @@ namespace Oan.Cradle
             var closureDecision = await _closureValidator
                 .ValidateAsync(admissionResult.NormalizedPrimePayload.EngramDraft, workingAtlas, cancellationToken)
                 .ConfigureAwait(false);
+
+            await RecordClosureObservationAsync(
+                admissionResult,
+                closureDecision.Grade == EngramClosureGrade.Closed
+                    ? AgentiFormationClosureState.Closed
+                    : AgentiFormationClosureState.Rejected,
+                observationSource,
+                cancellationToken).ConfigureAwait(false);
 
             return new CrypticSentenceFormationResult
             {
@@ -194,6 +222,87 @@ namespace Oan.Cradle
                 },
                 AdmissionResult = admissionResult,
                 ClosureDecision = closureDecision
+            };
+        }
+
+        private async Task RecordAdmissionObservationAsync(
+            CrypticAdmissionResult admissionResult,
+            AgentiFormationObservationSource source,
+            CancellationToken cancellationToken)
+        {
+            if (_formationObserver is null)
+            {
+                return;
+            }
+
+            var tags = admissionResult.TelemetryTags
+                .Append($"reason:{admissionResult.ReasonCode}")
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+
+            await _formationObserver.RecordAsync(
+                new AgentiFormationObservation(
+                    ObservationId: Guid.NewGuid(),
+                    Stage: AgentiFormationObservationStage.CrypticAdmission,
+                    CandidateId: admissionResult.CandidateId,
+                    BootClass: null,
+                    ActivationState: null,
+                    ExpansionRights: null,
+                    Office: null,
+                    AdmissionDecision: admissionResult.Decision,
+                    ClosureState: AgentiFormationClosureState.NotSubmitted,
+                    RevealMode: null,
+                    OriginRuntime: MapOriginRuntime(admissionResult.OriginRuntime),
+                    Source: source,
+                    SubmissionEligible: admissionResult.SubmissionEligible,
+                    ObservationTags: tags,
+                    Timestamp: DateTimeOffset.UtcNow),
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task RecordClosureObservationAsync(
+            CrypticAdmissionResult admissionResult,
+            AgentiFormationClosureState closureState,
+            AgentiFormationObservationSource source,
+            CancellationToken cancellationToken)
+        {
+            if (_formationObserver is null)
+            {
+                return;
+            }
+
+            var tags = admissionResult.TelemetryTags
+                .Append($"reason:{admissionResult.ReasonCode}")
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+
+            await _formationObserver.RecordAsync(
+                new AgentiFormationObservation(
+                    ObservationId: Guid.NewGuid(),
+                    Stage: AgentiFormationObservationStage.PrimeClosure,
+                    CandidateId: admissionResult.CandidateId,
+                    BootClass: null,
+                    ActivationState: null,
+                    ExpansionRights: null,
+                    Office: null,
+                    AdmissionDecision: admissionResult.Decision,
+                    ClosureState: closureState,
+                    RevealMode: null,
+                    OriginRuntime: MapOriginRuntime(admissionResult.OriginRuntime),
+                    Source: source,
+                    SubmissionEligible: admissionResult.SubmissionEligible,
+                    ObservationTags: tags,
+                    Timestamp: DateTimeOffset.UtcNow),
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        private static AgentiFormationOriginRuntime MapOriginRuntime(CrypticOriginRuntime originRuntime)
+        {
+            return originRuntime switch
+            {
+                CrypticOriginRuntime.OracleCSharp => AgentiFormationOriginRuntime.OracleCSharp,
+                CrypticOriginRuntime.Lisp => AgentiFormationOriginRuntime.Lisp,
+                _ => throw new ArgumentOutOfRangeException(nameof(originRuntime), originRuntime, null)
             };
         }
 

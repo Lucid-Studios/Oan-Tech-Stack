@@ -23,6 +23,8 @@ namespace Oan.Cradle
         public IGovernanceReceiptJournal? GovernanceReceiptJournal { get; }
         public ICmeCollapseQualifier? CmeCollapseQualifier { get; }
         public ICrypticAdmissionMembrane? CrypticAdmissionMembrane { get; }
+        public IAgentiFormationObserver? FormationObserver { get; }
+        public FirstBootFormationObservationHarness? FirstBootFormationObservationHarness { get; }
 
         public bool PublicAvailable { get; }
         public bool CrypticAvailable { get; }
@@ -44,7 +46,9 @@ namespace Oan.Cradle
             IGovernedPrimePublicationSink? governedPrimePublicationSink = null,
             IGovernanceReceiptJournal? governanceReceiptJournal = null,
             ICmeCollapseQualifier? cmeCollapseQualifier = null,
-            ICrypticAdmissionMembrane? crypticAdmissionMembrane = null)
+            ICrypticAdmissionMembrane? crypticAdmissionMembrane = null,
+            IAgentiFormationObserver? formationObserver = null,
+            FirstBootFormationObservationHarness? firstBootFormationObservationHarness = null)
         {
             GovernanceTelemetry = governanceTelemetry;
             StorageTelemetry = storageTelemetry;
@@ -63,6 +67,8 @@ namespace Oan.Cradle
             GovernanceReceiptJournal = governanceReceiptJournal;
             CmeCollapseQualifier = cmeCollapseQualifier;
             CrypticAdmissionMembrane = crypticAdmissionMembrane;
+            FormationObserver = formationObserver;
+            FirstBootFormationObservationHarness = firstBootFormationObservationHarness;
         }
 
         public StoreRegistry(
