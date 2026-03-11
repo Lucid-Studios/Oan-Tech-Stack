@@ -96,6 +96,41 @@ The first translation proof lane is intentionally fixture-backed and limited to 
 
 The third sentence stops at lane-level `NeedsSpecification` before structural closure. Ambiguity is surfaced before validator invocation rather than being simulated through a structurally broken draft.
 
+The next bounded proof lane is an internal five-sentence paragraph fixture that reuses the sentence lane unchanged, emits a deterministic `ConstructorGraph`, and records continuity edges only between adjacent sentence predicate roots:
+
+- `remember -> observe` / `continuity:gate`
+- `observe -> increase` / `continuity:hum`
+- `change -> lie` / `continuity:light`
+
+That paragraph lane still stops the ambiguous sentence at `NeedsSpecification` before structural closure. Paragraph continuity is proved without laundering ambiguity into closure.
+
+The next bounded proof lane above that is a fixed three-paragraph body-cleaving lane. It reuses the paragraph graph lane, keeps graph-proven continuity anchors limited to explicit `continuity:<root>` edges only, derives broader paragraph-level body invariants separately from sentence and graph truth, and emits one bounded draft cluster per paragraph without producing a paragraph-level `EngramDraft`.
+
+The next bounded bridge posture above the C# proof lanes is now active through the existing `SLI.Engine/LispBridge` path.
+
+In that bridge posture:
+
+- the current C# proof lanes remain the oracle
+- Lisp mirrors:
+  - sentence translation
+  - paragraph graph formation
+  - paragraph body cleaving
+- Lisp emits candidate morphology only
+- C# materializes canonical results
+- a CradleTek-hosted cryptic-to-prime admission membrane classifies mirrored candidates before any prime submission is created
+- only admitted candidates reach `IEngramClosureValidator`
+- parity is required across the fixed corpora before broader formation authority moves into Lisp
+
+This bridge remains fixture-bound and corpus-gated.
+
+It does not authorize:
+
+- GEL append
+- OE/cOE mutation
+- routing changes
+- paragraph or chapter closure
+- any Engram prior to successful admission and successful Prime closure
+
 ## Ambiguity-Resolution Protocol
 
 The bootstrap ambiguity experiment is:
@@ -148,5 +183,6 @@ The bootstrap phase is successful when:
 - the symbolic world is reserved before contextualization generation
 - closure validation is explicit, repeatable, and non-heuristic
 - the repo can distinguish trace, draft, closed Engram, and downstream governance DTOs
+- the Lisp morphology bridge can mirror the fixed sentence, paragraph graph, and paragraph body proof corpora while C# remains the lawful shell and closure authority
 
 That is enough to support later Atlas -> Engram -> GEL / OE work without rival meaning models.

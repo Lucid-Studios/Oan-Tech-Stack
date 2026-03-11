@@ -40,7 +40,7 @@ Verified result:
 - Build succeeded
 - `0` warnings
 - `0` errors
-- `79` tests passed across `5` discovered test assemblies
+- `133` tests passed across `5` discovered test assemblies
 
 Observed repository conditions:
 
@@ -56,6 +56,17 @@ Observed repository conditions:
 - the atlas root-core reading is now explicitly fixed at the lemma layer so canonical root identity is no longer left implicit in surface-word forms
 - the repo now also has a first curated seed lemma basis and a tracked machine-readable seed manifest so English intake can be proven against a bounded canonical subset before broader EngramDraft expansion begins
 - the repo now also has a first fixture-backed narrative translation lane in `SLI.Ingestion` that proves English input can land on lemma roots, attach canonical constructor bodies, produce bounded `EngramDraft` objects for structurally admissible sentences, and stop at lane-level `NeedsSpecification` before structural closure when ambiguity remains
+- the repo now also has a first internal paragraph predicate-graph proof lane in `SLI.Ingestion` that reuses the sentence lane, emits a deterministic `ConstructorGraph`, records continuity only between adjacent sentence predicate roots, produces four bounded drafts with closure decisions, and keeps one ambiguous sentence structural without upgrading it into closure
+- the repo now also has a first internal paragraph body-cleaving proof lane in `SLI.Ingestion` that keeps graph-proven continuity anchors distinct from broader body-level invariants, derives both only from existing sentence and graph truth, and emits bounded draft clusters without producing paragraph-level `EngramDraft` objects
+- the repo now also has a first fixture-bound Lisp morphology bridge through `SLI.Engine/LispBridge` that mirrors the fixed sentence, paragraph graph, and paragraph body proof lanes while keeping C# as the oracle, contract materialization layer, and closure authority
+- the repo now also has a first explicit CradleTek-hosted cryptic-to-prime admission membrane that classifies mirrored sentence candidates as `Admit`, `Defer`, `Quarantine`, or `Reject` before any `PrimeClosureSubmission` may reach `IEngramClosureValidator`
+- the repo now also has an explicit first-boot formation model for the internal governing CMEs so the next services-layer work can build Steward, Father, and Mother as lawful hosted offices before operator-bound CME formation is permitted
+- the repo now also has a first-boot classification and protected-intake policy layer in `Oan.Common` and the active docs, separating lawful boot class from activation state before any runtime orchestration is introduced
+- the repo now also has an explicit Sanctuary first-boot protocol and non-runtime first-boot contract stubs that distinguish normative ceremony from currently implemented runtime behavior, name dual-ledger genesis as a required architectural phase, and keep `.hopng` governance witnesses supplemental rather than constitutive in v0.1
+- the repo now also has a protected-intake security hardening baseline with immutable reusable workflow refs, live-surface path hygiene across `.github`, `Modules`, and active build surfaces, and an explicit inert boundary around the `OAN Mortalis V0.1 Archive`
+- the repo now also has a bounded hybrid protected-ingress rehearsal surface with a tracked abstract profile spec, a tracked example profile template, and a non-mutating host harness that proves masking, narrow reveal gating, membrane enforcement, and AgentiCore observation without introducing custody or routing changes
+- the repo now also has a first-class propositional compile layer before `EngramDraft`, with canonical proposition contracts in `GEL.Contracts`, a bounded triadic proposition model, and a hybrid protected-ingress proposition proof lane that stabilizes masked governance-topology propositions before membrane submission and Prime closure
+- the repo now also has a doctrine-first weave-to-proposition stabilization seam that formalizes `pre-instantiated coherence -> proposition-bearing stabilization -> admissible proposition surface -> Sanctuary-governed accountability`, keeps morphism candidacy explicitly deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`, and preserves Sanctuary as the accountability boundary rather than the source of formative coherence
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -198,6 +209,7 @@ Current status:
 Primary risk:
 
 - the solution appears conceptually rich but assembly boundaries are still broad and overlapping
+- the new Lisp bridge proves morphology parity on fixed corpora only; authority still rightly remains in the C# shell, and the new admission membrane makes lawful crossing explicit before any candidate may approach Prime closure
 
 Supporting document:
 
@@ -219,6 +231,7 @@ Supporting document:
 - `docs/GOVERNANCE_COLLAPSE_ROUTING_CONFORMANCE.md`
 - `docs/CME_MODULE_CONFORMANCE_QUEUE.md`
 - `docs/SLI_NATIVE_ENGRAMMITIZATION_MODEL.md`
+- `docs/WEAVE_TO_PROPOSITION_STABILIZATION_MODEL.md`
 - `docs/CORE_SYSTEMS_MATURATION_PLAN.md`
 - `docs/OPERATIONAL_GOLDEN_PATH.md`
 - `docs/RUNTIME_HARDENING_PLAN.md`
@@ -226,6 +239,12 @@ Supporting document:
 - `docs/RUNTIME_OPERATOR_SURFACE_PLAN.md`
 - `docs/OPERATOR_TELEMETRY_VISIBILITY_LATTICE.md`
 - `docs/SANCTUARY_FOUNDING_RUNTIME_BRIEF.md`
+- `docs/SANCTUARY_FIRST_BOOT_PROTOCOL.md`
+- `docs/FIRST_BOOT_INTERNAL_GOVERNING_CME_FORMATION.md`
+- `docs/FIRST_BOOT_CLASSIFICATION_AND_EXPANSION_POLICY.md`
+- `docs/PROTECTED_INTAKE_CLASSIFICATION_CONTRACT.md`
+- `docs/HYBRID_PROTECTED_INGRESS_TEST_PROFILE.md`
+- `../SECURITY_HARDENING.md`
 - `docs/HOLOGRAPHIC_DATA_TOOL.md`
 - `../docs/BUILD_AUDIT_PATH.md`
 - `docs/DEPENDENCY_AUDIT.md`
@@ -252,7 +271,7 @@ Current status:
 
 Primary risk:
 
-- the Golden Path now supports local operator control, and `.hopng` validation can be integrated as an optional toolchain lane, but broader operational adoption, concurrency beyond one process, and CI-backed proof are still incomplete
+- the Golden Path now supports local operator control, `.hopng` validation can be integrated as an optional toolchain lane, and Lisp can now mirror bounded morphology proofs, but broader operational adoption, concurrency beyond one process, and CI-backed proof are still incomplete
 
 ### Stage 4. Governed
 

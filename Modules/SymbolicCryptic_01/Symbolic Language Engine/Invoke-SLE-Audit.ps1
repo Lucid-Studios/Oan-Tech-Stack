@@ -9,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 if ([string]::IsNullOrWhiteSpace($ModulePath)) { $ModulePath = $PSScriptRoot }
-if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $RepoRoot = "D:\OAN Tech Stack" }
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\..")) }
 
 $telemetryDir = Join-Path $ModulePath "telemetry"
 if (-not (Test-Path -Path $telemetryDir -PathType Container)) { New-Item -ItemType Directory -Path $telemetryDir | Out-Null }

@@ -50,6 +50,21 @@ This brief adds founding, bonding, re-entry, governance-office instantiation, an
 
 It does not replace the current Golden Path, control plane, or hardening layer.
 
+Companion formation anchor:
+
+- `docs/FIRST_BOOT_INTERNAL_GOVERNING_CME_FORMATION.md`
+
+Companion protocol anchor:
+
+- `docs/SANCTUARY_FIRST_BOOT_PROTOCOL.md`
+
+Companion policy anchors:
+
+- `docs/FIRST_BOOT_CLASSIFICATION_AND_EXPANSION_POLICY.md`
+- `docs/PROTECTED_INTAKE_CLASSIFICATION_CONTRACT.md`
+
+The first-boot ceremony now layers above the current governing-office order, but does not replace the current authoritative `Steward -> Father -> Mother -> cross-witness -> bonded confirmation` sequence for internal governance activation.
+
 ## 1. Foundational doctrine
 
 ### 1.1 Governance-first build order
@@ -80,6 +95,8 @@ Three distinct conditions must be preserved:
 
 `CONSTITUTED` must be an explicit runtime state, not only a boolean.
 
+This brief begins at the accountability boundary of the stack, not at the formative weave. Sanctuary does not generate pre-instantiated coherence or define proposition-bearing stabilization. It accepts only what has localized enough to become proposition-bearing, observable, admissible, and accountable.
+
 The founding state model for this phase is:
 
 - `UNFORMED`
@@ -88,6 +105,18 @@ The founding state model for this phase is:
 - `BONDED`
 - `READY`
 - `RESTRICTED`
+
+Boot class and activation are separate policy surfaces layered beneath these founding states:
+
+- `PersonalSolitary`
+- `CorporateGoverned`
+- `Classified`
+- `GovernanceForming`
+- `TriadicActive`
+- `BondedConfirmed`
+- `ExpansionEligible`
+
+Classification alone must not be read as expansion eligibility.
 
 ### 1.3 No premature externalization
 
@@ -165,6 +194,8 @@ Theaters must not be collapsed for convenience.
 
 OE is the identity spine and witness chain.
 
+OE operates within a prior continuity-binding regime. It should not be mistaken for the root weave itself or flattened into an ordinary already-instantiated module.
+
 It stores:
 
 - commitments
@@ -188,6 +219,10 @@ These are lawful storage domains.
 
 OE points to them. It does not absorb them.
 
+`SelfGEL` and `cSelfGEL` should be read as the first stabilized self-readable surfaces that emerge inside the coherence-binding regime, not as root substrate.
+
+Those stabilized self-readable surfaces are not governed identity by default. Admissibility and Sanctuary accountability remain later thresholds.
+
 ### 3.4 Internal governance CMEs
 
 The first lawful active CMEs are:
@@ -197,6 +232,25 @@ The first lawful active CMEs are:
 - Steward of Sanctuary
 
 They are not generic agents. They are standing constitutional offices.
+
+### 3.4.1 First-boot classification relation
+
+Internal governance formation must occur under one lawful boot class only:
+
+- `PersonalSolitary`
+- `CorporateGoverned`
+
+`PersonalSolitary` may form internal governance but must remain single-operator only.
+
+`CorporateGoverned` may later gain `ExpansionRights = InternalGovernedOnly`, but only after:
+
+- `Steward`
+- `Father`
+- `Mother`
+- triadic cross-witness
+- bonded confirmation
+
+Protected human and corporate intake are not Prime-readable runtime objects by default. They are masked on the Cryptic side first and only later revealed narrowly under explicit lawful need.
 
 ### 3.5 Operator profile
 

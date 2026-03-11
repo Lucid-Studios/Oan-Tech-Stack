@@ -77,6 +77,42 @@ public sealed class EnglishNarrativeTranslationLaneTests
     }
 
     [Fact]
+    public async Task TranslateAsync_ObservationSentence_ProducesClosedDraft()
+    {
+        var fixture = LoadFixture();
+        var lane = CreateLane();
+        var atlas = await LoadCanonicalAtlasAsync();
+
+        var result = await lane.TranslateAsync("The Gate observes the hum.", atlas, ToOverlayRoots(fixture.OverlayRoots));
+
+        Assert.Equal(NarrativeTranslationLaneOutcome.Closed, result.LaneOutcome);
+        Assert.Equal(["gate", "observe", "hum"], result.ResolvedLemmaRoots);
+        Assert.Equal("observe(gate,hum)", result.DiagnosticPredicateRender);
+        Assert.NotNull(result.EngramDraft);
+        Assert.Equal("observe", result.EngramDraft!.RootKey);
+        Assert.NotNull(result.ClosureDecision);
+        Assert.Equal(EngramClosureGrade.Closed, result.ClosureDecision!.Grade);
+    }
+
+    [Fact]
+    public async Task TranslateAsync_ChangeSentence_ProducesClosedDraft()
+    {
+        var fixture = LoadFixture();
+        var lane = CreateLane();
+        var atlas = await LoadCanonicalAtlasAsync();
+
+        var result = await lane.TranslateAsync("The light changes the Gate.", atlas, ToOverlayRoots(fixture.OverlayRoots));
+
+        Assert.Equal(NarrativeTranslationLaneOutcome.Closed, result.LaneOutcome);
+        Assert.Equal(["light", "change", "gate"], result.ResolvedLemmaRoots);
+        Assert.Equal("change(light,gate)", result.DiagnosticPredicateRender);
+        Assert.NotNull(result.EngramDraft);
+        Assert.Equal("change", result.EngramDraft!.RootKey);
+        Assert.NotNull(result.ClosureDecision);
+        Assert.Equal(EngramClosureGrade.Closed, result.ClosureDecision!.Grade);
+    }
+
+    [Fact]
     public async Task TranslateAsync_AmbiguousSentence_StopsBeforeValidator()
     {
         var fixture = LoadFixture();

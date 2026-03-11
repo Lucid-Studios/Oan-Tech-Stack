@@ -1,3 +1,5 @@
+using GEL.Graphs;
+using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SoulFrame.Host;
 
@@ -154,6 +156,251 @@ public sealed class SliSymbolTable
             context.FinalDecision = context.CandidateBranches.FirstOrDefault() ?? "defer";
             context.AddTrace($"commit({context.FinalDecision})");
             return Task.FromResult(SExpression.AtomNode(context.FinalDecision));
+        });
+
+        Register("morph-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(root))
+            {
+                context.MorphologyState.ResolvedLemmaRoots.Add(root);
+                context.AddTrace($"morph-root({root})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-root"));
+        });
+
+        Register("morph-operator", (expression, context, _) =>
+        {
+            var token = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var kind = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(token) && !string.IsNullOrWhiteSpace(kind))
+            {
+                context.MorphologyState.OperatorAnnotations.Add((token, kind));
+                context.AddTrace($"morph-operator({token}:{kind})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-operator"));
+        });
+
+        Register("morph-constructor", (expression, context, _) =>
+        {
+            var role = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var rootKey = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(role) && !string.IsNullOrWhiteSpace(rootKey))
+            {
+                context.MorphologyState.ConstructorBodies.Add((role, rootKey));
+                context.AddTrace($"morph-constructor({role}:{rootKey})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-constructor"));
+        });
+
+        Register("morph-predicate-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.MorphologyState.PredicateRoot = root;
+            context.AddTrace($"morph-predicate-root({root})");
+            return Task.FromResult(SExpression.AtomNode("morph-predicate-root"));
+        });
+
+        Register("morph-render", (expression, context, _) =>
+        {
+            var render = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.MorphologyState.DiagnosticPredicateRender = render;
+            context.AddTrace($"morph-render({render})");
+            return Task.FromResult(SExpression.AtomNode("morph-render"));
+        });
+
+        Register("morph-summary", (expression, context, _) =>
+        {
+            var summary = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.MorphologyState.Summary = summary;
+            context.AddTrace($"morph-summary({summary})");
+            return Task.FromResult(SExpression.AtomNode("morph-summary"));
+        });
+
+        Register("morph-scalar", (expression, context, _) =>
+        {
+            var scalar = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.MorphologyState.ScalarPayload = scalar;
+            context.AddTrace($"morph-scalar({scalar})");
+            return Task.FromResult(SExpression.AtomNode("morph-scalar"));
+        });
+
+        Register("morph-outcome", (expression, context, _) =>
+        {
+            var outcome = UnwrapStringLiteral(Arg(expression, 1, "OutOfScope"));
+            context.MorphologyState.Outcome = outcome;
+            context.AddTrace($"morph-outcome({outcome})");
+            return Task.FromResult(SExpression.AtomNode("morph-outcome"));
+        });
+
+        Register("morph-graph-edge", (expression, context, _) =>
+        {
+            var source = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var target = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            var relation = UnwrapStringLiteral(Arg(expression, 3, string.Empty));
+            if (!string.IsNullOrWhiteSpace(source) &&
+                !string.IsNullOrWhiteSpace(target) &&
+                !string.IsNullOrWhiteSpace(relation))
+            {
+                context.MorphologyState.GraphEdges.Add(new ConstructorEdge
+                {
+                    Source = source,
+                    Target = target,
+                    Relation = relation
+                });
+                context.AddTrace($"morph-graph-edge({source}->{target}:{relation})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-graph-edge"));
+        });
+
+        Register("morph-anchor", (expression, context, _) =>
+        {
+            var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(anchor))
+            {
+                context.MorphologyState.ContinuityAnchors.Add(anchor);
+                context.AddTrace($"morph-anchor({anchor})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-anchor"));
+        });
+
+        Register("morph-invariant", (expression, context, _) =>
+        {
+            var invariant = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(invariant))
+            {
+                context.MorphologyState.BodyInvariants.Add(invariant);
+                context.AddTrace($"morph-invariant({invariant})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-invariant"));
+        });
+
+        Register("morph-cluster-entry", (expression, context, _) =>
+        {
+            var entry = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(entry))
+            {
+                context.MorphologyState.ClusterEntries.Add(entry);
+                context.AddTrace($"morph-cluster-entry({entry})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("morph-cluster-entry"));
+        });
+
+        Register("morph-body-summary", (expression, context, _) =>
+        {
+            var summary = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.MorphologyState.BodySummary = summary;
+            context.AddTrace($"morph-body-summary({summary})");
+            return Task.FromResult(SExpression.AtomNode("morph-body-summary"));
+        });
+
+        Register("prop-subject-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Subject.RootKey = root;
+            context.AddTrace($"prop-subject-root({root})");
+            return Task.FromResult(SExpression.AtomNode("prop-subject-root"));
+        });
+
+        Register("prop-subject-handle", (expression, context, _) =>
+        {
+            var handle = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Subject.SymbolicHandle = handle;
+            context.AddTrace($"prop-subject-handle({handle})");
+            return Task.FromResult(SExpression.AtomNode("prop-subject-handle"));
+        });
+
+        Register("prop-predicate-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.PredicateRoot = root;
+            context.AddTrace($"prop-predicate-root({root})");
+            return Task.FromResult(SExpression.AtomNode("prop-predicate-root"));
+        });
+
+        Register("prop-object-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Object.RootKey = root;
+            context.AddTrace($"prop-object-root({root})");
+            return Task.FromResult(SExpression.AtomNode("prop-object-root"));
+        });
+
+        Register("prop-object-handle", (expression, context, _) =>
+        {
+            var handle = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Object.SymbolicHandle = handle;
+            context.AddTrace($"prop-object-handle({handle})");
+            return Task.FromResult(SExpression.AtomNode("prop-object-handle"));
+        });
+
+        Register("prop-qualifier", (expression, context, _) =>
+        {
+            var name = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var value = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                context.PropositionState.Qualifiers.Add(new SliPropositionQualifierResult
+                {
+                    Name = name,
+                    Value = value
+                });
+                context.AddTrace($"prop-qualifier({name}:{value})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("prop-qualifier"));
+        });
+
+        Register("prop-context", (expression, context, _) =>
+        {
+            var name = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var value = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                context.PropositionState.ContextTags.Add(new SliPropositionContextTagResult
+                {
+                    Name = name,
+                    Value = value
+                });
+                context.AddTrace($"prop-context({name}:{value})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("prop-context"));
+        });
+
+        Register("prop-render", (expression, context, _) =>
+        {
+            var render = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.DiagnosticRender = render;
+            context.AddTrace($"prop-render({render})");
+            return Task.FromResult(SExpression.AtomNode("prop-render"));
+        });
+
+        Register("prop-tension", (expression, context, _) =>
+        {
+            var tension = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(tension))
+            {
+                context.PropositionState.UnresolvedTensions.Add(tension);
+                context.AddTrace($"prop-tension({tension})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("prop-tension"));
+        });
+
+        Register("prop-grade", (expression, context, _) =>
+        {
+            var grade = UnwrapStringLiteral(Arg(expression, 1, SliPropositionalCompileGrade.NeedsSpecification.ToString()));
+            context.PropositionState.Grade = grade;
+            context.AddTrace($"prop-grade({grade})");
+            return Task.FromResult(SExpression.AtomNode("prop-grade"));
         });
     }
 

@@ -49,9 +49,11 @@ The intended bootstrap order is:
 3. load curated seed lemma roots
 4. validate constructor legality against reserved domains
 5. prove English intake lands on admitted lemma roots
-6. admit `EngramDraft` binding against canonical roots
-7. validate closure grade
-8. only later consider governed memory movement
+6. prove one fixture-backed paragraph can be lifted into deterministic predicate continuity without upgrading ambiguity into closure
+7. prove one fixed paragraph body can carry graph-proven continuity anchors, separately derived body invariants, and a bounded draft cluster without paragraph-level closure
+8. admit `EngramDraft` binding against canonical roots
+9. validate closure grade
+10. only later consider governed memory movement
 
 ## Immediate Consequence
 
@@ -62,4 +64,6 @@ That means:
 - the symbolic world is reserved before it is extended
 - root cores are explicit before merged forms are generated
 - the first seed basis is curated before broad Engram generation begins
+- sentence-level ambiguity stays local even when paragraph continuity is proved
+- paragraph bodies may form semantic residue without being promoted into paragraph-level Engrams
 - unknown space is articulated before the system pretends completeness

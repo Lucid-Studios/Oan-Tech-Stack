@@ -20,6 +20,17 @@ Lisp-based SLI and Engineered Cognition are the native computational organism th
 
 Sanctuary provides the collective nervous system of SLI, while `OE` and `cOE` preserve the individuated continuity and identity custody of each CME.
 
+This means Lisp-based SLI participates nearest to the formative weave, while proposition-bearing stabilization remains the first explicit cognitive threshold at which structure becomes inspectable enough for compile discipline. Morphism-bearing candidacy remains a later threshold.
+
+The broader doctrine remains:
+
+1. pre-instantiated coherence
+2. proposition-bearing stabilization
+3. admissible proposition surface
+4. Sanctuary-governed accountability
+
+This document stays at the nearest computational and compile edge of that chain. It does not define Sanctuary intake, governed identity, or the later morphism doctrine reserved to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
+
 ## Canonical Contract Owner
 
 The canonical Atlas and Engram meaning contracts now live in:
@@ -28,16 +39,58 @@ The canonical Atlas and Engram meaning contracts now live in:
 
 This means:
 
+- proposition compile is now a first-class meaning layer before `EngramDraft`
 - `EngramDraft` is the bounded pre-closure candidate object
 - `Engram` is the closure-valid canonical meaning object
 - Lisp-based SLI and Engineered Cognition may form candidate Engram structures, but they do not bypass closure validation or custody law
 - `Oan.Spinal.EngramEnvelope` remains a runtime-event envelope rather than the canonical meaning object
+
+The first compile model is intentionally bounded to triadic proposition formation:
+
+- subject
+- predicate
+- object
+- qualifiers
+- context
+
+Procedural compile remains deferred until proposition compile fidelity is trustworthy.
+
+That bounded proposition layer is itself downstream from pre-instantiated coherence. `OE/cOE` and later `SelfGEL/cSelfGEL` must not be flattened into ordinary modules or root substrate merely because proposition-bearing stabilization has begun.
+
+## First Bridge Posture
+
+The first bounded Lisp bridge pass is now active for the fixed narrative proof corpora.
+
+This means:
+
+- Lisp-based SLI and Engineered Cognition now act as the live morphology runtime for:
+  - sentence translation proof
+  - paragraph graph proof
+  - paragraph body-cleaving proof
+- C# remains the canonical oracle for those same corpora
+- Lisp emits candidate morphology only
+- C# materializes canonical contract-shaped results, compares bridge output against the oracle, and remains the only closure authority
+- a CradleTek-hosted cryptic-to-prime admission membrane now classifies mirrored candidates before any `PrimeClosureSubmission` may reach closure
+- admitted candidates may proceed to closure, deferred candidates remain meaningful but unclosed, quarantined candidates remain observation-only, and rejected candidates remain outside the supported fixture-gated surface
+
+This bridge is fixture-bound and corpus-gated.
+
+It does not authorize:
+
+- GEL append
+- OE/cOE mutation
+- routing changes
+- custody changes
+- chapter-level closure
+- any Engram prior to successful admission and successful Prime closure
 
 ## What Native Engrammitization Means
 
 Native Engrammitization is not mere logging, tracing, or symbolic ornament.
 
 It is the process by which active runtime cognition becomes candidate engram-bearing structure suitable for lawful collapse evaluation.
+
+That candidate structure is not automatically an admissible proposition surface or a Sanctuary-governed accountability event.
 
 This process depends on:
 
@@ -79,6 +132,8 @@ Lisp provides the live computational morphology in which Engineered Cognition ca
 - local reflective recomposition
 - lawful cognitive morphism inside bounded runtime space
 - temporary symbolic residues produced during active cognition
+
+These runtime-local transformations do not formalize morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those remain deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
 
 ## What Lisp-Based SLI And EC May Not Own
 
@@ -153,6 +208,23 @@ CradleTek:
 - keeps the organism situated and observable
 
 Lisp-based SLI and Engineered Cognition must not redefine CradleTek sequencing or governance posture autonomously.
+
+## Relationship To The Current C# Proof Lanes
+
+The current proof lanes in `src/SLI.Ingestion` remain the reference implementation for:
+
+- `EnglishNarrativeTranslationLane`
+- `EnglishNarrativeParagraphLane`
+- `EnglishNarrativeParagraphBodyLane`
+
+The active Lisp bridge mirrors those proof lanes through the existing `SLI.Engine/LispBridge` path.
+
+This means the current architecture reads as:
+
+- C# proof lanes define oracle behavior
+- Lisp performs the live morphological formation work
+- C# adapters materialize canonical contract-shaped outputs
+- C# validators remain the closure authority
 
 ## Candidate Engram Formation
 
@@ -282,3 +354,8 @@ Forbidden use:
 The stack must not use Lisp as a generic plugin for missing architecture.
 
 The stack must use Lisp-based SLI and Engineered Cognition where morphological cognition and native Engrammitization are actually required, while keeping governance, custody, profile, and anti-bleed law in the C# runtime skeleton.
+
+The first bridge pass therefore proves parity before authority moves:
+
+- if Lisp and C# match on sentence, paragraph graph, and paragraph body outputs for the fixed corpora, Lisp is validated as the live morphology organism for those bounded formation tasks
+- if they diverge, the divergence is treated as a bridge failure, not as new truth
