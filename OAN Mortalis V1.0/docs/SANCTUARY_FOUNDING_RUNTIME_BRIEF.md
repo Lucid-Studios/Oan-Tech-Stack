@@ -95,6 +95,8 @@ Three distinct conditions must be preserved:
 
 `CONSTITUTED` must be an explicit runtime state, not only a boolean.
 
+This brief begins at the accountability boundary of the stack, not at the formative weave. Sanctuary does not generate pre-instantiated coherence or define proposition-bearing stabilization. It accepts only what has localized enough to become proposition-bearing, observable, admissible, and accountable.
+
 The founding state model for this phase is:
 
 - `UNFORMED`
@@ -192,6 +194,8 @@ Theaters must not be collapsed for convenience.
 
 OE is the identity spine and witness chain.
 
+OE operates within a prior continuity-binding regime. It should not be mistaken for the root weave itself or flattened into an ordinary already-instantiated module.
+
 It stores:
 
 - commitments
@@ -214,6 +218,10 @@ These are lawful storage domains.
 - cGoA - sealed or restricted contextual and environmental artifacts
 
 OE points to them. It does not absorb them.
+
+`SelfGEL` and `cSelfGEL` should be read as the first stabilized self-readable surfaces that emerge inside the coherence-binding regime, not as root substrate.
+
+Those stabilized self-readable surfaces are not governed identity by default. Admissibility and Sanctuary accountability remain later thresholds.
 
 ### 3.4 Internal governance CMEs
 

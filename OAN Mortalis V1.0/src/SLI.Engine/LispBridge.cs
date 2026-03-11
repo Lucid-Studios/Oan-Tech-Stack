@@ -36,6 +36,11 @@ public sealed class LispBridge
         _semanticDevice = semanticDevice ?? NullSoulFrameSemanticDevice.Instance;
     }
 
+    internal static LispBridge CreateForDetachedRuntime()
+    {
+        return new LispBridge(NullEngramResolver.Instance);
+    }
+
     public IReadOnlyDictionary<string, string> LoadedModules { get; private set; } =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -166,6 +171,47 @@ public sealed class LispBridge
                 ? string.Empty
                 : $"cluster[{string.Join("; ", state.ClusterEntries)}]",
             BodySummary = state.BodySummary
+        };
+    }
+
+    internal async Task<SliPropositionalCompileResult> ExecutePropositionProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        var state = await ExecutePropositionProgramStateAsync(symbolicProgram, objective, cancellationToken).ConfigureAwait(false);
+        return new SliPropositionalCompileResult
+        {
+            Subject = new SliPropositionTermResult
+            {
+                RootKey = state.Subject.RootKey,
+                SymbolicHandle = state.Subject.SymbolicHandle
+            },
+            PredicateRoot = state.PredicateRoot,
+            Object = new SliPropositionTermResult
+            {
+                RootKey = state.Object.RootKey,
+                SymbolicHandle = state.Object.SymbolicHandle
+            },
+            Qualifiers = state.Qualifiers
+                .Select(qualifier => new SliPropositionQualifierResult
+                {
+                    Name = qualifier.Name,
+                    Value = qualifier.Value
+                })
+                .ToArray(),
+            ContextTags = state.ContextTags
+                .Select(tag => new SliPropositionContextTagResult
+                {
+                    Name = tag.Name,
+                    Value = tag.Value
+                })
+                .ToArray(),
+            DiagnosticRender = state.DiagnosticRender,
+            UnresolvedTensions = state.UnresolvedTensions.ToArray(),
+            Grade = Enum.TryParse<SliPropositionalCompileGrade>(state.Grade, ignoreCase: true, out var grade)
+                ? grade
+                : SliPropositionalCompileGrade.NeedsSpecification
         };
     }
 
@@ -308,6 +354,34 @@ public sealed class LispBridge
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         return context.MorphologyState;
+    }
+
+    private async Task<SliPropositionState> ExecutePropositionProgramStateAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = _parser.ParseProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "proposition-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return context.PropositionState;
     }
 
     private static int IndexOf(IReadOnlyList<string> traceLines, string prefix)

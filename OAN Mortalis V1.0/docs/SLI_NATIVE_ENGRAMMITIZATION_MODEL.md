@@ -20,6 +20,17 @@ Lisp-based SLI and Engineered Cognition are the native computational organism th
 
 Sanctuary provides the collective nervous system of SLI, while `OE` and `cOE` preserve the individuated continuity and identity custody of each CME.
 
+This means Lisp-based SLI participates nearest to the formative weave, while proposition-bearing stabilization remains the first explicit cognitive threshold at which structure becomes inspectable enough for compile discipline. Morphism-bearing candidacy remains a later threshold.
+
+The broader doctrine remains:
+
+1. pre-instantiated coherence
+2. proposition-bearing stabilization
+3. admissible proposition surface
+4. Sanctuary-governed accountability
+
+This document stays at the nearest computational and compile edge of that chain. It does not define Sanctuary intake, governed identity, or the later morphism doctrine reserved to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
+
 ## Canonical Contract Owner
 
 The canonical Atlas and Engram meaning contracts now live in:
@@ -28,10 +39,23 @@ The canonical Atlas and Engram meaning contracts now live in:
 
 This means:
 
+- proposition compile is now a first-class meaning layer before `EngramDraft`
 - `EngramDraft` is the bounded pre-closure candidate object
 - `Engram` is the closure-valid canonical meaning object
 - Lisp-based SLI and Engineered Cognition may form candidate Engram structures, but they do not bypass closure validation or custody law
 - `Oan.Spinal.EngramEnvelope` remains a runtime-event envelope rather than the canonical meaning object
+
+The first compile model is intentionally bounded to triadic proposition formation:
+
+- subject
+- predicate
+- object
+- qualifiers
+- context
+
+Procedural compile remains deferred until proposition compile fidelity is trustworthy.
+
+That bounded proposition layer is itself downstream from pre-instantiated coherence. `OE/cOE` and later `SelfGEL/cSelfGEL` must not be flattened into ordinary modules or root substrate merely because proposition-bearing stabilization has begun.
 
 ## First Bridge Posture
 
@@ -65,6 +89,8 @@ It does not authorize:
 Native Engrammitization is not mere logging, tracing, or symbolic ornament.
 
 It is the process by which active runtime cognition becomes candidate engram-bearing structure suitable for lawful collapse evaluation.
+
+That candidate structure is not automatically an admissible proposition surface or a Sanctuary-governed accountability event.
 
 This process depends on:
 
@@ -106,6 +132,8 @@ Lisp provides the live computational morphology in which Engineered Cognition ca
 - local reflective recomposition
 - lawful cognitive morphism inside bounded runtime space
 - temporary symbolic residues produced during active cognition
+
+These runtime-local transformations do not formalize morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those remain deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
 
 ## What Lisp-Based SLI And EC May Not Own
 

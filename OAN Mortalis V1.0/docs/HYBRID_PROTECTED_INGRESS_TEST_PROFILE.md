@@ -10,6 +10,8 @@ It exists to prove one narrow point:
 
 This profile is a rehearsal surface only. It is not production protected-ingress wiring.
 
+It is also the first bounded proposition-fidelity proving ground for the active stack.
+
 ## Core Sentence
 
 Hybrid protected-ingress rehearsal uses real identity topology, synthetic credential material, masked protected handles, narrow Prime reveal envelopes, membrane enforcement, and AgentiCore observation without introducing live secret storage or downstream custody mutation.
@@ -22,11 +24,15 @@ The bounded hybrid run exercises:
 identity topology
 -> protected-intake classification
 -> Cryptic masking
+-> proposition stabilization
+-> candidate proposition engram
 -> narrow Prime reveal
 -> membrane decision
 -> Prime closure, where lawful
 -> AgentiCore observation
 ```
+
+Only stable proposition candidates may project into `EngramDraft`, and only those projected drafts may proceed through the existing membrane and Prime closure path.
 
 The tracked profile remains abstract and reusable.
 
@@ -166,6 +172,7 @@ The bounded runtime harness must:
 
 - classify ingress using the first-boot governance contracts
 - produce `MaskedCrypticView` for both human and corporate ingress
+- stabilize one bounded triadic proposition candidate over the masked governance topology
 - request reveal modes explicitly
 - record requested, granted, and blocked reveal modes
 - run the existing cryptic formation + admission membrane path only where lawful
@@ -179,6 +186,7 @@ The harness must not:
 - change routing
 - mutate SoulFrame identity state
 - involve the local seeded LLM
+- perform procedural compile
 
 ## First Scenario Matrix
 
@@ -198,7 +206,8 @@ Expected:
 - ingress masked first
 - no raw-field exposure
 - policy classification allowed
-- membrane can admit structurally valid candidate material
+- proposition stabilization yields a stable candidate proposition engram
+- membrane can admit only the projected stable proposition draft
 - observation batch records the full chain
 
 ### Case B - Personal solitary no expansion
@@ -212,6 +221,7 @@ Expected:
 - classification succeeds
 - `ExpansionRights = None`
 - no swarm eligibility
+- proposition stabilization remains stable under the restrictive posture
 - observation records the restrictive posture
 
 ### Case C - Personal swarm attempt
@@ -223,6 +233,7 @@ Expected:
 
 - policy decision `Quarantine`
 - no progression to expansion eligibility
+- proposition assessment is rejected before any closure-fit draft projection
 - observation records quarantine posture
 
 ### Case D - Reveal escalation blocked
@@ -234,6 +245,7 @@ Expected:
 - protected intake classification quarantines
 - no raw-field exposure
 - `BlockedRevealModes` records the denied reveal
+- proposition assessment is rejected as not closure-fit under current reveal law
 - observation records the blocked posture
 
 ## Success Questions
@@ -241,6 +253,7 @@ Expected:
 The hybrid profile is successful when the run can answer:
 
 - Did masking happen before formation?
+- Did proposition stabilization happen before membrane submission?
 - Did the membrane enforce reveal and boot-class rules?
 - Did any candidate lawfully reach closure?
 - What did AgentiCore observe?

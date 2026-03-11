@@ -1,4 +1,5 @@
 using GEL.Graphs;
+using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SoulFrame.Host;
 
@@ -298,6 +299,108 @@ public sealed class SliSymbolTable
             context.MorphologyState.BodySummary = summary;
             context.AddTrace($"morph-body-summary({summary})");
             return Task.FromResult(SExpression.AtomNode("morph-body-summary"));
+        });
+
+        Register("prop-subject-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Subject.RootKey = root;
+            context.AddTrace($"prop-subject-root({root})");
+            return Task.FromResult(SExpression.AtomNode("prop-subject-root"));
+        });
+
+        Register("prop-subject-handle", (expression, context, _) =>
+        {
+            var handle = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Subject.SymbolicHandle = handle;
+            context.AddTrace($"prop-subject-handle({handle})");
+            return Task.FromResult(SExpression.AtomNode("prop-subject-handle"));
+        });
+
+        Register("prop-predicate-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.PredicateRoot = root;
+            context.AddTrace($"prop-predicate-root({root})");
+            return Task.FromResult(SExpression.AtomNode("prop-predicate-root"));
+        });
+
+        Register("prop-object-root", (expression, context, _) =>
+        {
+            var root = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Object.RootKey = root;
+            context.AddTrace($"prop-object-root({root})");
+            return Task.FromResult(SExpression.AtomNode("prop-object-root"));
+        });
+
+        Register("prop-object-handle", (expression, context, _) =>
+        {
+            var handle = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.Object.SymbolicHandle = handle;
+            context.AddTrace($"prop-object-handle({handle})");
+            return Task.FromResult(SExpression.AtomNode("prop-object-handle"));
+        });
+
+        Register("prop-qualifier", (expression, context, _) =>
+        {
+            var name = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var value = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                context.PropositionState.Qualifiers.Add(new SliPropositionQualifierResult
+                {
+                    Name = name,
+                    Value = value
+                });
+                context.AddTrace($"prop-qualifier({name}:{value})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("prop-qualifier"));
+        });
+
+        Register("prop-context", (expression, context, _) =>
+        {
+            var name = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var value = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                context.PropositionState.ContextTags.Add(new SliPropositionContextTagResult
+                {
+                    Name = name,
+                    Value = value
+                });
+                context.AddTrace($"prop-context({name}:{value})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("prop-context"));
+        });
+
+        Register("prop-render", (expression, context, _) =>
+        {
+            var render = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.PropositionState.DiagnosticRender = render;
+            context.AddTrace($"prop-render({render})");
+            return Task.FromResult(SExpression.AtomNode("prop-render"));
+        });
+
+        Register("prop-tension", (expression, context, _) =>
+        {
+            var tension = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(tension))
+            {
+                context.PropositionState.UnresolvedTensions.Add(tension);
+                context.AddTrace($"prop-tension({tension})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("prop-tension"));
+        });
+
+        Register("prop-grade", (expression, context, _) =>
+        {
+            var grade = UnwrapStringLiteral(Arg(expression, 1, SliPropositionalCompileGrade.NeedsSpecification.ToString()));
+            context.PropositionState.Grade = grade;
+            context.AddTrace($"prop-grade({grade})");
+            return Task.FromResult(SExpression.AtomNode("prop-grade"));
         });
     }
 

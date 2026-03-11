@@ -12,7 +12,8 @@ public enum CrypticOriginLane
 {
     Sentence,
     ParagraphGraph,
-    ParagraphBody
+    ParagraphBody,
+    ProtectedIngressProposition
 }
 
 public enum CrypticFormationOutcome

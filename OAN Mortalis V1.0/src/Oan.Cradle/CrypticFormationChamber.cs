@@ -28,6 +28,13 @@ namespace Oan.Cradle
         public required IReadOnlyList<CrypticSentenceFormationResult> SentenceAdmissions { get; init; }
     }
 
+    internal sealed class CrypticPropositionFormationResult
+    {
+        public required PropositionalCompileAssessment PropositionAssessment { get; init; }
+        public required CrypticAdmissionResult AdmissionResult { get; init; }
+        public EngramClosureDecision? ClosureDecision { get; init; }
+    }
+
     internal sealed class CrypticFormationChamber
     {
         private readonly LispNarrativeMirrorAdapter _mirrorAdapter;
@@ -136,6 +143,89 @@ namespace Oan.Cradle
             {
                 ParagraphBody = BuildParagraphBody(candidateBody, sentenceAdmissions),
                 SentenceAdmissions = sentenceAdmissions
+            };
+        }
+
+        public async Task<CrypticPropositionFormationResult> FormPropositionAsync(
+            PropositionalCompileAssessment assessment,
+            RootAtlas atlas,
+            CrypticOriginRuntime originRuntime = CrypticOriginRuntime.OracleCSharp,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(assessment);
+            ArgumentNullException.ThrowIfNull(atlas);
+
+            var admissionCandidate = new CrypticAdmissionCandidate(
+                CandidateId: CreateDeterministicCandidateId(
+                    assessment.Candidate.DiagnosticPropositionRender,
+                    originRuntime,
+                    CrypticOriginLane.ProtectedIngressProposition),
+                OriginRuntime: originRuntime,
+                OriginLane: CrypticOriginLane.ProtectedIngressProposition,
+                SourceText: assessment.Candidate.DiagnosticPropositionRender,
+                MaterializedPayload: assessment,
+                CandidateDraft: assessment.ProjectedEngramDraft,
+                Outcome: MapOutcome(assessment.Grade),
+                DeterministicPrimeMaterializationSucceeded: assessment.Grade != PropositionalCompileGrade.Stable ||
+                                                            assessment.ProjectedEngramDraft is not null,
+                ReservedDomainViolation: false,
+                DiagnosticRender: assessment.Candidate.DiagnosticPropositionRender,
+                TelemetryTags:
+                [
+                    $"runtime:{originRuntime}",
+                    "lane:protected-ingress-proposition",
+                    $"grade:{assessment.Grade}"
+                ]);
+
+            var admissionResult = await _admissionMembrane
+                .EvaluateAsync(admissionCandidate, cancellationToken)
+                .ConfigureAwait(false);
+
+            await RecordAdmissionObservationAsync(
+                admissionResult,
+                AgentiFormationObservationSource.ProtectedIngressProposition,
+                cancellationToken).ConfigureAwait(false);
+
+            if (admissionResult.Decision != CrypticAdmissionDecision.Admit ||
+                admissionResult.NormalizedPrimePayload is null)
+            {
+                await RecordClosureObservationAsync(
+                    admissionResult,
+                    closureState: AgentiFormationClosureState.NoClosure,
+                    AgentiFormationObservationSource.ProtectedIngressProposition,
+                    cancellationToken).ConfigureAwait(false);
+
+                return new CrypticPropositionFormationResult
+                {
+                    PropositionAssessment = assessment,
+                    AdmissionResult = admissionResult
+                };
+            }
+
+            var closureDecision = await _closureValidator
+                .ValidateAsync(admissionResult.NormalizedPrimePayload.EngramDraft, atlas, cancellationToken)
+                .ConfigureAwait(false);
+
+            await RecordClosureObservationAsync(
+                admissionResult,
+                closureDecision.Grade == EngramClosureGrade.Closed
+                    ? AgentiFormationClosureState.Closed
+                    : AgentiFormationClosureState.Rejected,
+                AgentiFormationObservationSource.ProtectedIngressProposition,
+                cancellationToken).ConfigureAwait(false);
+
+            return new CrypticPropositionFormationResult
+            {
+                PropositionAssessment = new PropositionalCompileAssessment
+                {
+                    Candidate = assessment.Candidate,
+                    Grade = assessment.Grade,
+                    ReasonCodes = assessment.ReasonCodes,
+                    Warnings = assessment.Warnings,
+                    ProjectedEngramDraft = admissionResult.NormalizedPrimePayload.EngramDraft
+                },
+                AdmissionResult = admissionResult,
+                ClosureDecision = closureDecision
             };
         }
 
@@ -365,6 +455,17 @@ namespace Oan.Cradle
                 NarrativeTranslationLaneOutcome.Rejected => CrypticFormationOutcome.Rejected,
                 NarrativeTranslationLaneOutcome.OutOfScope => CrypticFormationOutcome.OutOfScope,
                 _ => throw new ArgumentOutOfRangeException(nameof(laneOutcome), laneOutcome, "Unsupported lane outcome.")
+            };
+        }
+
+        private static CrypticFormationOutcome MapOutcome(PropositionalCompileGrade grade)
+        {
+            return grade switch
+            {
+                PropositionalCompileGrade.Stable => CrypticFormationOutcome.Closed,
+                PropositionalCompileGrade.NeedsSpecification => CrypticFormationOutcome.NeedsSpecification,
+                PropositionalCompileGrade.Rejected => CrypticFormationOutcome.Rejected,
+                _ => throw new ArgumentOutOfRangeException(nameof(grade), grade, "Unsupported proposition compile grade.")
             };
         }
 

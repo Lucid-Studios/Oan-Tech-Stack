@@ -22,7 +22,8 @@ public enum AgentiFormationObservationSource
     FirstBootPolicy = 0,
     Sentence = 1,
     ParagraphGraph = 2,
-    ParagraphBody = 3
+    ParagraphBody = 3,
+    ProtectedIngressProposition = 4
 }
 
 public enum AgentiFormationClosureState

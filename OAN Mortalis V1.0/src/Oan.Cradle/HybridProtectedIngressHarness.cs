@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using GEL.Contracts;
 using GEL.Models;
 using Oan.Common;
-using SLI.Ingestion;
 
 namespace Oan.Cradle;
 
@@ -36,6 +35,9 @@ internal sealed class HybridProtectedIngressRunResult
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
     public required IReadOnlyList<PrimeRevealMode> GrantedRevealModes { get; init; }
     public required IReadOnlyList<PrimeRevealMode> BlockedRevealModes { get; init; }
+    public required PropositionalCompileAssessment OraclePropositionAssessment { get; init; }
+    public required PropositionalCompileAssessment LispPropositionAssessment { get; init; }
+    public required bool PropositionParityMatched { get; init; }
     public required IReadOnlyList<HybridProtectedIngressMembraneDecision> MembraneDecisions { get; init; }
     public required IReadOnlyList<HybridProtectedIngressClosureOutcome> ClosureOutcomes { get; init; }
     public required AgentiFormationObservationBatch ObservationBatch { get; init; }
@@ -55,7 +57,6 @@ internal sealed class HybridProtectedIngressProfile
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
     public required bool BondedAuthorityConfirmed { get; init; }
     public required IReadOnlyList<string> ApprovedRevealPurposes { get; init; }
-    public required string FormationSentence { get; init; }
 
     public BondedAuthorityContext ToBondedAuthorityContext()
     {
@@ -90,29 +91,28 @@ internal sealed class HybridProtectedIngressHarness
     private readonly IFirstBootGovernancePolicy _policy;
     private readonly IEngramClosureValidator _closureValidator;
     private readonly ICrypticAdmissionMembrane _admissionMembrane;
+    private readonly HybridProtectedIngressPropositionCompiler _propositionCompiler;
     private readonly IAgentiFormationObserver? _formationObserver;
 
     public HybridProtectedIngressHarness(
         IFirstBootGovernancePolicy policy,
         IEngramClosureValidator closureValidator,
         ICrypticAdmissionMembrane admissionMembrane,
+        HybridProtectedIngressPropositionCompiler? propositionCompiler = null,
         IAgentiFormationObserver? formationObserver = null)
     {
         _policy = policy ?? throw new ArgumentNullException(nameof(policy));
         _closureValidator = closureValidator ?? throw new ArgumentNullException(nameof(closureValidator));
         _admissionMembrane = admissionMembrane ?? throw new ArgumentNullException(nameof(admissionMembrane));
+        _propositionCompiler = propositionCompiler ?? new HybridProtectedIngressPropositionCompiler();
         _formationObserver = formationObserver;
     }
 
     public async Task<HybridProtectedIngressRunResult> RunAsync(
         HybridProtectedIngressProfile profile,
-        RootAtlas atlas,
-        IReadOnlyList<NarrativeOverlayRoot> overlayRoots,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(profile);
-        ArgumentNullException.ThrowIfNull(atlas);
-        ArgumentNullException.ThrowIfNull(overlayRoots);
 
         var collector = new CollectingAgentiFormationObserver(_formationObserver);
         var requestedRevealModes = NormalizeRevealModes(profile.RequestedRevealModes);
@@ -204,98 +204,55 @@ internal sealed class HybridProtectedIngressHarness
                 .Any(result => result.Classification.Decision != FirstBootGovernanceDecision.Allow))
             .ToArray();
 
-        var membraneDecisions = new List<HybridProtectedIngressMembraneDecision>();
-        var closureOutcomes = new List<HybridProtectedIngressClosureOutcome>();
-
         if (bootProfile.Decision == FirstBootGovernanceDecision.Allow &&
             intakeResults.All(result => result.Classification.Decision == FirstBootGovernanceDecision.Allow))
         {
-            var formedOffices = new List<InternalGoverningCmeOffice>(capacity: 3);
-            foreach (var office in OrderedOffices)
-            {
-                var formation = _policy.EvaluateFormationEligibility(
-                    new InternalGoverningCmeFormationRequest(
-                        BootClass: profile.RequestedBootClass,
-                        ActivationState: BootActivationState.GovernanceForming,
-                        Office: office,
-                        AlreadyFormedOffices: formedOffices.ToArray(),
-                        TriadicCrossWitnessComplete: false,
-                        BondedConfirmationComplete: false));
+            await RecordGoverningOfficeFormationAsync(profile, bootProfile, collector, cancellationToken).ConfigureAwait(false);
+        }
 
-                if (formation.Decision != FirstBootGovernanceDecision.Allow)
-                {
-                    throw new InvalidOperationException(
-                        $"Hybrid protected-ingress harness encountered unexpected office denial for {office}: {formation.ReasonCode}.");
-                }
+        var propositionCompile = await _propositionCompiler
+            .CompileAsync(
+                profile,
+                bootProfile,
+                grantedRevealModes,
+                blockedRevealModes,
+                cancellationToken)
+            .ConfigureAwait(false);
 
-                formedOffices.Add(office);
+        var membraneDecisions = new List<HybridProtectedIngressMembraneDecision>();
+        var closureOutcomes = new List<HybridProtectedIngressClosureOutcome>();
 
-                await collector.RecordAsync(
-                    CreateObservation(
-                        stage: AgentiFormationObservationStage.GoverningOfficeFormation,
-                        source: AgentiFormationObservationSource.FirstBootPolicy,
-                        bootClass: profile.RequestedBootClass,
-                        activationState: formation.ActivationState,
-                        expansionRights: bootProfile.ExpansionRights,
-                        office: office,
-                        admissionDecision: null,
-                        closureState: AgentiFormationClosureState.NotSubmitted,
-                        revealMode: null,
-                        originRuntime: AgentiFormationOriginRuntime.OracleCSharp,
-                        submissionEligible: false,
-                        observationTags:
-                        [
-                            $"decision:{formation.Decision}",
-                            $"reason:{formation.ReasonCode}"
-                        ]),
-                    cancellationToken).ConfigureAwait(false);
-            }
-
-            await collector.RecordAsync(
-                CreateObservation(
-                    stage: AgentiFormationObservationStage.TriadicCrossWitness,
-                    source: AgentiFormationObservationSource.FirstBootPolicy,
-                    bootClass: profile.RequestedBootClass,
-                    activationState: BootActivationState.TriadicActive,
-                    expansionRights: bootProfile.ExpansionRights,
-                    office: null,
-                    admissionDecision: null,
-                    closureState: AgentiFormationClosureState.NotSubmitted,
-                    revealMode: null,
-                    originRuntime: AgentiFormationOriginRuntime.OracleCSharp,
-                    submissionEligible: false,
-                    observationTags:
-                    [
-                        "triadic-cross-witness:complete",
-                        "bonded-confirmation:pending"
-                    ]),
-                cancellationToken).ConfigureAwait(false);
-
+        if (propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.Stable &&
+            propositionCompile.LispAssessment.Grade == PropositionalCompileGrade.Stable &&
+            propositionCompile.ParityMatched &&
+            propositionCompile.OracleAssessment.ProjectedEngramDraft is not null)
+        {
             var chamber = new CrypticFormationChamber(
                 _closureValidator,
                 _admissionMembrane,
                 formationObserver: collector);
 
-            var sentenceResult = await chamber.FormSentenceAsync(
-                profile.FormationSentence,
-                atlas,
-                overlayRoots,
-                cancellationToken).ConfigureAwait(false);
+            var propositionResult = await chamber.FormPropositionAsync(
+                    propositionCompile.OracleAssessment,
+                    propositionCompile.PropositionAtlas,
+                    CrypticOriginRuntime.OracleCSharp,
+                    cancellationToken)
+                .ConfigureAwait(false);
 
             membraneDecisions.Add(new HybridProtectedIngressMembraneDecision
             {
-                CandidateId = sentenceResult.AdmissionResult.CandidateId,
-                Decision = sentenceResult.AdmissionResult.Decision,
-                SubmissionEligible = sentenceResult.AdmissionResult.SubmissionEligible,
-                ReasonCode = sentenceResult.AdmissionResult.ReasonCode
+                CandidateId = propositionResult.AdmissionResult.CandidateId,
+                Decision = propositionResult.AdmissionResult.Decision,
+                SubmissionEligible = propositionResult.AdmissionResult.SubmissionEligible,
+                ReasonCode = propositionResult.AdmissionResult.ReasonCode
             });
 
             closureOutcomes.Add(new HybridProtectedIngressClosureOutcome
             {
-                CandidateId = sentenceResult.AdmissionResult.CandidateId,
-                ClosureState = sentenceResult.ClosureDecision is null
+                CandidateId = propositionResult.AdmissionResult.CandidateId,
+                ClosureState = propositionResult.ClosureDecision is null
                     ? AgentiFormationClosureState.NoClosure
-                    : sentenceResult.ClosureDecision.Grade == EngramClosureGrade.Closed
+                    : propositionResult.ClosureDecision.Grade == EngramClosureGrade.Closed
                         ? AgentiFormationClosureState.Closed
                         : AgentiFormationClosureState.Rejected
             });
@@ -309,10 +266,81 @@ internal sealed class HybridProtectedIngressHarness
             RequestedRevealModes = requestedRevealModes,
             GrantedRevealModes = grantedRevealModes,
             BlockedRevealModes = blockedRevealModes,
+            OraclePropositionAssessment = propositionCompile.OracleAssessment,
+            LispPropositionAssessment = propositionCompile.LispAssessment,
+            PropositionParityMatched = propositionCompile.ParityMatched,
             MembraneDecisions = membraneDecisions,
             ClosureOutcomes = closureOutcomes,
             ObservationBatch = new AgentiFormationObservationBatch(collector.Snapshot())
         };
+    }
+
+    private async Task RecordGoverningOfficeFormationAsync(
+        HybridProtectedIngressProfile profile,
+        InternalGovernanceBootProfile bootProfile,
+        CollectingAgentiFormationObserver collector,
+        CancellationToken cancellationToken)
+    {
+        var formedOffices = new List<InternalGoverningCmeOffice>(capacity: 3);
+        foreach (var office in OrderedOffices)
+        {
+            var formation = _policy.EvaluateFormationEligibility(
+                new InternalGoverningCmeFormationRequest(
+                    BootClass: profile.RequestedBootClass,
+                    ActivationState: BootActivationState.GovernanceForming,
+                    Office: office,
+                    AlreadyFormedOffices: formedOffices.ToArray(),
+                    TriadicCrossWitnessComplete: false,
+                    BondedConfirmationComplete: false));
+
+            if (formation.Decision != FirstBootGovernanceDecision.Allow)
+            {
+                throw new InvalidOperationException(
+                    $"Hybrid protected-ingress harness encountered unexpected office denial for {office}: {formation.ReasonCode}.");
+            }
+
+            formedOffices.Add(office);
+
+            await collector.RecordAsync(
+                CreateObservation(
+                    stage: AgentiFormationObservationStage.GoverningOfficeFormation,
+                    source: AgentiFormationObservationSource.FirstBootPolicy,
+                    bootClass: profile.RequestedBootClass,
+                    activationState: formation.ActivationState,
+                    expansionRights: bootProfile.ExpansionRights,
+                    office: office,
+                    admissionDecision: null,
+                    closureState: AgentiFormationClosureState.NotSubmitted,
+                    revealMode: null,
+                    originRuntime: AgentiFormationOriginRuntime.OracleCSharp,
+                    submissionEligible: false,
+                    observationTags:
+                    [
+                        $"decision:{formation.Decision}",
+                        $"reason:{formation.ReasonCode}"
+                    ]),
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        await collector.RecordAsync(
+            CreateObservation(
+                stage: AgentiFormationObservationStage.TriadicCrossWitness,
+                source: AgentiFormationObservationSource.FirstBootPolicy,
+                bootClass: profile.RequestedBootClass,
+                activationState: BootActivationState.TriadicActive,
+                expansionRights: bootProfile.ExpansionRights,
+                office: null,
+                admissionDecision: null,
+                closureState: AgentiFormationClosureState.NotSubmitted,
+                revealMode: null,
+                originRuntime: AgentiFormationOriginRuntime.OracleCSharp,
+                submissionEligible: false,
+                observationTags:
+                [
+                    "triadic-cross-witness:complete",
+                    "bonded-confirmation:pending"
+                ]),
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static AgentiFormationObservation CreateObservation(

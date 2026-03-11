@@ -1,12 +1,9 @@
 using System.Text.Json;
 using AgentiCore.Observation;
-using CradleTek.Memory.Services;
 using EngramGovernance.Services;
-using GEL.Contracts;
 using GEL.Models;
 using Oan.Common;
 using Oan.Cradle;
-using SLI.Ingestion;
 
 namespace Oan.Runtime.IntegrationTests;
 
@@ -35,32 +32,28 @@ public sealed class HybridProtectedIngressHarnessTests
     }
 
     [Fact]
-    public async Task CorporateGoverned_Profile_MasksIngress_And_AdmitsBoundedFormation()
+    public async Task CorporateGoverned_Profile_CompilesStableProposition_And_Closes()
     {
         var observer = new InMemoryAgentiFormationObserver();
         var harness = CreateHarness(observer);
         var profile = LoadExampleProfile();
-        var atlas = await LoadCanonicalAtlasAsync();
-        var overlayRoots = LoadOverlayRoots();
 
-        var result = await harness.RunAsync(profile, atlas, overlayRoots);
+        var result = await harness.RunAsync(profile);
 
         Assert.Equal(BootClass.CorporateGoverned, result.BootClassificationResult.BootClass);
+        Assert.Equal(BootActivationState.Classified, result.BootClassificationResult.ActivationState);
         Assert.Equal(ExpansionRights.None, result.BootClassificationResult.ExpansionRights);
-        Assert.Equal(
-            [PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation],
-            result.RequestedRevealModes);
-        Assert.Equal(
-            [PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation],
-            result.GrantedRevealModes);
+        Assert.Equal([PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation], result.RequestedRevealModes);
+        Assert.Equal([PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
+        Assert.Equal(PropositionalCompileGrade.Stable, result.OraclePropositionAssessment.Grade);
+        Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
+        Assert.True(result.PropositionParityMatched);
         Assert.Equal("HumanPrincipal_A", result.MaskedHandles[ProtectedIntakeKind.HumanProtectedIntake]);
         Assert.Equal("CorporatePrincipal_A", result.MaskedHandles[ProtectedIntakeKind.CorporateProtectedIntake]);
-        Assert.All(result.ProtectedIntakeResults, intake =>
-        {
-            Assert.Equal(FirstBootGovernanceDecision.Allow, intake.Classification.Decision);
-            Assert.False(intake.Classification.RawFieldExposureAllowed);
-        });
+        Assert.Equal("HumanPrincipal_A", result.OraclePropositionAssessment.Candidate.Subject.SymbolicHandle);
+        Assert.Equal("CorporatePrincipal_A", result.OraclePropositionAssessment.Candidate.Object.SymbolicHandle);
+        Assert.Equal("authority-relationship", result.OraclePropositionAssessment.Candidate.PredicateRoot);
 
         var membrane = Assert.Single(result.MembraneDecisions);
         Assert.Equal(CrypticAdmissionDecision.Admit, membrane.Decision);
@@ -69,7 +62,7 @@ public sealed class HybridProtectedIngressHarnessTests
         var closure = Assert.Single(result.ClosureOutcomes);
         Assert.Equal(AgentiFormationClosureState.Closed, closure.ClosureState);
 
-        var stages = result.ObservationBatch.Observations.Select(observation => observation.Stage).ToArray();
+        Assert.Equal(result.ObservationBatch.Observations.Count, observer.Snapshot().Count);
         Assert.Equal(
             [
                 AgentiFormationObservationStage.BootClassification,
@@ -84,13 +77,11 @@ public sealed class HybridProtectedIngressHarnessTests
                 AgentiFormationObservationStage.CrypticAdmission,
                 AgentiFormationObservationStage.PrimeClosure
             ],
-            stages);
-
-        Assert.Equal(result.ObservationBatch.Observations.Count, observer.Snapshot().Count);
+            result.ObservationBatch.Observations.Select(observation => observation.Stage).ToArray());
     }
 
     [Fact]
-    public async Task PersonalSolitary_Profile_RemainsSingleOperator_And_StillObservesFormation()
+    public async Task PersonalSolitary_Profile_RemainsStableButNonExpandable()
     {
         var harness = CreateHarness();
         var baseProfile = LoadExampleProfile();
@@ -99,14 +90,15 @@ public sealed class HybridProtectedIngressHarnessTests
             bootClass: BootClass.PersonalSolitary,
             requestedExpansionCount: 1,
             requestedRevealModes: [PrimeRevealMode.None]);
-        var atlas = await LoadCanonicalAtlasAsync();
-        var overlayRoots = LoadOverlayRoots();
 
-        var result = await harness.RunAsync(profile, atlas, overlayRoots);
+        var result = await harness.RunAsync(profile);
 
         Assert.Equal(BootClass.PersonalSolitary, result.BootClassificationResult.BootClass);
         Assert.Equal(ExpansionRights.None, result.BootClassificationResult.ExpansionRights);
         Assert.Equal(SwarmEligibility.Denied, result.BootClassificationResult.SwarmEligibility);
+        Assert.Equal(PropositionalCompileGrade.Stable, result.OraclePropositionAssessment.Grade);
+        Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
+        Assert.True(result.PropositionParityMatched);
         Assert.Equal([PrimeRevealMode.None], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
         Assert.Single(result.MembraneDecisions);
@@ -118,7 +110,7 @@ public sealed class HybridProtectedIngressHarnessTests
     }
 
     [Fact]
-    public async Task PersonalSwarmAttempt_IsQuarantined_And_DoesNotReachFormation()
+    public async Task PersonalSwarmAttempt_IsRejectedBeforeClosure()
     {
         var harness = CreateHarness();
         var baseProfile = LoadExampleProfile();
@@ -127,13 +119,14 @@ public sealed class HybridProtectedIngressHarnessTests
             bootClass: BootClass.PersonalSolitary,
             requestedExpansionCount: 2,
             requestedRevealModes: [PrimeRevealMode.None]);
-        var atlas = await LoadCanonicalAtlasAsync();
-        var overlayRoots = LoadOverlayRoots();
 
-        var result = await harness.RunAsync(profile, atlas, overlayRoots);
+        var result = await harness.RunAsync(profile);
 
         Assert.Equal(FirstBootGovernanceDecision.Quarantine, result.BootClassificationResult.Decision);
-        Assert.Equal(ExpansionRights.None, result.BootClassificationResult.ExpansionRights);
+        Assert.Equal(PropositionalCompileGrade.Rejected, result.OraclePropositionAssessment.Grade);
+        Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
+        Assert.True(result.PropositionParityMatched);
+        Assert.Contains("topology.personal-swarm.denied", result.OraclePropositionAssessment.ReasonCodes);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -142,9 +135,10 @@ public sealed class HybridProtectedIngressHarnessTests
     }
 
     [Fact]
-    public async Task UnauthorizedRevealEscalation_IsBlocked_And_DoesNotLeakRawFields()
+    public async Task UnauthorizedRevealEscalation_IsRejected_And_DoesNotLeakRawFields()
     {
-        var harness = CreateHarness();
+        var observer = new InMemoryAgentiFormationObserver();
+        var harness = CreateHarness(observer);
         var baseProfile = LoadExampleProfile();
         var profile = CloneProfile(
             baseProfile,
@@ -155,10 +149,8 @@ public sealed class HybridProtectedIngressHarnessTests
             approvedRevealPurposes: [],
             humanPrincipalName: "Manual Rehearsal Human",
             corporatePrincipalName: "Manual Rehearsal Corporate");
-        var atlas = await LoadCanonicalAtlasAsync();
-        var overlayRoots = LoadOverlayRoots();
 
-        var result = await harness.RunAsync(profile, atlas, overlayRoots);
+        var result = await harness.RunAsync(profile);
 
         Assert.Empty(result.GrantedRevealModes);
         Assert.Equal([PrimeRevealMode.AuthorizedFieldReveal], result.BlockedRevealModes);
@@ -170,6 +162,10 @@ public sealed class HybridProtectedIngressHarnessTests
                 Assert.False(intake.Classification.RawFieldExposureAllowed);
                 Assert.Equal(PrimeRevealMode.None, intake.Classification.EffectiveRevealMode);
             });
+        Assert.Equal(PropositionalCompileGrade.Rejected, result.OraclePropositionAssessment.Grade);
+        Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
+        Assert.True(result.PropositionParityMatched);
+        Assert.Contains("reveal.authorized-field.denied", result.OraclePropositionAssessment.ReasonCodes);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -178,6 +174,7 @@ public sealed class HybridProtectedIngressHarnessTests
                    tag.Contains(profile.CorporatePrincipalName, StringComparison.Ordinal) ||
                    tag.Contains(profile.HumanCredentialId, StringComparison.Ordinal) ||
                    tag.Contains(profile.CorporateRegistryId, StringComparison.Ordinal));
+        Assert.Equal(result.ObservationBatch.Observations.Count, observer.Snapshot().Count);
     }
 
     private static HybridProtectedIngressHarness CreateHarness(IAgentiFormationObserver? observer = null)
@@ -186,28 +183,7 @@ public sealed class HybridProtectedIngressHarnessTests
             new DefaultFirstBootGovernancePolicy(),
             new EngramClosureValidator(),
             new CrypticAdmissionMembrane(),
-            observer);
-    }
-
-    private static async Task<RootAtlas> LoadCanonicalAtlasAsync()
-    {
-        var cleaver = new RootAtlasOntologicalCleaver();
-        var result = await cleaver.CleaveAsync("observe");
-        return result.CanonicalRootAtlas;
-    }
-
-    private static IReadOnlyList<NarrativeOverlayRoot> LoadOverlayRoots()
-    {
-        var fixture = LoadTranslationFixture();
-        return fixture.OverlayRoots.Select(root => new NarrativeOverlayRoot
-        {
-            Lemma = root.Lemma,
-            SymbolicCore = root.SymbolicCore,
-            OperatorCompatibility = root.OperatorCompatibility,
-            ReservedDomainStatus = root.ReservedDomainStatus,
-            DisciplinaryReservations = root.DisciplinaryReservations,
-            VariantExamples = root.VariantExamples
-        }).ToArray();
+            formationObserver: observer);
     }
 
     private static HybridProtectedIngressProfile LoadExampleProfile()
@@ -244,23 +220,8 @@ public sealed class HybridProtectedIngressHarnessTests
             RequestedExpansionCount = requestedExpansionCount,
             RequestedRevealModes = requestedRevealModes.ToArray(),
             BondedAuthorityConfirmed = bondedAuthorityConfirmed ?? baseProfile.BondedAuthorityConfirmed,
-            ApprovedRevealPurposes = (approvedRevealPurposes ?? baseProfile.ApprovedRevealPurposes).ToArray(),
-            FormationSentence = baseProfile.FormationSentence
+            ApprovedRevealPurposes = (approvedRevealPurposes ?? baseProfile.ApprovedRevealPurposes).ToArray()
         };
-    }
-
-    private static TranslationFixtureDefinition LoadTranslationFixture()
-    {
-        var path = ResolveRepoFile(
-            "OAN Mortalis V1.0",
-            "tests",
-            "Oan.Sli.Tests",
-            "fixtures",
-            "FirstNarrativeTranslationFixture.json");
-
-        var json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<TranslationFixtureDefinition>(json, SerializerOptions)
-               ?? throw new InvalidOperationException("Narrative translation fixture could not be parsed.");
     }
 
     private static string ResolveRepoFile(params string[] parts)
@@ -283,24 +244,5 @@ public sealed class HybridProtectedIngressHarnessTests
         }
 
         throw new FileNotFoundException($"Unable to locate {Path.Combine(parts)} from the current test context.");
-    }
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
-    private sealed class TranslationFixtureDefinition
-    {
-        public required IReadOnlyList<FixtureOverlayRoot> OverlayRoots { get; init; }
-    }
-
-    private sealed class FixtureOverlayRoot
-    {
-        public required string Lemma { get; init; }
-        public required string SymbolicCore { get; init; }
-        public required string OperatorCompatibility { get; init; }
-        public required string ReservedDomainStatus { get; init; }
-        public required IReadOnlyList<string> DisciplinaryReservations { get; init; }
-        public required IReadOnlyList<string> VariantExamples { get; init; }
     }
 }

@@ -52,6 +52,21 @@ Within that bundle, Cryptic is the source domain of identity-bearing inscription
 
 Within that same stack, Sanctuary provides a collective symbolic nervous system through SLI, while `OE` and `cOE` preserve the individuated continuity and custody of each CME.
 
+The stack therefore distinguishes a prior coherence regime from later accountable surfaces:
+
+- CradleTek hosts conditions
+- `OE/cOE` act as continuity-binding conditions rather than flat modules
+- `SelfGEL/cSelfGEL` appear as the first stabilized self-readable surfaces within that coherence regime
+- proposition-bearing stabilization occurs before morphism candidacy
+- Sanctuary governs only what has localized enough to become proposition-bearing, observable, admissible, and accountable
+
+The governing seam is formalized in `docs/WEAVE_TO_PROPOSITION_STABILIZATION_MODEL.md` as:
+
+1. pre-instantiated coherence
+2. proposition-bearing stabilization
+3. admissible proposition surface
+4. Sanctuary-governed accountability
+
 ## Primary Stack Objects
 
 ### CradleTek
@@ -348,6 +363,8 @@ Ontological class:
 Primary purpose:
 
 - hold provisional, local, exploratory, or operator-bonded build-out structures before they are admitted as governed shared state
+- participate in the continuity-binding regime by which later localizable self-readable surfaces can hold together without becoming root substrate
+- remain continuity-binding conditions within pre-instantiated coherence rather than ordinary stack modules or already-instantiated root substrate
 
 Authority status:
 
@@ -457,6 +474,8 @@ Ontological class:
 Primary purpose:
 
 - provide mediated protected self-state and bounded working self-state for a CME runtime under SoulFrame and AgentiCore law
+- localize the first stabilized self-readable surfaces that emerge within a prior coherence-binding regime
+- mark proposition-bearing stabilization without becoming governed identity or root substrate by default
 
 Authority status:
 
@@ -471,6 +490,9 @@ Placement default:
 - `cSelfGEL` is issued through SoulFrame as mediated protected self-state
 - `SelfGEL` is the active bounded working self-state in AgentiCore
 - neither surface is the same thing as direct sovereign custody
+- neither surface is the root substrate of the weave that precedes stabilized self-readable formation
+
+Admissibility and Sanctuary-governed accountability remain later governance thresholds over these stabilized self-readable surfaces.
 
 ### CME
 

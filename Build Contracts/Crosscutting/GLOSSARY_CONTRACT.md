@@ -296,7 +296,7 @@ Contract fields:
 ### OE
 
 - Status: `canonical`
-- Meaning: private or local relative overlay domain for provisional, local, or mission-bound working state
+- Meaning: private or local relative overlay domain for provisional, local, or mission-bound working state inside a prior continuity-binding regime
 
 Contract fields:
 - Layer: local or provisional working domain
@@ -309,7 +309,7 @@ Contract fields:
 ### SelfGEL
 
 - Status: `canonical`
-- Meaning: self-oriented GEL-like surface for local or bonded self-state formation
+- Meaning: self-oriented GEL-like surface for local or bonded self-state formation and the first stabilized self-readable Prime-facing surface within a prior coherence regime
 
 Contract fields:
 - Layer: self-state
@@ -322,7 +322,7 @@ Contract fields:
 ### cSelfGEL
 
 - Status: `canonical`
-- Meaning: cryptic counterpart to self-oriented GEL-like surfaces
+- Meaning: cryptic counterpart to self-oriented GEL-like surfaces and the first stabilized protected self-readable surface within a prior coherence regime
 
 Contract fields:
 - Layer: cryptic self-state
@@ -331,6 +331,38 @@ Contract fields:
 - Identity relation: identity-coupled
 - Persistence type: protected self-scoped storage
 - Mutation rule: must not silently promote to Prime or GEL
+
+### Pre-Instantiated Coherence
+
+- Status: `canonical`
+- Meaning: the latent formative weave from which localizable proposition-bearing and identity-bearing surfaces may later emerge
+- Usage:
+  - use for doctrine describing the binding condition that precedes stabilized surface formation
+  - do not flatten into an ordinary stack module or already-instantiated object
+
+### Proposition-Bearing Stabilization
+
+- Status: `canonical`
+- Meaning: the first threshold at which a stable, inspectable, repeatable proposition-bearing formation can appear
+- Usage:
+  - use for the layer prior to morphism candidacy and prior to governed identity
+  - do not treat as equivalent to accepted truth or automatic custody eligibility
+
+### Admissible Proposition Surface
+
+- Status: `canonical`
+- Meaning: proposition-bearing structure that has become fit for observation, review, governance intake, and possible downstream handling
+- Usage:
+  - use when proposition-bearing structure has crossed into admissibility
+  - do not treat as governed identity by default
+
+### Admissible Identity Surface
+
+- Status: `canonical`
+- Meaning: a later accountable surface at which governed identity may be recognized under Sanctuary law
+- Usage:
+  - use for identity-bearing admissibility under governance and accountability
+  - do not collapse this back into mere proposition stabilization
 
 ### CME
 

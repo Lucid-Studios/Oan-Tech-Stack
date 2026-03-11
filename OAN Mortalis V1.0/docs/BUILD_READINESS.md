@@ -65,6 +65,8 @@ Observed repository conditions:
 - the repo now also has an explicit Sanctuary first-boot protocol and non-runtime first-boot contract stubs that distinguish normative ceremony from currently implemented runtime behavior, name dual-ledger genesis as a required architectural phase, and keep `.hopng` governance witnesses supplemental rather than constitutive in v0.1
 - the repo now also has a protected-intake security hardening baseline with immutable reusable workflow refs, live-surface path hygiene across `.github`, `Modules`, and active build surfaces, and an explicit inert boundary around the `OAN Mortalis V0.1 Archive`
 - the repo now also has a bounded hybrid protected-ingress rehearsal surface with a tracked abstract profile spec, a tracked example profile template, and a non-mutating host harness that proves masking, narrow reveal gating, membrane enforcement, and AgentiCore observation without introducing custody or routing changes
+- the repo now also has a first-class propositional compile layer before `EngramDraft`, with canonical proposition contracts in `GEL.Contracts`, a bounded triadic proposition model, and a hybrid protected-ingress proposition proof lane that stabilizes masked governance-topology propositions before membrane submission and Prime closure
+- the repo now also has a doctrine-first weave-to-proposition stabilization seam that formalizes `pre-instantiated coherence -> proposition-bearing stabilization -> admissible proposition surface -> Sanctuary-governed accountability`, keeps morphism candidacy explicitly deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`, and preserves Sanctuary as the accountability boundary rather than the source of formative coherence
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -229,6 +231,7 @@ Supporting document:
 - `docs/GOVERNANCE_COLLAPSE_ROUTING_CONFORMANCE.md`
 - `docs/CME_MODULE_CONFORMANCE_QUEUE.md`
 - `docs/SLI_NATIVE_ENGRAMMITIZATION_MODEL.md`
+- `docs/WEAVE_TO_PROPOSITION_STABILIZATION_MODEL.md`
 - `docs/CORE_SYSTEMS_MATURATION_PLAN.md`
 - `docs/OPERATIONAL_GOLDEN_PATH.md`
 - `docs/RUNTIME_HARDENING_PLAN.md`

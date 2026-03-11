@@ -1,5 +1,6 @@
 using CradleTek.Memory.Interfaces;
 using CradleTek.Memory.Models;
+using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SoulFrame.Host;
 
@@ -31,6 +32,7 @@ public sealed class SliExecutionContext
     public List<string> PrunedBranches { get; } = [];
     public SliExecutionGraph ExecutionGraph { get; } = new();
     internal SliMorphologyState MorphologyState { get; } = new();
+    internal SliPropositionState PropositionState { get; } = new();
     public string FinalDecision { get; set; } = "defer";
 
     public void AddTrace(string trace)

@@ -25,6 +25,8 @@ Qualification criteria for first-route holding are defined in `docs/CME_COLLAPSE
 
 A CME instantiates from lawful mediated continuity, thinks in bounded `SelfGEL` inside AgentiCore, uses Lisp-based SLI and Engineered Cognition as the native morphological and engrammitizing organism during runtime, and collapses Cryptic-first by mediated transfer from `SelfGEL` into `cSelfGEL`, then first into `cGoA` or `cMoS` according to protected classification, with any later `MoS` promotion or Dream eligibility occurring only after deeper curation.
 
+This runtime sentence begins only after the prior doctrine chain has crossed from pre-instantiated coherence through proposition-bearing stabilization and admissible proposition surface into Sanctuary-governed accountability. `OE/cOE` and later `SelfGEL/cSelfGEL` are not the root substrate of that regime; they are continuity-binding and stabilized surfaces within it.
+
 ## Runtime Roles
 
 ### CradleTek
@@ -198,6 +200,8 @@ The lawful instantiation path is:
 -> SoulFrame-mediated `cSelfGEL`
 -> AgentiCore-bounded `SelfGEL`
 -> active CME runtime
+
+This path assumes the coherence -> proposition-bearing stabilization -> admissible proposition surface -> Sanctuary-governed accountability chain has already localized enough for runtime instantiation. It does not yet imply morphism-bearing transport capability by itself, and the later morphism doctrine remains deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
 
 At birth, the runtime is layered as:
 
