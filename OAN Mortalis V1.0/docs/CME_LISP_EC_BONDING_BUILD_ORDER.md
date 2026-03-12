@@ -63,6 +63,14 @@ The runtime code uses `locality` and `anchor` names instead of raw `bond-*` oper
 - add an internal rehearsal execution path that remains non-binding, pre-admissible, non-transporting, and non-canonical by default
 - prove rehearsal requires completed locality, perspective, and participation before branch-local exploration may form
 
+### D witness / morphism candidacy
+
+- add an internal witness state lane nested under higher-order locality
+- add bounded witness primitives and witness composite expansion in Lisp
+- add an internal witness execution path that compares lawful localities and rehearsal branches without granting transport
+- materialize preserved invariants, lawful differences, typed residues, glue thresholds, and candidacy status without mutating custody, governance, or identity surfaces
+- prove comparison precedes gluing and candidacy precedes transport
+
 ## Deferred
 
 The current repo state does not implement:
@@ -95,3 +103,10 @@ Rehearsal extends that boundary without changing its law:
 - rehearsal is explicitly invoked
 - rehearsal is not a required canonical cognition step
 - rehearsal may vary a world, but it may not vary who is lawfully bound to that world
+
+Witness extends the boundary without crossing it:
+
+- witness is internal-first
+- witness compares lawful localities and rehearsal branches before any gluing claim
+- witness may name preserved structure, lawful difference, and residue
+- a candidate morphism is not yet a transport permission

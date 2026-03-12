@@ -161,6 +161,7 @@ public sealed class SliSymbolTable
 
         RegisterHigherOrderLocalityOperators();
         RegisterBoundedRehearsalOperators();
+        RegisterBoundedWitnessOperators();
 
         Register("morph-root", (expression, context, _) =>
         {
@@ -874,6 +875,268 @@ public sealed class SliSymbolTable
         });
     }
 
+    private void RegisterBoundedWitnessOperators()
+    {
+        Register("witness-begin", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var witness = state.Witness;
+
+            var missingPrerequisites =
+                string.IsNullOrWhiteSpace(state.LocalityHandle) ||
+                !state.Perspective.IsConfigured ||
+                !state.Participation.IsConfigured;
+
+            if (missingPrerequisites)
+            {
+                witness.IsConfigured = false;
+                witness.CandidacyStatus = SliWitnessState.NonCandidate;
+                witness.Warnings.Add("witness-begin requires completed locality, perspective, and participation.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.MissingWitnessPrerequisites,
+                    "witness-begin",
+                    "Witness formation requires completed locality, perspective, and participation.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteWitness,
+                    "witness-begin",
+                    "Witness remained incomplete because prerequisites were missing.");
+                context.AddTrace("witness-begin(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("witness-incomplete"));
+            }
+
+            var leftToken = UnwrapStringLiteral(Arg(expression, 1, "locality-state"));
+            var rightToken = UnwrapStringLiteral(Arg(expression, 2, "locality-state"));
+
+            var leftResolved = TryResolveWitnessReference(context, leftToken, out var leftHandle);
+            var rightResolved = TryResolveWitnessReference(context, rightToken, out var rightHandle);
+            if (!leftResolved || !rightResolved)
+            {
+                witness.IsConfigured = false;
+                witness.CandidacyStatus = SliWitnessState.NonCandidate;
+                witness.Warnings.Add("witness-begin rejected an unresolved locality or rehearsal branch reference.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.InvalidWitnessReference,
+                    "witness-begin",
+                    $"Witness rejected unresolved references '{leftToken}' and/or '{rightToken}'.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteWitness,
+                    "witness-begin",
+                    "Witness remained incomplete because a comparison reference could not be resolved.");
+                context.AddTrace("witness-begin(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("witness-invalid-reference"));
+            }
+
+            witness.Configure(leftHandle, rightHandle);
+            context.AddTrace($"witness-begin({leftToken}|{rightToken})");
+            return Task.FromResult(SExpression.AtomNode("witness-begin"));
+        });
+
+        Register("witness-compare", (expression, context, _) =>
+        {
+            var witness = context.HigherOrderLocalityState.Witness;
+            if (!witness.IsConfigured)
+            {
+                witness.Warnings.Add("witness-compare requires witness-begin.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteWitness,
+                    "witness-compare",
+                    "Comparison requires an active witness.");
+                context.AddTrace("witness-compare(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("witness-compare-incomplete"));
+            }
+
+            witness.CandidacyStatus = SliWitnessState.Comparable;
+            context.AddTrace($"witness-compare({witness.LeftLocalityHandle}|{witness.RightLocalityHandle})");
+            return Task.FromResult(SExpression.AtomNode("witness-compare"));
+        });
+
+        Register("witness-preserve", (expression, context, _) =>
+        {
+            var witness = context.HigherOrderLocalityState.Witness;
+            if (!witness.IsConfigured)
+            {
+                witness.Warnings.Add("witness-preserve requires witness-begin.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteWitness,
+                    "witness-preserve",
+                    "Preservation claims require an active witness.");
+                context.AddTrace("witness-preserve(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("witness-preserve-incomplete"));
+            }
+
+            var invariant = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(invariant) &&
+                !witness.PreservedInvariants.Contains(invariant, StringComparer.OrdinalIgnoreCase))
+            {
+                witness.PreservedInvariants.Add(invariant);
+                context.AddTrace($"witness-preserve({invariant})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("witness-preserve"));
+        });
+
+        Register("witness-difference", (expression, context, _) =>
+        {
+            var witness = context.HigherOrderLocalityState.Witness;
+            if (!witness.IsConfigured)
+            {
+                witness.Warnings.Add("witness-difference requires witness-begin.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteWitness,
+                    "witness-difference",
+                    "Difference claims require an active witness.");
+                context.AddTrace("witness-difference(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("witness-difference-incomplete"));
+            }
+
+            var difference = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(difference) &&
+                !witness.DifferenceSet.Contains(difference, StringComparer.OrdinalIgnoreCase))
+            {
+                witness.DifferenceSet.Add(difference);
+                context.AddTrace($"witness-difference({difference})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("witness-difference"));
+        });
+
+        Register("witness-residue", (expression, context, _) =>
+        {
+            var witness = context.HigherOrderLocalityState.Witness;
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "witness residue"));
+            AddResidue(
+                context,
+                witness.Residues,
+                HigherOrderLocalityResidueKind.LawfulDifferenceResidue,
+                "witness-residue",
+                detail);
+            context.AddTrace($"witness-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("witness-residue"));
+        });
+
+        Register("glue-threshold", (expression, context, _) =>
+        {
+            var witness = context.HigherOrderLocalityState.Witness;
+            var rawValue = UnwrapStringLiteral(Arg(expression, 1, SliWitnessState.DefaultGlueThreshold.ToString("0.00", CultureInfo.InvariantCulture)));
+            if (!double.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var threshold) ||
+                threshold < 0.0 ||
+                threshold > 1.0)
+            {
+                witness.GlueThreshold = SliWitnessState.DefaultGlueThreshold;
+                witness.Warnings.Add($"glue-threshold rejected invalid value '{rawValue}'.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.InvalidGlueThreshold,
+                    "glue-threshold",
+                    $"Rejected invalid glue threshold '{rawValue}'.");
+                context.AddTrace($"glue-threshold({witness.GlueThreshold.ToString("0.00", CultureInfo.InvariantCulture)})");
+                return Task.FromResult(SExpression.AtomNode("glue-threshold-invalid"));
+            }
+
+            witness.GlueThreshold = threshold;
+            context.AddTrace($"glue-threshold({threshold.ToString("0.00", CultureInfo.InvariantCulture)})");
+            return Task.FromResult(SExpression.AtomNode("glue-threshold"));
+        });
+
+        Register("morphism-candidate", (expression, context, _) =>
+        {
+            var witness = context.HigherOrderLocalityState.Witness;
+            if (!witness.IsConfigured)
+            {
+                witness.CandidacyStatus = SliWitnessState.NonCandidate;
+                witness.Warnings.Add("morphism-candidate requires witness-begin.");
+                AddResidue(
+                    context,
+                    witness.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteWitness,
+                    "morphism-candidate",
+                    "Morphism candidacy requires an active witness.");
+                context.AddTrace("morphism-candidate(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("morphism-incomplete"));
+            }
+
+            var blockingResidues = witness.Residues.Any(residue =>
+                residue.Kind is HigherOrderLocalityResidueKind.MissingWitnessPrerequisites or
+                    HigherOrderLocalityResidueKind.InvalidWitnessReference or
+                    HigherOrderLocalityResidueKind.InvalidGlueThreshold or
+                    HigherOrderLocalityResidueKind.IncompleteWitness);
+
+            var missingPreservedInvariants = RequiredWitnessInvariants()
+                .Except(witness.PreservedInvariants, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            var disallowedDifferences = witness.DifferenceSet
+                .Where(difference => !AllowedWitnessDifferences().Contains(difference, StringComparer.OrdinalIgnoreCase))
+                .ToArray();
+
+            if (blockingResidues)
+            {
+                witness.CandidacyStatus = SliWitnessState.NonCandidate;
+                context.AddTrace("morphism-candidate(non-candidate)");
+                return Task.FromResult(SExpression.AtomNode("morphism-non-candidate"));
+            }
+
+            if (missingPreservedInvariants.Length > 0 ||
+                disallowedDifferences.Length > 0 ||
+                witness.GlueThreshold < SliWitnessState.DefaultGlueThreshold)
+            {
+                witness.CandidacyStatus = SliWitnessState.Comparable;
+
+                if (missingPreservedInvariants.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        witness.Residues,
+                        HigherOrderLocalityResidueKind.NonCandidateWitness,
+                        "morphism-candidate",
+                        $"Missing preserved invariants: {string.Join(", ", missingPreservedInvariants)}.");
+                }
+
+                if (disallowedDifferences.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        witness.Residues,
+                        HigherOrderLocalityResidueKind.NonCandidateWitness,
+                        "morphism-candidate",
+                        $"Differences are not morphism-safe: {string.Join(", ", disallowedDifferences)}.");
+                }
+
+                if (witness.GlueThreshold < SliWitnessState.DefaultGlueThreshold)
+                {
+                    AddResidue(
+                        context,
+                        witness.Residues,
+                        HigherOrderLocalityResidueKind.NonCandidateWitness,
+                        "morphism-candidate",
+                        $"Glue threshold {witness.GlueThreshold.ToString("0.00", CultureInfo.InvariantCulture)} remained below candidacy floor.");
+                }
+
+                context.AddTrace("morphism-candidate(comparable)");
+                return Task.FromResult(SExpression.AtomNode("morphism-comparable"));
+            }
+
+            witness.CandidacyStatus = SliWitnessState.MorphismCandidate;
+            context.AddTrace("morphism-candidate(candidate)");
+            return Task.FromResult(SExpression.AtomNode("morphism-candidate"));
+        });
+    }
+
     private static void AddResidue(
         SliExecutionContext context,
         ICollection<HigherOrderLocalityResidue> scopedResidues,
@@ -918,6 +1181,67 @@ public sealed class SliSymbolTable
         }
 
         return SliRehearsalState.DreamGameMode;
+    }
+
+    private static IReadOnlyList<string> RequiredWitnessInvariants()
+    {
+        return
+        [
+            "self-anchor-polarity",
+            "other-anchor-polarity",
+            "relation-anchor-polarity",
+            "seal-posture-bound",
+            "reveal-posture-bound",
+            "participation-mode-limit",
+            "identity-nonbinding"
+        ];
+    }
+
+    private static IReadOnlyList<string> AllowedWitnessDifferences()
+    {
+        return
+        [
+            "rehearsal-branch",
+            "substitution",
+            "analogy",
+            "branch-context"
+        ];
+    }
+
+    private static bool TryResolveWitnessReference(SliExecutionContext context, string token, out string resolvedHandle)
+    {
+        resolvedHandle = string.Empty;
+        var state = context.HigherOrderLocalityState;
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return false;
+        }
+
+        if (string.Equals(token, "locality-state", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(token, state.LocalityHandle, StringComparison.OrdinalIgnoreCase))
+        {
+            resolvedHandle = state.LocalityHandle;
+            return !string.IsNullOrWhiteSpace(resolvedHandle);
+        }
+
+        if (!state.Rehearsal.IsConfigured)
+        {
+            return false;
+        }
+
+        if (state.Rehearsal.BranchSet.Contains(token, StringComparer.OrdinalIgnoreCase))
+        {
+            resolvedHandle = $"{state.Rehearsal.RehearsalHandle}:branch:{token}";
+            return true;
+        }
+
+        if (token.StartsWith($"{state.Rehearsal.RehearsalHandle}:branch:", StringComparison.OrdinalIgnoreCase))
+        {
+            resolvedHandle = token;
+            return true;
+        }
+
+        return false;
     }
 
     private static string Arg(SExpression expression, int index, string fallback)

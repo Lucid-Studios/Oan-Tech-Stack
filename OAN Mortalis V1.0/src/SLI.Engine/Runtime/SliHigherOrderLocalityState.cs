@@ -11,7 +11,13 @@ internal enum HigherOrderLocalityResidueKind
     MissingRehearsalPrerequisites,
     InvalidRehearsalMode,
     InvalidIdentitySeal,
-    IncompleteRehearsal
+    IncompleteRehearsal,
+    MissingWitnessPrerequisites,
+    InvalidWitnessReference,
+    InvalidGlueThreshold,
+    IncompleteWitness,
+    LawfulDifferenceResidue,
+    NonCandidateWitness
 }
 
 internal sealed class HigherOrderLocalityResidue
@@ -116,6 +122,49 @@ internal sealed class SliRehearsalState
     }
 }
 
+internal sealed class SliWitnessState
+{
+    public const string NonCandidate = "non-candidate";
+    public const string Comparable = "comparable";
+    public const string MorphismCandidate = "morphism-candidate";
+    public const double DefaultGlueThreshold = 0.75;
+
+    public bool IsConfigured { get; set; }
+    public string WitnessHandle { get; private set; } = string.Empty;
+    public string LeftLocalityHandle { get; private set; } = string.Empty;
+    public string RightLocalityHandle { get; private set; } = string.Empty;
+    public List<string> PreservedInvariants { get; } = [];
+    public List<string> DifferenceSet { get; } = [];
+    public double GlueThreshold { get; set; } = DefaultGlueThreshold;
+    public string CandidacyStatus { get; set; } = NonCandidate;
+    public List<string> Warnings { get; } = [];
+    public List<HigherOrderLocalityResidue> Residues { get; } = [];
+
+    public void Reset()
+    {
+        IsConfigured = false;
+        WitnessHandle = string.Empty;
+        LeftLocalityHandle = string.Empty;
+        RightLocalityHandle = string.Empty;
+        PreservedInvariants.Clear();
+        DifferenceSet.Clear();
+        GlueThreshold = DefaultGlueThreshold;
+        CandidacyStatus = NonCandidate;
+        Warnings.Clear();
+        Residues.Clear();
+    }
+
+    public void Configure(string leftLocalityHandle, string rightLocalityHandle)
+    {
+        Reset();
+        IsConfigured = true;
+        LeftLocalityHandle = leftLocalityHandle;
+        RightLocalityHandle = rightLocalityHandle;
+        WitnessHandle = $"{leftLocalityHandle}=>{rightLocalityHandle}:witness";
+        CandidacyStatus = Comparable;
+    }
+}
+
 internal sealed class SliHigherOrderLocalityState
 {
     public const string BoundedSealPosture = "bounded";
@@ -133,6 +182,7 @@ internal sealed class SliHigherOrderLocalityState
     public SliPerspectiveState Perspective { get; } = new();
     public SliParticipationState Participation { get; } = new();
     public SliRehearsalState Rehearsal { get; } = new();
+    public SliWitnessState Witness { get; } = new();
 
     public void Reset(string localityHandle)
     {
@@ -147,6 +197,7 @@ internal sealed class SliHigherOrderLocalityState
         Perspective.Reset();
         Participation.Reset();
         Rehearsal.Reset();
+        Witness.Reset();
     }
 
     public void AddWarning(string warning)

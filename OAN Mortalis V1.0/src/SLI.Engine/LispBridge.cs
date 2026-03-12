@@ -23,7 +23,8 @@ public sealed class LispBridge
         "compass.lisp",
         "morphology.lisp",
         "locality.lisp",
-        "rehearsal.lisp"
+        "rehearsal.lisp",
+        "witness.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
@@ -161,6 +162,34 @@ public sealed class LispBridge
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         return CreateBoundedRehearsalResult(context);
+    }
+
+    internal async Task<SliBoundedWitnessResult> ExecuteBoundedWitnessProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "witness-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return CreateBoundedWitnessResult(context);
     }
 
     internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
@@ -545,6 +574,30 @@ public sealed class LispBridge
                         Target = entry.Target
                     })
                     .ToArray(),
+                Warnings = state.Warnings.ToArray(),
+                Residues = CloneResidues(state.Residues)
+            },
+            SymbolicTrace = context.TraceLines.ToArray()
+        };
+    }
+
+    private static SliBoundedWitnessResult CreateBoundedWitnessResult(SliExecutionContext context)
+    {
+        var state = context.HigherOrderLocalityState.Witness;
+        return new SliBoundedWitnessResult
+        {
+            Locality = CreateHigherOrderLocalityResult(context),
+            Rehearsal = CreateBoundedRehearsalResult(context).Rehearsal,
+            Witness = new SliWitnessResult
+            {
+                IsConfigured = state.IsConfigured,
+                WitnessHandle = state.WitnessHandle,
+                LeftLocalityHandle = state.LeftLocalityHandle,
+                RightLocalityHandle = state.RightLocalityHandle,
+                PreservedInvariants = state.PreservedInvariants.ToArray(),
+                DifferenceSet = state.DifferenceSet.ToArray(),
+                GlueThreshold = state.GlueThreshold,
+                CandidacyStatus = state.CandidacyStatus,
                 Warnings = state.Warnings.ToArray(),
                 Residues = CloneResidues(state.Residues)
             },

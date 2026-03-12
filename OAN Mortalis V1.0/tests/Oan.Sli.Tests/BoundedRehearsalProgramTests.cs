@@ -84,7 +84,7 @@ public sealed class BoundedRehearsalProgramTests
     }
 
     [Fact]
-    public async Task RehearsalCannotExposeWitnessOrTransportOperators()
+    public async Task RehearsalCannotExposeUnsupportedWitnessPacketOrTransportOperators()
     {
         var bridge = await CreateBridgeAsync();
 
@@ -95,14 +95,12 @@ public sealed class BoundedRehearsalProgramTests
                 "(participation-bounded-cme locality-state)",
                 "(rehearsal-bounded-exploration locality-state branch-a identity-continuity alternate-world)",
                 "(witness-packet locality-state)",
-                "(transport-begin locality-state)",
-                "(morphism-candidate locality-state)"
+                "(transport-begin locality-state)"
             ],
             "identity-continuity");
 
         Assert.Contains("unknown-op(witness-packet)", result.SymbolicTrace);
         Assert.Contains("unknown-op(transport-begin)", result.SymbolicTrace);
-        Assert.Contains("unknown-op(morphism-candidate)", result.SymbolicTrace);
     }
 
     [Fact]

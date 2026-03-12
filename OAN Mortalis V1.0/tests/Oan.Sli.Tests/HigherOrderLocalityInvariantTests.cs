@@ -20,6 +20,8 @@ public sealed class HigherOrderLocalityInvariantTests
                 "(locality-bootstrap context cme-self task-objective identity-continuity)",
                 "(perspective-bounded-observer locality-state task-objective identity-continuity)",
                 "(participation-bounded-cme locality-state)",
+                "(rehearsal-bounded-exploration locality-state branch-a identity-continuity alternate-world)",
+                "(witness-branch-compare locality-state branch-a)",
                 "(seal-posture permeable)",
                 "(participation-mode improvise)"
             ]);
@@ -98,6 +100,43 @@ public sealed class HigherOrderLocalityInvariantTests
     }
 
     [Fact]
+    public void WitnessComposite_ExpandsOnlyToBoundedWitnessOps()
+    {
+        var parser = new SliParser();
+        var expander = new SliBoundedCompositionExpander(LispModuleCatalog.LoadModules());
+        var program = parser.ParseProgram(
+            [
+                "(witness-branch-compare locality-state branch-a)"
+            ]);
+
+        var expanded = expander.ExpandProgram(program);
+        var ops = expanded
+            .Select(expression => expression.Children[0].Atom ?? string.Empty)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "witness-begin",
+                "witness-compare",
+                "witness-preserve",
+                "witness-preserve",
+                "witness-preserve",
+                "witness-preserve",
+                "witness-preserve",
+                "witness-preserve",
+                "witness-preserve",
+                "witness-difference",
+                "witness-difference",
+                "witness-residue",
+                "glue-threshold",
+                "morphism-candidate"
+            ],
+            ops);
+
+        Assert.DoesNotContain(ops, op => op.StartsWith("transport-", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void HigherOrderLocalitySurface_RemainsFreeOfCustodyAndGovernanceHandles()
     {
         var symbolTable = new SliSymbolTable();
@@ -113,10 +152,20 @@ public sealed class HigherOrderLocalityInvariantTests
             .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Select(property => property.Name)
             .ToArray();
+        var rehearsalProperties = typeof(SliRehearsalState)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(property => property.Name)
+            .ToArray();
+        var witnessProperties = typeof(SliWitnessState)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(property => property.Name)
+            .ToArray();
 
         var allProperties = localityProperties
             .Concat(perspectiveProperties)
             .Concat(participationProperties)
+            .Concat(rehearsalProperties)
+            .Concat(witnessProperties)
             .ToArray();
 
         Assert.DoesNotContain(allProperties, name => name.Contains("GEL", StringComparison.OrdinalIgnoreCase));
