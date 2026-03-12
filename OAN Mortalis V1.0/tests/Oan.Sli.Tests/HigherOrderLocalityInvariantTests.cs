@@ -78,6 +78,29 @@ public sealed class HigherOrderLocalityInvariantTests
     }
 
     [Fact]
+    public async Task AdmissibleSurfacePrograms_DoNotMutateMorphologyPropositionOrDecisionSurfaces()
+    {
+        var context = await ExecuteContextAsync(
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)",
+                "(witness-locality-compare locality-state locality-state)",
+                "(transport-bounded witness-state locality-state locality-state)",
+                "(transport-status completed)",
+                "(admissible-surface-bounded transport-state comparative informational-only)",
+                "(surface-status formed)"
+            ]);
+
+        Assert.Empty(context.MorphologyState.ResolvedLemmaRoots);
+        Assert.Equal(string.Empty, context.PropositionState.PredicateRoot);
+        Assert.Equal("defer", context.FinalDecision);
+        Assert.Empty(context.CandidateBranches);
+        Assert.Empty(context.PrunedBranches);
+        Assert.Equal(SliAdmissibleSurfaceState.Formed, context.HigherOrderLocalityState.AdmissibleSurface.Status);
+    }
+
+    [Fact]
     public void CompositeForms_ExpandOnlyToBoundedLocalityOps()
     {
         var parser = new SliParser();
@@ -190,6 +213,39 @@ public sealed class HigherOrderLocalityInvariantTests
 
         Assert.DoesNotContain(ops, op => op.StartsWith("sanctuary-", StringComparison.Ordinal));
         Assert.DoesNotContain(ops, op => op.StartsWith("custody-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("surface-", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AdmissibleSurfaceComposite_ExpandsOnlyToBoundedSurfaceOps()
+    {
+        var parser = new SliParser();
+        var expander = new SliBoundedCompositionExpander(LispModuleCatalog.LoadModules());
+        var program = parser.ParseProgram(
+            [
+                "(admissible-surface-bounded transport-state comparative informational-only)"
+            ]);
+
+        var expanded = expander.ExpandProgram(program);
+        var ops = expanded
+            .Select(expression => expression.Children[0].Atom ?? string.Empty)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "surface-begin",
+                "surface-source",
+                "surface-class",
+                "surface-reveal",
+                "surface-boundary",
+                "surface-evidence",
+                "surface-evidence",
+                "surface-status"
+            ],
+            ops);
+
+        Assert.DoesNotContain(ops, op => op.StartsWith("sanctuary-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("custody-", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -220,6 +276,10 @@ public sealed class HigherOrderLocalityInvariantTests
             .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Select(property => property.Name)
             .ToArray();
+        var admissibleSurfaceProperties = typeof(SliAdmissibleSurfaceState)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(property => property.Name)
+            .ToArray();
 
         var allProperties = localityProperties
             .Concat(perspectiveProperties)
@@ -227,6 +287,7 @@ public sealed class HigherOrderLocalityInvariantTests
             .Concat(rehearsalProperties)
             .Concat(witnessProperties)
             .Concat(transportProperties)
+            .Concat(admissibleSurfaceProperties)
             .ToArray();
 
         Assert.DoesNotContain(allProperties, name => name.Contains("GEL", StringComparison.OrdinalIgnoreCase));

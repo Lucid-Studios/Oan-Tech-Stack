@@ -25,7 +25,8 @@ public sealed class LispBridge
         "locality.lisp",
         "rehearsal.lisp",
         "witness.lisp",
-        "transport.lisp"
+        "transport.lisp",
+        "admissibility.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
@@ -219,6 +220,34 @@ public sealed class LispBridge
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         return CreateBoundedTransportResult(context);
+    }
+
+    internal async Task<SliBoundedAdmissibleSurfaceResult> ExecuteAdmissibleSurfaceProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "admissibility-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return CreateAdmissibleSurfaceResult(context);
     }
 
     internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
@@ -657,6 +686,35 @@ public sealed class LispBridge
                         Target = entry.Target
                     })
                     .ToArray(),
+                Warnings = state.Warnings.ToArray(),
+                Residues = CloneResidues(state.Residues),
+                Status = state.Status
+            },
+            SymbolicTrace = context.TraceLines.ToArray()
+        };
+    }
+
+    private static SliBoundedAdmissibleSurfaceResult CreateAdmissibleSurfaceResult(SliExecutionContext context)
+    {
+        var state = context.HigherOrderLocalityState.AdmissibleSurface;
+        return new SliBoundedAdmissibleSurfaceResult
+        {
+            Locality = CreateHigherOrderLocalityResult(context),
+            Rehearsal = CreateBoundedRehearsalResult(context).Rehearsal,
+            Witness = CreateBoundedWitnessResult(context).Witness,
+            Transport = CreateBoundedTransportResult(context).Transport,
+            Surface = new SliAdmissibleSurfaceResult
+            {
+                IsConfigured = state.IsConfigured,
+                SurfaceHandle = state.SurfaceHandle,
+                TransportHandle = state.TransportHandle,
+                SourceLocalityHandle = state.SourceLocalityHandle,
+                TargetLocalityHandle = state.TargetLocalityHandle,
+                SurfaceClass = state.SurfaceClass,
+                IdentityBearingApplicable = state.IdentityBearingApplicable,
+                RevealPosture = state.RevealPosture,
+                Boundary = state.Boundary,
+                EvidenceSet = state.EvidenceSet.ToArray(),
                 Warnings = state.Warnings.ToArray(),
                 Residues = CloneResidues(state.Residues),
                 Status = state.Status

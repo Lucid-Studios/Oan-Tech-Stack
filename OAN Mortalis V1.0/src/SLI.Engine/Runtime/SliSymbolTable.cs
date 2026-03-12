@@ -163,6 +163,7 @@ public sealed class SliSymbolTable
         RegisterBoundedRehearsalOperators();
         RegisterBoundedWitnessOperators();
         RegisterBoundedTransportOperators();
+        RegisterBoundedAdmissibilityOperators();
 
         Register("morph-root", (expression, context, _) =>
         {
@@ -1507,6 +1508,432 @@ public sealed class SliSymbolTable
         });
     }
 
+    private void RegisterBoundedAdmissibilityOperators()
+    {
+        Register("surface-begin", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var transport = state.Transport;
+            var surface = state.AdmissibleSurface;
+            surface.Reset();
+
+            var transportToken = UnwrapStringLiteral(Arg(expression, 1, "transport-state"));
+            if (!TryResolveAdmissibleTransportHandle(state, transportToken, out var transportHandle))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add("surface-begin requires a resolved completed transport handle.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidSurfaceReference,
+                    "surface-begin",
+                    $"Admissible surface rejected unresolved transport reference '{transportToken}'.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-begin",
+                    "Admissible surface remained incomplete because no completed transport handle was available.");
+                context.AddTrace("surface-begin(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("surface-begin-invalid"));
+            }
+
+            var missingPrerequisites =
+                !transport.IsConfigured ||
+                !string.Equals(transport.TransportHandle, transportHandle, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(transport.Status, SliTransportState.Completed, StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(transport.SourceLocalityHandle) ||
+                string.IsNullOrWhiteSpace(transport.TargetLocalityHandle) ||
+                HasBlockingTransportResidues(transport);
+
+            if (missingPrerequisites)
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add("surface-begin requires completed lawful transport with intact preserved invariants.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.MissingAdmissibleSurfacePrerequisites,
+                    "surface-begin",
+                    "Admissible surface formation requires completed transport with explicit source and target localities.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.BlockedAdmissibleSurface,
+                    "surface-begin",
+                    "Admissible surface formation was blocked because transport had not completed lawfully.");
+                context.AddTrace("surface-begin(blocked)");
+                return Task.FromResult(SExpression.AtomNode("surface-begin-blocked"));
+            }
+
+            surface.Configure(transportHandle, transport.SourceLocalityHandle, transport.TargetLocalityHandle);
+            context.AddTrace($"surface-begin({transportToken})");
+            return Task.FromResult(SExpression.AtomNode("surface-begin"));
+        });
+
+        Register("surface-source", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var transport = state.Transport;
+            var surface = state.AdmissibleSurface;
+            if (!surface.IsConfigured)
+            {
+                surface.Warnings.Add("surface-source requires surface-begin.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-source",
+                    "Admissible surface source requires an active surface.");
+                context.AddTrace("surface-source(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("surface-source-incomplete"));
+            }
+
+            var transportToken = UnwrapStringLiteral(Arg(expression, 1, "transport-state"));
+            if (!TryResolveAdmissibleTransportHandle(state, transportToken, out var transportHandle) ||
+                !string.Equals(transport.TransportHandle, transportHandle, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(surface.TransportHandle, transportHandle, StringComparison.OrdinalIgnoreCase))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add("surface-source rejected an unresolved or mismatched transport reference.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidSurfaceReference,
+                    "surface-source",
+                    $"Admissible surface rejected unresolved transport reference '{transportToken}'.");
+                context.AddTrace("surface-source(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("surface-source-invalid"));
+            }
+
+            surface.Configure(transportHandle, transport.SourceLocalityHandle, transport.TargetLocalityHandle);
+            context.AddTrace($"surface-source({transportToken})");
+            return Task.FromResult(SExpression.AtomNode("surface-source"));
+        });
+
+        Register("surface-class", (expression, context, _) =>
+        {
+            var surface = context.HigherOrderLocalityState.AdmissibleSurface;
+            if (!surface.IsConfigured)
+            {
+                surface.Warnings.Add("surface-class requires surface-begin.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-class",
+                    "Admissible surface classification requires an active surface.");
+                context.AddTrace("surface-class(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("surface-class-incomplete"));
+            }
+
+            var requestedClass = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var identityApplicability = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+
+            if (!IsRecognizedSurfaceClass(requestedClass))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add($"surface-class rejected invalid value '{requestedClass}'.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidSurfaceClass,
+                    "surface-class",
+                    $"Rejected invalid admissible surface class '{requestedClass}'.");
+                context.AddTrace("surface-class(invalid)");
+                return Task.FromResult(SExpression.AtomNode("surface-class-invalid"));
+            }
+
+            if (!IsRecognizedIdentityApplicability(identityApplicability))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add($"surface-class rejected invalid identity applicability '{identityApplicability}'.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidIdentityBearingApplicability,
+                    "surface-class",
+                    $"Rejected invalid identity-bearing applicability '{identityApplicability}'.");
+                context.AddTrace("surface-class(invalid-identity-applicability)");
+                return Task.FromResult(SExpression.AtomNode("surface-class-invalid"));
+            }
+
+            surface.SurfaceClass = requestedClass.ToLowerInvariant();
+            surface.IdentityBearingApplicable = string.Equals(
+                identityApplicability,
+                SliAdmissibleSurfaceState.IdentityApplicable,
+                StringComparison.OrdinalIgnoreCase);
+            surface.HasIdentityBearingApplicability = true;
+            context.AddTrace($"surface-class({requestedClass}:{identityApplicability})");
+            return Task.FromResult(SExpression.AtomNode("surface-class"));
+        });
+
+        Register("surface-reveal", (expression, context, _) =>
+        {
+            var surface = context.HigherOrderLocalityState.AdmissibleSurface;
+            if (!surface.IsConfigured)
+            {
+                surface.Warnings.Add("surface-reveal requires surface-begin.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-reveal",
+                    "Admissible surface reveal posture requires an active surface.");
+                context.AddTrace("surface-reveal(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("surface-reveal-incomplete"));
+            }
+
+            var requestedReveal = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.MaskedRevealPosture));
+            if (!string.Equals(requestedReveal, SliHigherOrderLocalityState.MaskedRevealPosture, StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(requestedReveal, "narrow", StringComparison.OrdinalIgnoreCase))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.RevealPosture = ResolveSafeValue(surface.RevealPosture, SliHigherOrderLocalityState.MaskedRevealPosture);
+                surface.Warnings.Add($"surface-reveal rejected invalid value '{requestedReveal}'.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidSurfaceReveal,
+                    "surface-reveal",
+                    $"Rejected invalid admissible surface reveal posture '{requestedReveal}'.");
+                context.AddTrace("surface-reveal(invalid)");
+                return Task.FromResult(SExpression.AtomNode("surface-reveal-invalid"));
+            }
+
+            surface.RevealPosture = requestedReveal.ToLowerInvariant();
+            context.AddTrace($"surface-reveal({requestedReveal})");
+            return Task.FromResult(SExpression.AtomNode("surface-reveal"));
+        });
+
+        Register("surface-boundary", (expression, context, _) =>
+        {
+            var surface = context.HigherOrderLocalityState.AdmissibleSurface;
+            if (!surface.IsConfigured)
+            {
+                surface.Warnings.Add("surface-boundary requires surface-begin.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-boundary",
+                    "Admissible surface boundary requires an active surface.");
+                context.AddTrace("surface-boundary(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("surface-boundary-incomplete"));
+            }
+
+            var requestedBoundary = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.BoundedSealPosture));
+            if (!HasSafeSealPosture(requestedBoundary))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Boundary = ResolveSafeValue(surface.Boundary, SliHigherOrderLocalityState.BoundedSealPosture);
+                surface.Warnings.Add($"surface-boundary rejected invalid value '{requestedBoundary}'.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidSurfaceBoundary,
+                    "surface-boundary",
+                    $"Rejected invalid admissible surface boundary '{requestedBoundary}'.");
+                context.AddTrace("surface-boundary(invalid)");
+                return Task.FromResult(SExpression.AtomNode("surface-boundary-invalid"));
+            }
+
+            surface.Boundary = requestedBoundary.ToLowerInvariant();
+            context.AddTrace($"surface-boundary({requestedBoundary})");
+            return Task.FromResult(SExpression.AtomNode("surface-boundary"));
+        });
+
+        Register("surface-evidence", (expression, context, _) =>
+        {
+            var surface = context.HigherOrderLocalityState.AdmissibleSurface;
+            if (!surface.IsConfigured)
+            {
+                surface.Warnings.Add("surface-evidence requires surface-begin.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-evidence",
+                    "Admissible surface evidence requires an active surface.");
+                context.AddTrace("surface-evidence(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("surface-evidence-incomplete"));
+            }
+
+            var evidence = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(evidence) &&
+                !surface.EvidenceSet.Contains(evidence, StringComparer.OrdinalIgnoreCase))
+            {
+                surface.EvidenceSet.Add(evidence);
+                context.AddTrace($"surface-evidence({evidence})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("surface-evidence"));
+        });
+
+        Register("surface-residue", (expression, context, _) =>
+        {
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "admissible surface residue"));
+            AddResidue(
+                context,
+                context.HigherOrderLocalityState.AdmissibleSurface.Residues,
+                HigherOrderLocalityResidueKind.AdmissibleSurfaceResidue,
+                "surface-residue",
+                detail);
+            context.AddTrace($"surface-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("surface-residue"));
+        });
+
+        Register("surface-status", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var transport = state.Transport;
+            var surface = state.AdmissibleSurface;
+            var requestedStatus = UnwrapStringLiteral(Arg(expression, 1, SliAdmissibleSurfaceState.Candidate));
+
+            if (!surface.IsConfigured)
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add("surface-status requires surface-begin.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface,
+                    "surface-status",
+                    "Admissible surface status changes require an active surface.");
+                context.AddTrace("surface-status(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("surface-status-incomplete"));
+            }
+
+            if (!IsRecognizedSurfaceStatus(requestedStatus))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                surface.Warnings.Add($"surface-status rejected invalid value '{requestedStatus}'.");
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.InvalidSurfaceStatus,
+                    "surface-status",
+                    $"Rejected invalid admissible surface status '{requestedStatus}'.");
+                context.AddTrace("surface-status(invalid)");
+                return Task.FromResult(SExpression.AtomNode("surface-status-invalid"));
+            }
+
+            if (string.Equals(requestedStatus, SliAdmissibleSurfaceState.Blocked, StringComparison.OrdinalIgnoreCase))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+                context.AddTrace("surface-status(blocked)");
+                return Task.FromResult(SExpression.AtomNode("surface-blocked"));
+            }
+
+            if (string.Equals(requestedStatus, SliAdmissibleSurfaceState.Candidate, StringComparison.OrdinalIgnoreCase))
+            {
+                surface.Status = SliAdmissibleSurfaceState.Candidate;
+                context.AddTrace("surface-status(candidate)");
+                return Task.FromResult(SExpression.AtomNode("surface-candidate"));
+            }
+
+            var missingTransportInvariants = RequiredTransportInvariants()
+                .Except(transport.PreservedInvariants, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            var revealWouldWiden = WouldWidenReveal(state.RevealPosture, surface.RevealPosture);
+            var boundaryWouldWiden = WouldWidenBoundary(state.SealPosture, surface.Boundary);
+            var identityApplicabilityConflict =
+                string.Equals(surface.SurfaceClass, SliAdmissibleSurfaceState.IdentityBearingClass, StringComparison.OrdinalIgnoreCase) &&
+                !surface.IdentityBearingApplicable;
+
+            var blocked =
+                !transport.IsConfigured ||
+                !string.Equals(transport.Status, SliTransportState.Completed, StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(surface.TransportHandle) ||
+                !string.Equals(surface.TransportHandle, transport.TransportHandle, StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(surface.SourceLocalityHandle) ||
+                string.IsNullOrWhiteSpace(surface.TargetLocalityHandle) ||
+                string.IsNullOrWhiteSpace(surface.SurfaceClass) ||
+                !surface.HasIdentityBearingApplicability ||
+                surface.EvidenceSet.Count == 0 ||
+                HasBlockingTransportResidues(transport) ||
+                missingTransportInvariants.Length > 0 ||
+                revealWouldWiden ||
+                boundaryWouldWiden ||
+                identityApplicabilityConflict;
+
+            if (blocked)
+            {
+                surface.Status = SliAdmissibleSurfaceState.Blocked;
+
+                if (!transport.IsConfigured ||
+                    !string.Equals(transport.Status, SliTransportState.Completed, StringComparison.OrdinalIgnoreCase) ||
+                    surface.EvidenceSet.Count == 0 ||
+                    string.IsNullOrWhiteSpace(surface.SurfaceClass) ||
+                    !surface.HasIdentityBearingApplicability ||
+                    missingTransportInvariants.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        surface.Residues,
+                        HigherOrderLocalityResidueKind.MissingAdmissibleSurfacePrerequisites,
+                        "surface-status",
+                        $"Admissible surface formation requires completed transport, explicit classing, explicit identity applicability, evidence carriage, and preserved invariants. Missing invariants: {string.Join(", ", missingTransportInvariants)}.");
+                }
+
+                if (string.IsNullOrWhiteSpace(surface.TransportHandle) ||
+                    !string.Equals(surface.TransportHandle, transport.TransportHandle, StringComparison.OrdinalIgnoreCase))
+                {
+                    AddResidue(
+                        context,
+                        surface.Residues,
+                        HigherOrderLocalityResidueKind.InvalidSurfaceReference,
+                        "surface-status",
+                        "Admissible surface formation requires an active transport reference that matches the completed transport lane.");
+                }
+
+                if (revealWouldWiden)
+                {
+                    AddResidue(
+                        context,
+                        surface.Residues,
+                        HigherOrderLocalityResidueKind.InvalidSurfaceReveal,
+                        "surface-status",
+                        $"Admissible surface reveal '{surface.RevealPosture}' would widen locality reveal '{state.RevealPosture}'.");
+                }
+
+                if (boundaryWouldWiden)
+                {
+                    AddResidue(
+                        context,
+                        surface.Residues,
+                        HigherOrderLocalityResidueKind.InvalidSurfaceBoundary,
+                        "surface-status",
+                        $"Admissible surface boundary '{surface.Boundary}' would widen locality seal posture '{state.SealPosture}'.");
+                }
+
+                if (identityApplicabilityConflict)
+                {
+                    AddResidue(
+                        context,
+                        surface.Residues,
+                        HigherOrderLocalityResidueKind.InvalidIdentityBearingApplicability,
+                        "surface-status",
+                        "Identity-bearing surface class requires explicit identity applicability.");
+                }
+
+                AddResidue(
+                    context,
+                    surface.Residues,
+                    HigherOrderLocalityResidueKind.BlockedAdmissibleSurface,
+                    "surface-status",
+                    "Admissible surface remained blocked because the carried structure could not yet be lawfully shaped for inspection.");
+                context.AddTrace("surface-status(blocked)");
+                return Task.FromResult(SExpression.AtomNode("surface-blocked"));
+            }
+
+            surface.Status = SliAdmissibleSurfaceState.Formed;
+            context.AddTrace("surface-status(formed)");
+            return Task.FromResult(SExpression.AtomNode("surface-formed"));
+        });
+    }
+
     private static void AddResidue(
         SliExecutionContext context,
         ICollection<HigherOrderLocalityResidue> scopedResidues,
@@ -1612,6 +2039,38 @@ public sealed class SliSymbolTable
                string.Equals(value, SliTransportState.Completed, StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool IsRecognizedSurfaceClass(string value)
+    {
+        return string.Equals(value, SliAdmissibleSurfaceState.InformationalClass, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAdmissibleSurfaceState.ComparativeClass, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAdmissibleSurfaceState.IdentityBearingClass, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsRecognizedIdentityApplicability(string value)
+    {
+        return string.Equals(value, SliAdmissibleSurfaceState.InformationalOnly, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAdmissibleSurfaceState.IdentityApplicable, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsRecognizedSurfaceStatus(string value)
+    {
+        return string.Equals(value, SliAdmissibleSurfaceState.Blocked, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAdmissibleSurfaceState.Candidate, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAdmissibleSurfaceState.Formed, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool WouldWidenReveal(string localityReveal, string surfaceReveal)
+    {
+        return string.Equals(localityReveal, SliHigherOrderLocalityState.MaskedRevealPosture, StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(surfaceReveal, "narrow", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool WouldWidenBoundary(string localityBoundary, string surfaceBoundary)
+    {
+        return string.Equals(localityBoundary, "sealed", StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(surfaceBoundary, SliHigherOrderLocalityState.BoundedSealPosture, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static bool HasBlockingWitnessResidues(SliWitnessState witness)
     {
         return witness.Residues.Any(residue =>
@@ -1620,6 +2079,17 @@ public sealed class SliSymbolTable
                 HigherOrderLocalityResidueKind.InvalidGlueThreshold or
                 HigherOrderLocalityResidueKind.IncompleteWitness or
                 HigherOrderLocalityResidueKind.NonCandidateWitness);
+    }
+
+    private static bool HasBlockingTransportResidues(SliTransportState transport)
+    {
+        return transport.Residues.Any(residue =>
+            residue.Kind is HigherOrderLocalityResidueKind.MissingTransportPrerequisites or
+                HigherOrderLocalityResidueKind.InvalidTransportReference or
+                HigherOrderLocalityResidueKind.InvalidTransportStatus or
+                HigherOrderLocalityResidueKind.InvalidTransportMapping or
+                HigherOrderLocalityResidueKind.IncompleteTransport or
+                HigherOrderLocalityResidueKind.BlockedTransport);
     }
 
     private static bool TryResolveWitnessReference(SliExecutionContext context, string token, out string resolvedHandle)
@@ -1670,6 +2140,24 @@ public sealed class SliSymbolTable
             string.Equals(token, state.Witness.WitnessHandle, StringComparison.OrdinalIgnoreCase))
         {
             resolvedHandle = state.Witness.WitnessHandle;
+            return !string.IsNullOrWhiteSpace(resolvedHandle);
+        }
+
+        return false;
+    }
+
+    private static bool TryResolveAdmissibleTransportHandle(SliHigherOrderLocalityState state, string token, out string resolvedHandle)
+    {
+        resolvedHandle = string.Empty;
+        if (string.IsNullOrWhiteSpace(token) || !state.Transport.IsConfigured)
+        {
+            return false;
+        }
+
+        if (string.Equals(token, "transport-state", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(token, state.Transport.TransportHandle, StringComparison.OrdinalIgnoreCase))
+        {
+            resolvedHandle = state.Transport.TransportHandle;
             return !string.IsNullOrWhiteSpace(resolvedHandle);
         }
 

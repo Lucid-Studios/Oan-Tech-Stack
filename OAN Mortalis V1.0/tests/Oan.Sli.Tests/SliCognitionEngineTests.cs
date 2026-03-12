@@ -50,6 +50,7 @@ public sealed class SliCognitionEngineTests
         Assert.True(localityIndex < perspectiveIndex);
         Assert.True(perspectiveIndex < participationIndex);
         Assert.True(participationIndex < compassIndex);
+        Assert.DoesNotContain(engine.LastTraceEvent.SymbolicTrace, line => line.Contains("surface-", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -71,6 +72,8 @@ public sealed class SliCognitionEngineTests
         Assert.DoesNotContain(program, line => line.Contains("witness-", StringComparison.Ordinal));
         Assert.DoesNotContain(program, line => line.Contains("morphism-", StringComparison.Ordinal));
         Assert.DoesNotContain(program, line => line.Contains("transport-", StringComparison.Ordinal));
+        Assert.DoesNotContain(program, line => line.Contains("surface-", StringComparison.Ordinal));
+        Assert.DoesNotContain(program, line => line.Contains("admissible-surface", StringComparison.Ordinal));
         CanonicalCognitionCycle.ValidateProgramOrder(program);
     }
 

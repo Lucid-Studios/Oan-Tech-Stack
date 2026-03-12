@@ -22,8 +22,9 @@ The current maturity sequence is:
 - `C = lawful rehearsal`
 - `D = witness / morphism candidacy`
 - `E = lawful transport`
+- `F = admissible surface formation`
 
-Admissible surface formation and Sanctuary-governed accountability remain deferred from the canonical default lane.
+Sanctuary-governed accountability remains deferred from the canonical default lane.
 
 ## Ownership
 
@@ -79,13 +80,20 @@ The runtime code uses `locality` and `anchor` names instead of raw `bond-*` oper
 - materialize preserved-invariant carry, lawful difference mapping, typed residues, and blocked versus completed transport status without invoking admissibility or Sanctuary intake
 - prove transport remains internal, non-canonical, non-custodial, and pre-admissible
 
+### F admissible surface formation
+
+- add an internal admissible surface state lane nested under higher-order locality
+- add bounded admissibility primitives and admissible surface composite expansion in Lisp
+- add an internal admissibility execution path that shapes a completed transport into an inspectable bounded surface without promoting it into governance, custody, or Sanctuary review
+- materialize surface classing, identity-bearing applicability, reveal and boundary shaping, evidence carriage, typed residues, and blocked versus formed surface status without writing to accountability surfaces
+- prove an admissible surface remains internal, non-canonical, non-custodial, and pre-accountability
+
 ## Deferred
 
 The current repo state does not implement:
 
 - witness packets
 - admissibility review
-- admissible surface formation
 - Sanctuary accountability intake
 - governance mutation
 - custody mutation
@@ -93,16 +101,16 @@ The current repo state does not implement:
 
 ## Runtime Boundary
 
-The first slice proves enacted locality only.
+The enacted slices now prove lawful inhabitation, rehearsal, witness-bearing comparison, lawful transport, and admissible surface formation inside bounded runtime space.
 
-It must remain:
+They must remain:
 
 - bounded
+- internal-first
 - non-custodial
 - non-governing
-- non-transporting
-- pre-admissible
 - pre-accountability
+- non-canonical beyond lawful inhabitation
 
 Rehearsal extends that boundary without changing its law:
 
@@ -124,3 +132,11 @@ Transport extends the boundary without resolving it:
 - transport carries only what witness already preserved
 - transport may complete an internal carry without implying admissibility, identity, or accountability
 - a transported result is not yet an admissible identity surface
+
+Admissible surface formation extends the boundary without governing it:
+
+- admissibility is internal-first
+- an admissible surface is shaped from completed lawful transport, not from raw locality or rehearsal
+- an admissible surface may be inspectable and identity-bearing only where applicable
+- an admissible surface is not yet a governed identity event
+- an admissible surface is only the bounded formation a later accountability layer may inspect

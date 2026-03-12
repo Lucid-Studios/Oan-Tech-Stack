@@ -24,7 +24,17 @@ internal enum HigherOrderLocalityResidueKind
     InvalidTransportMapping,
     IncompleteTransport,
     TransportResidue,
-    BlockedTransport
+    BlockedTransport,
+    MissingAdmissibleSurfacePrerequisites,
+    InvalidSurfaceReference,
+    InvalidSurfaceClass,
+    InvalidSurfaceStatus,
+    InvalidSurfaceReveal,
+    InvalidSurfaceBoundary,
+    InvalidIdentityBearingApplicability,
+    IncompleteAdmissibleSurface,
+    AdmissibleSurfaceResidue,
+    BlockedAdmissibleSurface
 }
 
 internal sealed class HigherOrderLocalityResidue
@@ -219,6 +229,62 @@ internal sealed class SliTransportState
     }
 }
 
+internal sealed class SliAdmissibleSurfaceState
+{
+    public const string Blocked = "blocked";
+    public const string Candidate = "candidate";
+    public const string Formed = "formed";
+    public const string InformationalClass = "informational";
+    public const string ComparativeClass = "comparative";
+    public const string IdentityBearingClass = "identity-bearing";
+    public const string InformationalOnly = "informational-only";
+    public const string IdentityApplicable = "identity-applicable";
+
+    public bool IsConfigured { get; set; }
+    public string SurfaceHandle { get; private set; } = string.Empty;
+    public string TransportHandle { get; private set; } = string.Empty;
+    public string SourceLocalityHandle { get; private set; } = string.Empty;
+    public string TargetLocalityHandle { get; private set; } = string.Empty;
+    public string SurfaceClass { get; set; } = string.Empty;
+    public bool IdentityBearingApplicable { get; set; }
+    public bool HasIdentityBearingApplicability { get; set; }
+    public string RevealPosture { get; set; } = SliHigherOrderLocalityState.MaskedRevealPosture;
+    public string Boundary { get; set; } = SliHigherOrderLocalityState.BoundedSealPosture;
+    public List<string> EvidenceSet { get; } = [];
+    public List<string> Warnings { get; } = [];
+    public List<HigherOrderLocalityResidue> Residues { get; } = [];
+    public string Status { get; set; } = Blocked;
+
+    public void Reset()
+    {
+        IsConfigured = false;
+        SurfaceHandle = string.Empty;
+        TransportHandle = string.Empty;
+        SourceLocalityHandle = string.Empty;
+        TargetLocalityHandle = string.Empty;
+        SurfaceClass = string.Empty;
+        IdentityBearingApplicable = false;
+        HasIdentityBearingApplicability = false;
+        RevealPosture = SliHigherOrderLocalityState.MaskedRevealPosture;
+        Boundary = SliHigherOrderLocalityState.BoundedSealPosture;
+        EvidenceSet.Clear();
+        Warnings.Clear();
+        Residues.Clear();
+        Status = Blocked;
+    }
+
+    public void Configure(string transportHandle, string sourceLocalityHandle, string targetLocalityHandle)
+    {
+        Reset();
+        IsConfigured = true;
+        TransportHandle = transportHandle;
+        SourceLocalityHandle = sourceLocalityHandle;
+        TargetLocalityHandle = targetLocalityHandle;
+        SurfaceHandle = $"{transportHandle}:surface";
+        Status = Candidate;
+    }
+}
+
 internal sealed class SliHigherOrderLocalityState
 {
     public const string BoundedSealPosture = "bounded";
@@ -238,6 +304,7 @@ internal sealed class SliHigherOrderLocalityState
     public SliRehearsalState Rehearsal { get; } = new();
     public SliWitnessState Witness { get; } = new();
     public SliTransportState Transport { get; } = new();
+    public SliAdmissibleSurfaceState AdmissibleSurface { get; } = new();
 
     public void Reset(string localityHandle)
     {
@@ -254,6 +321,7 @@ internal sealed class SliHigherOrderLocalityState
         Rehearsal.Reset();
         Witness.Reset();
         Transport.Reset();
+        AdmissibleSurface.Reset();
     }
 
     public void AddWarning(string warning)

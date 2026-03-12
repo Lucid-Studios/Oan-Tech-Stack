@@ -134,7 +134,7 @@ public sealed class HigherOrderLocalityProgramTests
     }
 
     [Fact]
-    public async Task SanctuaryAndCustodyOps_RemainUnknownAfterSprintE()
+    public async Task SanctuaryAndCustodyOps_RemainUnknownInHigherOrderLocalityLane()
     {
         var bridge = await CreateBridgeAsync();
 
