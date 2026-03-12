@@ -58,6 +58,7 @@ The stack therefore distinguishes a prior coherence regime from later accountabl
 - `OE/cOE` act as continuity-binding conditions rather than flat modules
 - `SelfGEL/cSelfGEL` appear as the first stabilized self-readable surfaces within that coherence regime
 - proposition-bearing stabilization occurs before morphism candidacy
+- lawful transport yields an admissible surface, identity-bearing only where applicable
 - Sanctuary governs only what has localized enough to become proposition-bearing, observable, admissible, and accountable
 
 The governing seam is formalized in `docs/WEAVE_TO_PROPOSITION_STABILIZATION_MODEL.md` as:
@@ -66,6 +67,27 @@ The governing seam is formalized in `docs/WEAVE_TO_PROPOSITION_STABILIZATION_MOD
 2. proposition-bearing stabilization
 3. admissible proposition surface
 4. Sanctuary-governed accountability
+
+The higher-order locality continuation of that seam is formalized through:
+
+- `docs/PROPOSITION_TO_PERSPECTIVAL_CONFIGURATION_MODEL.md`
+- `docs/PERSPECTIVAL_TO_PARTICIPATORY_ENGRAM_FORMATION_MODEL.md`
+- `docs/BOUNDED_DREAM_GAME_REHEARSAL_MODEL.md`
+- `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`
+
+That continuation preserves this order:
+
+1. proposition
+2. procedure
+3. perspectival configuration
+4. participatory configuration
+5. bounded Dream/Game rehearsal
+6. morphism candidacy
+7. lawful transport
+8. admissible surface, identity-bearing only where applicable
+9. Sanctuary-governed accountability
+
+`CradleTek hosts. SoulFrame governs. AgentiCore inhabits. SLI/Lisp forms higher-order cognitive locality before it ever transports it.`
 
 ## Primary Stack Objects
 
@@ -226,6 +248,7 @@ Primary purpose:
 
 - move meaning lawfully across stack layers
 - provide the native morphological and Engrammitizing computational organ for Engineered Cognition inside AgentiCore runtime
+- form higher-order cognitive locality before lawful transport may be claimed
 - packetize, route, transform, tensorize, and gate symbolic material
 - enable lawful interaction with protected stores, modules, certifications, and future stack services
 
@@ -857,6 +880,15 @@ An agent or CME may:
 - carry continuity across Theaters
 - move work between Theaters only through lawful mappings
 
+Before work may move across Theaters lawfully, higher-order locality must already have formed:
+
+- perspectival configuration
+- participatory configuration
+- bounded Dream/Game rehearsal
+- morphism candidacy
+
+Only after those thresholds may lawful transport become thinkable, and even then the result is an admissible surface, identity-bearing only where applicable.
+
 This is one of the reasons the IUTT analogy fits the stack: the system behaves like a bundle of local universes connected by structured transformations.
 
 `Steward` is the primary witness of lawful continuity across this Theater bundle.
@@ -912,6 +944,7 @@ The current intended high-level chain is:
 - symbolic mediation is not authority
 - operational cognition is not shared invariant memory
 - exploratory overlays are not automatic commitment domains
+- lawful transport is not automatic identity formation
 - public invariant state must never be rewritten by silent local or diagnostic processes
 
 ## Reference Documents

@@ -89,6 +89,7 @@ SLI may:
 - packetize, route, transform, and tensorize symbolic material
 - emit evidence, refusals, and commit intents
 - connect stack components to protected stores and modules through lawful symbolic interfaces
+- form higher-order cognitive locality under bounded runtime law before any transport or identity claim becomes admissible
 
 SLI may not:
 
@@ -96,6 +97,7 @@ SLI may not:
 - seize runtime authority
 - directly rewrite GEL
 - directly rewrite AgentiCore or SoulFrame state outside lawful interfaces
+- treat lawful transport as automatic identity formation
 
 ### GEL Law
 
@@ -413,6 +415,32 @@ Dream Theater outputs may not:
 - silently become Prime facts
 - silently become Cryptic guarantees
 - silently bind identity continuity
+- silently become admissible surfaces or Sanctuary accountability claims
+
+## Higher-Order Locality Preconditions
+
+Before cross-Theater transport becomes lawful, the stack must preserve higher-order locality formation as an explicit sequence:
+
+1. proposition
+2. procedure
+3. perspectival configuration
+4. participatory configuration
+5. bounded Dream/Game rehearsal
+6. morphism candidacy
+7. lawful transport
+8. admissible surface, identity-bearing only where applicable
+9. Sanctuary-governed accountability
+
+This means:
+
+- propositional and procedural layers are stabilized floor layers
+- perspectival and participatory configuration are preconditions of morphism candidacy
+- Dream/Game rehearsal is exploratory inhabitation, not truth, identity binding, admissibility, or Sanctuary intake
+- Sanctuary remains the accountability boundary over what survived prior thresholds
+
+Governing warning:
+
+> The system must not attempt transport across localities it has not yet lawfully inhabited.
 
 ## Theater Transition Law
 
@@ -423,6 +451,8 @@ In stack terms, a Theater is an Inter-universal Techmuller Theory-aligned locali
 Each Theater therefore acts as a distinct coordinate system for cognition.
 
 Cross-Theater movement requires lawful transformation structures.
+
+Those transformations must not be invoked as though locality formation were optional preamble.
 
 Canonical transition structures:
 
@@ -443,6 +473,7 @@ Key principle:
 
 - work may proceed freely inside a lawful Theater
 - movement between Theaters requires lawful transformation
+- lawful transport follows candidacy and yields an admissible surface, identity-bearing only where applicable
 
 ## Theater Pollution Law
 
