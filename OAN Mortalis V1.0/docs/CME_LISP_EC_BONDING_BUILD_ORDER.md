@@ -6,7 +6,7 @@ This build note stages the first enacted higher-order locality slice for CME-bou
 
 The implementation ladder is:
 
-`Bond -> Perspective -> Participation -> Rehearsal -> Witness -> Morphism Candidacy -> Lawful Transport -> Admissible Surface -> Sanctuary Accountability`
+`Bond -> Perspective -> Participation -> Rehearsal -> Witness -> Morphism Candidacy -> Lawful Transport -> Admissible Surface -> Accountability Packet -> Sanctuary Accountability`
 
 `A1` and `B1` implement only the first three runtime-local thresholds:
 
@@ -23,6 +23,7 @@ The current maturity sequence is:
 - `D = witness / morphism candidacy`
 - `E = lawful transport`
 - `F = admissible surface formation`
+- `G1 = accountability packet formation`
 
 Sanctuary-governed accountability remains deferred from the canonical default lane.
 
@@ -88,6 +89,14 @@ The runtime code uses `locality` and `anchor` names instead of raw `bond-*` oper
 - materialize surface classing, identity-bearing applicability, reveal and boundary shaping, evidence carriage, typed residues, and blocked versus formed surface status without writing to accountability surfaces
 - prove an admissible surface remains internal, non-canonical, non-custodial, and pre-accountability
 
+### G1 accountability packet formation
+
+- add an internal accountability packet state lane nested under higher-order locality
+- add bounded accountability packet primitives and accountability packet composite expansion in Lisp
+- add an internal packet execution path that shapes a formed admissible surface into a review packet without granting Sanctuary judgment, custody mutation, or identity promotion
+- materialize source surface lineage, witness and transport lineage, preserved invariants, surface classing, identity-bearing applicability, reveal posture, typed residues, and blocked versus review-ready packet status without invoking Sanctuary intake
+- prove an accountability packet remains internal, non-canonical, non-custodial, and pre-judgment
+
 ## Deferred
 
 The current repo state does not implement:
@@ -140,3 +149,11 @@ Admissible surface formation extends the boundary without governing it:
 - an admissible surface may be inspectable and identity-bearing only where applicable
 - an admissible surface is not yet a governed identity event
 - an admissible surface is only the bounded formation a later accountability layer may inspect
+
+Accountability packet formation extends the boundary without letting Sanctuary speak:
+
+- packet formation is internal-first
+- an accountability packet is shaped from a formed admissible surface, not directly from transport
+- an accountability packet may carry lineage, preserved invariants, residues, and review-readiness without deciding judgment
+- an accountability packet is not yet a Sanctuary judgment
+- SLI/Lisp may shape what is reviewable; it must not decide what is accountable

@@ -34,7 +34,15 @@ internal enum HigherOrderLocalityResidueKind
     InvalidIdentityBearingApplicability,
     IncompleteAdmissibleSurface,
     AdmissibleSurfaceResidue,
-    BlockedAdmissibleSurface
+    BlockedAdmissibleSurface,
+    MissingAccountabilityPacketPrerequisites,
+    InvalidPacketReference,
+    InvalidPacketStatus,
+    InvalidPacketReveal,
+    InvalidPacketInvariant,
+    IncompleteAccountabilityPacket,
+    AccountabilityPacketResidue,
+    BlockedAccountabilityPacket
 }
 
 internal sealed class HigherOrderLocalityResidue
@@ -285,6 +293,55 @@ internal sealed class SliAdmissibleSurfaceState
     }
 }
 
+internal sealed class SliAccountabilityPacketState
+{
+    public const string Blocked = "blocked";
+    public const string Candidate = "candidate";
+    public const string ReviewReady = "review-ready";
+
+    public bool IsConfigured { get; set; }
+    public string PacketHandle { get; private set; } = string.Empty;
+    public string SurfaceHandle { get; private set; } = string.Empty;
+    public string TransportHandle { get; set; } = string.Empty;
+    public string WitnessHandle { get; set; } = string.Empty;
+    public string SourceLocalityHandle { get; set; } = string.Empty;
+    public string TargetLocalityHandle { get; set; } = string.Empty;
+    public List<string> PreservedInvariants { get; } = [];
+    public string SurfaceClass { get; set; } = string.Empty;
+    public bool IdentityBearingApplicable { get; set; }
+    public string RevealPosture { get; set; } = SliHigherOrderLocalityState.MaskedRevealPosture;
+    public List<string> Warnings { get; } = [];
+    public List<HigherOrderLocalityResidue> Residues { get; } = [];
+    public string ReadinessStatus { get; set; } = Blocked;
+
+    public void Reset()
+    {
+        IsConfigured = false;
+        PacketHandle = string.Empty;
+        SurfaceHandle = string.Empty;
+        TransportHandle = string.Empty;
+        WitnessHandle = string.Empty;
+        SourceLocalityHandle = string.Empty;
+        TargetLocalityHandle = string.Empty;
+        PreservedInvariants.Clear();
+        SurfaceClass = string.Empty;
+        IdentityBearingApplicable = false;
+        RevealPosture = SliHigherOrderLocalityState.MaskedRevealPosture;
+        Warnings.Clear();
+        Residues.Clear();
+        ReadinessStatus = Blocked;
+    }
+
+    public void Configure(string surfaceHandle)
+    {
+        Reset();
+        IsConfigured = true;
+        SurfaceHandle = surfaceHandle;
+        PacketHandle = $"{surfaceHandle}:packet";
+        ReadinessStatus = Candidate;
+    }
+}
+
 internal sealed class SliHigherOrderLocalityState
 {
     public const string BoundedSealPosture = "bounded";
@@ -305,6 +362,7 @@ internal sealed class SliHigherOrderLocalityState
     public SliWitnessState Witness { get; } = new();
     public SliTransportState Transport { get; } = new();
     public SliAdmissibleSurfaceState AdmissibleSurface { get; } = new();
+    public SliAccountabilityPacketState AccountabilityPacket { get; } = new();
 
     public void Reset(string localityHandle)
     {
@@ -322,6 +380,7 @@ internal sealed class SliHigherOrderLocalityState
         Witness.Reset();
         Transport.Reset();
         AdmissibleSurface.Reset();
+        AccountabilityPacket.Reset();
     }
 
     public void AddWarning(string warning)

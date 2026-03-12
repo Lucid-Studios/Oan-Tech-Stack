@@ -101,6 +101,31 @@ public sealed class HigherOrderLocalityInvariantTests
     }
 
     [Fact]
+    public async Task AccountabilityPacketPrograms_DoNotMutateMorphologyPropositionOrDecisionSurfaces()
+    {
+        var context = await ExecuteContextAsync(
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)",
+                "(witness-locality-compare locality-state locality-state)",
+                "(transport-bounded witness-state locality-state locality-state)",
+                "(transport-status completed)",
+                "(admissible-surface-bounded transport-state comparative informational-only)",
+                "(surface-status formed)",
+                "(accountability-packet-bounded surface-state)",
+                "(packet-status review-ready)"
+            ]);
+
+        Assert.Empty(context.MorphologyState.ResolvedLemmaRoots);
+        Assert.Equal(string.Empty, context.PropositionState.PredicateRoot);
+        Assert.Equal("defer", context.FinalDecision);
+        Assert.Empty(context.CandidateBranches);
+        Assert.Empty(context.PrunedBranches);
+        Assert.Equal(SliAccountabilityPacketState.ReviewReady, context.HigherOrderLocalityState.AccountabilityPacket.ReadinessStatus);
+    }
+
+    [Fact]
     public void CompositeForms_ExpandOnlyToBoundedLocalityOps()
     {
         var parser = new SliParser();
@@ -249,6 +274,39 @@ public sealed class HigherOrderLocalityInvariantTests
     }
 
     [Fact]
+    public void AccountabilityPacketComposite_ExpandsOnlyToBoundedPacketOps()
+    {
+        var parser = new SliParser();
+        var expander = new SliBoundedCompositionExpander(LispModuleCatalog.LoadModules());
+        var program = parser.ParseProgram(
+            [
+                "(accountability-packet-bounded surface-state)"
+            ]);
+
+        var expanded = expander.ExpandProgram(program);
+        var ops = expanded
+            .Select(expression => expression.Children[0].Atom ?? string.Empty)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "packet-begin",
+                "packet-lineage",
+                "packet-invariants",
+                "packet-class",
+                "packet-reveal",
+                "packet-status"
+            ],
+            ops);
+
+        Assert.DoesNotContain(ops, op => op.StartsWith("sanctuary-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("judgment-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("custody-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("gel-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("soulframe-", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void HigherOrderLocalitySurface_RemainsFreeOfCustodyAndGovernanceHandles()
     {
         var symbolTable = new SliSymbolTable();
@@ -280,6 +338,10 @@ public sealed class HigherOrderLocalityInvariantTests
             .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Select(property => property.Name)
             .ToArray();
+        var accountabilityPacketProperties = typeof(SliAccountabilityPacketState)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(property => property.Name)
+            .ToArray();
 
         var allProperties = localityProperties
             .Concat(perspectiveProperties)
@@ -288,6 +350,7 @@ public sealed class HigherOrderLocalityInvariantTests
             .Concat(witnessProperties)
             .Concat(transportProperties)
             .Concat(admissibleSurfaceProperties)
+            .Concat(accountabilityPacketProperties)
             .ToArray();
 
         Assert.DoesNotContain(allProperties, name => name.Contains("GEL", StringComparison.OrdinalIgnoreCase));

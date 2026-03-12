@@ -26,7 +26,8 @@ public sealed class LispBridge
         "rehearsal.lisp",
         "witness.lisp",
         "transport.lisp",
-        "admissibility.lisp"
+        "admissibility.lisp",
+        "accountability.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
@@ -248,6 +249,34 @@ public sealed class LispBridge
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         return CreateAdmissibleSurfaceResult(context);
+    }
+
+    internal async Task<SliBoundedAccountabilityPacketResult> ExecuteAccountabilityPacketProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "packet-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return CreateAccountabilityPacketResult(context);
     }
 
     internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
@@ -718,6 +747,37 @@ public sealed class LispBridge
                 Warnings = state.Warnings.ToArray(),
                 Residues = CloneResidues(state.Residues),
                 Status = state.Status
+            },
+            SymbolicTrace = context.TraceLines.ToArray()
+        };
+    }
+
+    private static SliBoundedAccountabilityPacketResult CreateAccountabilityPacketResult(SliExecutionContext context)
+    {
+        var state = context.HigherOrderLocalityState.AccountabilityPacket;
+        return new SliBoundedAccountabilityPacketResult
+        {
+            Locality = CreateHigherOrderLocalityResult(context),
+            Rehearsal = CreateBoundedRehearsalResult(context).Rehearsal,
+            Witness = CreateBoundedWitnessResult(context).Witness,
+            Transport = CreateBoundedTransportResult(context).Transport,
+            Surface = CreateAdmissibleSurfaceResult(context).Surface,
+            Packet = new SliAccountabilityPacketResult
+            {
+                IsConfigured = state.IsConfigured,
+                PacketHandle = state.PacketHandle,
+                SurfaceHandle = state.SurfaceHandle,
+                TransportHandle = state.TransportHandle,
+                WitnessHandle = state.WitnessHandle,
+                SourceLocalityHandle = state.SourceLocalityHandle,
+                TargetLocalityHandle = state.TargetLocalityHandle,
+                PreservedInvariants = state.PreservedInvariants.ToArray(),
+                SurfaceClass = state.SurfaceClass,
+                IdentityBearingApplicable = state.IdentityBearingApplicable,
+                RevealPosture = state.RevealPosture,
+                Warnings = state.Warnings.ToArray(),
+                Residues = CloneResidues(state.Residues),
+                ReadinessStatus = state.ReadinessStatus
             },
             SymbolicTrace = context.TraceLines.ToArray()
         };

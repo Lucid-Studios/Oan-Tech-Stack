@@ -164,6 +164,7 @@ public sealed class SliSymbolTable
         RegisterBoundedWitnessOperators();
         RegisterBoundedTransportOperators();
         RegisterBoundedAdmissibilityOperators();
+        RegisterBoundedAccountabilityPacketOperators();
 
         Register("morph-root", (expression, context, _) =>
         {
@@ -1934,6 +1935,438 @@ public sealed class SliSymbolTable
         });
     }
 
+    private void RegisterBoundedAccountabilityPacketOperators()
+    {
+        Register("packet-begin", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var surface = state.AdmissibleSurface;
+            var packet = state.AccountabilityPacket;
+            packet.Reset();
+
+            var surfaceToken = UnwrapStringLiteral(Arg(expression, 1, "surface-state"));
+            if (string.Equals(surfaceToken, "surface-state", StringComparison.OrdinalIgnoreCase) &&
+                (!surface.IsConfigured || !string.Equals(surface.Status, SliAdmissibleSurfaceState.Formed, StringComparison.OrdinalIgnoreCase)))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.Warnings.Add("packet-begin requires a formed admissible surface.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.MissingAccountabilityPacketPrerequisites,
+                    "packet-begin",
+                    "Accountability packet formation requires a formed admissible surface.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-begin",
+                    "Accountability packet remained incomplete because admissible surface formation had not completed.");
+                context.AddTrace("packet-begin(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-begin-blocked"));
+            }
+
+            if (!TryResolveAdmissibleSurfaceHandle(state, surfaceToken, out var surfaceHandle))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.Warnings.Add("packet-begin requires a resolved formed admissible surface handle.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketReference,
+                    "packet-begin",
+                    $"Accountability packet rejected unresolved surface reference '{surfaceToken}'.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-begin",
+                    "Accountability packet remained incomplete because no formed admissible surface handle was available.");
+                context.AddTrace("packet-begin(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("packet-begin-invalid"));
+            }
+
+            var missingPrerequisites =
+                !surface.IsConfigured ||
+                !string.Equals(surface.SurfaceHandle, surfaceHandle, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(surface.Status, SliAdmissibleSurfaceState.Formed, StringComparison.OrdinalIgnoreCase) ||
+                HasBlockingAdmissibleSurfaceResidues(surface);
+
+            if (missingPrerequisites)
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.Warnings.Add("packet-begin requires a formed admissible surface with intact bounded review state.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.MissingAccountabilityPacketPrerequisites,
+                    "packet-begin",
+                    "Accountability packet formation requires a formed admissible surface.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.BlockedAccountabilityPacket,
+                    "packet-begin",
+                    "Accountability packet formation was blocked because admissible surface formation had not completed lawfully.");
+                context.AddTrace("packet-begin(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-begin-blocked"));
+            }
+
+            packet.Configure(surfaceHandle);
+            context.AddTrace($"packet-begin({surfaceToken})");
+            return Task.FromResult(SExpression.AtomNode("packet-begin"));
+        });
+
+        Register("packet-lineage", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var packet = state.AccountabilityPacket;
+            var surface = state.AdmissibleSurface;
+            var transport = state.Transport;
+            var witness = state.Witness;
+
+            if (!packet.IsConfigured)
+            {
+                packet.Warnings.Add("packet-lineage requires packet-begin.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-lineage",
+                    "Accountability packet lineage requires an active packet.");
+                context.AddTrace("packet-lineage(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("packet-lineage-incomplete"));
+            }
+
+            var surfaceToken = UnwrapStringLiteral(Arg(expression, 1, "surface-state"));
+            if (!TryResolveAdmissibleSurfaceHandle(state, surfaceToken, out var surfaceHandle) ||
+                !string.Equals(packet.SurfaceHandle, surfaceHandle, StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.Warnings.Add("packet-lineage rejected an unresolved or mismatched admissible surface reference.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketReference,
+                    "packet-lineage",
+                    $"Accountability packet rejected unresolved surface reference '{surfaceToken}'.");
+                context.AddTrace("packet-lineage(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("packet-lineage-invalid"));
+            }
+
+            if (string.IsNullOrWhiteSpace(surface.TransportHandle) ||
+                !transport.IsConfigured ||
+                !string.Equals(surface.TransportHandle, transport.TransportHandle, StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(transport.WitnessHandle) ||
+                !witness.IsConfigured ||
+                !string.Equals(transport.WitnessHandle, witness.WitnessHandle, StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.MissingAccountabilityPacketPrerequisites,
+                    "packet-lineage",
+                    "Accountability packet lineage requires completed admissible surface, transport, and witness lineage.");
+                context.AddTrace("packet-lineage(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-lineage-blocked"));
+            }
+
+            packet.TransportHandle = transport.TransportHandle;
+            packet.WitnessHandle = witness.WitnessHandle;
+            packet.SourceLocalityHandle = surface.SourceLocalityHandle;
+            packet.TargetLocalityHandle = surface.TargetLocalityHandle;
+            context.AddTrace($"packet-lineage({surfaceToken})");
+            return Task.FromResult(SExpression.AtomNode("packet-lineage"));
+        });
+
+        Register("packet-invariants", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var packet = state.AccountabilityPacket;
+            var transport = state.Transport;
+            var witness = state.Witness;
+
+            if (!packet.IsConfigured)
+            {
+                packet.Warnings.Add("packet-invariants requires packet-begin.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-invariants",
+                    "Accountability packet invariants require an active packet.");
+                context.AddTrace("packet-invariants(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("packet-invariants-incomplete"));
+            }
+
+            var surfaceToken = UnwrapStringLiteral(Arg(expression, 1, "surface-state"));
+            if (!TryResolveAdmissibleSurfaceHandle(state, surfaceToken, out var surfaceHandle) ||
+                !string.Equals(packet.SurfaceHandle, surfaceHandle, StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketReference,
+                    "packet-invariants",
+                    $"Accountability packet rejected unresolved surface reference '{surfaceToken}'.");
+                context.AddTrace("packet-invariants(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("packet-invariants-invalid"));
+            }
+
+            var carriedInvariants = transport.PreservedInvariants
+                .Intersect(witness.PreservedInvariants, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            if (carriedInvariants.Length == 0)
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketInvariant,
+                    "packet-invariants",
+                    "Accountability packet invariants must be carried from already-preserved witness and transport invariants.");
+                context.AddTrace("packet-invariants(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-invariants-blocked"));
+            }
+
+            packet.PreservedInvariants.Clear();
+            packet.PreservedInvariants.AddRange(carriedInvariants);
+            context.AddTrace($"packet-invariants({surfaceToken})");
+            return Task.FromResult(SExpression.AtomNode("packet-invariants"));
+        });
+
+        Register("packet-class", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var packet = state.AccountabilityPacket;
+            var surface = state.AdmissibleSurface;
+
+            if (!packet.IsConfigured)
+            {
+                packet.Warnings.Add("packet-class requires packet-begin.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-class",
+                    "Accountability packet classing requires an active packet.");
+                context.AddTrace("packet-class(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("packet-class-incomplete"));
+            }
+
+            var surfaceToken = UnwrapStringLiteral(Arg(expression, 1, "surface-state"));
+            if (!TryResolveAdmissibleSurfaceHandle(state, surfaceToken, out var surfaceHandle) ||
+                !string.Equals(packet.SurfaceHandle, surfaceHandle, StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketReference,
+                    "packet-class",
+                    $"Accountability packet rejected unresolved surface reference '{surfaceToken}'.");
+                context.AddTrace("packet-class(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("packet-class-invalid"));
+            }
+
+            packet.SurfaceClass = surface.SurfaceClass;
+            packet.IdentityBearingApplicable = surface.IdentityBearingApplicable;
+            context.AddTrace($"packet-class({surfaceToken})");
+            return Task.FromResult(SExpression.AtomNode("packet-class"));
+        });
+
+        Register("packet-reveal", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var packet = state.AccountabilityPacket;
+            var surface = state.AdmissibleSurface;
+
+            if (!packet.IsConfigured)
+            {
+                packet.Warnings.Add("packet-reveal requires packet-begin.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-reveal",
+                    "Accountability packet reveal posture requires an active packet.");
+                context.AddTrace("packet-reveal(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("packet-reveal-incomplete"));
+            }
+
+            var revealToken = UnwrapStringLiteral(Arg(expression, 1, "surface-state"));
+            string requestedReveal;
+            if (TryResolveAdmissibleSurfaceHandle(state, revealToken, out var surfaceHandle) &&
+                string.Equals(packet.SurfaceHandle, surfaceHandle, StringComparison.OrdinalIgnoreCase))
+            {
+                requestedReveal = surface.RevealPosture;
+            }
+            else
+            {
+                requestedReveal = revealToken;
+            }
+
+            if (!string.Equals(requestedReveal, SliHigherOrderLocalityState.MaskedRevealPosture, StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(requestedReveal, "narrow", StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.RevealPosture = ResolveSafeValue(packet.RevealPosture, surface.RevealPosture);
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketReveal,
+                    "packet-reveal",
+                    $"Rejected invalid accountability packet reveal posture '{requestedReveal}'.");
+                context.AddTrace("packet-reveal(invalid)");
+                return Task.FromResult(SExpression.AtomNode("packet-reveal-invalid"));
+            }
+
+            if (WouldWidenPacketReveal(surface.RevealPosture, requestedReveal))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.RevealPosture = ResolveSafeValue(packet.RevealPosture, surface.RevealPosture);
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketReveal,
+                    "packet-reveal",
+                    $"Accountability packet reveal '{requestedReveal}' would widen admissible surface reveal '{surface.RevealPosture}'.");
+                context.AddTrace("packet-reveal(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-reveal-blocked"));
+            }
+
+            packet.RevealPosture = requestedReveal.ToLowerInvariant();
+            context.AddTrace($"packet-reveal({revealToken})");
+            return Task.FromResult(SExpression.AtomNode("packet-reveal"));
+        });
+
+        Register("packet-residue", (expression, context, _) =>
+        {
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "accountability packet residue"));
+            AddResidue(
+                context,
+                context.HigherOrderLocalityState.AccountabilityPacket.Residues,
+                HigherOrderLocalityResidueKind.AccountabilityPacketResidue,
+                "packet-residue",
+                detail);
+            context.AddTrace($"packet-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("packet-residue"));
+        });
+
+        Register("packet-status", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var packet = state.AccountabilityPacket;
+            var surface = state.AdmissibleSurface;
+            var transport = state.Transport;
+            var witness = state.Witness;
+            var requestedStatus = UnwrapStringLiteral(Arg(expression, 1, SliAccountabilityPacketState.Candidate));
+
+            if (!packet.IsConfigured)
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.Warnings.Add("packet-status requires packet-begin.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket,
+                    "packet-status",
+                    "Accountability packet status changes require an active packet.");
+                context.AddTrace("packet-status(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("packet-status-incomplete"));
+            }
+
+            if (!IsRecognizedPacketStatus(requestedStatus))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                packet.Warnings.Add($"packet-status rejected invalid value '{requestedStatus}'.");
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.InvalidPacketStatus,
+                    "packet-status",
+                    $"Rejected invalid accountability packet readiness status '{requestedStatus}'.");
+                context.AddTrace("packet-status(invalid)");
+                return Task.FromResult(SExpression.AtomNode("packet-status-invalid"));
+            }
+
+            if (string.Equals(requestedStatus, SliAccountabilityPacketState.Blocked, StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+                context.AddTrace("packet-status(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-blocked"));
+            }
+
+            if (string.Equals(requestedStatus, SliAccountabilityPacketState.Candidate, StringComparison.OrdinalIgnoreCase))
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Candidate;
+                context.AddTrace("packet-status(candidate)");
+                return Task.FromResult(SExpression.AtomNode("packet-candidate"));
+            }
+
+            var blocked =
+                !surface.IsConfigured ||
+                !string.Equals(surface.Status, SliAdmissibleSurfaceState.Formed, StringComparison.OrdinalIgnoreCase) ||
+                HasBlockingAdmissibleSurfaceResidues(surface) ||
+                HasBlockingTransportResidues(transport) ||
+                HasBlockingWitnessResidues(witness) ||
+                HasBlockingAccountabilityPacketResidues(packet) ||
+                string.IsNullOrWhiteSpace(packet.TransportHandle) ||
+                string.IsNullOrWhiteSpace(packet.WitnessHandle) ||
+                string.IsNullOrWhiteSpace(packet.SourceLocalityHandle) ||
+                string.IsNullOrWhiteSpace(packet.TargetLocalityHandle) ||
+                packet.PreservedInvariants.Count == 0 ||
+                string.IsNullOrWhiteSpace(packet.SurfaceClass) ||
+                WouldWidenPacketReveal(surface.RevealPosture, packet.RevealPosture);
+
+            if (blocked)
+            {
+                packet.ReadinessStatus = SliAccountabilityPacketState.Blocked;
+
+                if (string.IsNullOrWhiteSpace(packet.TransportHandle) ||
+                    string.IsNullOrWhiteSpace(packet.WitnessHandle) ||
+                    string.IsNullOrWhiteSpace(packet.SourceLocalityHandle) ||
+                    string.IsNullOrWhiteSpace(packet.TargetLocalityHandle) ||
+                    packet.PreservedInvariants.Count == 0 ||
+                    string.IsNullOrWhiteSpace(packet.SurfaceClass))
+                {
+                    AddResidue(
+                        context,
+                        packet.Residues,
+                        HigherOrderLocalityResidueKind.MissingAccountabilityPacketPrerequisites,
+                        "packet-status",
+                        "Accountability packet review readiness requires carried lineage, preserved invariants, and mirrored surface classing.");
+                }
+
+                if (WouldWidenPacketReveal(surface.RevealPosture, packet.RevealPosture))
+                {
+                    AddResidue(
+                        context,
+                        packet.Residues,
+                        HigherOrderLocalityResidueKind.InvalidPacketReveal,
+                        "packet-status",
+                        $"Accountability packet reveal '{packet.RevealPosture}' would widen admissible surface reveal '{surface.RevealPosture}'.");
+                }
+
+                AddResidue(
+                    context,
+                    packet.Residues,
+                    HigherOrderLocalityResidueKind.BlockedAccountabilityPacket,
+                    "packet-status",
+                    "Accountability packet remained blocked because the review packet could not yet be lawfully shaped for Sanctuary inspection.");
+                context.AddTrace("packet-status(blocked)");
+                return Task.FromResult(SExpression.AtomNode("packet-blocked"));
+            }
+
+            packet.ReadinessStatus = SliAccountabilityPacketState.ReviewReady;
+            context.AddTrace("packet-status(review-ready)");
+            return Task.FromResult(SExpression.AtomNode("packet-review-ready"));
+        });
+    }
+
     private static void AddResidue(
         SliExecutionContext context,
         ICollection<HigherOrderLocalityResidue> scopedResidues,
@@ -2059,6 +2492,13 @@ public sealed class SliSymbolTable
                string.Equals(value, SliAdmissibleSurfaceState.Formed, StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool IsRecognizedPacketStatus(string value)
+    {
+        return string.Equals(value, SliAccountabilityPacketState.Blocked, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAccountabilityPacketState.Candidate, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliAccountabilityPacketState.ReviewReady, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static bool WouldWidenReveal(string localityReveal, string surfaceReveal)
     {
         return string.Equals(localityReveal, SliHigherOrderLocalityState.MaskedRevealPosture, StringComparison.OrdinalIgnoreCase) &&
@@ -2069,6 +2509,12 @@ public sealed class SliSymbolTable
     {
         return string.Equals(localityBoundary, "sealed", StringComparison.OrdinalIgnoreCase) &&
                string.Equals(surfaceBoundary, SliHigherOrderLocalityState.BoundedSealPosture, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool WouldWidenPacketReveal(string surfaceReveal, string packetReveal)
+    {
+        return string.Equals(surfaceReveal, SliHigherOrderLocalityState.MaskedRevealPosture, StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(packetReveal, "narrow", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool HasBlockingWitnessResidues(SliWitnessState witness)
@@ -2090,6 +2536,32 @@ public sealed class SliSymbolTable
                 HigherOrderLocalityResidueKind.InvalidTransportMapping or
                 HigherOrderLocalityResidueKind.IncompleteTransport or
                 HigherOrderLocalityResidueKind.BlockedTransport);
+    }
+
+    private static bool HasBlockingAdmissibleSurfaceResidues(SliAdmissibleSurfaceState surface)
+    {
+        return surface.Residues.Any(residue =>
+            residue.Kind is HigherOrderLocalityResidueKind.MissingAdmissibleSurfacePrerequisites or
+                HigherOrderLocalityResidueKind.InvalidSurfaceReference or
+                HigherOrderLocalityResidueKind.InvalidSurfaceClass or
+                HigherOrderLocalityResidueKind.InvalidSurfaceStatus or
+                HigherOrderLocalityResidueKind.InvalidSurfaceReveal or
+                HigherOrderLocalityResidueKind.InvalidSurfaceBoundary or
+                HigherOrderLocalityResidueKind.InvalidIdentityBearingApplicability or
+                HigherOrderLocalityResidueKind.IncompleteAdmissibleSurface or
+                HigherOrderLocalityResidueKind.BlockedAdmissibleSurface);
+    }
+
+    private static bool HasBlockingAccountabilityPacketResidues(SliAccountabilityPacketState packet)
+    {
+        return packet.Residues.Any(residue =>
+            residue.Kind is HigherOrderLocalityResidueKind.MissingAccountabilityPacketPrerequisites or
+                HigherOrderLocalityResidueKind.InvalidPacketReference or
+                HigherOrderLocalityResidueKind.InvalidPacketStatus or
+                HigherOrderLocalityResidueKind.InvalidPacketReveal or
+                HigherOrderLocalityResidueKind.InvalidPacketInvariant or
+                HigherOrderLocalityResidueKind.IncompleteAccountabilityPacket or
+                HigherOrderLocalityResidueKind.BlockedAccountabilityPacket);
     }
 
     private static bool TryResolveWitnessReference(SliExecutionContext context, string token, out string resolvedHandle)
@@ -2158,6 +2630,24 @@ public sealed class SliSymbolTable
             string.Equals(token, state.Transport.TransportHandle, StringComparison.OrdinalIgnoreCase))
         {
             resolvedHandle = state.Transport.TransportHandle;
+            return !string.IsNullOrWhiteSpace(resolvedHandle);
+        }
+
+        return false;
+    }
+
+    private static bool TryResolveAdmissibleSurfaceHandle(SliHigherOrderLocalityState state, string token, out string resolvedHandle)
+    {
+        resolvedHandle = string.Empty;
+        if (string.IsNullOrWhiteSpace(token) || !state.AdmissibleSurface.IsConfigured)
+        {
+            return false;
+        }
+
+        if (string.Equals(token, "surface-state", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(token, state.AdmissibleSurface.SurfaceHandle, StringComparison.OrdinalIgnoreCase))
+        {
+            resolvedHandle = state.AdmissibleSurface.SurfaceHandle;
             return !string.IsNullOrWhiteSpace(resolvedHandle);
         }
 
