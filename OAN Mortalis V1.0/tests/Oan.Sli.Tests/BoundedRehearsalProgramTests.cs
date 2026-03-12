@@ -84,7 +84,7 @@ public sealed class BoundedRehearsalProgramTests
     }
 
     [Fact]
-    public async Task RehearsalCannotExposeUnsupportedWitnessPacketOrTransportOperators()
+    public async Task RehearsalCannotExposeSanctuaryOrCustodySurfaces()
     {
         var bridge = await CreateBridgeAsync();
 
@@ -94,13 +94,13 @@ public sealed class BoundedRehearsalProgramTests
                 "(perspective-bounded-observer locality-state task-objective identity-continuity)",
                 "(participation-bounded-cme locality-state)",
                 "(rehearsal-bounded-exploration locality-state branch-a identity-continuity alternate-world)",
-                "(witness-packet locality-state)",
-                "(transport-begin locality-state)"
+                "(sanctuary-intake locality-state)",
+                "(custody-write locality-state)"
             ],
             "identity-continuity");
 
-        Assert.Contains("unknown-op(witness-packet)", result.SymbolicTrace);
-        Assert.Contains("unknown-op(transport-begin)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(sanctuary-intake)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(custody-write)", result.SymbolicTrace);
     }
 
     [Fact]

@@ -12,7 +12,8 @@ internal sealed class SliBoundedCompositionExpander
         "participation-bounded-cme",
         "rehearsal-bounded-exploration",
         "witness-locality-compare",
-        "witness-branch-compare"
+        "witness-branch-compare",
+        "transport-bounded"
     };
 
     private readonly Dictionary<string, CompositeTemplate> _templates;
@@ -83,6 +84,7 @@ internal sealed class SliBoundedCompositionExpander
         LoadModuleTemplates(templates, loadedModules, "locality.lisp", "locality-composite");
         LoadModuleTemplates(templates, loadedModules, "rehearsal.lisp", "rehearsal-composite");
         LoadModuleTemplates(templates, loadedModules, "witness.lisp", "witness-composite");
+        LoadModuleTemplates(templates, loadedModules, "transport.lisp", "transport-composite");
 
         foreach (var required in AllowedComposites)
         {

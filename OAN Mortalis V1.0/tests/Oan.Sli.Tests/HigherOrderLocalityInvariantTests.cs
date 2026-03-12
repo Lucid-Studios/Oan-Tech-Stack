@@ -57,6 +57,27 @@ public sealed class HigherOrderLocalityInvariantTests
     }
 
     [Fact]
+    public async Task TransportPrograms_DoNotMutateMorphologyPropositionOrDecisionSurfaces()
+    {
+        var context = await ExecuteContextAsync(
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)",
+                "(witness-locality-compare locality-state locality-state)",
+                "(transport-bounded witness-state locality-state locality-state)",
+                "(transport-status completed)"
+            ]);
+
+        Assert.Empty(context.MorphologyState.ResolvedLemmaRoots);
+        Assert.Equal(string.Empty, context.PropositionState.PredicateRoot);
+        Assert.Equal("defer", context.FinalDecision);
+        Assert.Empty(context.CandidateBranches);
+        Assert.Empty(context.PrunedBranches);
+        Assert.Equal(SliTransportState.Completed, context.HigherOrderLocalityState.Transport.Status);
+    }
+
+    [Fact]
     public void CompositeForms_ExpandOnlyToBoundedLocalityOps()
     {
         var parser = new SliParser();
@@ -137,6 +158,41 @@ public sealed class HigherOrderLocalityInvariantTests
     }
 
     [Fact]
+    public void TransportComposite_ExpandsOnlyToBoundedTransportOps()
+    {
+        var parser = new SliParser();
+        var expander = new SliBoundedCompositionExpander(LispModuleCatalog.LoadModules());
+        var program = parser.ParseProgram(
+            [
+                "(transport-bounded witness-state locality-state locality-state)"
+            ]);
+
+        var expanded = expander.ExpandProgram(program);
+        var ops = expanded
+            .Select(expression => expression.Children[0].Atom ?? string.Empty)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "transport-begin",
+                "transport-source",
+                "transport-target",
+                "transport-preserve",
+                "transport-preserve",
+                "transport-preserve",
+                "transport-preserve",
+                "transport-preserve",
+                "transport-preserve",
+                "transport-preserve",
+                "transport-status"
+            ],
+            ops);
+
+        Assert.DoesNotContain(ops, op => op.StartsWith("sanctuary-", StringComparison.Ordinal));
+        Assert.DoesNotContain(ops, op => op.StartsWith("custody-", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void HigherOrderLocalitySurface_RemainsFreeOfCustodyAndGovernanceHandles()
     {
         var symbolTable = new SliSymbolTable();
@@ -160,12 +216,17 @@ public sealed class HigherOrderLocalityInvariantTests
             .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Select(property => property.Name)
             .ToArray();
+        var transportProperties = typeof(SliTransportState)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(property => property.Name)
+            .ToArray();
 
         var allProperties = localityProperties
             .Concat(perspectiveProperties)
             .Concat(participationProperties)
             .Concat(rehearsalProperties)
             .Concat(witnessProperties)
+            .Concat(transportProperties)
             .ToArray();
 
         Assert.DoesNotContain(allProperties, name => name.Contains("GEL", StringComparison.OrdinalIgnoreCase));

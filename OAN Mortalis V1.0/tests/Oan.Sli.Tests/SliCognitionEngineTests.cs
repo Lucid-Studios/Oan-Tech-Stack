@@ -70,6 +70,7 @@ public sealed class SliCognitionEngineTests
         Assert.DoesNotContain(program, line => line.Contains("rehearsal-", StringComparison.Ordinal));
         Assert.DoesNotContain(program, line => line.Contains("witness-", StringComparison.Ordinal));
         Assert.DoesNotContain(program, line => line.Contains("morphism-", StringComparison.Ordinal));
+        Assert.DoesNotContain(program, line => line.Contains("transport-", StringComparison.Ordinal));
         CanonicalCognitionCycle.ValidateProgramOrder(program);
     }
 

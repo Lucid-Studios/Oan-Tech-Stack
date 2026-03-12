@@ -134,20 +134,20 @@ public sealed class HigherOrderLocalityProgramTests
     }
 
     [Fact]
-    public async Task UnsupportedWitnessPacketAndTransportOps_RemainUnknownAfterSprintD()
+    public async Task SanctuaryAndCustodyOps_RemainUnknownAfterSprintE()
     {
         var bridge = await CreateBridgeAsync();
 
         var result = await bridge.ExecuteHigherOrderLocalityProgramAsync(
             [
                 "(locality-bootstrap context cme-self task-objective identity-continuity)",
-                "(witness-packet locality-state)",
-                "(transport-begin locality-state)"
+                "(sanctuary-intake locality-state)",
+                "(custody-write locality-state)"
             ],
             "identity-continuity");
 
-        Assert.Contains("unknown-op(witness-packet)", result.SymbolicTrace);
-        Assert.Contains("unknown-op(transport-begin)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(sanctuary-intake)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(custody-write)", result.SymbolicTrace);
     }
 
     private static async Task<LispBridge> CreateBridgeAsync()

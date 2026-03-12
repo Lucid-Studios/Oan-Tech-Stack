@@ -24,7 +24,8 @@ public sealed class LispBridge
         "morphology.lisp",
         "locality.lisp",
         "rehearsal.lisp",
-        "witness.lisp"
+        "witness.lisp",
+        "transport.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
@@ -190,6 +191,34 @@ public sealed class LispBridge
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         return CreateBoundedWitnessResult(context);
+    }
+
+    internal async Task<SliBoundedTransportResult> ExecuteBoundedTransportProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "transport-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return CreateBoundedTransportResult(context);
     }
 
     internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
@@ -600,6 +629,37 @@ public sealed class LispBridge
                 CandidacyStatus = state.CandidacyStatus,
                 Warnings = state.Warnings.ToArray(),
                 Residues = CloneResidues(state.Residues)
+            },
+            SymbolicTrace = context.TraceLines.ToArray()
+        };
+    }
+
+    private static SliBoundedTransportResult CreateBoundedTransportResult(SliExecutionContext context)
+    {
+        var state = context.HigherOrderLocalityState.Transport;
+        return new SliBoundedTransportResult
+        {
+            Locality = CreateHigherOrderLocalityResult(context),
+            Rehearsal = CreateBoundedRehearsalResult(context).Rehearsal,
+            Witness = CreateBoundedWitnessResult(context).Witness,
+            Transport = new SliTransportResult
+            {
+                IsConfigured = state.IsConfigured,
+                TransportHandle = state.TransportHandle,
+                WitnessHandle = state.WitnessHandle,
+                SourceLocalityHandle = state.SourceLocalityHandle,
+                TargetLocalityHandle = state.TargetLocalityHandle,
+                PreservedInvariants = state.PreservedInvariants.ToArray(),
+                MappedDifferences = state.MappedDifferences
+                    .Select(entry => new SliTransportMappingResult
+                    {
+                        Source = entry.Source,
+                        Target = entry.Target
+                    })
+                    .ToArray(),
+                Warnings = state.Warnings.ToArray(),
+                Residues = CloneResidues(state.Residues),
+                Status = state.Status
             },
             SymbolicTrace = context.TraceLines.ToArray()
         };

@@ -162,6 +162,7 @@ public sealed class SliSymbolTable
         RegisterHigherOrderLocalityOperators();
         RegisterBoundedRehearsalOperators();
         RegisterBoundedWitnessOperators();
+        RegisterBoundedTransportOperators();
 
         Register("morph-root", (expression, context, _) =>
         {
@@ -1137,6 +1138,375 @@ public sealed class SliSymbolTable
         });
     }
 
+    private void RegisterBoundedTransportOperators()
+    {
+        Register("transport-begin", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var witness = state.Witness;
+            var transport = state.Transport;
+
+            var witnessToken = UnwrapStringLiteral(Arg(expression, 1, "witness-state"));
+            if (!TryResolveTransportWitnessHandle(state, witnessToken, out var witnessHandle))
+            {
+                transport.IsConfigured = false;
+                transport.Status = SliTransportState.Blocked;
+                transport.Warnings.Add("transport-begin requires a resolved witness handle.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.MissingTransportPrerequisites,
+                    "transport-begin",
+                    "Transport requires a resolved witness handle.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteTransport,
+                    "transport-begin",
+                    "Transport remained incomplete because no witness handle was available.");
+                context.AddTrace("transport-begin(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("transport-incomplete"));
+            }
+
+            var missingPrerequisites =
+                string.IsNullOrWhiteSpace(state.LocalityHandle) ||
+                !state.Perspective.IsConfigured ||
+                !state.Participation.IsConfigured ||
+                !witness.IsConfigured ||
+                !string.Equals(witness.CandidacyStatus, SliWitnessState.MorphismCandidate, StringComparison.OrdinalIgnoreCase) ||
+                HasBlockingWitnessResidues(witness);
+
+            if (missingPrerequisites)
+            {
+                transport.IsConfigured = false;
+                transport.Status = SliTransportState.Blocked;
+                transport.Warnings.Add("transport-begin requires completed locality, perspective, participation, and positive witness candidacy.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.MissingTransportPrerequisites,
+                    "transport-begin",
+                    "Transport requires completed locality, perspective, participation, and morphism candidacy.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.BlockedTransport,
+                    "transport-begin",
+                    "Transport was blocked because witness candidacy did not authorize carry.");
+                context.AddTrace("transport-begin(blocked)");
+                return Task.FromResult(SExpression.AtomNode("transport-blocked"));
+            }
+
+            transport.Configure(witnessHandle);
+            context.AddTrace($"transport-begin({witnessToken})");
+            return Task.FromResult(SExpression.AtomNode("transport-begin"));
+        });
+
+        Register("transport-source", (expression, context, _) =>
+        {
+            var transport = context.HigherOrderLocalityState.Transport;
+            if (!transport.IsConfigured)
+            {
+                transport.Warnings.Add("transport-source requires transport-begin.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteTransport,
+                    "transport-source",
+                    "Transport source requires an active transport.");
+                context.AddTrace("transport-source(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("transport-source-incomplete"));
+            }
+
+            var token = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!TryResolveWitnessReference(context, token, out var sourceHandle))
+            {
+                transport.Status = SliTransportState.Blocked;
+                transport.Warnings.Add("transport-source rejected an unresolved locality or rehearsal branch reference.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.InvalidTransportReference,
+                    "transport-source",
+                    $"Transport rejected unresolved source reference '{token}'.");
+                context.AddTrace("transport-source(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("transport-source-invalid"));
+            }
+
+            transport.SourceLocalityHandle = sourceHandle;
+            context.AddTrace($"transport-source({token})");
+            return Task.FromResult(SExpression.AtomNode("transport-source"));
+        });
+
+        Register("transport-target", (expression, context, _) =>
+        {
+            var transport = context.HigherOrderLocalityState.Transport;
+            if (!transport.IsConfigured)
+            {
+                transport.Warnings.Add("transport-target requires transport-begin.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteTransport,
+                    "transport-target",
+                    "Transport target requires an active transport.");
+                context.AddTrace("transport-target(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("transport-target-incomplete"));
+            }
+
+            var token = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!TryResolveWitnessReference(context, token, out var targetHandle))
+            {
+                transport.Status = SliTransportState.Blocked;
+                transport.Warnings.Add("transport-target rejected an unresolved locality or rehearsal branch reference.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.InvalidTransportReference,
+                    "transport-target",
+                    $"Transport rejected unresolved target reference '{token}'.");
+                context.AddTrace("transport-target(invalid-reference)");
+                return Task.FromResult(SExpression.AtomNode("transport-target-invalid"));
+            }
+
+            transport.TargetLocalityHandle = targetHandle;
+            context.AddTrace($"transport-target({token})");
+            return Task.FromResult(SExpression.AtomNode("transport-target"));
+        });
+
+        Register("transport-preserve", (expression, context, _) =>
+        {
+            var transport = context.HigherOrderLocalityState.Transport;
+            if (!transport.IsConfigured)
+            {
+                transport.Warnings.Add("transport-preserve requires transport-begin.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteTransport,
+                    "transport-preserve",
+                    "Transport preservation requires an active transport.");
+                context.AddTrace("transport-preserve(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("transport-preserve-incomplete"));
+            }
+
+            var invariant = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(invariant) &&
+                !transport.PreservedInvariants.Contains(invariant, StringComparer.OrdinalIgnoreCase))
+            {
+                transport.PreservedInvariants.Add(invariant);
+                context.AddTrace($"transport-preserve({invariant})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("transport-preserve"));
+        });
+
+        Register("transport-map", (expression, context, _) =>
+        {
+            var transport = context.HigherOrderLocalityState.Transport;
+            if (!transport.IsConfigured)
+            {
+                transport.Warnings.Add("transport-map requires transport-begin.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteTransport,
+                    "transport-map",
+                    "Transport mapping requires an active transport.");
+                context.AddTrace("transport-map(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("transport-map-incomplete"));
+            }
+
+            var source = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var target = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target))
+            {
+                transport.Status = SliTransportState.Blocked;
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.InvalidTransportMapping,
+                    "transport-map",
+                    "Transport mapping requires both source and target values.");
+                context.AddTrace("transport-map(invalid)");
+                return Task.FromResult(SExpression.AtomNode("transport-map-invalid"));
+            }
+
+            transport.MappedDifferences.Add(new SliTransportMappingState
+            {
+                Source = source,
+                Target = target
+            });
+            context.AddTrace($"transport-map({source}->{target})");
+            return Task.FromResult(SExpression.AtomNode("transport-map"));
+        });
+
+        Register("transport-residue", (expression, context, _) =>
+        {
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "transport residue"));
+            AddResidue(
+                context,
+                context.HigherOrderLocalityState.Transport.Residues,
+                HigherOrderLocalityResidueKind.TransportResidue,
+                "transport-residue",
+                detail);
+            context.AddTrace($"transport-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("transport-residue"));
+        });
+
+        Register("transport-status", (expression, context, _) =>
+        {
+            var transport = context.HigherOrderLocalityState.Transport;
+            var requestedStatus = UnwrapStringLiteral(Arg(expression, 1, SliTransportState.Candidate));
+
+            if (!transport.IsConfigured)
+            {
+                transport.Status = SliTransportState.Blocked;
+                transport.Warnings.Add("transport-status requires transport-begin.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteTransport,
+                    "transport-status",
+                    "Transport status changes require an active transport.");
+                context.AddTrace("transport-status(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("transport-status-incomplete"));
+            }
+
+            if (!IsRecognizedTransportStatus(requestedStatus))
+            {
+                transport.Status = SliTransportState.Blocked;
+                transport.Warnings.Add($"transport-status rejected invalid value '{requestedStatus}'.");
+                AddResidue(
+                    context,
+                    transport.Residues,
+                    HigherOrderLocalityResidueKind.InvalidTransportStatus,
+                    "transport-status",
+                    $"Rejected invalid transport status '{requestedStatus}'.");
+                context.AddTrace("transport-status(invalid)");
+                return Task.FromResult(SExpression.AtomNode("transport-status-invalid"));
+            }
+
+            if (string.Equals(requestedStatus, SliTransportState.Blocked, StringComparison.OrdinalIgnoreCase))
+            {
+                transport.Status = SliTransportState.Blocked;
+                context.AddTrace("transport-status(blocked)");
+                return Task.FromResult(SExpression.AtomNode("transport-blocked"));
+            }
+
+            if (string.Equals(requestedStatus, SliTransportState.Candidate, StringComparison.OrdinalIgnoreCase))
+            {
+                transport.Status = SliTransportState.Candidate;
+                context.AddTrace("transport-status(candidate)");
+                return Task.FromResult(SExpression.AtomNode("transport-candidate"));
+            }
+
+            var witness = context.HigherOrderLocalityState.Witness;
+            var missingRequiredInvariants = RequiredTransportInvariants()
+                .Except(transport.PreservedInvariants, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            var illegalCarriedInvariants = transport.PreservedInvariants
+                .Where(invariant => !witness.PreservedInvariants.Contains(invariant, StringComparer.OrdinalIgnoreCase))
+                .ToArray();
+
+            var disallowedMappings = transport.MappedDifferences
+                .Where(mapping => !IsAllowedTransportMapping(mapping.Source, mapping.Target))
+                .ToArray();
+
+            var missingWitnessMappings = witness.DifferenceSet
+                .Except(transport.MappedDifferences.Select(mapping => mapping.Source), StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            var blocked =
+                HasBlockingWitnessResidues(witness) ||
+                !string.Equals(witness.CandidacyStatus, SliWitnessState.MorphismCandidate, StringComparison.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(transport.SourceLocalityHandle) ||
+                string.IsNullOrWhiteSpace(transport.TargetLocalityHandle) ||
+                !string.Equals(transport.SourceLocalityHandle, witness.LeftLocalityHandle, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(transport.TargetLocalityHandle, witness.RightLocalityHandle, StringComparison.OrdinalIgnoreCase) ||
+                missingRequiredInvariants.Length > 0 ||
+                illegalCarriedInvariants.Length > 0 ||
+                disallowedMappings.Length > 0 ||
+                missingWitnessMappings.Length > 0;
+
+            if (blocked)
+            {
+                transport.Status = SliTransportState.Blocked;
+
+                if (string.IsNullOrWhiteSpace(transport.SourceLocalityHandle) || string.IsNullOrWhiteSpace(transport.TargetLocalityHandle))
+                {
+                    AddResidue(
+                        context,
+                        transport.Residues,
+                        HigherOrderLocalityResidueKind.MissingTransportPrerequisites,
+                        "transport-status",
+                        "Transport completion requires explicit source and target localities.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(transport.SourceLocalityHandle) &&
+                    !string.IsNullOrWhiteSpace(transport.TargetLocalityHandle) &&
+                    (!string.Equals(transport.SourceLocalityHandle, witness.LeftLocalityHandle, StringComparison.OrdinalIgnoreCase) ||
+                     !string.Equals(transport.TargetLocalityHandle, witness.RightLocalityHandle, StringComparison.OrdinalIgnoreCase)))
+                {
+                    AddResidue(
+                        context,
+                        transport.Residues,
+                        HigherOrderLocalityResidueKind.BlockedTransport,
+                        "transport-status",
+                        "Transport source and target must match the active witness comparison pair.");
+                }
+
+                if (missingRequiredInvariants.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        transport.Residues,
+                        HigherOrderLocalityResidueKind.BlockedTransport,
+                        "transport-status",
+                        $"Transport omitted required preserved invariants: {string.Join(", ", missingRequiredInvariants)}.");
+                }
+
+                if (illegalCarriedInvariants.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        transport.Residues,
+                        HigherOrderLocalityResidueKind.InvalidTransportMapping,
+                        "transport-status",
+                        $"Transport attempted to carry invariants not preserved by witness: {string.Join(", ", illegalCarriedInvariants)}.");
+                }
+
+                if (disallowedMappings.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        transport.Residues,
+                        HigherOrderLocalityResidueKind.InvalidTransportMapping,
+                        "transport-status",
+                        $"Transport attempted disallowed mappings: {string.Join(", ", disallowedMappings.Select(mapping => $"{mapping.Source}->{mapping.Target}"))}.");
+                }
+
+                if (missingWitnessMappings.Length > 0)
+                {
+                    AddResidue(
+                        context,
+                        transport.Residues,
+                        HigherOrderLocalityResidueKind.BlockedTransport,
+                        "transport-status",
+                        $"Transport omitted witness differences: {string.Join(", ", missingWitnessMappings)}.");
+                }
+
+                context.AddTrace("transport-status(blocked)");
+                return Task.FromResult(SExpression.AtomNode("transport-blocked"));
+            }
+
+            transport.Status = SliTransportState.Completed;
+            context.AddTrace("transport-status(completed)");
+            return Task.FromResult(SExpression.AtomNode("transport-completed"));
+        });
+    }
+
     private static void AddResidue(
         SliExecutionContext context,
         ICollection<HigherOrderLocalityResidue> scopedResidues,
@@ -1208,6 +1578,50 @@ public sealed class SliSymbolTable
         ];
     }
 
+    private static IReadOnlyList<string> RequiredTransportInvariants()
+    {
+        return
+        [
+            "self-anchor-polarity",
+            "other-anchor-polarity",
+            "relation-anchor-polarity",
+            "seal-posture-bound",
+            "reveal-posture-bound",
+            "participation-mode-limit",
+            "identity-nonbinding"
+        ];
+    }
+
+    private static bool IsAllowedTransportMapping(string source, string target)
+    {
+        return
+            (string.Equals(source, "rehearsal-branch", StringComparison.OrdinalIgnoreCase) &&
+             string.Equals(target, "branch-variant", StringComparison.OrdinalIgnoreCase)) ||
+            (string.Equals(source, "substitution", StringComparison.OrdinalIgnoreCase) &&
+             string.Equals(target, "substitution", StringComparison.OrdinalIgnoreCase)) ||
+            (string.Equals(source, "analogy", StringComparison.OrdinalIgnoreCase) &&
+             string.Equals(target, "analogy", StringComparison.OrdinalIgnoreCase)) ||
+            (string.Equals(source, "branch-context", StringComparison.OrdinalIgnoreCase) &&
+             string.Equals(target, "branch-context", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool IsRecognizedTransportStatus(string value)
+    {
+        return string.Equals(value, SliTransportState.Blocked, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliTransportState.Candidate, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, SliTransportState.Completed, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool HasBlockingWitnessResidues(SliWitnessState witness)
+    {
+        return witness.Residues.Any(residue =>
+            residue.Kind is HigherOrderLocalityResidueKind.MissingWitnessPrerequisites or
+                HigherOrderLocalityResidueKind.InvalidWitnessReference or
+                HigherOrderLocalityResidueKind.InvalidGlueThreshold or
+                HigherOrderLocalityResidueKind.IncompleteWitness or
+                HigherOrderLocalityResidueKind.NonCandidateWitness);
+    }
+
     private static bool TryResolveWitnessReference(SliExecutionContext context, string token, out string resolvedHandle)
     {
         resolvedHandle = string.Empty;
@@ -1239,6 +1653,24 @@ public sealed class SliSymbolTable
         {
             resolvedHandle = token;
             return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryResolveTransportWitnessHandle(SliHigherOrderLocalityState state, string token, out string resolvedHandle)
+    {
+        resolvedHandle = string.Empty;
+        if (string.IsNullOrWhiteSpace(token) || !state.Witness.IsConfigured)
+        {
+            return false;
+        }
+
+        if (string.Equals(token, "witness-state", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(token, state.Witness.WitnessHandle, StringComparison.OrdinalIgnoreCase))
+        {
+            resolvedHandle = state.Witness.WitnessHandle;
+            return !string.IsNullOrWhiteSpace(resolvedHandle);
         }
 
         return false;

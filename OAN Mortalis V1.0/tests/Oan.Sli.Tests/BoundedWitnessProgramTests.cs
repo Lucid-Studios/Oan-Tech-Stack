@@ -103,7 +103,7 @@ public sealed class BoundedWitnessProgramTests
     }
 
     [Fact]
-    public async Task WitnessCannotInvokeTransportOperators()
+    public async Task WitnessCannotInvokeSanctuaryOrCustodySurfaces()
     {
         var bridge = await CreateBridgeAsync();
 
@@ -113,13 +113,13 @@ public sealed class BoundedWitnessProgramTests
                 "(perspective-bounded-observer locality-state task-objective identity-continuity)",
                 "(participation-bounded-cme locality-state)",
                 "(witness-locality-compare locality-state locality-state)",
-                "(witness-packet locality-state)",
-                "(transport-begin locality-state)"
+                "(sanctuary-intake locality-state)",
+                "(custody-write locality-state)"
             ],
             "identity-continuity");
 
-        Assert.Contains("unknown-op(witness-packet)", result.SymbolicTrace);
-        Assert.Contains("unknown-op(transport-begin)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(sanctuary-intake)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(custody-write)", result.SymbolicTrace);
     }
 
     [Fact]

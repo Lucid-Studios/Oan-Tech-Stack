@@ -17,7 +17,14 @@ internal enum HigherOrderLocalityResidueKind
     InvalidGlueThreshold,
     IncompleteWitness,
     LawfulDifferenceResidue,
-    NonCandidateWitness
+    NonCandidateWitness,
+    MissingTransportPrerequisites,
+    InvalidTransportReference,
+    InvalidTransportStatus,
+    InvalidTransportMapping,
+    IncompleteTransport,
+    TransportResidue,
+    BlockedTransport
 }
 
 internal sealed class HigherOrderLocalityResidue
@@ -165,6 +172,53 @@ internal sealed class SliWitnessState
     }
 }
 
+internal sealed class SliTransportMappingState
+{
+    public required string Source { get; init; }
+    public required string Target { get; init; }
+}
+
+internal sealed class SliTransportState
+{
+    public const string Blocked = "blocked";
+    public const string Candidate = "candidate";
+    public const string Completed = "completed";
+
+    public bool IsConfigured { get; set; }
+    public string TransportHandle { get; private set; } = string.Empty;
+    public string WitnessHandle { get; private set; } = string.Empty;
+    public string SourceLocalityHandle { get; set; } = string.Empty;
+    public string TargetLocalityHandle { get; set; } = string.Empty;
+    public List<string> PreservedInvariants { get; } = [];
+    public List<SliTransportMappingState> MappedDifferences { get; } = [];
+    public List<string> Warnings { get; } = [];
+    public List<HigherOrderLocalityResidue> Residues { get; } = [];
+    public string Status { get; set; } = Blocked;
+
+    public void Reset()
+    {
+        IsConfigured = false;
+        TransportHandle = string.Empty;
+        WitnessHandle = string.Empty;
+        SourceLocalityHandle = string.Empty;
+        TargetLocalityHandle = string.Empty;
+        PreservedInvariants.Clear();
+        MappedDifferences.Clear();
+        Warnings.Clear();
+        Residues.Clear();
+        Status = Blocked;
+    }
+
+    public void Configure(string witnessHandle)
+    {
+        Reset();
+        IsConfigured = true;
+        WitnessHandle = witnessHandle;
+        TransportHandle = $"{witnessHandle}:transport";
+        Status = Candidate;
+    }
+}
+
 internal sealed class SliHigherOrderLocalityState
 {
     public const string BoundedSealPosture = "bounded";
@@ -183,6 +237,7 @@ internal sealed class SliHigherOrderLocalityState
     public SliParticipationState Participation { get; } = new();
     public SliRehearsalState Rehearsal { get; } = new();
     public SliWitnessState Witness { get; } = new();
+    public SliTransportState Transport { get; } = new();
 
     public void Reset(string localityHandle)
     {
@@ -198,6 +253,7 @@ internal sealed class SliHigherOrderLocalityState
         Participation.Reset();
         Rehearsal.Reset();
         Witness.Reset();
+        Transport.Reset();
     }
 
     public void AddWarning(string warning)

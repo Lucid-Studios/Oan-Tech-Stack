@@ -6,7 +6,7 @@ This build note stages the first enacted higher-order locality slice for CME-bou
 
 The implementation ladder is:
 
-`Bond -> Perspective -> Participation -> Rehearsal -> Witness -> Transport`
+`Bond -> Perspective -> Participation -> Rehearsal -> Witness -> Morphism Candidacy -> Lawful Transport -> Admissible Surface -> Sanctuary Accountability`
 
 `A1` and `B1` implement only the first three runtime-local thresholds:
 
@@ -23,7 +23,7 @@ The current maturity sequence is:
 - `D = witness / morphism candidacy`
 - `E = lawful transport`
 
-Dream/Game rehearsal, witness formation, morphism candidacy, lawful transport, admissibility, and Sanctuary-governed accountability remain deferred from the canonical default lane.
+Admissible surface formation and Sanctuary-governed accountability remain deferred from the canonical default lane.
 
 ## Ownership
 
@@ -71,14 +71,21 @@ The runtime code uses `locality` and `anchor` names instead of raw `bond-*` oper
 - materialize preserved invariants, lawful differences, typed residues, glue thresholds, and candidacy status without mutating custody, governance, or identity surfaces
 - prove comparison precedes gluing and candidacy precedes transport
 
+### E lawful transport
+
+- add an internal transport state lane nested under higher-order locality
+- add bounded transport primitives and transport composite expansion in Lisp
+- add an internal transport execution path that carries only witness-preserved structure across an explicitly named source and target locality
+- materialize preserved-invariant carry, lawful difference mapping, typed residues, and blocked versus completed transport status without invoking admissibility or Sanctuary intake
+- prove transport remains internal, non-canonical, non-custodial, and pre-admissible
+
 ## Deferred
 
 The current repo state does not implement:
 
 - witness packets
-- morphism candidacy
-- lawful transport
 - admissibility review
+- admissible surface formation
 - Sanctuary accountability intake
 - governance mutation
 - custody mutation
@@ -110,3 +117,10 @@ Witness extends the boundary without crossing it:
 - witness compares lawful localities and rehearsal branches before any gluing claim
 - witness may name preserved structure, lawful difference, and residue
 - a candidate morphism is not yet a transport permission
+
+Transport extends the boundary without resolving it:
+
+- transport is internal-first
+- transport carries only what witness already preserved
+- transport may complete an internal carry without implying admissibility, identity, or accountability
+- a transported result is not yet an admissible identity surface
