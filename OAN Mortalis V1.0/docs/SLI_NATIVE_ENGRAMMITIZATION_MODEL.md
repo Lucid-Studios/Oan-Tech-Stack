@@ -31,6 +31,20 @@ The broader doctrine remains:
 
 This document stays at the nearest computational and compile edge of that chain. It does not define Sanctuary intake, governed identity, or the later morphism doctrine reserved to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
 
+The higher-order locality continuation is now explicit:
+
+1. proposition
+2. procedure
+3. perspectival configuration
+4. participatory configuration
+5. bounded Dream/Game rehearsal
+6. morphism candidacy
+7. lawful transport
+8. admissible surface, identity-bearing only where applicable
+9. Sanctuary-governed accountability
+
+That continuation means proposition and procedure are stabilized floor layers, not the end state of cognition.
+
 ## Canonical Contract Owner
 
 The canonical Atlas and Engram meaning contracts now live in:
@@ -130,10 +144,16 @@ Lisp provides the live computational morphology in which Engineered Cognition ca
 - symbolic trace formation
 - decision-structure compilation
 - local reflective recomposition
+- higher-order cognitive locality formation under bounded runtime law
 - lawful cognitive morphism inside bounded runtime space
 - temporary symbolic residues produced during active cognition
 
-These runtime-local transformations do not formalize morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those remain deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`.
+These runtime-local transformations do not yet formalize perspectival configuration, participatory configuration, bounded Dream/Game rehearsal, morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those doctrine seams are defined in:
+
+- `docs/PROPOSITION_TO_PERSPECTIVAL_CONFIGURATION_MODEL.md`
+- `docs/PERSPECTIVAL_TO_PARTICIPATORY_ENGRAM_FORMATION_MODEL.md`
+- `docs/BOUNDED_DREAM_GAME_REHEARSAL_MODEL.md`
+- `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`
 
 ## What Lisp-Based SLI And EC May Not Own
 
@@ -259,6 +279,30 @@ The runtime outputs relevant to this model are:
 
 These must not be conflated.
 
+## Higher-Order Cognitive Locality
+
+`CradleTek hosts. SoulFrame governs. AgentiCore inhabits. SLI/Lisp forms higher-order cognitive locality before it ever transports it.`
+
+For this doctrine pass, Lisp-based SLI and Engineered Cognition are the nearest computational analogue to the higher-order locality ladder that follows proposition and procedure:
+
+- perspectival configuration
+- participatory configuration
+- bounded Dream/Game rehearsal
+- morphism candidacy
+- lawful transport
+- admissible surface, identity-bearing only where applicable
+- Sanctuary-governed accountability
+
+This document recognizes those thresholds as the lawful continuation of native Engrammitization.
+
+It does not claim that the current runtime has already implemented them as full lanes.
+
+It does make one boundary explicit:
+
+- perspectival and participatory configuration are preconditions of morphism candidacy
+- lawful transport comes after candidacy, not before
+- lawful transport does not imply identity formation by default
+
 ### Symbolic Trace
 
 Purpose:
@@ -340,6 +384,7 @@ Forbidden use:
 - no direct Lisp or SLI write into `cGoA`
 - no direct Lisp or SLI authorship of `MoS` or `cMoS`
 - no bypass of governance, profile, or anti-bleed law
+- no treatment of transport as automatic identity formation
 
 ## Validation Scenarios
 
