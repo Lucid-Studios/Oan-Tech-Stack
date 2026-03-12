@@ -2,6 +2,7 @@ using GEL.Graphs;
 using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SoulFrame.Host;
+using System.Globalization;
 
 namespace SLI.Engine.Runtime;
 
@@ -157,6 +158,8 @@ public sealed class SliSymbolTable
             context.AddTrace($"commit({context.FinalDecision})");
             return Task.FromResult(SExpression.AtomNode(context.FinalDecision));
         });
+
+        RegisterHigherOrderLocalityOperators();
 
         Register("morph-root", (expression, context, _) =>
         {
@@ -402,6 +405,323 @@ public sealed class SliSymbolTable
             context.AddTrace($"prop-grade({grade})");
             return Task.FromResult(SExpression.AtomNode("prop-grade"));
         });
+    }
+
+    private void RegisterHigherOrderLocalityOperators()
+    {
+        Register("locality-bind", (expression, context, _) =>
+        {
+            var localitySeed = UnwrapStringLiteral(Arg(expression, 1, "context"));
+            var localityHandle = $"{localitySeed}:{context.Frame.CMEId}:{context.Frame.ContextId:D}";
+            context.HigherOrderLocalityState.Reset(localityHandle);
+            context.AddTrace($"locality-bind({localitySeed})");
+            return Task.FromResult(SExpression.AtomNode("locality-bind"));
+        });
+
+        Register("anchor-self", (expression, context, _) =>
+        {
+            var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.HigherOrderLocalityState.SelfAnchor = anchor;
+            context.AddTrace($"anchor-self({anchor})");
+            return Task.FromResult(SExpression.AtomNode("anchor-self"));
+        });
+
+        Register("anchor-other", (expression, context, _) =>
+        {
+            var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.HigherOrderLocalityState.OtherAnchor = anchor;
+            context.AddTrace($"anchor-other({anchor})");
+            return Task.FromResult(SExpression.AtomNode("anchor-other"));
+        });
+
+        Register("anchor-relation", (expression, context, _) =>
+        {
+            var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.HigherOrderLocalityState.RelationAnchor = anchor;
+            context.AddTrace($"anchor-relation({anchor})");
+            return Task.FromResult(SExpression.AtomNode("anchor-relation"));
+        });
+
+        Register("seal-posture", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var value = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.BoundedSealPosture));
+            if (string.Equals(value, SliHigherOrderLocalityState.BoundedSealPosture, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "sealed", StringComparison.OrdinalIgnoreCase))
+            {
+                state.SealPosture = value.ToLowerInvariant();
+            }
+            else
+            {
+                state.SealPosture = ResolveSafeValue(state.SealPosture, SliHigherOrderLocalityState.BoundedSealPosture);
+                state.AddWarning($"seal-posture rejected invalid value '{value}'.");
+                AddResidue(context, state.Residues, HigherOrderLocalityResidueKind.InvalidPostureValue, "seal-posture", $"Rejected invalid seal posture '{value}'.");
+            }
+
+            context.AddTrace($"seal-posture({state.SealPosture})");
+            return Task.FromResult(SExpression.AtomNode("seal-posture"));
+        });
+
+        Register("reveal-posture", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var value = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.MaskedRevealPosture));
+            if (string.Equals(value, SliHigherOrderLocalityState.MaskedRevealPosture, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "narrow", StringComparison.OrdinalIgnoreCase))
+            {
+                state.RevealPosture = value.ToLowerInvariant();
+            }
+            else
+            {
+                state.RevealPosture = ResolveSafeValue(state.RevealPosture, SliHigherOrderLocalityState.MaskedRevealPosture);
+                state.AddWarning($"reveal-posture rejected invalid value '{value}'.");
+                AddResidue(context, state.Residues, HigherOrderLocalityResidueKind.InvalidPostureValue, "reveal-posture", $"Rejected invalid reveal posture '{value}'.");
+            }
+
+            context.AddTrace($"reveal-posture({state.RevealPosture})");
+            return Task.FromResult(SExpression.AtomNode("reveal-posture"));
+        });
+
+        Register("perspective-configure", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var missingLocality = string.IsNullOrWhiteSpace(state.LocalityHandle);
+            var missingAnchors =
+                string.IsNullOrWhiteSpace(state.SelfAnchor) ||
+                string.IsNullOrWhiteSpace(state.OtherAnchor) ||
+                string.IsNullOrWhiteSpace(state.RelationAnchor);
+
+            if (missingLocality)
+            {
+                AddResidue(
+                    context,
+                    state.Perspective.Residues,
+                    HigherOrderLocalityResidueKind.MissingLocalityPrerequisites,
+                    "perspective-configure",
+                    "Perspective configuration requires a bound locality handle.");
+            }
+
+            if (missingAnchors)
+            {
+                AddResidue(
+                    context,
+                    state.Perspective.Residues,
+                    HigherOrderLocalityResidueKind.MissingAnchorPrerequisites,
+                    "perspective-configure",
+                    "Perspective configuration requires self, other, and relation anchors.");
+            }
+
+            if (missingLocality || missingAnchors)
+            {
+                state.Perspective.IsConfigured = false;
+                state.AddWarning("perspective-configure remained incomplete.");
+                AddResidue(
+                    context,
+                    state.Perspective.Residues,
+                    HigherOrderLocalityResidueKind.IncompletePerspective,
+                    "perspective-configure",
+                    "Perspective configuration remained incomplete because prerequisites were missing.");
+                context.AddTrace("perspective-configure(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("perspective-incomplete"));
+            }
+
+            state.Perspective.IsConfigured = true;
+            context.AddTrace($"perspective-configure({UnwrapStringLiteral(Arg(expression, 1, "locality-state"))})");
+            return Task.FromResult(SExpression.AtomNode("perspective-configure"));
+        });
+
+        Register("perspective-orientation", (expression, context, _) =>
+        {
+            var focus = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var weightValue = UnwrapStringLiteral(Arg(expression, 2, "0.0"));
+            if (string.IsNullOrWhiteSpace(focus) ||
+                !double.TryParse(weightValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var weight))
+            {
+                context.HigherOrderLocalityState.AddWarning($"perspective-orientation ignored invalid weight '{weightValue}'.");
+                AddResidue(
+                    context,
+                    context.HigherOrderLocalityState.Perspective.Residues,
+                    HigherOrderLocalityResidueKind.IncompletePerspective,
+                    "perspective-orientation",
+                    $"Perspective orientation rejected invalid weight '{weightValue}'.");
+                context.AddTrace("perspective-orientation(invalid)");
+                return Task.FromResult(SExpression.AtomNode("perspective-orientation-invalid"));
+            }
+
+            context.HigherOrderLocalityState.Perspective.OrientationVector[focus] = weight;
+            context.AddTrace($"perspective-orientation({focus}:{weight.ToString("0.0###", CultureInfo.InvariantCulture)})");
+            return Task.FromResult(SExpression.AtomNode("perspective-orientation"));
+        });
+
+        Register("perspective-constraint", (expression, context, _) =>
+        {
+            var constraint = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(constraint))
+            {
+                context.HigherOrderLocalityState.Perspective.EthicalConstraints.Add(constraint);
+                context.AddTrace($"perspective-constraint({constraint})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("perspective-constraint"));
+        });
+
+        Register("perspective-weight", (expression, context, _) =>
+        {
+            var name = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var rawValue = UnwrapStringLiteral(Arg(expression, 2, "0.0"));
+            if (string.IsNullOrWhiteSpace(name) ||
+                !double.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+            {
+                context.HigherOrderLocalityState.AddWarning($"perspective-weight ignored invalid value '{rawValue}'.");
+                AddResidue(
+                    context,
+                    context.HigherOrderLocalityState.Perspective.Residues,
+                    HigherOrderLocalityResidueKind.IncompletePerspective,
+                    "perspective-weight",
+                    $"Perspective weight rejected invalid value '{rawValue}'.");
+                context.AddTrace("perspective-weight(invalid)");
+                return Task.FromResult(SExpression.AtomNode("perspective-weight-invalid"));
+            }
+
+            context.HigherOrderLocalityState.Perspective.WeightFunctions[name] = value;
+            context.AddTrace($"perspective-weight({name}:{value.ToString("0.0###", CultureInfo.InvariantCulture)})");
+            return Task.FromResult(SExpression.AtomNode("perspective-weight"));
+        });
+
+        Register("perspective-residue", (expression, context, _) =>
+        {
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "perspective residue"));
+            AddResidue(
+                context,
+                context.HigherOrderLocalityState.Perspective.Residues,
+                HigherOrderLocalityResidueKind.IncompletePerspective,
+                "perspective-residue",
+                detail);
+            context.AddTrace($"perspective-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("perspective-residue"));
+        });
+
+        Register("participation-configure", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            if (!state.Perspective.IsConfigured)
+            {
+                state.Participation.IsConfigured = false;
+                state.Participation.Mode = ResolveSafeValue(state.Participation.Mode, SliHigherOrderLocalityState.ObserveMode);
+                state.AddWarning("participation-configure remained incomplete because perspective is not configured.");
+                AddResidue(
+                    context,
+                    state.Participation.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteParticipation,
+                    "participation-configure",
+                    "Participation configuration requires completed perspective configuration.");
+                context.AddTrace("participation-configure(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("participation-incomplete"));
+            }
+
+            state.Participation.IsConfigured = true;
+            state.Participation.Mode = ResolveSafeValue(state.Participation.Mode, SliHigherOrderLocalityState.ObserveMode);
+            context.AddTrace($"participation-configure({UnwrapStringLiteral(Arg(expression, 1, "locality-state"))})");
+            return Task.FromResult(SExpression.AtomNode("participation-configure"));
+        });
+
+        Register("participation-mode", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var value = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.ObserveMode));
+            if (string.Equals(value, SliHigherOrderLocalityState.ObserveMode, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "engage", StringComparison.OrdinalIgnoreCase))
+            {
+                state.Participation.Mode = value.ToLowerInvariant();
+            }
+            else
+            {
+                state.Participation.Mode = ResolveSafeValue(state.Participation.Mode, SliHigherOrderLocalityState.ObserveMode);
+                state.AddWarning($"participation-mode rejected invalid value '{value}'.");
+                AddResidue(
+                    context,
+                    state.Participation.Residues,
+                    HigherOrderLocalityResidueKind.InvalidParticipationMode,
+                    "participation-mode",
+                    $"Rejected invalid participation mode '{value}'.");
+            }
+
+            context.AddTrace($"participation-mode({state.Participation.Mode})");
+            return Task.FromResult(SExpression.AtomNode("participation-mode"));
+        });
+
+        Register("participation-role", (expression, context, _) =>
+        {
+            var role = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            context.HigherOrderLocalityState.Participation.Role = role;
+            context.AddTrace($"participation-role({role})");
+            return Task.FromResult(SExpression.AtomNode("participation-role"));
+        });
+
+        Register("participation-rule", (expression, context, _) =>
+        {
+            var rule = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(rule))
+            {
+                context.HigherOrderLocalityState.Participation.InteractionRules.Add(rule);
+                context.AddTrace($"participation-rule({rule})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("participation-rule"));
+        });
+
+        Register("participation-capability", (expression, context, _) =>
+        {
+            var capability = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(capability))
+            {
+                context.HigherOrderLocalityState.Participation.CapabilitySet.Add(capability);
+                context.AddTrace($"participation-capability({capability})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("participation-capability"));
+        });
+
+        Register("participation-residue", (expression, context, _) =>
+        {
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "participation residue"));
+            AddResidue(
+                context,
+                context.HigherOrderLocalityState.Participation.Residues,
+                HigherOrderLocalityResidueKind.IncompleteParticipation,
+                "participation-residue",
+                detail);
+            context.AddTrace($"participation-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("participation-residue"));
+        });
+    }
+
+    private static void AddResidue(
+        SliExecutionContext context,
+        ICollection<HigherOrderLocalityResidue> scopedResidues,
+        HigherOrderLocalityResidueKind kind,
+        string source,
+        string detail)
+    {
+        var residue = new HigherOrderLocalityResidue
+        {
+            Kind = kind,
+            Source = source,
+            Detail = detail
+        };
+
+        context.HigherOrderLocalityState.AddResidue(residue);
+        if (!ReferenceEquals(scopedResidues, context.HigherOrderLocalityState.Residues))
+        {
+            scopedResidues.Add(residue);
+        }
+    }
+
+    private static string ResolveSafeValue(string currentValue, string safeDefault)
+    {
+        return string.IsNullOrWhiteSpace(currentValue)
+            ? safeDefault
+            : currentValue;
     }
 
     private static string Arg(SExpression expression, int index, string fallback)

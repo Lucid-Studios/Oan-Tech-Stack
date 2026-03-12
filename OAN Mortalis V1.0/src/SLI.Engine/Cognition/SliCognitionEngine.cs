@@ -167,7 +167,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
         }
     }
 
-    private IReadOnlyList<string> BuildProgram(string objective, IReadOnlyList<string>? symbolicProgram)
+    internal IReadOnlyList<string> BuildProgram(string objective, IReadOnlyList<string>? symbolicProgram)
     {
         var escapedObjective = objective.Replace("\"", "\\\"", StringComparison.Ordinal);
         var program = new List<string>();
@@ -202,6 +202,9 @@ public sealed class SliCognitionEngine : ICognitionEngine
             "(predicate-evaluate identity-continuity)",
             "(context-expand engram-set)",
             "(decision-evaluate predicate-set)",
+            "(locality-bootstrap context cme-self task-objective identity-continuity)",
+            "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+            "(participation-bounded-cme locality-state)",
             "(compass-update context reasoning-state)",
             "(decision-branch cognition-state)",
             "(cleave branch-set)",

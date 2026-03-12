@@ -40,5 +40,64 @@ public sealed class SliCognitionEngineTests
         Assert.False(string.IsNullOrWhiteSpace(engine.LastTraceEvent.TraceId));
         Assert.Equal(result.Decision, engine.LastTraceEvent.DecisionBranch);
         Assert.Equal(result.CleaveResidue, engine.LastTraceEvent.CleaveResidue);
+
+        var localityIndex = IndexOfContaining(engine.LastTraceEvent.SymbolicTrace, "locality-bind(");
+        var perspectiveIndex = IndexOfContaining(engine.LastTraceEvent.SymbolicTrace, "perspective-configure(");
+        var participationIndex = IndexOfContaining(engine.LastTraceEvent.SymbolicTrace, "participation-configure(");
+        var compassIndex = IndexOfContaining(engine.LastTraceEvent.SymbolicTrace, "compass-update(");
+
+        Assert.True(localityIndex >= 0);
+        Assert.True(localityIndex < perspectiveIndex);
+        Assert.True(perspectiveIndex < participationIndex);
+        Assert.True(participationIndex < compassIndex);
+    }
+
+    [Fact]
+    public void CanonicalProgram_UsesCompositeFormsBeforeCompassUpdate()
+    {
+        var engine = new SliCognitionEngine(new EngramResolverService());
+        var program = engine.BuildProgram("identity-continuity", null);
+
+        var localityIndex = IndexOfContaining(program, "(locality-bootstrap");
+        var perspectiveIndex = IndexOfContaining(program, "(perspective-bounded-observer");
+        var participationIndex = IndexOfContaining(program, "(participation-bounded-cme");
+        var compassIndex = IndexOfContaining(program, "(compass-update");
+
+        Assert.True(localityIndex >= 0);
+        Assert.True(localityIndex < perspectiveIndex);
+        Assert.True(perspectiveIndex < participationIndex);
+        Assert.True(participationIndex < compassIndex);
+        CanonicalCognitionCycle.ValidateProgramOrder(program);
+    }
+
+    [Fact]
+    public void CanonicalProgramOrder_FailsWhenCompassPrecedesHigherOrderLocality()
+    {
+        var invalidProgram = new[]
+        {
+            "(decision-evaluate predicate-set)",
+            "(compass-update context reasoning-state)",
+            "(locality-bootstrap context cme-self task-objective identity-continuity)",
+            "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+            "(participation-bounded-cme locality-state)",
+            "(decision-branch cognition-state)",
+            "(cleave branch-set)",
+            "(commit decision)"
+        };
+
+        Assert.Throws<InvalidOperationException>(() => CanonicalCognitionCycle.ValidateProgramOrder(invalidProgram));
+    }
+
+    private static int IndexOfContaining(IReadOnlyList<string> entries, string fragment)
+    {
+        for (var index = 0; index < entries.Count; index++)
+        {
+            if (entries[index].Contains(fragment, StringComparison.Ordinal))
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 }

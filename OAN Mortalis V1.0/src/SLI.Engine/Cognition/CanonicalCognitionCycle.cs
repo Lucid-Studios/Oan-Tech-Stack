@@ -9,6 +9,9 @@ public static class CanonicalCognitionCycle
         "sli-packetization",
         "engram-context-expansion",
         "symbolic-reasoning",
+        "higher-order-locality-bootstrap",
+        "perspectival-configuration",
+        "participatory-configuration",
         "compass-orientation-update",
         "decision-branch-resolution",
         "ontological-cleave",
@@ -21,17 +24,37 @@ public static class CanonicalCognitionCycle
         ArgumentNullException.ThrowIfNull(symbolicProgram);
 
         var reasoningIndex = IndexOf(symbolicProgram, "(decision-evaluate");
+        var localityIndex = IndexOf(symbolicProgram, "(locality-bootstrap");
+        var perspectiveIndex = IndexOf(symbolicProgram, "(perspective-bounded-observer");
+        var participationIndex = IndexOf(symbolicProgram, "(participation-bounded-cme");
         var compassIndex = IndexOf(symbolicProgram, "(compass-update");
         var decisionIndex = IndexOf(symbolicProgram, "(decision-branch");
         var cleaveIndex = IndexOf(symbolicProgram, "(cleave");
         var commitIndex = IndexOf(symbolicProgram, "(commit");
 
-        if (reasoningIndex < 0 || compassIndex < 0 || decisionIndex < 0 || cleaveIndex < 0 || commitIndex < 0)
+        if (reasoningIndex < 0 ||
+            localityIndex < 0 ||
+            perspectiveIndex < 0 ||
+            participationIndex < 0 ||
+            compassIndex < 0 ||
+            decisionIndex < 0 ||
+            cleaveIndex < 0 ||
+            commitIndex < 0)
         {
-            throw new InvalidOperationException("Canonical cognition cycle requires reasoning, compass, decision, cleave, and commit steps.");
+            throw new InvalidOperationException(
+                "Canonical cognition cycle requires reasoning, locality, perspective, participation, compass, decision, cleave, and commit steps.");
         }
 
-        if (!(reasoningIndex < compassIndex && compassIndex < decisionIndex && decisionIndex < cleaveIndex && cleaveIndex < commitIndex))
+        var valid =
+            reasoningIndex < localityIndex &&
+            localityIndex < perspectiveIndex &&
+            perspectiveIndex < participationIndex &&
+            participationIndex < compassIndex &&
+            compassIndex < decisionIndex &&
+            decisionIndex < cleaveIndex &&
+            cleaveIndex < commitIndex;
+
+        if (!valid)
         {
             throw new InvalidOperationException("Canonical cognition cycle ordering violation.");
         }

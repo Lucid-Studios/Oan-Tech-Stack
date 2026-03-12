@@ -33,6 +33,7 @@ public sealed class SliExecutionContext
     public SliExecutionGraph ExecutionGraph { get; } = new();
     internal SliMorphologyState MorphologyState { get; } = new();
     internal SliPropositionState PropositionState { get; } = new();
+    internal SliHigherOrderLocalityState HigherOrderLocalityState { get; } = new();
     public string FinalDecision { get; set; } = "defer";
 
     public void AddTrace(string trace)

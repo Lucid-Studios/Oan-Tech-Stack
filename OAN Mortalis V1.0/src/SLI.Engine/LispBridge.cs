@@ -21,13 +21,15 @@ public sealed class LispBridge
         "reasoning.lisp",
         "engram.lisp",
         "compass.lisp",
-        "morphology.lisp"
+        "morphology.lisp",
+        "locality.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
     private readonly ISoulFrameSemanticDevice _semanticDevice;
     private readonly SliParser _parser = new();
     private readonly SliInterpreter _interpreter = new(new SliSymbolTable());
+    private SliLocalityCompositionExpander? _localityCompositionExpander;
     private bool _initialized;
 
     public LispBridge(IEngramResolver resolver, ISoulFrameSemanticDevice? semanticDevice = null)
@@ -58,6 +60,7 @@ public sealed class LispBridge
         }
 
         LoadedModules = modules;
+        _localityCompositionExpander = new SliLocalityCompositionExpander(modules);
         _initialized = true;
         return Task.CompletedTask;
     }
@@ -75,7 +78,7 @@ public sealed class LispBridge
         ArgumentNullException.ThrowIfNull(symbolicProgram);
         ArgumentNullException.ThrowIfNull(frame);
 
-        var program = _parser.ParseProgram(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
         var context = new SliExecutionContext(frame, _resolver, _semanticDevice);
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         EnforceCanonicalOrdering(context.TraceLines);
@@ -101,6 +104,34 @@ public sealed class LispBridge
             SymbolicTraceHash = traceHash,
             CompassState = compass
         };
+    }
+
+    internal async Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "locality-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return CreateHigherOrderLocalityResult(context);
     }
 
     internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
@@ -306,18 +337,31 @@ public sealed class LispBridge
     private static void EnforceCanonicalOrdering(IReadOnlyList<string> traceLines)
     {
         var reasoningIndex = IndexOf(traceLines, "decision-evaluate(");
+        var localityIndex = IndexOf(traceLines, "locality-bind(");
+        var perspectiveIndex = IndexOf(traceLines, "perspective-configure(");
+        var participationIndex = IndexOf(traceLines, "participation-configure(");
         var compassIndex = IndexOf(traceLines, "compass-update(");
         var decisionIndex = IndexOf(traceLines, "decision-branch(");
         var cleaveIndex = IndexOf(traceLines, "cleave(");
         var commitIndex = IndexOf(traceLines, "commit(");
 
-        if (reasoningIndex < 0 || compassIndex < 0 || decisionIndex < 0 || cleaveIndex < 0 || commitIndex < 0)
+        if (reasoningIndex < 0 ||
+            localityIndex < 0 ||
+            perspectiveIndex < 0 ||
+            participationIndex < 0 ||
+            compassIndex < 0 ||
+            decisionIndex < 0 ||
+            cleaveIndex < 0 ||
+            commitIndex < 0)
         {
             throw new InvalidOperationException("SLI canonical cognition cycle is incomplete.");
         }
 
         var valid =
-            reasoningIndex < compassIndex &&
+            reasoningIndex < localityIndex &&
+            localityIndex < perspectiveIndex &&
+            perspectiveIndex < participationIndex &&
+            participationIndex < compassIndex &&
             compassIndex < decisionIndex &&
             decisionIndex < cleaveIndex &&
             cleaveIndex < commitIndex;
@@ -339,7 +383,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = _parser.ParseProgram(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -367,7 +411,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = _parser.ParseProgram(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -384,6 +428,17 @@ public sealed class LispBridge
         return context.PropositionState;
     }
 
+    private IReadOnlyList<SExpression> ExpandProgram(IReadOnlyList<string> symbolicProgram)
+    {
+        if (!_initialized || _localityCompositionExpander is null)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        var parsedProgram = _parser.ParseProgram(symbolicProgram);
+        return _localityCompositionExpander.ExpandProgram(parsedProgram);
+    }
+
     private static int IndexOf(IReadOnlyList<string> traceLines, string prefix)
     {
         for (var index = 0; index < traceLines.Count; index++)
@@ -395,6 +450,52 @@ public sealed class LispBridge
         }
 
         return -1;
+    }
+
+    private static SliHigherOrderLocalityResult CreateHigherOrderLocalityResult(SliExecutionContext context)
+    {
+        var state = context.HigherOrderLocalityState;
+        return new SliHigherOrderLocalityResult
+        {
+            LocalityHandle = state.LocalityHandle,
+            SelfAnchor = state.SelfAnchor,
+            OtherAnchor = state.OtherAnchor,
+            RelationAnchor = state.RelationAnchor,
+            SealPosture = state.SealPosture,
+            RevealPosture = state.RevealPosture,
+            Warnings = state.Warnings.ToArray(),
+            Residues = CloneResidues(state.Residues),
+            Perspective = new SliPerspectiveResult
+            {
+                IsConfigured = state.Perspective.IsConfigured,
+                OrientationVector = new Dictionary<string, double>(state.Perspective.OrientationVector, StringComparer.OrdinalIgnoreCase),
+                EthicalConstraints = state.Perspective.EthicalConstraints.ToArray(),
+                WeightFunctions = new Dictionary<string, double>(state.Perspective.WeightFunctions, StringComparer.OrdinalIgnoreCase),
+                Residues = CloneResidues(state.Perspective.Residues)
+            },
+            Participation = new SliParticipationResult
+            {
+                IsConfigured = state.Participation.IsConfigured,
+                Mode = state.Participation.Mode,
+                Role = state.Participation.Role,
+                InteractionRules = state.Participation.InteractionRules.ToArray(),
+                CapabilitySet = state.Participation.CapabilitySet.ToArray(),
+                Residues = CloneResidues(state.Participation.Residues)
+            },
+            SymbolicTrace = context.TraceLines.ToArray()
+        };
+    }
+
+    private static IReadOnlyList<HigherOrderLocalityResidue> CloneResidues(IEnumerable<HigherOrderLocalityResidue> residues)
+    {
+        return residues
+            .Select(residue => new HigherOrderLocalityResidue
+            {
+                Kind = residue.Kind,
+                Source = residue.Source,
+                Detail = residue.Detail
+            })
+            .ToArray();
     }
 
     private sealed class NullEngramResolver : IEngramResolver
