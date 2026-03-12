@@ -3,27 +3,22 @@ using SLI.Engine.Parser;
 
 namespace SLI.Engine.Runtime;
 
-internal sealed class SliLocalityCompositionExpander
+internal sealed class SliBoundedCompositionExpander
 {
     private static readonly HashSet<string> AllowedComposites = new(StringComparer.OrdinalIgnoreCase)
     {
         "locality-bootstrap",
         "perspective-bounded-observer",
-        "participation-bounded-cme"
+        "participation-bounded-cme",
+        "rehearsal-bounded-exploration"
     };
 
     private readonly Dictionary<string, CompositeTemplate> _templates;
 
-    public SliLocalityCompositionExpander(IReadOnlyDictionary<string, string> loadedModules)
+    public SliBoundedCompositionExpander(IReadOnlyDictionary<string, string> loadedModules)
     {
         ArgumentNullException.ThrowIfNull(loadedModules);
-
-        if (!loadedModules.TryGetValue("locality.lisp", out var localityModule))
-        {
-            throw new InvalidOperationException("Required Lisp module 'locality.lisp' is not available.");
-        }
-
-        _templates = LoadTemplates(localityModule);
+        _templates = LoadTemplates(loadedModules);
     }
 
     public IReadOnlyList<SExpression> ExpandProgram(IReadOnlyList<SExpression> program)
@@ -80,51 +75,67 @@ internal sealed class SliLocalityCompositionExpander
         return true;
     }
 
-    private static Dictionary<string, CompositeTemplate> LoadTemplates(string localityModule)
+    private static Dictionary<string, CompositeTemplate> LoadTemplates(IReadOnlyDictionary<string, string> loadedModules)
     {
-        var parser = new SliParser();
         var templates = new Dictionary<string, CompositeTemplate>(StringComparer.OrdinalIgnoreCase);
-        var compositeLines = localityModule
-            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim())
-            .Where(line => line.StartsWith("(locality-composite ", StringComparison.Ordinal));
-
-        foreach (var line in compositeLines)
-        {
-            var expression = parser.ParseSingle(line);
-            if (expression.IsAtom || expression.Children.Count < 3)
-            {
-                throw new InvalidOperationException("Malformed locality composite declaration.");
-            }
-
-            var directive = expression.Children[0].Atom;
-            var compositeName = expression.Children[1].Atom;
-            if (!string.Equals(directive, "locality-composite", StringComparison.Ordinal) ||
-                string.IsNullOrWhiteSpace(compositeName))
-            {
-                throw new InvalidOperationException("Malformed locality composite declaration.");
-            }
-
-            if (!AllowedComposites.Contains(compositeName))
-            {
-                throw new InvalidOperationException(
-                    $"Locality composite '{compositeName}' is outside the Sprint A1+B1 bounded composition surface.");
-            }
-
-            var steps = expression.Children.Skip(2).ToArray();
-            templates[compositeName] = new CompositeTemplate(compositeName, DetermineArity(steps), steps);
-        }
+        LoadModuleTemplates(templates, loadedModules, "locality.lisp", "locality-composite");
+        LoadModuleTemplates(templates, loadedModules, "rehearsal.lisp", "rehearsal-composite");
 
         foreach (var required in AllowedComposites)
         {
             if (!templates.ContainsKey(required))
             {
                 throw new InvalidOperationException(
-                    $"Required locality composite '{required}' is not declared in locality.lisp.");
+                    $"Required bounded composite '{required}' is not declared in the embedded Lisp modules.");
             }
         }
 
         return templates;
+    }
+
+    private static void LoadModuleTemplates(
+        Dictionary<string, CompositeTemplate> templates,
+        IReadOnlyDictionary<string, string> loadedModules,
+        string moduleName,
+        string directive)
+    {
+        if (!loadedModules.TryGetValue(moduleName, out var moduleContent))
+        {
+            throw new InvalidOperationException($"Required Lisp module '{moduleName}' is not available.");
+        }
+
+        var parser = new SliParser();
+        var prefix = $"({directive} ";
+        var compositeLines = moduleContent
+            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim())
+            .Where(line => line.StartsWith(prefix, StringComparison.Ordinal));
+
+        foreach (var line in compositeLines)
+        {
+            var expression = parser.ParseSingle(line);
+            if (expression.IsAtom || expression.Children.Count < 3)
+            {
+                throw new InvalidOperationException("Malformed bounded composite declaration.");
+            }
+
+            var expressionDirective = expression.Children[0].Atom;
+            var compositeName = expression.Children[1].Atom;
+            if (!string.Equals(expressionDirective, directive, StringComparison.Ordinal) ||
+                string.IsNullOrWhiteSpace(compositeName))
+            {
+                throw new InvalidOperationException("Malformed bounded composite declaration.");
+            }
+
+            if (!AllowedComposites.Contains(compositeName))
+            {
+                throw new InvalidOperationException(
+                    $"Composite '{compositeName}' is outside the bounded higher-order composition surface.");
+            }
+
+            var steps = expression.Children.Skip(2).ToArray();
+            templates[compositeName] = new CompositeTemplate(compositeName, DetermineArity(steps), steps);
+        }
     }
 
     private static int DetermineArity(IEnumerable<SExpression> steps)

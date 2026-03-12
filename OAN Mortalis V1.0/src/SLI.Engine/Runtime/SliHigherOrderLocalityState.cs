@@ -7,7 +7,11 @@ internal enum HigherOrderLocalityResidueKind
     InvalidPostureValue,
     InvalidParticipationMode,
     IncompletePerspective,
-    IncompleteParticipation
+    IncompleteParticipation,
+    MissingRehearsalPrerequisites,
+    InvalidRehearsalMode,
+    InvalidIdentitySeal,
+    IncompleteRehearsal
 }
 
 internal sealed class HigherOrderLocalityResidue
@@ -55,6 +59,63 @@ internal sealed class SliParticipationState
     }
 }
 
+internal sealed class SliRehearsalSubstitutionState
+{
+    public required string Source { get; init; }
+    public required string Target { get; init; }
+}
+
+internal sealed class SliRehearsalAnalogyState
+{
+    public required string Source { get; init; }
+    public required string Target { get; init; }
+}
+
+internal sealed class SliRehearsalState
+{
+    public const string DreamGameMode = "dream-game";
+    public const string IdentitySealed = "identity-sealed";
+    public const string PreAdmissible = "pre-admissible";
+
+    public bool IsConfigured { get; set; }
+    public string RehearsalHandle { get; private set; } = string.Empty;
+    public string SourceLocalityHandle { get; private set; } = string.Empty;
+    public string Mode { get; set; } = DreamGameMode;
+    public string IdentitySeal { get; set; } = IdentitySealed;
+    public string AdmissionStatus { get; set; } = PreAdmissible;
+    public bool IsBindable { get; set; }
+    public List<string> BranchSet { get; } = [];
+    public List<SliRehearsalSubstitutionState> SubstitutionLedger { get; } = [];
+    public List<SliRehearsalAnalogyState> AnalogyLedger { get; } = [];
+    public List<string> Warnings { get; } = [];
+    public List<HigherOrderLocalityResidue> Residues { get; } = [];
+
+    public void Reset()
+    {
+        IsConfigured = false;
+        RehearsalHandle = string.Empty;
+        SourceLocalityHandle = string.Empty;
+        Mode = DreamGameMode;
+        IdentitySeal = IdentitySealed;
+        AdmissionStatus = PreAdmissible;
+        IsBindable = false;
+        BranchSet.Clear();
+        SubstitutionLedger.Clear();
+        AnalogyLedger.Clear();
+        Warnings.Clear();
+        Residues.Clear();
+    }
+
+    public void Configure(string sourceLocalityHandle, string mode)
+    {
+        Reset();
+        IsConfigured = true;
+        SourceLocalityHandle = sourceLocalityHandle;
+        Mode = mode;
+        RehearsalHandle = $"{sourceLocalityHandle}:rehearsal:{mode}";
+    }
+}
+
 internal sealed class SliHigherOrderLocalityState
 {
     public const string BoundedSealPosture = "bounded";
@@ -71,6 +132,7 @@ internal sealed class SliHigherOrderLocalityState
     public List<HigherOrderLocalityResidue> Residues { get; } = [];
     public SliPerspectiveState Perspective { get; } = new();
     public SliParticipationState Participation { get; } = new();
+    public SliRehearsalState Rehearsal { get; } = new();
 
     public void Reset(string localityHandle)
     {
@@ -84,6 +146,7 @@ internal sealed class SliHigherOrderLocalityState
         Residues.Clear();
         Perspective.Reset();
         Participation.Reset();
+        Rehearsal.Reset();
     }
 
     public void AddWarning(string warning)

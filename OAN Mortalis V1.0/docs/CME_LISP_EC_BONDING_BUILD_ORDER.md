@@ -14,7 +14,16 @@ The implementation ladder is:
 - Perspectival configuration
 - Participatory configuration
 
-Dream/Game rehearsal, witness formation, morphism candidacy, lawful transport, admissibility, and Sanctuary-governed accountability remain deferred.
+The next bounded step is `C`, which implements Dream/Game rehearsal as an explicitly invoked exploratory lane rather than as a required canonical cognition step.
+
+The current maturity sequence is:
+
+- `A1+B1 = lawful inhabitation`
+- `C = lawful rehearsal`
+- `D = witness / morphism candidacy`
+- `E = lawful transport`
+
+Dream/Game rehearsal, witness formation, morphism candidacy, lawful transport, admissibility, and Sanctuary-governed accountability remain deferred from the canonical default lane.
 
 ## Ownership
 
@@ -47,11 +56,17 @@ The runtime code uses `locality` and `anchor` names instead of raw `bond-*` oper
 - insert locality, perspective, and participation into the canonical cognition cycle before `compass-update`
 - prove differential formation in tests using the same C# fixture context with different Lisp-authored locality programs
 
+### C rehearsal
+
+- add an internal rehearsal state lane nested under higher-order locality
+- add bounded rehearsal primitives and rehearsal composite expansion in Lisp
+- add an internal rehearsal execution path that remains non-binding, pre-admissible, non-transporting, and non-canonical by default
+- prove rehearsal requires completed locality, perspective, and participation before branch-local exploration may form
+
 ## Deferred
 
-This slice does not implement:
+The current repo state does not implement:
 
-- Dream/Game rehearsal
 - witness packets
 - morphism candidacy
 - lawful transport
@@ -73,3 +88,10 @@ It must remain:
 - non-transporting
 - pre-admissible
 - pre-accountability
+
+Rehearsal extends that boundary without changing its law:
+
+- rehearsal is internal-first
+- rehearsal is explicitly invoked
+- rehearsal is not a required canonical cognition step
+- rehearsal may vary a world, but it may not vary who is lawfully bound to that world

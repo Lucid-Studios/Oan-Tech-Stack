@@ -58,7 +58,7 @@ public sealed class HigherOrderLocalityInvariantTests
     public void CompositeForms_ExpandOnlyToBoundedLocalityOps()
     {
         var parser = new SliParser();
-        var expander = new SliLocalityCompositionExpander(LispModuleCatalog.LoadModules());
+        var expander = new SliBoundedCompositionExpander(LispModuleCatalog.LoadModules());
         var program = parser.ParseProgram(
             [
                 "(locality-bootstrap context cme-self task-objective identity-continuity)",
@@ -150,7 +150,7 @@ public sealed class HigherOrderLocalityInvariantTests
     private static async Task<SliExecutionContext> ExecuteContextAsync(IReadOnlyList<string> symbolicProgram)
     {
         var parser = new SliParser();
-        var expander = new SliLocalityCompositionExpander(LispModuleCatalog.LoadModules());
+        var expander = new SliBoundedCompositionExpander(LispModuleCatalog.LoadModules());
         var interpreter = new SliInterpreter(new SliSymbolTable());
         var program = expander.ExpandProgram(parser.ParseProgram(symbolicProgram));
         var context = new SliExecutionContext(

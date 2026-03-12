@@ -134,20 +134,20 @@ public sealed class HigherOrderLocalityProgramTests
     }
 
     [Fact]
-    public async Task FutureWitnessOrTransportOps_RemainUnknownInSprintAB()
+    public async Task WitnessMorphismAndTransportOps_RemainUnknownAfterSprintC()
     {
         var bridge = await CreateBridgeAsync();
 
         var result = await bridge.ExecuteHigherOrderLocalityProgramAsync(
             [
                 "(locality-bootstrap context cme-self task-objective identity-continuity)",
-                "(rehearsal-branch locality-state)",
+                "(morphism-candidate locality-state)",
                 "(witness-packet locality-state)",
                 "(transport-begin locality-state)"
             ],
             "identity-continuity");
 
-        Assert.Contains("unknown-op(rehearsal-branch)", result.SymbolicTrace);
+        Assert.Contains("unknown-op(morphism-candidate)", result.SymbolicTrace);
         Assert.Contains("unknown-op(witness-packet)", result.SymbolicTrace);
         Assert.Contains("unknown-op(transport-begin)", result.SymbolicTrace);
     }

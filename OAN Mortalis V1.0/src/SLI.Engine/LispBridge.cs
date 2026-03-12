@@ -22,14 +22,15 @@ public sealed class LispBridge
         "engram.lisp",
         "compass.lisp",
         "morphology.lisp",
-        "locality.lisp"
+        "locality.lisp",
+        "rehearsal.lisp"
     ];
 
     private readonly IEngramResolver _resolver;
     private readonly ISoulFrameSemanticDevice _semanticDevice;
     private readonly SliParser _parser = new();
     private readonly SliInterpreter _interpreter = new(new SliSymbolTable());
-    private SliLocalityCompositionExpander? _localityCompositionExpander;
+    private SliBoundedCompositionExpander? _boundedCompositionExpander;
     private bool _initialized;
 
     public LispBridge(IEngramResolver resolver, ISoulFrameSemanticDevice? semanticDevice = null)
@@ -60,7 +61,7 @@ public sealed class LispBridge
         }
 
         LoadedModules = modules;
-        _localityCompositionExpander = new SliLocalityCompositionExpander(modules);
+        _boundedCompositionExpander = new SliBoundedCompositionExpander(modules);
         _initialized = true;
         return Task.CompletedTask;
     }
@@ -132,6 +133,34 @@ public sealed class LispBridge
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         return CreateHigherOrderLocalityResult(context);
+    }
+
+    internal async Task<SliBoundedRehearsalResult> ExecuteBoundedRehearsalProgramAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("LispBridge has not been initialized.");
+        }
+
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        var program = ExpandProgram(symbolicProgram);
+        var context = new SliExecutionContext(
+            new ContextFrame
+            {
+                CMEId = "rehearsal-fixture",
+                SoulFrameId = Guid.Empty,
+                ContextId = Guid.Empty,
+                TaskObjective = objective,
+                Engrams = []
+            },
+            NullEngramResolver.Instance,
+            _semanticDevice);
+
+        await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        return CreateBoundedRehearsalResult(context);
     }
 
     internal async Task<SliMorphologySentenceResult> ExecuteMorphologySentenceProgramAsync(
@@ -430,13 +459,13 @@ public sealed class LispBridge
 
     private IReadOnlyList<SExpression> ExpandProgram(IReadOnlyList<string> symbolicProgram)
     {
-        if (!_initialized || _localityCompositionExpander is null)
+        if (!_initialized || _boundedCompositionExpander is null)
         {
             throw new InvalidOperationException("LispBridge has not been initialized.");
         }
 
         var parsedProgram = _parser.ParseProgram(symbolicProgram);
-        return _localityCompositionExpander.ExpandProgram(parsedProgram);
+        return _boundedCompositionExpander.ExpandProgram(parsedProgram);
     }
 
     private static int IndexOf(IReadOnlyList<string> traceLines, string prefix)
@@ -481,6 +510,43 @@ public sealed class LispBridge
                 InteractionRules = state.Participation.InteractionRules.ToArray(),
                 CapabilitySet = state.Participation.CapabilitySet.ToArray(),
                 Residues = CloneResidues(state.Participation.Residues)
+            },
+            SymbolicTrace = context.TraceLines.ToArray()
+        };
+    }
+
+    private static SliBoundedRehearsalResult CreateBoundedRehearsalResult(SliExecutionContext context)
+    {
+        var state = context.HigherOrderLocalityState.Rehearsal;
+        return new SliBoundedRehearsalResult
+        {
+            Locality = CreateHigherOrderLocalityResult(context),
+            Rehearsal = new SliRehearsalResult
+            {
+                IsConfigured = state.IsConfigured,
+                RehearsalHandle = state.RehearsalHandle,
+                SourceLocalityHandle = state.SourceLocalityHandle,
+                Mode = state.Mode,
+                IdentitySeal = state.IdentitySeal,
+                AdmissionStatus = state.AdmissionStatus,
+                IsBindable = state.IsBindable,
+                BranchSet = state.BranchSet.ToArray(),
+                SubstitutionLedger = state.SubstitutionLedger
+                    .Select(entry => new SliRehearsalSubstitutionResult
+                    {
+                        Source = entry.Source,
+                        Target = entry.Target
+                    })
+                    .ToArray(),
+                AnalogyLedger = state.AnalogyLedger
+                    .Select(entry => new SliRehearsalAnalogyResult
+                    {
+                        Source = entry.Source,
+                        Target = entry.Target
+                    })
+                    .ToArray(),
+                Warnings = state.Warnings.ToArray(),
+                Residues = CloneResidues(state.Residues)
             },
             SymbolicTrace = context.TraceLines.ToArray()
         };

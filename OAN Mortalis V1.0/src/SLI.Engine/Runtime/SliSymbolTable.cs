@@ -160,6 +160,7 @@ public sealed class SliSymbolTable
         });
 
         RegisterHigherOrderLocalityOperators();
+        RegisterBoundedRehearsalOperators();
 
         Register("morph-root", (expression, context, _) =>
         {
@@ -696,6 +697,183 @@ public sealed class SliSymbolTable
         });
     }
 
+    private void RegisterBoundedRehearsalOperators()
+    {
+        Register("rehearsal-begin", (expression, context, _) =>
+        {
+            var state = context.HigherOrderLocalityState;
+            var rehearsal = state.Rehearsal;
+            var modeValue = UnwrapStringLiteral(Arg(expression, 2, SliRehearsalState.DreamGameMode));
+            var mode = ResolveRehearsalMode(modeValue);
+            if (!string.Equals(modeValue, mode, StringComparison.OrdinalIgnoreCase))
+            {
+                rehearsal.Warnings.Add($"rehearsal-begin rejected invalid mode '{modeValue}'.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.InvalidRehearsalMode,
+                    "rehearsal-begin",
+                    $"Rejected invalid rehearsal mode '{modeValue}'.");
+            }
+
+            var missingPrerequisites =
+                string.IsNullOrWhiteSpace(state.LocalityHandle) ||
+                !state.Perspective.IsConfigured ||
+                !state.Participation.IsConfigured ||
+                !HasSafeSealPosture(state.SealPosture);
+
+            if (missingPrerequisites)
+            {
+                rehearsal.IsConfigured = false;
+                rehearsal.Warnings.Add("rehearsal-begin requires completed locality, perspective, participation, and safe seal posture.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.MissingRehearsalPrerequisites,
+                    "rehearsal-begin",
+                    "Rehearsal requires completed locality, perspective, participation, and safe seal posture.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteRehearsal,
+                    "rehearsal-begin",
+                    "Rehearsal remained incomplete because prerequisites were missing.");
+                context.AddTrace("rehearsal-begin(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("rehearsal-incomplete"));
+            }
+
+            rehearsal.Configure(state.LocalityHandle, mode);
+            context.AddTrace($"rehearsal-begin({mode})");
+            return Task.FromResult(SExpression.AtomNode("rehearsal-begin"));
+        });
+
+        Register("rehearsal-branch", (expression, context, _) =>
+        {
+            var rehearsal = context.HigherOrderLocalityState.Rehearsal;
+            if (!rehearsal.IsConfigured)
+            {
+                rehearsal.Warnings.Add("rehearsal-branch requires rehearsal-begin.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteRehearsal,
+                    "rehearsal-branch",
+                    "Branch formation requires an active rehearsal.");
+                context.AddTrace("rehearsal-branch(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("rehearsal-branch-incomplete"));
+            }
+
+            var branch = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            if (!string.IsNullOrWhiteSpace(branch))
+            {
+                rehearsal.BranchSet.Add(branch);
+                context.AddTrace($"rehearsal-branch({branch})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("rehearsal-branch"));
+        });
+
+        Register("rehearsal-substitute", (expression, context, _) =>
+        {
+            var rehearsal = context.HigherOrderLocalityState.Rehearsal;
+            if (!rehearsal.IsConfigured)
+            {
+                rehearsal.Warnings.Add("rehearsal-substitute requires rehearsal-begin.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteRehearsal,
+                    "rehearsal-substitute",
+                    "Substitution requires an active rehearsal.");
+                context.AddTrace("rehearsal-substitute(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("rehearsal-substitute-incomplete"));
+            }
+
+            var source = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var target = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(source) && !string.IsNullOrWhiteSpace(target))
+            {
+                rehearsal.SubstitutionLedger.Add(new SliRehearsalSubstitutionState
+                {
+                    Source = source,
+                    Target = target
+                });
+                context.AddTrace($"rehearsal-substitute({source}->{target})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("rehearsal-substitute"));
+        });
+
+        Register("rehearsal-analogy", (expression, context, _) =>
+        {
+            var rehearsal = context.HigherOrderLocalityState.Rehearsal;
+            if (!rehearsal.IsConfigured)
+            {
+                rehearsal.Warnings.Add("rehearsal-analogy requires rehearsal-begin.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.IncompleteRehearsal,
+                    "rehearsal-analogy",
+                    "Analogy requires an active rehearsal.");
+                context.AddTrace("rehearsal-analogy(incomplete)");
+                return Task.FromResult(SExpression.AtomNode("rehearsal-analogy-incomplete"));
+            }
+
+            var source = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
+            var target = UnwrapStringLiteral(Arg(expression, 2, string.Empty));
+            if (!string.IsNullOrWhiteSpace(source) && !string.IsNullOrWhiteSpace(target))
+            {
+                rehearsal.AnalogyLedger.Add(new SliRehearsalAnalogyState
+                {
+                    Source = source,
+                    Target = target
+                });
+                context.AddTrace($"rehearsal-analogy({source}~{target})");
+            }
+
+            return Task.FromResult(SExpression.AtomNode("rehearsal-analogy"));
+        });
+
+        Register("rehearsal-seal", (expression, context, _) =>
+        {
+            var rehearsal = context.HigherOrderLocalityState.Rehearsal;
+            var value = UnwrapStringLiteral(Arg(expression, 1, SliRehearsalState.IdentitySealed));
+            if (string.Equals(value, SliRehearsalState.IdentitySealed, StringComparison.OrdinalIgnoreCase))
+            {
+                rehearsal.IdentitySeal = SliRehearsalState.IdentitySealed;
+            }
+            else
+            {
+                rehearsal.IdentitySeal = SliRehearsalState.IdentitySealed;
+                rehearsal.IsBindable = false;
+                rehearsal.Warnings.Add($"rehearsal-seal rejected invalid value '{value}'.");
+                AddResidue(
+                    context,
+                    rehearsal.Residues,
+                    HigherOrderLocalityResidueKind.InvalidIdentitySeal,
+                    "rehearsal-seal",
+                    $"Rejected invalid rehearsal identity seal '{value}'.");
+            }
+
+            context.AddTrace($"rehearsal-seal({rehearsal.IdentitySeal})");
+            return Task.FromResult(SExpression.AtomNode("rehearsal-seal"));
+        });
+
+        Register("rehearsal-residue", (expression, context, _) =>
+        {
+            var detail = UnwrapStringLiteral(Arg(expression, 1, "rehearsal residue"));
+            AddResidue(
+                context,
+                context.HigherOrderLocalityState.Rehearsal.Residues,
+                HigherOrderLocalityResidueKind.IncompleteRehearsal,
+                "rehearsal-residue",
+                detail);
+            context.AddTrace($"rehearsal-residue({detail})");
+            return Task.FromResult(SExpression.AtomNode("rehearsal-residue"));
+        });
+    }
+
     private static void AddResidue(
         SliExecutionContext context,
         ICollection<HigherOrderLocalityResidue> scopedResidues,
@@ -722,6 +900,24 @@ public sealed class SliSymbolTable
         return string.IsNullOrWhiteSpace(currentValue)
             ? safeDefault
             : currentValue;
+    }
+
+    private static bool HasSafeSealPosture(string value)
+    {
+        return string.Equals(value, SliHigherOrderLocalityState.BoundedSealPosture, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(value, "sealed", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ResolveRehearsalMode(string value)
+    {
+        if (string.Equals(value, SliRehearsalState.DreamGameMode, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "dream", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "game", StringComparison.OrdinalIgnoreCase))
+        {
+            return value.ToLowerInvariant();
+        }
+
+        return SliRehearsalState.DreamGameMode;
     }
 
     private static string Arg(SExpression expression, int index, string fallback)

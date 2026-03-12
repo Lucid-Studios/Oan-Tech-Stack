@@ -67,6 +67,7 @@ public sealed class SliCognitionEngineTests
         Assert.True(localityIndex < perspectiveIndex);
         Assert.True(perspectiveIndex < participationIndex);
         Assert.True(participationIndex < compassIndex);
+        Assert.DoesNotContain(program, line => line.Contains("rehearsal-", StringComparison.Ordinal));
         CanonicalCognitionCycle.ValidateProgramOrder(program);
     }
 
