@@ -144,12 +144,14 @@ Lisp provides the live computational morphology in which Engineered Cognition ca
 - symbolic trace formation
 - decision-structure compilation
 - local reflective recomposition
+- theater-scoped uptake qualification between tensor resonance and SLI/Lisp actualization
 - higher-order cognitive locality formation under bounded runtime law
 - lawful cognitive morphism inside bounded runtime space
 - temporary symbolic residues produced during active cognition
 
-These runtime-local transformations do not yet formalize perspectival configuration, participatory configuration, bounded Dream/Game rehearsal, morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those doctrine seams are defined in:
+These runtime-local transformations do not yet formalize the full pre-actualization uptake conformance seam, perspectival configuration, participatory configuration, bounded Dream/Game rehearsal, morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those doctrine seams are defined in:
 
+- `docs/THEATER_SCOPED_UPTAKE_CONFORMANCE_MODEL.md`
 - `docs/PROPOSITION_TO_PERSPECTIVAL_CONFIGURATION_MODEL.md`
 - `docs/PERSPECTIVAL_TO_PARTICIPATORY_ENGRAM_FORMATION_MODEL.md`
 - `docs/BOUNDED_DREAM_GAME_REHEARSAL_MODEL.md`
@@ -162,9 +164,12 @@ These runtime-local transformations do not yet formalize perspectival configurat
 - profile law
 - anti-bleed law
 - collapse authority
+- self-validity authorship by improvisation
 - direct `cSelfGEL` mutation
 - direct `cGoA` write
 - direct `MoS` or `cMoS` authorship
+
+When active runtime cognition encounters contradiction between hot `cSelfGEL` candidate meaning and cooler `SelfGEL` validation-bearing meaning, Lisp-based SLI and Engineered Cognition may detect, packetize, and route that contradiction. They may not invent a bridge meaning merely to keep the runtime fluent.
 
 ## Placement In The Runtime Chain
 
@@ -246,6 +251,16 @@ This means the current architecture reads as:
 - C# adapters materialize canonical contract-shaped outputs
 - C# validators remain the closure authority
 
+This is current truth, not target truth.
+
+The target doctrine is that semantic ownership migrates to a target SLI/Lisp runtime while the current host-side interpreter stack becomes membrane authority for legality, transport, telemetry, conditioning, and return.
+
+That transfer is defined in:
+
+- `docs/SLI_RUNTIME_SEMANTIC_OWNERSHIP_TRANSFER.md`
+
+Until that transfer is complete, the host interpreter remains materially authoritative for runtime meaning and should be described that way.
+
 ## Candidate Engram Formation
 
 Candidate engram formation is the native output class that matters for collapse.
@@ -302,6 +317,19 @@ It does make one boundary explicit:
 - perspectival and participatory configuration are preconditions of morphism candidacy
 - lawful transport comes after candidacy, not before
 - lawful transport does not imply identity formation by default
+
+### Theater-Scoped Uptake
+
+This document also recognizes an upstream seam between tensor resonance and SLI/Lisp actualization.
+
+That seam is formalized in `docs/THEATER_SCOPED_UPTAKE_CONFORMANCE_MODEL.md`.
+
+Its governing interpretation is:
+
+- resonance may propose neighborhoods
+- Lisp-based SLI and Engineered Cognition must qualify those neighborhoods lawfully before actualizing any uptake object
+- that qualification is pre-witness, pre-transport, pre-admissibility, and pre-Sanctuary
+- OAN terms remain primary, while IUTT-derived language such as `species`, `basepoint`, `torsor`, and `mutation-core` remains secondary explanatory mapping
 
 ### Symbolic Trace
 

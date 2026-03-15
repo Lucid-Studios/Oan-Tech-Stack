@@ -391,6 +391,13 @@ The default placement model is:
 - `SelfGEL` is the active bounded working self-state inside AgentiCore
 - active runtime does not directly author sovereign custody
 
+Correction note:
+
+- the current runtime code and some older doctrine still carry a legacy inversion of hot/cool self-state language
+- the corrected reading is that `c*` surfaces are Cryptic-active and operationally hot, while the corresponding unprefixed surface is the cooler stabilized validation-bearing counterpart unless another governing contract explicitly says otherwise
+- runtime migration must make that duty split explicit in code rather than relying on naming convenience
+- until that migration lands, any contradiction between hot runtime self-meaning and cooled self-validation must be treated as validation work or obstruction, never as a cue for local meaning invention
+
 ## Hard Invariants
 
 - no direct `SelfGEL -> cGoA` write
@@ -404,6 +411,8 @@ The default placement model is:
 - no Prime publication from active runtime residue without a later governed derivative path
 - symbolic trace alone is not an engram candidate
 - no collapse path may treat symbolic trace as equivalent to candidate engram structure without explicit native Engrammitization
+- no user-, operator-, or telemetry-provided claim may become validated self-memory merely because active runtime found it narratively convenient
+- no contradiction between hot runtime self-meaning and cooled self-validation may be resolved by local invention; unresolved conflict must remain evidence for mediated validation or obstructed routing
 
 ## Planned Runtime Object Vocabulary
 

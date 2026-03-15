@@ -89,6 +89,7 @@ SLI may:
 - packetize, route, transform, and tensorize symbolic material
 - emit evidence, refusals, and commit intents
 - connect stack components to protected stores and modules through lawful symbolic interfaces
+- qualify uptake candidates under theater-scoped conformance before any witness, transport, admissibility, or accountability claim becomes lawful
 - form higher-order cognitive locality under bounded runtime law before any transport or identity claim becomes admissible
 
 SLI may not:
@@ -97,7 +98,52 @@ SLI may not:
 - seize runtime authority
 - directly rewrite GEL
 - directly rewrite AgentiCore or SoulFrame state outside lawful interfaces
+- let tensor resonance bypass lawful conformance into actualized accountable objects
+- promote user-provided or telemetry-provided self-claims into validated self-state without lawful cross-surface checking
+- invent reconciliatory meaning when a hot `c*` surface contradicts its cooler validation counterpart
+- let the host membrane silently inherit semantic authority for legal SLI programs that belong to the target runtime
 - treat lawful transport as automatic identity formation
+
+When semantic ownership transfer is in effect for a migrated SLI lane, the membrane may judge legality, but it may not judge meaning.
+
+### Cross-Surface Self-Validation Law
+
+When hot `c*` runtime cognition encounters contradiction against a cooler `*` validation surface, the stack may:
+
+- poll the lawful validation surface
+- poll another governed non-self surface when the contradiction concerns schedule, asset, capability, or permission
+- emit residue or obstruction
+- defer promotion
+- route identity-bearing conflict to SoulFrame-mediated continuity handling
+
+The stack may not:
+
+- treat a user claim as validated self-memory merely because it is linguistically coherent
+- treat observed behavior as equivalent to permission, capability, or authority
+- invent local meaning to dissolve contradiction before validation
+- promote unresolved contradiction into Prime, admissibility, or accountability surfaces
+
+### Membrane And Target Runtime Law
+
+For migrated SLI semantic lanes:
+
+- the target runtime is meaning-authority
+- the membrane is legality, transport, telemetry, conditioning, and return authority
+- target absence must resolve to refusal or explicit unavailable status, not host semantic fallback
+
+The membrane may therefore:
+
+- reject
+- quarantine
+- trace
+- receipt
+- mediate host-device transport
+
+The membrane may not:
+
+- reinterpret a legal program's meaning
+- invent cognition results when target semantics are unavailable
+- quietly execute host semantics under target naming
 
 ### GEL Law
 
@@ -442,11 +488,38 @@ Governing warning:
 
 > The system must not attempt transport across localities it has not yet lawfully inhabited.
 
+## Theater-Scoped Uptake Law
+
+Before witness or transport becomes lawful, SLI may perform theater-scoped uptake inside a lawful Theater.
+
+That uptake remains a bounded conformance seam between tensor resonance and SLI/Lisp actualization.
+
+It may:
+
+- type a candidate by lawful engram kind
+- declare observer-position and relative carrier posture
+- derive local atlas and functor plans
+- extract an invariant-bearing core
+- refuse actualization through consistency or cohomology obstruction
+- emit bounded uptake candidates or packets for later lanes
+
+It may not:
+
+- treat resonance as already witnessed
+- treat uptake as already transported
+- treat uptake as already admissible
+- treat uptake as already accountable
+- bypass identity, custody, `GEL`, or Sanctuary law
+
 ## Theater Transition Law
 
 Each Theater is a local universe with its own geometry, ruleset, symbolic grammar, admissible actors, and lawful operations.
 
-In stack terms, a Theater is an Inter-universal Techmuller Theory-aligned locality surface for universal selection.
+In stack terms, a Theater is an OAN locality surface whose conformance law is being deliberately derived from IUTT-level distinctions for engineered cognition.
+
+Repo terms remain primary.
+
+No literal one-to-one formal identity with Mochizuki's formal objects is claimed unless exact correspondences are explicitly specified.
 
 Each Theater therefore acts as a distinct coordinate system for cognition.
 

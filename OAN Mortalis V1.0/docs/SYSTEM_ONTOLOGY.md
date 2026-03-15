@@ -185,6 +185,7 @@ Prohibited actions:
 - must not silently rewrite AgentiCore identity or OE contents
 - must not act as an autonomous cognition engine
 - must not collapse into a generic everything-service host
+- must not let a host membrane interpreter remain hidden semantic authority once target runtime transfer has been declared
 
 Failure semantics:
 
@@ -256,6 +257,7 @@ Authority status:
 
 - non-authoritative for identity and runtime command
 - authoritative for symbolic transport grammar and gate evidence structure
+- target SLI/Lisp runtime is the intended semantic authority for legal SLI program meaning once ownership transfer is complete
 
 Identity relation:
 
@@ -282,6 +284,7 @@ Prohibited actions:
 - must not seize sibling-family authority
 - must not directly mutate GEL or runtime state outside lawful gate paths
 - must not be treated as a generic symbolic helper detached from native runtime cognition
+- host-side SLI support layers must not continue as covert meaning-authority once target runtime lanes are declared migrated
 
 Failure semantics:
 
@@ -485,8 +488,9 @@ Examples:
 Default interpretation:
 
 - a `c*` surface belongs to the explicit Cryptic SLI side of the stack
-- it is protected, non-public, and not automatically rights-processed for shared release
+- it is protected, non-public, operationally hot where runtime law instantiates it, and not automatically rights-processed for shared release
 - it must not be treated as Prime-safe by naming convenience alone
+- the corresponding unprefixed surface is the cooler stabilized, validation-bearing, or release-conditioned counterpart unless another governing contract says otherwise
 
 ### SelfGEL And cSelfGEL
 
@@ -510,10 +514,12 @@ Identity relation:
 
 Placement default:
 
-- `cSelfGEL` is issued through SoulFrame as mediated protected self-state
-- `SelfGEL` is the active bounded working self-state in AgentiCore
+- `cSelfGEL` is the Cryptic-active, protected, operationally hot self field used for bounded runtime cognition where active EC is lawfully instantiated
+- `SelfGEL` is the cooler stabilized self-readable and validation-bearing counterpart surface
 - neither surface is the same thing as direct sovereign custody
 - neither surface is the root substrate of the weave that precedes stabilized self-readable formation
+- contradiction between `cSelfGEL` and `SelfGEL` must be resolved by lawful validation or remain obstruction; hot runtime cognition may not invent meaning to replace validation
+- older language that treated the duties as inverted should be read as migration debt and corrected explicitly rather than preserved by implication
 
 Admissibility and Sanctuary-governed accountability remain later governance thresholds over these stabilized self-readable surfaces.
 

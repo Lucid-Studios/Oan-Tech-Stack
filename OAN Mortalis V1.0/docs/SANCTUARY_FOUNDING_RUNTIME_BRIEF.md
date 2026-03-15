@@ -190,6 +190,18 @@ Primary theaters:
 
 Theaters must not be collapsed for convenience.
 
+Before Sanctuary sees anything, SLI may perform a theater-scoped uptake pass inside a lawful Theater.
+
+That uptake seam remains:
+
+- SLI-side
+- pre-witness
+- pre-transport
+- pre-admissibility
+- pre-Sanctuary judgment
+
+OAN is deliberately deriving that uptake conformance from IUTT-level distinctions while keeping OAN terms primary and keeping Sanctuary outside the uptake loop.
+
 ### 3.2 OE (Opal Engram)
 
 OE is the identity spine and witness chain.
@@ -222,6 +234,8 @@ OE points to them. It does not absorb them.
 `SelfGEL` and `cSelfGEL` should be read as the first stabilized self-readable surfaces that emerge inside the coherence-binding regime, not as root substrate.
 
 Those stabilized self-readable surfaces are not governed identity by default. Admissibility and Sanctuary accountability remain later thresholds.
+
+For future target-runtime work, Sanctuary and SoulFrame-side host services must be read as membrane and telemetry authorities, not as hidden semantic owners of SLI cognition. When semantic ownership migrates, the target SLI/Lisp runtime becomes meaning-authority while host C# services remain legality, conditioning, and return authorities only.
 
 ### 3.4 Internal governance CMEs
 

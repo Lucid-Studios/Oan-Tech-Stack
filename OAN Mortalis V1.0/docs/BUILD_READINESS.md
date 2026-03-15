@@ -68,6 +68,7 @@ Observed repository conditions:
 - the repo now also has a first-class propositional compile layer before `EngramDraft`, with canonical proposition contracts in `GEL.Contracts`, a bounded triadic proposition model, and a hybrid protected-ingress proposition proof lane that stabilizes masked governance-topology propositions before membrane submission and Prime closure
 - the repo now also has a doctrine-first weave-to-proposition stabilization seam that formalizes `pre-instantiated coherence -> proposition-bearing stabilization -> admissible proposition surface -> Sanctuary-governed accountability`, keeps morphism candidacy explicitly deferred to `docs/PROPOSITION_TO_MORPHISM_CANDIDACY_MODEL.md`, and preserves Sanctuary as the accountability boundary rather than the source of formative coherence
 - the repo now also has doctrine-first higher-order cognitive locality seams that formalize `proposition -> procedure -> perspectival configuration -> participatory configuration -> bounded Dream/Game rehearsal -> morphism candidacy -> lawful transport -> admissible surface (identity-bearing only where applicable) -> Sanctuary-governed accountability`, keep SLI/Lisp as the lawful locality engine before transport, and keep admissibility distinct from governed identity
+- the repo now also has an IUTT-derived theater-scoped uptake conformance seam that formalizes `tensor resonance -> root anchoring -> theater selection -> engram kind typing -> observer-position declaration -> relative carrier decision -> local atlas / functor plan -> invariant-core extraction -> obstruction qualification -> SLI/Lisp actualization`, keeps OAN terms primary, and keeps uptake distinct from witness, transport, admissibility, and Sanctuary judgment
 - The first explicit Cryptic custody, SoulFrame membrane, and Prime derivative interfaces now exist in `src/Oan.Common`
 - The active Prime routing path now depends on derivative publication contracts rather than directly on coarse public plane store access
 - SoulFrame membrane payloads have been narrowed in code so projection and return intake carry bounded worker-cognition and return-candidate shapes rather than broad custody-oriented fields
@@ -211,13 +212,19 @@ Primary risk:
 
 - the solution appears conceptually rich but assembly boundaries are still broad and overlapping
 - the new Lisp bridge proves morphology parity on fixed corpora only; authority still rightly remains in the C# shell, and the new admission membrane makes lawful crossing explicit before any candidate may approach Prime closure
+- semantic ownership transfer from the current C# interpreter stack to a target SLI/Lisp runtime is now doctrine-defined, but no IR or capability manifest, migrated semantic subset, or refusal-on-target-absence enforcement exists yet
 - higher-order cognitive locality beyond proposition and procedure is now doctrine-defined, but it remains intentionally separate from runtime transport implementation
+- theater-scoped uptake between tensor resonance and SLI/Lisp actualization is now doctrine-defined, but no runtime selector, species/basepoint qualification lane, or uptake packet lane has been implemented yet
+- cross-surface self-validation between hot `c*` runtime reasoning and cooler validation-bearing `*` surfaces is now doctrine-defined, but the active runtime does not yet model claim class, contradiction class, or validation routing explicitly
 
 Supporting document:
 
 - `docs/SYSTEM_ONTOLOGY.md`
+- `docs/CROSS_SURFACE_SELF_VALIDATION_MODEL.md`
+- `docs/SLI_RUNTIME_SEMANTIC_OWNERSHIP_TRANSFER.md`
 - `docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
 - `docs/PRIME_CRYPTIC_DATA_TOPOLOGY.md`
+- `docs/THEATER_SCOPED_UPTAKE_CONFORMANCE_MODEL.md`
 - `docs/CME_RUNTIME_LIFECYCLE_AND_COLLAPSE_MODEL.md`
 - `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`
 - `docs/ATLAS_ENGRAM_CANONICALIZATION_NOTE.md`
@@ -264,6 +271,19 @@ Supporting document:
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
 - `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
 - `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
+
+### Immediate Correction Notes
+
+The following active code surfaces should be updated in a later implementation pass to prevent the reasoning error where a claim is treated as validated self-memory merely because it resonates:
+
+- `src/AgentiCore/Models/AgentiSelfGelModels.cs`
+  - extend the working pool beyond `ActiveConcepts` and stringly `WorkingMemory` so hot/cool self-state, claim provenance, contradiction class, and validation routing become explicit
+- `src/CradleTek.Memory/Services/EngramResolverService.cs`
+  - separate uptake scoring from self-validity, schedule validity, asset validity, and permission validity so concept/token resonance is not mistaken for lawful confirmation
+- `src/SLI.Engine/LispBridge.cs`, `src/SLI.Engine/Runtime/SliInterpreter.cs`, and `src/SLI.Engine/Runtime/SliSymbolTable.cs`
+  - split membrane duties from semantic duties, define shared IR and capability surfaces, and refuse migrated cognition lanes when target semantics are unavailable instead of falling back to host meaning
+- later SLI selector and uptake runtime work
+  - carry claim provenance, self-implication class, contradiction evidence, and validation receipts before any self-related actualization, transport, admissibility, or accountability path becomes lawful
 
 ### Stage 3. Operable
 
