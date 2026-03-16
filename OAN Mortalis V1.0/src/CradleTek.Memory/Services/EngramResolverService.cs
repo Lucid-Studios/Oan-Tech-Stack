@@ -8,6 +8,24 @@ namespace CradleTek.Memory.Services;
 
 public sealed class EngramResolverService : IEngramResolver
 {
+    private static readonly string[] SelfMarkers =
+    [
+        "self",
+        "identity",
+        "continuity",
+        "autobiographical",
+        "subject"
+    ];
+
+    private static readonly string[] ContradictionMarkers =
+    [
+        "other",
+        "mismatch",
+        "contradict",
+        "foreign",
+        "not-self"
+    ];
+
     private readonly object _loadGate = new();
     private bool _loaded;
     private string _source = "Lucid Research Corpus";
@@ -57,6 +75,40 @@ public sealed class EngramResolverService : IEngramResolver
         };
 
         return ResolveByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<EngramSelfResolutionResult> ResolveSelfSensitiveAsync(
+        CognitionContext context,
+        string cSelfGelHandle,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(cSelfGelHandle);
+
+        var relevant = await ResolveRelevantAsync(context, cancellationToken).ConfigureAwait(false);
+        var validationReferenceHandle = EngramSelfResolutionFactory.CreateCooledValidationHandle(cSelfGelHandle);
+        var queryTokens = Tokenize(context.TaskObjective)
+            .Concat(Tokenize(string.Join(" ", context.RelevantEngrams.Select(entry => entry.SummaryText))))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        var selfSensitiveQuery = queryTokens.Any(IsSelfMarker);
+        var contradictionRequested = selfSensitiveQuery && queryTokens.Any(IsContradictionMarker);
+
+        var claims = relevant.Summaries
+            .Select((summary, index) => CreateSelfSensitiveClaim(
+                summary,
+                relevant.Source,
+                validationReferenceHandle,
+                index,
+                selfSensitiveQuery,
+                contradictionRequested))
+            .ToArray();
+
+        return new EngramSelfResolutionResult
+        {
+            Source = relevant.Source,
+            Claims = claims
+        };
     }
 
     private Task<EngramQueryResult> ResolveByQueryAsync(EngramQuery query, CancellationToken cancellationToken)
@@ -309,6 +361,64 @@ public sealed class EngramResolverService : IEngramResolver
             }
         }
     }
+
+    private static EngramSelfResolutionClaim CreateSelfSensitiveClaim(
+        EngramSummary summary,
+        string source,
+        string validationReferenceHandle,
+        int index,
+        bool selfSensitiveQuery,
+        bool contradictionRequested)
+    {
+        var posture = DetermineSelfValidationPosture(summary, index, selfSensitiveQuery, contradictionRequested);
+        var obstructionCode = posture switch
+        {
+            EngramSelfValidationPosture.Contradicted => "self-claim-conflict",
+            EngramSelfValidationPosture.Deferred => "deferred-self-admissibility",
+            _ => null
+        };
+
+        return EngramSelfResolutionFactory.CreateClaim(
+            summary,
+            source,
+            posture,
+            EngramSelfResolutionOrigin.HotWorkingResolution,
+            posture == EngramSelfValidationPosture.Deferred ? null : validationReferenceHandle,
+            obstructionCode);
+    }
+
+    private static EngramSelfValidationPosture DetermineSelfValidationPosture(
+        EngramSummary summary,
+        int index,
+        bool selfSensitiveQuery,
+        bool contradictionRequested)
+    {
+        if (!selfSensitiveQuery)
+        {
+            return EngramSelfValidationPosture.Deferred;
+        }
+
+        if (contradictionRequested && index == 0)
+        {
+            return EngramSelfValidationPosture.Contradicted;
+        }
+
+        if (index == 0 || ContainsSelfMarkers(summary.ConceptTag) || ContainsSelfMarkers(summary.SummaryText))
+        {
+            return EngramSelfValidationPosture.HotClaim;
+        }
+
+        return EngramSelfValidationPosture.Deferred;
+    }
+
+    private static bool ContainsSelfMarkers(string input) =>
+        SelfMarkers.Any(marker => input.Contains(marker, StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsSelfMarker(string token) =>
+        SelfMarkers.Any(marker => string.Equals(token, marker, StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsContradictionMarker(string token) =>
+        ContradictionMarkers.Any(marker => string.Equals(token, marker, StringComparison.OrdinalIgnoreCase));
 }
 
 internal sealed record RankedNode(IndexNode Node, double Score);

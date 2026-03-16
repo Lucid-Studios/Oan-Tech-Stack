@@ -7,6 +7,7 @@
     <ProjectReference Include="..\CradleTek.Memory\CradleTek.Memory.csproj" />
     <ProjectReference Include="..\GEL.Contracts\GEL.Contracts.csproj" />
     <ProjectReference Include="..\GEL\GEL.csproj" />
+    <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\OAN.Core\OAN.Core.csproj" />
     <ProjectReference Include="..\SLI.Ingestion\SLI.Ingestion.csproj" />
     <ProjectReference Include="..\SLI.Lisp\SLI.Lisp.csproj" />

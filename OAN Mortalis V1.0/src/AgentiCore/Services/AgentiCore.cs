@@ -169,7 +169,17 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         EmitTelemetry("ontological-cleave", context.ContextId, context.CMEId);
 
         var resolvedEngrams = await _engramResolver.ResolveRelevantAsync(baseCognitionContext, cancellationToken).ConfigureAwait(false);
+        var selfSensitiveResolution = await _engramResolver
+            .ResolveSelfSensitiveAsync(
+                baseCognitionContext,
+                boundedWorkerState.MediatedSelfState.CSelfGelHandle,
+                cancellationToken)
+            .ConfigureAwait(false);
         context.WorkingMemory["resolved_engram_count"] = resolvedEngrams.Summaries.Count.ToString();
+        context.WorkingMemory["selfgel_claim_count"] = selfSensitiveResolution.Claims.Count.ToString(CultureInfo.InvariantCulture);
+        context.WorkingMemory["selfgel_claim_postures"] = selfSensitiveResolution.Claims.Count == 0
+            ? "none"
+            : string.Join(",", selfSensitiveResolution.Claims.Select(claim => claim.ValidationPosture.ToString()));
         EmitTelemetry("engram-resolve", context.ContextId, context.CMEId);
 
         var cognitionRequest = _contextAssembler.BuildRequest(
@@ -265,8 +275,10 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             provenanceMarker: boundedWorkerState.ProvenanceMarker,
             cSelfGelHandle: boundedWorkerState.MediatedSelfState.CSelfGelHandle,
             activeConcepts: context.ActiveConcepts,
-            workingMemory: context.WorkingMemory);
+            workingMemory: context.WorkingMemory,
+            selfClaims: selfSensitiveResolution.Claims);
         context.SelfGelWorkingPool = selfGelWorkingPool;
+        context.WorkingMemory["selfgel_validation_surface_handle"] = selfGelWorkingPool.ValidationSurface.SelfGelHandle;
 
         var collapseClassification = BuildCollapseClassification(cognitionResult.Confidence, requiresCommit);
 

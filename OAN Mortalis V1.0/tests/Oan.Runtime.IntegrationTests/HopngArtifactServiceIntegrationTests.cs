@@ -21,7 +21,20 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Null(receipt.ProjectionPath);
     }
 
-    private static GovernedHopngEmissionRequest CreateEmissionRequest()
+    [Fact]
+    public void EvidenceReferences_IncludeTargetWitnessHandlesFromSnapshot()
+    {
+        var request = CreateEmissionRequest(includeTargetWitnessReceipts: true);
+
+        var refs = GovernedHopngEvidenceReferences.Build(request, request.Snapshot);
+
+        Assert.Contains(refs, reference => reference.PointerUri == "target-witness://admission-accepted/aaaaaaaaaaaaaaaa");
+        Assert.Contains(refs, reference => reference.PointerUri == "target-lineage://bbbbbbbbbbbbbbbb");
+        Assert.Contains(refs, reference => reference.PointerUri == "target-trace://cccccccccccccccc");
+        Assert.Contains(refs, reference => reference.PointerUri == "target-residue://dddddddddddddddd");
+    }
+
+    private static GovernedHopngEmissionRequest CreateEmissionRequest(bool includeTargetWitnessReceipts = false)
     {
         var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
             contentHandle: "agenticore-return://candidate/test",
@@ -100,7 +113,8 @@ public sealed class HopngArtifactServiceIntegrationTests
             FailureCode: null,
             FailureStage: null,
             JournalIntegrityErrorCount: 0,
-            HopngArtifacts: []);
+            HopngArtifacts: [],
+            TargetWitnessReceipts: includeTargetWitnessReceipts ? [CreateTargetWitnessReceipt()] : []);
 
         return new GovernedHopngEmissionRequest(
             LoopKey: snapshot.LoopKey,
@@ -124,5 +138,38 @@ public sealed class HopngArtifactServiceIntegrationTests
                 EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
                 SourceSubsystem: "AgentiCore"));
+    }
+
+    private static GovernedTargetWitnessReceipt CreateTargetWitnessReceipt()
+    {
+        return new GovernedTargetWitnessReceipt(
+            WitnessHandle: "target-witness://admission-accepted/aaaaaaaaaaaaaaaa",
+            Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+            Kind: GovernedTargetWitnessKind.AdmissionAccepted,
+            Accepted: true,
+            WitnessedBy: "CradleTek",
+            LaneId: "higher-order-locality",
+            RuntimeId: "gc-locality-runtime",
+            ProfileId: "gc-locality-profile",
+            BudgetClass: "target-bounded-lane",
+            CommitAuthorityClass: "refusal-only",
+            Objective: "identity-continuity",
+            ProgramId: "program-001",
+            AdmissionHandle: "target-admission://eeeeeeeeeeeeeeee",
+            LineageHandle: "target-lineage://bbbbbbbbbbbbbbbb",
+            TraceHandle: "target-trace://cccccccccccccccc",
+            ResidueHandle: "target-residue://dddddddddddddddd",
+            Reasons: [],
+            ReasonFamilies: [],
+            BudgetUsage: new GovernedTargetExecutionBudgetUsage(
+                InstructionCount: 3,
+                SymbolicDepth: 3,
+                ProjectedTraceEntryCount: 5,
+                ProjectedResidueCount: 1,
+                WitnessOperationCount: 0,
+                TransportOperationCount: 0),
+            EmittedTraceCount: 5,
+            EmittedResidueCount: 1,
+            TimestampUtc: DateTimeOffset.UtcNow);
     }
 }

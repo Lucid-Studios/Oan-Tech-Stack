@@ -1,6 +1,8 @@
+using Oan.Common;
 using SLI.Engine;
 using SLI.Engine.Cognition;
 using SLI.Engine.Runtime;
+using SLI.Engine.Telemetry;
 
 namespace Oan.Sli.Tests;
 
@@ -251,6 +253,37 @@ public sealed class HigherOrderLocalityProgramTests
     }
 
     [Fact]
+    public async Task HigherOrderLocalityTargetLane_RejectsWhenTraceBudgetIsTooNarrow()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ];
+        var lowered = bridge.LowerProgram(symbolicProgram);
+        var traceBoundProfile = SliRuntimeRealizationProfile.CreateTargetBounded(
+            profileId: "gc-trace-budget-profile",
+            supportsHigherOrderLocality: true,
+            supportsBoundedRehearsal: false,
+            supportsBoundedWitness: false,
+            supportsBoundedTransport: false,
+            supportsAdmissibleSurface: false,
+            supportsAccountabilityPacket: false,
+            maxTraceEntries: 4);
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            lowered.Instructions.Select(instruction => instruction.Opcode),
+            runtimeId: "gc-locality-runtime",
+            realizationProfile: traceBoundProfile);
+
+        var eligibility = bridge.EvaluateHigherOrderLocalityTargetEligibility(symbolicProgram, targetManifest);
+
+        Assert.False(eligibility.IsEligible);
+        Assert.Contains(eligibility.ProfileViolations, violation => violation.StartsWith("trace-budget-exceeded:", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task HigherOrderLocalityTargetExecution_UsesExecutorWhenLaneIsEligible()
     {
         var bridge = await CreateBridgeAsync();
@@ -285,6 +318,152 @@ public sealed class HigherOrderLocalityProgramTests
         Assert.Equal(lowered.ProgramId, executor.LastRequest!.Program.ProgramId);
         Assert.Equal("target-locality-handle", result.LocalityHandle);
         Assert.Equal("identity-continuity", executor.LastRequest.Objective);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetExecution_UsesBoundedTargetExecutorImplementation()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ];
+        var lowered = bridge.LowerProgram(symbolicProgram);
+        var targetProfile = SliRuntimeRealizationProfile.CreateTargetBounded(
+            profileId: "gc-locality-profile",
+            supportsHigherOrderLocality: true,
+            supportsBoundedRehearsal: false,
+            supportsBoundedWitness: false,
+            supportsBoundedTransport: false,
+            supportsAdmissibleSurface: false,
+            supportsAccountabilityPacket: false);
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            lowered.Instructions.Select(instruction => instruction.Opcode),
+            runtimeId: "gc-locality-runtime",
+            realizationProfile: targetProfile);
+
+        var result = await bridge.ExecuteHigherOrderLocalityOnTargetAsync(
+            symbolicProgram,
+            "identity-continuity",
+            targetManifest);
+
+        Assert.StartsWith("context:gc-locality-runtime:", result.LocalityHandle);
+        Assert.Equal("cme-self", result.SelfAnchor);
+        Assert.Equal("task-objective", result.OtherAnchor);
+        Assert.Equal("identity-continuity", result.RelationAnchor);
+        Assert.True(result.Perspective.IsConfigured);
+        Assert.True(result.Participation.IsConfigured);
+        Assert.Contains("target-runtime(gc-locality-runtime)", result.SymbolicTrace);
+        Assert.Contains("target-profile(gc-locality-profile)", result.SymbolicTrace);
+        Assert.Contains("locality-bind(context)", result.SymbolicTrace);
+        Assert.Contains("perspective-configure(locality-state)", result.SymbolicTrace);
+        Assert.Contains("participation-configure(locality-state)", result.SymbolicTrace);
+        Assert.NotNull(result.TargetLineage);
+        Assert.Equal("gc-locality-runtime", result.TargetLineage!.RuntimeId);
+        Assert.Equal("gc-locality-profile", result.TargetLineage.ProfileId);
+        Assert.Equal("target-bounded-lane", result.TargetLineage.BudgetClass);
+        Assert.Equal("refusal-only", result.TargetLineage.CommitAuthorityClass);
+        Assert.Equal(lowered.ProgramId, result.TargetLineage.ProgramId);
+        Assert.Equal(result.SymbolicTrace.Count, result.TargetLineage.EmittedTraceCount);
+        Assert.StartsWith("target-lineage://", result.TargetLineage.LineageHandle);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetExecution_EmitsGovernedTelemetryForSuccess()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ];
+        var lowered = bridge.LowerProgram(symbolicProgram);
+        var targetProfile = SliRuntimeRealizationProfile.CreateTargetBounded(
+            profileId: "gc-locality-profile",
+            supportsHigherOrderLocality: true,
+            supportsBoundedRehearsal: false,
+            supportsBoundedWitness: false,
+            supportsBoundedTransport: false,
+            supportsAdmissibleSurface: false,
+            supportsAccountabilityPacket: false);
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            lowered.Instructions.Select(instruction => instruction.Opcode),
+            runtimeId: "gc-locality-runtime",
+            realizationProfile: targetProfile);
+        var telemetrySink = new CapturingTelemetrySink();
+
+        var result = await bridge.ExecuteHigherOrderLocalityOnTargetAsync(
+            symbolicProgram,
+            "identity-continuity",
+            targetManifest,
+            telemetrySink);
+
+        var events = telemetrySink.Events
+            .OfType<SliTargetExecutionTelemetryEvent>()
+            .ToArray();
+
+        Assert.Equal(2, events.Length);
+        Assert.Equal("sli-target-admission-accepted", events[0].EventType);
+        Assert.True(events[0].Accepted);
+        Assert.Equal("CradleTek", events[0].WitnessedBy);
+        Assert.Equal(lowered.ProgramId, events[0].ProgramId);
+        Assert.Equal(result.TargetLineage!.AdmissionHandle, events[0].AdmissionHandle);
+        Assert.Empty(events[0].Reasons);
+        Assert.Empty(events[0].ReasonFamilies);
+        Assert.Equal("target-bounded-lane", events[0].BudgetClass);
+        Assert.Equal("refusal-only", events[0].CommitAuthorityClass);
+
+        Assert.Equal("sli-target-lineage-recorded", events[1].EventType);
+        Assert.True(events[1].Accepted);
+        Assert.Equal(result.TargetLineage.LineageHandle, events[1].LineageHandle);
+        Assert.Equal(result.TargetLineage.TraceHandle, events[1].TraceHandle);
+        Assert.Equal(result.TargetLineage.ResidueHandle, events[1].ResidueHandle);
+        Assert.Equal(result.TargetLineage.EmittedTraceCount, events[1].EmittedTraceCount);
+        Assert.Equal(result.TargetLineage.EmittedResidueCount, events[1].EmittedResidueCount);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetExecution_EmitsGovernedRefusalTelemetry()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ];
+        var telemetrySink = new CapturingTelemetrySink();
+        var targetManifest = bridge.CreateTargetCapabilityManifest(Array.Empty<string>());
+
+        var exception = await Assert.ThrowsAsync<SliTargetLaneRefusalException>(() =>
+            bridge.ExecuteHigherOrderLocalityOnTargetAsync(
+                symbolicProgram,
+                "identity-continuity",
+                targetManifest,
+                telemetrySink));
+
+        var telemetryEvent = Assert.Single(
+            telemetrySink.Events.OfType<SliTargetExecutionTelemetryEvent>());
+
+        Assert.Equal("sli-target-admission-refused", telemetryEvent.EventType);
+        Assert.False(telemetryEvent.Accepted);
+        Assert.Equal("higher-order-locality", telemetryEvent.LaneId);
+        Assert.Equal("target-sli-runtime", telemetryEvent.RuntimeId);
+        Assert.Equal("CradleTek", telemetryEvent.WitnessedBy);
+        Assert.Contains("missing-capability", telemetryEvent.ReasonFamilies);
+        Assert.Contains("profile-violation", telemetryEvent.ReasonFamilies);
+        Assert.Contains(
+            telemetryEvent.Reasons,
+            reason => reason.StartsWith("missing-capability:locality-bind", StringComparison.Ordinal));
+        Assert.Contains(
+            telemetryEvent.Reasons,
+            reason => reason.StartsWith("profile-violation:higher-order-locality-unsupported", StringComparison.Ordinal));
+        Assert.StartsWith("target-admission://", telemetryEvent.AdmissionHandle);
+        Assert.Null(telemetryEvent.LineageHandle);
+        Assert.Equal(exception.Eligibility.BudgetUsage.ProjectedTraceEntryCount, telemetryEvent.BudgetUsage.ProjectedTraceEntryCount);
     }
 
     private static async Task<LispBridge> CreateBridgeAsync()
@@ -346,6 +525,17 @@ public sealed class HigherOrderLocalityProgramTests
                 },
                 SymbolicTrace = ["target-executor(locality)"]
             });
+        }
+    }
+
+    private sealed class CapturingTelemetrySink : ITelemetrySink
+    {
+        public List<object> Events { get; } = [];
+
+        public Task EmitAsync(object telemetryEvent)
+        {
+            Events.Add(telemetryEvent);
+            return Task.CompletedTask;
         }
     }
 }

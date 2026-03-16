@@ -18,6 +18,7 @@ using Oan.Common;
 using Oan.Cradle;
 using Oan.Storage;
 using SoulFrame.Host;
+using SLI.Engine.Runtime;
 using Telemetry.GEL;
 
 namespace Oan.Runtime.IntegrationTests;
@@ -81,6 +82,67 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.All(result.HopngArtifacts, receipt => Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, receipt.Outcome));
         Assert.Equal(reviewRequest.RequestEnvelope.ActionableContent.ContentHandle, result.DecisionReceipt.MutationReceipt.ContentHandle);
         Assert.All(replay.Where(entry => entry.ActReceipt is not null), entry => Assert.NotNull(entry.ActReceipt!.MutationReceipt));
+    }
+
+    [Fact]
+    public async Task LoopStatus_ProjectsTargetWitnessReceipts_AppendedAfterCompletion()
+    {
+        var telemetry = new GelTelemetryAdapter();
+        var publicLayer = new PublicLayerService();
+        var crypticLayer = new CrypticLayerService();
+        var mantle = new MantleOfSovereigntyService();
+        var steward = CreateSteward(publicLayer, crypticLayer, telemetry);
+        var membrane = CreateSoulFrameHostClient();
+        var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
+        var identityId = Guid.NewGuid();
+        var request = CreateGoldenPathRequest(identityId);
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+
+        await mantle.AppendAsync(
+            new CrypticCustodyAppendRequest(
+                identityId,
+                CustodyDomain: "cMoS",
+                PayloadPointer: "cmos://seed/source",
+                Classification: "seed"));
+
+        var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, membrane, cognition, steward);
+        var manager = new StackManager(stores);
+        var result = await manager.RunGovernanceGoldenPathAsync(request);
+        var replay = await journal.ReplayLoopAsync(result.LoopKey);
+        var reviewRequest = replay.Select(entry => entry.ReviewRequest).First(requestItem => requestItem is not null)!;
+        var targetBridge = new SliGovernedTargetTelemetryBridge(new RecordingTelemetrySink(), journal);
+
+        await targetBridge.WitnessHigherOrderLocalityTargetExecutionAsync(
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ],
+            "identity-continuity",
+            runtimeId: "gc-locality-runtime",
+            realizationProfile: SliRuntimeRealizationProfile.CreateTargetBounded(
+                profileId: "gc-locality-profile",
+                supportsHigherOrderLocality: true,
+                supportsBoundedRehearsal: false,
+                supportsBoundedWitness: false,
+                supportsBoundedTransport: false,
+                supportsAdmissibleSurface: false,
+                supportsAccountabilityPacket: false),
+            journalContext: new SliGovernedTargetWitnessJournalContext(
+                result.LoopKey,
+                GovernanceLoopStage.BoundedCognitionCompleted,
+                result.DecisionReceipt,
+                reviewRequest));
+
+        var status = await manager.GetStatusByLoopKeyAsync(result.LoopKey);
+
+        Assert.Equal(2, status.TargetWitnessReceipts!.Count);
+        Assert.Contains(
+            status.TargetWitnessReceipts,
+            receipt => receipt.Kind == GovernedTargetWitnessKind.AdmissionAccepted);
+        Assert.Contains(
+            status.TargetWitnessReceipts,
+            receipt => receipt.Kind == GovernedTargetWitnessKind.LineageRecorded);
     }
 
     [Fact]

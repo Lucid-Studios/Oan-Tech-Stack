@@ -51,6 +51,11 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.Same(context.SelfGelWorkingPool, result.SelfGelWorkingPool);
         Assert.Equal("bounded-selfgel-working-pool", result.SelfGelWorkingPool.Classification);
         Assert.StartsWith("soulframe-cselfgel://", result.SelfGelWorkingPool.CSelfGelHandle, StringComparison.Ordinal);
+        Assert.Equal("cooled-selfgel-validation-surface", result.SelfGelWorkingPool.ValidationSurface.Classification);
+        Assert.Equal("validation-only", result.SelfGelWorkingPool.ValidationSurface.ValidationPosture);
+        Assert.StartsWith("soulframe-selfgel://", result.SelfGelWorkingPool.ValidationSurface.SelfGelHandle, StringComparison.Ordinal);
+        Assert.Contains("identity-continuity", result.SelfGelWorkingPool.ValidationSurface.ValidatedConcepts, StringComparer.OrdinalIgnoreCase);
+        Assert.Empty(result.SelfGelWorkingPool.Claims);
         Assert.Equal("symbolic-trace", result.SymbolicTrace.Classification);
         Assert.Equal("candidate-engram-structure", result.EngramCandidate.Classification);
         Assert.Equal("residue", result.TransientResidue.CleaveResidue);
@@ -64,6 +69,9 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.NotEmpty(context.WorkingMemory["membrane_actionable_content_handle"]);
         Assert.Equal(context.WorkingMemory["membrane_working_state_handle"], result.SelfGelWorkingPool.WorkingStateHandle);
         Assert.Equal(context.WorkingMemory["membrane_provenance_marker"], result.SelfGelWorkingPool.ProvenanceMarker);
+        Assert.Equal(context.WorkingMemory["selfgel_validation_surface_handle"], result.SelfGelWorkingPool.ValidationSurface.SelfGelHandle);
+        Assert.Equal("0", context.WorkingMemory["selfgel_claim_count"]);
+        Assert.Equal("none", context.WorkingMemory["selfgel_claim_postures"]);
         Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
         Assert.Equal(["step-a", "step-b"], result.SymbolicTrace.Steps);
         Assert.Equal(["token-a"], result.SymbolicTrace.Tokens);

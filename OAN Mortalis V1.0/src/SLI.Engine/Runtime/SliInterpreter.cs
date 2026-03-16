@@ -53,12 +53,39 @@ public sealed class SliInterpreter
         SliExecutionContext context,
         CancellationToken cancellationToken = default)
     {
+        await ExecuteProgramInternalAsync(program, context, targetManifest: null, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task ExecuteTargetProgramAsync(
+        SliCoreProgram program,
+        SliExecutionContext context,
+        SliRuntimeCapabilityManifest targetManifest,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(program);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(targetManifest);
+
+        await ExecuteProgramInternalAsync(program, context, targetManifest, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task ExecuteProgramInternalAsync(
+        SliCoreProgram program,
+        SliExecutionContext context,
+        SliRuntimeCapabilityManifest? targetManifest,
+        CancellationToken cancellationToken)
+    {
         ArgumentNullException.ThrowIfNull(program);
         ArgumentNullException.ThrowIfNull(context);
 
         string? previousNode = null;
         foreach (var instruction in program.Instructions)
         {
+            if (targetManifest is not null)
+            {
+                EnsureTargetInstructionSupported(instruction, targetManifest);
+            }
+
             var result = await ExecuteInstructionAsync(instruction, context, cancellationToken).ConfigureAwait(false);
             var currentNode = instruction.CanonicalForm;
             context.ExecutionGraph.AddNode(currentNode);
@@ -69,6 +96,25 @@ public sealed class SliInterpreter
 
             previousNode = currentNode;
             context.ExecutionGraph.AddNode(result.ToCanonicalString());
+        }
+    }
+
+    private static void EnsureTargetInstructionSupported(
+        SliCoreInstruction instruction,
+        SliRuntimeCapabilityManifest targetManifest)
+    {
+        if (instruction.OperationClass != SliRuntimeOperationClass.TargetCandidate)
+        {
+            throw new InvalidOperationException(
+                $"Target runtime '{targetManifest.RuntimeId}' may not execute non-target opcode '{instruction.Opcode}' classified as '{instruction.OperationClass}'.");
+        }
+
+        if (!targetManifest.TryGetCapability(instruction.Opcode, out var capability) ||
+            capability.OperationClass != SliRuntimeOperationClass.TargetCandidate ||
+            capability.Availability != SliRuntimeCapabilityAvailability.Available)
+        {
+            throw new InvalidOperationException(
+                $"Target runtime '{targetManifest.RuntimeId}' does not advertise available target capability for opcode '{instruction.Opcode}'.");
         }
     }
 

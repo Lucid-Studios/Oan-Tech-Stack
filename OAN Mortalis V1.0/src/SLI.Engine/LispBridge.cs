@@ -2,11 +2,13 @@ using System.Security.Cryptography;
 using System.Text;
 using CradleTek.Memory.Interfaces;
 using CradleTek.Memory.Models;
+using Oan.Common;
 using SLI.Engine.Cognition;
 using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SLI.Engine.Parser;
 using SLI.Engine.Runtime;
+using SLI.Engine.Telemetry;
 using SLI.Lisp;
 using SoulFrame.Host;
 
@@ -147,7 +149,7 @@ public sealed class LispBridge
             _semanticDevice);
 
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
-        return CreateHigherOrderLocalityResult(context);
+        return SliHigherOrderLocalityResultFactory.Create(context);
     }
 
     internal SliTargetLaneEligibility EvaluateHigherOrderLocalityTargetEligibility(
@@ -172,23 +174,134 @@ public sealed class LispBridge
         IReadOnlyList<string> symbolicProgram,
         string objective,
         ISliTargetHigherOrderLocalityExecutor targetExecutor,
+        ITelemetrySink governanceTelemetry,
+        string witnessedBy = "CradleTek",
         CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(governanceTelemetry);
+
+        return await ExecuteHigherOrderLocalityOnTargetAsync(
+                symbolicProgram,
+                objective,
+                targetExecutor,
+                governanceTelemetry,
+                witnessedBy,
+                emitGovernedTelemetry: true,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    internal async Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityOnTargetAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        ISliTargetHigherOrderLocalityExecutor targetExecutor,
+        CancellationToken cancellationToken = default)
+    {
+        return await ExecuteHigherOrderLocalityOnTargetAsync(
+                symbolicProgram,
+                objective,
+                targetExecutor,
+                governanceTelemetry: null,
+                witnessedBy: "CradleTek",
+                emitGovernedTelemetry: false,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private async Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityOnTargetAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        ISliTargetHigherOrderLocalityExecutor targetExecutor,
+        ITelemetrySink? governanceTelemetry,
+        string witnessedBy,
+        bool emitGovernedTelemetry,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(symbolicProgram);
         ArgumentException.ThrowIfNullOrWhiteSpace(objective);
         ArgumentNullException.ThrowIfNull(targetExecutor);
+        if (emitGovernedTelemetry)
+        {
+            ArgumentNullException.ThrowIfNull(governanceTelemetry);
+            ArgumentException.ThrowIfNullOrWhiteSpace(witnessedBy);
+        }
 
         var program = LowerProgram(symbolicProgram);
         var eligibility = SliTargetLaneGuard.EvaluateHigherOrderLocality(program, targetExecutor.CapabilityManifest);
-        eligibility.EnsureEligible();
+        var admission = SliTargetExecutionContracts.CreateAdmission(eligibility, targetExecutor.CapabilityManifest);
+        if (!eligibility.IsEligible)
+        {
+            await EmitGovernedTargetTelemetryAsync(
+                    governanceTelemetry,
+                    SliTargetExecutionTelemetry.CreateAdmissionEvent(admission, objective, program.ProgramId, witnessedBy),
+                    emitGovernedTelemetry,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            throw new SliTargetLaneRefusalException(eligibility);
+        }
 
-        return await targetExecutor.ExecuteAsync(
+        await EmitGovernedTargetTelemetryAsync(
+                governanceTelemetry,
+                SliTargetExecutionTelemetry.CreateAdmissionEvent(admission, objective, program.ProgramId, witnessedBy),
+                emitGovernedTelemetry,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        var result = await targetExecutor.ExecuteAsync(
                 new SliTargetHigherOrderLocalityExecutionRequest(
                     Objective: objective,
                     Program: program,
-                    Eligibility: eligibility),
+                    Eligibility: eligibility,
+                    Admission: admission),
                 cancellationToken)
             .ConfigureAwait(false);
+
+        if (result.TargetLineage is not null)
+        {
+            await EmitGovernedTargetTelemetryAsync(
+                    governanceTelemetry,
+                    SliTargetExecutionTelemetry.CreateLineageEvent(admission, result.TargetLineage, witnessedBy),
+                    emitGovernedTelemetry,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return result;
+    }
+
+    internal Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityOnTargetAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        SliRuntimeCapabilityManifest targetManifest,
+        ITelemetrySink governanceTelemetry,
+        string witnessedBy = "CradleTek",
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(targetManifest);
+        ArgumentNullException.ThrowIfNull(governanceTelemetry);
+
+        return ExecuteHigherOrderLocalityOnTargetAsync(
+            symbolicProgram,
+            objective,
+            new SliBoundedHigherOrderLocalityTargetExecutor(targetManifest),
+            governanceTelemetry,
+            witnessedBy,
+            cancellationToken);
+    }
+
+    internal Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityOnTargetAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        SliRuntimeCapabilityManifest targetManifest,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(targetManifest);
+
+        return ExecuteHigherOrderLocalityOnTargetAsync(
+            symbolicProgram,
+            objective,
+            new SliBoundedHigherOrderLocalityTargetExecutor(targetManifest),
+            cancellationToken);
     }
 
     internal async Task<SliBoundedRehearsalResult> ExecuteBoundedRehearsalProgramAsync(
@@ -652,36 +765,7 @@ public sealed class LispBridge
 
     private static SliHigherOrderLocalityResult CreateHigherOrderLocalityResult(SliExecutionContext context)
     {
-        var state = context.HigherOrderLocalityState;
-        return new SliHigherOrderLocalityResult
-        {
-            LocalityHandle = state.LocalityHandle,
-            SelfAnchor = state.SelfAnchor,
-            OtherAnchor = state.OtherAnchor,
-            RelationAnchor = state.RelationAnchor,
-            SealPosture = state.SealPosture,
-            RevealPosture = state.RevealPosture,
-            Warnings = state.Warnings.ToArray(),
-            Residues = CloneResidues(state.Residues),
-            Perspective = new SliPerspectiveResult
-            {
-                IsConfigured = state.Perspective.IsConfigured,
-                OrientationVector = new Dictionary<string, double>(state.Perspective.OrientationVector, StringComparer.OrdinalIgnoreCase),
-                EthicalConstraints = state.Perspective.EthicalConstraints.ToArray(),
-                WeightFunctions = new Dictionary<string, double>(state.Perspective.WeightFunctions, StringComparer.OrdinalIgnoreCase),
-                Residues = CloneResidues(state.Perspective.Residues)
-            },
-            Participation = new SliParticipationResult
-            {
-                IsConfigured = state.Participation.IsConfigured,
-                Mode = state.Participation.Mode,
-                Role = state.Participation.Role,
-                InteractionRules = state.Participation.InteractionRules.ToArray(),
-                CapabilitySet = state.Participation.CapabilitySet.ToArray(),
-                Residues = CloneResidues(state.Participation.Residues)
-            },
-            SymbolicTrace = context.TraceLines.ToArray()
-        };
+        return SliHigherOrderLocalityResultFactory.Create(context);
     }
 
     private static SliBoundedRehearsalResult CreateBoundedRehearsalResult(SliExecutionContext context)
@@ -846,6 +930,21 @@ public sealed class LispBridge
                 Detail = residue.Detail
             })
             .ToArray();
+    }
+
+    private static Task EmitGovernedTargetTelemetryAsync(
+        ITelemetrySink? governanceTelemetry,
+        SliTargetExecutionTelemetryEvent telemetryEvent,
+        bool emitGovernedTelemetry,
+        CancellationToken cancellationToken)
+    {
+        if (!emitGovernedTelemetry || governanceTelemetry is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return governanceTelemetry.EmitAsync(telemetryEvent);
     }
 
     private sealed class NullEngramResolver : IEngramResolver

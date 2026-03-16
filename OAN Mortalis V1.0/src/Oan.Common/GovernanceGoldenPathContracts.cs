@@ -38,7 +38,8 @@ public enum GovernanceJournalEntryKind
     ActReceipt = 2,
     State = 3,
     Annotation = 4,
-    ArtifactReceipt = 5
+    ArtifactReceipt = 5,
+    TargetWitness = 6
 }
 
 public enum GovernanceActKind
@@ -240,7 +241,8 @@ public sealed record GovernanceGoldenPathResult(
     GovernedPrimeDerivativeLane PublishedLanes,
     string? FailureCode,
     CmeCollapseRoutingDecision? CollapseRoutingDecision = null,
-    IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null);
+    IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null,
+    IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -273,7 +275,8 @@ public sealed record GovernanceLoopStatusView(
     bool ResumeEligible,
     bool HasJournalIntegrityErrors,
     int JournalIntegrityErrorCount,
-    IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null);
+    IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null,
+    IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null);
 
 public sealed record DeferredBacklogItemView(
     string LoopKey,
@@ -364,7 +367,8 @@ public sealed record GovernanceJournalEntry(
     GovernanceActReceipt? ActReceipt,
     ReturnCandidateReviewRequest? ReviewRequest,
     GovernanceDeferredAnnotation? Annotation,
-    GovernedHopngArtifactReceipt? HopngArtifactReceipt = null);
+    GovernedHopngArtifactReceipt? HopngArtifactReceipt = null,
+    GovernedTargetWitnessReceipt? TargetWitnessReceipt = null);
 
 public sealed record GovernanceJournalReplayIssue(
     int LineNumber,
@@ -391,7 +395,8 @@ public sealed record GovernanceLoopStateSnapshot(
     string? FailureCode,
     GovernanceLoopStage? FailureStage,
     int JournalIntegrityErrorCount,
-    IReadOnlyList<GovernedHopngArtifactReceipt> HopngArtifacts);
+    IReadOnlyList<GovernedHopngArtifactReceipt> HopngArtifacts,
+    IReadOnlyList<GovernedTargetWitnessReceipt> TargetWitnessReceipts);
 
 public interface IGovernanceCycleCognitionService
 {
@@ -547,6 +552,7 @@ public static class GovernanceLoopStateModel
         string? failureCode = null;
         GovernanceLoopStage? failureStage = null;
         var hopngArtifactsByProfile = new Dictionary<GovernedHopngArtifactProfile, GovernedHopngArtifactReceipt>();
+        var targetWitnessReceipts = new List<GovernedTargetWitnessReceipt>();
 
         foreach (var entry in batch.Entries
                      .Where(entry => string.Equals(entry.LoopKey, loopKey, StringComparison.Ordinal)))
@@ -566,6 +572,11 @@ public static class GovernanceLoopStateModel
             if (entry.HopngArtifactReceipt is not null)
             {
                 hopngArtifactsByProfile[entry.HopngArtifactReceipt.Profile] = entry.HopngArtifactReceipt;
+            }
+
+            if (entry.TargetWitnessReceipt is not null)
+            {
+                targetWitnessReceipts.Add(entry.TargetWitnessReceipt);
             }
 
             if (entry.ActReceipt is not null)
@@ -668,6 +679,10 @@ public static class GovernanceLoopStateModel
             hopngArtifactsByProfile
                 .Values
                 .OrderBy(receipt => receipt.Profile)
+                .ToArray(),
+            targetWitnessReceipts
+                .OrderBy(receipt => receipt.TimestampUtc)
+                .ThenBy(receipt => receipt.WitnessHandle, StringComparer.Ordinal)
                 .ToArray());
     }
 

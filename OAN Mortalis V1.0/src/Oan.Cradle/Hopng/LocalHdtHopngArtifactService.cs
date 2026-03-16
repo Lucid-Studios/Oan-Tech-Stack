@@ -447,7 +447,7 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
 
     private static List<CrypticReference> BuildVisibilityReferences(GovernedHopngEmissionRequest request, LoadedHopngArtifact artifact)
     {
-        return BuildProtectedEvidenceReferences(request, request.Snapshot)
+        return GovernedHopngEvidenceReferences.Build(request, request.Snapshot)
             .Select(reference => new CrypticReference
             {
                 Id = reference.RefId,
@@ -462,37 +462,15 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         GovernedHopngEmissionRequest request,
         GovernanceLoopStateSnapshot snapshot)
     {
-        var refs = new List<ProtectedEvidenceReference>();
-
-        AddReference(refs, "decision", request.DecisionReceipt.MutationReceipt.ReceiptHandle, "governance-decision-receipt");
-        if (snapshot.ReviewRequest?.RequestEnvelope is not null)
-        {
-            AddReference(refs, "review-envelope", snapshot.ReviewRequest.RequestEnvelope.EnvelopeId, "steward-review-envelope");
-            AddReference(refs, "actionable-content", snapshot.ReviewRequest.RequestEnvelope.ActionableContent.ContentHandle, "actionable-return-candidate");
-        }
-
-        if (!string.IsNullOrWhiteSpace(snapshot.ReviewRequest?.ReturnCandidatePointer))
-        {
-            AddReference(refs, "return-pointer", snapshot.ReviewRequest.ReturnCandidatePointer, "return-candidate-pointer");
-        }
-
-        foreach (var receipt in snapshot.HopngArtifacts)
-        {
-            AddReference(refs, $"artifact-{receipt.Profile}", receipt.ArtifactHandle, "prior-hopng-artifact");
-        }
-
-        return refs;
-    }
-
-    private static void AddReference(ICollection<ProtectedEvidenceReference> refs, string refId, string pointerUri, string summary)
-    {
-        refs.Add(new ProtectedEvidenceReference
-        {
-            RefId = refId,
-            PointerUri = pointerUri,
-            DigestSha256 = ArtifactHashing.ComputeSha256(Encoding.UTF8.GetBytes(pointerUri)),
-            Summary = summary
-        });
+        return GovernedHopngEvidenceReferences.Build(request, snapshot)
+            .Select(reference => new ProtectedEvidenceReference
+            {
+                RefId = reference.RefId,
+                PointerUri = reference.PointerUri,
+                DigestSha256 = ArtifactHashing.ComputeSha256(Encoding.UTF8.GetBytes(reference.PointerUri)),
+                Summary = reference.Summary
+            })
+            .ToList();
     }
 
     private static Dictionary<string, TemporalUniverseState> BuildUniverseStates(

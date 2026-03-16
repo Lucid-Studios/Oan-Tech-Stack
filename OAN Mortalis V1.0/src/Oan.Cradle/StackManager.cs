@@ -732,7 +732,8 @@ namespace Oan.Cradle
                 PublishedLanes: snapshot.PublishedLanes,
                 FailureCode: snapshot.FailureCode,
                 CollapseRoutingDecision: BuildCollapseRoutingDecision(snapshot),
-                HopngArtifacts: snapshot.HopngArtifacts);
+                HopngArtifacts: snapshot.HopngArtifacts,
+                TargetWitnessReceipts: snapshot.TargetWitnessReceipts);
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -770,7 +771,8 @@ namespace Oan.Cradle
                                 controlState is GovernanceLoopControlState.InProgress or GovernanceLoopControlState.PendingRecovery,
                 HasJournalIntegrityErrors: snapshot.JournalIntegrityErrorCount > 0,
                 JournalIntegrityErrorCount: snapshot.JournalIntegrityErrorCount,
-                HopngArtifacts: snapshot.HopngArtifacts);
+                HopngArtifacts: snapshot.HopngArtifacts,
+                TargetWitnessReceipts: snapshot.TargetWitnessReceipts);
         }
 
         private async Task<GovernanceLoopStateSnapshot> EnsureTerminalHopngArtifactsAsync(

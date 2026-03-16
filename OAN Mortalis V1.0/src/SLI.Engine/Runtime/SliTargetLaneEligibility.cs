@@ -6,7 +6,8 @@ public sealed record SliTargetLaneEligibility(
     bool IsEligible,
     IReadOnlyList<string> MissingTargetCapabilities,
     IReadOnlyList<string> DisallowedOperations,
-    IReadOnlyList<string> ProfileViolations)
+    IReadOnlyList<string> ProfileViolations,
+    SliTargetExecutionBudgetUsage BudgetUsage)
 {
     public void EnsureEligible()
     {
@@ -57,7 +58,8 @@ public static class SliTargetLaneGuard
 
         var missing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var disallowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var profileViolations = EvaluateProfile(program, targetManifest.RealizationProfile);
+        var budgetUsage = MeasureHigherOrderLocalityBudgetUsage(program);
+        var profileViolations = EvaluateProfile(program, budgetUsage, targetManifest.RealizationProfile);
 
         foreach (var instruction in program.Instructions)
         {
@@ -81,11 +83,27 @@ public static class SliTargetLaneGuard
             IsEligible: missing.Count == 0 && disallowed.Count == 0 && profileViolations.Count == 0,
             MissingTargetCapabilities: missing.OrderBy(opcode => opcode, StringComparer.OrdinalIgnoreCase).ToArray(),
             DisallowedOperations: disallowed.OrderBy(opcode => opcode, StringComparer.OrdinalIgnoreCase).ToArray(),
-            ProfileViolations: profileViolations);
+            ProfileViolations: profileViolations,
+            BudgetUsage: budgetUsage);
+    }
+
+    private static SliTargetExecutionBudgetUsage MeasureHigherOrderLocalityBudgetUsage(SliCoreProgram program)
+    {
+        var traceMarkers = 2;
+        return new SliTargetExecutionBudgetUsage(
+            InstructionCount: program.Instructions.Count,
+            SymbolicDepth: program.Instructions.Count,
+            ProjectedTraceEntryCount: program.Instructions.Count + traceMarkers,
+            ProjectedResidueCount: program.Instructions.Count(instruction =>
+                instruction.Opcode.EndsWith("-residue", StringComparison.OrdinalIgnoreCase)),
+            WitnessOperationCount: program.Instructions.Count(instruction => IsWitnessOpcode(instruction.Opcode)),
+            TransportOperationCount: program.Instructions.Count(instruction =>
+                instruction.Opcode.StartsWith("transport-", StringComparison.OrdinalIgnoreCase)));
     }
 
     private static IReadOnlyList<string> EvaluateProfile(
         SliCoreProgram program,
+        SliTargetExecutionBudgetUsage budgetUsage,
         SliRuntimeRealizationProfile profile)
     {
         var violations = new List<string>();
@@ -97,6 +115,26 @@ public static class SliTargetLaneGuard
         if (program.Instructions.Count > profile.MaxSymbolicDepth)
         {
             violations.Add($"symbolic-depth-exceeded:{program.Instructions.Count}>{profile.MaxSymbolicDepth}");
+        }
+
+        if (budgetUsage.ProjectedTraceEntryCount > profile.MaxTraceEntries)
+        {
+            violations.Add($"trace-budget-exceeded:{budgetUsage.ProjectedTraceEntryCount}>{profile.MaxTraceEntries}");
+        }
+
+        if (budgetUsage.ProjectedResidueCount > profile.MaxResidueCount)
+        {
+            violations.Add($"residue-budget-exceeded:{budgetUsage.ProjectedResidueCount}>{profile.MaxResidueCount}");
+        }
+
+        if (budgetUsage.WitnessOperationCount > profile.MaxWitnessOperationCount)
+        {
+            violations.Add($"witness-budget-exceeded:{budgetUsage.WitnessOperationCount}>{profile.MaxWitnessOperationCount}");
+        }
+
+        if (budgetUsage.TransportOperationCount > profile.MaxTransportOperationCount)
+        {
+            violations.Add($"transport-budget-exceeded:{budgetUsage.TransportOperationCount}>{profile.MaxTransportOperationCount}");
         }
 
         var opcodes = program.Instructions

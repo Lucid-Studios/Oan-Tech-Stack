@@ -34,4 +34,5 @@ internal sealed class SliHigherOrderLocalityResult
     public required SliPerspectiveResult Perspective { get; init; }
     public required SliParticipationResult Participation { get; init; }
     public required IReadOnlyList<string> SymbolicTrace { get; init; }
+    public SliTargetExecutionLineage? TargetLineage { get; init; }
 }
