@@ -180,6 +180,15 @@ public sealed class SoulFrameHostClientTests
     {
         var client = CreateClient((_, _) => throw new InvalidOperationException("Membrane intake should not call transport."));
         var identityId = Guid.NewGuid();
+        var actionableContent = new GovernedActionableContent(
+            ContentHandle: "return-candidate://delta/42",
+            Kind: ActionableContentKind.ReturnCandidate,
+            OriginSurface: "prime",
+            ProvenanceMarker: "worker:agenticore/session:cme-alpha",
+            SourceSubsystem: "AgentiCore",
+            PayloadClass: "return-candidate",
+            TraceReference: null,
+            ResidueReference: null);
         var request = new SoulFrameReturnIntakeRequest(
             identityId,
             CMEId: "cme-alpha",
@@ -194,7 +203,14 @@ public sealed class SoulFrameHostClientTests
                 AutobiographicalRelevant: true,
                 EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
-                SourceSubsystem: "AgentiCore"));
+                SourceSubsystem: "AgentiCore"),
+            RequestEnvelope: ControlSurfaceContractGuards.CreateRequestEnvelope(
+                targetSurface: ControlSurfaceKind.SoulFrameReturnIntake,
+                requestedBy: "AgentiCore",
+                scopeHandle: $"soulframe-session://cme-alpha/{identityId:D}",
+                protectionClass: "cryptic-return",
+                witnessRequirement: "membrane-witness",
+                actionableContent: actionableContent));
 
         var receipt = await client.ReceiveReturnIntakeAsync(request);
 
@@ -208,6 +224,47 @@ public sealed class SoulFrameHostClientTests
         Assert.False(receipt.Evaluation.CanRouteToCustody);
         Assert.False(receipt.Evaluation.CanPublishPrime);
         Assert.StartsWith("soulframe://return/", receipt.IntakeHandle, StringComparison.Ordinal);
+        Assert.Equal(request.RequestEnvelope.EnvelopeId, receipt.RequestEnvelopeId);
+        Assert.Equal(request.RequestEnvelope.ActionableContent.ContentHandle, receipt.ActionableContentHandle);
+    }
+
+    [Fact]
+    public async Task MembraneIntake_MismatchedEnvelopeParity_IsRejected()
+    {
+        var client = CreateClient((_, _) => throw new InvalidOperationException("Membrane intake should not call transport."));
+        var identityId = Guid.NewGuid();
+        var request = new SoulFrameReturnIntakeRequest(
+            identityId,
+            CMEId: "cme-alpha",
+            SessionHandle: $"soulframe-session://cme-alpha/{identityId:D}",
+            SourceTheater: "prime",
+            ReturnCandidatePointer: "return-candidate://delta/42",
+            ProvenanceMarker: "worker:agenticore/session:cme-alpha",
+            IntakeIntent: "candidate-return-evaluation",
+            CollapseClassification: new CmeCollapseClassification(
+                CollapseConfidence: 0.91,
+                SelfGelIdentified: true,
+                AutobiographicalRelevant: true,
+                EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
+                ReviewTriggers: CmeCollapseReviewTrigger.None,
+                SourceSubsystem: "AgentiCore"),
+            RequestEnvelope: ControlSurfaceContractGuards.CreateRequestEnvelope(
+                targetSurface: ControlSurfaceKind.SoulFrameReturnIntake,
+                requestedBy: "AgentiCore",
+                scopeHandle: $"soulframe-session://cme-alpha/{identityId:D}",
+                protectionClass: "cryptic-return",
+                witnessRequirement: "membrane-witness",
+                actionableContent: new GovernedActionableContent(
+                    ContentHandle: "return-candidate://delta/99",
+                    Kind: ActionableContentKind.ReturnCandidate,
+                    OriginSurface: "prime",
+                    ProvenanceMarker: "worker:agenticore/session:cme-alpha",
+                    SourceSubsystem: "AgentiCore",
+                    PayloadClass: "return-candidate",
+                    TraceReference: null,
+                    ResidueReference: null)));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => client.ReceiveReturnIntakeAsync(request));
     }
 
     private static SoulFrameHostClient CreateClient(

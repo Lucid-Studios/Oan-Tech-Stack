@@ -55,6 +55,8 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var snapshot = GovernanceLoopStateModel.Project(
             result.LoopKey,
             await journal.ReplayLoopAsync(result.LoopKey));
+        var replay = await journal.ReplayLoopAsync(result.LoopKey);
+        var reviewRequest = replay.Select(entry => entry.ReviewRequest).First(requestItem => requestItem is not null)!;
 
         Assert.Equal(GovernanceDecision.Approved, result.DecisionReceipt.Decision);
         Assert.Equal(GovernanceLoopStage.LoopCompleted, result.Stage);
@@ -75,6 +77,10 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Contains(derivativeViews, view => view.RepresentationKind == "checked-view");
         Assert.True(crypticRecords.Count >= 2);
         Assert.Equal(GovernanceLoopStage.LoopCompleted, snapshot.Stage);
+        Assert.Equal(2, result.HopngArtifacts!.Count);
+        Assert.All(result.HopngArtifacts, receipt => Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, receipt.Outcome));
+        Assert.Equal(reviewRequest.RequestEnvelope.ActionableContent.ContentHandle, result.DecisionReceipt.MutationReceipt.ContentHandle);
+        Assert.All(replay.Where(entry => entry.ActReceipt is not null), entry => Assert.NotNull(entry.ActReceipt!.MutationReceipt));
     }
 
     [Fact]
@@ -109,7 +115,16 @@ public sealed class GovernanceGoldenPathIntegrationTests
                 autobiographicalRelevant: true,
                 selfGelIdentified: true),
             ResultType: "cognition-accepted",
-            EngramCommitRequired: true));
+            EngramCommitRequired: true,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/rejected",
+                "not-membrane-derived"),
+            ReturnIntakeHandle: "soulframe://return/rejected",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "invalid-session",
+                "agenticore-return://candidate/rejected",
+                "not-membrane-derived",
+                "AgentiCore")));
 
         var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, soulFrameMembrane: null, cognition, steward);
         var manager = new StackManager(stores);
@@ -126,6 +141,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Equal(GovernedPrimeDerivativeLane.Neither, result.PublishedLanes);
         Assert.Empty(derivativeViews);
         Assert.Single(crypticRecords);
+        Assert.Empty(result.HopngArtifacts!);
     }
 
     [Fact]
@@ -160,7 +176,15 @@ public sealed class GovernanceGoldenPathIntegrationTests
                 autobiographicalRelevant: true,
                 selfGelIdentified: true),
             ResultType: "cognition-accepted",
-            EngramCommitRequired: true));
+            EngramCommitRequired: true,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/deferred",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/deferred",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/deferred",
+                "agenticore-return://candidate/deferred",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle")));
 
         var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, soulFrameMembrane: null, cognition, steward);
         var manager = new StackManager(stores);
@@ -184,6 +208,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.Empty(derivativeViews);
         Assert.Equal(2, crypticRecords.Count);
         Assert.Single(deferred);
+        Assert.Empty(result.HopngArtifacts!);
     }
 
     [Fact]
@@ -225,6 +250,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
             entry => entry.ActReceipt?.ActKind == GovernanceActKind.CollapseHoldToCGoA && entry.ActReceipt.Succeeded);
         Assert.Contains(derivativeViews, view => view.RepresentationKind == "pointer");
         Assert.Contains(derivativeViews, view => view.RepresentationKind == "checked-view");
+        Assert.Equal(2, result.HopngArtifacts!.Count);
     }
 
     [Fact]
@@ -264,6 +290,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
             replay,
             entry => entry.ActReceipt?.ActKind == GovernanceActKind.CollapseHoldToCGoA && entry.ActReceipt.Succeeded);
         Assert.Single(deferred);
+        Assert.Empty(result.HopngArtifacts!);
     }
 
     [Fact]
@@ -303,7 +330,15 @@ public sealed class GovernanceGoldenPathIntegrationTests
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
                 SourceSubsystem: "AgentiCore"),
             ResultType: "cognition-mixed",
-            EngramCommitRequired: true));
+            EngramCommitRequired: true,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/mixed",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/mixed",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/mixed",
+                "agenticore-return://candidate/mixed",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle")));
 
         var stores = CreateStoreRegistry(publicLayer, mantle, publicLayer, journal, soulFrameMembrane: null, cognition, steward);
         var manager = new StackManager(stores);
@@ -375,6 +410,8 @@ public sealed class GovernanceGoldenPathIntegrationTests
         Assert.StartsWith("reengrammitization-failed:", result.FailureCode, StringComparison.Ordinal);
         Assert.Empty(derivativeViews);
         Assert.Equal(GovernanceLoopStage.PendingRecovery, snapshot.Stage);
+        Assert.Equal(2, result.HopngArtifacts!.Count);
+        Assert.All(result.HopngArtifacts, receipt => Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, receipt.Outcome));
     }
 
     [Fact]
@@ -411,6 +448,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
             GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView,
             second.PublishedLanes);
         Assert.Equal(2, secondViews.Count);
+        Assert.Equal(2, second.HopngArtifacts!.Count);
     }
 
     private static GovernanceCycleStartRequest CreateGoldenPathRequest(Guid identityId)
@@ -475,7 +513,15 @@ public sealed class GovernanceGoldenPathIntegrationTests
                 autobiographicalRelevant: true,
                 selfGelIdentified: true),
             ResultType: "cognition-accepted",
-            EngramCommitRequired: true);
+            EngramCommitRequired: true,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/approved",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/approved",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/approved",
+                "agenticore-return://candidate/approved",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"));
     }
 
     private static GovernanceCycleWorkResult CreateApprovedContextualWorkResult(Guid identityId, GovernanceCycleStartRequest request)
@@ -498,7 +544,15 @@ public sealed class GovernanceGoldenPathIntegrationTests
                 autobiographicalRelevant: false,
                 selfGelIdentified: false),
             ResultType: "cognition-accepted",
-            EngramCommitRequired: false);
+            EngramCommitRequired: false,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/contextual",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/contextual",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/contextual",
+                "agenticore-return://candidate/contextual",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"));
     }
 
     private static GovernanceCycleWorkResult CreateDeferredContextualWorkResult(Guid identityId, GovernanceCycleStartRequest request)
@@ -522,7 +576,43 @@ public sealed class GovernanceGoldenPathIntegrationTests
                 selfGelIdentified: false,
                 collapseConfidence: 0.51),
             ResultType: "cognition-review",
-            EngramCommitRequired: false);
+            EngramCommitRequired: false,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/deferred-contextual",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/deferred-contextual",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/deferred-contextual",
+                "agenticore-return://candidate/deferred-contextual",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"));
+    }
+
+    private static GovernedActionableContent CreateActionableContent(string returnPointer, string provenanceMarker)
+    {
+        return ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
+            contentHandle: returnPointer,
+            originSurface: "prime",
+            provenanceMarker: provenanceMarker,
+            sourceSubsystem: "AgentiCore");
+    }
+
+    private static string CreateReturnIntakeEnvelopeId(
+        string sessionHandle,
+        string returnPointer,
+        string provenanceMarker,
+        string sourceSubsystem = "AgentiCore")
+    {
+        return ControlSurfaceContractGuards.CreateRequestEnvelope(
+            targetSurface: ControlSurfaceKind.SoulFrameReturnIntake,
+            requestedBy: "AgentiCore",
+            scopeHandle: sessionHandle,
+            protectionClass: "cryptic-return",
+            witnessRequirement: "membrane-witness",
+            actionableContent: ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
+                contentHandle: returnPointer,
+                originSurface: "prime",
+                provenanceMarker: provenanceMarker,
+                sourceSubsystem: sourceSubsystem)).EnvelopeId;
     }
 
     private static CmeCollapseClassification CreateCollapseClassification(

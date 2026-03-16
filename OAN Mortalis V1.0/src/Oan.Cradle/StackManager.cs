@@ -244,7 +244,7 @@ namespace Oan.Cradle
             var snapshot = GovernanceLoopStateModel.Project(batch, loopKey);
             if (snapshot.IsTerminal)
             {
-                return BuildResult(reviewRequest.CandidateId, loopKey, snapshot);
+                return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
             }
 
             var decisionReceipt = snapshot.DecisionReceipt;
@@ -306,7 +306,7 @@ namespace Oan.Cradle
 
             if (decisionReceipt.Decision == GovernanceDecision.Rejected)
             {
-                return BuildResult(reviewRequest.CandidateId, loopKey, snapshot);
+                return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
             }
 
             var collapseQualification = RequireCmeCollapseQualifier().Qualify(reviewRequest.CollapseClassification);
@@ -329,7 +329,7 @@ namespace Oan.Cradle
 
                 batch = await journal.ReplayLoopBatchAsync(loopKey, cancellationToken).ConfigureAwait(false);
                 snapshot = GovernanceLoopStateModel.Project(batch, loopKey);
-                return BuildResult(reviewRequest.CandidateId, loopKey, snapshot);
+                return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
             }
 
             return await ContinueApprovedLoopAsync(loopKey, reviewRequest, decisionReceipt, snapshot, retryLane: null, cancellationToken)
@@ -433,7 +433,14 @@ namespace Oan.Cradle
                                     ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
                                     EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
                                     ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
-                                    SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
+                                    SourceSubsystem: collapseRoutingDecision.SourceSubsystem,
+                                    MutationReceipt: CreateActMutationReceipt(
+                                        reviewRequest,
+                                        decisionReceipt,
+                                        GovernanceActKind.Reengrammitization,
+                                        succeeded: true,
+                                        failureCode: null,
+                                        timestamp: reengrammitizationReceipt.Timestamp)),
                                 ReviewRequest: reviewRequest,
                                 Annotation: null),
                             cancellationToken).ConfigureAwait(false);
@@ -464,20 +471,19 @@ namespace Oan.Cradle
                                     ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
                                     EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
                                     ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
-                                    SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
+                                    SourceSubsystem: collapseRoutingDecision.SourceSubsystem,
+                                    MutationReceipt: CreateActMutationReceipt(
+                                        reviewRequest,
+                                        decisionReceipt,
+                                        GovernanceActKind.Reengrammitization,
+                                        succeeded: false,
+                                        failureCode: $"reengrammitization-failed:{ex.GetType().Name}",
+                                        timestamp: DateTime.UtcNow)),
                                 ReviewRequest: reviewRequest,
                                 Annotation: null),
                             cancellationToken).ConfigureAwait(false);
 
-                        return new GovernanceGoldenPathResult(
-                            CandidateId: reviewRequest.CandidateId,
-                            LoopKey: loopKey,
-                            Stage: GovernanceLoopStage.PendingRecovery,
-                            DecisionReceipt: decisionReceipt,
-                            ReengrammitizationReceipt: null,
-                            PublishedLanes: snapshot.PublishedLanes,
-                            FailureCode: $"reengrammitization-failed:{ex.GetType().Name}",
-                            CollapseRoutingDecision: collapseRoutingDecision);
+                        return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
                     }
                 }
                 else
@@ -501,15 +507,7 @@ namespace Oan.Cradle
                         .ConfigureAwait(false);
                     if (!cgoaResult.Succeeded)
                     {
-                        return new GovernanceGoldenPathResult(
-                            CandidateId: reviewRequest.CandidateId,
-                            LoopKey: loopKey,
-                            Stage: GovernanceLoopStage.PendingRecovery,
-                            DecisionReceipt: decisionReceipt,
-                            ReengrammitizationReceipt: null,
-                            PublishedLanes: snapshot.PublishedLanes,
-                            FailureCode: cgoaResult.FailureCode,
-                            CollapseRoutingDecision: collapseRoutingDecision);
+                        return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
                     }
                 }
 
@@ -550,7 +548,16 @@ namespace Oan.Cradle
                                 ReceiptPointer: lane == GovernedPrimeDerivativeLane.Pointer
                                     ? laneRequest.PointerValue
                                     : laneRequest.CheckedViewValue,
-                                RequestFingerprint: ComputeFingerprint(laneRequest)),
+                                RequestFingerprint: ComputeFingerprint(laneRequest),
+                                MutationReceipt: CreateActMutationReceipt(
+                                    reviewRequest,
+                                    decisionReceipt,
+                                    lane == GovernedPrimeDerivativeLane.Pointer
+                                        ? GovernanceActKind.PrimePointerPublication
+                                        : GovernanceActKind.PrimeCheckedViewPublication,
+                                    succeeded: true,
+                                    failureCode: null,
+                                    timestamp: DateTime.UtcNow)),
                             ReviewRequest: reviewRequest,
                             Annotation: null),
                         cancellationToken).ConfigureAwait(false);
@@ -577,20 +584,21 @@ namespace Oan.Cradle
                                 DateTime.UtcNow,
                                 PublishedLanes: publishedLanes,
                                 ReceiptPointer: null,
-                                RequestFingerprint: ComputeFingerprint(laneRequest)),
+                                RequestFingerprint: ComputeFingerprint(laneRequest),
+                                MutationReceipt: CreateActMutationReceipt(
+                                    reviewRequest,
+                                    decisionReceipt,
+                                    lane == GovernedPrimeDerivativeLane.Pointer
+                                        ? GovernanceActKind.PrimePointerPublication
+                                        : GovernanceActKind.PrimeCheckedViewPublication,
+                                    succeeded: false,
+                                    failureCode: $"publication-failed:{lane}:{ex.GetType().Name}",
+                                    timestamp: DateTime.UtcNow)),
                             ReviewRequest: reviewRequest,
                             Annotation: null),
                         cancellationToken).ConfigureAwait(false);
 
-                    return new GovernanceGoldenPathResult(
-                        CandidateId: reviewRequest.CandidateId,
-                        LoopKey: loopKey,
-                        Stage: GovernanceLoopStage.PendingRecovery,
-                        DecisionReceipt: decisionReceipt,
-                        ReengrammitizationReceipt: reengrammitizationReceipt,
-                        PublishedLanes: publishedLanes,
-                        FailureCode: $"publication-failed:{lane}:{ex.GetType().Name}",
-                        CollapseRoutingDecision: collapseRoutingDecision);
+                    return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -616,20 +624,19 @@ namespace Oan.Cradle
                         DateTime.UtcNow,
                         PublishedLanes: publishedLanes,
                         ReceiptPointer: null,
-                        RequestFingerprint: null),
+                        RequestFingerprint: null,
+                        MutationReceipt: CreateActMutationReceipt(
+                            reviewRequest,
+                            decisionReceipt,
+                            GovernanceActKind.Completion,
+                            succeeded: true,
+                            failureCode: null,
+                            timestamp: DateTime.UtcNow)),
                     ReviewRequest: reviewRequest,
                     Annotation: null),
                 cancellationToken).ConfigureAwait(false);
 
-            return new GovernanceGoldenPathResult(
-                CandidateId: reviewRequest.CandidateId,
-                LoopKey: loopKey,
-                Stage: stage,
-                DecisionReceipt: decisionReceipt,
-                ReengrammitizationReceipt: reengrammitizationReceipt,
-                PublishedLanes: publishedLanes,
-                FailureCode: null,
-                CollapseRoutingDecision: collapseRoutingDecision);
+            return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
         }
 
         private IGovernanceCycleCognitionService RequireGovernanceCognitionService() =>
@@ -660,8 +667,20 @@ namespace Oan.Cradle
             _stores.CmeCollapseQualifier
             ?? throw new InvalidOperationException("Golden Path qualification requires a CME collapse qualifier.");
 
+        private CradleTek.Host.Interfaces.IHopngArtifactService RequireHopngArtifactService() =>
+            _stores.HopngArtifactService;
+
         private static ReturnCandidateReviewRequest CreateReviewRequest(GovernanceCycleWorkResult workResult)
         {
+            var requestEnvelope = ControlSurfaceContractGuards.CreateRequestEnvelope(
+                targetSurface: ControlSurfaceKind.StewardReturnReview,
+                requestedBy: "CradleTek",
+                scopeHandle: workResult.SessionHandle,
+                protectionClass: "cryptic-review",
+                witnessRequirement: "governance-witness",
+                actionableContent: workResult.ActionableContent,
+                parentEnvelopeId: workResult.ReturnIntakeEnvelopeId);
+
             return new ReturnCandidateReviewRequest(
                 CandidateId: workResult.CandidateId,
                 IdentityId: workResult.IdentityId,
@@ -675,9 +694,23 @@ namespace Oan.Cradle
                 ReturnCandidatePointer: workResult.ReturnCandidatePointer,
                 ProvenanceMarker: workResult.ProvenanceMarker,
                 IntakeIntent: workResult.IntakeIntent,
-                SubmittedBy: "AgentiCore",
+                SubmittedBy: "CradleTek",
                 CandidatePayload: workResult.CandidatePayload,
-                CollapseClassification: workResult.CollapseClassification);
+                CollapseClassification: workResult.CollapseClassification,
+                RequestEnvelope: requestEnvelope);
+        }
+
+        private async Task<GovernanceGoldenPathResult> BuildResultAsync(
+            Guid candidateId,
+            string loopKey,
+            CancellationToken cancellationToken)
+        {
+            var batch = await RequireGovernanceReceiptJournal()
+                .ReplayLoopBatchAsync(loopKey, cancellationToken)
+                .ConfigureAwait(false);
+            var snapshot = GovernanceLoopStateModel.Project(batch, loopKey);
+            snapshot = await EnsureTerminalHopngArtifactsAsync(loopKey, snapshot, cancellationToken).ConfigureAwait(false);
+            return BuildResult(candidateId, loopKey, snapshot);
         }
 
         private GovernanceGoldenPathResult BuildResult(
@@ -698,7 +731,8 @@ namespace Oan.Cradle
                 ReengrammitizationReceipt: snapshot.ReengrammitizationReceipt,
                 PublishedLanes: snapshot.PublishedLanes,
                 FailureCode: snapshot.FailureCode,
-                CollapseRoutingDecision: BuildCollapseRoutingDecision(snapshot));
+                CollapseRoutingDecision: BuildCollapseRoutingDecision(snapshot),
+                HopngArtifacts: snapshot.HopngArtifacts);
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -735,7 +769,76 @@ namespace Oan.Cradle
                 ResumeEligible: snapshot.DecisionReceipt?.Decision == GovernanceDecision.Approved &&
                                 controlState is GovernanceLoopControlState.InProgress or GovernanceLoopControlState.PendingRecovery,
                 HasJournalIntegrityErrors: snapshot.JournalIntegrityErrorCount > 0,
-                JournalIntegrityErrorCount: snapshot.JournalIntegrityErrorCount);
+                JournalIntegrityErrorCount: snapshot.JournalIntegrityErrorCount,
+                HopngArtifacts: snapshot.HopngArtifacts);
+        }
+
+        private async Task<GovernanceLoopStateSnapshot> EnsureTerminalHopngArtifactsAsync(
+            string loopKey,
+            GovernanceLoopStateSnapshot snapshot,
+            CancellationToken cancellationToken)
+        {
+            if (snapshot.Stage is not (GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.PendingRecovery))
+            {
+                return snapshot;
+            }
+
+            if (snapshot.DecisionReceipt is null)
+            {
+                return snapshot;
+            }
+
+            var existingProfiles = snapshot.HopngArtifacts
+                .Select(receipt => receipt.Profile)
+                .ToHashSet();
+            var missingProfiles = new[]
+            {
+                GovernedHopngArtifactProfile.GoverningTrafficEvidence,
+                GovernedHopngArtifactProfile.GovernanceTelemetryPhaseStack
+            }.Where(profile => !existingProfiles.Contains(profile)).ToArray();
+            if (missingProfiles.Length == 0)
+            {
+                return snapshot;
+            }
+
+            var journal = RequireGovernanceReceiptJournal();
+            var loopEntries = await journal.ReplayLoopAsync(loopKey, cancellationToken).ConfigureAwait(false);
+            var collapseRoutingDecision = BuildCollapseRoutingDecision(snapshot);
+            foreach (var profile in missingProfiles)
+            {
+                var receipt = await RequireHopngArtifactService()
+                    .EmitAsync(
+                        new GovernedHopngEmissionRequest(
+                            LoopKey: loopKey,
+                            CandidateId: snapshot.DecisionReceipt.CandidateId,
+                            CandidateProvenance: snapshot.DecisionReceipt.CandidateProvenance,
+                            Profile: profile,
+                            Stage: snapshot.Stage,
+                            RequestedBy: "CradleTek",
+                            DecisionReceipt: snapshot.DecisionReceipt,
+                            Snapshot: snapshot,
+                            JournalEntries: loopEntries,
+                            CollapseRoutingDecision: collapseRoutingDecision),
+                        cancellationToken)
+                    .ConfigureAwait(false);
+
+                await journal.AppendAsync(
+                    new GovernanceJournalEntry(
+                        loopKey,
+                        GovernanceJournalEntryKind.ArtifactReceipt,
+                        snapshot.Stage,
+                        receipt.TimestampUtc.UtcDateTime,
+                        snapshot.DecisionReceipt,
+                        DeferredReview: null,
+                        ActReceipt: null,
+                        ReviewRequest: snapshot.ReviewRequest,
+                        Annotation: null,
+                        HopngArtifactReceipt: receipt),
+                    cancellationToken).ConfigureAwait(false);
+            }
+
+            var refreshedBatch = await journal.ReplayLoopBatchAsync(loopKey, cancellationToken).ConfigureAwait(false);
+            return GovernanceLoopStateModel.Project(refreshedBatch, loopKey);
         }
 
         private static PublicationLaneStatusView BuildPublicationLaneStatus(
@@ -772,6 +875,24 @@ namespace Oan.Cradle
             var json = System.Text.Json.JsonSerializer.Serialize(payload);
             var bytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(json));
             return Convert.ToHexString(bytes).ToLowerInvariant();
+        }
+
+        private static GovernedControlSurfaceMutationReceipt CreateActMutationReceipt(
+            ReturnCandidateReviewRequest reviewRequest,
+            GovernanceDecisionReceipt decisionReceipt,
+            GovernanceActKind actKind,
+            bool succeeded,
+            string? failureCode,
+            DateTime timestamp)
+        {
+            return ControlSurfaceContractGuards.CreateMutationReceipt(
+                envelopeId: reviewRequest.RequestEnvelope.EnvelopeId,
+                contentHandle: reviewRequest.RequestEnvelope.ActionableContent.ContentHandle,
+                targetSurface: ControlSurfaceKind.GovernanceAct,
+                outcome: succeeded ? ControlMutationOutcome.Authorized : ControlMutationOutcome.Refused,
+                governedBy: decisionReceipt.AdjudicatorIdentity,
+                decisionCode: succeeded ? $"act:{actKind}" : failureCode ?? $"act:{actKind}:failed",
+                timestampUtc: new DateTimeOffset(timestamp, TimeSpan.Zero));
         }
 
         private CmeCollapseRoutingDecision? BuildCollapseRoutingDecision(GovernanceLoopStateSnapshot snapshot)
@@ -827,15 +948,7 @@ namespace Oan.Cradle
                 return null;
             }
 
-            return new GovernanceGoldenPathResult(
-                CandidateId: reviewRequest.CandidateId,
-                LoopKey: loopKey,
-                Stage: GovernanceLoopStage.PendingRecovery,
-                DecisionReceipt: decisionReceipt,
-                ReengrammitizationReceipt: null,
-                PublishedLanes: GovernedPrimeDerivativeLane.Neither,
-                FailureCode: holdResult.FailureCode,
-                CollapseRoutingDecision: collapseRoutingDecision);
+            return await BuildResultAsync(reviewRequest.CandidateId, loopKey, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<(bool Succeeded, string? FailureCode)> TryAppendCrypticHoldAsync(
@@ -887,7 +1000,16 @@ namespace Oan.Cradle
                             ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
                             EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
                             ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
-                            SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
+                            SourceSubsystem: collapseRoutingDecision.SourceSubsystem,
+                            MutationReceipt: CreateActMutationReceipt(
+                                reviewRequest,
+                                decisionReceipt,
+                                collapseRoutingDecision.Disposition == CmeCollapseDisposition.RouteToCMoS
+                                    ? GovernanceActKind.CollapseHoldToCMoS
+                                    : GovernanceActKind.CollapseHoldToCGoA,
+                                succeeded: true,
+                                failureCode: null,
+                                timestamp: record.Timestamp)),
                         ReviewRequest: reviewRequest,
                         Annotation: null),
                     cancellationToken).ConfigureAwait(false);
@@ -921,7 +1043,16 @@ namespace Oan.Cradle
                             ClassificationConfidence: collapseRoutingDecision.ClassificationConfidence,
                             EvidenceFlags: collapseRoutingDecision.EvidenceFlags,
                             ReviewTriggers: collapseRoutingDecision.ReviewTriggers,
-                            SourceSubsystem: collapseRoutingDecision.SourceSubsystem),
+                            SourceSubsystem: collapseRoutingDecision.SourceSubsystem,
+                            MutationReceipt: CreateActMutationReceipt(
+                                reviewRequest,
+                                decisionReceipt,
+                                collapseRoutingDecision.Disposition == CmeCollapseDisposition.RouteToCMoS
+                                    ? GovernanceActKind.CollapseHoldToCMoS
+                                    : GovernanceActKind.CollapseHoldToCGoA,
+                                succeeded: false,
+                                failureCode: $"collapse-hold-failed:{collapseRoutingDecision.TargetClass}:{ex.GetType().Name}",
+                                timestamp: DateTime.UtcNow)),
                         ReviewRequest: reviewRequest,
                         Annotation: null),
                     cancellationToken).ConfigureAwait(false);

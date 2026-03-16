@@ -169,6 +169,7 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ControlSurfaceContractGuards.ValidateReturnCandidateReviewRequest(request);
 
         var decision = ClassifyDecision(request);
         var timestamp = DateTime.UtcNow;
@@ -184,17 +185,34 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
             _deferredReviewQueue.Add(request);
         }
 
+        var mutationOutcome = decision switch
+        {
+            GovernanceDecision.Approved => ControlMutationOutcome.Authorized,
+            GovernanceDecision.Deferred => ControlMutationOutcome.Deferred,
+            _ => ControlMutationOutcome.Refused
+        };
+        var rationaleCode = BuildRationaleCode(request, decision);
+        var mutationReceipt = ControlSurfaceContractGuards.CreateMutationReceipt(
+            envelopeId: request.RequestEnvelope.EnvelopeId,
+            contentHandle: request.RequestEnvelope.ActionableContent.ContentHandle,
+            targetSurface: ControlSurfaceKind.GovernanceDecision,
+            outcome: mutationOutcome,
+            governedBy: StewardIdentity,
+            decisionCode: rationaleCode,
+            timestampUtc: new DateTimeOffset(timestamp, TimeSpan.Zero));
+
         var receipt = new GovernanceDecisionReceipt(
             CandidateId: request.CandidateId,
             IdempotencyKey: loopKey,
             CandidateProvenance: request.ProvenanceMarker,
             Decision: decision,
             AdjudicatorIdentity: StewardIdentity,
-            RationaleCode: BuildRationaleCode(request, decision),
+            RationaleCode: rationaleCode,
             Timestamp: timestamp,
             ReengrammitizationAuthorized: reengrammitizationAuthorized,
             PrimePublicationAuthorized: decision == GovernanceDecision.Approved,
-            AuthorizedDerivativeLanes: lanes);
+            AuthorizedDerivativeLanes: lanes,
+            MutationReceipt: mutationReceipt);
 
         GovernedReengrammitizationRequest? reengrammitizationRequest = null;
         GovernedPrimePublicationRequest? publicationRequest = null;
@@ -598,6 +616,7 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
 
         var reviewRequest = await LoadReviewRequestAsync(request.LoopKey, cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Deferred review request could not be reconstructed from audit history.");
+        ControlSurfaceContractGuards.ValidateReturnCandidateReviewRequest(reviewRequest);
 
         var latestDeferred = await GetDeferredAsync(request.LoopKey, cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Deferred loop is no longer reviewable.");
@@ -611,23 +630,36 @@ public sealed class StewardAgent : IReturnGovernanceAdjudicator, IDeferredReview
         var timestamp = DateTime.UtcNow;
         var reengrammitizationAuthorized = reviewedDecision == GovernanceDecision.Approved &&
                                            RequiresCrypticReengrammitization(reviewRequest);
+        var outcome = reviewedDecision == GovernanceDecision.Approved
+            ? ControlMutationOutcome.Authorized
+            : ControlMutationOutcome.Refused;
+        var reviewedRationaleCode = string.IsNullOrWhiteSpace(request.RationaleCode)
+            ? reviewedDecision == GovernanceDecision.Approved
+                ? "steward.approved.deferred-review"
+                : "steward.rejected.deferred-review"
+            : request.RationaleCode.Trim();
+        var mutationReceipt = ControlSurfaceContractGuards.CreateMutationReceipt(
+            envelopeId: reviewRequest.RequestEnvelope.EnvelopeId,
+            contentHandle: reviewRequest.RequestEnvelope.ActionableContent.ContentHandle,
+            targetSurface: ControlSurfaceKind.GovernanceDecision,
+            outcome: outcome,
+            governedBy: StewardIdentity,
+            decisionCode: reviewedRationaleCode,
+            timestampUtc: new DateTimeOffset(timestamp, TimeSpan.Zero));
         var receipt = new GovernanceDecisionReceipt(
             CandidateId: reviewRequest.CandidateId,
             IdempotencyKey: request.LoopKey,
             CandidateProvenance: reviewRequest.ProvenanceMarker,
             Decision: reviewedDecision,
             AdjudicatorIdentity: StewardIdentity,
-            RationaleCode: string.IsNullOrWhiteSpace(request.RationaleCode)
-                ? reviewedDecision == GovernanceDecision.Approved
-                    ? "steward.approved.deferred-review"
-                    : "steward.rejected.deferred-review"
-                : request.RationaleCode.Trim(),
+            RationaleCode: reviewedRationaleCode,
             Timestamp: timestamp,
             ReengrammitizationAuthorized: reengrammitizationAuthorized,
             PrimePublicationAuthorized: reviewedDecision == GovernanceDecision.Approved,
             AuthorizedDerivativeLanes: reviewedDecision == GovernanceDecision.Approved
                 ? GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView
-                : GovernedPrimeDerivativeLane.Neither);
+                : GovernedPrimeDerivativeLane.Neither,
+            MutationReceipt: mutationReceipt);
 
         GovernedReengrammitizationRequest? reengrammitizationRequest = null;
         GovernedPrimePublicationRequest? publicationRequest = null;

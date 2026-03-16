@@ -38,7 +38,13 @@ public sealed class AgentiCoreMembraneCallerTests
         Assert.Equal(state.SessionHandle, membrane.LastReturnRequest.SessionHandle);
         Assert.Equal(state.ProvenanceMarker, membrane.LastReturnRequest.ProvenanceMarker);
         Assert.Equal("agenticore-return://delta/42", membrane.LastReturnRequest.ReturnCandidatePointer);
+        Assert.Equal(ControlSurfaceKind.SoulFrameReturnIntake, membrane.LastReturnRequest.RequestEnvelope.TargetSurface);
+        Assert.Equal("agenticore-return://delta/42", membrane.LastReturnRequest.RequestEnvelope.ActionableContent.ContentHandle);
+        Assert.Equal("prime", membrane.LastReturnRequest.RequestEnvelope.ActionableContent.OriginSurface);
+        Assert.Equal(state.ProvenanceMarker, membrane.LastReturnRequest.RequestEnvelope.ActionableContent.ProvenanceMarker);
         Assert.True(receipt.Accepted);
+        Assert.Equal(membrane.LastReturnRequest.RequestEnvelope.EnvelopeId, receipt.RequestEnvelopeId);
+        Assert.Equal(membrane.LastReturnRequest.RequestEnvelope.ActionableContent.ContentHandle, receipt.ActionableContentHandle);
     }
 
     [Fact]
@@ -102,6 +108,7 @@ public sealed class AgentiCoreMembraneCallerTests
             CancellationToken cancellationToken = default)
         {
             LastReturnRequest = request;
+            ControlSurfaceContractGuards.ValidateSoulFrameReturnIntakeRequest(request);
             return Task.FromResult(new SoulFrameReturnIntakeReceipt(
                 request.IdentityId,
                 IntakeHandle: "soulframe://return/test",
@@ -114,7 +121,9 @@ public sealed class AgentiCoreMembraneCallerTests
                     ReviewState: CmeCollapseReviewState.DeferredReview,
                     RequiresReview: true,
                     CanRouteToCustody: false,
-                    CanPublishPrime: false)));
+                    CanPublishPrime: false),
+                RequestEnvelopeId: request.RequestEnvelope.EnvelopeId,
+                ActionableContentHandle: request.RequestEnvelope.ActionableContent.ContentHandle));
         }
 
     }

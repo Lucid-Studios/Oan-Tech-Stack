@@ -324,7 +324,15 @@ public sealed class RuntimeOperatorCliIntegrationTests
                 autobiographicalRelevant: true,
                 selfGelIdentified: true),
             ResultType: "cognition-accepted",
-            EngramCommitRequired: true);
+            EngramCommitRequired: true,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/approved",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/approved",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/approved",
+                "agenticore-return://candidate/approved",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"));
     }
 
     private static GovernanceCycleWorkResult CreateDeferredWorkResult(Guid identityId, Guid soulFrameId, string cmeId)
@@ -348,7 +356,38 @@ public sealed class RuntimeOperatorCliIntegrationTests
                 selfGelIdentified: true,
                 collapseConfidence: 0.61),
             ResultType: "cognition-review",
-            EngramCommitRequired: true);
+            EngramCommitRequired: true,
+            ActionableContent: CreateActionableContent(
+                "agenticore-return://candidate/deferred",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"),
+            ReturnIntakeHandle: "soulframe://return/deferred",
+            ReturnIntakeEnvelopeId: CreateReturnIntakeEnvelopeId(
+                "soulframe-session://cme-runtime/deferred",
+                "agenticore-return://candidate/deferred",
+                "membrane-derived:cme:cme-runtime|policy:agenticore.cognition.cycle"));
+    }
+
+    private static GovernedActionableContent CreateActionableContent(string returnPointer, string provenanceMarker)
+    {
+        return ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
+            contentHandle: returnPointer,
+            originSurface: "prime",
+            provenanceMarker: provenanceMarker,
+            sourceSubsystem: "AgentiCore");
+    }
+
+    private static string CreateReturnIntakeEnvelopeId(
+        string sessionHandle,
+        string returnPointer,
+        string provenanceMarker)
+    {
+        return ControlSurfaceContractGuards.CreateRequestEnvelope(
+            targetSurface: ControlSurfaceKind.SoulFrameReturnIntake,
+            requestedBy: "AgentiCore",
+            scopeHandle: sessionHandle,
+            protectionClass: "cryptic-return",
+            witnessRequirement: "membrane-witness",
+            actionableContent: CreateActionableContent(returnPointer, provenanceMarker)).EnvelopeId;
     }
 
     private static CmeCollapseClassification CreateCollapseClassification(

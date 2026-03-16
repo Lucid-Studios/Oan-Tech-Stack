@@ -601,6 +601,7 @@ public static class HeadlessRuntimeBootstrap
             true,
             crypticStore,
             true,
+            hopngArtifactService: HopngArtifactServiceFactory.Create(Path.Combine(runtimeRoot, "telemetry", "hopng")),
             crypticAdmissionMembrane: admissionMembrane,
             formationObserver: formationObserver,
             firstBootFormationObservationHarness: firstBootHarness);

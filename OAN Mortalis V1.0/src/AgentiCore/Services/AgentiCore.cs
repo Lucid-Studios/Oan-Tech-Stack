@@ -280,6 +280,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         context.WorkingMemory["membrane_return_candidate_pointer"] = BuildReturnCandidatePointer(context.ContextId, cognitionResult.TraceId);
         context.WorkingMemory["membrane_return_handle"] = returnReceipt.IntakeHandle;
         context.WorkingMemory["membrane_return_disposition"] = returnReceipt.Disposition;
+        context.WorkingMemory["membrane_return_request_envelope_id"] = returnReceipt.RequestEnvelopeId;
+        context.WorkingMemory["membrane_actionable_content_handle"] = returnReceipt.ActionableContentHandle;
         EmitTelemetry("membrane-return-candidate", context.ContextId, context.CMEId);
 
         var symbolicTrace = new AgentiSymbolicTrace(
@@ -367,6 +369,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         var workingStateHandle = RequireWorkingMemoryValue(context, "membrane_working_state_handle");
         var provenanceMarker = RequireWorkingMemoryValue(context, "membrane_provenance_marker");
         var returnCandidatePointer = RequireWorkingMemoryValue(context, "membrane_return_candidate_pointer");
+        var returnIntakeHandle = RequireWorkingMemoryValue(context, "membrane_return_handle");
+        var returnIntakeEnvelopeId = RequireWorkingMemoryValue(context, "membrane_return_request_envelope_id");
         var intakeIntent = "candidate-return-evaluation";
 
         var candidateId = CreateDeterministicCandidateId(request, provenanceMarker);
@@ -375,6 +379,11 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 ? 1.0
                 : 0.0,
             result.EngramCommitRequired);
+        var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
+            contentHandle: returnCandidatePointer,
+            originSurface: request.SourceTheater,
+            provenanceMarker: provenanceMarker,
+            sourceSubsystem: collapseClassification.SourceSubsystem);
 
         return new GovernanceCycleWorkResult(
             CandidateId: candidateId,
@@ -392,7 +401,10 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             CandidatePayload: result.ResultPayload,
             CollapseClassification: collapseClassification,
             ResultType: result.ResultType,
-            EngramCommitRequired: result.EngramCommitRequired);
+            EngramCommitRequired: result.EngramCommitRequired,
+            ActionableContent: actionableContent,
+            ReturnIntakeHandle: returnIntakeHandle,
+            ReturnIntakeEnvelopeId: returnIntakeEnvelopeId);
     }
 
     private static IReadOnlyDictionary<string, string> BuildCommitMetadata(AgentiResult result)

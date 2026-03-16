@@ -49,7 +49,8 @@ public sealed record SoulFrameReturnIntakeRequest(
     string ReturnCandidatePointer,
     string ProvenanceMarker,
     string IntakeIntent,
-    CmeCollapseClassification CollapseClassification);
+    CmeCollapseClassification CollapseClassification,
+    GovernedControlSurfaceRequestEnvelope RequestEnvelope);
 
 public sealed record SoulFrameCollapseEvaluation(
     string Classification,
@@ -65,7 +66,9 @@ public sealed record SoulFrameReturnIntakeReceipt(
     string IntakeHandle,
     bool Accepted,
     string Disposition,
-    SoulFrameCollapseEvaluation Evaluation);
+    SoulFrameCollapseEvaluation Evaluation,
+    string RequestEnvelopeId,
+    string ActionableContentHandle);
 
 public interface ISoulFrameMembrane
 {

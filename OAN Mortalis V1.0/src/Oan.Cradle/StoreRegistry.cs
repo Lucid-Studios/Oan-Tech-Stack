@@ -1,3 +1,4 @@
+using CradleTek.Host.Interfaces;
 using Oan.Common;
 
 namespace Oan.Cradle
@@ -23,6 +24,7 @@ namespace Oan.Cradle
         public IGovernanceReceiptJournal? GovernanceReceiptJournal { get; }
         public ICmeCollapseQualifier? CmeCollapseQualifier { get; }
         public ICrypticAdmissionMembrane? CrypticAdmissionMembrane { get; }
+        public IHopngArtifactService HopngArtifactService { get; }
         public IAgentiFormationObserver? FormationObserver { get; }
         public FirstBootFormationObservationHarness? FirstBootFormationObservationHarness { get; }
 
@@ -47,6 +49,7 @@ namespace Oan.Cradle
             IGovernanceReceiptJournal? governanceReceiptJournal = null,
             ICmeCollapseQualifier? cmeCollapseQualifier = null,
             ICrypticAdmissionMembrane? crypticAdmissionMembrane = null,
+            IHopngArtifactService? hopngArtifactService = null,
             IAgentiFormationObserver? formationObserver = null,
             FirstBootFormationObservationHarness? firstBootFormationObservationHarness = null)
         {
@@ -67,6 +70,7 @@ namespace Oan.Cradle
             GovernanceReceiptJournal = governanceReceiptJournal;
             CmeCollapseQualifier = cmeCollapseQualifier;
             CrypticAdmissionMembrane = crypticAdmissionMembrane;
+            HopngArtifactService = hopngArtifactService ?? new UnavailableHopngArtifactService();
             FormationObserver = formationObserver;
             FirstBootFormationObservationHarness = firstBootFormationObservationHarness;
         }

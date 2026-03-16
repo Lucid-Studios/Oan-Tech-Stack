@@ -22,6 +22,8 @@ public sealed class StewardAgentGovernanceTests
         Assert.Equal(
             GovernedPrimeDerivativeLane.Pointer | GovernedPrimeDerivativeLane.CheckedView,
             adjudication.Receipt.AuthorizedDerivativeLanes);
+        Assert.Equal(ControlMutationOutcome.Authorized, adjudication.Receipt.MutationReceipt.Outcome);
+        Assert.Equal(ControlSurfaceKind.GovernanceDecision, adjudication.Receipt.MutationReceipt.TargetSurface);
         Assert.NotNull(adjudication.ReengrammitizationRequest);
         Assert.NotNull(adjudication.PrimePublicationRequest);
     }
@@ -42,6 +44,7 @@ public sealed class StewardAgentGovernanceTests
         Assert.False(adjudication.Receipt.ReengrammitizationAuthorized);
         Assert.False(adjudication.Receipt.PrimePublicationAuthorized);
         Assert.Equal(GovernedPrimeDerivativeLane.Neither, adjudication.Receipt.AuthorizedDerivativeLanes);
+        Assert.Equal(ControlMutationOutcome.Refused, adjudication.Receipt.MutationReceipt.Outcome);
         Assert.Null(adjudication.ReengrammitizationRequest);
         Assert.Null(adjudication.PrimePublicationRequest);
     }
@@ -63,6 +66,7 @@ public sealed class StewardAgentGovernanceTests
         Assert.False(adjudication.Receipt.PrimePublicationAuthorized);
         Assert.Null(adjudication.ReengrammitizationRequest);
         Assert.Null(adjudication.PrimePublicationRequest);
+        Assert.Equal(ControlMutationOutcome.Deferred, adjudication.Receipt.MutationReceipt.Outcome);
         Assert.Single(deferred);
         Assert.Equal(request.CandidateId, deferred[0].CandidateId);
     }
@@ -104,7 +108,22 @@ public sealed class StewardAgentGovernanceTests
                 AutobiographicalRelevant: true,
                 EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
-                SourceSubsystem: "AgentiCore"));
+                SourceSubsystem: "AgentiCore"),
+            RequestEnvelope: ControlSurfaceContractGuards.CreateRequestEnvelope(
+                targetSurface: ControlSurfaceKind.StewardReturnReview,
+                requestedBy: "CradleTek",
+                scopeHandle: "soulframe-session://cme-governance/session",
+                protectionClass: "cryptic-review",
+                witnessRequirement: "governance-witness",
+                actionableContent: new GovernedActionableContent(
+                    ContentHandle: "agenticore-return://candidate/approved",
+                    Kind: ActionableContentKind.ReturnCandidate,
+                    OriginSurface: "prime",
+                    ProvenanceMarker: "membrane-derived:cme:cme-governance|policy:agenticore.cognition.cycle",
+                    SourceSubsystem: "AgentiCore",
+                    PayloadClass: "return-candidate",
+                    TraceReference: null,
+                    ResidueReference: null)));
     }
 
     private sealed class RecordingPublicStore : IPublicStore

@@ -75,6 +75,19 @@ public sealed class BoundedMembraneWorkerService
 
         EnsureBoundedState(state);
 
+        var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
+            contentHandle: returnCandidatePointer,
+            originSurface: sourceTheater,
+            provenanceMarker: state.ProvenanceMarker,
+            sourceSubsystem: collapseClassification.SourceSubsystem);
+        var requestEnvelope = ControlSurfaceContractGuards.CreateRequestEnvelope(
+            targetSurface: ControlSurfaceKind.SoulFrameReturnIntake,
+            requestedBy: "AgentiCore",
+            scopeHandle: state.SessionHandle,
+            protectionClass: "cryptic-return",
+            witnessRequirement: "membrane-witness",
+            actionableContent: actionableContent);
+
         return _membrane.ReceiveReturnIntakeAsync(
             new SoulFrameReturnIntakeRequest(
                 state.IdentityId,
@@ -84,7 +97,8 @@ public sealed class BoundedMembraneWorkerService
                 returnCandidatePointer,
                 state.ProvenanceMarker,
                 intakeIntent,
-                collapseClassification),
+                collapseClassification,
+                requestEnvelope),
             cancellationToken);
     }
 

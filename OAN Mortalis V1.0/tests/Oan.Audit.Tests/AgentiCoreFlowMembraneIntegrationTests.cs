@@ -60,6 +60,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.StartsWith("membrane-derived:", context.WorkingMemory["membrane_provenance_marker"], StringComparison.Ordinal);
         Assert.StartsWith("soulframe://return/", context.WorkingMemory["membrane_return_handle"], StringComparison.Ordinal);
         Assert.Equal("return-candidate-recorded", context.WorkingMemory["membrane_return_disposition"]);
+        Assert.NotEmpty(context.WorkingMemory["membrane_return_request_envelope_id"]);
+        Assert.NotEmpty(context.WorkingMemory["membrane_actionable_content_handle"]);
         Assert.Equal(context.WorkingMemory["membrane_working_state_handle"], result.SelfGelWorkingPool.WorkingStateHandle);
         Assert.Equal(context.WorkingMemory["membrane_provenance_marker"], result.SelfGelWorkingPool.ProvenanceMarker);
         Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
@@ -72,6 +74,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.NotNull(membrane.LastReturnRequest);
         Assert.Equal("candidate-return-evaluation", membrane.LastReturnRequest!.IntakeIntent);
         Assert.StartsWith("agenticore-return://", membrane.LastReturnRequest.ReturnCandidatePointer, StringComparison.Ordinal);
+        Assert.Equal(ControlSurfaceKind.SoulFrameReturnIntake, membrane.LastReturnRequest.RequestEnvelope.TargetSurface);
+        Assert.Equal(membrane.LastReturnRequest.RequestEnvelope.EnvelopeId, context.WorkingMemory["membrane_return_request_envelope_id"]);
     }
 
     [Fact]
@@ -324,6 +328,7 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             CancellationToken cancellationToken = default)
         {
             LastReturnRequest = request;
+            ControlSurfaceContractGuards.ValidateSoulFrameReturnIntakeRequest(request);
             return Task.FromResult(new SoulFrameReturnIntakeReceipt(
                 request.IdentityId,
                 IntakeHandle: "soulframe://return/integration",
@@ -342,7 +347,9 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                     ReviewState: CmeCollapseReviewState.DeferredReview,
                     RequiresReview: true,
                     CanRouteToCustody: false,
-                    CanPublishPrime: false)));
+                    CanPublishPrime: false),
+                RequestEnvelopeId: request.RequestEnvelope.EnvelopeId,
+                ActionableContentHandle: request.RequestEnvelope.ActionableContent.ContentHandle));
         }
 
     }

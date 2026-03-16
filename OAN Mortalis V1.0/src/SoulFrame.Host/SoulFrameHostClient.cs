@@ -130,6 +130,7 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         ArgumentException.ThrowIfNullOrWhiteSpace(request.ReturnCandidatePointer);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.ProvenanceMarker);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.IntakeIntent);
+        ControlSurfaceContractGuards.ValidateSoulFrameReturnIntakeRequest(request);
 
         return Task.FromResult(new SoulFrameReturnIntakeReceipt(
             request.IdentityId,
@@ -147,7 +148,9 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                     : CmeCollapseReviewState.None,
                 RequiresReview: request.IntakeIntent.Contains("defer", StringComparison.OrdinalIgnoreCase),
                 CanRouteToCustody: false,
-                CanPublishPrime: false)));
+                CanPublishPrime: false),
+            RequestEnvelopeId: request.RequestEnvelope.EnvelopeId,
+            ActionableContentHandle: request.RequestEnvelope.ActionableContent.ContentHandle));
     }
 
     private async Task<SoulFrameInferenceResponse> ExecuteTaskAsync(
