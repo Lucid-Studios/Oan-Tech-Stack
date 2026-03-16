@@ -24,6 +24,19 @@ Forbidden write surface:
 - `OAN Mortalis V0.1 Archive/**`
 - any external path outside the repository root
 
+## External Governing Documentation Surface
+
+The `Documentation Repo` is an active governing documentation surface for the OAN build cycle, but it is not part of this repository's allowed write boundary.
+
+In this workspace:
+
+- the active build repo remains the executable source of present truth
+- the `Documentation Repo` may be consulted as stabilized conceptual truth and theory digestion
+- governed build work should ground itself in both surfaces when the `Documentation Repo` is available
+- tracked files in this repo must reference that external surface only by logical label, never by machine-specific absolute path
+
+Unless explicitly directed, work in this repository must not write to the external documentation surface.
+
 ## Local-Only Foundations
 
 Foundational private corpus material may be indexed from a local external root, including:

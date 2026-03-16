@@ -39,12 +39,14 @@ CradleTek may:
 - manage local seed LLM selection, download, integration, and use
 - host bounded flasked services under operator call and mission law
 - maintain protected cryptic services such as `Mantle of Sovereigns`
+- form, encode, and route governed call traffic for governance-relevant ingress, dispatch, return, and collapse transitions
 
 CradleTek may not:
 
 - define identity
 - silently author GEL
 - bypass SoulFrame and SLI governance for commitment-bearing state changes
+- allow governance-relevant cross-boundary service traffic to bypass CradleTek transit handling
 
 ### SoulFrame Law
 
@@ -144,6 +146,50 @@ The membrane may not:
 - reinterpret a legal program's meaning
 - invent cognition results when target semantics are unavailable
 - quietly execute host semantics under target naming
+
+## Governed Call Transit Law
+
+All governance-relevant ingress, dispatch, return, and collapse traffic must pass through CradleTek for lawful call formation, telemetry encoding, lifecycle control, and return normalization.
+
+This law does not require every internal helper call to route through CradleTek.
+
+It does require CradleTek passage for:
+
+- public-facing service ingress into protected or governance-relevant lanes
+- protected dispatch into AgentiCore or target SLI/Lisp runtime work
+- return traffic carrying traces, residues, receipts, or conditioned derivatives
+- collapse traffic carrying protected closure or adjudication candidates
+
+No component may bypass this transit spine for convenience once a governance-relevant boundary is being crossed.
+
+Governed transit does not grant mutation authority over the control surfaces touched by that traffic.
+
+## Control Surface Mutation Law
+
+Control surfaces exist so the connective tissue can transport, witness, request, and receipt actionable content without silently redefining the governing surfaces by participating in them.
+
+This means:
+
+- actionable content may be proposed from hot symbolic or connective layers
+- transit may carry that content through governed envelopes
+- only the lawful control surface may authorize, refuse, defer, or quarantine mutation
+- no transit layer gains mutation rights merely by proximity to the control surface
+
+Short rule:
+
+> Transit is not authority. Carriage is not mutation. Passage is not admission.
+
+## Documentation Governance Law
+
+The active build repo records executable truth and immediate implementation constraints.
+
+The `Documentation Repo` records stabilized conceptual truth and theory digestion for the governed build cycle.
+
+Governed build work must consult both when the `Documentation Repo` is available.
+
+Documentation uptake may guide future implementation, but it may not silently override executable runtime truth.
+
+When the two surfaces diverge, the stack must record doctrine debt, build debt, or migration debt rather than inventing reconciliation by narrative convenience.
 
 ### GEL Law
 

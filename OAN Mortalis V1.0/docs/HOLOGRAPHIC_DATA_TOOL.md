@@ -158,6 +158,7 @@ Current integration posture:
 - optional only
 - local and operator-scoped only
 - never constitutive of Sanctuary founding, bonding, re-entry, or OE binding in v0.1
+- may now be called through a bounded CradleTek-governed runtime service for supplemental terminal governance evidence only
 
 The approved build path is:
 
@@ -173,6 +174,7 @@ The optional validation lane may use HDT for:
 - `.hopng` artifact validation
 - Prime-safe inspection
 - artifact surface comparison
+- supplemental terminal governance evidence emission through CradleTek when a local bridge is available
 
 It must not use HDT in this phase for:
 
@@ -180,6 +182,8 @@ It must not use HDT in this phase for:
 - re-entry gates
 - constitutive OE binding
 - runtime authority or continuity truth
+- governance mutation authority
+- replacement of journals, request envelopes, or mutation receipts
 
 That boundary remains in force until later-phase commands such as `Invoke-HOPNGFormation` and `Bind-HOPNGToOE` are implemented and explicitly admitted by runtime law.
 
@@ -202,6 +206,22 @@ These expansions must not bypass:
 - SLI transition law
 - Theater locality law
 - GEL and OE mutation law
+
+## Current Runtime Evidence Landing
+
+The current runtime landing is deliberately narrow.
+
+CradleTek may emit `.hopng` artifacts at terminal governance stages for:
+
+- governing traffic evidence
+- governance telemetry phase stacks
+
+That runtime landing remains:
+
+- supplemental
+- derivative of typed governance records
+- optional when the local HDT bridge is absent
+- auditable even when unavailable through explicit unavailable receipts
 
 ## Summary
 

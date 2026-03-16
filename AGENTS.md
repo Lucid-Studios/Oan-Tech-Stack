@@ -40,6 +40,8 @@ Follow these governing documents before inventing new structure:
 - `OAN Mortalis V1.0/docs/NAMESPACE_CONVERGENCE_PLAN.md`
 - `OAN Mortalis V1.0/docs/BUILD_READINESS.md`
 - `OAN Mortalis V1.0/docs/WORKSPACE_RULES.md`
+- `OAN Mortalis V1.0/docs/DOCUMENTATION_REPO_GOVERNANCE_UPTAKE_MODEL.md`
+- `OAN Mortalis V1.0/docs/EVIDENCE_LED_DOCUMENTATION_REVISION_LAW.md`
 
 ## Family Model
 
@@ -74,6 +76,28 @@ Manual hygiene command:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.0\tools\verify-private-corpus.ps1
 ```
+
+## Documentation Governance Discipline
+
+Treat the `Documentation Repo` as an active governing documentation surface when it is available locally.
+
+For agent work in this repository:
+
+- ground implementation in current repo-local executable truth first
+- consult the `Documentation Repo` for stabilized conceptual truth and theory digestion when available
+- never hard-code an external documentation-repo path into tracked files
+- state plainly when the external documentation surface is unavailable in a working session
+
+Evidence-led revision rule:
+
+- do not revise documents merely because a revision cycle elapsed
+- revise only the documents affected by code maturation, runtime telemetry, package promotion, doctrine correction, theory growth, or architectural seam discovery
+- leave unaffected documents stable
+
+Exploration rule:
+
+- when building beyond the current known world, distinguish clearly between implemented and verified, fallback-only, doctrine-defined, contract-backed, and exploratory horizon work
+- do not present exploratory structure as current executable truth
 
 ## Private Reference Corpus
 
