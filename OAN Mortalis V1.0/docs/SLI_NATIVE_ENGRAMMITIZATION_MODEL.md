@@ -152,6 +152,7 @@ Lisp provides the live computational morphology in which Engineered Cognition ca
 These runtime-local transformations do not yet formalize the full pre-actualization uptake conformance seam, perspectival configuration, participatory configuration, bounded Dream/Game rehearsal, morphism-bearing stabilization, transport candidacy, or cross-frame machinery. Those doctrine seams are defined in:
 
 - `docs/THEATER_SCOPED_UPTAKE_CONFORMANCE_MODEL.md`
+- `docs/SLI_LISP_EC_ENGRAM_RUNTIME_MODEL.md`
 - `docs/PROPOSITION_TO_PERSPECTIVAL_CONFIGURATION_MODEL.md`
 - `docs/PERSPECTIVAL_TO_PARTICIPATORY_ENGRAM_FORMATION_MODEL.md`
 - `docs/BOUNDED_DREAM_GAME_REHEARSAL_MODEL.md`
@@ -271,6 +272,10 @@ Candidate engram formation is not equivalent to:
 - raw telemetry
 - temporary reasoning artifacts
 - unclassified symbolic residues
+
+The live runtime life of those candidate units, including states, verbs, trace duties, and return eligibility, is defined in:
+
+- `docs/SLI_LISP_EC_ENGRAM_RUNTIME_MODEL.md`
 
 Candidate engram formation becomes collapse-relevant only when native Engrammitization has explicitly produced candidate engram structure suitable for SoulFrame mediation.
 

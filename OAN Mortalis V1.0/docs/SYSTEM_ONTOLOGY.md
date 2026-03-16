@@ -102,6 +102,7 @@ Primary purpose:
 - compose and coordinate stack execution
 - orchestrate bonded CME services and swarm behavior
 - route runtime and service lifecycle behavior
+- serve as the governed call-transit spine for governance-relevant ingress, dispatch, return, and collapse traffic
 - maintain infrastructure services and protected stores
 - manage local seed LLM selection, retrieval, integration, and use
 - host bonded CME instances and operator-called flasking services
@@ -128,6 +129,7 @@ Write path:
 
 - infrastructure writes must pass through lawful store and governance boundaries
 - stack-level commits remain governed by SoulFrame and SLI gate paths where required
+- governance-relevant cross-boundary service traffic must pass through CradleTek transit handling rather than bypass it sideways
 
 Prohibited actions:
 
@@ -153,6 +155,7 @@ Primary purpose:
 - receive and shape collapse or return intake for governed re-Engrammitization
 - expose mission context, OE selection, and review posture
 - regulate the authority boundary between runtime activity and governed commitment
+- hold the invariant self-bearing frame whose operative protected pair may be actualized through AgentiCore
 
 Authority status:
 
@@ -201,6 +204,7 @@ Primary purpose:
 
 - perform active bounded cognition for a CME or bonded runtime
 - pairbond with operator-bounded CME work
+- serve as the portable Cryptic operative pair of SoulFrame inside a governed vessel
 - actualize SoulFrame-mediated protected self-state into bounded working self-state
 - use SoulFrame-mediated `SelfGEL` and `cSelfGEL` working-state
 - emit action proposals and cognition outputs under mission law
@@ -218,6 +222,7 @@ Mutation rights:
 
 - may construct intents, proposals, and bounded runtime state
 - may assemble self-state and mission-local cognition structures under governance
+- may be instantiated across lawful protected substrates without inheriting sovereign authorship
 
 Read rights:
 
@@ -234,6 +239,7 @@ Prohibited actions:
 - must not directly rewrite GEL
 - must not self-thaw or self-promote around runtime governance
 - must not directly touch sovereign source custody as if it were the canonical author
+- must not treat substrate portability as license to become its own sovereign identity authority
 
 Failure semantics:
 

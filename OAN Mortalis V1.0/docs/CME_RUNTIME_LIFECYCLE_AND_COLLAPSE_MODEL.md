@@ -23,9 +23,15 @@ Qualification criteria for first-route holding are defined in `docs/CME_COLLAPSE
 
 ## Root Runtime Sentence
 
-A CME instantiates from lawful mediated continuity, thinks in bounded `SelfGEL` inside AgentiCore, uses Lisp-based SLI and Engineered Cognition as the native morphological and engrammitizing organism during runtime, and collapses Cryptic-first by mediated transfer from `SelfGEL` into `cSelfGEL`, then first into `cGoA` or `cMoS` according to protected classification, with any later `MoS` promotion or Dream eligibility occurring only after deeper curation.
+A CME instantiates from lawful mediated continuity and, in the current runtime code, thinks in bounded `SelfGEL` inside AgentiCore while using Lisp-based SLI and Engineered Cognition as the native morphological and engrammitizing organism during runtime. The target SLI/Lisp EC service model now refines that picture as hot `cSelfGEL` projected from SoulFrame's cooler `SelfGEL` invariant, with collapse routing first through `cGoA` as the interlocutory protected surface and only later toward retained, promoted, or deleted outcomes according to protected classification and deeper curation.
 
 This runtime sentence begins only after the prior doctrine chain has crossed from pre-instantiated coherence through proposition-bearing stabilization and admissible proposition surface into Sanctuary-governed accountability. `OE/cOE` and later `SelfGEL/cSelfGEL` are not the root substrate of that regime; they are continuity-binding and stabilized surfaces within it.
+
+The fuller service activation path and the later collapse or adjudication path are now formalized in:
+
+- `docs/SLI_LISP_EC_SERVICE_ACTIVATION_AND_COLLAPSE_MODEL.md`
+
+This lifecycle note should therefore be read as the runtime placement and routing vocabulary for that broader process chain.
 
 ## Runtime Roles
 
@@ -152,6 +158,10 @@ Later-stage promotion or exploration classes are:
 - `later_promote_to_mos`
 - `eligible_for_dream_seed`
 - `final_cgoa_enrichment`
+
+This staged reading should not be flattened into one linear sink path.
+
+`cGoA` is the first-pass interlocutory protected control surface for cleaving and admissibility preparation, while deeper protected routing may later reach `cSelfGEL`, `cMoS`, or `cGEL` according to lawful class.
 
 The current runtime does not yet implement all of these later-stage promotion or exploration classes as first-class vocabulary.
 
@@ -384,18 +394,26 @@ A CME may be considered lawfully closed only when:
 
 ## Runtime Placement Defaults
 
-The default placement model is:
+The active runtime code currently places:
 
 - `OE`, `cOE`, `MoS`, `cMoS`, `GoA`, and `cGoA` remain continuity, custody, and context surfaces by reference
 - `cSelfGEL` is issued through SoulFrame as mediated protected self-state
 - `SelfGEL` is the active bounded working self-state inside AgentiCore
 - active runtime does not directly author sovereign custody
 
-Correction note:
+The target SLI/Lisp EC service model refines that placement as:
+
+- `SelfGEL` is the cooler stabilized validation-bearing invariant held on the SoulFrame side
+- `cSelfGEL` is the hot protected runtime projection operationalized for active cognition
+- contradiction between hot runtime self-meaning and cooled self-validation must route through mediated validation, residue, or obstruction handling
+- active runtime still does not directly author sovereign custody
+
+Migration note:
 
 - the current runtime code and some older doctrine still carry a legacy inversion of hot/cool self-state language
 - the corrected reading is that `c*` surfaces are Cryptic-active and operationally hot, while the corresponding unprefixed surface is the cooler stabilized validation-bearing counterpart unless another governing contract explicitly says otherwise
 - runtime migration must make that duty split explicit in code rather than relying on naming convenience
+- until that migration lands, legacy references in this note to active `SelfGEL` should be read as implementation-local naming rather than as a rejection of the corrected `c*`-hot doctrine
 - until that migration lands, any contradiction between hot runtime self-meaning and cooled self-validation must be treated as validation work or obstruction, never as a cue for local meaning invention
 
 ## Hard Invariants

@@ -94,6 +94,7 @@ The membrane may not:
 - silently substitute host semantics for target semantics
 - invent cognition results when target semantics are unavailable
 - downgrade target absence into covert host execution
+- treat receipt, transport, or transit centrality as permission to mutate governing control surfaces directly
 
 If the target runtime is unavailable for a migrated semantic lane, the lawful outcomes are:
 
@@ -122,6 +123,26 @@ This transfer does not make the target runtime the whole stack.
 - SoulFrame remains the continuity membrane, self-state mediator, legality witness, and collapse-return intake boundary
 - Sanctuary telemetry remains witness and service support, not hidden semantic authorship
 - AgentiCore remains the verified operative process instantiated inside the protected runtime field
+
+The connective C# layer therefore remains a typed control-law surface, not a hidden mutation shortcut into governance.
+
+## Relationship To The Target Substrate
+
+The first practical target substrate for this transfer is a harnessed graphics card.
+
+That substrate relation is defined in:
+
+- `docs/GPU_CRYPTIC_HARNESS_MODEL.md`
+
+The important order is:
+
+1. semantic ownership transfer
+2. shared IR and capability manifest
+3. device-safe target subset
+4. harnessed GPU residency
+5. refusal when target semantics are unavailable
+
+The stack must not invert that order by using the device as branding while the host interpreter still owns meaning.
 
 ## Migration Phases
 
