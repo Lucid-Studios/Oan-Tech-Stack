@@ -1,4 +1,5 @@
 using SLI.Engine;
+using SLI.Engine.Cognition;
 using SLI.Engine.Runtime;
 
 namespace Oan.Sli.Tests;
@@ -150,10 +151,201 @@ public sealed class HigherOrderLocalityProgramTests
         Assert.Contains("unknown-op(custody-write)", result.SymbolicTrace);
     }
 
+    [Fact]
+    public async Task HigherOrderLocalityTargetLane_RefusesWhenTargetCapabilityIsAbsent()
+    {
+        var bridge = await CreateBridgeAsync();
+        var targetManifest = bridge.CreateTargetCapabilityManifest(Array.Empty<string>());
+
+        var exception = Assert.Throws<SliTargetLaneRefusalException>(() =>
+            bridge.EnsureHigherOrderLocalityTargetEligibility(
+                [
+                    "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                    "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                    "(participation-bounded-cme locality-state)"
+                ],
+                targetManifest));
+
+        Assert.Equal("higher-order-locality", exception.Eligibility.LaneId);
+        Assert.Equal("target-sli-runtime", exception.Eligibility.RuntimeId);
+        Assert.Contains("locality-bind", exception.Eligibility.MissingTargetCapabilities);
+        Assert.Contains("perspective-configure", exception.Eligibility.MissingTargetCapabilities);
+        Assert.Contains("participation-configure", exception.Eligibility.MissingTargetCapabilities);
+        Assert.Empty(exception.Eligibility.DisallowedOperations);
+        Assert.Contains("higher-order-locality-unsupported", exception.Eligibility.ProfileViolations);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetLane_AcceptsCompleteTargetManifest()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ];
+        var lowered = bridge.LowerProgram(symbolicProgram);
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            lowered.Instructions.Select(instruction => instruction.Opcode));
+
+        var eligibility = bridge.EvaluateHigherOrderLocalityTargetEligibility(symbolicProgram, targetManifest);
+
+        Assert.True(eligibility.IsEligible);
+        Assert.Empty(eligibility.MissingTargetCapabilities);
+        Assert.Empty(eligibility.DisallowedOperations);
+        Assert.Empty(eligibility.ProfileViolations);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetLane_RejectsHostOnlyIngressOps()
+    {
+        var bridge = await CreateBridgeAsync();
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            bridge.LowerProgram(
+                [
+                    "(locality-bootstrap context cme-self task-objective identity-continuity)"
+                ]).Instructions.Select(instruction => instruction.Opcode));
+
+        var eligibility = bridge.EvaluateHigherOrderLocalityTargetEligibility(
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(sanctuary-intake locality-state)"
+            ],
+            targetManifest);
+
+        Assert.False(eligibility.IsEligible);
+        Assert.Contains("sanctuary-intake", eligibility.DisallowedOperations);
+        Assert.Empty(eligibility.ProfileViolations);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetLane_RejectsWitnessWorkWhenProfileIsTooNarrow()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)",
+                "(witness-locality-compare locality-state locality-state)"
+            ];
+        var lowered = bridge.LowerProgram(symbolicProgram);
+        var narrowProfile = SliRuntimeRealizationProfile.CreateTargetBounded(
+            profileId: "gc-locality-only",
+            supportsHigherOrderLocality: true,
+            supportsBoundedRehearsal: false,
+            supportsBoundedWitness: false,
+            supportsBoundedTransport: false,
+            supportsAdmissibleSurface: false,
+            supportsAccountabilityPacket: false);
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            lowered.Instructions.Select(instruction => instruction.Opcode),
+            runtimeId: "gc-locality-runtime",
+            realizationProfile: narrowProfile);
+
+        var eligibility = bridge.EvaluateHigherOrderLocalityTargetEligibility(symbolicProgram, targetManifest);
+
+        Assert.False(eligibility.IsEligible);
+        Assert.Contains("bounded-witness-unsupported", eligibility.ProfileViolations);
+    }
+
+    [Fact]
+    public async Task HigherOrderLocalityTargetExecution_UsesExecutorWhenLaneIsEligible()
+    {
+        var bridge = await CreateBridgeAsync();
+        IReadOnlyList<string> symbolicProgram =
+            [
+                "(locality-bootstrap context cme-self task-objective identity-continuity)",
+                "(perspective-bounded-observer locality-state task-objective identity-continuity)",
+                "(participation-bounded-cme locality-state)"
+            ];
+        var lowered = bridge.LowerProgram(symbolicProgram);
+        var targetProfile = SliRuntimeRealizationProfile.CreateTargetBounded(
+            profileId: "gc-locality-profile",
+            supportsHigherOrderLocality: true,
+            supportsBoundedRehearsal: false,
+            supportsBoundedWitness: false,
+            supportsBoundedTransport: false,
+            supportsAdmissibleSurface: false,
+            supportsAccountabilityPacket: false);
+        var targetManifest = bridge.CreateTargetCapabilityManifest(
+            lowered.Instructions.Select(instruction => instruction.Opcode),
+            runtimeId: "gc-locality-runtime",
+            realizationProfile: targetProfile);
+        var executor = new RecordingHigherOrderLocalityExecutor(targetManifest);
+
+        var result = await bridge.ExecuteHigherOrderLocalityOnTargetAsync(
+            symbolicProgram,
+            "identity-continuity",
+            executor);
+
+        Assert.True(executor.WasInvoked);
+        Assert.NotNull(executor.LastRequest);
+        Assert.Equal(lowered.ProgramId, executor.LastRequest!.Program.ProgramId);
+        Assert.Equal("target-locality-handle", result.LocalityHandle);
+        Assert.Equal("identity-continuity", executor.LastRequest.Objective);
+    }
+
     private static async Task<LispBridge> CreateBridgeAsync()
     {
         var bridge = LispBridge.CreateForDetachedRuntime();
         await bridge.InitializeAsync();
         return bridge;
+    }
+
+    private sealed class RecordingHigherOrderLocalityExecutor : ISliTargetHigherOrderLocalityExecutor
+    {
+        public RecordingHigherOrderLocalityExecutor(SliRuntimeCapabilityManifest capabilityManifest)
+        {
+            CapabilityManifest = capabilityManifest;
+        }
+
+        public bool WasInvoked { get; private set; }
+        public SliTargetHigherOrderLocalityExecutionRequest? LastRequest { get; private set; }
+        public SliRuntimeCapabilityManifest CapabilityManifest { get; }
+
+        public Task<SliHigherOrderLocalityResult> ExecuteAsync(
+            SliTargetHigherOrderLocalityExecutionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            WasInvoked = true;
+            LastRequest = request;
+            return Task.FromResult(new SliHigherOrderLocalityResult
+            {
+                LocalityHandle = "target-locality-handle",
+                SelfAnchor = "cme-self",
+                OtherAnchor = "task-objective",
+                RelationAnchor = "identity-continuity",
+                SealPosture = SliHigherOrderLocalityState.BoundedSealPosture,
+                RevealPosture = SliHigherOrderLocalityState.MaskedRevealPosture,
+                Warnings = Array.Empty<string>(),
+                Residues = Array.Empty<HigherOrderLocalityResidue>(),
+                Perspective = new SliPerspectiveResult
+                {
+                    IsConfigured = true,
+                    OrientationVector = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["task-objective"] = 1.0
+                    },
+                    EthicalConstraints = ["identity-continuity"],
+                    WeightFunctions = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["task-objective"] = 1.0
+                    },
+                    Residues = Array.Empty<HigherOrderLocalityResidue>()
+                },
+                Participation = new SliParticipationResult
+                {
+                    IsConfigured = true,
+                    Mode = SliHigherOrderLocalityState.ObserveMode,
+                    Role = "bounded-cme",
+                    InteractionRules = ["observe-only"],
+                    CapabilitySet = ["bounded-locality"],
+                    Residues = Array.Empty<HigherOrderLocalityResidue>()
+                },
+                SymbolicTrace = ["target-executor(locality)"]
+            });
+        }
     }
 }

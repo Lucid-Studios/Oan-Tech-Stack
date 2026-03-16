@@ -14,23 +14,166 @@ public delegate Task<SExpression> SliOperator(
 public sealed class SliSymbolTable
 {
     private readonly Dictionary<string, SliOperator> _operators = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, SliRuntimeOperationClass> _operationClasses = new(StringComparer.OrdinalIgnoreCase);
 
     public SliSymbolTable()
     {
         RegisterDefaults();
     }
 
-    public void Register(string symbol, SliOperator handler)
+    public void Register(
+        string symbol,
+        SliOperator handler,
+        SliRuntimeOperationClass operationClass = SliRuntimeOperationClass.HostOnly)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(symbol);
         ArgumentNullException.ThrowIfNull(handler);
         _operators[symbol] = handler;
+        _operationClasses[symbol] = operationClass;
     }
 
     public bool TryResolve(string symbol, out SliOperator handler)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(symbol);
         return _operators.TryGetValue(symbol, out handler!);
+    }
+
+    public SliRuntimeCapabilityManifest CreateCapabilityManifest(string runtimeId = "host-sli-interpreter")
+    {
+        var capabilities = _operators.Keys
+            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
+            .Select(key => new SliRuntimeOperationCapability(
+                Opcode: key,
+                MeaningAuthority: "host-interpreter",
+                Availability: SliRuntimeCapabilityAvailability.Available,
+                OperationClass: ResolveOperationClass(key)))
+            .ToArray();
+
+        return new SliRuntimeCapabilityManifest(
+            runtimeId,
+            meaningAuthority: "host-interpreter",
+            realizationProfile: SliRuntimeRealizationProfile.CreateHostManaged(),
+            capabilities);
+    }
+
+    public SliRuntimeCapabilityManifest CreateTargetCapabilityManifest(
+        IEnumerable<string> supportedOpcodes,
+        string runtimeId = "target-sli-runtime",
+        SliRuntimeRealizationProfile? realizationProfile = null)
+    {
+        ArgumentNullException.ThrowIfNull(supportedOpcodes);
+
+        var supported = supportedOpcodes
+            .Where(opcode => !string.IsNullOrWhiteSpace(opcode))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var capabilities = _operators.Keys
+            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
+            .Select(key =>
+            {
+                var operationClass = ResolveOperationClass(key);
+                var availability = operationClass == SliRuntimeOperationClass.HostOnly
+                    ? SliRuntimeCapabilityAvailability.Unavailable
+                    : supported.Contains(key)
+                        ? SliRuntimeCapabilityAvailability.Available
+                        : SliRuntimeCapabilityAvailability.Unavailable;
+
+                return new SliRuntimeOperationCapability(
+                    Opcode: key,
+                    MeaningAuthority: availability == SliRuntimeCapabilityAvailability.Available
+                        ? "target-runtime"
+                        : "target-runtime-unavailable",
+                    Availability: availability,
+                    OperationClass: operationClass);
+            })
+            .ToArray();
+
+        return new SliRuntimeCapabilityManifest(
+            runtimeId,
+            meaningAuthority: "target-runtime",
+            realizationProfile: realizationProfile ?? CreateDerivedTargetRealizationProfile(runtimeId, supported),
+            capabilities);
+    }
+
+    public IReadOnlyList<string> GetOpcodesByOperationClass(SliRuntimeOperationClass operationClass)
+    {
+        return _operationClasses
+            .Where(entry => entry.Value == operationClass)
+            .Select(entry => entry.Key)
+            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    private void RegisterSharedContract(string symbol, SliOperator handler)
+    {
+        Register(symbol, handler, SliRuntimeOperationClass.SharedContract);
+    }
+
+    private void RegisterTargetCandidate(string symbol, SliOperator handler)
+    {
+        Register(symbol, handler, SliRuntimeOperationClass.TargetCandidate);
+    }
+
+    private SliRuntimeOperationClass ResolveOperationClass(string opcode)
+    {
+        return _operationClasses.TryGetValue(opcode, out var operationClass)
+            ? operationClass
+            : SliRuntimeOperationClass.HostOnly;
+    }
+
+    private static SliRuntimeRealizationProfile CreateDerivedTargetRealizationProfile(
+        string runtimeId,
+        ISet<string> supported)
+    {
+        return SliRuntimeRealizationProfile.CreateTargetBounded(
+            profileId: $"{runtimeId}-profile",
+            supportsHigherOrderLocality: supported.Any(IsHigherOrderLocalityOpcode),
+            supportsBoundedRehearsal: supported.Any(IsRehearsalOpcode),
+            supportsBoundedWitness: supported.Any(IsWitnessOpcode),
+            supportsBoundedTransport: supported.Any(IsTransportOpcode),
+            supportsAdmissibleSurface: supported.Any(IsAdmissibleSurfaceOpcode),
+            supportsAccountabilityPacket: supported.Any(IsAccountabilityPacketOpcode),
+            supportsResidueEmission: supported.Any(opcode => opcode.EndsWith("-residue", StringComparison.OrdinalIgnoreCase)),
+            supportsSymbolicTrace: true,
+            maxInstructionCount: Math.Max(32, supported.Count * 2),
+            maxSymbolicDepth: Math.Max(16, supported.Count));
+    }
+
+    private static bool IsHigherOrderLocalityOpcode(string opcode)
+    {
+        return opcode.StartsWith("locality-", StringComparison.OrdinalIgnoreCase) ||
+               opcode.StartsWith("anchor-", StringComparison.OrdinalIgnoreCase) ||
+               opcode.StartsWith("perspective-", StringComparison.OrdinalIgnoreCase) ||
+               opcode.StartsWith("participation-", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(opcode, "seal-posture", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(opcode, "reveal-posture", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsRehearsalOpcode(string opcode)
+    {
+        return opcode.StartsWith("rehearsal-", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsWitnessOpcode(string opcode)
+    {
+        return opcode.StartsWith("witness-", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(opcode, "glue-threshold", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(opcode, "morphism-candidate", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsTransportOpcode(string opcode)
+    {
+        return opcode.StartsWith("transport-", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsAdmissibleSurfaceOpcode(string opcode)
+    {
+        return opcode.StartsWith("surface-", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsAccountabilityPacketOpcode(string opcode)
+    {
+        return opcode.StartsWith("packet-", StringComparison.OrdinalIgnoreCase);
     }
 
     private void RegisterDefaults()
@@ -98,14 +241,14 @@ public sealed class SliSymbolTable
             return SExpression.AtomNode(response.Accepted ? response.Decision : "llm-refused");
         });
 
-        Register("predicate-evaluate", (expression, context, _) =>
+        RegisterSharedContract("predicate-evaluate", (expression, context, _) =>
         {
             var predicate = Arg(expression, 1, "identity-continuity");
             context.AddTrace($"predicate-evaluate({predicate})");
             return Task.FromResult(SExpression.AtomNode("predicate-ok"));
         });
 
-        Register("decision-evaluate", (expression, context, _) =>
+        RegisterSharedContract("decision-evaluate", (expression, context, _) =>
         {
             var branchSet = context.ActiveEngrams
                 .OrderByDescending(e => e.ConfidenceWeight)
@@ -126,13 +269,13 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("evaluated"));
         });
 
-        Register("decision-branch", (expression, context, _) =>
+        RegisterSharedContract("decision-branch", (expression, context, _) =>
         {
             context.AddTrace($"decision-branch({context.CandidateBranches.Count})");
             return Task.FromResult(SExpression.AtomNode("branched"));
         });
 
-        Register("compass-update", (expression, context, _) =>
+        RegisterSharedContract("compass-update", (expression, context, _) =>
         {
             var arg1 = Arg(expression, 1, "context");
             var arg2 = Arg(expression, 2, "reasoning-state");
@@ -140,7 +283,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("compass-ok"));
         });
 
-        Register("cleave", (expression, context, _) =>
+        RegisterSharedContract("cleave", (expression, context, _) =>
         {
             var survivors = context.CandidateBranches.Take(1).ToList();
             var pruned = context.CandidateBranches.Skip(1).ToList();
@@ -152,7 +295,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("cleaved"));
         });
 
-        Register("commit", (expression, context, _) =>
+        RegisterSharedContract("commit", (expression, context, _) =>
         {
             context.FinalDecision = context.CandidateBranches.FirstOrDefault() ?? "defer";
             context.AddTrace($"commit({context.FinalDecision})");
@@ -414,7 +557,7 @@ public sealed class SliSymbolTable
 
     private void RegisterHigherOrderLocalityOperators()
     {
-        Register("locality-bind", (expression, context, _) =>
+        RegisterTargetCandidate("locality-bind", (expression, context, _) =>
         {
             var localitySeed = UnwrapStringLiteral(Arg(expression, 1, "context"));
             var localityHandle = $"{localitySeed}:{context.Frame.CMEId}:{context.Frame.ContextId:D}";
@@ -423,7 +566,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("locality-bind"));
         });
 
-        Register("anchor-self", (expression, context, _) =>
+        RegisterTargetCandidate("anchor-self", (expression, context, _) =>
         {
             var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             context.HigherOrderLocalityState.SelfAnchor = anchor;
@@ -431,7 +574,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("anchor-self"));
         });
 
-        Register("anchor-other", (expression, context, _) =>
+        RegisterTargetCandidate("anchor-other", (expression, context, _) =>
         {
             var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             context.HigherOrderLocalityState.OtherAnchor = anchor;
@@ -439,7 +582,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("anchor-other"));
         });
 
-        Register("anchor-relation", (expression, context, _) =>
+        RegisterTargetCandidate("anchor-relation", (expression, context, _) =>
         {
             var anchor = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             context.HigherOrderLocalityState.RelationAnchor = anchor;
@@ -447,7 +590,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("anchor-relation"));
         });
 
-        Register("seal-posture", (expression, context, _) =>
+        RegisterTargetCandidate("seal-posture", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var value = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.BoundedSealPosture));
@@ -467,7 +610,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("seal-posture"));
         });
 
-        Register("reveal-posture", (expression, context, _) =>
+        RegisterTargetCandidate("reveal-posture", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var value = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.MaskedRevealPosture));
@@ -487,7 +630,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("reveal-posture"));
         });
 
-        Register("perspective-configure", (expression, context, _) =>
+        RegisterTargetCandidate("perspective-configure", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var missingLocality = string.IsNullOrWhiteSpace(state.LocalityHandle);
@@ -535,7 +678,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("perspective-configure"));
         });
 
-        Register("perspective-orientation", (expression, context, _) =>
+        RegisterTargetCandidate("perspective-orientation", (expression, context, _) =>
         {
             var focus = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             var weightValue = UnwrapStringLiteral(Arg(expression, 2, "0.0"));
@@ -558,7 +701,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("perspective-orientation"));
         });
 
-        Register("perspective-constraint", (expression, context, _) =>
+        RegisterTargetCandidate("perspective-constraint", (expression, context, _) =>
         {
             var constraint = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             if (!string.IsNullOrWhiteSpace(constraint))
@@ -570,7 +713,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("perspective-constraint"));
         });
 
-        Register("perspective-weight", (expression, context, _) =>
+        RegisterTargetCandidate("perspective-weight", (expression, context, _) =>
         {
             var name = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             var rawValue = UnwrapStringLiteral(Arg(expression, 2, "0.0"));
@@ -593,7 +736,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("perspective-weight"));
         });
 
-        Register("perspective-residue", (expression, context, _) =>
+        RegisterTargetCandidate("perspective-residue", (expression, context, _) =>
         {
             var detail = UnwrapStringLiteral(Arg(expression, 1, "perspective residue"));
             AddResidue(
@@ -606,7 +749,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("perspective-residue"));
         });
 
-        Register("participation-configure", (expression, context, _) =>
+        RegisterTargetCandidate("participation-configure", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             if (!state.Perspective.IsConfigured)
@@ -630,7 +773,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("participation-configure"));
         });
 
-        Register("participation-mode", (expression, context, _) =>
+        RegisterTargetCandidate("participation-mode", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var value = UnwrapStringLiteral(Arg(expression, 1, SliHigherOrderLocalityState.ObserveMode));
@@ -655,7 +798,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("participation-mode"));
         });
 
-        Register("participation-role", (expression, context, _) =>
+        RegisterTargetCandidate("participation-role", (expression, context, _) =>
         {
             var role = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             context.HigherOrderLocalityState.Participation.Role = role;
@@ -663,7 +806,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("participation-role"));
         });
 
-        Register("participation-rule", (expression, context, _) =>
+        RegisterTargetCandidate("participation-rule", (expression, context, _) =>
         {
             var rule = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             if (!string.IsNullOrWhiteSpace(rule))
@@ -675,7 +818,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("participation-rule"));
         });
 
-        Register("participation-capability", (expression, context, _) =>
+        RegisterTargetCandidate("participation-capability", (expression, context, _) =>
         {
             var capability = UnwrapStringLiteral(Arg(expression, 1, string.Empty));
             if (!string.IsNullOrWhiteSpace(capability))
@@ -687,7 +830,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("participation-capability"));
         });
 
-        Register("participation-residue", (expression, context, _) =>
+        RegisterTargetCandidate("participation-residue", (expression, context, _) =>
         {
             var detail = UnwrapStringLiteral(Arg(expression, 1, "participation residue"));
             AddResidue(
@@ -703,7 +846,7 @@ public sealed class SliSymbolTable
 
     private void RegisterBoundedRehearsalOperators()
     {
-        Register("rehearsal-begin", (expression, context, _) =>
+        RegisterTargetCandidate("rehearsal-begin", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var rehearsal = state.Rehearsal;
@@ -751,7 +894,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("rehearsal-begin"));
         });
 
-        Register("rehearsal-branch", (expression, context, _) =>
+        RegisterTargetCandidate("rehearsal-branch", (expression, context, _) =>
         {
             var rehearsal = context.HigherOrderLocalityState.Rehearsal;
             if (!rehearsal.IsConfigured)
@@ -777,7 +920,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("rehearsal-branch"));
         });
 
-        Register("rehearsal-substitute", (expression, context, _) =>
+        RegisterTargetCandidate("rehearsal-substitute", (expression, context, _) =>
         {
             var rehearsal = context.HigherOrderLocalityState.Rehearsal;
             if (!rehearsal.IsConfigured)
@@ -808,7 +951,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("rehearsal-substitute"));
         });
 
-        Register("rehearsal-analogy", (expression, context, _) =>
+        RegisterTargetCandidate("rehearsal-analogy", (expression, context, _) =>
         {
             var rehearsal = context.HigherOrderLocalityState.Rehearsal;
             if (!rehearsal.IsConfigured)
@@ -839,7 +982,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("rehearsal-analogy"));
         });
 
-        Register("rehearsal-seal", (expression, context, _) =>
+        RegisterTargetCandidate("rehearsal-seal", (expression, context, _) =>
         {
             var rehearsal = context.HigherOrderLocalityState.Rehearsal;
             var value = UnwrapStringLiteral(Arg(expression, 1, SliRehearsalState.IdentitySealed));
@@ -864,7 +1007,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("rehearsal-seal"));
         });
 
-        Register("rehearsal-residue", (expression, context, _) =>
+        RegisterTargetCandidate("rehearsal-residue", (expression, context, _) =>
         {
             var detail = UnwrapStringLiteral(Arg(expression, 1, "rehearsal residue"));
             AddResidue(
@@ -880,7 +1023,7 @@ public sealed class SliSymbolTable
 
     private void RegisterBoundedWitnessOperators()
     {
-        Register("witness-begin", (expression, context, _) =>
+        RegisterTargetCandidate("witness-begin", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var witness = state.Witness;
@@ -942,7 +1085,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("witness-begin"));
         });
 
-        Register("witness-compare", (expression, context, _) =>
+        RegisterTargetCandidate("witness-compare", (expression, context, _) =>
         {
             var witness = context.HigherOrderLocalityState.Witness;
             if (!witness.IsConfigured)
@@ -963,7 +1106,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("witness-compare"));
         });
 
-        Register("witness-preserve", (expression, context, _) =>
+        RegisterTargetCandidate("witness-preserve", (expression, context, _) =>
         {
             var witness = context.HigherOrderLocalityState.Witness;
             if (!witness.IsConfigured)
@@ -990,7 +1133,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("witness-preserve"));
         });
 
-        Register("witness-difference", (expression, context, _) =>
+        RegisterTargetCandidate("witness-difference", (expression, context, _) =>
         {
             var witness = context.HigherOrderLocalityState.Witness;
             if (!witness.IsConfigured)
@@ -1017,7 +1160,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("witness-difference"));
         });
 
-        Register("witness-residue", (expression, context, _) =>
+        RegisterTargetCandidate("witness-residue", (expression, context, _) =>
         {
             var witness = context.HigherOrderLocalityState.Witness;
             var detail = UnwrapStringLiteral(Arg(expression, 1, "witness residue"));
@@ -1031,7 +1174,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("witness-residue"));
         });
 
-        Register("glue-threshold", (expression, context, _) =>
+        RegisterTargetCandidate("glue-threshold", (expression, context, _) =>
         {
             var witness = context.HigherOrderLocalityState.Witness;
             var rawValue = UnwrapStringLiteral(Arg(expression, 1, SliWitnessState.DefaultGlueThreshold.ToString("0.00", CultureInfo.InvariantCulture)));
@@ -1056,7 +1199,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("glue-threshold"));
         });
 
-        Register("morphism-candidate", (expression, context, _) =>
+        RegisterTargetCandidate("morphism-candidate", (expression, context, _) =>
         {
             var witness = context.HigherOrderLocalityState.Witness;
             if (!witness.IsConfigured)
@@ -1142,7 +1285,7 @@ public sealed class SliSymbolTable
 
     private void RegisterBoundedTransportOperators()
     {
-        Register("transport-begin", (expression, context, _) =>
+        RegisterTargetCandidate("transport-begin", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var witness = state.Witness;
@@ -1204,7 +1347,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("transport-begin"));
         });
 
-        Register("transport-source", (expression, context, _) =>
+        RegisterTargetCandidate("transport-source", (expression, context, _) =>
         {
             var transport = context.HigherOrderLocalityState.Transport;
             if (!transport.IsConfigured)
@@ -1240,7 +1383,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("transport-source"));
         });
 
-        Register("transport-target", (expression, context, _) =>
+        RegisterTargetCandidate("transport-target", (expression, context, _) =>
         {
             var transport = context.HigherOrderLocalityState.Transport;
             if (!transport.IsConfigured)
@@ -1276,7 +1419,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("transport-target"));
         });
 
-        Register("transport-preserve", (expression, context, _) =>
+        RegisterTargetCandidate("transport-preserve", (expression, context, _) =>
         {
             var transport = context.HigherOrderLocalityState.Transport;
             if (!transport.IsConfigured)
@@ -1303,7 +1446,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("transport-preserve"));
         });
 
-        Register("transport-map", (expression, context, _) =>
+        RegisterTargetCandidate("transport-map", (expression, context, _) =>
         {
             var transport = context.HigherOrderLocalityState.Transport;
             if (!transport.IsConfigured)
@@ -1343,7 +1486,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("transport-map"));
         });
 
-        Register("transport-residue", (expression, context, _) =>
+        RegisterTargetCandidate("transport-residue", (expression, context, _) =>
         {
             var detail = UnwrapStringLiteral(Arg(expression, 1, "transport residue"));
             AddResidue(
@@ -1356,7 +1499,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("transport-residue"));
         });
 
-        Register("transport-status", (expression, context, _) =>
+        RegisterTargetCandidate("transport-status", (expression, context, _) =>
         {
             var transport = context.HigherOrderLocalityState.Transport;
             var requestedStatus = UnwrapStringLiteral(Arg(expression, 1, SliTransportState.Candidate));
@@ -1511,7 +1654,7 @@ public sealed class SliSymbolTable
 
     private void RegisterBoundedAdmissibilityOperators()
     {
-        Register("surface-begin", (expression, context, _) =>
+        RegisterTargetCandidate("surface-begin", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var transport = state.Transport;
@@ -1572,7 +1715,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-begin"));
         });
 
-        Register("surface-source", (expression, context, _) =>
+        RegisterTargetCandidate("surface-source", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var transport = state.Transport;
@@ -1612,7 +1755,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-source"));
         });
 
-        Register("surface-class", (expression, context, _) =>
+        RegisterTargetCandidate("surface-class", (expression, context, _) =>
         {
             var surface = context.HigherOrderLocalityState.AdmissibleSurface;
             if (!surface.IsConfigured)
@@ -1669,7 +1812,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-class"));
         });
 
-        Register("surface-reveal", (expression, context, _) =>
+        RegisterTargetCandidate("surface-reveal", (expression, context, _) =>
         {
             var surface = context.HigherOrderLocalityState.AdmissibleSurface;
             if (!surface.IsConfigured)
@@ -1707,7 +1850,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-reveal"));
         });
 
-        Register("surface-boundary", (expression, context, _) =>
+        RegisterTargetCandidate("surface-boundary", (expression, context, _) =>
         {
             var surface = context.HigherOrderLocalityState.AdmissibleSurface;
             if (!surface.IsConfigured)
@@ -1744,7 +1887,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-boundary"));
         });
 
-        Register("surface-evidence", (expression, context, _) =>
+        RegisterTargetCandidate("surface-evidence", (expression, context, _) =>
         {
             var surface = context.HigherOrderLocalityState.AdmissibleSurface;
             if (!surface.IsConfigured)
@@ -1771,7 +1914,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-evidence"));
         });
 
-        Register("surface-residue", (expression, context, _) =>
+        RegisterTargetCandidate("surface-residue", (expression, context, _) =>
         {
             var detail = UnwrapStringLiteral(Arg(expression, 1, "admissible surface residue"));
             AddResidue(
@@ -1784,7 +1927,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("surface-residue"));
         });
 
-        Register("surface-status", (expression, context, _) =>
+        RegisterTargetCandidate("surface-status", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var transport = state.Transport;
@@ -1937,7 +2080,7 @@ public sealed class SliSymbolTable
 
     private void RegisterBoundedAccountabilityPacketOperators()
     {
-        Register("packet-begin", (expression, context, _) =>
+        RegisterTargetCandidate("packet-begin", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var surface = state.AdmissibleSurface;
@@ -2017,7 +2160,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("packet-begin"));
         });
 
-        Register("packet-lineage", (expression, context, _) =>
+        RegisterTargetCandidate("packet-lineage", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var packet = state.AccountabilityPacket;
@@ -2080,7 +2223,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("packet-lineage"));
         });
 
-        Register("packet-invariants", (expression, context, _) =>
+        RegisterTargetCandidate("packet-invariants", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var packet = state.AccountabilityPacket;
@@ -2138,7 +2281,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("packet-invariants"));
         });
 
-        Register("packet-class", (expression, context, _) =>
+        RegisterTargetCandidate("packet-class", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var packet = state.AccountabilityPacket;
@@ -2178,7 +2321,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("packet-class"));
         });
 
-        Register("packet-reveal", (expression, context, _) =>
+        RegisterTargetCandidate("packet-reveal", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var packet = state.AccountabilityPacket;
@@ -2243,7 +2386,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("packet-reveal"));
         });
 
-        Register("packet-residue", (expression, context, _) =>
+        RegisterTargetCandidate("packet-residue", (expression, context, _) =>
         {
             var detail = UnwrapStringLiteral(Arg(expression, 1, "accountability packet residue"));
             AddResidue(
@@ -2256,7 +2399,7 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("packet-residue"));
         });
 
-        Register("packet-status", (expression, context, _) =>
+        RegisterTargetCandidate("packet-status", (expression, context, _) =>
         {
             var state = context.HigherOrderLocalityState;
             var packet = state.AccountabilityPacket;

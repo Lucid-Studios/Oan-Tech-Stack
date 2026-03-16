@@ -34,6 +34,7 @@ public sealed class LispBridge
     private readonly ISoulFrameSemanticDevice _semanticDevice;
     private readonly SliParser _parser = new();
     private readonly SliInterpreter _interpreter = new(new SliSymbolTable());
+    private readonly SliCoreProgramLowerer _lowerer = new();
     private SliBoundedCompositionExpander? _boundedCompositionExpander;
     private bool _initialized;
 
@@ -50,6 +51,16 @@ public sealed class LispBridge
 
     public IReadOnlyDictionary<string, string> LoadedModules { get; private set; } =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    public SliRuntimeCapabilityManifest CapabilityManifest => _interpreter.CapabilityManifest;
+
+    public SliRuntimeCapabilityManifest CreateTargetCapabilityManifest(
+        IEnumerable<string> supportedOpcodes,
+        string runtimeId = "target-sli-runtime",
+        SliRuntimeRealizationProfile? realizationProfile = null)
+    {
+        return _interpreter.CreateTargetCapabilityManifest(supportedOpcodes, runtimeId, realizationProfile);
+    }
 
     public Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -83,7 +94,7 @@ public sealed class LispBridge
         ArgumentNullException.ThrowIfNull(symbolicProgram);
         ArgumentNullException.ThrowIfNull(frame);
 
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(frame, _resolver, _semanticDevice);
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
         EnforceCanonicalOrdering(context.TraceLines);
@@ -122,7 +133,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -139,6 +150,47 @@ public sealed class LispBridge
         return CreateHigherOrderLocalityResult(context);
     }
 
+    internal SliTargetLaneEligibility EvaluateHigherOrderLocalityTargetEligibility(
+        IReadOnlyList<string> symbolicProgram,
+        SliRuntimeCapabilityManifest targetManifest)
+    {
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        ArgumentNullException.ThrowIfNull(targetManifest);
+
+        var program = LowerProgram(symbolicProgram);
+        return SliTargetLaneGuard.EvaluateHigherOrderLocality(program, targetManifest);
+    }
+
+    internal void EnsureHigherOrderLocalityTargetEligibility(
+        IReadOnlyList<string> symbolicProgram,
+        SliRuntimeCapabilityManifest targetManifest)
+    {
+        EvaluateHigherOrderLocalityTargetEligibility(symbolicProgram, targetManifest).EnsureEligible();
+    }
+
+    internal async Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityOnTargetAsync(
+        IReadOnlyList<string> symbolicProgram,
+        string objective,
+        ISliTargetHigherOrderLocalityExecutor targetExecutor,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(symbolicProgram);
+        ArgumentException.ThrowIfNullOrWhiteSpace(objective);
+        ArgumentNullException.ThrowIfNull(targetExecutor);
+
+        var program = LowerProgram(symbolicProgram);
+        var eligibility = SliTargetLaneGuard.EvaluateHigherOrderLocality(program, targetExecutor.CapabilityManifest);
+        eligibility.EnsureEligible();
+
+        return await targetExecutor.ExecuteAsync(
+                new SliTargetHigherOrderLocalityExecutionRequest(
+                    Objective: objective,
+                    Program: program,
+                    Eligibility: eligibility),
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     internal async Task<SliBoundedRehearsalResult> ExecuteBoundedRehearsalProgramAsync(
         IReadOnlyList<string> symbolicProgram,
         string objective,
@@ -150,7 +202,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -178,7 +230,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -206,7 +258,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -234,7 +286,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -262,7 +314,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -528,7 +580,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -556,7 +608,7 @@ public sealed class LispBridge
         }
 
         ArgumentNullException.ThrowIfNull(symbolicProgram);
-        var program = ExpandProgram(symbolicProgram);
+        var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(
             new ContextFrame
             {
@@ -573,7 +625,7 @@ public sealed class LispBridge
         return context.PropositionState;
     }
 
-    private IReadOnlyList<SExpression> ExpandProgram(IReadOnlyList<string> symbolicProgram)
+    public SliCoreProgram LowerProgram(IReadOnlyList<string> symbolicProgram)
     {
         if (!_initialized || _boundedCompositionExpander is null)
         {
@@ -581,7 +633,8 @@ public sealed class LispBridge
         }
 
         var parsedProgram = _parser.ParseProgram(symbolicProgram);
-        return _boundedCompositionExpander.ExpandProgram(parsedProgram);
+        var expandedProgram = _boundedCompositionExpander.ExpandProgram(parsedProgram);
+        return _lowerer.LowerProgram(expandedProgram, CapabilityManifest);
     }
 
     private static int IndexOf(IReadOnlyList<string> traceLines, string prefix)
