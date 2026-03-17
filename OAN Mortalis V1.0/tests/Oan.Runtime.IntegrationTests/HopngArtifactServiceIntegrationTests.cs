@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Oan.Common;
 using Oan.Cradle;
 
@@ -9,7 +10,9 @@ public sealed class HopngArtifactServiceIntegrationTests
     public async Task UnavailableService_EmitsExplicitUnavailableReceipt()
     {
         var service = new UnavailableHopngArtifactService();
-        var request = CreateEmissionRequest(includeInnerWeatherReceipts: true);
+        var request = CreateEmissionRequest(
+            includeInnerWeatherReceipts: true,
+            includeWeatherDisclosureReceipts: true);
 
         var receipt = await service.EmitAsync(request);
 
@@ -21,6 +24,10 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Null(receipt.ProjectionPath);
         Assert.Contains("community-weather:unstable", receipt.ValidationSummary);
         Assert.Contains("steward-attention:recommended", receipt.ProfileSummary);
+        Assert.Contains("care-routing:checkinneeded", receipt.ValidationSummary);
+        Assert.Contains("disclosure-scope:steward", receipt.ValidationSummary);
+        Assert.Contains("evidence-sufficiency:sufficient", receipt.ValidationSummary);
+        Assert.Contains("withheld:guardedevidence", receipt.ValidationSummary);
     }
 
     [Fact]
@@ -30,7 +37,8 @@ public sealed class HopngArtifactServiceIntegrationTests
             includeTargetWitnessReceipts: true,
             includeCompassObservationReceipts: true,
             includeCompassDriftReceipts: true,
-            includeInnerWeatherReceipts: true);
+            includeInnerWeatherReceipts: true,
+            includeWeatherDisclosureReceipts: true);
 
         var refs = GovernedHopngEvidenceReferences.Build(request, request.Snapshot);
 
@@ -41,13 +49,54 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Contains(refs, reference => reference.PointerUri == "compass-witness://ffffffffffffffff");
         Assert.Contains(refs, reference => reference.PointerUri == "compass-drift://9999999999999999");
         Assert.Contains(refs, reference => reference.PointerUri == "inner-weather://1212121212121212");
+        Assert.Contains(refs, reference => reference.PointerUri == "weather-disclosure://5656565656565656");
     }
+
+#if LOCAL_HDT_BRIDGE
+    [Fact]
+    public async Task HdtAndFallback_KeepDisclosureParityForCommunityWeather()
+    {
+        var request = CreateEmissionRequest(
+            includeInnerWeatherReceipts: true,
+            includeWeatherDisclosureReceipts: true);
+        var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-hopng-disclosure-parity");
+        var localService = new LocalHdtHopngArtifactService(outputRoot);
+        var fallbackService = new UnavailableHopngArtifactService();
+
+        var localReceipt = await localService.EmitAsync(request);
+        var fallbackReceipt = await fallbackService.EmitAsync(request);
+
+        Assert.Equal(GovernedHopngArtifactOutcome.Created, localReceipt.Outcome);
+        Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, fallbackReceipt.Outcome);
+
+        var communityWeatherPath = Path.Combine(
+            Path.GetDirectoryName(localReceipt.ManifestPath!)!,
+            "governing-traffic-evidence.community-weather.json");
+        Assert.True(File.Exists(communityWeatherPath));
+
+        var communityWeatherNode = JsonNode.Parse(File.ReadAllText(communityWeatherPath));
+        Assert.Equal("unstable", communityWeatherNode?["community_safe_weather"]?["status"]?.GetValue<string>());
+        Assert.Equal("recommended", communityWeatherNode?["community_safe_weather"]?["steward_attention"]?.GetValue<string>());
+        Assert.Equal("checkinneeded", communityWeatherNode?["community_safe_weather"]?["routing_state"]?.GetValue<string>());
+        Assert.Equal("steward", communityWeatherNode?["community_safe_weather"]?["disclosure_scope"]?.GetValue<string>());
+        Assert.Equal("sufficient", communityWeatherNode?["community_safe_weather"]?["evidence_sufficiency"]?.GetValue<string>());
+        Assert.Equal("guardedevidence", communityWeatherNode?["community_safe_weather"]?["withheld_markers"]?[0]?.GetValue<string>());
+
+        Assert.Contains("community-weather:unstable", fallbackReceipt.ValidationSummary);
+        Assert.Contains("steward-attention:recommended", fallbackReceipt.ValidationSummary);
+        Assert.Contains("care-routing:checkinneeded", fallbackReceipt.ValidationSummary);
+        Assert.Contains("disclosure-scope:steward", fallbackReceipt.ValidationSummary);
+        Assert.Contains("evidence-sufficiency:sufficient", fallbackReceipt.ValidationSummary);
+        Assert.Contains("withheld:guardedevidence", fallbackReceipt.ValidationSummary);
+    }
+#endif
 
     private static GovernedHopngEmissionRequest CreateEmissionRequest(
         bool includeTargetWitnessReceipts = false,
         bool includeCompassObservationReceipts = false,
         bool includeCompassDriftReceipts = false,
-        bool includeInnerWeatherReceipts = false)
+        bool includeInnerWeatherReceipts = false,
+        bool includeWeatherDisclosureReceipts = false)
     {
         var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
             contentHandle: "agenticore-return://candidate/test",
@@ -131,14 +180,15 @@ public sealed class HopngArtifactServiceIntegrationTests
             CompassObservationReceipts: includeCompassObservationReceipts ? [CreateCompassObservationReceipt()] : [],
             CompassDriftReceipts: includeCompassDriftReceipts ? [CreateCompassDriftReceipt()] : [],
             InnerWeatherReceipts: includeInnerWeatherReceipts ? [CreateInnerWeatherReceipt()] : [],
-            CommunityWeatherPacket: includeInnerWeatherReceipts
+            CommunityWeatherPacket: includeInnerWeatherReceipts || includeWeatherDisclosureReceipts
                 ? new CommunityWeatherPacket(
                     Status: CommunityWeatherStatus.Unstable,
                     StewardAttention: CommunityStewardAttentionState.Recommended,
                     AnchorState: CompassDriftState.Weakened,
                     VisibilityClass: CompassVisibilityClass.CommunityLegible,
                     TimestampUtc: DateTimeOffset.UtcNow)
-                : null);
+                : null,
+            WeatherDisclosureReceipts: includeWeatherDisclosureReceipts ? [CreateWeatherDisclosureReceipt()] : []);
 
         return new GovernedHopngEmissionRequest(
             LoopKey: snapshot.LoopKey,
@@ -291,6 +341,47 @@ public sealed class HopngArtifactServiceIntegrationTests
                 "compass-observation://bbbbbbbbbbbbbbbb",
                 "compass-observation://cccccccccccccccc"
             ],
+            TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
+    private static GovernedWeatherDisclosureReceipt CreateWeatherDisclosureReceipt()
+    {
+        return new GovernedWeatherDisclosureReceipt(
+            DisclosureHandle: "weather-disclosure://5656565656565656",
+            LoopKey: "loop:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:test",
+            Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+            CMEId: "cme-runtime",
+            RoutingState: StewardCareRoutingState.CheckInNeeded,
+            CadenceState: CheckInCadenceState.Current,
+            EvidenceSufficiencyState: EvidenceSufficiencyState.Sufficient,
+            WindowIntegrityState: WindowIntegrityState.Intact,
+            DisclosureScope: WeatherDisclosureScope.Steward,
+            CommunityWeatherPacket: new CommunityWeatherPacket(
+                Status: CommunityWeatherStatus.Unstable,
+                StewardAttention: CommunityStewardAttentionState.Recommended,
+                AnchorState: CompassDriftState.Weakened,
+                VisibilityClass: CompassVisibilityClass.CommunityLegible,
+                TimestampUtc: DateTimeOffset.UtcNow),
+            AllowedCommunityFields:
+            [
+                CommunityWeatherField.Status,
+                CommunityWeatherField.StewardAttention,
+                CommunityWeatherField.AnchorState,
+                CommunityWeatherField.VisibilityClass,
+                CommunityWeatherField.TimestampUtc
+            ],
+            StewardReasonCodes:
+            [
+                StewardAttentionCause.DriftWeakening,
+                StewardAttentionCause.ResiduePersistence
+            ],
+            WithheldMarkers:
+            [
+                WeatherWithheldMarker.GuardedEvidence
+            ],
+            RationaleCode: WeatherDisclosureRationaleCode.GuardedReduction,
+            WitnessedBy: "CradleTek",
+            InnerWeatherHandle: "inner-weather://1212121212121212",
             TimestampUtc: DateTimeOffset.UtcNow);
     }
 }

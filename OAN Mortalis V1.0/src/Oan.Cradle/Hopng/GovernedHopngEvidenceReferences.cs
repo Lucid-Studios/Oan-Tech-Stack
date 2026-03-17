@@ -130,6 +130,18 @@ internal static class GovernedHopngEvidenceReferences
                 "inner-weather");
         }
 
+        var weatherDisclosureReceipts = snapshot.WeatherDisclosureReceipts ?? [];
+        for (var index = 0; index < weatherDisclosureReceipts.Count; index++)
+        {
+            var receipt = weatherDisclosureReceipts[index];
+            AddReference(
+                refs,
+                seenPointers,
+                $"weather-disclosure-{index + 1}",
+                receipt.DisclosureHandle,
+                "weather-disclosure");
+        }
+
         foreach (var receipt in snapshot.HopngArtifacts)
         {
             AddReference(

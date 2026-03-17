@@ -54,6 +54,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
         var status = await manager.GetStatusByLoopKeyAsync(third.LoopKey);
         var replay = await journal.ReplayLoopAsync(third.LoopKey);
         var innerWeatherEntry = Assert.Single(replay.Where(entry => entry.InnerWeatherReceipt is not null));
+        var weatherDisclosureEntry = Assert.Single(replay.Where(entry => entry.WeatherDisclosureReceipt is not null));
         var snapshot = GovernanceLoopStateModel.Project(third.LoopKey, replay);
         Assert.NotNull(third.CollapseRoutingDecision);
         var hopngRequest = new GovernedHopngEmissionRequest(
@@ -71,6 +72,8 @@ public sealed class GovernedInnerWeatherIntegrationTests
 
         var resultReceipt = Assert.Single(third.InnerWeatherReceipts!);
         var statusReceipt = Assert.Single(status.InnerWeatherReceipts!);
+        var resultDisclosureReceipt = Assert.Single(third.WeatherDisclosureReceipts!);
+        var statusDisclosureReceipt = Assert.Single(status.WeatherDisclosureReceipts!);
         var packet = third.CommunityWeatherPacket;
         Assert.NotNull(packet);
 
@@ -79,14 +82,31 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(resultReceipt.InnerWeatherHandle, Assert.Single(snapshot.InnerWeatherReceipts!).InnerWeatherHandle);
         Assert.Equal(AttentionResidueState.Persistent, resultReceipt.ResidueState);
         Assert.Equal(WindowIntegrityState.Intact, resultReceipt.WindowIntegrityState);
+        Assert.Equal(resultDisclosureReceipt.DisclosureHandle, statusDisclosureReceipt.DisclosureHandle);
+        Assert.Equal(resultDisclosureReceipt.DisclosureHandle, weatherDisclosureEntry.WeatherDisclosureReceipt!.DisclosureHandle);
+        Assert.Equal(resultDisclosureReceipt.DisclosureHandle, Assert.Single(snapshot.WeatherDisclosureReceipts!).DisclosureHandle);
+        Assert.Equal(StewardCareRoutingState.CheckInNeeded, resultDisclosureReceipt.RoutingState);
+        Assert.Equal(CheckInCadenceState.Current, resultDisclosureReceipt.CadenceState);
+        Assert.Equal(EvidenceSufficiencyState.Sufficient, resultDisclosureReceipt.EvidenceSufficiencyState);
+        Assert.Equal(WeatherDisclosureScope.Steward, resultDisclosureReceipt.DisclosureScope);
+        Assert.Equal(WeatherDisclosureRationaleCode.GuardedReduction, resultDisclosureReceipt.RationaleCode);
+        Assert.Contains(WeatherWithheldMarker.GuardedEvidence, resultDisclosureReceipt.WithheldMarkers);
+        Assert.Contains(StewardAttentionCause.DriftWeakening, resultDisclosureReceipt.StewardReasonCodes);
+        Assert.Contains(StewardAttentionCause.ResiduePersistence, resultDisclosureReceipt.StewardReasonCodes);
         Assert.Equal(CommunityWeatherStatus.Unstable, packet!.Status);
         Assert.Equal(CommunityStewardAttentionState.Recommended, packet.StewardAttention);
         Assert.Equal(CommunityWeatherStatus.Unstable, status.CommunityWeatherPacket!.Status);
         Assert.Contains(refs, reference => reference.PointerUri == resultReceipt.InnerWeatherHandle);
+        Assert.Contains(refs, reference => reference.PointerUri == resultDisclosureReceipt.DisclosureHandle);
         Assert.Contains(
             telemetry.Events.OfType<GovernedInnerWeatherTelemetryEvent>(),
             item => item.InnerWeatherHandle == resultReceipt.InnerWeatherHandle &&
                     item.ResidueState == AttentionResidueState.Persistent);
+        Assert.Contains(
+            telemetry.Events.OfType<GovernedWeatherDisclosureTelemetryEvent>(),
+            item => item.DisclosureHandle == resultDisclosureReceipt.DisclosureHandle &&
+                    item.RoutingState == StewardCareRoutingState.CheckInNeeded &&
+                    item.DisclosureScope == WeatherDisclosureScope.Steward);
 
 #if LOCAL_HDT_BRIDGE
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
@@ -107,6 +127,18 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(
             "unstable",
             communityWeatherNode?["community_safe_weather"]?["status"]?.GetValue<string>());
+        Assert.Equal(
+            "checkinneeded",
+            communityWeatherNode?["community_safe_weather"]?["routing_state"]?.GetValue<string>());
+        Assert.Equal(
+            "steward",
+            communityWeatherNode?["community_safe_weather"]?["disclosure_scope"]?.GetValue<string>());
+        Assert.Equal(
+            "sufficient",
+            communityWeatherNode?["community_safe_weather"]?["evidence_sufficiency"]?.GetValue<string>());
+        Assert.Equal(
+            "guardedevidence",
+            communityWeatherNode?["community_safe_weather"]?["withheld_markers"]?[0]?.GetValue<string>());
 #else
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
         var hopngService = HopngArtifactServiceFactory.Create(outputRoot);
@@ -115,6 +147,10 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, governingTrafficArtifact.Outcome);
         Assert.Contains("community-weather:unstable", governingTrafficArtifact.ValidationSummary);
         Assert.Contains("steward-attention:recommended", governingTrafficArtifact.ProfileSummary);
+        Assert.Contains("care-routing:checkinneeded", governingTrafficArtifact.ValidationSummary);
+        Assert.Contains("disclosure-scope:steward", governingTrafficArtifact.ValidationSummary);
+        Assert.Contains("evidence-sufficiency:sufficient", governingTrafficArtifact.ValidationSummary);
+        Assert.Contains("withheld:guardedevidence", governingTrafficArtifact.ValidationSummary);
 #endif
     }
 

@@ -131,7 +131,8 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         LoadedHopngArtifact artifact,
         GovernedHopngEmissionRequest request)
     {
-        var communityWeatherPacket = request.Snapshot.CommunityWeatherPacket;
+        var disclosureReceipt = request.Snapshot.WeatherDisclosureReceipts?.LastOrDefault();
+        var communityWeatherPacket = request.Snapshot.CommunityWeatherPacket ?? disclosureReceipt?.CommunityWeatherPacket;
         var communityWeatherPath = GetCommunityWeatherPath(artifact.Layout);
 
         if (communityWeatherPacket is null)
@@ -155,6 +156,17 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
                 ["timestamp_utc"] = communityWeatherPacket.TimestampUtc
             }
         };
+
+        if (disclosureReceipt is not null)
+        {
+            projection["community_safe_weather"]!["routing_state"] = disclosureReceipt.RoutingState.ToString().ToLowerInvariant().Replace('_', '-');
+            projection["community_safe_weather"]!["disclosure_scope"] = disclosureReceipt.DisclosureScope.ToString().ToLowerInvariant().Replace('_', '-');
+            projection["community_safe_weather"]!["evidence_sufficiency"] = disclosureReceipt.EvidenceSufficiencyState.ToString().ToLowerInvariant().Replace('_', '-');
+            projection["community_safe_weather"]!["withheld_markers"] = new JsonArray(
+                disclosureReceipt.WithheldMarkers
+                    .Select(marker => JsonValue.Create(marker.ToString().ToLowerInvariant().Replace('_', '-')))
+                    .ToArray());
+        }
 
         _jsonStore.WriteCanonical(communityWeatherPath, projection);
     }

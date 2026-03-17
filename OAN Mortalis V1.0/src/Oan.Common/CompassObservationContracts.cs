@@ -70,6 +70,14 @@ public enum WindowIntegrityState
     GovernanceReset = 6
 }
 
+public enum EvidenceSufficiencyState
+{
+    Sufficient = 0,
+    Sparse = 1,
+    BrokenWindow = 2,
+    ContinuityAmbiguous = 3
+}
+
 public enum AttentionResidueContributor
 {
     None = 0,
@@ -105,6 +113,58 @@ public enum CommunityStewardAttentionState
     None = 0,
     Recommended = 1,
     Needed = 2
+}
+
+public enum StewardCareRoutingState
+{
+    None = 0,
+    CheckInRecommended = 1,
+    CheckInNeeded = 2,
+    EscalationEligible = 3
+}
+
+public enum CheckInCadenceState
+{
+    Current = 0,
+    DueSoon = 1,
+    Overdue = 2,
+    Broken = 3,
+    Unknown = 4
+}
+
+public enum WeatherDisclosureScope
+{
+    Community = 0,
+    Steward = 1,
+    OperatorGuarded = 2
+}
+
+public enum CommunityWeatherField
+{
+    Status = 0,
+    StewardAttention = 1,
+    AnchorState = 2,
+    VisibilityClass = 3,
+    TimestampUtc = 4
+}
+
+public enum WeatherWithheldMarker
+{
+    GuardedEvidence = 0,
+    CrypticEvidence = 1,
+    SparseEvidence = 2,
+    BrokenWindow = 3,
+    ContinuityAmbiguous = 4
+}
+
+public enum WeatherDisclosureRationaleCode
+{
+    CommunityWhitelisted = 0,
+    GuardedReduction = 1,
+    SparseReduction = 2,
+    BrokenWindowReduction = 3,
+    ContinuityAmbiguousReduction = 4,
+    OperatorGuardedReduction = 5
 }
 
 public enum CompassObservationProvenance
@@ -209,6 +269,31 @@ public sealed record InnerWeatherEvidence(
     IReadOnlyList<string> ObservationHandles,
     DateTimeOffset TimestampUtc);
 
+public sealed record StewardCareAssessment(
+    string CMEId,
+    StewardCareRoutingState RoutingState,
+    CheckInCadenceState CadenceState,
+    EvidenceSufficiencyState EvidenceSufficiencyState,
+    WindowIntegrityState WindowIntegrityState,
+    CommunityWeatherPacket CommunityWeatherPacket,
+    bool HasGuardedInfluence,
+    bool HasCrypticInfluence,
+    IReadOnlyList<StewardAttentionCause> ReasonCodes,
+    string InnerWeatherHandle,
+    DateTimeOffset TimestampUtc);
+
+public sealed record WeatherDisclosureDecision(
+    string CMEId,
+    WeatherDisclosureScope DisclosureScope,
+    EvidenceSufficiencyState EvidenceSufficiencyState,
+    CommunityWeatherPacket CommunityWeatherPacket,
+    IReadOnlyList<CommunityWeatherField> AllowedCommunityFields,
+    IReadOnlyList<StewardAttentionCause> StewardReasonCodes,
+    IReadOnlyList<WeatherWithheldMarker> WithheldMarkers,
+    WeatherDisclosureRationaleCode RationaleCode,
+    string InnerWeatherHandle,
+    DateTimeOffset TimestampUtc);
+
 public sealed record GovernedCompassObservationReceipt(
     string WitnessHandle,
     GovernanceLoopStage Stage,
@@ -286,6 +371,25 @@ public sealed record CommunityWeatherPacket(
     CompassVisibilityClass VisibilityClass,
     DateTimeOffset TimestampUtc);
 
+public sealed record GovernedWeatherDisclosureReceipt(
+    string DisclosureHandle,
+    string LoopKey,
+    GovernanceLoopStage Stage,
+    string CMEId,
+    StewardCareRoutingState RoutingState,
+    CheckInCadenceState CadenceState,
+    EvidenceSufficiencyState EvidenceSufficiencyState,
+    WindowIntegrityState WindowIntegrityState,
+    WeatherDisclosureScope DisclosureScope,
+    CommunityWeatherPacket CommunityWeatherPacket,
+    IReadOnlyList<CommunityWeatherField> AllowedCommunityFields,
+    IReadOnlyList<StewardAttentionCause> StewardReasonCodes,
+    IReadOnlyList<WeatherWithheldMarker> WithheldMarkers,
+    WeatherDisclosureRationaleCode RationaleCode,
+    string WitnessedBy,
+    string InnerWeatherHandle,
+    DateTimeOffset TimestampUtc);
+
 public static class CompassObservationKeys
 {
     public static string CreateObservationHandle(
@@ -354,6 +458,20 @@ public static class CompassObservationKeys
         }
 
         return $"inner-weather://{ComputeDigest(loopKey, cmeId, windowIntegrityState.ToString(), driftState.ToString(), string.Join("|", orderedObservationHandles))}";
+    }
+
+    public static string CreateWeatherDisclosureHandle(
+        string loopKey,
+        string cmeId,
+        StewardCareRoutingState routingState,
+        WeatherDisclosureScope disclosureScope,
+        string innerWeatherHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(loopKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(innerWeatherHandle);
+
+        return $"weather-disclosure://{ComputeDigest(loopKey, cmeId, routingState.ToString(), disclosureScope.ToString(), innerWeatherHandle)}";
     }
 
     private static string ComputeDigest(params string[] parts)

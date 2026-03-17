@@ -42,7 +42,8 @@ public enum GovernanceJournalEntryKind
     TargetWitness = 6,
     CompassObservation = 7,
     CompassDrift = 8,
-    InnerWeather = 9
+    InnerWeather = 9,
+    WeatherDisclosure = 10
 }
 
 public enum GovernanceActKind
@@ -174,7 +175,8 @@ public sealed record ReturnCandidateReviewRequest(
     CmeCollapseClassification CollapseClassification,
     GovernedControlSurfaceRequestEnvelope RequestEnvelope,
     IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null,
-    IReadOnlyList<GovernedInnerWeatherReceipt>? InnerWeatherReceipts = null);
+    IReadOnlyList<GovernedInnerWeatherReceipt>? InnerWeatherReceipts = null,
+    IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null);
 
 public sealed record GovernanceDecisionReceipt(
     Guid CandidateId,
@@ -252,7 +254,8 @@ public sealed record GovernanceGoldenPathResult(
     IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null,
     IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null,
     IReadOnlyList<GovernedInnerWeatherReceipt>? InnerWeatherReceipts = null,
-    CommunityWeatherPacket? CommunityWeatherPacket = null);
+    CommunityWeatherPacket? CommunityWeatherPacket = null,
+    IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -290,7 +293,8 @@ public sealed record GovernanceLoopStatusView(
     IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null,
     IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null,
     IReadOnlyList<GovernedInnerWeatherReceipt>? InnerWeatherReceipts = null,
-    CommunityWeatherPacket? CommunityWeatherPacket = null);
+    CommunityWeatherPacket? CommunityWeatherPacket = null,
+    IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null);
 
 public sealed record DeferredBacklogItemView(
     string LoopKey,
@@ -385,7 +389,8 @@ public sealed record GovernanceJournalEntry(
     GovernedTargetWitnessReceipt? TargetWitnessReceipt = null,
     GovernedCompassObservationReceipt? CompassObservationReceipt = null,
     GovernedCompassDriftReceipt? CompassDriftReceipt = null,
-    GovernedInnerWeatherReceipt? InnerWeatherReceipt = null);
+    GovernedInnerWeatherReceipt? InnerWeatherReceipt = null,
+    GovernedWeatherDisclosureReceipt? WeatherDisclosureReceipt = null);
 
 public sealed record GovernanceJournalReplayIssue(
     int LineNumber,
@@ -417,7 +422,8 @@ public sealed record GovernanceLoopStateSnapshot(
     IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null,
     IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null,
     IReadOnlyList<GovernedInnerWeatherReceipt>? InnerWeatherReceipts = null,
-    CommunityWeatherPacket? CommunityWeatherPacket = null);
+    CommunityWeatherPacket? CommunityWeatherPacket = null,
+    IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null);
 
 public interface IGovernanceCycleCognitionService
 {
@@ -577,6 +583,7 @@ public static class GovernanceLoopStateModel
         var compassObservationReceipts = new List<GovernedCompassObservationReceipt>();
         var compassDriftReceipts = new List<GovernedCompassDriftReceipt>();
         var innerWeatherReceipts = new List<GovernedInnerWeatherReceipt>();
+        var weatherDisclosureReceipts = new List<GovernedWeatherDisclosureReceipt>();
 
         foreach (var entry in batch.Entries
                      .Where(entry => string.Equals(entry.LoopKey, loopKey, StringComparison.Ordinal)))
@@ -616,6 +623,11 @@ public static class GovernanceLoopStateModel
             if (entry.InnerWeatherReceipt is not null)
             {
                 innerWeatherReceipts.Add(entry.InnerWeatherReceipt);
+            }
+
+            if (entry.WeatherDisclosureReceipt is not null)
+            {
+                weatherDisclosureReceipts.Add(entry.WeatherDisclosureReceipt);
             }
 
             if (entry.ActReceipt is not null)
@@ -712,6 +724,10 @@ public static class GovernanceLoopStateModel
             .OrderBy(receipt => receipt.TimestampUtc)
             .ThenBy(receipt => receipt.InnerWeatherHandle, StringComparer.Ordinal)
             .ToArray();
+        var orderedWeatherDisclosureReceipts = weatherDisclosureReceipts
+            .OrderBy(receipt => receipt.TimestampUtc)
+            .ThenBy(receipt => receipt.DisclosureHandle, StringComparer.Ordinal)
+            .ToArray();
         if (reviewRequest is not null && orderedCompassDriftReceipts.Length > 0)
         {
             reviewRequest = reviewRequest with
@@ -726,10 +742,19 @@ public static class GovernanceLoopStateModel
                 InnerWeatherReceipts = orderedInnerWeatherReceipts
             };
         }
+        if (reviewRequest is not null && orderedWeatherDisclosureReceipts.Length > 0)
+        {
+            reviewRequest = reviewRequest with
+            {
+                WeatherDisclosureReceipts = orderedWeatherDisclosureReceipts
+            };
+        }
 
-        var communityWeatherPacket = orderedInnerWeatherReceipts.Length == 0
-            ? null
-            : CommunityWeatherReducer.Reduce(orderedInnerWeatherReceipts[^1]);
+        var communityWeatherPacket = orderedWeatherDisclosureReceipts.Length > 0
+            ? orderedWeatherDisclosureReceipts[^1].CommunityWeatherPacket
+            : orderedInnerWeatherReceipts.Length == 0
+                ? null
+                : CommunityWeatherReducer.Reduce(orderedInnerWeatherReceipts[^1]);
 
         return new GovernanceLoopStateSnapshot(
             loopKey,
@@ -757,7 +782,8 @@ public static class GovernanceLoopStateModel
             orderedCompassObservationReceipts,
             orderedCompassDriftReceipts,
             orderedInnerWeatherReceipts,
-            communityWeatherPacket);
+            communityWeatherPacket,
+            orderedWeatherDisclosureReceipts);
     }
 
     public static GovernanceLoopControlState ClassifyControlState(

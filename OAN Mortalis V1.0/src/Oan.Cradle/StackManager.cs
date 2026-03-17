@@ -726,6 +726,7 @@ namespace Oan.Cradle
 
             await WitnessCompassDriftAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
             await WitnessInnerWeatherAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
+            await WitnessWeatherDisclosureAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task WitnessCompassDriftAsync(
@@ -766,6 +767,26 @@ namespace Oan.Cradle
                 .ConfigureAwait(false);
         }
 
+        private async Task WitnessWeatherDisclosureAsync(
+            string loopKey,
+            GovernanceLoopStage stage,
+            ReturnCandidateReviewRequest reviewRequest,
+            CancellationToken cancellationToken)
+        {
+            var journal = RequireGovernanceReceiptJournal();
+            var batch = await journal.ReplayBatchAsync(cancellationToken).ConfigureAwait(false);
+            var assessment = StewardCareRouter.AssessForLoop(loopKey, batch);
+            if (assessment is null)
+            {
+                return;
+            }
+
+            var decision = InnerWeatherDisclosureReducer.Reduce(assessment);
+            var bridge = new GovernedWeatherDisclosureBridge(_stores.GovernanceTelemetry, journal);
+            await bridge.WitnessAsync(loopKey, assessment, decision, stage, reviewRequest, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         private async Task<GovernanceGoldenPathResult> BuildResultAsync(
             Guid candidateId,
             string loopKey,
@@ -803,7 +824,8 @@ namespace Oan.Cradle
                 CompassObservationReceipts: snapshot.CompassObservationReceipts ?? [],
                 CompassDriftReceipts: snapshot.CompassDriftReceipts ?? [],
                 InnerWeatherReceipts: snapshot.InnerWeatherReceipts ?? [],
-                CommunityWeatherPacket: snapshot.CommunityWeatherPacket);
+                CommunityWeatherPacket: snapshot.CommunityWeatherPacket,
+                WeatherDisclosureReceipts: snapshot.WeatherDisclosureReceipts ?? []);
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -846,7 +868,8 @@ namespace Oan.Cradle
                 CompassObservationReceipts: snapshot.CompassObservationReceipts ?? [],
                 CompassDriftReceipts: snapshot.CompassDriftReceipts ?? [],
                 InnerWeatherReceipts: snapshot.InnerWeatherReceipts ?? [],
-                CommunityWeatherPacket: snapshot.CommunityWeatherPacket);
+                CommunityWeatherPacket: snapshot.CommunityWeatherPacket,
+                WeatherDisclosureReceipts: snapshot.WeatherDisclosureReceipts ?? []);
         }
 
         private async Task<GovernanceLoopStateSnapshot> EnsureTerminalHopngArtifactsAsync(
