@@ -141,12 +141,17 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         var hostedRequestContext = ingestionResult.MatchResult.EngramCandidates.Count == 0
             ? runtimeInput
             : string.Join(" ", ingestionResult.MatchResult.EngramCandidates.Select(candidate => candidate.Token).Take(8));
+        var hostedConstraints = BuildOpalConstraints(sheafPlan.Domain, runtimeInput);
         var hostedSemanticResponse = await _soulFrameHostClient.ClassifyAsync(
                 new SoulFrameInferenceRequest
                 {
                     Task = "classify",
-                    Context = hostedRequestContext,
-                    OpalConstraints = BuildOpalConstraints(sheafPlan.Domain),
+                    Context = SoulFrameGovernedPromptContextComposer.Compose(
+                        "classify",
+                        hostedRequestContext,
+                        hostedConstraints,
+                        runtimeInput),
+                    OpalConstraints = hostedConstraints,
                     SoulFrameId = context.SoulFrameId,
                     ContextId = context.ContextId,
                     GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
@@ -558,11 +563,14 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             $"SLIExpr:{string.Join(" || ", ingestionResult.SliExpression.ProgramExpressions.Take(2))}";
     }
 
-    private static SoulFrameInferenceConstraints BuildOpalConstraints(string domain)
+    private static SoulFrameInferenceConstraints BuildOpalConstraints(string domain, string objectiveHint)
     {
         return new SoulFrameInferenceConstraints
         {
-            Domain = domain,
+            Domain = SoulFrameGovernedPromptContextComposer.ResolveDomain(
+                rawContext: objectiveHint,
+                configuredDomain: domain,
+                objectiveHint: objectiveHint),
             DriftLimit = 0.02,
             MaxTokens = 128
         };

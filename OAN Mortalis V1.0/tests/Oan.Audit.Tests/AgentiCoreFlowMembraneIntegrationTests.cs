@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using AgentiCore.Models;
 using AgentiCore.Services;
 using AgentiCoreService = AgentiCore.Services.AgentiCore;
@@ -123,6 +124,52 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             cognition.ExecuteCognitionCycleAsync(CreateContext(), "solve bounded task"));
     }
 
+    [Fact]
+    public async Task CognitionCycle_ClassifyRequest_AnchorsBoundedLocalityDoctrine()
+    {
+        string? classifyContext = null;
+        string? classifyDomain = null;
+
+        var telemetry = new GelTelemetryAdapter();
+        var publicStore = new RecordingPublicStore();
+        var crypticStore = new RecordingCrypticStore();
+        var membrane = new RecordingMembrane();
+        var boundedWorker = new BoundedMembraneWorkerService(membrane);
+        var cognition = new AgentiCoreService(
+            new StubCognitionEngine(),
+            new StubEngramResolver(),
+            new ContextAssembler(),
+            CreateCommitService(publicStore, crypticStore, telemetry),
+            publicStore,
+            crypticStore,
+            telemetry,
+            new StubRootOntologicalCleaver(),
+            new GEL.Runtime.SheafMasterEngramService(),
+            new SLI.Ingestion.SliIngestionEngine(),
+            CreateSoulFrameHostClient(async (request, _) =>
+            {
+                if (request.RequestUri?.AbsolutePath == "/classify")
+                {
+                    using var document = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+                    classifyContext = document.RootElement.GetProperty("context").GetString();
+                    classifyDomain = document.RootElement.GetProperty("opal_constraints").GetProperty("domain").GetString();
+                }
+
+                return await DefaultSoulFrameResponder(request);
+            }),
+            boundedWorker);
+
+        await cognition.ExecuteCognitionCycleAsync(
+            CreateContext(),
+            "maintain bounded locality continuity under masked locality witness");
+
+        Assert.Equal("bounded-locality continuity", classifyDomain);
+        Assert.NotNull(classifyContext);
+        Assert.Contains("ACTIVE_DOCTRINE_DOMAIN: bounded-locality continuity", classifyContext, StringComparison.Ordinal);
+        Assert.Contains("EXCLUDED_NEARBY_DOMAIN: fluid continuity law", classifyContext, StringComparison.Ordinal);
+        Assert.Contains("INPUT:", classifyContext, StringComparison.Ordinal);
+    }
+
     private static MediatedSelfStateContour CreateMediatedSelfState(string cmeId, string policyHandle) =>
         new(
             CSelfGelHandle: $"soulframe-cselfgel://{cmeId}/{Guid.NewGuid():D}",
@@ -159,33 +206,10 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         return new EngramCommitService(steward);
     }
 
-    private static SoulFrameHostClient CreateSoulFrameHostClient()
+    private static SoulFrameHostClient CreateSoulFrameHostClient(
+        Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? responder = null)
     {
-        var handler = new DelegatingHandlerStub((request, _) =>
-        {
-            if (request.RequestUri?.AbsolutePath == "/classify")
-            {
-                var json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74}";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(json, Encoding.UTF8, "application/json")
-                });
-            }
-
-            if (request.RequestUri?.AbsolutePath == "/semantic_expand")
-            {
-                var json = "{\"decision\":\"semantic-expand\",\"payload\":\"hint\",\"confidence\":0.61,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"hint\"}}";
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(json, Encoding.UTF8, "application/json")
-                });
-            }
-
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"{}\"}}", Encoding.UTF8, "application/json")
-            });
-        });
+        var handler = new DelegatingHandlerStub(responder ?? ((request, _) => DefaultSoulFrameResponder(request)));
 
         var httpClient = new HttpClient(handler)
         {
@@ -193,6 +217,32 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         };
 
         return new SoulFrameHostClient(httpClient, telemetry: null, "http://127.0.0.1:8181");
+    }
+
+    private static Task<HttpResponseMessage> DefaultSoulFrameResponder(HttpRequestMessage request)
+    {
+        if (request.RequestUri?.AbsolutePath == "/classify")
+        {
+            var json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74}";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
+        }
+
+        if (request.RequestUri?.AbsolutePath == "/semantic_expand")
+        {
+            var json = "{\"decision\":\"semantic-expand\",\"payload\":\"hint\",\"confidence\":0.61,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"hint\"}}";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
+        }
+
+        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"{}\"}}", Encoding.UTF8, "application/json")
+        });
     }
 
     private sealed class StubCognitionEngine : ICognitionEngine

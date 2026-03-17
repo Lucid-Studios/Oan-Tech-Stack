@@ -2822,11 +2822,25 @@ public sealed class SliSymbolTable
         string contextValue,
         SliExecutionContext context)
     {
+        var constraints = new SoulFrameInferenceConstraints
+        {
+            Domain = SoulFrameGovernedPromptContextComposer.ResolveDomain(
+                rawContext: contextValue,
+                configuredDomain: context.OpalConstraints.Domain,
+                objectiveHint: context.Frame.TaskObjective),
+            DriftLimit = context.OpalConstraints.DriftLimit,
+            MaxTokens = context.OpalConstraints.MaxTokens
+        };
+
         return new SoulFrameInferenceRequest
         {
             Task = task,
-            Context = contextValue,
-            OpalConstraints = context.OpalConstraints,
+            Context = SoulFrameGovernedPromptContextComposer.Compose(
+                task,
+                contextValue,
+                constraints,
+                context.Frame.TaskObjective),
+            OpalConstraints = constraints,
             SoulFrameId = context.Frame.SoulFrameId,
             ContextId = context.Frame.ContextId,
             GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
