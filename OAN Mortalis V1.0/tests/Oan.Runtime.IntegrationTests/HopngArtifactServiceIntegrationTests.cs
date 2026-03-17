@@ -24,7 +24,10 @@ public sealed class HopngArtifactServiceIntegrationTests
     [Fact]
     public void EvidenceReferences_IncludeWitnessAndCompassHandlesFromSnapshot()
     {
-        var request = CreateEmissionRequest(includeTargetWitnessReceipts: true, includeCompassObservationReceipts: true);
+        var request = CreateEmissionRequest(
+            includeTargetWitnessReceipts: true,
+            includeCompassObservationReceipts: true,
+            includeCompassDriftReceipts: true);
 
         var refs = GovernedHopngEvidenceReferences.Build(request, request.Snapshot);
 
@@ -33,11 +36,13 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Contains(refs, reference => reference.PointerUri == "target-trace://cccccccccccccccc");
         Assert.Contains(refs, reference => reference.PointerUri == "target-residue://dddddddddddddddd");
         Assert.Contains(refs, reference => reference.PointerUri == "compass-witness://ffffffffffffffff");
+        Assert.Contains(refs, reference => reference.PointerUri == "compass-drift://9999999999999999");
     }
 
     private static GovernedHopngEmissionRequest CreateEmissionRequest(
         bool includeTargetWitnessReceipts = false,
-        bool includeCompassObservationReceipts = false)
+        bool includeCompassObservationReceipts = false,
+        bool includeCompassDriftReceipts = false)
     {
         var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
             contentHandle: "agenticore-return://candidate/test",
@@ -118,7 +123,8 @@ public sealed class HopngArtifactServiceIntegrationTests
             JournalIntegrityErrorCount: 0,
             HopngArtifacts: [],
             TargetWitnessReceipts: includeTargetWitnessReceipts ? [CreateTargetWitnessReceipt()] : [],
-            CompassObservationReceipts: includeCompassObservationReceipts ? [CreateCompassObservationReceipt()] : []);
+            CompassObservationReceipts: includeCompassObservationReceipts ? [CreateCompassObservationReceipt()] : [],
+            CompassDriftReceipts: includeCompassDriftReceipts ? [CreateCompassDriftReceipt()] : []);
 
         return new GovernedHopngEmissionRequest(
             LoopKey: snapshot.LoopKey,
@@ -206,6 +212,31 @@ public sealed class HopngArtifactServiceIntegrationTests
             AdvisoryDisposition: CompassSeedAdvisoryDisposition.Accepted,
             AdvisoryDispositionReason: "host-accepted",
             AdvisoryJustification: "bounded-locality continuity remains dominant",
+            TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
+    private static GovernedCompassDriftReceipt CreateCompassDriftReceipt()
+    {
+        return new GovernedCompassDriftReceipt(
+            DriftHandle: "compass-drift://9999999999999999",
+            LoopKey: "loop:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:test",
+            Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+            CMEId: "cme-runtime",
+            DriftState: CompassDriftState.Weakened,
+            BaselineActiveBasin: CompassDoctrineBasin.BoundedLocalityContinuity,
+            BaselineCompetingBasin: CompassDoctrineBasin.FluidContinuityLaw,
+            LatestActiveBasin: CompassDoctrineBasin.BoundedLocalityContinuity,
+            ObservationCount: 3,
+            WindowSize: 3,
+            AdvisoryDivergenceCount: 2,
+            CompetingMigrationCount: 0,
+            WitnessedBy: "CradleTek",
+            ObservationHandles:
+            [
+                "compass-observation://aaaaaaaaaaaaaaaa",
+                "compass-observation://bbbbbbbbbbbbbbbb",
+                "compass-observation://cccccccccccccccc"
+            ],
             TimestampUtc: DateTimeOffset.UtcNow);
     }
 }

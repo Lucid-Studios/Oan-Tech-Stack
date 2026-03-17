@@ -20,6 +20,13 @@ public enum CompassAnchorState
     Lost = 3
 }
 
+public enum CompassDriftState
+{
+    Held = 0,
+    Weakened = 1,
+    Lost = 2
+}
+
 public enum CompassObservationProvenance
 {
     LispNative = 0,
@@ -82,6 +89,20 @@ public sealed record CompassObservationSurface(
     CompassSeedAdvisoryObservation? SeedAdvisory,
     DateTimeOffset TimestampUtc);
 
+public sealed record CompassDriftAssessment(
+    string CMEId,
+    int WindowSize,
+    int ObservationCount,
+    CompassDoctrineBasin BaselineActiveBasin,
+    CompassDoctrineBasin BaselineCompetingBasin,
+    CompassDoctrineBasin LatestActiveBasin,
+    CompassAnchorState LatestAnchorState,
+    CompassDriftState DriftState,
+    int AdvisoryDivergenceCount,
+    int CompetingMigrationCount,
+    IReadOnlyList<string> ObservationHandles,
+    DateTimeOffset TimestampUtc);
+
 public sealed record GovernedCompassObservationReceipt(
     string WitnessHandle,
     GovernanceLoopStage Stage,
@@ -111,6 +132,23 @@ public sealed record GovernedCompassObservationReceipt(
     string? AdvisoryJustification,
     DateTimeOffset TimestampUtc);
 
+public sealed record GovernedCompassDriftReceipt(
+    string DriftHandle,
+    string LoopKey,
+    GovernanceLoopStage Stage,
+    string CMEId,
+    CompassDriftState DriftState,
+    CompassDoctrineBasin BaselineActiveBasin,
+    CompassDoctrineBasin BaselineCompetingBasin,
+    CompassDoctrineBasin LatestActiveBasin,
+    int ObservationCount,
+    int WindowSize,
+    int AdvisoryDivergenceCount,
+    int CompetingMigrationCount,
+    string WitnessedBy,
+    IReadOnlyList<string> ObservationHandles,
+    DateTimeOffset TimestampUtc);
+
 public static class CompassObservationKeys
 {
     public static string CreateObservationHandle(
@@ -134,6 +172,28 @@ public static class CompassObservationKeys
         ArgumentException.ThrowIfNullOrWhiteSpace(observationHandle);
 
         return $"compass-witness://{ComputeDigest(loopKey, observationHandle)}";
+    }
+
+    public static string CreateDriftHandle(
+        string loopKey,
+        string cmeId,
+        CompassDriftState driftState,
+        IEnumerable<string> observationHandles)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(loopKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentNullException.ThrowIfNull(observationHandles);
+
+        var orderedObservationHandles = observationHandles
+            .Where(handle => !string.IsNullOrWhiteSpace(handle))
+            .Select(handle => handle.Trim())
+            .ToArray();
+        if (orderedObservationHandles.Length == 0)
+        {
+            throw new ArgumentException("At least one observation handle is required.", nameof(observationHandles));
+        }
+
+        return $"compass-drift://{ComputeDigest(loopKey, cmeId, driftState.ToString(), string.Join("|", orderedObservationHandles))}";
     }
 
     private static string ComputeDigest(params string[] parts)

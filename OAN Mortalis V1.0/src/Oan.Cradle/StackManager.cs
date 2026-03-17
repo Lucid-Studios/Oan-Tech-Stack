@@ -716,12 +716,33 @@ namespace Oan.Cradle
             var bridge = new GovernedCompassObservationBridge(
                 _stores.GovernanceTelemetry,
                 RequireGovernanceReceiptJournal());
-            await bridge.WitnessAsync(
+            var receipt = await bridge.WitnessAsync(
                     loopKey,
                     workResult.CompassObservation,
                     GovernanceLoopStage.BoundedCognitionCompleted,
                     reviewRequest,
                     cancellationToken)
+                .ConfigureAwait(false);
+
+            await WitnessCompassDriftAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task WitnessCompassDriftAsync(
+            string loopKey,
+            GovernanceLoopStage stage,
+            ReturnCandidateReviewRequest reviewRequest,
+            CancellationToken cancellationToken)
+        {
+            var journal = RequireGovernanceReceiptJournal();
+            var entries = await journal.ReplayAsync(cancellationToken).ConfigureAwait(false);
+            var assessment = CompassDriftProjector.ProjectForLoop(loopKey, entries);
+            if (assessment is null)
+            {
+                return;
+            }
+
+            var bridge = new GovernedCompassDriftBridge(_stores.GovernanceTelemetry, journal);
+            await bridge.WitnessAsync(loopKey, assessment, stage, reviewRequest, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -759,7 +780,8 @@ namespace Oan.Cradle
                 CollapseRoutingDecision: BuildCollapseRoutingDecision(snapshot),
                 HopngArtifacts: snapshot.HopngArtifacts,
                 TargetWitnessReceipts: snapshot.TargetWitnessReceipts,
-                CompassObservationReceipts: snapshot.CompassObservationReceipts ?? []);
+                CompassObservationReceipts: snapshot.CompassObservationReceipts ?? [],
+                CompassDriftReceipts: snapshot.CompassDriftReceipts ?? []);
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -799,7 +821,8 @@ namespace Oan.Cradle
                 JournalIntegrityErrorCount: snapshot.JournalIntegrityErrorCount,
                 HopngArtifacts: snapshot.HopngArtifacts,
                 TargetWitnessReceipts: snapshot.TargetWitnessReceipts,
-                CompassObservationReceipts: snapshot.CompassObservationReceipts ?? []);
+                CompassObservationReceipts: snapshot.CompassObservationReceipts ?? [],
+                CompassDriftReceipts: snapshot.CompassDriftReceipts ?? []);
         }
 
         private async Task<GovernanceLoopStateSnapshot> EnsureTerminalHopngArtifactsAsync(

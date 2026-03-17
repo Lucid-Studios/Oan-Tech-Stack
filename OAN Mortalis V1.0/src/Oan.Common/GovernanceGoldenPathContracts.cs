@@ -40,7 +40,8 @@ public enum GovernanceJournalEntryKind
     Annotation = 4,
     ArtifactReceipt = 5,
     TargetWitness = 6,
-    CompassObservation = 7
+    CompassObservation = 7,
+    CompassDrift = 8
 }
 
 public enum GovernanceActKind
@@ -170,7 +171,8 @@ public sealed record ReturnCandidateReviewRequest(
     string SubmittedBy,
     string CandidatePayload,
     CmeCollapseClassification CollapseClassification,
-    GovernedControlSurfaceRequestEnvelope RequestEnvelope);
+    GovernedControlSurfaceRequestEnvelope RequestEnvelope,
+    IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null);
 
 public sealed record GovernanceDecisionReceipt(
     Guid CandidateId,
@@ -245,7 +247,8 @@ public sealed record GovernanceGoldenPathResult(
     CmeCollapseRoutingDecision? CollapseRoutingDecision = null,
     IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null,
     IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null,
-    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null);
+    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null,
+    IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -280,7 +283,8 @@ public sealed record GovernanceLoopStatusView(
     int JournalIntegrityErrorCount,
     IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null,
     IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null,
-    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null);
+    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null,
+    IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null);
 
 public sealed record DeferredBacklogItemView(
     string LoopKey,
@@ -373,7 +377,8 @@ public sealed record GovernanceJournalEntry(
     GovernanceDeferredAnnotation? Annotation,
     GovernedHopngArtifactReceipt? HopngArtifactReceipt = null,
     GovernedTargetWitnessReceipt? TargetWitnessReceipt = null,
-    GovernedCompassObservationReceipt? CompassObservationReceipt = null);
+    GovernedCompassObservationReceipt? CompassObservationReceipt = null,
+    GovernedCompassDriftReceipt? CompassDriftReceipt = null);
 
 public sealed record GovernanceJournalReplayIssue(
     int LineNumber,
@@ -402,7 +407,8 @@ public sealed record GovernanceLoopStateSnapshot(
     int JournalIntegrityErrorCount,
     IReadOnlyList<GovernedHopngArtifactReceipt> HopngArtifacts,
     IReadOnlyList<GovernedTargetWitnessReceipt> TargetWitnessReceipts,
-    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null);
+    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null,
+    IReadOnlyList<GovernedCompassDriftReceipt>? CompassDriftReceipts = null);
 
 public interface IGovernanceCycleCognitionService
 {
@@ -560,6 +566,7 @@ public static class GovernanceLoopStateModel
         var hopngArtifactsByProfile = new Dictionary<GovernedHopngArtifactProfile, GovernedHopngArtifactReceipt>();
         var targetWitnessReceipts = new List<GovernedTargetWitnessReceipt>();
         var compassObservationReceipts = new List<GovernedCompassObservationReceipt>();
+        var compassDriftReceipts = new List<GovernedCompassDriftReceipt>();
 
         foreach (var entry in batch.Entries
                      .Where(entry => string.Equals(entry.LoopKey, loopKey, StringComparison.Ordinal)))
@@ -589,6 +596,11 @@ public static class GovernanceLoopStateModel
             if (entry.CompassObservationReceipt is not null)
             {
                 compassObservationReceipts.Add(entry.CompassObservationReceipt);
+            }
+
+            if (entry.CompassDriftReceipt is not null)
+            {
+                compassDriftReceipts.Add(entry.CompassDriftReceipt);
             }
 
             if (entry.ActReceipt is not null)
@@ -673,6 +685,22 @@ public static class GovernanceLoopStateModel
         var isTerminal =
             stage is GovernanceLoopStage.LoopCompleted or GovernanceLoopStage.GovernanceDecisionRejected;
 
+        var orderedCompassObservationReceipts = compassObservationReceipts
+            .OrderBy(receipt => receipt.TimestampUtc)
+            .ThenBy(receipt => receipt.WitnessHandle, StringComparer.Ordinal)
+            .ToArray();
+        var orderedCompassDriftReceipts = compassDriftReceipts
+            .OrderBy(receipt => receipt.TimestampUtc)
+            .ThenBy(receipt => receipt.DriftHandle, StringComparer.Ordinal)
+            .ToArray();
+        if (reviewRequest is not null && orderedCompassDriftReceipts.Length > 0)
+        {
+            reviewRequest = reviewRequest with
+            {
+                CompassDriftReceipts = orderedCompassDriftReceipts
+            };
+        }
+
         return new GovernanceLoopStateSnapshot(
             loopKey,
             stage,
@@ -696,10 +724,8 @@ public static class GovernanceLoopStateModel
                 .OrderBy(receipt => receipt.TimestampUtc)
                 .ThenBy(receipt => receipt.WitnessHandle, StringComparer.Ordinal)
                 .ToArray(),
-            compassObservationReceipts
-                .OrderBy(receipt => receipt.TimestampUtc)
-                .ThenBy(receipt => receipt.WitnessHandle, StringComparer.Ordinal)
-                .ToArray());
+            orderedCompassObservationReceipts,
+            orderedCompassDriftReceipts);
     }
 
     public static GovernanceLoopControlState ClassifyControlState(
