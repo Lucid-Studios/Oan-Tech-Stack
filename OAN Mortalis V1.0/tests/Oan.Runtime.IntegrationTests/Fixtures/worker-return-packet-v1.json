@@ -1,0 +1,19 @@
+{
+  "workerPacketId": "worker-return-packet://1111111111111111",
+  "handoffPacketId": "worker-handoff-packet://aaaaaaaaaaaaaaaa",
+  "workerSpecies": "RepoBugStewardWorker",
+  "completionState": "Deferred",
+  "resultSummary": "worker-return-summary-v1",
+  "evidenceHandles": [],
+  "reasonCodes": [
+    "NeedsSpecification",
+    "UnknownNotFailure"
+  ],
+  "unsupportedClaimFlags": [],
+  "prohibitedActionAttempts": [],
+  "residueState": "NeedsClassification",
+  "disclosureClass": "OperatorGuarded",
+  "executionClaimed": false,
+  "mutationClaimed": false,
+  "timestampUtc": "2026-03-17T12:00:05+00:00"
+}

@@ -235,6 +235,36 @@ namespace Oan.Cradle
             }
         }
 
+        public async Task<GovernedWorkerReturnReceipt> RecordWorkerReturnAsync(
+            string loopKey,
+            WorkerReturnPacket returnPacket,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(loopKey);
+            ArgumentNullException.ThrowIfNull(returnPacket);
+
+            var journal = RequireGovernanceReceiptJournal();
+            var batch = await journal.ReplayLoopBatchAsync(loopKey, cancellationToken).ConfigureAwait(false);
+            var handoffProjection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch)
+                ?? throw new InvalidOperationException("Worker return recording requires an existing governed worker handoff.");
+            var (handoffPacket, projectedHandoffReceipt) = handoffProjection;
+            var snapshot = GovernanceLoopStateModel.Project(batch, loopKey);
+            var witnessedHandoffReceipt = snapshot.WorkerHandoffReceipts?
+                .LastOrDefault(receipt => string.Equals(receipt.HandoffPacketId, handoffPacket.HandoffPacketId, StringComparison.Ordinal))
+                ?? throw new InvalidOperationException("Worker return recording requires a witnessed worker handoff receipt.");
+            var stage = snapshot.Stage;
+            var validatedReceipt = GovernedWorkerReturnValidator.Validate(
+                loopKey,
+                projectedHandoffReceipt.CMEId,
+                stage,
+                handoffPacket,
+                witnessedHandoffReceipt,
+                returnPacket);
+            var bridge = new GovernedWorkerReturnBridge(_stores.GovernanceTelemetry, journal);
+            return await bridge.WitnessAsync(loopKey, validatedReceipt, snapshot.ReviewRequest, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         private async Task<GovernanceGoldenPathResult> ExecuteGovernanceGoldenPathCoreAsync(
             string loopKey,
             ReturnCandidateReviewRequest reviewRequest,
@@ -729,6 +759,7 @@ namespace Oan.Cradle
             await WitnessWeatherDisclosureAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
             await WitnessOfficeAuthorityAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
             await WitnessOfficeIssuanceAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
+            await WitnessWorkerHandoffAsync(loopKey, receipt.Stage, reviewRequest, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task WitnessCompassDriftAsync(
@@ -819,7 +850,7 @@ namespace Oan.Cradle
             CancellationToken cancellationToken)
         {
             var journal = RequireGovernanceReceiptJournal();
-            var batch = await journal.ReplayBatchAsync(cancellationToken).ConfigureAwait(false);
+            var batch = await journal.ReplayLoopBatchAsync(loopKey, cancellationToken).ConfigureAwait(false);
             var issuanceProjection = IssuedOfficePackageProjector.ProjectForLoop(loopKey, batch);
             if (!issuanceProjection.HasValue)
             {
@@ -832,6 +863,29 @@ namespace Oan.Cradle
                 : projectedReceipt with { Stage = stage };
             var bridge = new GovernedOfficeIssuanceBridge(_stores.GovernanceTelemetry, journal);
             await bridge.WitnessAsync(loopKey, package, receipt, reviewRequest, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        private async Task WitnessWorkerHandoffAsync(
+            string loopKey,
+            GovernanceLoopStage stage,
+            ReturnCandidateReviewRequest reviewRequest,
+            CancellationToken cancellationToken)
+        {
+            var journal = RequireGovernanceReceiptJournal();
+            var batch = await journal.ReplayLoopBatchAsync(loopKey, cancellationToken).ConfigureAwait(false);
+            var handoffProjection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch);
+            if (!handoffProjection.HasValue)
+            {
+                return;
+            }
+
+            var (packet, projectedReceipt) = handoffProjection.Value;
+            var receipt = projectedReceipt.Stage == stage
+                ? projectedReceipt
+                : projectedReceipt with { Stage = stage };
+            var bridge = new GovernedWorkerHandoffBridge(_stores.GovernanceTelemetry, journal);
+            await bridge.WitnessAsync(loopKey, packet, receipt, reviewRequest, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -875,7 +929,9 @@ namespace Oan.Cradle
                 CommunityWeatherPacket: snapshot.CommunityWeatherPacket,
                 WeatherDisclosureReceipts: snapshot.WeatherDisclosureReceipts ?? [],
                 OfficeAuthorityReceipts: snapshot.OfficeAuthorityReceipts ?? [],
-                OfficeIssuanceReceipts: snapshot.OfficeIssuanceReceipts ?? []);
+                OfficeIssuanceReceipts: snapshot.OfficeIssuanceReceipts ?? [],
+                WorkerHandoffReceipts: snapshot.WorkerHandoffReceipts ?? [],
+                WorkerReturnReceipts: snapshot.WorkerReturnReceipts ?? []);
         }
 
         private static GovernanceLoopStatusView BuildStatusView(
@@ -921,7 +977,9 @@ namespace Oan.Cradle
                 CommunityWeatherPacket: snapshot.CommunityWeatherPacket,
                 WeatherDisclosureReceipts: snapshot.WeatherDisclosureReceipts ?? [],
                 OfficeAuthorityReceipts: snapshot.OfficeAuthorityReceipts ?? [],
-                OfficeIssuanceReceipts: snapshot.OfficeIssuanceReceipts ?? []);
+                OfficeIssuanceReceipts: snapshot.OfficeIssuanceReceipts ?? [],
+                WorkerHandoffReceipts: snapshot.WorkerHandoffReceipts ?? [],
+                WorkerReturnReceipts: snapshot.WorkerReturnReceipts ?? []);
         }
 
         private async Task<GovernanceLoopStateSnapshot> EnsureTerminalHopngArtifactsAsync(

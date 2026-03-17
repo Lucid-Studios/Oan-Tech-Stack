@@ -1,0 +1,13 @@
+[
+  "NeedsSpecification",
+  "InsufficientEvidence",
+  "DeferredReview",
+  "AuthorityDenied",
+  "DisclosureScopeViolation",
+  "NoHandleNoAction",
+  "UnsupportedClaim",
+  "BrokenWindow",
+  "UnknownNotFailure",
+  "OfficeNonOverlap",
+  "PromptInjection"
+]

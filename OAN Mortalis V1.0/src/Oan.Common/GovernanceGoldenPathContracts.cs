@@ -45,7 +45,9 @@ public enum GovernanceJournalEntryKind
     InnerWeather = 9,
     WeatherDisclosure = 10,
     OfficeAuthority = 11,
-    OfficeIssuance = 12
+    OfficeIssuance = 12,
+    WorkerHandoff = 13,
+    WorkerReturn = 14
 }
 
 public enum GovernanceActKind
@@ -180,7 +182,9 @@ public sealed record ReturnCandidateReviewRequest(
     IReadOnlyList<GovernedInnerWeatherReceipt>? InnerWeatherReceipts = null,
     IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null,
     IReadOnlyList<GovernedOfficeAuthorityReceipt>? OfficeAuthorityReceipts = null,
-    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null);
+    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null,
+    IReadOnlyList<GovernedWorkerHandoffReceipt>? WorkerHandoffReceipts = null,
+    IReadOnlyList<GovernedWorkerReturnReceipt>? WorkerReturnReceipts = null);
 
 public sealed record GovernanceDecisionReceipt(
     Guid CandidateId,
@@ -261,7 +265,9 @@ public sealed record GovernanceGoldenPathResult(
     CommunityWeatherPacket? CommunityWeatherPacket = null,
     IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null,
     IReadOnlyList<GovernedOfficeAuthorityReceipt>? OfficeAuthorityReceipts = null,
-    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null);
+    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null,
+    IReadOnlyList<GovernedWorkerHandoffReceipt>? WorkerHandoffReceipts = null,
+    IReadOnlyList<GovernedWorkerReturnReceipt>? WorkerReturnReceipts = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -302,7 +308,9 @@ public sealed record GovernanceLoopStatusView(
     CommunityWeatherPacket? CommunityWeatherPacket = null,
     IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null,
     IReadOnlyList<GovernedOfficeAuthorityReceipt>? OfficeAuthorityReceipts = null,
-    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null);
+    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null,
+    IReadOnlyList<GovernedWorkerHandoffReceipt>? WorkerHandoffReceipts = null,
+    IReadOnlyList<GovernedWorkerReturnReceipt>? WorkerReturnReceipts = null);
 
 public sealed record DeferredBacklogItemView(
     string LoopKey,
@@ -400,7 +408,9 @@ public sealed record GovernanceJournalEntry(
     GovernedInnerWeatherReceipt? InnerWeatherReceipt = null,
     GovernedWeatherDisclosureReceipt? WeatherDisclosureReceipt = null,
     GovernedOfficeAuthorityReceipt? OfficeAuthorityReceipt = null,
-    GovernedOfficeIssuanceReceipt? OfficeIssuanceReceipt = null);
+    GovernedOfficeIssuanceReceipt? OfficeIssuanceReceipt = null,
+    GovernedWorkerHandoffReceipt? WorkerHandoffReceipt = null,
+    GovernedWorkerReturnReceipt? WorkerReturnReceipt = null);
 
 public sealed record GovernanceJournalReplayIssue(
     int LineNumber,
@@ -435,7 +445,9 @@ public sealed record GovernanceLoopStateSnapshot(
     CommunityWeatherPacket? CommunityWeatherPacket = null,
     IReadOnlyList<GovernedWeatherDisclosureReceipt>? WeatherDisclosureReceipts = null,
     IReadOnlyList<GovernedOfficeAuthorityReceipt>? OfficeAuthorityReceipts = null,
-    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null);
+    IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null,
+    IReadOnlyList<GovernedWorkerHandoffReceipt>? WorkerHandoffReceipts = null,
+    IReadOnlyList<GovernedWorkerReturnReceipt>? WorkerReturnReceipts = null);
 
 public interface IGovernanceCycleCognitionService
 {
@@ -598,6 +610,8 @@ public static class GovernanceLoopStateModel
         var weatherDisclosureReceipts = new List<GovernedWeatherDisclosureReceipt>();
         var officeAuthorityReceipts = new List<GovernedOfficeAuthorityReceipt>();
         var officeIssuanceReceipts = new List<GovernedOfficeIssuanceReceipt>();
+        var workerHandoffReceipts = new List<GovernedWorkerHandoffReceipt>();
+        var workerReturnReceipts = new List<GovernedWorkerReturnReceipt>();
 
         foreach (var entry in batch.Entries
                      .Where(entry => string.Equals(entry.LoopKey, loopKey, StringComparison.Ordinal)))
@@ -652,6 +666,16 @@ public static class GovernanceLoopStateModel
             if (entry.OfficeIssuanceReceipt is not null)
             {
                 officeIssuanceReceipts.Add(entry.OfficeIssuanceReceipt);
+            }
+
+            if (entry.WorkerHandoffReceipt is not null)
+            {
+                workerHandoffReceipts.Add(entry.WorkerHandoffReceipt);
+            }
+
+            if (entry.WorkerReturnReceipt is not null)
+            {
+                workerReturnReceipts.Add(entry.WorkerReturnReceipt);
             }
 
             if (entry.ActReceipt is not null)
@@ -760,6 +784,14 @@ public static class GovernanceLoopStateModel
             .OrderBy(receipt => receipt.TimestampUtc)
             .ThenBy(receipt => receipt.IssuanceHandle, StringComparer.Ordinal)
             .ToArray();
+        var orderedWorkerHandoffReceipts = workerHandoffReceipts
+            .OrderBy(receipt => receipt.TimestampUtc)
+            .ThenBy(receipt => receipt.HandoffHandle, StringComparer.Ordinal)
+            .ToArray();
+        var orderedWorkerReturnReceipts = workerReturnReceipts
+            .OrderBy(receipt => receipt.TimestampUtc)
+            .ThenBy(receipt => receipt.ReturnHandle, StringComparer.Ordinal)
+            .ToArray();
         if (reviewRequest is not null && orderedCompassDriftReceipts.Length > 0)
         {
             reviewRequest = reviewRequest with
@@ -793,6 +825,20 @@ public static class GovernanceLoopStateModel
             reviewRequest = reviewRequest with
             {
                 OfficeIssuanceReceipts = orderedOfficeIssuanceReceipts
+            };
+        }
+        if (reviewRequest is not null && orderedWorkerHandoffReceipts.Length > 0)
+        {
+            reviewRequest = reviewRequest with
+            {
+                WorkerHandoffReceipts = orderedWorkerHandoffReceipts
+            };
+        }
+        if (reviewRequest is not null && orderedWorkerReturnReceipts.Length > 0)
+        {
+            reviewRequest = reviewRequest with
+            {
+                WorkerReturnReceipts = orderedWorkerReturnReceipts
             };
         }
 
@@ -831,7 +877,9 @@ public static class GovernanceLoopStateModel
             communityWeatherPacket,
             orderedWeatherDisclosureReceipts,
             orderedOfficeAuthorityReceipts,
-            orderedOfficeIssuanceReceipts);
+            orderedOfficeIssuanceReceipts,
+            orderedWorkerHandoffReceipts,
+            orderedWorkerReturnReceipts);
     }
 
     public static GovernanceLoopControlState ClassifyControlState(

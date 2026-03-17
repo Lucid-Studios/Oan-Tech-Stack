@@ -64,6 +64,10 @@ public sealed class GovernedInnerWeatherIntegrationTests
             .Where(entry => entry.OfficeIssuanceReceipt is not null)
             .Select(entry => entry.OfficeIssuanceReceipt!)
             .ToArray();
+        var workerHandoffEntries = replay
+            .Where(entry => entry.WorkerHandoffReceipt is not null)
+            .Select(entry => entry.WorkerHandoffReceipt!)
+            .ToArray();
         var snapshot = GovernanceLoopStateModel.Project(third.LoopKey, replay);
         Assert.NotNull(third.CollapseRoutingDecision);
         var hopngRequest = new GovernedHopngEmissionRequest(
@@ -95,6 +99,9 @@ public sealed class GovernedInnerWeatherIntegrationTests
         var resultIssuanceReceipt = Assert.Single(third.OfficeIssuanceReceipts!);
         var statusIssuanceReceipt = Assert.Single(status.OfficeIssuanceReceipts!);
         var snapshotIssuanceReceipt = Assert.Single(snapshot.OfficeIssuanceReceipts!);
+        var resultHandoffReceipt = Assert.Single(third.WorkerHandoffReceipts!);
+        var statusHandoffReceipt = Assert.Single(status.WorkerHandoffReceipts!);
+        var snapshotHandoffReceipt = Assert.Single(snapshot.WorkerHandoffReceipts!);
         var packet = third.CommunityWeatherPacket;
         Assert.NotNull(packet);
         Assert.Equal(3, resultOfficeReceipts.Length);
@@ -104,6 +111,11 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(3, snapshot.ReviewRequest!.OfficeAuthorityReceipts!.Count);
         Assert.Single(officeIssuanceEntries);
         Assert.Single(snapshot.ReviewRequest!.OfficeIssuanceReceipts!);
+        Assert.Single(workerHandoffEntries);
+        Assert.Single(snapshot.ReviewRequest!.WorkerHandoffReceipts!);
+        Assert.Empty(third.WorkerReturnReceipts ?? Array.Empty<GovernedWorkerReturnReceipt>());
+        Assert.Empty(status.WorkerReturnReceipts ?? Array.Empty<GovernedWorkerReturnReceipt>());
+        Assert.Empty(snapshot.WorkerReturnReceipts ?? Array.Empty<GovernedWorkerReturnReceipt>());
 
         var stewardAuthority = Assert.Single(resultOfficeReceipts.Where(receipt => receipt.Office == InternalGoverningCmeOffice.Steward));
         var fatherAuthority = Assert.Single(resultOfficeReceipts.Where(receipt => receipt.Office == InternalGoverningCmeOffice.Father));
@@ -149,6 +161,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Contains(refs, reference => reference.PointerUri == fatherAuthority.AuthorityHandle);
         Assert.Contains(refs, reference => reference.PointerUri == motherAuthority.AuthorityHandle);
         Assert.DoesNotContain(refs, reference => reference.PointerUri == resultIssuanceReceipt.IssuanceHandle);
+        Assert.DoesNotContain(refs, reference => reference.PointerUri == resultHandoffReceipt.HandoffHandle);
         Assert.Equal(OfficeViewEligibility.OfficeSpecificView, stewardAuthority.ViewEligibility);
         Assert.Equal(OfficeActionEligibility.CheckInAllowed, stewardAuthority.ActionEligibility);
         Assert.Equal(OfficeAuthorityRationaleCode.OfficeSpecificStewardView, stewardAuthority.RationaleCode);
@@ -172,6 +185,18 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(resultIssuanceReceipt.PackageId, statusIssuanceReceipt.PackageId);
         Assert.Equal(resultIssuanceReceipt.PackageId, snapshotIssuanceReceipt.PackageId);
         Assert.Equal(resultIssuanceReceipt.PackageId, Assert.Single(officeIssuanceEntries).PackageId);
+        Assert.Equal(resultHandoffReceipt.HandoffHandle, statusHandoffReceipt.HandoffHandle);
+        Assert.Equal(resultHandoffReceipt.HandoffHandle, snapshotHandoffReceipt.HandoffHandle);
+        Assert.Equal(resultHandoffReceipt.HandoffHandle, Assert.Single(workerHandoffEntries).HandoffHandle);
+        Assert.Equal(InternalGoverningCmeOffice.Steward, resultHandoffReceipt.RequestingOffice);
+        Assert.Equal(ConstructClass.BoundedWorker, resultHandoffReceipt.ConstructClass);
+        Assert.Equal(GovernedWorkerSpecies.RepoBugStewardWorker, resultHandoffReceipt.WorkerSpecies);
+        Assert.Equal(WorkerInstanceMode.RequestOnly, resultHandoffReceipt.WorkerInstanceMode);
+        Assert.Equal(OfficeActionEligibility.CheckInAllowed, resultHandoffReceipt.ActionCeiling);
+        Assert.Equal(CompassVisibilityClass.OperatorGuarded, resultHandoffReceipt.DisclosureClass);
+        Assert.Equal(resultIssuanceReceipt.IssuanceHandle, resultHandoffReceipt.OfficeIssuanceHandle);
+        Assert.Equal(stewardAuthority.AuthorityHandle, resultHandoffReceipt.OfficeAuthorityHandle);
+        Assert.Equal(resultDisclosureReceipt.DisclosureHandle, resultHandoffReceipt.WeatherDisclosureHandle);
         Assert.Contains(
             telemetry.Events.OfType<GovernedInnerWeatherTelemetryEvent>(),
             item => item.InnerWeatherHandle == resultReceipt.InnerWeatherHandle &&
@@ -196,6 +221,12 @@ public sealed class GovernedInnerWeatherIntegrationTests
             item => item.IssuanceHandle == resultIssuanceReceipt.IssuanceHandle &&
                     item.Office == InternalGoverningCmeOffice.Steward &&
                     item.ConstructClass == ConstructClass.IssuedOffice);
+        Assert.Contains(
+            telemetry.Events.OfType<GovernedWorkerHandoffTelemetryEvent>(),
+            item => item.HandoffHandle == resultHandoffReceipt.HandoffHandle &&
+                    item.RequestingOffice == InternalGoverningCmeOffice.Steward &&
+                    item.WorkerSpecies == GovernedWorkerSpecies.RepoBugStewardWorker &&
+                    item.WorkerInstanceMode == WorkerInstanceMode.RequestOnly);
 
 #if LOCAL_HDT_BRIDGE
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
@@ -247,6 +278,115 @@ public sealed class GovernedInnerWeatherIntegrationTests
             "office-authority:steward=checkinallowed/officespecificview,father=viewonly/withheld,mother=viewonly/withheld",
             governingTrafficArtifact.ValidationSummary);
 #endif
+    }
+
+    [Fact]
+    public async Task RecordWorkerReturn_ProjectsValidatedReturnIntoStatusSnapshotAndJournalWithoutHopngWidening()
+    {
+        var telemetry = new RecordingTelemetrySink();
+        var storageTelemetry = new RecordingTelemetrySink();
+        var publicLayer = new PublicLayerService();
+        var mantle = new MantleOfSovereigntyService();
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var identityId = Guid.NewGuid();
+        var request = CreateGoldenPathRequest(identityId);
+
+        await mantle.AppendAsync(
+            new CrypticCustodyAppendRequest(
+                identityId,
+                CustodyDomain: "cMoS",
+                PayloadPointer: "cmos://seed/source",
+                Classification: "seed"));
+
+        var cognition = new FakeGovernanceCognitionSequenceService(
+            CreateApprovedWorkResult(identityId, request, 1, CompassSeedAdvisoryDisposition.Accepted),
+            CreateApprovedWorkResult(identityId, request, 2, CompassSeedAdvisoryDisposition.Deferred),
+            CreateApprovedWorkResult(identityId, request, 3, CompassSeedAdvisoryDisposition.Rejected));
+        var steward = CreateSteward(publicLayer, new CrypticLayerService(), new GelTelemetryAdapter(), journal);
+        var stores = CreateStoreRegistry(
+            telemetry,
+            storageTelemetry,
+            publicLayer,
+            mantle,
+            publicLayer,
+            journal,
+            cognition,
+            steward);
+        var manager = new StackManager(stores);
+
+        await manager.RunGovernanceGoldenPathAsync(request);
+        await manager.RunGovernanceGoldenPathAsync(request);
+        var third = await manager.RunGovernanceGoldenPathAsync(request);
+
+        var handoffReceipt = Assert.Single(third.WorkerHandoffReceipts!);
+        var returnPacket = new WorkerReturnPacket(
+            WorkerPacketId: WorkerGovernanceKeys.CreateWorkerReturnPacketId(
+                third.LoopKey,
+                handoffReceipt.CMEId,
+                handoffReceipt.HandoffPacketId,
+                handoffReceipt.WorkerSpecies),
+            HandoffPacketId: handoffReceipt.HandoffPacketId,
+            WorkerSpecies: handoffReceipt.WorkerSpecies,
+            CompletionState: WorkerCompletionState.Deferred,
+            ResultSummary: "worker-return-summary-v1",
+            EvidenceHandles: [],
+            ReasonCodes:
+            [
+                WorkerReasonCode.NeedsSpecification,
+                WorkerReasonCode.UnknownNotFailure
+            ],
+            UnsupportedClaimFlags: [],
+            ProhibitedActionAttempts: [],
+            ResidueState: WorkerResidueDisposition.NeedsClassification,
+            DisclosureClass: handoffReceipt.DisclosureClass,
+            ExecutionClaimed: false,
+            MutationClaimed: false,
+            TimestampUtc: DateTimeOffset.UtcNow);
+
+        var recordedReturn = await manager.RecordWorkerReturnAsync(third.LoopKey, returnPacket);
+
+        var status = await manager.GetStatusByLoopKeyAsync(third.LoopKey);
+        var replay = await journal.ReplayLoopAsync(third.LoopKey);
+        var returnEntry = Assert.Single(replay.Where(entry => entry.WorkerReturnReceipt is not null));
+        var snapshot = GovernanceLoopStateModel.Project(third.LoopKey, replay);
+        Assert.NotNull(third.CollapseRoutingDecision);
+        var hopngRequest = new GovernedHopngEmissionRequest(
+            LoopKey: third.LoopKey,
+            CandidateId: third.CandidateId,
+            CandidateProvenance: third.DecisionReceipt.CandidateProvenance,
+            Profile: GovernedHopngArtifactProfile.GoverningTrafficEvidence,
+            Stage: snapshot.Stage,
+            RequestedBy: "CradleTek",
+            DecisionReceipt: third.DecisionReceipt,
+            Snapshot: snapshot,
+            JournalEntries: replay,
+            CollapseRoutingDecision: third.CollapseRoutingDecision!);
+        var refs = GovernedHopngEvidenceReferences.Build(hopngRequest, snapshot);
+
+        var statusReturnReceipt = Assert.Single(status.WorkerReturnReceipts!);
+        var snapshotReturnReceipt = Assert.Single(snapshot.WorkerReturnReceipts!);
+        Assert.Single(snapshot.ReviewRequest!.WorkerReturnReceipts!);
+        Assert.True(recordedReturn.Validated);
+        Assert.Null(recordedReturn.ValidationFailureCode);
+        Assert.Equal(recordedReturn.ReturnHandle, statusReturnReceipt.ReturnHandle);
+        Assert.Equal(recordedReturn.ReturnHandle, snapshotReturnReceipt.ReturnHandle);
+        Assert.Equal(recordedReturn.ReturnHandle, returnEntry.WorkerReturnReceipt!.ReturnHandle);
+        Assert.Equal(InternalGoverningCmeOffice.Steward, recordedReturn.RequestingOffice);
+        Assert.Equal(ConstructClass.BoundedWorker, recordedReturn.ConstructClass);
+        Assert.Equal(GovernedWorkerSpecies.RepoBugStewardWorker, recordedReturn.WorkerSpecies);
+        Assert.Equal(WorkerCompletionState.Deferred, recordedReturn.CompletionState);
+        Assert.Contains(WorkerReasonCode.NeedsSpecification, recordedReturn.ReasonCodes);
+        Assert.Contains(WorkerReasonCode.UnknownNotFailure, recordedReturn.ReasonCodes);
+        Assert.Equal(WorkerResidueDisposition.NeedsClassification, recordedReturn.ResidueDisposition);
+        Assert.Equal(CommunityWeatherStatus.Unstable, status.CommunityWeatherPacket!.Status);
+        Assert.DoesNotContain(refs, reference => reference.PointerUri == handoffReceipt.HandoffHandle);
+        Assert.DoesNotContain(refs, reference => reference.PointerUri == recordedReturn.ReturnHandle);
+        Assert.Contains(
+            telemetry.Events.OfType<GovernedWorkerReturnTelemetryEvent>(),
+            item => item.ReturnHandle == recordedReturn.ReturnHandle &&
+                    item.WorkerSpecies == GovernedWorkerSpecies.RepoBugStewardWorker &&
+                    item.CompletionState == WorkerCompletionState.Deferred &&
+                    item.Validated);
     }
 
     private static GovernanceCycleStartRequest CreateGoldenPathRequest(Guid identityId)

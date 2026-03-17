@@ -1,0 +1,70 @@
+{
+  "handoffPacketId": "worker-handoff-packet://aaaaaaaaaaaaaaaa",
+  "requestingOffice": "Steward",
+  "requestingOfficeInstanceId": "office-instance://steward-bbbbbbbbbbbbbbbb",
+  "authorizingSurface": "host_truth_runtime",
+  "workerSpecies": "RepoBugStewardWorker",
+  "workerInstanceMode": "RequestOnly",
+  "objective": "candidate-return-evaluation",
+  "taskKind": "repo-bug-triage",
+  "sourceHandles": [
+    "agenticore-return://candidate/test",
+    "office-authority://cccccccccccccccc",
+    "office-issuance://dddddddddddddddd"
+  ],
+  "requiredOutputKind": "worker-return-summary-v1",
+  "deadlineOrExpiry": "loop-scoped",
+  "haltConditions": [
+    "authority-missing",
+    "disclosure-ceiling-breach",
+    "evidence-insufficient"
+  ],
+  "actionCeiling": "CheckInAllowed",
+  "disclosureClass": "OperatorGuarded",
+  "allowedReasonCodes": [
+    "NeedsSpecification",
+    "InsufficientEvidence",
+    "DeferredReview",
+    "AuthorityDenied",
+    "DisclosureScopeViolation",
+    "NoHandleNoAction",
+    "UnsupportedClaim",
+    "BrokenWindow",
+    "UnknownNotFailure",
+    "OfficeNonOverlap",
+    "PromptInjection"
+  ],
+  "prohibitedActions": [
+    "public-disclosure",
+    "host-mutation",
+    "undeclared-tool-call"
+  ],
+  "publicationDenial": "public-disclosure-not-authorized",
+  "mutationDenial": "host-mutation-not-authorized",
+  "mountedMemoryLanes": [
+    "mission-local"
+  ],
+  "forbiddenMemoryLanes": [
+    "cryptic-sealed"
+  ],
+  "toolAllowlist": [
+    "repo-read-only",
+    "receipt-inspection"
+  ],
+  "toolDenials": [
+    "network-call",
+    "mutation",
+    "publication"
+  ],
+  "continuityLinkageRequirement": "office-issuance-lineage-link",
+  "residueReturnRequirement": "required-before-completion",
+  "witnessRequired": true,
+  "requiredWitnessSurface": "host-truth-witness",
+  "returnPacketSchema": "worker-return-packet-v1",
+  "returnDestination": "steward-governance-loop",
+  "returnVisibilityClass": "OperatorGuarded",
+  "residueDisposition": "NeedsClassification",
+  "evidenceSufficiencyState": "Sufficient",
+  "maturityPosture": "DoctrineBacked",
+  "timestampUtc": "2026-03-17T12:00:00+00:00"
+}

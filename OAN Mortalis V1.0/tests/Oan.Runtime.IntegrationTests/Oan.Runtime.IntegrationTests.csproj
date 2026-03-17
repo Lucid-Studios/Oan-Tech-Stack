@@ -27,6 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Fixtures\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\AgentiCore\AgentiCore.csproj" />
     <ProjectReference Include="..\..\src\CradleTek.Cryptic\CradleTek.Cryptic.csproj" />
     <ProjectReference Include="..\..\src\CradleTek.Mantle\CradleTek.Mantle.csproj" />
