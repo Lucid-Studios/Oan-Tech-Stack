@@ -60,6 +60,10 @@ public sealed class GovernedInnerWeatherIntegrationTests
             .Select(entry => entry.OfficeAuthorityReceipt!)
             .OrderBy(entry => entry.Office)
             .ToArray();
+        var officeIssuanceEntries = replay
+            .Where(entry => entry.OfficeIssuanceReceipt is not null)
+            .Select(entry => entry.OfficeIssuanceReceipt!)
+            .ToArray();
         var snapshot = GovernanceLoopStateModel.Project(third.LoopKey, replay);
         Assert.NotNull(third.CollapseRoutingDecision);
         var hopngRequest = new GovernedHopngEmissionRequest(
@@ -88,6 +92,9 @@ public sealed class GovernedInnerWeatherIntegrationTests
         var snapshotOfficeReceipts = snapshot.OfficeAuthorityReceipts!
             .OrderBy(receipt => receipt.Office)
             .ToArray();
+        var resultIssuanceReceipt = Assert.Single(third.OfficeIssuanceReceipts!);
+        var statusIssuanceReceipt = Assert.Single(status.OfficeIssuanceReceipts!);
+        var snapshotIssuanceReceipt = Assert.Single(snapshot.OfficeIssuanceReceipts!);
         var packet = third.CommunityWeatherPacket;
         Assert.NotNull(packet);
         Assert.Equal(3, resultOfficeReceipts.Length);
@@ -95,6 +102,8 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(3, officeAuthorityEntries.Length);
         Assert.Equal(3, snapshotOfficeReceipts.Length);
         Assert.Equal(3, snapshot.ReviewRequest!.OfficeAuthorityReceipts!.Count);
+        Assert.Single(officeIssuanceEntries);
+        Assert.Single(snapshot.ReviewRequest!.OfficeIssuanceReceipts!);
 
         var stewardAuthority = Assert.Single(resultOfficeReceipts.Where(receipt => receipt.Office == InternalGoverningCmeOffice.Steward));
         var fatherAuthority = Assert.Single(resultOfficeReceipts.Where(receipt => receipt.Office == InternalGoverningCmeOffice.Father));
@@ -139,6 +148,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Contains(refs, reference => reference.PointerUri == stewardAuthority.AuthorityHandle);
         Assert.Contains(refs, reference => reference.PointerUri == fatherAuthority.AuthorityHandle);
         Assert.Contains(refs, reference => reference.PointerUri == motherAuthority.AuthorityHandle);
+        Assert.DoesNotContain(refs, reference => reference.PointerUri == resultIssuanceReceipt.IssuanceHandle);
         Assert.Equal(OfficeViewEligibility.OfficeSpecificView, stewardAuthority.ViewEligibility);
         Assert.Equal(OfficeActionEligibility.CheckInAllowed, stewardAuthority.ActionEligibility);
         Assert.Equal(OfficeAuthorityRationaleCode.OfficeSpecificStewardView, stewardAuthority.RationaleCode);
@@ -152,6 +162,16 @@ public sealed class GovernedInnerWeatherIntegrationTests
         Assert.Equal(OfficeActionEligibility.ViewOnly, motherAuthority.ActionEligibility);
         Assert.Equal(OfficeAuthorityRationaleCode.WithheldForOfficeNotAttached, motherAuthority.RationaleCode);
         Assert.Contains(OfficeAuthorityWithheldMarker.OfficeNotAttached, motherAuthority.WithheldMarkers);
+        Assert.Equal(InternalGoverningCmeOffice.Steward, resultIssuanceReceipt.Office);
+        Assert.Equal(ConstructClass.IssuedOffice, resultIssuanceReceipt.ConstructClass);
+        Assert.Equal(MaturityPosture.DoctrineBacked, resultIssuanceReceipt.MaturityPosture);
+        Assert.Equal(stewardAuthority.AuthorityHandle, resultIssuanceReceipt.OfficeAuthorityHandle);
+        Assert.Equal(resultDisclosureReceipt.DisclosureHandle, resultIssuanceReceipt.WeatherDisclosureHandle);
+        Assert.Equal(resultIssuanceReceipt.IssuanceHandle, statusIssuanceReceipt.IssuanceHandle);
+        Assert.Equal(resultIssuanceReceipt.IssuanceHandle, snapshotIssuanceReceipt.IssuanceHandle);
+        Assert.Equal(resultIssuanceReceipt.PackageId, statusIssuanceReceipt.PackageId);
+        Assert.Equal(resultIssuanceReceipt.PackageId, snapshotIssuanceReceipt.PackageId);
+        Assert.Equal(resultIssuanceReceipt.PackageId, Assert.Single(officeIssuanceEntries).PackageId);
         Assert.Contains(
             telemetry.Events.OfType<GovernedInnerWeatherTelemetryEvent>(),
             item => item.InnerWeatherHandle == resultReceipt.InnerWeatherHandle &&
@@ -171,6 +191,11 @@ public sealed class GovernedInnerWeatherIntegrationTests
             item => item.Office == InternalGoverningCmeOffice.Steward &&
                     item.AuthorityHandle == stewardAuthority.AuthorityHandle &&
                     item.ActionEligibility == OfficeActionEligibility.CheckInAllowed);
+        Assert.Contains(
+            telemetry.Events.OfType<GovernedOfficeIssuanceTelemetryEvent>(),
+            item => item.IssuanceHandle == resultIssuanceReceipt.IssuanceHandle &&
+                    item.Office == InternalGoverningCmeOffice.Steward &&
+                    item.ConstructClass == ConstructClass.IssuedOffice);
 
 #if LOCAL_HDT_BRIDGE
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
