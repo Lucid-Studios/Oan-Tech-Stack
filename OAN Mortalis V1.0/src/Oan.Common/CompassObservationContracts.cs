@@ -167,6 +167,71 @@ public enum WeatherDisclosureRationaleCode
     OperatorGuardedReduction = 5
 }
 
+public enum OfficeAuthoritySurface
+{
+    StewardSurface = 0,
+    CrypticBoundarySurface = 1,
+    PrimeCareSurface = 2,
+    GuardedReviewSurface = 3
+}
+
+public enum OfficeViewEligibility
+{
+    Withheld = 0,
+    CommunityReduced = 1,
+    GuardedView = 2,
+    OfficeSpecificView = 3
+}
+
+public enum OfficeAcknowledgmentEligibility
+{
+    NotAllowed = 0,
+    Allowed = 1
+}
+
+public enum OfficeActionEligibility
+{
+    ViewOnly = 0,
+    AcknowledgeAllowed = 1,
+    CheckInAllowed = 2,
+    EscalationReviewAllowed = 3,
+    HandoffEligible = 4
+}
+
+public enum OfficeAuthorityProhibition
+{
+    MayNotOriginateTruth = 0,
+    MayNotWidenDisclosure = 1,
+    MayNotBypassBond = 2,
+    MayNotOverrideStewardContinuity = 3,
+    MayNotOverrideCrypticBoundary = 4,
+    MayNotOverridePrimeContinuity = 5,
+    MayNotActWithoutHostEligibility = 6,
+    MayNotAuthorPublicDisclosure = 7
+}
+
+public enum OfficeAuthorityWithheldMarker
+{
+    GuardedEvidence = 0,
+    CrypticEvidence = 1,
+    SparseEvidence = 2,
+    BrokenWindow = 3,
+    ContinuityAmbiguous = 4,
+    OfficeNotAttached = 5,
+    BondRequired = 6,
+    ActionNotAuthorized = 7
+}
+
+public enum OfficeAuthorityRationaleCode
+{
+    WithheldForOfficeNotAttached = 0,
+    WithheldForInsufficientEvidence = 1,
+    WithheldForAuthorityRequirement = 2,
+    CommunityReducedForOffice = 3,
+    GuardedViewForOffice = 4,
+    OfficeSpecificStewardView = 5
+}
+
 public enum CompassObservationProvenance
 {
     LispNative = 0,
@@ -294,6 +359,46 @@ public sealed record WeatherDisclosureDecision(
     string InnerWeatherHandle,
     DateTimeOffset TimestampUtc);
 
+public sealed record GoverningOfficeAuthorityContext(
+    InternalGoverningCmeOffice Office,
+    bool OfficeAttached,
+    bool BondedConfirmed,
+    bool GuardedReviewConfirmed);
+
+public sealed record GoverningOfficeAuthorityAssessment(
+    string CMEId,
+    InternalGoverningCmeOffice Office,
+    OfficeAuthoritySurface AuthoritySurface,
+    OfficeViewEligibility ViewEligibility,
+    OfficeAcknowledgmentEligibility AcknowledgmentEligibility,
+    OfficeActionEligibility ActionEligibility,
+    EvidenceSufficiencyState EvidenceSufficiencyState,
+    WindowIntegrityState WindowIntegrityState,
+    WeatherDisclosureScope DisclosureScope,
+    bool OfficeAttached,
+    bool BondedConfirmed,
+    bool GuardedReviewConfirmed,
+    CommunityWeatherPacket CommunityWeatherPacket,
+    IReadOnlyList<StewardAttentionCause> SourceReasonCodes,
+    IReadOnlyList<WeatherWithheldMarker> SourceWithheldMarkers,
+    IReadOnlyList<OfficeAuthorityProhibition> Prohibitions,
+    string WeatherDisclosureHandle,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GoverningOfficeAuthorityView(
+    InternalGoverningCmeOffice Office,
+    OfficeAuthoritySurface AuthoritySurface,
+    OfficeViewEligibility ViewEligibility,
+    OfficeAcknowledgmentEligibility AcknowledgmentEligibility,
+    OfficeActionEligibility ActionEligibility,
+    CommunityWeatherPacket? CommunityWeatherPacket,
+    IReadOnlyList<StewardAttentionCause> AllowedReasonCodes,
+    IReadOnlyList<OfficeAuthorityWithheldMarker> WithheldMarkers,
+    IReadOnlyList<OfficeAuthorityProhibition> Prohibitions,
+    OfficeAuthorityRationaleCode RationaleCode,
+    string WeatherDisclosureHandle,
+    DateTimeOffset TimestampUtc);
+
 public sealed record GovernedCompassObservationReceipt(
     string WitnessHandle,
     GovernanceLoopStage Stage,
@@ -390,6 +495,27 @@ public sealed record GovernedWeatherDisclosureReceipt(
     string InnerWeatherHandle,
     DateTimeOffset TimestampUtc);
 
+public sealed record GovernedOfficeAuthorityReceipt(
+    string AuthorityHandle,
+    string LoopKey,
+    GovernanceLoopStage Stage,
+    string CMEId,
+    InternalGoverningCmeOffice Office,
+    OfficeAuthoritySurface AuthoritySurface,
+    OfficeViewEligibility ViewEligibility,
+    OfficeAcknowledgmentEligibility AcknowledgmentEligibility,
+    OfficeActionEligibility ActionEligibility,
+    EvidenceSufficiencyState EvidenceSufficiencyState,
+    WeatherDisclosureScope DisclosureScope,
+    CommunityWeatherPacket? CommunityWeatherPacket,
+    IReadOnlyList<StewardAttentionCause> AllowedReasonCodes,
+    IReadOnlyList<OfficeAuthorityWithheldMarker> WithheldMarkers,
+    IReadOnlyList<OfficeAuthorityProhibition> Prohibitions,
+    OfficeAuthorityRationaleCode RationaleCode,
+    string WitnessedBy,
+    string WeatherDisclosureHandle,
+    DateTimeOffset TimestampUtc);
+
 public static class CompassObservationKeys
 {
     public static string CreateObservationHandle(
@@ -472,6 +598,20 @@ public static class CompassObservationKeys
         ArgumentException.ThrowIfNullOrWhiteSpace(innerWeatherHandle);
 
         return $"weather-disclosure://{ComputeDigest(loopKey, cmeId, routingState.ToString(), disclosureScope.ToString(), innerWeatherHandle)}";
+    }
+
+    public static string CreateOfficeAuthorityHandle(
+        string loopKey,
+        string cmeId,
+        InternalGoverningCmeOffice office,
+        OfficeActionEligibility actionEligibility,
+        string weatherDisclosureHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(loopKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(weatherDisclosureHandle);
+
+        return $"office-authority://{ComputeDigest(loopKey, cmeId, office.ToString(), actionEligibility.ToString(), weatherDisclosureHandle)}";
     }
 
     private static string ComputeDigest(params string[] parts)

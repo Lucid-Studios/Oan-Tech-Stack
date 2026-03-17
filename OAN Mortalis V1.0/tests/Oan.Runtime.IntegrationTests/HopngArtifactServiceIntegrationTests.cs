@@ -12,7 +12,8 @@ public sealed class HopngArtifactServiceIntegrationTests
         var service = new UnavailableHopngArtifactService();
         var request = CreateEmissionRequest(
             includeInnerWeatherReceipts: true,
-            includeWeatherDisclosureReceipts: true);
+            includeWeatherDisclosureReceipts: true,
+            includeOfficeAuthorityReceipts: true);
 
         var receipt = await service.EmitAsync(request);
 
@@ -28,6 +29,9 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Contains("disclosure-scope:steward", receipt.ValidationSummary);
         Assert.Contains("evidence-sufficiency:sufficient", receipt.ValidationSummary);
         Assert.Contains("withheld:guardedevidence", receipt.ValidationSummary);
+        Assert.Contains(
+            "office-authority:steward=checkinallowed/officespecificview,father=viewonly/withheld,mother=viewonly/withheld",
+            receipt.ValidationSummary);
     }
 
     [Fact]
@@ -38,7 +42,8 @@ public sealed class HopngArtifactServiceIntegrationTests
             includeCompassObservationReceipts: true,
             includeCompassDriftReceipts: true,
             includeInnerWeatherReceipts: true,
-            includeWeatherDisclosureReceipts: true);
+            includeWeatherDisclosureReceipts: true,
+            includeOfficeAuthorityReceipts: true);
 
         var refs = GovernedHopngEvidenceReferences.Build(request, request.Snapshot);
 
@@ -50,6 +55,9 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Contains(refs, reference => reference.PointerUri == "compass-drift://9999999999999999");
         Assert.Contains(refs, reference => reference.PointerUri == "inner-weather://1212121212121212");
         Assert.Contains(refs, reference => reference.PointerUri == "weather-disclosure://5656565656565656");
+        Assert.Contains(refs, reference => reference.PointerUri == "office-authority://7878787878787878");
+        Assert.Contains(refs, reference => reference.PointerUri == "office-authority://8989898989898989");
+        Assert.Contains(refs, reference => reference.PointerUri == "office-authority://9090909090909090");
     }
 
 #if LOCAL_HDT_BRIDGE
@@ -58,7 +66,8 @@ public sealed class HopngArtifactServiceIntegrationTests
     {
         var request = CreateEmissionRequest(
             includeInnerWeatherReceipts: true,
-            includeWeatherDisclosureReceipts: true);
+            includeWeatherDisclosureReceipts: true,
+            includeOfficeAuthorityReceipts: true);
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-hopng-disclosure-parity");
         var localService = new LocalHdtHopngArtifactService(outputRoot);
         var fallbackService = new UnavailableHopngArtifactService();
@@ -88,6 +97,12 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Contains("disclosure-scope:steward", fallbackReceipt.ValidationSummary);
         Assert.Contains("evidence-sufficiency:sufficient", fallbackReceipt.ValidationSummary);
         Assert.Contains("withheld:guardedevidence", fallbackReceipt.ValidationSummary);
+        Assert.Contains(
+            "office-authority:steward=checkinallowed/officespecificview,father=viewonly/withheld,mother=viewonly/withheld",
+            localReceipt.ValidationSummary);
+        Assert.Contains(
+            "office-authority:steward=checkinallowed/officespecificview,father=viewonly/withheld,mother=viewonly/withheld",
+            fallbackReceipt.ValidationSummary);
     }
 #endif
 
@@ -96,7 +111,8 @@ public sealed class HopngArtifactServiceIntegrationTests
         bool includeCompassObservationReceipts = false,
         bool includeCompassDriftReceipts = false,
         bool includeInnerWeatherReceipts = false,
-        bool includeWeatherDisclosureReceipts = false)
+        bool includeWeatherDisclosureReceipts = false,
+        bool includeOfficeAuthorityReceipts = false)
     {
         var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
             contentHandle: "agenticore-return://candidate/test",
@@ -188,7 +204,8 @@ public sealed class HopngArtifactServiceIntegrationTests
                     VisibilityClass: CompassVisibilityClass.CommunityLegible,
                     TimestampUtc: DateTimeOffset.UtcNow)
                 : null,
-            WeatherDisclosureReceipts: includeWeatherDisclosureReceipts ? [CreateWeatherDisclosureReceipt()] : []);
+            WeatherDisclosureReceipts: includeWeatherDisclosureReceipts ? [CreateWeatherDisclosureReceipt()] : [],
+            OfficeAuthorityReceipts: includeOfficeAuthorityReceipts ? CreateOfficeAuthorityReceipts() : []);
 
         return new GovernedHopngEmissionRequest(
             LoopKey: snapshot.LoopKey,
@@ -383,5 +400,114 @@ public sealed class HopngArtifactServiceIntegrationTests
             WitnessedBy: "CradleTek",
             InnerWeatherHandle: "inner-weather://1212121212121212",
             TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
+    private static IReadOnlyList<GovernedOfficeAuthorityReceipt> CreateOfficeAuthorityReceipts()
+    {
+        return
+        [
+            new GovernedOfficeAuthorityReceipt(
+                AuthorityHandle: "office-authority://7878787878787878",
+                LoopKey: "loop:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:test",
+                Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+                CMEId: "cme-runtime",
+                Office: InternalGoverningCmeOffice.Steward,
+                AuthoritySurface: OfficeAuthoritySurface.StewardSurface,
+                ViewEligibility: OfficeViewEligibility.OfficeSpecificView,
+                AcknowledgmentEligibility: OfficeAcknowledgmentEligibility.Allowed,
+                ActionEligibility: OfficeActionEligibility.CheckInAllowed,
+                EvidenceSufficiencyState: EvidenceSufficiencyState.Sufficient,
+                DisclosureScope: WeatherDisclosureScope.Steward,
+                CommunityWeatherPacket: new CommunityWeatherPacket(
+                    Status: CommunityWeatherStatus.Unstable,
+                    StewardAttention: CommunityStewardAttentionState.Recommended,
+                    AnchorState: CompassDriftState.Weakened,
+                    VisibilityClass: CompassVisibilityClass.CommunityLegible,
+                    TimestampUtc: DateTimeOffset.UtcNow),
+                AllowedReasonCodes:
+                [
+                    StewardAttentionCause.DriftWeakening,
+                    StewardAttentionCause.ResiduePersistence
+                ],
+                WithheldMarkers:
+                [
+                    OfficeAuthorityWithheldMarker.GuardedEvidence
+                ],
+                Prohibitions:
+                [
+                    OfficeAuthorityProhibition.MayNotOriginateTruth,
+                    OfficeAuthorityProhibition.MayNotWidenDisclosure,
+                    OfficeAuthorityProhibition.MayNotOverrideCrypticBoundary,
+                    OfficeAuthorityProhibition.MayNotOverridePrimeContinuity
+                ],
+                RationaleCode: OfficeAuthorityRationaleCode.OfficeSpecificStewardView,
+                WitnessedBy: "CradleTek",
+                WeatherDisclosureHandle: "weather-disclosure://5656565656565656",
+                TimestampUtc: DateTimeOffset.UtcNow),
+            new GovernedOfficeAuthorityReceipt(
+                AuthorityHandle: "office-authority://8989898989898989",
+                LoopKey: "loop:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:test",
+                Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+                CMEId: "cme-runtime",
+                Office: InternalGoverningCmeOffice.Father,
+                AuthoritySurface: OfficeAuthoritySurface.CrypticBoundarySurface,
+                ViewEligibility: OfficeViewEligibility.Withheld,
+                AcknowledgmentEligibility: OfficeAcknowledgmentEligibility.NotAllowed,
+                ActionEligibility: OfficeActionEligibility.ViewOnly,
+                EvidenceSufficiencyState: EvidenceSufficiencyState.Sufficient,
+                DisclosureScope: WeatherDisclosureScope.Steward,
+                CommunityWeatherPacket: null,
+                AllowedReasonCodes: [],
+                WithheldMarkers:
+                [
+                    OfficeAuthorityWithheldMarker.GuardedEvidence,
+                    OfficeAuthorityWithheldMarker.OfficeNotAttached
+                ],
+                Prohibitions:
+                [
+                    OfficeAuthorityProhibition.MayNotOriginateTruth,
+                    OfficeAuthorityProhibition.MayNotWidenDisclosure,
+                    OfficeAuthorityProhibition.MayNotOverrideStewardContinuity,
+                    OfficeAuthorityProhibition.MayNotOverridePrimeContinuity,
+                    OfficeAuthorityProhibition.MayNotAuthorPublicDisclosure,
+                    OfficeAuthorityProhibition.MayNotActWithoutHostEligibility
+                ],
+                RationaleCode: OfficeAuthorityRationaleCode.WithheldForOfficeNotAttached,
+                WitnessedBy: "CradleTek",
+                WeatherDisclosureHandle: "weather-disclosure://5656565656565656",
+                TimestampUtc: DateTimeOffset.UtcNow),
+            new GovernedOfficeAuthorityReceipt(
+                AuthorityHandle: "office-authority://9090909090909090",
+                LoopKey: "loop:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:test",
+                Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+                CMEId: "cme-runtime",
+                Office: InternalGoverningCmeOffice.Mother,
+                AuthoritySurface: OfficeAuthoritySurface.PrimeCareSurface,
+                ViewEligibility: OfficeViewEligibility.Withheld,
+                AcknowledgmentEligibility: OfficeAcknowledgmentEligibility.NotAllowed,
+                ActionEligibility: OfficeActionEligibility.ViewOnly,
+                EvidenceSufficiencyState: EvidenceSufficiencyState.Sufficient,
+                DisclosureScope: WeatherDisclosureScope.Steward,
+                CommunityWeatherPacket: null,
+                AllowedReasonCodes: [],
+                WithheldMarkers:
+                [
+                    OfficeAuthorityWithheldMarker.GuardedEvidence,
+                    OfficeAuthorityWithheldMarker.OfficeNotAttached
+                ],
+                Prohibitions:
+                [
+                    OfficeAuthorityProhibition.MayNotOriginateTruth,
+                    OfficeAuthorityProhibition.MayNotWidenDisclosure,
+                    OfficeAuthorityProhibition.MayNotOverrideStewardContinuity,
+                    OfficeAuthorityProhibition.MayNotOverrideCrypticBoundary,
+                    OfficeAuthorityProhibition.MayNotAuthorPublicDisclosure,
+                    OfficeAuthorityProhibition.MayNotActWithoutHostEligibility
+                ],
+                RationaleCode: OfficeAuthorityRationaleCode.WithheldForOfficeNotAttached,
+                WitnessedBy: "CradleTek",
+                WeatherDisclosureHandle: "weather-disclosure://5656565656565656",
+                TimestampUtc: DateTimeOffset.UtcNow)
+        ];
     }
 }

@@ -67,6 +67,7 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
             var outcome = validation.Errors.Count == 0
                 ? GovernedHopngArtifactOutcome.Created
                 : GovernedHopngArtifactOutcome.FailedValidation;
+            var officeSummary = BuildOfficeAuthoritySummary(request.Snapshot);
             var projectionSummary = request.Profile == GovernedHopngArtifactProfile.GoverningTrafficEvidence
                 ? BuildProjectionSummary(artifact, validation)
                 : BuildPhaseSummary(artifact, validation);
@@ -84,8 +85,8 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
                 ArtifactId: artifact.Manifest.ArtifactId,
                 ManifestPath: artifact.Layout.ManifestPath,
                 ProjectionPath: artifact.Layout.ProjectionPath,
-                ValidationSummary: $"validation-errors:{validation.Errors.Count}",
-                ProfileSummary: projectionSummary,
+                ValidationSummary: $"validation-errors:{validation.Errors.Count};{officeSummary}",
+                ProfileSummary: $"{projectionSummary};{officeSummary}",
                 FailureCode: outcome == GovernedHopngArtifactOutcome.Created ? null : "hopng-validation-failed"));
         }
         catch (Exception ex)
@@ -808,6 +809,29 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
     {
         var render = _phaseStack.Render(artifact, validation, view: "prime");
         return $"phase-stack:{render.Status};slices:{render.PhaseSliceCount};issues:{render.Issues.Count}";
+    }
+
+    private static string BuildOfficeAuthoritySummary(GovernanceLoopStateSnapshot snapshot)
+    {
+        var receipts = snapshot.OfficeAuthorityReceipts ?? [];
+        if (receipts.Count == 0)
+        {
+            return "office-authority:none";
+        }
+
+        var officeStates = receipts
+            .GroupBy(receipt => receipt.Office)
+            .OrderBy(group => group.Key)
+            .Select(group =>
+            {
+                var latest = group
+                    .OrderBy(receipt => receipt.TimestampUtc)
+                    .ThenBy(receipt => receipt.AuthorityHandle, StringComparer.Ordinal)
+                    .Last();
+                return $"{latest.Office.ToString().ToLowerInvariant()}={latest.ActionEligibility.ToString().ToLowerInvariant().Replace('_', '-')}/{latest.ViewEligibility.ToString().ToLowerInvariant().Replace('_', '-')}";
+            });
+
+        return $"office-authority:{string.Join(",", officeStates)}";
     }
 
     private static string GetCommunityWeatherPath(HopngArtifactLayout layout)
