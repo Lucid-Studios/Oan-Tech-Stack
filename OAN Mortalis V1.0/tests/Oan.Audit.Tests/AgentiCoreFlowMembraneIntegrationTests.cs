@@ -77,9 +77,10 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.NotNull(result.CompassObservation);
         Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation!.ActiveBasin);
         Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation.CompetingBasin);
-        Assert.False(result.CompassObservation.SeedAdvisory!.Accepted);
-        Assert.Equal(CompassObservationProvenance.LispNative, result.CompassObservation.Provenance);
-        Assert.Equal(CompassOeCoePosture.Unresolved, result.CompassObservation.OeCoePosture);
+        Assert.True(result.CompassObservation.SeedAdvisory!.Accepted);
+        Assert.Equal(CompassSeedAdvisoryDisposition.Accepted, result.CompassObservation.SeedAdvisory.Disposition);
+        Assert.Equal(CompassObservationProvenance.Braided, result.CompassObservation.Provenance);
+        Assert.Equal(CompassOeCoePosture.CoeDominant, result.CompassObservation.OeCoePosture);
         Assert.Equal(CompassSelfTouchClass.ValidationTouch, result.CompassObservation.SelfTouchClass);
         Assert.Equal(CompassAnchorState.Weakened, result.CompassObservation.AnchorState);
         Assert.Equal(["step-a", "step-b"], result.SymbolicTrace.Steps);
@@ -179,11 +180,14 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.NotNull(result.CompassObservation);
         Assert.Equal(CompassDoctrineBasin.BoundedLocalityContinuity, result.CompassObservation!.ActiveBasin);
         Assert.Equal(CompassDoctrineBasin.FluidContinuityLaw, result.CompassObservation.CompetingBasin);
-        Assert.False(result.CompassObservation.SeedAdvisory!.Accepted);
-        Assert.Equal(CompassObservationProvenance.LispNative, result.CompassObservation.Provenance);
-        Assert.Equal(CompassOeCoePosture.Unresolved, result.CompassObservation.OeCoePosture);
+        Assert.True(result.CompassObservation.SeedAdvisory!.Accepted);
+        Assert.Equal(CompassDoctrineBasin.BoundedLocalityContinuity, result.CompassObservation.SeedAdvisory.SuggestedActiveBasin);
+        Assert.Equal(CompassDoctrineBasin.FluidContinuityLaw, result.CompassObservation.SeedAdvisory.SuggestedCompetingBasin);
+        Assert.Equal(CompassSeedAdvisoryDisposition.Accepted, result.CompassObservation.SeedAdvisory.Disposition);
+        Assert.Equal(CompassObservationProvenance.Braided, result.CompassObservation.Provenance);
+        Assert.Equal(CompassOeCoePosture.CoeDominant, result.CompassObservation.OeCoePosture);
         Assert.Equal(CompassSelfTouchClass.ValidationTouch, result.CompassObservation.SelfTouchClass);
-        Assert.Equal(CompassAnchorState.Weakened, result.CompassObservation.AnchorState);
+        Assert.Equal(CompassAnchorState.Held, result.CompassObservation.AnchorState);
     }
 
     private static MediatedSelfStateContour CreateMediatedSelfState(string cmeId, string policyHandle) =>
@@ -239,7 +243,10 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
     {
         if (request.RequestUri?.AbsolutePath == "/classify")
         {
-            var json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74}";
+            using var document = JsonDocument.Parse(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            var context = document.RootElement.GetProperty("context").GetString() ?? string.Empty;
+            var domain = document.RootElement.GetProperty("opal_constraints").GetProperty("domain").GetString() ?? string.Empty;
+            var json = BuildClassifyResponseJson(context, domain);
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -260,6 +267,76 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"{}\"}}", Encoding.UTF8, "application/json")
         });
     }
+
+    private static string BuildClassifyResponseJson(string context, string domain)
+    {
+        var activeBasin = ResolveSuggestedBasin($"{context} {domain}");
+        var competingBasin = activeBasin switch
+        {
+            CompassDoctrineBasin.BoundedLocalityContinuity => CompassDoctrineBasin.FluidContinuityLaw,
+            CompassDoctrineBasin.FluidContinuityLaw => CompassDoctrineBasin.BoundedLocalityContinuity,
+            _ => CompassDoctrineBasin.Unknown
+        };
+        var anchorState = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+            ? CompassAnchorState.Held
+            : CompassAnchorState.Weakened;
+        var payload = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+            ? "bounded-locality continuity locality witness"
+            : "bounded-payload";
+        var justification = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+            ? "bounded-locality continuity remains dominant"
+            : "no stable continuity basin was selected";
+
+        return JsonSerializer.Serialize(new
+        {
+            decision = "bounded-classify",
+            payload,
+            confidence = 0.74,
+            governance = new
+            {
+                state = "QUERY",
+                trace = "response-ready",
+                content = payload
+            },
+            compass_advisory = new
+            {
+                suggested_active_basin = ToCompassToken(activeBasin),
+                suggested_competing_basin = ToCompassToken(competingBasin),
+                suggested_anchor_state = anchorState.ToString().ToUpperInvariant(),
+                suggested_self_touch_class = "VALIDATION_TOUCH",
+                confidence = 0.71,
+                justification
+            }
+        });
+    }
+
+    private static CompassDoctrineBasin ResolveSuggestedBasin(string value)
+    {
+        var lowered = value.ToLowerInvariant();
+        if (lowered.Contains("bounded-locality continuity", StringComparison.Ordinal) ||
+            lowered.Contains("bounded locality continuity", StringComparison.Ordinal) ||
+            (lowered.Contains("locality", StringComparison.Ordinal) && lowered.Contains("continuity", StringComparison.Ordinal)))
+        {
+            return CompassDoctrineBasin.BoundedLocalityContinuity;
+        }
+
+        if (lowered.Contains("fluid continuity law", StringComparison.Ordinal) ||
+            lowered.Contains("fluid continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.FluidContinuityLaw;
+        }
+
+        return CompassDoctrineBasin.Unknown;
+    }
+
+    private static string ToCompassToken(CompassDoctrineBasin basin) => basin switch
+    {
+        CompassDoctrineBasin.BoundedLocalityContinuity => "BOUNDED_LOCALITY_CONTINUITY",
+        CompassDoctrineBasin.FluidContinuityLaw => "FLUID_CONTINUITY_LAW",
+        CompassDoctrineBasin.IdentityContinuity => "IDENTITY_CONTINUITY",
+        CompassDoctrineBasin.GeneralContinuityDiscourse => "GENERAL_CONTINUITY_DISCOURSE",
+        _ => "UNKNOWN"
+    };
 
     private sealed class StubCognitionEngine : ICognitionEngine
     {

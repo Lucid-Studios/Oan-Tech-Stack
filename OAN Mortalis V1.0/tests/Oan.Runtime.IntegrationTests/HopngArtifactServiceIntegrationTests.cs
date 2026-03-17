@@ -199,6 +199,13 @@ public sealed class HopngArtifactServiceIntegrationTests
             AdvisoryDecision: "classify-ok",
             AdvisoryTrace: "classify-response-ready",
             AdvisoryConfidence: 0.71,
+            AdvisorySuggestedActiveBasin: CompassDoctrineBasin.BoundedLocalityContinuity,
+            AdvisorySuggestedCompetingBasin: CompassDoctrineBasin.FluidContinuityLaw,
+            AdvisorySuggestedAnchorState: CompassAnchorState.Held,
+            AdvisorySuggestedSelfTouchClass: CompassSelfTouchClass.ValidationTouch,
+            AdvisoryDisposition: CompassSeedAdvisoryDisposition.Accepted,
+            AdvisoryDispositionReason: "host-accepted",
+            AdvisoryJustification: "bounded-locality continuity remains dominant",
             TimestampUtc: DateTimeOffset.UtcNow);
     }
 }

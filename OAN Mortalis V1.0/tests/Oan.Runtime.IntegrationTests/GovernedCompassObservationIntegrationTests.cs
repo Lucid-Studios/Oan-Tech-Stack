@@ -62,7 +62,14 @@ public sealed class GovernedCompassObservationIntegrationTests
                 Decision: "classify-ok",
                 Trace: "classify-response-ready",
                 Confidence: 0.71,
-                Payload: "bounded-locality continuity"),
+                Payload: "bounded-locality continuity",
+                SuggestedActiveBasin: CompassDoctrineBasin.BoundedLocalityContinuity,
+                SuggestedCompetingBasin: CompassDoctrineBasin.FluidContinuityLaw,
+                SuggestedAnchorState: CompassAnchorState.Held,
+                SuggestedSelfTouchClass: CompassSelfTouchClass.ValidationTouch,
+                Disposition: CompassSeedAdvisoryDisposition.Accepted,
+                DispositionReason: "host-accepted",
+                Justification: "bounded-locality continuity remains dominant"),
             TimestampUtc: DateTimeOffset.UtcNow);
     }
 

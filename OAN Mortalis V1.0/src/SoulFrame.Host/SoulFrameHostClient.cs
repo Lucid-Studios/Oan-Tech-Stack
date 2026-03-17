@@ -203,6 +203,15 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                     AllowedStates = request.GovernanceProtocol.AllowedStates
                         .Select(SoulFrameGovernedEmissionStateTokens.ToToken)
                         .ToArray()
+                },
+            CompassAdvisory = request.CompassAdvisory is null
+                ? null
+                : new SoulFrameApiCompassAdvisoryRequest
+                {
+                    Version = request.CompassAdvisory.Version,
+                    RequireStructuredAdvisory = request.CompassAdvisory.RequireStructuredAdvisory,
+                    TargetActiveBasin = request.CompassAdvisory.TargetActiveBasin.ToString(),
+                    ExcludedCompetingBasin = request.CompassAdvisory.ExcludedCompetingBasin.ToString()
                 }
         };
 
@@ -355,7 +364,42 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
             Decision = payload?.Decision ?? DefaultDecision(request.Task, governance.State),
             Payload = payload?.Payload ?? governance.Content ?? request.Context,
             Confidence = payload?.Confidence ?? DefaultConfidence(governance.State),
-            Governance = governance
+            Governance = governance,
+            CompassAdvisory = ParseCompassAdvisory(request, payload)
+        };
+    }
+
+    private static SoulFrameCompassAdvisoryResponse? ParseCompassAdvisory(
+        SoulFrameInferenceRequest request,
+        SoulFrameApiResponse? payload)
+    {
+        var contract = request.CompassAdvisory;
+        if (payload?.CompassAdvisory is null)
+        {
+            if (contract?.RequireStructuredAdvisory == true)
+            {
+                throw new InvalidOperationException("invalid-governed-emission:missing-compass-advisory");
+            }
+
+            return null;
+        }
+
+        if (!TryParseDoctrineBasin(payload.CompassAdvisory.SuggestedActiveBasin, out var suggestedActiveBasin) ||
+            !TryParseDoctrineBasin(payload.CompassAdvisory.SuggestedCompetingBasin, out var suggestedCompetingBasin) ||
+            !TryParseAnchorState(payload.CompassAdvisory.SuggestedAnchorState, out var suggestedAnchorState) ||
+            !TryParseSelfTouchClass(payload.CompassAdvisory.SuggestedSelfTouchClass, out var suggestedSelfTouchClass))
+        {
+            throw new InvalidOperationException("invalid-governed-emission:invalid-compass-advisory");
+        }
+
+        return new SoulFrameCompassAdvisoryResponse
+        {
+            SuggestedActiveBasin = suggestedActiveBasin,
+            SuggestedCompetingBasin = suggestedCompetingBasin,
+            SuggestedAnchorState = suggestedAnchorState,
+            SuggestedSelfTouchClass = suggestedSelfTouchClass,
+            Confidence = payload.CompassAdvisory.Confidence ?? 0.0,
+            Justification = payload.CompassAdvisory.Justification
         };
     }
 
@@ -454,9 +498,61 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                 State = state,
                 Trace = trace,
                 Content = null
-            }
+            },
+            CompassAdvisory = null
         };
     }
+
+    private static bool TryParseDoctrineBasin(string? token, out CompassDoctrineBasin basin)
+    {
+        var normalized = NormalizeToken(token);
+        basin = normalized switch
+        {
+            "BOUNDED_LOCALITY_CONTINUITY" => CompassDoctrineBasin.BoundedLocalityContinuity,
+            "FLUID_CONTINUITY_LAW" => CompassDoctrineBasin.FluidContinuityLaw,
+            "IDENTITY_CONTINUITY" => CompassDoctrineBasin.IdentityContinuity,
+            "GENERAL_CONTINUITY_DISCOURSE" => CompassDoctrineBasin.GeneralContinuityDiscourse,
+            "UNKNOWN" => CompassDoctrineBasin.Unknown,
+            _ => (CompassDoctrineBasin)(-1)
+        };
+
+        return Enum.IsDefined(basin);
+    }
+
+    private static bool TryParseAnchorState(string? token, out CompassAnchorState anchorState)
+    {
+        var normalized = NormalizeToken(token);
+        anchorState = normalized switch
+        {
+            "HELD" => CompassAnchorState.Held,
+            "WEAKENED" => CompassAnchorState.Weakened,
+            "LOST" => CompassAnchorState.Lost,
+            "UNKNOWN" => CompassAnchorState.Unknown,
+            _ => (CompassAnchorState)(-1)
+        };
+
+        return Enum.IsDefined(anchorState);
+    }
+
+    private static bool TryParseSelfTouchClass(string? token, out CompassSelfTouchClass selfTouchClass)
+    {
+        var normalized = NormalizeToken(token);
+        selfTouchClass = normalized switch
+        {
+            "NO_TOUCH" => CompassSelfTouchClass.NoTouch,
+            "VALIDATION_TOUCH" => CompassSelfTouchClass.ValidationTouch,
+            "HOT_CLAIM_TOUCH" => CompassSelfTouchClass.HotClaimTouch,
+            "BOUNDARY_CONTACT" => CompassSelfTouchClass.BoundaryContact,
+            _ => (CompassSelfTouchClass)(-1)
+        };
+
+        return Enum.IsDefined(selfTouchClass);
+    }
+
+    private static string NormalizeToken(string? token) =>
+        string.IsNullOrWhiteSpace(token)
+            ? string.Empty
+            : token.Trim().Replace("-", "_", StringComparison.Ordinal).ToUpperInvariant();
 
     private static Uri ResolveHostEndpoint(string? hostEndpoint)
     {
@@ -500,6 +596,9 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
         [JsonPropertyName("governance_protocol")]
         public SoulFrameApiGovernanceProtocol? GovernanceProtocol { get; init; }
+
+        [JsonPropertyName("compass_advisory")]
+        public SoulFrameApiCompassAdvisoryRequest? CompassAdvisory { get; init; }
     }
 
     private sealed class SoulFrameApiConstraints
@@ -527,6 +626,9 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
         [JsonPropertyName("governance")]
         public SoulFrameApiGovernanceEnvelope? Governance { get; init; }
+
+        [JsonPropertyName("compass_advisory")]
+        public SoulFrameApiCompassAdvisoryResponse? CompassAdvisory { get; init; }
     }
 
     private sealed class SoulFrameApiGovernanceProtocol
@@ -560,5 +662,41 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
         [JsonPropertyName("content")]
         public string? Content { get; init; }
+    }
+
+    private sealed class SoulFrameApiCompassAdvisoryRequest
+    {
+        [JsonPropertyName("version")]
+        public required string Version { get; init; }
+
+        [JsonPropertyName("require_structured_advisory")]
+        public required bool RequireStructuredAdvisory { get; init; }
+
+        [JsonPropertyName("target_active_basin")]
+        public required string TargetActiveBasin { get; init; }
+
+        [JsonPropertyName("excluded_competing_basin")]
+        public required string ExcludedCompetingBasin { get; init; }
+    }
+
+    private sealed class SoulFrameApiCompassAdvisoryResponse
+    {
+        [JsonPropertyName("suggested_active_basin")]
+        public string? SuggestedActiveBasin { get; init; }
+
+        [JsonPropertyName("suggested_competing_basin")]
+        public string? SuggestedCompetingBasin { get; init; }
+
+        [JsonPropertyName("suggested_anchor_state")]
+        public string? SuggestedAnchorState { get; init; }
+
+        [JsonPropertyName("suggested_self_touch_class")]
+        public string? SuggestedSelfTouchClass { get; init; }
+
+        [JsonPropertyName("confidence")]
+        public double? Confidence { get; init; }
+
+        [JsonPropertyName("justification")]
+        public string? Justification { get; init; }
     }
 }

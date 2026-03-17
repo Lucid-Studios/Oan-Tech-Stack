@@ -122,6 +122,97 @@ public sealed class SoulFrameHostClientTests
     }
 
     [Fact]
+    public async Task SemanticInference_StructuredCompassAdvisory_IsParsed()
+    {
+        var client = CreateClient((request, _) =>
+        {
+            if (request.RequestUri?.AbsolutePath != "/classify")
+            {
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            }
+
+            var json = "{\"decision\":\"classify-ok\",\"payload\":\"bounded-locality continuity\",\"confidence\":0.82,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"bounded-locality continuity\"},\"compass_advisory\":{\"suggested_active_basin\":\"BOUNDED_LOCALITY_CONTINUITY\",\"suggested_competing_basin\":\"FLUID_CONTINUITY_LAW\",\"suggested_anchor_state\":\"HELD\",\"suggested_self_touch_class\":\"VALIDATION_TOUCH\",\"confidence\":0.76,\"justification\":\"bounded-locality continuity remains dominant\"}}";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
+        });
+
+        var response = await client.ClassifyAsync(new SoulFrameInferenceRequest
+        {
+            Task = "classify",
+            Context = "maintain bounded locality continuity under masked locality witness",
+            OpalConstraints = new SoulFrameInferenceConstraints
+            {
+                Domain = "bounded-locality continuity",
+                DriftLimit = 0.02,
+                MaxTokens = 64
+            },
+            SoulFrameId = Guid.NewGuid(),
+            ContextId = Guid.NewGuid(),
+            GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired(),
+            CompassAdvisory = new SoulFrameCompassAdvisoryRequest
+            {
+                Version = "compass-seed-advisory-v1",
+                RequireStructuredAdvisory = true,
+                TargetActiveBasin = CompassDoctrineBasin.BoundedLocalityContinuity,
+                ExcludedCompetingBasin = CompassDoctrineBasin.FluidContinuityLaw
+            }
+        });
+
+        Assert.NotNull(response.CompassAdvisory);
+        Assert.Equal(CompassDoctrineBasin.BoundedLocalityContinuity, response.CompassAdvisory!.SuggestedActiveBasin);
+        Assert.Equal(CompassDoctrineBasin.FluidContinuityLaw, response.CompassAdvisory.SuggestedCompetingBasin);
+        Assert.Equal(CompassAnchorState.Held, response.CompassAdvisory.SuggestedAnchorState);
+        Assert.Equal(CompassSelfTouchClass.ValidationTouch, response.CompassAdvisory.SuggestedSelfTouchClass);
+        Assert.Equal(0.76, response.CompassAdvisory.Confidence, 3);
+    }
+
+    [Fact]
+    public async Task SemanticInference_RequiredCompassAdvisory_RejectsMissingStructuredObservation()
+    {
+        var client = CreateClient((request, _) =>
+        {
+            if (request.RequestUri?.AbsolutePath != "/classify")
+            {
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            }
+
+            var json = "{\"decision\":\"classify-ok\",\"payload\":\"bounded-locality continuity\",\"confidence\":0.82,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"bounded-locality continuity\"}}";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
+        });
+
+        var response = await client.ClassifyAsync(new SoulFrameInferenceRequest
+        {
+            Task = "classify",
+            Context = "maintain bounded locality continuity under masked locality witness",
+            OpalConstraints = new SoulFrameInferenceConstraints
+            {
+                Domain = "bounded-locality continuity",
+                DriftLimit = 0.02,
+                MaxTokens = 64
+            },
+            SoulFrameId = Guid.NewGuid(),
+            ContextId = Guid.NewGuid(),
+            GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired(),
+            CompassAdvisory = new SoulFrameCompassAdvisoryRequest
+            {
+                Version = "compass-seed-advisory-v1",
+                RequireStructuredAdvisory = true,
+                TargetActiveBasin = CompassDoctrineBasin.BoundedLocalityContinuity,
+                ExcludedCompetingBasin = CompassDoctrineBasin.FluidContinuityLaw
+            }
+        });
+
+        Assert.False(response.Accepted);
+        Assert.Equal(SoulFrameGovernedEmissionState.Error, response.Governance.State);
+        Assert.Equal("invalid-governed-emission:missing-compass-advisory", response.Governance.Trace);
+    }
+
+    [Fact]
     public async Task SemanticInference_StrictGovernedProtocol_RejectsMissingStateEnvelope()
     {
         var telemetry = new GelTelemetryAdapter();

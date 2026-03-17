@@ -752,7 +752,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         {
             if (request.RequestUri?.AbsolutePath == "/classify")
             {
-                const string json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"bounded-payload\"}}";
+                const string json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"bounded-payload\"},\"compass_advisory\":{\"suggested_active_basin\":\"UNKNOWN\",\"suggested_competing_basin\":\"UNKNOWN\",\"suggested_anchor_state\":\"WEAKENED\",\"suggested_self_touch_class\":\"VALIDATION_TOUCH\",\"confidence\":0.71,\"justification\":\"no stable continuity basin was selected\"}}";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")

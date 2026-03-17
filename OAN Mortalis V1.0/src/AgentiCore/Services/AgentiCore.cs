@@ -154,7 +154,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                     OpalConstraints = hostedConstraints,
                     SoulFrameId = context.SoulFrameId,
                     ContextId = context.ContextId,
-                    GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
+                    GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired(),
+                    CompassAdvisory = BuildCompassAdvisoryRequest(hostedConstraints, runtimeInput)
                 },
                 cancellationToken)
             .ConfigureAwait(false);
@@ -221,6 +222,12 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         context.WorkingMemory["compass_observation_provenance"] = compassObservation.Provenance.ToString();
         context.WorkingMemory["compass_oe_coe_posture"] = compassObservation.OeCoePosture.ToString();
         context.WorkingMemory["compass_self_touch_class"] = compassObservation.SelfTouchClass.ToString();
+        context.WorkingMemory["compass_advisory_disposition"] = compassObservation.SeedAdvisory?.Disposition.ToString() ?? CompassSeedAdvisoryDisposition.None.ToString();
+        context.WorkingMemory["compass_advisory_reason"] = compassObservation.SeedAdvisory?.DispositionReason ?? "none";
+        context.WorkingMemory["compass_advisory_suggested_active_basin"] = compassObservation.SeedAdvisory?.SuggestedActiveBasin?.ToString() ?? "none";
+        context.WorkingMemory["compass_advisory_suggested_competing_basin"] = compassObservation.SeedAdvisory?.SuggestedCompetingBasin?.ToString() ?? "none";
+        context.WorkingMemory["compass_advisory_suggested_anchor_state"] = compassObservation.SeedAdvisory?.SuggestedAnchorState?.ToString() ?? "none";
+        context.WorkingMemory["compass_advisory_suggested_self_touch_class"] = compassObservation.SeedAdvisory?.SuggestedSelfTouchClass?.ToString() ?? "none";
 
         var cognitionPayload = JsonSerializer.Serialize(new Dictionary<string, object?>
         {
@@ -315,6 +322,13 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 ["advisory_decision"] = compassObservation.SeedAdvisory?.Decision,
                 ["advisory_trace"] = compassObservation.SeedAdvisory?.Trace,
                 ["advisory_confidence"] = compassObservation.SeedAdvisory?.Confidence,
+                ["advisory_suggested_active_basin"] = compassObservation.SeedAdvisory?.SuggestedActiveBasin?.ToString(),
+                ["advisory_suggested_competing_basin"] = compassObservation.SeedAdvisory?.SuggestedCompetingBasin?.ToString(),
+                ["advisory_suggested_anchor_state"] = compassObservation.SeedAdvisory?.SuggestedAnchorState?.ToString(),
+                ["advisory_suggested_self_touch_class"] = compassObservation.SeedAdvisory?.SuggestedSelfTouchClass?.ToString(),
+                ["advisory_disposition"] = compassObservation.SeedAdvisory?.Disposition.ToString(),
+                ["advisory_disposition_reason"] = compassObservation.SeedAdvisory?.DispositionReason,
+                ["advisory_justification"] = compassObservation.SeedAdvisory?.Justification,
                 ["timestamp"] = compassObservation.TimestampUtc
             },
             ["confidence"] = cognitionResult.Confidence
@@ -548,6 +562,13 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 CopyString(observation, "observer_identity", metadata, "compass_observer_identity");
                 CopyString(observation, "advisory_decision", metadata, "compass_advisory_decision");
                 CopyString(observation, "advisory_trace", metadata, "compass_advisory_trace");
+                CopyString(observation, "advisory_suggested_active_basin", metadata, "compass_advisory_suggested_active_basin");
+                CopyString(observation, "advisory_suggested_competing_basin", metadata, "compass_advisory_suggested_competing_basin");
+                CopyString(observation, "advisory_suggested_anchor_state", metadata, "compass_advisory_suggested_anchor_state");
+                CopyString(observation, "advisory_suggested_self_touch_class", metadata, "compass_advisory_suggested_self_touch_class");
+                CopyString(observation, "advisory_disposition", metadata, "compass_advisory_disposition");
+                CopyString(observation, "advisory_disposition_reason", metadata, "compass_advisory_disposition_reason");
+                CopyString(observation, "advisory_justification", metadata, "compass_advisory_justification");
             }
         }
         catch (JsonException)
@@ -625,6 +646,23 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         };
     }
 
+    private static SoulFrameCompassAdvisoryRequest BuildCompassAdvisoryRequest(
+        SoulFrameInferenceConstraints hostedConstraints,
+        string objective)
+    {
+        ArgumentNullException.ThrowIfNull(hostedConstraints);
+        ArgumentException.ThrowIfNullOrWhiteSpace(objective);
+
+        var activeBasin = ResolveBasin(hostedConstraints.Domain, objective);
+        return new SoulFrameCompassAdvisoryRequest
+        {
+            Version = "compass-seed-advisory-v1",
+            RequireStructuredAdvisory = true,
+            TargetActiveBasin = activeBasin,
+            ExcludedCompetingBasin = ResolveCompetingBasin(activeBasin)
+        };
+    }
+
     private static CompassObservationSurface BuildCompassObservation(
         string objective,
         SoulFrameInferenceResponse hostedSemanticResponse,
@@ -640,15 +678,15 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
 
         var activeBasin = ResolveBasin(hostedConstraints.Domain, objective);
         var competingBasin = ResolveCompetingBasin(activeBasin);
-        var provenance = hostedSemanticResponse.Accepted
-            ? CompassObservationProvenance.Braided
-            : CompassObservationProvenance.LispNative;
-        var advisory = new CompassSeedAdvisoryObservation(
-            Accepted: hostedSemanticResponse.Accepted,
-            Decision: hostedSemanticResponse.Decision,
-            Trace: hostedSemanticResponse.Governance.Trace,
-            Confidence: hostedSemanticResponse.Confidence,
-            Payload: hostedSemanticResponse.Payload);
+        var selfTouchClass = ResolveSelfTouchClass(selfGelWorkingPool);
+        var anchorState = ResolveAnchorState(activeBasin, competingBasin, hostedSemanticResponse);
+        var advisory = BuildSeedAdvisoryObservation(
+            hostedSemanticResponse,
+            activeBasin,
+            competingBasin,
+            selfTouchClass,
+            anchorState);
+        var provenance = ResolveObservationProvenance(advisory);
 
         return new CompassObservationSurface(
             ObservationHandle: CompassObservationKeys.CreateObservationHandle(
@@ -658,9 +696,9 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 objective),
             ActiveBasin: activeBasin,
             CompetingBasin: competingBasin,
-            OeCoePosture: ResolveOeCoePosture(cleaverResult, hostedSemanticResponse),
-            SelfTouchClass: ResolveSelfTouchClass(selfGelWorkingPool),
-            AnchorState: ResolveAnchorState(activeBasin, competingBasin, hostedSemanticResponse),
+            OeCoePosture: ResolveOeCoePosture(cleaverResult, hostedSemanticResponse, advisory),
+            SelfTouchClass: selfTouchClass,
+            AnchorState: anchorState,
             Provenance: provenance,
             ObserverIdentity: "AgentiCore Compass",
             WorkingStateHandle: selfGelWorkingPool.WorkingStateHandle,
@@ -673,6 +711,81 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             SeedAdvisory: advisory,
             TimestampUtc: DateTimeOffset.UtcNow);
     }
+
+    private static CompassSeedAdvisoryObservation BuildSeedAdvisoryObservation(
+        SoulFrameInferenceResponse hostedSemanticResponse,
+        CompassDoctrineBasin activeBasin,
+        CompassDoctrineBasin competingBasin,
+        CompassSelfTouchClass selfTouchClass,
+        CompassAnchorState anchorState)
+    {
+        ArgumentNullException.ThrowIfNull(hostedSemanticResponse);
+
+        var advisory = hostedSemanticResponse.CompassAdvisory;
+        var disposition = CompassSeedAdvisoryDisposition.None;
+        string? dispositionReason = advisory is null ? "missing-structured-advisory" : null;
+
+        if (advisory is not null)
+        {
+            if (!hostedSemanticResponse.Accepted)
+            {
+                disposition = CompassSeedAdvisoryDisposition.Deferred;
+                dispositionReason = "seed-governance-not-admitted";
+            }
+            else if (advisory.Confidence < 0.55)
+            {
+                disposition = CompassSeedAdvisoryDisposition.Deferred;
+                dispositionReason = "low-advisory-confidence";
+            }
+            else if (advisory.SuggestedActiveBasin != activeBasin)
+            {
+                disposition = CompassSeedAdvisoryDisposition.Rejected;
+                dispositionReason = "active-basin-mismatch";
+            }
+            else if (advisory.SuggestedCompetingBasin != competingBasin)
+            {
+                disposition = CompassSeedAdvisoryDisposition.Deferred;
+                dispositionReason = "competing-basin-mismatch";
+            }
+            else if (advisory.SuggestedAnchorState != anchorState)
+            {
+                disposition = CompassSeedAdvisoryDisposition.Deferred;
+                dispositionReason = "anchor-state-mismatch";
+            }
+            else if (advisory.SuggestedSelfTouchClass != selfTouchClass)
+            {
+                disposition = CompassSeedAdvisoryDisposition.Deferred;
+                dispositionReason = "self-touch-mismatch";
+            }
+            else
+            {
+                disposition = CompassSeedAdvisoryDisposition.Accepted;
+                dispositionReason = "host-accepted";
+            }
+        }
+
+        return new CompassSeedAdvisoryObservation(
+            Accepted: hostedSemanticResponse.Accepted,
+            Decision: hostedSemanticResponse.Decision,
+            Trace: hostedSemanticResponse.Governance.Trace,
+            Confidence: hostedSemanticResponse.Confidence,
+            Payload: hostedSemanticResponse.Payload,
+            SuggestedActiveBasin: advisory?.SuggestedActiveBasin,
+            SuggestedCompetingBasin: advisory?.SuggestedCompetingBasin,
+            SuggestedAnchorState: advisory?.SuggestedAnchorState,
+            SuggestedSelfTouchClass: advisory?.SuggestedSelfTouchClass,
+            Disposition: disposition,
+            DispositionReason: dispositionReason,
+            Justification: advisory?.Justification);
+    }
+
+    private static CompassObservationProvenance ResolveObservationProvenance(
+        CompassSeedAdvisoryObservation advisory) => advisory.Disposition switch
+    {
+        CompassSeedAdvisoryDisposition.Accepted => CompassObservationProvenance.Braided,
+        CompassSeedAdvisoryDisposition.Deferred or CompassSeedAdvisoryDisposition.Rejected => CompassObservationProvenance.SeedAssisted,
+        _ => CompassObservationProvenance.LispNative
+    };
 
     private static CompassDoctrineBasin ResolveBasin(string domain, string objective)
     {
@@ -713,9 +826,10 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
 
     private static CompassOeCoePosture ResolveOeCoePosture(
         OntologicalCleaverResult cleaverResult,
-        SoulFrameInferenceResponse hostedSemanticResponse)
+        SoulFrameInferenceResponse hostedSemanticResponse,
+        CompassSeedAdvisoryObservation advisory)
     {
-        if (!hostedSemanticResponse.Accepted)
+        if (!hostedSemanticResponse.Accepted || advisory.Disposition != CompassSeedAdvisoryDisposition.Accepted)
         {
             return CompassOeCoePosture.Unresolved;
         }

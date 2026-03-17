@@ -51,6 +51,13 @@ public sealed class GovernedCompassObservationBridge
             AdvisoryDecision: observation.SeedAdvisory?.Decision,
             AdvisoryTrace: observation.SeedAdvisory?.Trace,
             AdvisoryConfidence: observation.SeedAdvisory?.Confidence,
+            AdvisorySuggestedActiveBasin: observation.SeedAdvisory?.SuggestedActiveBasin,
+            AdvisorySuggestedCompetingBasin: observation.SeedAdvisory?.SuggestedCompetingBasin,
+            AdvisorySuggestedAnchorState: observation.SeedAdvisory?.SuggestedAnchorState,
+            AdvisorySuggestedSelfTouchClass: observation.SeedAdvisory?.SuggestedSelfTouchClass,
+            AdvisoryDisposition: observation.SeedAdvisory?.Disposition,
+            AdvisoryDispositionReason: observation.SeedAdvisory?.DispositionReason,
+            AdvisoryJustification: observation.SeedAdvisory?.Justification,
             TimestampUtc: observation.TimestampUtc);
 
         if (_governanceReceiptJournal is not null)

@@ -28,6 +28,13 @@ public sealed class GovernedCompassObservationTelemetryEvent : ITelemetryEvent
     public string? AdvisoryDecision { get; init; }
     public string? AdvisoryTrace { get; init; }
     public double? AdvisoryConfidence { get; init; }
+    public CompassDoctrineBasin? AdvisorySuggestedActiveBasin { get; init; }
+    public CompassDoctrineBasin? AdvisorySuggestedCompetingBasin { get; init; }
+    public CompassAnchorState? AdvisorySuggestedAnchorState { get; init; }
+    public CompassSelfTouchClass? AdvisorySuggestedSelfTouchClass { get; init; }
+    public CompassSeedAdvisoryDisposition? AdvisoryDisposition { get; init; }
+    public string? AdvisoryDispositionReason { get; init; }
+    public string? AdvisoryJustification { get; init; }
 }
 
 internal static class GovernedCompassObservationTelemetry
@@ -66,7 +73,14 @@ internal static class GovernedCompassObservationTelemetry
             AdvisoryAccepted = observation.SeedAdvisory?.Accepted,
             AdvisoryDecision = observation.SeedAdvisory?.Decision,
             AdvisoryTrace = observation.SeedAdvisory?.Trace,
-            AdvisoryConfidence = observation.SeedAdvisory?.Confidence
+            AdvisoryConfidence = observation.SeedAdvisory?.Confidence,
+            AdvisorySuggestedActiveBasin = observation.SeedAdvisory?.SuggestedActiveBasin,
+            AdvisorySuggestedCompetingBasin = observation.SeedAdvisory?.SuggestedCompetingBasin,
+            AdvisorySuggestedAnchorState = observation.SeedAdvisory?.SuggestedAnchorState,
+            AdvisorySuggestedSelfTouchClass = observation.SeedAdvisory?.SuggestedSelfTouchClass,
+            AdvisoryDisposition = observation.SeedAdvisory?.Disposition,
+            AdvisoryDispositionReason = observation.SeedAdvisory?.DispositionReason,
+            AdvisoryJustification = observation.SeedAdvisory?.Justification
         };
     }
 

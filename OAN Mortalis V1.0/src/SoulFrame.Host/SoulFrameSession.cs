@@ -1,3 +1,5 @@
+using Oan.Common;
+
 namespace SoulFrame.Host;
 
 public enum SoulFrameSessionState
@@ -33,6 +35,24 @@ public sealed class SoulFrameInferenceConstraints
     public required string Domain { get; init; }
     public required double DriftLimit { get; init; }
     public required int MaxTokens { get; init; }
+}
+
+public sealed class SoulFrameCompassAdvisoryRequest
+{
+    public required string Version { get; init; }
+    public required bool RequireStructuredAdvisory { get; init; }
+    public required CompassDoctrineBasin TargetActiveBasin { get; init; }
+    public required CompassDoctrineBasin ExcludedCompetingBasin { get; init; }
+}
+
+public sealed class SoulFrameCompassAdvisoryResponse
+{
+    public required CompassDoctrineBasin SuggestedActiveBasin { get; init; }
+    public required CompassDoctrineBasin SuggestedCompetingBasin { get; init; }
+    public required CompassAnchorState SuggestedAnchorState { get; init; }
+    public required CompassSelfTouchClass SuggestedSelfTouchClass { get; init; }
+    public required double Confidence { get; init; }
+    public string? Justification { get; init; }
 }
 
 public enum SoulFrameGovernedEmissionState
@@ -87,6 +107,7 @@ public sealed class SoulFrameInferenceRequest
     public required Guid SoulFrameId { get; init; }
     public required Guid ContextId { get; init; }
     public SoulFrameGovernedEmissionProtocol? GovernanceProtocol { get; init; }
+    public SoulFrameCompassAdvisoryRequest? CompassAdvisory { get; init; }
 }
 
 public sealed class SoulFrameInferenceResponse
@@ -96,6 +117,7 @@ public sealed class SoulFrameInferenceResponse
     public required string Payload { get; init; }
     public required double Confidence { get; init; }
     public required SoulFrameGovernedEmissionEnvelope Governance { get; init; }
+    public SoulFrameCompassAdvisoryResponse? CompassAdvisory { get; init; }
 }
 
 public interface ISoulFrameSemanticDevice
@@ -135,7 +157,8 @@ public sealed class NullSoulFrameSemanticDevice : ISoulFrameSemanticDevice
                 State = SoulFrameGovernedEmissionState.Query,
                 Trace = "null-device-fallback",
                 Content = context
-            }
+            },
+            CompassAdvisory = null
         };
     }
 }

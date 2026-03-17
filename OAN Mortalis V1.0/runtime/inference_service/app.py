@@ -197,12 +197,108 @@ def parse_payload() -> Dict[str, Any]:
     context = data.get("context") or data.get("text") or data.get("prompt") or ""
     constraints = data.get("opal_constraints") or {}
     governance_protocol = data.get("governance_protocol") or {}
+    compass_advisory = data.get("compass_advisory") or {}
     max_tokens = int(constraints.get("max_tokens", CONFIG["max_context"]))
     return {
         "task": task,
         "context": context,
         "max_tokens": max_tokens,
         "governance_protocol": governance_protocol,
+        "compass_advisory": compass_advisory,
+    }
+
+
+def normalize_token(value: Optional[str]) -> str:
+    if not value:
+        return ""
+    return str(value).strip().replace("-", "_").upper()
+
+
+def opposing_basin_token(token: str) -> str:
+    if token == "BOUNDED_LOCALITY_CONTINUITY":
+        return "FLUID_CONTINUITY_LAW"
+    if token == "FLUID_CONTINUITY_LAW":
+        return "BOUNDED_LOCALITY_CONTINUITY"
+    return "UNKNOWN"
+
+
+def basin_markers(token: str) -> tuple[str, ...]:
+    return {
+        "BOUNDED_LOCALITY_CONTINUITY": (
+            "bounded-locality continuity",
+            "bounded locality continuity",
+            "locality witness",
+        ),
+        "FLUID_CONTINUITY_LAW": (
+            "fluid continuity law",
+            "fluid continuity",
+        ),
+        "IDENTITY_CONTINUITY": (
+            "identity continuity",
+            "identity-continuity",
+        ),
+        "GENERAL_CONTINUITY_DISCOURSE": (
+            "continuity discourse",
+            "general continuity",
+        ),
+    }.get(token, tuple())
+
+
+def detect_basin_token(value: str) -> str:
+    lowered = (value or "").lower()
+    if any(marker in lowered for marker in basin_markers("BOUNDED_LOCALITY_CONTINUITY")):
+        return "BOUNDED_LOCALITY_CONTINUITY"
+    if any(marker in lowered for marker in basin_markers("FLUID_CONTINUITY_LAW")):
+        return "FLUID_CONTINUITY_LAW"
+    if any(marker in lowered for marker in basin_markers("IDENTITY_CONTINUITY")):
+        return "IDENTITY_CONTINUITY"
+    if "continuity" in lowered:
+        return "GENERAL_CONTINUITY_DISCOURSE"
+    return "UNKNOWN"
+
+
+def build_compass_advisory(context: str, content: str, compass_request: Dict[str, Any]) -> Dict[str, Any]:
+    target_active = normalize_token(compass_request.get("target_active_basin"))
+    excluded_competing = normalize_token(compass_request.get("excluded_competing_basin"))
+    combined = " ".join(part for part in [context, content] if part).lower()
+
+    suggested_active = detect_basin_token(combined)
+    if suggested_active == "UNKNOWN" and target_active:
+        suggested_active = target_active
+
+    suggested_competing = excluded_competing or opposing_basin_token(suggested_active)
+
+    active_seen = any(marker in combined for marker in basin_markers(suggested_active))
+    competing_seen = any(marker in combined for marker in basin_markers(suggested_competing))
+    if active_seen and not competing_seen:
+        anchor_state = "HELD"
+    elif competing_seen and not active_seen:
+        anchor_state = "LOST"
+    else:
+        anchor_state = "WEAKENED"
+
+    if any(marker in combined for marker in ("selfgel", "self-gel", "identity continuity", "identity-continuity")):
+        self_touch_class = "VALIDATION_TOUCH"
+    elif "claim" in combined:
+        self_touch_class = "HOT_CLAIM_TOUCH"
+    else:
+        self_touch_class = "NO_TOUCH"
+
+    confidence = 0.76 if active_seen else 0.61 if suggested_active != "UNKNOWN" else 0.44
+    if suggested_active == "UNKNOWN":
+        justification = "No stable continuity basin could be distinguished from the governed context."
+    elif anchor_state == "HELD":
+        justification = f"{suggested_active.replace('_', '-').lower()} remains dominant within the governed context."
+    else:
+        justification = f"{suggested_active.replace('_', '-').lower()} appears active but not fully stable."
+
+    return {
+        "suggested_active_basin": suggested_active,
+        "suggested_competing_basin": suggested_competing,
+        "suggested_anchor_state": anchor_state,
+        "suggested_self_touch_class": self_touch_class,
+        "confidence": confidence,
+        "justification": justification,
     }
 
 
@@ -292,7 +388,13 @@ def choose_governed_state(task: str, context: str, max_tokens: int, require_term
     }
 
 
-def build_governed_response(task: str, context: str, max_tokens: int, protocol: Dict[str, Any]) -> Dict[str, Any]:
+def build_governed_response(
+    task: str,
+    context: str,
+    max_tokens: int,
+    protocol: Dict[str, Any],
+    compass_request: Dict[str, Any],
+) -> Dict[str, Any]:
     require_terminal = bool(protocol.get("require_terminal_state"))
     selected = choose_governed_state(task, context, max_tokens, require_terminal)
     state = selected["state"]
@@ -330,7 +432,7 @@ def build_governed_response(task: str, context: str, max_tokens: int, protocol: 
         "HALT": f"{task}-halted",
     }.get(state, f"{task}-pending")
 
-    return {
+    response = {
         "decision": decision,
         "payload": selected["content"],
         "confidence": confidence,
@@ -341,6 +443,11 @@ def build_governed_response(task: str, context: str, max_tokens: int, protocol: 
         },
     }
 
+    if compass_request:
+        response["compass_advisory"] = build_compass_advisory(context, selected["content"], compass_request)
+
+    return response
+
 
 def handle_inference(default_task: str) -> Any:
     payload = parse_payload()
@@ -348,6 +455,7 @@ def handle_inference(default_task: str) -> Any:
     context = payload["context"]
     max_tokens = max(1, min(payload["max_tokens"], int(CONFIG["max_context"])))
     governance_protocol = payload["governance_protocol"]
+    compass_request = payload["compass_advisory"]
     readiness = runtime_readiness()
 
     emit_telemetry(
@@ -360,7 +468,7 @@ def handle_inference(default_task: str) -> Any:
     )
 
     if governance_protocol:
-        response = build_governed_response(task, context, max_tokens, governance_protocol)
+        response = build_governed_response(task, context, max_tokens, governance_protocol, compass_request)
         emit_telemetry(
             "InferenceCompleted",
             {
@@ -368,6 +476,7 @@ def handle_inference(default_task: str) -> Any:
                 "governed": True,
                 "state": response["governance"]["state"],
                 "trace": response["governance"]["trace"],
+                "compass_advisory": bool(response.get("compass_advisory")),
             },
         )
         return jsonify(response)

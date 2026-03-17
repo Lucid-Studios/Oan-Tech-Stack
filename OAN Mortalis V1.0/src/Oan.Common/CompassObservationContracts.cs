@@ -27,6 +27,14 @@ public enum CompassObservationProvenance
     Braided = 2
 }
 
+public enum CompassSeedAdvisoryDisposition
+{
+    None = 0,
+    Accepted = 1,
+    Deferred = 2,
+    Rejected = 3
+}
+
 public enum CompassSelfTouchClass
 {
     NoTouch = 0,
@@ -48,7 +56,14 @@ public sealed record CompassSeedAdvisoryObservation(
     string Decision,
     string Trace,
     double Confidence,
-    string? Payload);
+    string? Payload,
+    CompassDoctrineBasin? SuggestedActiveBasin,
+    CompassDoctrineBasin? SuggestedCompetingBasin,
+    CompassAnchorState? SuggestedAnchorState,
+    CompassSelfTouchClass? SuggestedSelfTouchClass,
+    CompassSeedAdvisoryDisposition Disposition,
+    string? DispositionReason,
+    string? Justification);
 
 public sealed record CompassObservationSurface(
     string ObservationHandle,
@@ -87,6 +102,13 @@ public sealed record GovernedCompassObservationReceipt(
     string? AdvisoryDecision,
     string? AdvisoryTrace,
     double? AdvisoryConfidence,
+    CompassDoctrineBasin? AdvisorySuggestedActiveBasin,
+    CompassDoctrineBasin? AdvisorySuggestedCompetingBasin,
+    CompassAnchorState? AdvisorySuggestedAnchorState,
+    CompassSelfTouchClass? AdvisorySuggestedSelfTouchClass,
+    CompassSeedAdvisoryDisposition? AdvisoryDisposition,
+    string? AdvisoryDispositionReason,
+    string? AdvisoryJustification,
     DateTimeOffset TimestampUtc);
 
 public static class CompassObservationKeys
