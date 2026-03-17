@@ -1,3 +1,5 @@
+using Oan.Common;
+
 namespace AgentiCore.Models;
 
 public sealed class AgentiResult
@@ -10,4 +12,5 @@ public sealed class AgentiResult
     public required AgentiSymbolicTrace SymbolicTrace { get; init; }
     public required AgentiEngramCandidate EngramCandidate { get; init; }
     public required AgentiTransientResidue TransientResidue { get; init; }
+    public CompassObservationSurface? CompassObservation { get; init; }
 }

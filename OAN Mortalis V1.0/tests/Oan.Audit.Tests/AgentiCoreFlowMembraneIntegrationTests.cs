@@ -74,6 +74,14 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.Equal("0", context.WorkingMemory["selfgel_claim_count"]);
         Assert.Equal("none", context.WorkingMemory["selfgel_claim_postures"]);
         Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
+        Assert.NotNull(result.CompassObservation);
+        Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation!.ActiveBasin);
+        Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation.CompetingBasin);
+        Assert.False(result.CompassObservation.SeedAdvisory!.Accepted);
+        Assert.Equal(CompassObservationProvenance.LispNative, result.CompassObservation.Provenance);
+        Assert.Equal(CompassOeCoePosture.Unresolved, result.CompassObservation.OeCoePosture);
+        Assert.Equal(CompassSelfTouchClass.ValidationTouch, result.CompassObservation.SelfTouchClass);
+        Assert.Equal(CompassAnchorState.Weakened, result.CompassObservation.AnchorState);
         Assert.Equal(["step-a", "step-b"], result.SymbolicTrace.Steps);
         Assert.Equal(["token-a"], result.SymbolicTrace.Tokens);
         Assert.StartsWith("agenticore-return://", result.EngramCandidate.ReturnCandidatePointer, StringComparison.Ordinal);
@@ -159,7 +167,7 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             }),
             boundedWorker);
 
-        await cognition.ExecuteCognitionCycleAsync(
+        var result = await cognition.ExecuteCognitionCycleAsync(
             CreateContext(),
             "maintain bounded locality continuity under masked locality witness");
 
@@ -168,6 +176,14 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.Contains("ACTIVE_DOCTRINE_DOMAIN: bounded-locality continuity", classifyContext, StringComparison.Ordinal);
         Assert.Contains("EXCLUDED_NEARBY_DOMAIN: fluid continuity law", classifyContext, StringComparison.Ordinal);
         Assert.Contains("INPUT:", classifyContext, StringComparison.Ordinal);
+        Assert.NotNull(result.CompassObservation);
+        Assert.Equal(CompassDoctrineBasin.BoundedLocalityContinuity, result.CompassObservation!.ActiveBasin);
+        Assert.Equal(CompassDoctrineBasin.FluidContinuityLaw, result.CompassObservation.CompetingBasin);
+        Assert.False(result.CompassObservation.SeedAdvisory!.Accepted);
+        Assert.Equal(CompassObservationProvenance.LispNative, result.CompassObservation.Provenance);
+        Assert.Equal(CompassOeCoePosture.Unresolved, result.CompassObservation.OeCoePosture);
+        Assert.Equal(CompassSelfTouchClass.ValidationTouch, result.CompassObservation.SelfTouchClass);
+        Assert.Equal(CompassAnchorState.Weakened, result.CompassObservation.AnchorState);
     }
 
     private static MediatedSelfStateContour CreateMediatedSelfState(string cmeId, string policyHandle) =>

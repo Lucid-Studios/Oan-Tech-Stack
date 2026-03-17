@@ -94,6 +94,18 @@ internal static class GovernedHopngEvidenceReferences
             }
         }
 
+        var compassObservationReceipts = snapshot.CompassObservationReceipts ?? [];
+        for (var index = 0; index < compassObservationReceipts.Count; index++)
+        {
+            var receipt = compassObservationReceipts[index];
+            AddReference(
+                refs,
+                seenPointers,
+                $"compass-observation-{index + 1}",
+                receipt.WitnessHandle,
+                "compass-observation");
+        }
+
         foreach (var receipt in snapshot.HopngArtifacts)
         {
             AddReference(

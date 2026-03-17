@@ -136,6 +136,13 @@ public sealed class GovernanceGoldenPathIntegrationTests
 
         var status = await manager.GetStatusByLoopKeyAsync(result.LoopKey);
 
+        var resultCompassReceipt = Assert.Single(result.CompassObservationReceipts!);
+        Assert.Equal(CompassDoctrineBasin.Unknown, resultCompassReceipt.ActiveBasin);
+        Assert.Equal(CompassObservationProvenance.Braided, resultCompassReceipt.Provenance);
+        Assert.Equal(request.OperatorInput, resultCompassReceipt.Objective);
+        var statusCompassReceipt = Assert.Single(status.CompassObservationReceipts!);
+        Assert.Equal(resultCompassReceipt.WitnessHandle, statusCompassReceipt.WitnessHandle);
+        Assert.Equal(resultCompassReceipt.ActiveBasin, statusCompassReceipt.ActiveBasin);
         Assert.Equal(2, status.TargetWitnessReceipts!.Count);
         Assert.Contains(
             status.TargetWitnessReceipts,

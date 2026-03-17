@@ -198,6 +198,30 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
 
         var requiresCommit = cognitionResult.EngramCandidate;
 
+        var selfGelWorkingPool = AgentiSelfGelWorkingPoolFactory.Create(
+            sessionHandle: boundedWorkerState.SessionHandle,
+            workingStateHandle: boundedWorkerState.WorkingStateHandle,
+            provenanceMarker: boundedWorkerState.ProvenanceMarker,
+            cSelfGelHandle: boundedWorkerState.MediatedSelfState.CSelfGelHandle,
+            activeConcepts: context.ActiveConcepts,
+            workingMemory: context.WorkingMemory,
+            selfClaims: selfSensitiveResolution.Claims);
+        context.SelfGelWorkingPool = selfGelWorkingPool;
+        context.WorkingMemory["selfgel_validation_surface_handle"] = selfGelWorkingPool.ValidationSurface.SelfGelHandle;
+
+        var compassObservation = BuildCompassObservation(
+            objective: runtimeInput,
+            hostedSemanticResponse: hostedSemanticResponse,
+            hostedConstraints: hostedConstraints,
+            cleaverResult: cleaverResult,
+            selfGelWorkingPool: selfGelWorkingPool);
+        context.WorkingMemory["compass_active_basin"] = compassObservation.ActiveBasin.ToString();
+        context.WorkingMemory["compass_competing_basin"] = compassObservation.CompetingBasin.ToString();
+        context.WorkingMemory["compass_anchor_state"] = compassObservation.AnchorState.ToString();
+        context.WorkingMemory["compass_observation_provenance"] = compassObservation.Provenance.ToString();
+        context.WorkingMemory["compass_oe_coe_posture"] = compassObservation.OeCoePosture.ToString();
+        context.WorkingMemory["compass_self_touch_class"] = compassObservation.SelfTouchClass.ToString();
+
         var cognitionPayload = JsonSerializer.Serialize(new Dictionary<string, object?>
         {
             ["reasoning"] = cognitionResult.Reasoning,
@@ -272,19 +296,29 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 ["decision_entropy"] = cognitionResult.CompassState.DecisionEntropy,
                 ["timestamp"] = cognitionResult.CompassState.Timestamp
             },
+            ["compass_observation"] = new Dictionary<string, object?>
+            {
+                ["observation_handle"] = compassObservation.ObservationHandle,
+                ["active_basin"] = compassObservation.ActiveBasin.ToString(),
+                ["competing_basin"] = compassObservation.CompetingBasin.ToString(),
+                ["oe_coe_posture"] = compassObservation.OeCoePosture.ToString(),
+                ["self_touch_class"] = compassObservation.SelfTouchClass.ToString(),
+                ["anchor_state"] = compassObservation.AnchorState.ToString(),
+                ["provenance"] = compassObservation.Provenance.ToString(),
+                ["observer_identity"] = compassObservation.ObserverIdentity,
+                ["working_state_handle"] = compassObservation.WorkingStateHandle,
+                ["cselfgel_handle"] = compassObservation.CSelfGelHandle,
+                ["selfgel_handle"] = compassObservation.SelfGelHandle,
+                ["validation_reference_handle"] = compassObservation.ValidationReferenceHandle,
+                ["objective"] = compassObservation.Objective,
+                ["advisory_accepted"] = compassObservation.SeedAdvisory?.Accepted,
+                ["advisory_decision"] = compassObservation.SeedAdvisory?.Decision,
+                ["advisory_trace"] = compassObservation.SeedAdvisory?.Trace,
+                ["advisory_confidence"] = compassObservation.SeedAdvisory?.Confidence,
+                ["timestamp"] = compassObservation.TimestampUtc
+            },
             ["confidence"] = cognitionResult.Confidence
         });
-
-        var selfGelWorkingPool = AgentiSelfGelWorkingPoolFactory.Create(
-            sessionHandle: boundedWorkerState.SessionHandle,
-            workingStateHandle: boundedWorkerState.WorkingStateHandle,
-            provenanceMarker: boundedWorkerState.ProvenanceMarker,
-            cSelfGelHandle: boundedWorkerState.MediatedSelfState.CSelfGelHandle,
-            activeConcepts: context.ActiveConcepts,
-            workingMemory: context.WorkingMemory,
-            selfClaims: selfSensitiveResolution.Claims);
-        context.SelfGelWorkingPool = selfGelWorkingPool;
-        context.WorkingMemory["selfgel_validation_surface_handle"] = selfGelWorkingPool.ValidationSurface.SelfGelHandle;
 
         var collapseClassification = BuildCollapseClassification(cognitionResult.Confidence, requiresCommit);
 
@@ -334,7 +368,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             SelfGelWorkingPool = selfGelWorkingPool,
             SymbolicTrace = symbolicTrace,
             EngramCandidate = engramCandidate,
-            TransientResidue = transientResidue
+            TransientResidue = transientResidue,
+            CompassObservation = compassObservation
         };
     }
 
@@ -422,7 +457,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             EngramCommitRequired: result.EngramCommitRequired,
             ActionableContent: actionableContent,
             ReturnIntakeHandle: returnIntakeHandle,
-            ReturnIntakeEnvelopeId: returnIntakeEnvelopeId);
+            ReturnIntakeEnvelopeId: returnIntakeEnvelopeId,
+            CompassObservation: result.CompassObservation);
     }
 
     private static IReadOnlyDictionary<string, string> BuildCommitMetadata(AgentiResult result)
@@ -500,6 +536,19 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 CopyDouble(compass, "branching_factor", metadata, "compass_branching_factor");
                 CopyString(compass, "timestamp", metadata, "compass_timestamp");
             }
+
+            if (root.TryGetProperty("compass_observation", out var observation))
+            {
+                CopyString(observation, "active_basin", metadata, "compass_active_basin");
+                CopyString(observation, "competing_basin", metadata, "compass_competing_basin");
+                CopyString(observation, "oe_coe_posture", metadata, "compass_oe_coe_posture");
+                CopyString(observation, "self_touch_class", metadata, "compass_self_touch_class");
+                CopyString(observation, "anchor_state", metadata, "compass_anchor_state");
+                CopyString(observation, "provenance", metadata, "compass_observation_provenance");
+                CopyString(observation, "observer_identity", metadata, "compass_observer_identity");
+                CopyString(observation, "advisory_decision", metadata, "compass_advisory_decision");
+                CopyString(observation, "advisory_trace", metadata, "compass_advisory_trace");
+            }
         }
         catch (JsonException)
         {
@@ -575,6 +624,181 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             MaxTokens = 128
         };
     }
+
+    private static CompassObservationSurface BuildCompassObservation(
+        string objective,
+        SoulFrameInferenceResponse hostedSemanticResponse,
+        SoulFrameInferenceConstraints hostedConstraints,
+        OntologicalCleaverResult cleaverResult,
+        AgentiSelfGelWorkingPool selfGelWorkingPool)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(objective);
+        ArgumentNullException.ThrowIfNull(hostedSemanticResponse);
+        ArgumentNullException.ThrowIfNull(hostedConstraints);
+        ArgumentNullException.ThrowIfNull(cleaverResult);
+        ArgumentNullException.ThrowIfNull(selfGelWorkingPool);
+
+        var activeBasin = ResolveBasin(hostedConstraints.Domain, objective);
+        var competingBasin = ResolveCompetingBasin(activeBasin);
+        var provenance = hostedSemanticResponse.Accepted
+            ? CompassObservationProvenance.Braided
+            : CompassObservationProvenance.LispNative;
+        var advisory = new CompassSeedAdvisoryObservation(
+            Accepted: hostedSemanticResponse.Accepted,
+            Decision: hostedSemanticResponse.Decision,
+            Trace: hostedSemanticResponse.Governance.Trace,
+            Confidence: hostedSemanticResponse.Confidence,
+            Payload: hostedSemanticResponse.Payload);
+
+        return new CompassObservationSurface(
+            ObservationHandle: CompassObservationKeys.CreateObservationHandle(
+                selfGelWorkingPool.WorkingStateHandle,
+                selfGelWorkingPool.CSelfGelHandle,
+                activeBasin,
+                objective),
+            ActiveBasin: activeBasin,
+            CompetingBasin: competingBasin,
+            OeCoePosture: ResolveOeCoePosture(cleaverResult, hostedSemanticResponse),
+            SelfTouchClass: ResolveSelfTouchClass(selfGelWorkingPool),
+            AnchorState: ResolveAnchorState(activeBasin, competingBasin, hostedSemanticResponse),
+            Provenance: provenance,
+            ObserverIdentity: "AgentiCore Compass",
+            WorkingStateHandle: selfGelWorkingPool.WorkingStateHandle,
+            CSelfGelHandle: selfGelWorkingPool.CSelfGelHandle,
+            SelfGelHandle: selfGelWorkingPool.ValidationSurface.SelfGelHandle,
+            ValidationReferenceHandle: selfGelWorkingPool.Claims
+                .Select(claim => claim.ValidationReferenceHandle)
+                .FirstOrDefault(handle => !string.IsNullOrWhiteSpace(handle)),
+            Objective: objective.Trim(),
+            SeedAdvisory: advisory,
+            TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
+    private static CompassDoctrineBasin ResolveBasin(string domain, string objective)
+    {
+        var normalized = $"{domain} {objective}".ToLowerInvariant();
+
+        if (normalized.Contains("bounded-locality continuity", StringComparison.Ordinal) ||
+            normalized.Contains("bounded locality continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.BoundedLocalityContinuity;
+        }
+
+        if (normalized.Contains("fluid continuity law", StringComparison.Ordinal) ||
+            normalized.Contains("fluid continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.FluidContinuityLaw;
+        }
+
+        if (normalized.Contains("identity continuity", StringComparison.Ordinal) ||
+            normalized.Contains("identity-continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.IdentityContinuity;
+        }
+
+        if (normalized.Contains("continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.GeneralContinuityDiscourse;
+        }
+
+        return CompassDoctrineBasin.Unknown;
+    }
+
+    private static CompassDoctrineBasin ResolveCompetingBasin(CompassDoctrineBasin activeBasin) => activeBasin switch
+    {
+        CompassDoctrineBasin.BoundedLocalityContinuity => CompassDoctrineBasin.FluidContinuityLaw,
+        CompassDoctrineBasin.FluidContinuityLaw => CompassDoctrineBasin.BoundedLocalityContinuity,
+        _ => CompassDoctrineBasin.Unknown
+    };
+
+    private static CompassOeCoePosture ResolveOeCoePosture(
+        OntologicalCleaverResult cleaverResult,
+        SoulFrameInferenceResponse hostedSemanticResponse)
+    {
+        if (!hostedSemanticResponse.Accepted)
+        {
+            return CompassOeCoePosture.Unresolved;
+        }
+
+        if (cleaverResult.Metrics.KnownRatio >= 0.66 && cleaverResult.Metrics.UnknownRatio <= 0.34)
+        {
+            return CompassOeCoePosture.OeDominant;
+        }
+
+        if (cleaverResult.Metrics.UnknownRatio >= 0.66)
+        {
+            return CompassOeCoePosture.CoeDominant;
+        }
+
+        return CompassOeCoePosture.ShuntedBalanced;
+    }
+
+    private static CompassSelfTouchClass ResolveSelfTouchClass(AgentiSelfGelWorkingPool selfGelWorkingPool)
+    {
+        if (selfGelWorkingPool.Claims.Any(
+                claim => claim.Posture is AgentiSelfGelClaimPosture.Contradicted or AgentiSelfGelClaimPosture.Deferred))
+        {
+            return CompassSelfTouchClass.BoundaryContact;
+        }
+
+        if (selfGelWorkingPool.Claims.Count > 0)
+        {
+            return CompassSelfTouchClass.HotClaimTouch;
+        }
+
+        if (selfGelWorkingPool.ValidationSurface.ValidatedConcepts.Count > 0)
+        {
+            return CompassSelfTouchClass.ValidationTouch;
+        }
+
+        return CompassSelfTouchClass.NoTouch;
+    }
+
+    private static CompassAnchorState ResolveAnchorState(
+        CompassDoctrineBasin activeBasin,
+        CompassDoctrineBasin competingBasin,
+        SoulFrameInferenceResponse hostedSemanticResponse)
+    {
+        if (!hostedSemanticResponse.Accepted)
+        {
+            return CompassAnchorState.Weakened;
+        }
+
+        var advisoryText = string.Join(
+            " ",
+            new[]
+            {
+                hostedSemanticResponse.Decision,
+                hostedSemanticResponse.Payload,
+                hostedSemanticResponse.Governance.Content,
+                hostedSemanticResponse.Governance.Trace
+            }.Where(value => !string.IsNullOrWhiteSpace(value)))
+            .ToLowerInvariant();
+
+        var activeSeen = BasinMarkers(activeBasin).Any(marker => advisoryText.Contains(marker, StringComparison.Ordinal));
+        var competingSeen = BasinMarkers(competingBasin).Any(marker => advisoryText.Contains(marker, StringComparison.Ordinal));
+
+        if (activeSeen && !competingSeen)
+        {
+            return CompassAnchorState.Held;
+        }
+
+        if (competingSeen && !activeSeen)
+        {
+            return CompassAnchorState.Lost;
+        }
+
+        return CompassAnchorState.Weakened;
+    }
+
+    private static IReadOnlyList<string> BasinMarkers(CompassDoctrineBasin basin) => basin switch
+    {
+        CompassDoctrineBasin.BoundedLocalityContinuity => ["bounded-locality continuity", "bounded locality continuity", "locality witness"],
+        CompassDoctrineBasin.FluidContinuityLaw => ["fluid continuity law", "fluid continuity"],
+        CompassDoctrineBasin.IdentityContinuity => ["identity continuity", "identity-continuity"],
+        CompassDoctrineBasin.GeneralContinuityDiscourse => ["continuity discourse", "continuity"],
+        _ => Array.Empty<string>()
+    };
 
     private void EmitTelemetry(string stage, Guid contextId, string cmeId)
     {

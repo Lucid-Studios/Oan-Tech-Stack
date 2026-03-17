@@ -39,7 +39,8 @@ public enum GovernanceJournalEntryKind
     State = 3,
     Annotation = 4,
     ArtifactReceipt = 5,
-    TargetWitness = 6
+    TargetWitness = 6,
+    CompassObservation = 7
 }
 
 public enum GovernanceActKind
@@ -150,7 +151,8 @@ public sealed record GovernanceCycleWorkResult(
     bool EngramCommitRequired,
     GovernedActionableContent ActionableContent,
     string ReturnIntakeHandle,
-    string ReturnIntakeEnvelopeId);
+    string ReturnIntakeEnvelopeId,
+    CompassObservationSurface? CompassObservation = null);
 
 public sealed record ReturnCandidateReviewRequest(
     Guid CandidateId,
@@ -242,7 +244,8 @@ public sealed record GovernanceGoldenPathResult(
     string? FailureCode,
     CmeCollapseRoutingDecision? CollapseRoutingDecision = null,
     IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null,
-    IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null);
+    IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null,
+    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null);
 
 public sealed record GovernanceDecisionView(
     Guid CandidateId,
@@ -276,7 +279,8 @@ public sealed record GovernanceLoopStatusView(
     bool HasJournalIntegrityErrors,
     int JournalIntegrityErrorCount,
     IReadOnlyList<GovernedHopngArtifactReceipt>? HopngArtifacts = null,
-    IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null);
+    IReadOnlyList<GovernedTargetWitnessReceipt>? TargetWitnessReceipts = null,
+    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null);
 
 public sealed record DeferredBacklogItemView(
     string LoopKey,
@@ -368,7 +372,8 @@ public sealed record GovernanceJournalEntry(
     ReturnCandidateReviewRequest? ReviewRequest,
     GovernanceDeferredAnnotation? Annotation,
     GovernedHopngArtifactReceipt? HopngArtifactReceipt = null,
-    GovernedTargetWitnessReceipt? TargetWitnessReceipt = null);
+    GovernedTargetWitnessReceipt? TargetWitnessReceipt = null,
+    GovernedCompassObservationReceipt? CompassObservationReceipt = null);
 
 public sealed record GovernanceJournalReplayIssue(
     int LineNumber,
@@ -396,7 +401,8 @@ public sealed record GovernanceLoopStateSnapshot(
     GovernanceLoopStage? FailureStage,
     int JournalIntegrityErrorCount,
     IReadOnlyList<GovernedHopngArtifactReceipt> HopngArtifacts,
-    IReadOnlyList<GovernedTargetWitnessReceipt> TargetWitnessReceipts);
+    IReadOnlyList<GovernedTargetWitnessReceipt> TargetWitnessReceipts,
+    IReadOnlyList<GovernedCompassObservationReceipt>? CompassObservationReceipts = null);
 
 public interface IGovernanceCycleCognitionService
 {
@@ -553,6 +559,7 @@ public static class GovernanceLoopStateModel
         GovernanceLoopStage? failureStage = null;
         var hopngArtifactsByProfile = new Dictionary<GovernedHopngArtifactProfile, GovernedHopngArtifactReceipt>();
         var targetWitnessReceipts = new List<GovernedTargetWitnessReceipt>();
+        var compassObservationReceipts = new List<GovernedCompassObservationReceipt>();
 
         foreach (var entry in batch.Entries
                      .Where(entry => string.Equals(entry.LoopKey, loopKey, StringComparison.Ordinal)))
@@ -577,6 +584,11 @@ public static class GovernanceLoopStateModel
             if (entry.TargetWitnessReceipt is not null)
             {
                 targetWitnessReceipts.Add(entry.TargetWitnessReceipt);
+            }
+
+            if (entry.CompassObservationReceipt is not null)
+            {
+                compassObservationReceipts.Add(entry.CompassObservationReceipt);
             }
 
             if (entry.ActReceipt is not null)
@@ -681,6 +693,10 @@ public static class GovernanceLoopStateModel
                 .OrderBy(receipt => receipt.Profile)
                 .ToArray(),
             targetWitnessReceipts
+                .OrderBy(receipt => receipt.TimestampUtc)
+                .ThenBy(receipt => receipt.WitnessHandle, StringComparer.Ordinal)
+                .ToArray(),
+            compassObservationReceipts
                 .OrderBy(receipt => receipt.TimestampUtc)
                 .ThenBy(receipt => receipt.WitnessHandle, StringComparer.Ordinal)
                 .ToArray());
