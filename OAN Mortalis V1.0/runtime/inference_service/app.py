@@ -19,6 +19,16 @@ from flask import Flask, jsonify, request
 
 APP = Flask(__name__)
 
+TERMINAL_STATES = {
+    "QUERY",
+    "NEEDS_MORE_INFORMATION",
+    "UNRESOLVED_CONFLICT",
+    "REFUSAL",
+    "ERROR",
+    "COMPLETE",
+    "HALT",
+}
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -122,8 +132,128 @@ def parse_payload() -> Dict[str, Any]:
     task = data.get("task") or "infer"
     context = data.get("context") or data.get("text") or data.get("prompt") or ""
     constraints = data.get("opal_constraints") or {}
+    governance_protocol = data.get("governance_protocol") or {}
     max_tokens = int(constraints.get("max_tokens", CONFIG["max_context"]))
-    return {"task": task, "context": context, "max_tokens": max_tokens}
+    return {
+        "task": task,
+        "context": context,
+        "max_tokens": max_tokens,
+        "governance_protocol": governance_protocol,
+    }
+
+
+def choose_governed_state(task: str, context: str, max_tokens: int, require_terminal: bool) -> Dict[str, str]:
+    normalized = " ".join(str(context).strip().split())
+    lowered = normalized.lower()
+
+    if "ready-check" in lowered and not require_terminal:
+        return {
+            "state": "READY",
+            "trace": "runtime-ready",
+            "content": "The governed seed runtime is initialized and able to accept work.",
+        }
+
+    if "heartbeat-check" in lowered and not require_terminal:
+        return {
+            "state": "HEARTBEAT",
+            "trace": "still-processing",
+            "content": "The governed seed runtime is alive and still processing.",
+        }
+
+    if not normalized:
+        return {
+            "state": "NEEDS_MORE_INFORMATION",
+            "trace": "missing-context",
+            "content": "No context was supplied for governed inference.",
+        }
+
+    if len(normalized.split()) < 3 or "underspecified" in lowered:
+        return {
+            "state": "NEEDS_MORE_INFORMATION",
+            "trace": "underspecified-context",
+            "content": "More context is required before a governed response can be emitted.",
+        }
+
+    conflict_markers = ("contradict", "conflict", "mutually exclusive", "both true and false")
+    if any(marker in lowered for marker in conflict_markers):
+        return {
+            "state": "UNRESOLVED_CONFLICT",
+            "trace": "contradictory-constraints",
+            "content": "The request contains incompatible constraints and cannot collapse safely.",
+        }
+
+    refusal_markers = ("forbidden", "disallowed", "refuse", "policy violation")
+    if any(marker in lowered for marker in refusal_markers):
+        return {
+            "state": "REFUSAL",
+            "trace": "policy-refusal",
+            "content": "The runtime refused the request under current admissibility rules.",
+        }
+
+    halt_markers = ("halt now", "terminate immediately", "emergency stop")
+    if any(marker in lowered for marker in halt_markers):
+        return {
+            "state": "HALT",
+            "trace": "halt-requested",
+            "content": "The runtime halted in response to an explicit stop request.",
+        }
+
+    body = run_llama(normalized, max(1, min(max_tokens, int(CONFIG["max_context"]))))
+    return {
+        "state": "QUERY",
+        "trace": f"{task}-response-ready",
+        "content": body,
+    }
+
+
+def build_governed_response(task: str, context: str, max_tokens: int, protocol: Dict[str, Any]) -> Dict[str, Any]:
+    require_terminal = bool(protocol.get("require_terminal_state"))
+    selected = choose_governed_state(task, context, max_tokens, require_terminal)
+    state = selected["state"]
+    allowed_states = {
+        str(token).strip().upper()
+        for token in protocol.get("allowed_states", [])
+        if str(token).strip()
+    }
+
+    if allowed_states and state not in allowed_states:
+        state = "ERROR"
+        selected = {
+            "state": "ERROR",
+            "trace": f"disallowed-state:{selected['state']}",
+            "content": "The runtime selected a state outside the caller's allowed governance surface.",
+        }
+
+    if require_terminal and state not in TERMINAL_STATES:
+        invalid_state = state
+        state = "ERROR"
+        selected = {
+            "state": "ERROR",
+            "trace": f"non-terminal-state:{invalid_state}",
+            "content": "The runtime cannot return a non-terminal governed state on a final HTTP response.",
+        }
+
+    confidence = 0.70 if state in {"QUERY", "COMPLETE"} else 0.15
+    decision = {
+        "QUERY": f"{task}-ok",
+        "NEEDS_MORE_INFORMATION": "needs-more-information",
+        "UNRESOLVED_CONFLICT": "unresolved-conflict",
+        "REFUSAL": f"{task}-refused",
+        "ERROR": f"{task}-error",
+        "COMPLETE": f"{task}-complete",
+        "HALT": f"{task}-halted",
+    }.get(state, f"{task}-pending")
+
+    return {
+        "decision": decision,
+        "payload": selected["content"],
+        "confidence": confidence,
+        "governance": {
+            "state": selected["state"],
+            "trace": selected["trace"],
+            "content": selected["content"],
+        },
+    }
 
 
 def handle_inference(default_task: str) -> Any:
@@ -131,15 +261,37 @@ def handle_inference(default_task: str) -> Any:
     task = payload["task"] or default_task
     context = payload["context"]
     max_tokens = max(1, min(payload["max_tokens"], int(CONFIG["max_context"])))
+    governance_protocol = payload["governance_protocol"]
 
-    emit_telemetry("InferenceRequested", {"task": task, "max_tokens": max_tokens})
+    emit_telemetry(
+        "InferenceRequested",
+        {
+            "task": task,
+            "max_tokens": max_tokens,
+            "governed": bool(governance_protocol),
+        },
+    )
+
+    if governance_protocol:
+        response = build_governed_response(task, context, max_tokens, governance_protocol)
+        emit_telemetry(
+            "InferenceCompleted",
+            {
+                "task": task,
+                "governed": True,
+                "state": response["governance"]["state"],
+                "trace": response["governance"]["trace"],
+            },
+        )
+        return jsonify(response)
+
     body = run_llama(context, max_tokens)
     response = {
         "decision": f"{task}-ok",
         "payload": body,
         "confidence": 0.70,
     }
-    emit_telemetry("InferenceCompleted", {"task": task})
+    emit_telemetry("InferenceCompleted", {"task": task, "governed": False})
     return jsonify(response)
 
 
