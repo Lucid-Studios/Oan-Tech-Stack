@@ -27,7 +27,8 @@ public sealed class HopngArtifactServiceIntegrationTests
         var request = CreateEmissionRequest(
             includeTargetWitnessReceipts: true,
             includeCompassObservationReceipts: true,
-            includeCompassDriftReceipts: true);
+            includeCompassDriftReceipts: true,
+            includeInnerWeatherReceipts: true);
 
         var refs = GovernedHopngEvidenceReferences.Build(request, request.Snapshot);
 
@@ -37,12 +38,14 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Contains(refs, reference => reference.PointerUri == "target-residue://dddddddddddddddd");
         Assert.Contains(refs, reference => reference.PointerUri == "compass-witness://ffffffffffffffff");
         Assert.Contains(refs, reference => reference.PointerUri == "compass-drift://9999999999999999");
+        Assert.Contains(refs, reference => reference.PointerUri == "inner-weather://1212121212121212");
     }
 
     private static GovernedHopngEmissionRequest CreateEmissionRequest(
         bool includeTargetWitnessReceipts = false,
         bool includeCompassObservationReceipts = false,
-        bool includeCompassDriftReceipts = false)
+        bool includeCompassDriftReceipts = false,
+        bool includeInnerWeatherReceipts = false)
     {
         var actionableContent = ControlSurfaceContractGuards.CreateReturnCandidateActionableContent(
             contentHandle: "agenticore-return://candidate/test",
@@ -124,7 +127,16 @@ public sealed class HopngArtifactServiceIntegrationTests
             HopngArtifacts: [],
             TargetWitnessReceipts: includeTargetWitnessReceipts ? [CreateTargetWitnessReceipt()] : [],
             CompassObservationReceipts: includeCompassObservationReceipts ? [CreateCompassObservationReceipt()] : [],
-            CompassDriftReceipts: includeCompassDriftReceipts ? [CreateCompassDriftReceipt()] : []);
+            CompassDriftReceipts: includeCompassDriftReceipts ? [CreateCompassDriftReceipt()] : [],
+            InnerWeatherReceipts: includeInnerWeatherReceipts ? [CreateInnerWeatherReceipt()] : [],
+            CommunityWeatherPacket: includeInnerWeatherReceipts
+                ? new CommunityWeatherPacket(
+                    Status: CommunityWeatherStatus.Unstable,
+                    StewardAttention: CommunityStewardAttentionState.Recommended,
+                    AnchorState: CompassDriftState.Weakened,
+                    VisibilityClass: CompassVisibilityClass.CommunityLegible,
+                    TimestampUtc: DateTimeOffset.UtcNow)
+                : null);
 
         return new GovernedHopngEmissionRequest(
             LoopKey: snapshot.LoopKey,
@@ -231,6 +243,46 @@ public sealed class HopngArtifactServiceIntegrationTests
             AdvisoryDivergenceCount: 2,
             CompetingMigrationCount: 0,
             WitnessedBy: "CradleTek",
+            ObservationHandles:
+            [
+                "compass-observation://aaaaaaaaaaaaaaaa",
+                "compass-observation://bbbbbbbbbbbbbbbb",
+                "compass-observation://cccccccccccccccc"
+            ],
+            TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
+    private static GovernedInnerWeatherReceipt CreateInnerWeatherReceipt()
+    {
+        return new GovernedInnerWeatherReceipt(
+            InnerWeatherHandle: "inner-weather://1212121212121212",
+            LoopKey: "loop:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:test",
+            Stage: GovernanceLoopStage.BoundedCognitionCompleted,
+            CMEId: "cme-runtime",
+            ActiveBasin: CompassDoctrineBasin.BoundedLocalityContinuity,
+            CompetingBasin: CompassDoctrineBasin.FluidContinuityLaw,
+            DriftState: CompassDriftState.Weakened,
+            WindowIntegrityState: WindowIntegrityState.Intact,
+            ObservationCount: 3,
+            WindowSize: 3,
+            ResidueState: AttentionResidueState.Persistent,
+            ResidueVisibilityClass: CompassVisibilityClass.OperatorGuarded,
+            ResidueContributors:
+            [
+                AttentionResidueContributor.AdvisoryDivergence,
+                AttentionResidueContributor.DriftInstability
+            ],
+            ShellCompetitionState: ShellCompetitionState.Absent,
+            ShellCompetitionVisibilityClass: CompassVisibilityClass.CommunityLegible,
+            HotCoolContactState: HotCoolContactState.InContact,
+            HotCoolContactVisibilityClass: CompassVisibilityClass.CommunityLegible,
+            StewardAttentionCauses:
+            [
+                StewardAttentionCause.DriftWeakening,
+                StewardAttentionCause.ResiduePersistence
+            ],
+            WitnessedBy: "CradleTek",
+            DriftHandle: "compass-drift://9999999999999999",
             ObservationHandles:
             [
                 "compass-observation://aaaaaaaaaaaaaaaa",

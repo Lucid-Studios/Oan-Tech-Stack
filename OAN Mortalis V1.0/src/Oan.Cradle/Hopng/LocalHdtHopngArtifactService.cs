@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Nodes;
 using CradleTek.Host.Interfaces;
 using Hdt.Core.Artifacts;
 using Hdt.Core.Models;
@@ -112,8 +113,46 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
             WritePhase3Sidecars(artifact, request);
         }
 
+        WriteCommunitySafeWeatherProjection(artifact, request);
+
         RewriteManifestAndTrust(artifact, request);
         return _loader.Load(artifact.Layout.ManifestPath);
+    }
+
+    private void WriteCommunitySafeWeatherProjection(
+        LoadedHopngArtifact artifact,
+        GovernedHopngEmissionRequest request)
+    {
+        var communityWeatherPacket = request.Snapshot.CommunityWeatherPacket;
+        JsonObject projection;
+
+        if (File.Exists(artifact.Layout.ProjectionPath))
+        {
+            var existing = JsonNode.Parse(File.ReadAllText(artifact.Layout.ProjectionPath));
+            projection = existing as JsonObject ?? new JsonObject();
+        }
+        else
+        {
+            projection = new JsonObject();
+        }
+
+        if (communityWeatherPacket is null)
+        {
+            projection.Remove("community_safe_weather");
+        }
+        else
+        {
+            projection["community_safe_weather"] = new JsonObject
+            {
+                ["status"] = communityWeatherPacket.Status.ToString().ToLowerInvariant().Replace('_', '-'),
+                ["steward_attention"] = communityWeatherPacket.StewardAttention.ToString().ToLowerInvariant(),
+                ["anchor_state"] = communityWeatherPacket.AnchorState.ToString().ToLowerInvariant(),
+                ["visibility_class"] = communityWeatherPacket.VisibilityClass.ToString().ToLowerInvariant(),
+                ["timestamp_utc"] = communityWeatherPacket.TimestampUtc
+            };
+        }
+
+        _jsonStore.WriteCanonical(artifact.Layout.ProjectionPath, projection);
     }
 
     private void WritePhase2Sidecars(LoadedHopngArtifact artifact, GovernedHopngEmissionRequest request)

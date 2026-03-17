@@ -27,6 +27,86 @@ public enum CompassDriftState
     Lost = 2
 }
 
+public enum AttentionResidueState
+{
+    None = 0,
+    Low = 1,
+    Present = 2,
+    Persistent = 3,
+    Escalating = 4
+}
+
+public enum CompassVisibilityClass
+{
+    CommunityLegible = 0,
+    OperatorGuarded = 1,
+    CrypticOnly = 2
+}
+
+public enum ShellCompetitionState
+{
+    Unknown = 0,
+    Absent = 1,
+    Present = 2,
+    Rising = 3
+}
+
+public enum HotCoolContactState
+{
+    Unknown = 0,
+    InContact = 1,
+    Cool = 2,
+    MissedCheckIn = 3
+}
+
+public enum WindowIntegrityState
+{
+    Intact = 0,
+    Sparse = 1,
+    JournalGap = 2,
+    RuntimeRestart = 3,
+    CmeReselected = 4,
+    VisibilityDowngraded = 5,
+    GovernanceReset = 6
+}
+
+public enum AttentionResidueContributor
+{
+    None = 0,
+    AdvisoryDivergence = 1,
+    CompetingPressure = 2,
+    DriftInstability = 3,
+    WindowIntegrityBreak = 4,
+    ContactCadenceMissed = 5
+}
+
+public enum StewardAttentionCause
+{
+    None = 0,
+    DriftWeakening = 1,
+    DriftLoss = 2,
+    ResiduePersistence = 3,
+    ShellCompetition = 4,
+    MissedCheckIn = 5,
+    WindowIntegrityBreak = 6
+}
+
+public enum CommunityWeatherStatus
+{
+    Unknown = 0,
+    Stable = 1,
+    Unstable = 2,
+    Degraded = 3,
+    MissedCheckIn = 4
+}
+
+public enum CommunityStewardAttentionState
+{
+    None = 0,
+    Recommended = 1,
+    Needed = 2
+}
+
 public enum CompassObservationProvenance
 {
     LispNative = 0,
@@ -103,6 +183,32 @@ public sealed record CompassDriftAssessment(
     IReadOnlyList<string> ObservationHandles,
     DateTimeOffset TimestampUtc);
 
+public sealed record CompassResidueAssessment(
+    AttentionResidueState ResidueState,
+    CompassVisibilityClass VisibilityClass,
+    IReadOnlyList<AttentionResidueContributor> Contributors);
+
+public sealed record ShellCompetitionAssessment(
+    ShellCompetitionState CompetitionState,
+    CompassVisibilityClass VisibilityClass);
+
+public sealed record InnerWeatherEvidence(
+    string CMEId,
+    CompassDoctrineBasin ActiveBasin,
+    CompassDoctrineBasin CompetingBasin,
+    CompassDriftState DriftState,
+    int WindowSize,
+    int ObservationCount,
+    WindowIntegrityState WindowIntegrityState,
+    CompassResidueAssessment Residue,
+    ShellCompetitionAssessment ShellCompetition,
+    HotCoolContactState HotCoolContactState,
+    CompassVisibilityClass HotCoolContactVisibilityClass,
+    IReadOnlyList<StewardAttentionCause> StewardAttentionCauses,
+    string DriftHandle,
+    IReadOnlyList<string> ObservationHandles,
+    DateTimeOffset TimestampUtc);
+
 public sealed record GovernedCompassObservationReceipt(
     string WitnessHandle,
     GovernanceLoopStage Stage,
@@ -147,6 +253,37 @@ public sealed record GovernedCompassDriftReceipt(
     int CompetingMigrationCount,
     string WitnessedBy,
     IReadOnlyList<string> ObservationHandles,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedInnerWeatherReceipt(
+    string InnerWeatherHandle,
+    string LoopKey,
+    GovernanceLoopStage Stage,
+    string CMEId,
+    CompassDoctrineBasin ActiveBasin,
+    CompassDoctrineBasin CompetingBasin,
+    CompassDriftState DriftState,
+    WindowIntegrityState WindowIntegrityState,
+    int ObservationCount,
+    int WindowSize,
+    AttentionResidueState ResidueState,
+    CompassVisibilityClass ResidueVisibilityClass,
+    IReadOnlyList<AttentionResidueContributor> ResidueContributors,
+    ShellCompetitionState ShellCompetitionState,
+    CompassVisibilityClass ShellCompetitionVisibilityClass,
+    HotCoolContactState HotCoolContactState,
+    CompassVisibilityClass HotCoolContactVisibilityClass,
+    IReadOnlyList<StewardAttentionCause> StewardAttentionCauses,
+    string WitnessedBy,
+    string DriftHandle,
+    IReadOnlyList<string> ObservationHandles,
+    DateTimeOffset TimestampUtc);
+
+public sealed record CommunityWeatherPacket(
+    CommunityWeatherStatus Status,
+    CommunityStewardAttentionState StewardAttention,
+    CompassDriftState AnchorState,
+    CompassVisibilityClass VisibilityClass,
     DateTimeOffset TimestampUtc);
 
 public static class CompassObservationKeys
@@ -194,6 +331,29 @@ public static class CompassObservationKeys
         }
 
         return $"compass-drift://{ComputeDigest(loopKey, cmeId, driftState.ToString(), string.Join("|", orderedObservationHandles))}";
+    }
+
+    public static string CreateInnerWeatherHandle(
+        string loopKey,
+        string cmeId,
+        WindowIntegrityState windowIntegrityState,
+        CompassDriftState driftState,
+        IEnumerable<string> observationHandles)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(loopKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentNullException.ThrowIfNull(observationHandles);
+
+        var orderedObservationHandles = observationHandles
+            .Where(handle => !string.IsNullOrWhiteSpace(handle))
+            .Select(handle => handle.Trim())
+            .ToArray();
+        if (orderedObservationHandles.Length == 0)
+        {
+            throw new ArgumentException("At least one observation handle is required.", nameof(observationHandles));
+        }
+
+        return $"inner-weather://{ComputeDigest(loopKey, cmeId, windowIntegrityState.ToString(), driftState.ToString(), string.Join("|", orderedObservationHandles))}";
     }
 
     private static string ComputeDigest(params string[] parts)

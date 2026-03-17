@@ -118,6 +118,18 @@ internal static class GovernedHopngEvidenceReferences
                 "compass-drift");
         }
 
+        var innerWeatherReceipts = snapshot.InnerWeatherReceipts ?? [];
+        for (var index = 0; index < innerWeatherReceipts.Count; index++)
+        {
+            var receipt = innerWeatherReceipts[index];
+            AddReference(
+                refs,
+                seenPointers,
+                $"inner-weather-{index + 1}",
+                receipt.InnerWeatherHandle,
+                "inner-weather");
+        }
+
         foreach (var receipt in snapshot.HopngArtifacts)
         {
             AddReference(
