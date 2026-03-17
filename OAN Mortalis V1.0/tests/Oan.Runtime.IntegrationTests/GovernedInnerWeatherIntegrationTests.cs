@@ -6,6 +6,7 @@ using EngramGovernance.Services;
 using Oan.Common;
 using Oan.Cradle;
 using Oan.Storage;
+using System.Text.Json.Nodes;
 using Telemetry.GEL;
 
 namespace Oan.Runtime.IntegrationTests;
@@ -92,8 +93,20 @@ public sealed class GovernedInnerWeatherIntegrationTests
         var hopngService = HopngArtifactServiceFactory.Create(outputRoot);
         var governingTrafficArtifact = await hopngService.EmitAsync(hopngRequest);
 
-        Assert.Equal(GovernedHopngArtifactOutcome.Created, governingTrafficArtifact.Outcome);
+        Assert.True(
+            governingTrafficArtifact.Outcome == GovernedHopngArtifactOutcome.Created,
+            $"Outcome={governingTrafficArtifact.Outcome}; FailureCode={governingTrafficArtifact.FailureCode}; ValidationSummary={governingTrafficArtifact.ValidationSummary}; ManifestPath={governingTrafficArtifact.ManifestPath}");
         Assert.NotNull(governingTrafficArtifact.ProjectionPath);
+
+        var communityWeatherPath = Path.Combine(
+            Path.GetDirectoryName(governingTrafficArtifact.ManifestPath!)!,
+            "governing-traffic-evidence.community-weather.json");
+        Assert.True(File.Exists(communityWeatherPath));
+
+        var communityWeatherNode = JsonNode.Parse(File.ReadAllText(communityWeatherPath));
+        Assert.Equal(
+            "unstable",
+            communityWeatherNode?["community_safe_weather"]?["status"]?.GetValue<string>());
 #else
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
         var hopngService = HopngArtifactServiceFactory.Create(outputRoot);

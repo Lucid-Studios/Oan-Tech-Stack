@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\.local\Hdt.Local.props" Condition="Exists('..\..\.local\Hdt.Local.props')" />
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -7,6 +9,10 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(EnableLocalHdtBridge)' == 'true'">
+    <DefineConstants>$(DefineConstants);LOCAL_HDT_BRIDGE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

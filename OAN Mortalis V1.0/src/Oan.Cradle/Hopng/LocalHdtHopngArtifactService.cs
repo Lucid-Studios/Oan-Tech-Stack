@@ -40,24 +40,28 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         ArgumentNullException.ThrowIfNull(request);
 
         var artifactHandle = GovernedHopngArtifactKeys.CreateArtifactHandle(request.LoopKey, request.Profile);
+        var artifactSlug = GovernedHopngArtifactKeys.GetProfileSlug(request.Profile);
         var outputRoot = ResolveOutputRoot();
         var artifactDirectory = Path.Combine(outputRoot, GovernedHopngArtifactKeys.CreateArtifactDirectoryName(request.LoopKey, request.Profile));
+        var artifactLayout = HopngArtifactLayout.Create(artifactDirectory, artifactSlug);
+        var privateKeyPath = GetSharedPrivateKeyPath(outputRoot);
+        var publicKeyPath = GetSharedPublicKeyPath(outputRoot);
         Directory.CreateDirectory(artifactDirectory);
 
         try
         {
             var newArtifact = _builder.Create(new NewHopngRequest(
                 OutputDirectory: artifactDirectory,
-                Name: GovernedHopngArtifactKeys.GetProfileSlug(request.Profile),
+                Name: artifactSlug,
                 Signer: Signer,
                 KeyId: KeyId,
                 DisplayName: $"{request.Profile} {request.LoopKey}",
                 ArtifactId: CreateArtifactId(request.LoopKey, request.Profile),
                 PrivateKeyPath: null,
-                PrivateKeyOutputPath: Path.Combine(outputRoot, "_keys", $"{KeyId}.ed25519.private.key"),
-                PublicKeyOutputPath: Path.Combine(outputRoot, "_keys", $"{KeyId}.ed25519.public.key")));
+                PrivateKeyOutputPath: privateKeyPath,
+                PublicKeyOutputPath: publicKeyPath));
 
-            var artifact = EnrichArtifact(newArtifact, request);
+            var artifact = EnrichArtifact(newArtifact, request, privateKeyPath);
             var validation = _validator.Validate(artifact.Layout.ManifestPath);
 
             var outcome = validation.Errors.Count == 0
@@ -97,16 +101,20 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
                 IssuedBy: Signer,
                 TimestampUtc: DateTimeOffset.UtcNow,
                 ArtifactId: null,
-                ManifestPath: null,
-                ProjectionPath: null,
-                ValidationSummary: null,
-                ProfileSummary: null,
+                ManifestPath: File.Exists(artifactLayout.ManifestPath) ? artifactLayout.ManifestPath : null,
+                ProjectionPath: File.Exists(artifactLayout.ProjectionPath) ? artifactLayout.ProjectionPath : null,
+                ValidationSummary: ex.Message,
+                ProfileSummary: ex.ToString(),
                 FailureCode: $"hopng-emission-failed:{ex.GetType().Name}"));
         }
     }
 
-    private LoadedHopngArtifact EnrichArtifact(LoadedHopngArtifact artifact, GovernedHopngEmissionRequest request)
+    private LoadedHopngArtifact EnrichArtifact(
+        LoadedHopngArtifact artifact,
+        GovernedHopngEmissionRequest request,
+        string privateKeyPath)
     {
+        WriteProjectionSurfaces(artifact);
         WritePhase2Sidecars(artifact, request);
         if (request.Profile == GovernedHopngArtifactProfile.GovernanceTelemetryPhaseStack)
         {
@@ -115,7 +123,7 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
 
         WriteCommunitySafeWeatherProjection(artifact, request);
 
-        RewriteManifestAndTrust(artifact, request);
+        RewriteManifestAndTrust(artifact, request, privateKeyPath);
         return _loader.Load(artifact.Layout.ManifestPath);
     }
 
@@ -124,35 +132,84 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         GovernedHopngEmissionRequest request)
     {
         var communityWeatherPacket = request.Snapshot.CommunityWeatherPacket;
-        JsonObject projection;
-
-        if (File.Exists(artifact.Layout.ProjectionPath))
-        {
-            var existing = JsonNode.Parse(File.ReadAllText(artifact.Layout.ProjectionPath));
-            projection = existing as JsonObject ?? new JsonObject();
-        }
-        else
-        {
-            projection = new JsonObject();
-        }
+        var communityWeatherPath = GetCommunityWeatherPath(artifact.Layout);
 
         if (communityWeatherPacket is null)
         {
-            projection.Remove("community_safe_weather");
+            if (File.Exists(communityWeatherPath))
+            {
+                File.Delete(communityWeatherPath);
+            }
+
+            return;
         }
-        else
+
+        var projection = new JsonObject
         {
-            projection["community_safe_weather"] = new JsonObject
+            ["community_safe_weather"] = new JsonObject
             {
                 ["status"] = communityWeatherPacket.Status.ToString().ToLowerInvariant().Replace('_', '-'),
                 ["steward_attention"] = communityWeatherPacket.StewardAttention.ToString().ToLowerInvariant(),
                 ["anchor_state"] = communityWeatherPacket.AnchorState.ToString().ToLowerInvariant(),
                 ["visibility_class"] = communityWeatherPacket.VisibilityClass.ToString().ToLowerInvariant(),
                 ["timestamp_utc"] = communityWeatherPacket.TimestampUtc
+            }
+        };
+
+        _jsonStore.WriteCanonical(communityWeatherPath, projection);
+    }
+
+    private void WriteProjectionSurfaces(LoadedHopngArtifact artifact)
+    {
+        if (!artifact.LayerMap.Layers.Any(layer => string.Equals(layer.ProjectionRole, "audit-surface", StringComparison.Ordinal)))
+        {
+            var auditFrame = artifact.LayerMap.Layers.FirstOrDefault()?.CoordinateFrame ?? new CoordinateFrame
+            {
+                XAxis = "x",
+                YAxis = "y",
+                ZAxis = "z",
+                Units = "pixel-relative"
             };
+
+            var updatedLayerMap = artifact.LayerMap with
+            {
+                Layers =
+                [
+                    .. artifact.LayerMap.Layers,
+                    new LayerDefinition
+                    {
+                        LayerId = "audit-prime",
+                        UniverseId = "prime-audit",
+                        Modality = "governance-audit",
+                        ProjectionRole = "audit-surface",
+                        NeutralPlane = 0.25d,
+                        CoordinateFrame = auditFrame
+                    }
+                ]
+            };
+
+            _jsonStore.WriteCanonical(artifact.Layout.LayerMapPath, updatedLayerMap);
         }
 
-        _jsonStore.WriteCanonical(artifact.Layout.ProjectionPath, projection);
+        if (!artifact.DepthField.Planes.Any(plane => string.Equals(plane.LayerId, "audit-prime", StringComparison.Ordinal)))
+        {
+            var updatedDepthField = artifact.DepthField with
+            {
+                Planes =
+                [
+                    .. artifact.DepthField.Planes,
+                    new DepthPlane
+                    {
+                        LayerId = "audit-prime",
+                        NeutralPlane = 0.25d,
+                        MinimumZ = -1d,
+                        MaximumZ = 1d
+                    }
+                ]
+            };
+
+            _jsonStore.WriteCanonical(artifact.Layout.DepthFieldPath, updatedDepthField);
+        }
     }
 
     private void WritePhase2Sidecars(LoadedHopngArtifact artifact, GovernedHopngEmissionRequest request)
@@ -341,7 +398,10 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         _jsonStore.WriteCanonical(artifact.Layout.PhaseSlicePath, phaseSlices);
     }
 
-    private void RewriteManifestAndTrust(LoadedHopngArtifact artifact, GovernedHopngEmissionRequest request)
+    private void RewriteManifestAndTrust(
+        LoadedHopngArtifact artifact,
+        GovernedHopngEmissionRequest request,
+        string privateKeyPath)
     {
         var manifest = artifact.Manifest with
         {
@@ -365,7 +425,6 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         };
         _jsonStore.WriteCanonical(artifact.Layout.HashPath, hashSidecar);
 
-        var privateKeyPath = Path.Combine(Path.GetDirectoryName(artifact.Layout.PrivateKeyPath) ?? artifact.Layout.DirectoryPath, $"{KeyId}.ed25519.private.key");
         var keyMaterial = _signatureService.CreateOrLoad(privateKeyPath, privateKeyPath);
         var hashBytes = File.ReadAllBytes(artifact.Layout.HashPath);
         var signature = _signatureService.Sign(keyMaterial.PrivateKeyBase64, hashBytes);
@@ -395,6 +454,12 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
             Sidecar("legibility-profile", "oan.hopng_legibility_profile", artifact.Layout.LegibilityProfilePath)
         };
 
+        var communityWeatherPath = GetCommunityWeatherPath(artifact.Layout);
+        if (File.Exists(communityWeatherPath))
+        {
+            sidecars.Add(Sidecar("community-weather", "oan.hopng_community_weather", communityWeatherPath));
+        }
+
         if (profile == GovernedHopngArtifactProfile.GovernanceTelemetryPhaseStack)
         {
             sidecars.Add(Sidecar("event-slices", "oan.hopng_event_slice", artifact.Layout.EventSlicePath));
@@ -420,6 +485,12 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
             FileDigest("projection-rules", artifact.Layout.ProjectionRulesPath),
             FileDigest("legibility-profile", artifact.Layout.LegibilityProfilePath)
         };
+
+        var communityWeatherPath = GetCommunityWeatherPath(artifact.Layout);
+        if (File.Exists(communityWeatherPath))
+        {
+            digests.Add(FileDigest("community-weather", communityWeatherPath));
+        }
 
         if (profile == GovernedHopngArtifactProfile.GovernanceTelemetryPhaseStack)
         {
@@ -725,5 +796,20 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
     {
         var render = _phaseStack.Render(artifact, validation, view: "prime");
         return $"phase-stack:{render.Status};slices:{render.PhaseSliceCount};issues:{render.Issues.Count}";
+    }
+
+    private static string GetCommunityWeatherPath(HopngArtifactLayout layout)
+    {
+        return Path.Combine(layout.DirectoryPath, $"{layout.BaseName}.community-weather.json");
+    }
+
+    private static string GetSharedPrivateKeyPath(string outputRoot)
+    {
+        return Path.Combine(outputRoot, "_keys", $"{KeyId}.ed25519.private.key");
+    }
+
+    private static string GetSharedPublicKeyPath(string outputRoot)
+    {
+        return Path.Combine(outputRoot, "_keys", $"{KeyId}.ed25519.public.key");
     }
 }
