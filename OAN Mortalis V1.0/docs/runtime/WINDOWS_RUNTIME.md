@@ -45,6 +45,7 @@ Optional flags:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\windows-bootstrap.ps1 -SkipLlamaBuild
 powershell -ExecutionPolicy Bypass -File scripts\windows-bootstrap.ps1 -SkipStartService
+powershell -ExecutionPolicy Bypass -File scripts\windows-bootstrap.ps1 -CradleTekRoot <CRADLETEK_RUNTIME_ROOT>
 ```
 
 The script performs:
@@ -58,6 +59,8 @@ The script performs:
 5. Python package install (`flask`, `requests`).
 6. `llama.cpp` clone/build/install to `<CRADLETEK_RUNTIME_ROOT>\runtime\llama.cpp`.
 7. Inference service deployment and service start.
+
+Bootstrap now reuses the first existing `*.gguf` under `<CRADLETEK_RUNTIME_ROOT>\models\` when `seed.gguf` is absent.
 
 ## llama.cpp Installation Details
 
@@ -123,8 +126,36 @@ Schema fields:
 ## Model Installation
 
 1. Copy model file manually to `<CRADLETEK_RUNTIME_ROOT>\models\` (example: `seed.gguf`).
-2. Update `<CRADLETEK_RUNTIME_ROOT>\runtime\config.json` field `model_path`.
-3. Restart runtime with `scripts\windows-bootstrap.ps1 -SkipLlamaBuild`.
+2. If another `*.gguf` already exists in the models folder, bootstrap and preflight will resolve that file automatically.
+3. Update `<CRADLETEK_RUNTIME_ROOT>\runtime\config.json` field `model_path` only when you want to override the automatic resolution.
+4. Restart runtime with `scripts\windows-bootstrap.ps1 -SkipLlamaBuild`.
+
+## Runtime Preflight
+
+Run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\runtime-preflight.ps1
+```
+
+Optional explicit root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\runtime-preflight.ps1 -CradleTekRoot <CRADLETEK_RUNTIME_ROOT>
+```
+
+Preflight reports:
+
+1. runtime binary presence
+2. resolved model path and whether it exists
+3. runtime config and service-script presence
+4. virtual-environment presence
+5. host URL and health reachability
+6. runtime state:
+   - `ready-for-inference`
+   - `ready-for-model-drop`
+   - `runtime-binary-missing`
+   - `runtime-binary-and-model-missing`
 
 ## SoulFrame.Host Connectivity
 
@@ -139,3 +170,5 @@ Validation command:
 ```powershell
 Invoke-RestMethod -Method Get -Uri http://127.0.0.1:8181/health
 ```
+
+When the service is bootable but the model asset is absent, `/health` reports `ready-for-model-drop` rather than pretending inference is available.

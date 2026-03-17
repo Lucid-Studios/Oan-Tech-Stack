@@ -64,12 +64,17 @@ function Test-HyperVAvailability {
     }
 
     if (Test-Command "Get-WindowsOptionalFeature") {
-        $feature = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -ErrorAction SilentlyContinue
-        if ($null -ne $feature) {
-            $result.Enabled = $feature.State -eq "Enabled"
-            $result.Detail = "State: $($feature.State)"
-        } else {
-            $result.Detail = "Hyper-V feature not found by Get-WindowsOptionalFeature."
+        try {
+            $feature = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -ErrorAction Stop
+            if ($null -ne $feature) {
+                $result.Enabled = $feature.State -eq "Enabled"
+                $result.Detail = "State: $($feature.State)"
+            } else {
+                $result.Detail = "Hyper-V feature not found by Get-WindowsOptionalFeature."
+            }
+        }
+        catch {
+            $result.Detail = "Feature state unavailable in current shell: $($_.Exception.Message)"
         }
     } else {
         $result.Detail = "Get-WindowsOptionalFeature unavailable in this shell."
@@ -102,13 +107,35 @@ function Test-CpuVirtualizationSupport {
     }
 }
 
+function Resolve-DefaultModelPath {
+    param([string]$Root)
+
+    $preferred = Join-Path $Root "models\seed.gguf"
+    if (Test-Path $preferred) {
+        return (Resolve-Path $preferred).Path
+    }
+
+    $modelsRoot = Join-Path $Root "models"
+    if (Test-Path $modelsRoot) {
+        $existing = Get-ChildItem -Path $modelsRoot -Filter *.gguf -File -ErrorAction SilentlyContinue |
+            Sort-Object Name |
+            Select-Object -First 1
+        if ($null -ne $existing) {
+            return $existing.FullName
+        }
+    }
+
+    return $preferred
+}
+
 function Set-UserEnvironmentVariables {
     param([string]$Root)
 
+    $modelPath = Resolve-DefaultModelPath -Root $Root
     $values = @{
         "CRADLETEK_RUNTIME_ROOT" = $Root
         "OAN_RUNTIME_ROOT" = $Root
-        "OAN_MODEL_PATH" = (Join-Path $Root "models\seed.gguf")
+        "OAN_MODEL_PATH" = $modelPath
         "OAN_SELF_GEL" = (Join-Path $Root "cme\SelfGEL")
         "OAN_CSELF_GEL" = (Join-Path $Root "cme\cSelfGEL")
         "OAN_GOA" = (Join-Path $Root "cme\GoA")
@@ -122,6 +149,34 @@ function Set-UserEnvironmentVariables {
     }
 
     Write-Step "Environment variables configured for current user and process."
+}
+
+function Update-RuntimeConfig {
+    param(
+        [string]$Root,
+        [string]$ModelPath
+    )
+
+    $configPath = Join-Path $Root "runtime\config.json"
+    $existing = @{}
+    if (Test-Path $configPath) {
+        $raw = Get-Content $configPath -Raw | ConvertFrom-Json
+        if ($null -ne $raw) {
+            foreach ($property in $raw.PSObject.Properties) {
+                $existing[$property.Name] = $property.Value
+            }
+        }
+    }
+
+    $config = [ordered]@{
+        model_path = $ModelPath
+        inference_port = if ($existing.ContainsKey("inference_port")) { [int]$existing["inference_port"] } else { 8181 }
+        max_context = if ($existing.ContainsKey("max_context")) { [int]$existing["max_context"] } else { 2048 }
+        telemetry_enabled = if ($existing.ContainsKey("telemetry_enabled")) { [bool]$existing["telemetry_enabled"] } else { $true }
+    }
+
+    $config | ConvertTo-Json | Set-Content -Path $configPath -Encoding UTF8
+    Write-Step "Runtime config updated at $configPath."
 }
 
 function Ensure-PythonRuntime {
@@ -144,8 +199,8 @@ function Ensure-PythonRuntime {
         throw "Virtual environment python executable not found under $venvDir."
     }
 
-    Invoke-OrThrow -FilePath $venvPython -Arguments @("-m", "pip", "install", "--upgrade", "pip")
-    Invoke-OrThrow -FilePath $venvPython -Arguments @("-m", "pip", "install", "flask", "requests")
+    $null = Invoke-OrThrow -FilePath $venvPython -Arguments @("-m", "pip", "install", "--upgrade", "pip")
+    $null = Invoke-OrThrow -FilePath $venvPython -Arguments @("-m", "pip", "install", "flask", "requests")
     Write-Step "Python runtime ready at $venvDir."
     return $venvPython
 }
@@ -238,9 +293,9 @@ function Start-InferenceService {
     )
 
     $runtimeDir = Join-Path $Root "runtime"
+    $serviceDir = Join-Path $runtimeDir "inference_service"
     $servicePath = Join-Path $runtimeDir "inference_service\app.py"
     $configPath = Join-Path $runtimeDir "config.json"
-    $logPath = Join-Path $Root "logs\inference_service.log"
     $pidPath = Join-Path $runtimeDir "inference_service.pid"
 
     if (-not (Test-Path $servicePath)) {
@@ -263,23 +318,42 @@ function Start-InferenceService {
 
     $config = Get-Content $configPath -Raw | ConvertFrom-Json
     $port = if ($null -ne $config.inference_port) { [int]$config.inference_port } else { 8181 }
+    $modelPath = if ($null -ne $config.model_path -and -not [string]::IsNullOrWhiteSpace($config.model_path)) {
+        [string]$config.model_path
+    } else {
+        Resolve-DefaultModelPath -Root $Root
+    }
 
     [Environment]::SetEnvironmentVariable("CRADLETEK_RUNTIME_ROOT", $Root, "Process")
     [Environment]::SetEnvironmentVariable("SOULFRAME_API_PORT", "$port", "Process")
-    [Environment]::SetEnvironmentVariable("OAN_MODEL_PATH", (Join-Path $Root "models\seed.gguf"), "Process")
+    [Environment]::SetEnvironmentVariable("OAN_MODEL_PATH", $modelPath, "Process")
 
-    New-Item -Path (Split-Path $logPath -Parent) -ItemType Directory -Force | Out-Null
+    $pythonw = Join-Path (Split-Path $VenvPython -Parent) "pythonw.exe"
+    $launchExecutable = if (Test-Path $pythonw) { $pythonw } else { $VenvPython }
 
-    $proc = Start-Process `
-        -FilePath $VenvPython `
-        -ArgumentList @($servicePath) `
-        -RedirectStandardOutput $logPath `
-        -RedirectStandardError $logPath `
-        -PassThru `
-        -WindowStyle Hidden
+    Push-Location $serviceDir
+    try {
+        & $launchExecutable "app.py"
+    }
+    finally {
+        Pop-Location
+    }
 
-    $proc.Id | Set-Content $pidPath
-    Write-Step "Inference service started on http://127.0.0.1:$port (pid=$($proc.Id))."
+    Start-Sleep -Seconds 2
+    $proc = Get-CimInstance Win32_Process |
+        Where-Object {
+            $_.Name -like "python*.exe" -and
+            $_.ExecutablePath -eq $launchExecutable -and
+            $_.CommandLine -like "*app.py*"
+        } |
+        Select-Object -First 1
+
+    if ($null -eq $proc) {
+        throw "Inference service process not found after launch."
+    }
+
+    $proc.ProcessId | Set-Content $pidPath
+    Write-Step "Inference service started on http://127.0.0.1:$port (pid=$($proc.ProcessId))."
 }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -292,6 +366,7 @@ Set-UserEnvironmentVariables -Root $CradleTekRoot
 
 $venvPython = Ensure-PythonRuntime -Root $CradleTekRoot -PythonExecutable $PythonBin
 Install-InferenceServiceTemplate -Root $CradleTekRoot -RepoRoot $repoRoot
+Update-RuntimeConfig -Root $CradleTekRoot -ModelPath (Resolve-DefaultModelPath -Root $CradleTekRoot)
 
 if (-not $SkipLlamaBuild) {
     Install-LlamaCpp -Root $CradleTekRoot -RepoUrl $LlamaRepoUrl

@@ -10,6 +10,7 @@ by scripts/windows-bootstrap.ps1.
 import hashlib
 import json
 import os
+import re
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -45,7 +46,7 @@ def runtime_root() -> Path:
 def load_config() -> Dict[str, Any]:
     cfg_path = runtime_root() / "runtime" / "config.json"
     if cfg_path.exists():
-        with cfg_path.open("r", encoding="utf-8") as handle:
+        with cfg_path.open("r", encoding="utf-8-sig") as handle:
             cfg = json.load(handle)
     else:
         cfg = {}
@@ -86,7 +87,9 @@ def emit_telemetry(event_type: str, detail: Dict[str, Any]) -> None:
 def find_llama_cli() -> Optional[Path]:
     candidates = [
         runtime_root() / "runtime" / "llama.cpp" / "bin" / "llama-cli.exe",
+        runtime_root() / "runtime" / "llama.cpp" / "build" / "bin" / "Release" / "llama-cli.exe",
         runtime_root() / "runtime" / "llama.cpp" / "bin" / "main.exe",
+        runtime_root() / "runtime" / "llama.cpp" / "build" / "bin" / "Release" / "main.exe",
     ]
     for candidate in candidates:
         if candidate.exists():
@@ -94,14 +97,42 @@ def find_llama_cli() -> Optional[Path]:
     return None
 
 
+def current_model_path() -> Path:
+    return Path(CONFIG["model_path"])
+
+
+def runtime_readiness() -> Dict[str, Any]:
+    cli = find_llama_cli()
+    model = current_model_path()
+    cli_present = cli is not None
+    model_present = model.exists()
+
+    if cli_present and model_present:
+        state = "ready-for-inference"
+    elif cli_present:
+        state = "ready-for-model-drop"
+    elif model_present:
+        state = "runtime-binary-missing"
+    else:
+        state = "runtime-binary-and-model-missing"
+
+    return {
+        "runtime_state": state,
+        "llama_cli_present": cli_present,
+        "llama_cli_path": str(cli) if cli_present else None,
+        "model_present": model_present,
+        "model_path": str(model),
+    }
+
+
 def run_llama(prompt: str, max_tokens: int) -> str:
-    model_path = Path(CONFIG["model_path"])
+    model_path = current_model_path()
     cli = find_llama_cli()
     if cli is None or not model_path.exists():
         return json.dumps(
             {
-                "mode": "stub",
-                "reason": "llama-cli or model missing",
+                "mode": "unavailable",
+                "reason": runtime_readiness()["runtime_state"],
                 "trace": str_hash(prompt)[:16],
             }
         )
@@ -116,6 +147,14 @@ def run_llama(prompt: str, max_tokens: int) -> str:
         str(max_tokens),
         "--temp",
         "0.2",
+        "--simple-io",
+        "--no-display-prompt",
+        "--single-turn",
+        "--log-disable",
+        "--color",
+        "off",
+        "--log-colors",
+        "off",
     ]
 
     result = subprocess.run(args, capture_output=True, text=True, check=False, timeout=120)
@@ -124,7 +163,32 @@ def run_llama(prompt: str, max_tokens: int) -> str:
         output = (result.stderr or "").strip()
     if not output:
         output = json.dumps({"mode": "stub", "trace": str_hash(prompt)[:16]})
-    return output[:4000]
+    return extract_completion_text(output, prompt)[:4000]
+
+
+def extract_completion_text(output: str, prompt: str) -> str:
+    cleaned = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", output or "")
+    cleaned = cleaned.replace("\r\n", "\n").replace("\r", "\n")
+
+    prompt_marker = f"> {prompt}"
+    if prompt_marker in cleaned:
+        cleaned = cleaned.split(prompt_marker, 1)[1]
+
+    if "[ Prompt:" in cleaned:
+        cleaned = cleaned.split("[ Prompt:", 1)[0]
+
+    lines = []
+    for raw_line in cleaned.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith(">"):
+            continue
+        if line == "Exiting...":
+            continue
+        lines.append(line)
+
+    return "\n".join(lines).strip() or cleaned.strip()
 
 
 def parse_payload() -> Dict[str, Any]:
@@ -198,6 +262,28 @@ def choose_governed_state(task: str, context: str, max_tokens: int, require_term
             "content": "The runtime halted in response to an explicit stop request.",
         }
 
+    readiness = runtime_readiness()
+    if readiness["runtime_state"] == "runtime-binary-missing":
+        return {
+            "state": "REFUSAL",
+            "trace": "runtime-binary-missing",
+            "content": "The inference runtime binary is not installed yet.",
+        }
+
+    if readiness["runtime_state"] == "runtime-binary-and-model-missing":
+        return {
+            "state": "REFUSAL",
+            "trace": "runtime-binary-and-model-missing",
+            "content": "The inference runtime binary and model asset are both missing.",
+        }
+
+    if readiness["runtime_state"] == "ready-for-model-drop":
+        return {
+            "state": "REFUSAL",
+            "trace": "model-asset-missing",
+            "content": "The runtime is ready for model drop but no GGUF model is installed yet.",
+        }
+
     body = run_llama(normalized, max(1, min(max_tokens, int(CONFIG["max_context"]))))
     return {
         "state": "QUERY",
@@ -262,6 +348,7 @@ def handle_inference(default_task: str) -> Any:
     context = payload["context"]
     max_tokens = max(1, min(payload["max_tokens"], int(CONFIG["max_context"])))
     governance_protocol = payload["governance_protocol"]
+    readiness = runtime_readiness()
 
     emit_telemetry(
         "InferenceRequested",
@@ -285,6 +372,28 @@ def handle_inference(default_task: str) -> Any:
         )
         return jsonify(response)
 
+    if readiness["runtime_state"] != "ready-for-inference":
+        response = {
+            "decision": f"{task}-blocked",
+            "payload": json.dumps(
+                {
+                    "mode": "unavailable",
+                    "reason": readiness["runtime_state"],
+                    "trace": str_hash(context)[:16],
+                }
+            ),
+            "confidence": 0.0,
+        }
+        emit_telemetry(
+            "InferenceCompleted",
+            {
+                "task": task,
+                "governed": False,
+                "runtime_state": readiness["runtime_state"],
+            },
+        )
+        return jsonify(response)
+
     body = run_llama(context, max_tokens)
     response = {
         "decision": f"{task}-ok",
@@ -297,11 +406,15 @@ def handle_inference(default_task: str) -> Any:
 
 @APP.get("/health")
 def health() -> Any:
+    readiness = runtime_readiness()
     return jsonify(
         {
-            "status": "ok",
+            "status": readiness["runtime_state"],
             "time": utc_now(),
-            "model_path": CONFIG["model_path"],
+            "model_path": readiness["model_path"],
+            "model_present": readiness["model_present"],
+            "llama_cli_present": readiness["llama_cli_present"],
+            "governance_protocol_enabled": True,
             "inference_port": CONFIG["inference_port"],
         }
     )
