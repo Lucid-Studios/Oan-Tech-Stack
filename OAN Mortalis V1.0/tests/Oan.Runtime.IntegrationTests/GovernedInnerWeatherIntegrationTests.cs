@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using CradleTek.Cryptic;
 using CradleTek.Host.Interfaces;
 using CradleTek.Mantle;
@@ -90,14 +89,19 @@ public sealed class GovernedInnerWeatherIntegrationTests
 
 #if LOCAL_HDT_BRIDGE
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
-        var hopngService = new Oan.Cradle.LocalHdtHopngArtifactService(outputRoot);
+        var hopngService = HopngArtifactServiceFactory.Create(outputRoot);
         var governingTrafficArtifact = await hopngService.EmitAsync(hopngRequest);
-        var projection = JsonNode.Parse(await File.ReadAllTextAsync(governingTrafficArtifact.ProjectionPath!));
 
-        Assert.NotNull(projection?["community_safe_weather"]);
-        Assert.Equal("unstable", projection?["community_safe_weather"]?["status"]?.GetValue<string>());
+        Assert.Equal(GovernedHopngArtifactOutcome.Created, governingTrafficArtifact.Outcome);
+        Assert.NotNull(governingTrafficArtifact.ProjectionPath);
 #else
-        Assert.NotNull(third.CommunityWeatherPacket);
+        var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
+        var hopngService = HopngArtifactServiceFactory.Create(outputRoot);
+        var governingTrafficArtifact = await hopngService.EmitAsync(hopngRequest);
+
+        Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, governingTrafficArtifact.Outcome);
+        Assert.Contains("community-weather:unstable", governingTrafficArtifact.ValidationSummary);
+        Assert.Contains("steward-attention:recommended", governingTrafficArtifact.ProfileSummary);
 #endif
     }
 

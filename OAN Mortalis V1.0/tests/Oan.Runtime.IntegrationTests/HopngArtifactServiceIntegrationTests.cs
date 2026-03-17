@@ -9,7 +9,7 @@ public sealed class HopngArtifactServiceIntegrationTests
     public async Task UnavailableService_EmitsExplicitUnavailableReceipt()
     {
         var service = new UnavailableHopngArtifactService();
-        var request = CreateEmissionRequest();
+        var request = CreateEmissionRequest(includeInnerWeatherReceipts: true);
 
         var receipt = await service.EmitAsync(request);
 
@@ -19,6 +19,8 @@ public sealed class HopngArtifactServiceIntegrationTests
         Assert.Equal("hopng-bridge-unavailable", receipt.FailureCode);
         Assert.Null(receipt.ManifestPath);
         Assert.Null(receipt.ProjectionPath);
+        Assert.Contains("community-weather:unstable", receipt.ValidationSummary);
+        Assert.Contains("steward-attention:recommended", receipt.ProfileSummary);
     }
 
     [Fact]
