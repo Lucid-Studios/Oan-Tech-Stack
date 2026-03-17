@@ -76,7 +76,8 @@ public sealed class SliIngestionEngine
                             MaxTokens = 64
                         },
                         SoulFrameId = Guid.Empty,
-                        ContextId = Guid.Empty
+                        ContextId = Guid.Empty,
+                        GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
                     },
                     cancellationToken)
                 .ConfigureAwait(false);

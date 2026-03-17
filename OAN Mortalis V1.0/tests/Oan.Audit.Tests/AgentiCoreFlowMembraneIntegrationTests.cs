@@ -174,7 +174,7 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
 
             if (request.RequestUri?.AbsolutePath == "/semantic_expand")
             {
-                var json = "{\"decision\":\"semantic-expand\",\"payload\":\"hint\",\"confidence\":0.61}";
+                var json = "{\"decision\":\"semantic-expand\",\"payload\":\"hint\",\"confidence\":0.61,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"hint\"}}";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -183,7 +183,7 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
 
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50}", Encoding.UTF8, "application/json")
+                Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"{}\"}}", Encoding.UTF8, "application/json")
             });
         });
 

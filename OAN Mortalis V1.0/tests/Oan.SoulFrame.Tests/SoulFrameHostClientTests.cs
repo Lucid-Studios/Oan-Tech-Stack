@@ -79,6 +79,86 @@ public sealed class SoulFrameHostClientTests
         Assert.Equal("label:equation", response.Decision);
         Assert.Equal("equation-structure", response.Payload);
         Assert.Equal(0.82, response.Confidence, 3);
+        Assert.Equal(SoulFrameGovernedEmissionState.Query, response.Governance.State);
+        Assert.Equal("legacy-response-envelope", response.Governance.Trace);
+    }
+
+    [Fact]
+    public async Task SemanticInference_StrictGovernedProtocol_ParsesExplicitStateEnvelope()
+    {
+        var client = CreateClient((request, _) =>
+        {
+            if (request.RequestUri?.AbsolutePath != "/classify")
+            {
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            }
+
+            var json = "{\"decision\":\"label:equation\",\"payload\":\"equation-structure\",\"confidence\":0.82,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"equation-structure\"}}";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
+        });
+
+        var response = await client.ClassifyAsync(new SoulFrameInferenceRequest
+        {
+            Task = "classify",
+            Context = "3x + 7 = 25",
+            OpalConstraints = new SoulFrameInferenceConstraints
+            {
+                Domain = "arithmetic",
+                DriftLimit = 0.02,
+                MaxTokens = 64
+            },
+            SoulFrameId = Guid.NewGuid(),
+            ContextId = Guid.NewGuid(),
+            GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
+        });
+
+        Assert.True(response.Accepted);
+        Assert.Equal(SoulFrameGovernedEmissionState.Query, response.Governance.State);
+        Assert.Equal("response-ready", response.Governance.Trace);
+        Assert.Equal("equation-structure", response.Governance.Content);
+    }
+
+    [Fact]
+    public async Task SemanticInference_StrictGovernedProtocol_RejectsMissingStateEnvelope()
+    {
+        var telemetry = new GelTelemetryAdapter();
+        var adapter = new SoulFrameTelemetryAdapter(telemetry);
+        var client = CreateClient((request, _) =>
+        {
+            if (request.RequestUri?.AbsolutePath != "/infer")
+            {
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            }
+
+            var json = "{\"decision\":\"infer-ok\",\"payload\":\"{}\",\"confidence\":0.7}";
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
+        }, adapter);
+
+        var response = await client.InferAsync(new SoulFrameInferenceRequest
+        {
+            Task = "infer",
+            Context = "context sample",
+            OpalConstraints = new SoulFrameInferenceConstraints
+            {
+                Domain = "general",
+                DriftLimit = 0.02,
+                MaxTokens = 64
+            },
+            SoulFrameId = Guid.NewGuid(),
+            ContextId = Guid.NewGuid(),
+            GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
+        });
+
+        Assert.False(response.Accepted);
+        Assert.Equal(SoulFrameGovernedEmissionState.Error, response.Governance.State);
+        Assert.Equal("invalid-governed-emission:missing-state-envelope", response.Governance.Trace);
+        Assert.Contains(telemetry.Records, record => record.RuntimeState == "soulframe-host:inferencerefused");
     }
 
     [Fact]

@@ -148,7 +148,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                     Context = hostedRequestContext,
                     OpalConstraints = BuildOpalConstraints(sheafPlan.Domain),
                     SoulFrameId = context.SoulFrameId,
-                    ContextId = context.ContextId
+                    ContextId = context.ContextId,
+                    GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
                 },
                 cancellationToken)
             .ConfigureAwait(false);

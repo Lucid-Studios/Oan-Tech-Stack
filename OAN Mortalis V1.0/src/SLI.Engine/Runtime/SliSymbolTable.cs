@@ -2828,7 +2828,8 @@ public sealed class SliSymbolTable
             Context = contextValue,
             OpalConstraints = context.OpalConstraints,
             SoulFrameId = context.Frame.SoulFrameId,
-            ContextId = context.Frame.ContextId
+            ContextId = context.Frame.ContextId,
+            GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
         };
     }
 }

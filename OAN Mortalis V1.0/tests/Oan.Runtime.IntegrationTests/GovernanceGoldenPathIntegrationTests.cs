@@ -745,7 +745,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         {
             if (request.RequestUri?.AbsolutePath == "/classify")
             {
-                const string json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74}";
+                const string json = "{\"decision\":\"bounded-classify\",\"payload\":\"bounded-payload\",\"confidence\":0.74,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"bounded-payload\"}}";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -754,7 +754,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
 
             if (request.RequestUri?.AbsolutePath == "/semantic_expand")
             {
-                const string json = "{\"decision\":\"semantic-expand\",\"payload\":\"hint\",\"confidence\":0.61}";
+                const string json = "{\"decision\":\"semantic-expand\",\"payload\":\"hint\",\"confidence\":0.61,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"hint\"}}";
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -763,7 +763,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
 
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50}", Encoding.UTF8, "application/json")
+                Content = new StringContent("{\"decision\":\"ok\",\"payload\":\"{}\",\"confidence\":0.50,\"governance\":{\"state\":\"QUERY\",\"trace\":\"response-ready\",\"content\":\"{}\"}}", Encoding.UTF8, "application/json")
             });
         });
 

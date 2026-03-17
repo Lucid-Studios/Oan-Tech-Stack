@@ -171,7 +171,11 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                     violation.Message,
                     cancellationToken)
                 .ConfigureAwait(false);
-            return FallbackResponse(request, accepted: false);
+            return FallbackResponse(
+                request,
+                accepted: false,
+                state: SoulFrameGovernedEmissionState.Refusal,
+                trace: "constraint-violation");
         }
 
         await EmitAsync(SoulFrameTelemetryEventType.InferenceRequested, request.SoulFrameId, request.ContextId, request.Task, cancellationToken)
@@ -186,7 +190,20 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                 Domain = request.OpalConstraints.Domain,
                 DriftLimit = request.OpalConstraints.DriftLimit,
                 MaxTokens = request.OpalConstraints.MaxTokens
-            }
+            },
+            GovernanceProtocol = request.GovernanceProtocol is null
+                ? null
+                : new SoulFrameApiGovernanceProtocol
+                {
+                    Version = request.GovernanceProtocol.Version,
+                    RequireStateEnvelope = request.GovernanceProtocol.RequireStateEnvelope,
+                    RequireTrace = request.GovernanceProtocol.RequireTrace,
+                    RequireTerminalState = request.GovernanceProtocol.RequireTerminalState,
+                    AllowLegacyFallback = request.GovernanceProtocol.AllowLegacyFallback,
+                    AllowedStates = request.GovernanceProtocol.AllowedStates
+                        .Select(SoulFrameGovernedEmissionStateTokens.ToToken)
+                        .ToArray()
+                }
         };
 
         try
@@ -201,18 +218,16 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                         $"status:{(int)response.StatusCode}",
                         cancellationToken)
                     .ConfigureAwait(false);
-                return FallbackResponse(request, accepted: false);
+                return FallbackResponse(
+                    request,
+                    accepted: false,
+                    state: SoulFrameGovernedEmissionState.Refusal,
+                    trace: $"http-status:{(int)response.StatusCode}");
             }
 
             var payload = await response.Content.ReadFromJsonAsync<SoulFrameApiResponse>(cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            var result = new SoulFrameInferenceResponse
-            {
-                Accepted = true,
-                Decision = payload?.Decision ?? $"{request.Task}-ok",
-                Payload = payload?.Payload ?? request.Context,
-                Confidence = payload?.Confidence ?? 0.5
-            };
+            var result = BuildInferenceResponse(request, payload);
 
             if (request.OpalConstraints.DriftLimit < 0.05 && result.Confidence < 0.45)
             {
@@ -234,6 +249,21 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                 .ConfigureAwait(false);
             return result;
         }
+        catch (InvalidOperationException protocolViolation)
+        {
+            await EmitAsync(
+                    SoulFrameTelemetryEventType.InferenceRefused,
+                    request.SoulFrameId,
+                    request.ContextId,
+                    protocolViolation.Message,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            return FallbackResponse(
+                request,
+                accepted: false,
+                state: SoulFrameGovernedEmissionState.Error,
+                trace: protocolViolation.Message);
+        }
         catch
         {
             await EmitAsync(
@@ -243,7 +273,11 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                     "transport-error",
                     cancellationToken)
                 .ConfigureAwait(false);
-            return FallbackResponse(request, accepted: false);
+            return FallbackResponse(
+                request,
+                accepted: false,
+                state: SoulFrameGovernedEmissionState.Error,
+                trace: "transport-error");
         }
     }
 
@@ -309,16 +343,118 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         await _telemetry.EmitAsync(eventType, soulFrameId, contextId, detail, cancellationToken).ConfigureAwait(false);
     }
 
-    private static SoulFrameInferenceResponse FallbackResponse(SoulFrameInferenceRequest request, bool accepted)
+    private static SoulFrameInferenceResponse BuildInferenceResponse(
+        SoulFrameInferenceRequest request,
+        SoulFrameApiResponse? payload)
+    {
+        var governance = ParseGovernanceEnvelope(request, payload);
+        var accepted = IsAcceptedState(governance.State);
+        return new SoulFrameInferenceResponse
+        {
+            Accepted = accepted,
+            Decision = payload?.Decision ?? DefaultDecision(request.Task, governance.State),
+            Payload = payload?.Payload ?? governance.Content ?? request.Context,
+            Confidence = payload?.Confidence ?? DefaultConfidence(governance.State),
+            Governance = governance
+        };
+    }
+
+    private static SoulFrameGovernedEmissionEnvelope ParseGovernanceEnvelope(
+        SoulFrameInferenceRequest request,
+        SoulFrameApiResponse? payload)
+    {
+        var protocol = request.GovernanceProtocol;
+        if (payload?.Governance is null)
+        {
+            if (protocol?.RequireStateEnvelope == true && !protocol.AllowLegacyFallback)
+            {
+                throw new InvalidOperationException("invalid-governed-emission:missing-state-envelope");
+            }
+
+            return new SoulFrameGovernedEmissionEnvelope
+            {
+                State = SoulFrameGovernedEmissionState.Query,
+                Trace = "legacy-response-envelope",
+                Content = payload?.Payload
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(payload.Governance.State) ||
+            !SoulFrameGovernedEmissionStateTokens.TryParse(payload.Governance.State, out var state))
+        {
+            throw new InvalidOperationException("invalid-governed-emission:unknown-state-token");
+        }
+
+        if (protocol is not null)
+        {
+            if (!protocol.AllowedStates.Contains(state))
+            {
+                throw new InvalidOperationException($"invalid-governed-emission:disallowed-state:{SoulFrameGovernedEmissionStateTokens.ToToken(state)}");
+            }
+
+            if (protocol.RequireTrace && string.IsNullOrWhiteSpace(payload.Governance.Trace))
+            {
+                throw new InvalidOperationException("invalid-governed-emission:missing-trace");
+            }
+
+            if (protocol.RequireTerminalState && !SoulFrameGovernedEmissionStateTokens.IsTerminal(state))
+            {
+                throw new InvalidOperationException($"invalid-governed-emission:non-terminal-state:{SoulFrameGovernedEmissionStateTokens.ToToken(state)}");
+            }
+        }
+
+        return new SoulFrameGovernedEmissionEnvelope
+        {
+            State = state,
+            Trace = string.IsNullOrWhiteSpace(payload.Governance.Trace)
+                ? "governed-emission"
+                : payload.Governance.Trace,
+            Content = payload.Governance.Content ?? payload.Payload
+        };
+    }
+
+    private static bool IsAcceptedState(SoulFrameGovernedEmissionState state) =>
+        state is SoulFrameGovernedEmissionState.Query or SoulFrameGovernedEmissionState.Complete;
+
+    private static string DefaultDecision(string task, SoulFrameGovernedEmissionState state) => state switch
+    {
+        SoulFrameGovernedEmissionState.Query => $"{task}-query",
+        SoulFrameGovernedEmissionState.NeedsMoreInformation => "needs-more-information",
+        SoulFrameGovernedEmissionState.UnresolvedConflict => "unresolved-conflict",
+        SoulFrameGovernedEmissionState.Refusal => $"{task}-refused",
+        SoulFrameGovernedEmissionState.Error => $"{task}-error",
+        SoulFrameGovernedEmissionState.Complete => $"{task}-complete",
+        SoulFrameGovernedEmissionState.Halt => $"{task}-halted",
+        _ => $"{task}-pending"
+    };
+
+    private static double DefaultConfidence(SoulFrameGovernedEmissionState state) => state switch
+    {
+        SoulFrameGovernedEmissionState.Query or SoulFrameGovernedEmissionState.Complete => 0.5,
+        SoulFrameGovernedEmissionState.NeedsMoreInformation or SoulFrameGovernedEmissionState.UnresolvedConflict => 0.2,
+        _ => 0.0
+    };
+
+    private static SoulFrameInferenceResponse FallbackResponse(
+        SoulFrameInferenceRequest request,
+        bool accepted,
+        SoulFrameGovernedEmissionState state,
+        string trace)
     {
         var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(request.Context)))
             .ToLowerInvariant()[..16];
         return new SoulFrameInferenceResponse
         {
             Accepted = accepted,
-            Decision = accepted ? $"{request.Task}-fallback-ok" : $"{request.Task}-refused",
+            Decision = DefaultDecision(request.Task, state),
             Payload = JsonSerializer.Serialize(new { request.Task, hash }),
-            Confidence = accepted ? 0.55 : 0.0
+            Confidence = accepted ? 0.55 : DefaultConfidence(state),
+            Governance = new SoulFrameGovernedEmissionEnvelope
+            {
+                State = state,
+                Trace = trace,
+                Content = null
+            }
         };
     }
 
@@ -361,6 +497,9 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
         [JsonPropertyName("opal_constraints")]
         public required SoulFrameApiConstraints OpalConstraints { get; init; }
+
+        [JsonPropertyName("governance_protocol")]
+        public SoulFrameApiGovernanceProtocol? GovernanceProtocol { get; init; }
     }
 
     private sealed class SoulFrameApiConstraints
@@ -385,5 +524,41 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
         [JsonPropertyName("confidence")]
         public double? Confidence { get; init; }
+
+        [JsonPropertyName("governance")]
+        public SoulFrameApiGovernanceEnvelope? Governance { get; init; }
+    }
+
+    private sealed class SoulFrameApiGovernanceProtocol
+    {
+        [JsonPropertyName("version")]
+        public required string Version { get; init; }
+
+        [JsonPropertyName("require_state_envelope")]
+        public required bool RequireStateEnvelope { get; init; }
+
+        [JsonPropertyName("require_trace")]
+        public required bool RequireTrace { get; init; }
+
+        [JsonPropertyName("require_terminal_state")]
+        public required bool RequireTerminalState { get; init; }
+
+        [JsonPropertyName("allow_legacy_fallback")]
+        public required bool AllowLegacyFallback { get; init; }
+
+        [JsonPropertyName("allowed_states")]
+        public required string[] AllowedStates { get; init; }
+    }
+
+    private sealed class SoulFrameApiGovernanceEnvelope
+    {
+        [JsonPropertyName("state")]
+        public string? State { get; init; }
+
+        [JsonPropertyName("trace")]
+        public string? Trace { get; init; }
+
+        [JsonPropertyName("content")]
+        public string? Content { get; init; }
     }
 }
