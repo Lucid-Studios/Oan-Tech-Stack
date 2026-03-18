@@ -82,8 +82,11 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.NotEmpty(context.WorkingMemory["sli_fragment_diag_stress_degraded_variants"]);
         Assert.Equal("zed-theta:test-audit", result.ZedThetaCandidate.CandidateHandle);
         Assert.Equal(SliAuthorityClass.CandidateBearing, result.ZedThetaCandidate.PacketDirective.AuthorityClass);
+        Assert.Equal("Ok", context.WorkingMemory["zed_theta_bridge_outcome"]);
+        Assert.Equal("ThresholdBreach", context.WorkingMemory["zed_theta_bridge_threshold"]);
+        Assert.Equal("sli-runtime-candidate-only", context.WorkingMemory["zed_theta_runtime_reason"]);
         Assert.Equal(SliTheaterAuthorizationState.Withheld, result.TheaterAuthorization.AuthorizationState);
-        Assert.Equal("sli-candidate-bearing-only", result.TheaterAuthorization.ReasonCode);
+        Assert.Equal("sli-runtime-candidate-only", result.TheaterAuthorization.ReasonCode);
         Assert.NotNull(result.CompassObservation);
         Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation!.ActiveBasin);
         Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation.CompetingBasin);
@@ -368,30 +371,50 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
             var anchorState = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
                 ? CompassAnchorState.Held
                 : CompassAnchorState.Weakened;
+            var updateLocus = activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf;
+            var packetDirective = new SliPacketDirective(
+                SliThinkingTier.Master,
+                SliPacketClass.Commitment,
+                SliEngramOperation.Write,
+                updateLocus,
+                SliAuthorityClass.CandidateBearing);
+            var identityKernelBoundary = new IdentityKernelBoundaryReceipt(
+                CmeIdentityHandle: "cme:test",
+                IdentityKernelHandle: "kernel:test",
+                ContinuityAnchorHandle: "anchor:test:bounded-locality",
+                KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
+                CandidateLocus: updateLocus);
+            var validity = new SliPacketValidityReceipt(true, true, true, true, "sli-packet-valid");
+            var bridgeReview = SliBridgeContracts.CreateCandidateBridgeReview(
+                bridgeStage: "zed-theta-candidate",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: "sli-bridge://test-audit",
+                thetaState: "theta-ready",
+                gammaState: "gamma-ready",
+                packetDirective: packetDirective,
+                identityKernelBoundary: identityKernelBoundary,
+                validity: validity,
+                activeBasin: activeBasin,
+                competingBasin: competingBasin,
+                anchorState: anchorState,
+                selfTouchClass: CompassSelfTouchClass.ValidationTouch);
             var zedThetaCandidate = new ZedThetaCandidateReceipt(
                 CandidateHandle: "zed-theta:test-audit",
                 Objective: objective,
                 PrimeState: "task-objective",
                 ThetaState: "theta-ready",
                 GammaState: "gamma-ready",
-                PacketDirective: new SliPacketDirective(
-                    SliThinkingTier.Master,
-                    SliPacketClass.Commitment,
-                    SliEngramOperation.Write,
-                    activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf,
-                    SliAuthorityClass.CandidateBearing),
-                IdentityKernelBoundary: new IdentityKernelBoundaryReceipt(
-                    CmeIdentityHandle: "cme:test",
-                    IdentityKernelHandle: "kernel:test",
-                    ContinuityAnchorHandle: "anchor:test:bounded-locality",
-                    KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
-                    CandidateLocus: activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf),
-                Validity: new SliPacketValidityReceipt(true, true, true, true, "sli-packet-valid"),
+                PacketDirective: packetDirective,
+                IdentityKernelBoundary: identityKernelBoundary,
+                Validity: validity,
                 ActiveBasin: activeBasin,
                 CompetingBasin: competingBasin,
                 AnchorState: anchorState,
                 SelfTouchClass: CompassSelfTouchClass.ValidationTouch,
-                OeCoePosture: CompassOeCoePosture.CoeDominant);
+                OeCoePosture: CompassOeCoePosture.CoeDominant,
+                BridgeReview: bridgeReview,
+                RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
 
             return Task.FromResult(new CognitionResult
             {

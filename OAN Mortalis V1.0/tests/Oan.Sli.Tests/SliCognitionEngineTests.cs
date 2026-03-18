@@ -85,7 +85,7 @@ public sealed class SliCognitionEngineTests
         Assert.True(gammaIndex < compassIndex);
         Assert.Contains("GoldenCode(", result.Reasoning, StringComparison.Ordinal);
         Assert.Equal(CompassDoctrineBasin.IdentityContinuity, result.GoldenCodeCompass.ActiveBasin);
-        Assert.Equal(CompassDoctrineBasin.Unknown, result.GoldenCodeCompass.CompetingBasin);
+        Assert.Equal(CompassDoctrineBasin.IdentityContinuity, result.GoldenCodeCompass.CompetingBasin);
         Assert.Equal(CompassAnchorState.Held, result.GoldenCodeCompass.AnchorState);
         Assert.Equal(CompassSelfTouchClass.ValidationTouch, result.GoldenCodeCompass.SelfTouchClass);
         Assert.Equal(CompassOeCoePosture.OeDominant, result.GoldenCodeCompass.OeCoePosture);
@@ -105,6 +105,10 @@ public sealed class SliCognitionEngineTests
         Assert.Equal(result.GoldenCodeCompass.AnchorState, result.ZedThetaCandidate.AnchorState);
         Assert.Equal(result.GoldenCodeCompass.SelfTouchClass, result.ZedThetaCandidate.SelfTouchClass);
         Assert.Equal(result.GoldenCodeCompass.OeCoePosture, result.ZedThetaCandidate.OeCoePosture);
+        Assert.NotNull(result.ZedThetaCandidate.BridgeReview);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, result.ZedThetaCandidate.BridgeReview!.OutcomeKind);
+        Assert.NotNull(result.ZedThetaCandidate.RuntimeUseCeiling);
+        Assert.True(result.ZedThetaCandidate.RuntimeUseCeiling!.CandidateOnly);
         var compatibilityProjection = GoldenCodeCompassProjection.FromCandidateReceipt(result.ZedThetaCandidate);
         Assert.Equal(result.GoldenCodeCompass.ActiveBasin, compatibilityProjection.ActiveBasin);
         Assert.Equal(result.GoldenCodeCompass.CompetingBasin, compatibilityProjection.CompetingBasin);
@@ -192,7 +196,16 @@ public sealed class SliCognitionEngineTests
             CompetingBasin: CompassDoctrineBasin.Unknown,
             AnchorState: CompassAnchorState.Held,
             SelfTouchClass: CompassSelfTouchClass.ValidationTouch,
-            OeCoePosture: CompassOeCoePosture.OeDominant);
+            OeCoePosture: CompassOeCoePosture.OeDominant,
+            BridgeReview: SliBridgeContracts.CreateReview(
+                bridgeStage: "zed-theta-candidate",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: "sli-bridge://test",
+                outcomeKind: SliBridgeOutcomeKind.Ok,
+                thresholdClass: SliBridgeThresholdClass.WithinBand,
+                reasonCode: "sli-bridge-within-band"),
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
 
         var options = new JsonSerializerOptions();
         var first = JsonSerializer.Serialize(receipt, options);
@@ -210,7 +223,7 @@ public sealed class SliCognitionEngineTests
                 RequestedTheater: "prime",
                 AuthorityClass: SliAuthorityClass.CandidateBearing,
                 AuthorizationState: SliTheaterAuthorizationState.Withheld,
-                ReasonCode: "sli-candidate-bearing-only",
+                ReasonCode: "sli-runtime-candidate-only",
                 WitnessedBy: "test",
                 TimestampUtc: DateTimeOffset.UnixEpoch), options), StringComparison.Ordinal);
     }

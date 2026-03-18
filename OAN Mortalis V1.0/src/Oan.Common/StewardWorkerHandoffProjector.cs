@@ -150,6 +150,15 @@ public static class StewardWorkerHandoffProjector
             return null;
         }
 
+        var bridgeReview = reviewRequest.BridgeReview ?? CreateFallbackBridgeReview(reviewRequest);
+        var runtimeUseCeiling = reviewRequest.RuntimeUseCeiling
+            ?? SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+        if (bridgeReview.OutcomeKind != SliBridgeOutcomeKind.Ok ||
+            runtimeUseCeiling.CandidateOnly != true)
+        {
+            return null;
+        }
+
         var handoffPacketId = WorkerGovernanceKeys.CreateWorkerHandoffPacketId(
             loopKey,
             issuanceReceipt.CMEId,
@@ -161,6 +170,18 @@ public static class StewardWorkerHandoffProjector
             : reviewRequest.IntakeIntent.Trim();
         var disclosureClass = issuanceReceipt.DisclosureCeiling;
         var timestampUtc = issuanceReceipt.TimestampUtc;
+        var sourceHandles = new List<string>
+        {
+            reviewRequest.ReturnCandidatePointer,
+            reviewRequest.WorkingStateHandle,
+            authorityReceipt.AuthorityHandle,
+            issuanceReceipt.IssuanceHandle,
+            weatherDisclosureReceipt.DisclosureHandle
+        };
+        if (!string.IsNullOrWhiteSpace(bridgeReview.BridgeWitnessHandle))
+        {
+            sourceHandles.Add(bridgeReview.BridgeWitnessHandle);
+        }
 
         var packet = new WorkerHandoffPacket(
             HandoffPacketId: handoffPacketId,
@@ -171,14 +192,7 @@ public static class StewardWorkerHandoffProjector
             WorkerInstanceMode: WorkerInstanceMode.RequestOnly,
             Objective: objective,
             TaskKind: profile.TaskKind,
-            SourceHandles:
-            [
-                reviewRequest.ReturnCandidatePointer,
-                reviewRequest.WorkingStateHandle,
-                authorityReceipt.AuthorityHandle,
-                issuanceReceipt.IssuanceHandle,
-                weatherDisclosureReceipt.DisclosureHandle
-            ],
+            SourceHandles: sourceHandles,
             RequiredOutputKind: profile.RequiredOutputKind,
             DeadlineOrExpiry: profile.DeadlineOrExpiry,
             HaltConditions: profile.HaltConditions,
@@ -202,7 +216,9 @@ public static class StewardWorkerHandoffProjector
             ResidueDisposition: WorkerResidueDisposition.NeedsClassification,
             EvidenceSufficiencyState: authorityReceipt.EvidenceSufficiencyState,
             MaturityPosture: MaturityPosture.DoctrineBacked,
-            TimestampUtc: timestampUtc);
+            TimestampUtc: timestampUtc,
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling);
 
         var handoffHandle = WorkerGovernanceKeys.CreateWorkerHandoffHandle(
             loopKey,
@@ -228,9 +244,36 @@ public static class StewardWorkerHandoffProjector
             OfficeAuthorityHandle: issuanceReceipt.OfficeAuthorityHandle,
             WeatherDisclosureHandle: issuanceReceipt.WeatherDisclosureHandle,
             WitnessedBy: "CradleTek",
-            TimestampUtc: packet.TimestampUtc);
+            TimestampUtc: packet.TimestampUtc,
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling);
 
         return (packet, receipt);
+    }
+
+    private static SliBridgeReviewReceipt CreateFallbackBridgeReview(ReturnCandidateReviewRequest reviewRequest)
+    {
+        if (!string.Equals(reviewRequest.SourceTheater, reviewRequest.RequestedTheater, StringComparison.OrdinalIgnoreCase))
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "steward-worker-handoff-fallback",
+                sourceTheater: reviewRequest.SourceTheater,
+                targetTheater: reviewRequest.RequestedTheater,
+                bridgeWitnessHandle: reviewRequest.ReturnCandidatePointer,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-cross-theater-identification",
+                refusalClass: SliBridgeRefusalClass.CrossTheaterIdentification);
+        }
+
+        return SliBridgeContracts.CreateReview(
+            bridgeStage: "steward-worker-handoff-fallback",
+            sourceTheater: reviewRequest.SourceTheater,
+            targetTheater: reviewRequest.RequestedTheater,
+            bridgeWitnessHandle: reviewRequest.ReturnCandidatePointer,
+            outcomeKind: SliBridgeOutcomeKind.Ok,
+            thresholdClass: SliBridgeThresholdClass.WithinBand,
+            reasonCode: "sli-bridge-worker-fallback");
     }
 
     private sealed record StewardWorkerProfile(

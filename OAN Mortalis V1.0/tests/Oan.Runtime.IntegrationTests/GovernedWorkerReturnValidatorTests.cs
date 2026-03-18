@@ -32,6 +32,8 @@ public sealed class GovernedWorkerReturnValidatorTests
         Assert.Equal(returnPacket.WorkerPacketId, receipt.WorkerPacketId);
         Assert.Equal(returnPacket.CompletionState, receipt.CompletionState);
         Assert.Equal(returnPacket.ReasonCodes, receipt.ReasonCodes);
+        Assert.Equal(handoffPacket.BridgeReview, receipt.BridgeReview);
+        Assert.Equal(handoffPacket.RuntimeUseCeiling, receipt.RuntimeUseCeiling);
     }
 
     [Fact]
@@ -185,9 +187,44 @@ public sealed class GovernedWorkerReturnValidatorTests
         Assert.Equal("prohibited-action-attempt", receipt.ValidationFailureCode);
     }
 
+    [Fact]
+    public void Validate_RuntimeCeilingWidening_RejectsPacket()
+    {
+        var handoffPacket = CreateHandoffPacket();
+        var handoffReceipt = CreateHandoffReceipt(handoffPacket);
+        var returnPacket = CreateReturnPacket(
+            handoffPacket,
+            runtimeUseCeiling: new SliRuntimeUseCeilingReceipt(
+                CandidateOnly: false,
+                PersistenceAuthorityGranted: true,
+                DeploymentAuthorityGranted: false,
+                HaltAuthorityGranted: false,
+                ReasonCode: "sli-runtime-authority-granted"));
+
+        var receipt = GovernedWorkerReturnValidator.Validate(
+            "loop:worker-return:test",
+            "cme-worker-return",
+            GovernanceLoopStage.BoundedCognitionCompleted,
+            handoffPacket,
+            handoffReceipt,
+            returnPacket);
+
+        Assert.False(receipt.Validated);
+        Assert.Equal("runtime-ceiling-widened", receipt.ValidationFailureCode);
+    }
+
     private static WorkerHandoffPacket CreateHandoffPacket(
         CompassVisibilityClass returnVisibilityClass = CompassVisibilityClass.OperatorGuarded)
     {
+        var bridgeReview = SliBridgeContracts.CreateReview(
+            bridgeStage: "worker-return-validator-test",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: "agenticore-return://candidate/test",
+            outcomeKind: SliBridgeOutcomeKind.Ok,
+            thresholdClass: SliBridgeThresholdClass.WithinBand,
+            reasonCode: "sli-bridge-within-band");
+
         return new WorkerHandoffPacket(
             HandoffPacketId: "worker-handoff-packet://aaaaaaaaaaaaaaaa",
             RequestingOffice: InternalGoverningCmeOffice.Steward,
@@ -264,7 +301,9 @@ public sealed class GovernedWorkerReturnValidatorTests
             ResidueDisposition: WorkerResidueDisposition.NeedsClassification,
             EvidenceSufficiencyState: EvidenceSufficiencyState.Sufficient,
             MaturityPosture: MaturityPosture.DoctrineBacked,
-            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 0, TimeSpan.Zero));
+            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 0, TimeSpan.Zero),
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
     }
 
     private static GovernedWorkerHandoffReceipt CreateHandoffReceipt(WorkerHandoffPacket handoffPacket)
@@ -288,7 +327,9 @@ public sealed class GovernedWorkerReturnValidatorTests
             OfficeAuthorityHandle: "office-authority://cccccccccccccccc",
             WeatherDisclosureHandle: "weather-disclosure://ffffffffffffffff",
             WitnessedBy: "CradleTek",
-            TimestampUtc: handoffPacket.TimestampUtc);
+            TimestampUtc: handoffPacket.TimestampUtc,
+            BridgeReview: handoffPacket.BridgeReview,
+            RuntimeUseCeiling: handoffPacket.RuntimeUseCeiling);
     }
 
     private static WorkerReturnPacket CreateReturnPacket(
@@ -301,7 +342,9 @@ public sealed class GovernedWorkerReturnValidatorTests
         WorkerResidueDisposition residueDisposition = WorkerResidueDisposition.NeedsClassification,
         CompassVisibilityClass? disclosureClass = null,
         bool executionClaimed = false,
-        bool mutationClaimed = false)
+        bool mutationClaimed = false,
+        SliBridgeReviewReceipt? bridgeReview = null,
+        SliRuntimeUseCeilingReceipt? runtimeUseCeiling = null)
     {
         return new WorkerReturnPacket(
             WorkerPacketId: "worker-return-packet://1111111111111111",
@@ -317,6 +360,8 @@ public sealed class GovernedWorkerReturnValidatorTests
             DisclosureClass: disclosureClass ?? handoffPacket.ReturnVisibilityClass,
             ExecutionClaimed: executionClaimed,
             MutationClaimed: mutationClaimed,
-            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 5, TimeSpan.Zero));
+            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 5, TimeSpan.Zero),
+            BridgeReview: bridgeReview ?? handoffPacket.BridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling ?? handoffPacket.RuntimeUseCeiling);
     }
 }

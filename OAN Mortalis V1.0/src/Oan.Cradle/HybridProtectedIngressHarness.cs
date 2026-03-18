@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Security.Cryptography;
+using System.Text;
 using GEL.Contracts;
 using GEL.Models;
 using Oan.Common;
@@ -38,6 +40,8 @@ internal sealed class HybridProtectedIngressRunResult
     public required PropositionalCompileAssessment OraclePropositionAssessment { get; init; }
     public required PropositionalCompileAssessment LispPropositionAssessment { get; init; }
     public required bool PropositionParityMatched { get; init; }
+    public required SliBridgeReviewReceipt ProjectedBridgeReview { get; init; }
+    public required SliRuntimeUseCeilingReceipt ProjectedRuntimeUseCeiling { get; init; }
     public required IReadOnlyList<HybridProtectedIngressMembraneDecision> MembraneDecisions { get; init; }
     public required IReadOnlyList<HybridProtectedIngressClosureOutcome> ClosureOutcomes { get; init; }
     public required AgentiFormationObservationBatch ObservationBatch { get; init; }
@@ -218,11 +222,18 @@ internal sealed class HybridProtectedIngressHarness
                 blockedRevealModes,
                 cancellationToken)
             .ConfigureAwait(false);
+        var projectedRuntimeUseCeiling = SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+        var projectedBridgeReview = CreateProjectedBridgeReview(
+            profile,
+            bootProfile,
+            blockedRevealModes,
+            propositionCompile);
 
         var membraneDecisions = new List<HybridProtectedIngressMembraneDecision>();
         var closureOutcomes = new List<HybridProtectedIngressClosureOutcome>();
 
-        if (propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.Stable &&
+        if (projectedBridgeReview.OutcomeKind == SliBridgeOutcomeKind.Ok &&
+            propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.Stable &&
             propositionCompile.LispAssessment.Grade == PropositionalCompileGrade.Stable &&
             propositionCompile.ParityMatched &&
             propositionCompile.OracleAssessment.ProjectedEngramDraft is not null)
@@ -269,10 +280,109 @@ internal sealed class HybridProtectedIngressHarness
             OraclePropositionAssessment = propositionCompile.OracleAssessment,
             LispPropositionAssessment = propositionCompile.LispAssessment,
             PropositionParityMatched = propositionCompile.ParityMatched,
+            ProjectedBridgeReview = projectedBridgeReview,
+            ProjectedRuntimeUseCeiling = projectedRuntimeUseCeiling,
             MembraneDecisions = membraneDecisions,
             ClosureOutcomes = closureOutcomes,
             ObservationBatch = new AgentiFormationObservationBatch(collector.Snapshot())
         };
+    }
+
+    private static SliBridgeReviewReceipt CreateProjectedBridgeReview(
+        HybridProtectedIngressProfile profile,
+        InternalGovernanceBootProfile bootProfile,
+        IReadOnlyList<PrimeRevealMode> blockedRevealModes,
+        HybridProtectedIngressPropositionCompileResult propositionCompile)
+    {
+        var witnessHandle = CreateBridgeWitnessHandle(profile, propositionCompile.OracleAssessment);
+
+        if (bootProfile.Decision == FirstBootGovernanceDecision.Quarantine)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-quarantine");
+        }
+
+        if (blockedRevealModes.Count > 0)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-blocked-reveal-escalation");
+        }
+
+        if (!propositionCompile.ParityMatched)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.Reject,
+                thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                reasonCode: "sli-bridge-proposition-parity-mismatch");
+        }
+
+        if (propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.NeedsSpecification ||
+            propositionCompile.LispAssessment.Grade == PropositionalCompileGrade.NeedsSpecification)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.NeedsSpec,
+                thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                reasonCode: "sli-bridge-proposition-needs-spec");
+        }
+
+        if (propositionCompile.OracleAssessment.Grade != PropositionalCompileGrade.Stable ||
+            propositionCompile.LispAssessment.Grade != PropositionalCompileGrade.Stable ||
+            propositionCompile.OracleAssessment.ProjectedEngramDraft is null)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.Reject,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-proposition-not-closure-fit");
+        }
+
+        return SliBridgeContracts.CreateReview(
+            bridgeStage: "hybrid-protected-ingress",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: witnessHandle,
+            outcomeKind: SliBridgeOutcomeKind.Ok,
+            thresholdClass: SliBridgeThresholdClass.WithinBand,
+            reasonCode: "sli-bridge-within-band");
+    }
+
+    private static string CreateBridgeWitnessHandle(
+        HybridProtectedIngressProfile profile,
+        PropositionalCompileAssessment assessment)
+    {
+        var material = string.Join(
+            "|",
+            profile.RequestedBootClass,
+            assessment.Candidate.Subject.RootKey,
+            assessment.Candidate.PredicateRoot,
+            assessment.Candidate.Object.RootKey,
+            assessment.Candidate.DiagnosticPropositionRender,
+            assessment.Grade);
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(material));
+        return $"sli-bridge://protected-ingress/{Convert.ToHexString(hash).ToLowerInvariant()[..16]}";
     }
 
     private async Task RecordGoverningOfficeFormationAsync(

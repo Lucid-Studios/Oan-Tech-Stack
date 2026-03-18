@@ -34,14 +34,20 @@ public static class SoulFrameTheaterAuthorizationProjector
         string sourceTheater,
         string requestedTheater)
     {
-        if (!candidate.Validity.PolicyEligible || !candidate.Validity.ScepOk)
+        var bridgeReview = ResolveBridgeReview(candidate, sourceTheater, requestedTheater);
+        var runtimeUseCeiling = candidate.RuntimeUseCeiling
+            ?? SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+
+        if (bridgeReview.OutcomeKind != SliBridgeOutcomeKind.Ok ||
+            bridgeReview.ThresholdClass == SliBridgeThresholdClass.FaultLine)
         {
             return SliTheaterAuthorizationState.Forbidden;
         }
 
-        if (!string.Equals(sourceTheater.Trim(), requestedTheater.Trim(), StringComparison.OrdinalIgnoreCase))
+        if (runtimeUseCeiling.CandidateOnly ||
+            bridgeReview.ThresholdClass is SliBridgeThresholdClass.NearThreshold or SliBridgeThresholdClass.ThresholdBreach)
         {
-            return SliTheaterAuthorizationState.Forbidden;
+            return SliTheaterAuthorizationState.Withheld;
         }
 
         return candidate.PacketDirective.AuthorityClass == SliAuthorityClass.AuthorityBearing
@@ -55,24 +61,58 @@ public static class SoulFrameTheaterAuthorizationProjector
         string requestedTheater,
         SliTheaterAuthorizationState state)
     {
+        var bridgeReview = ResolveBridgeReview(candidate, sourceTheater, requestedTheater);
+        var runtimeUseCeiling = candidate.RuntimeUseCeiling
+            ?? SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+
         if (state == SliTheaterAuthorizationState.Forbidden)
         {
-            if (!candidate.Validity.PolicyEligible || !candidate.Validity.ScepOk)
-            {
-                return candidate.Validity.ReasonCode;
-            }
-
-            if (!string.Equals(sourceTheater.Trim(), requestedTheater.Trim(), StringComparison.OrdinalIgnoreCase))
-            {
-                return "sli-cross-theater-forbidden";
-            }
+            return bridgeReview.ReasonCode;
         }
 
         return state switch
         {
             SliTheaterAuthorizationState.Authorized => "sli-authority-bearing",
-            SliTheaterAuthorizationState.Withheld => "sli-candidate-bearing-only",
+            SliTheaterAuthorizationState.Withheld => runtimeUseCeiling.CandidateOnly
+                ? runtimeUseCeiling.ReasonCode
+                : bridgeReview.ReasonCode,
             _ => "sli-theater-forbidden"
         };
+    }
+
+    private static SliBridgeReviewReceipt ResolveBridgeReview(
+        ZedThetaCandidateReceipt candidate,
+        string sourceTheater,
+        string requestedTheater)
+    {
+        var bridgeReview = candidate.BridgeReview ?? SliBridgeContracts.CreateCandidateBridgeReview(
+            bridgeStage: "soulframe-authorization-fallback",
+            sourceTheater: sourceTheater,
+            targetTheater: requestedTheater,
+            bridgeWitnessHandle: candidate.CandidateHandle,
+            thetaState: candidate.ThetaState,
+            gammaState: candidate.GammaState,
+            packetDirective: candidate.PacketDirective,
+            identityKernelBoundary: candidate.IdentityKernelBoundary,
+            validity: candidate.Validity,
+            activeBasin: candidate.ActiveBasin,
+            competingBasin: candidate.CompetingBasin,
+            anchorState: candidate.AnchorState,
+            selfTouchClass: candidate.SelfTouchClass);
+
+        if (!string.Equals(sourceTheater.Trim(), requestedTheater.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            bridgeReview = SliBridgeContracts.CreateReview(
+                bridgeStage: bridgeReview.BridgeStage,
+                sourceTheater: sourceTheater,
+                targetTheater: requestedTheater,
+                bridgeWitnessHandle: bridgeReview.BridgeWitnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-cross-theater-identification",
+                refusalClass: SliBridgeRefusalClass.CrossTheaterIdentification);
+        }
+
+        return bridgeReview;
     }
 }

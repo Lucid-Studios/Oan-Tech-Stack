@@ -14,14 +14,30 @@ public sealed class SoulFrameTheaterAuthorizationProjectorTests
             requestedTheater: "prime");
 
         Assert.Equal(SliTheaterAuthorizationState.Withheld, receipt.AuthorizationState);
-        Assert.Equal("sli-candidate-bearing-only", receipt.ReasonCode);
+        Assert.Equal("sli-runtime-candidate-only", receipt.ReasonCode);
     }
 
     [Fact]
     public void DescribeCandidate_AuthorityBearingReceipt_IsAuthorized()
     {
         var receipt = SoulFrameTheaterAuthorizationProjector.DescribeCandidate(
-            CreateCandidateReceipt(SliAuthorityClass.AuthorityBearing, SliUpdateLocus.Kernel),
+            CreateCandidateReceipt(
+                SliAuthorityClass.AuthorityBearing,
+                SliUpdateLocus.Kernel,
+                explicitBridgeReview: SliBridgeContracts.CreateReview(
+                    bridgeStage: "zed-theta-candidate",
+                    sourceTheater: "prime",
+                    targetTheater: "prime",
+                    bridgeWitnessHandle: "sli-bridge://test",
+                    outcomeKind: SliBridgeOutcomeKind.Ok,
+                    thresholdClass: SliBridgeThresholdClass.WithinBand,
+                    reasonCode: "sli-bridge-within-band"),
+                runtimeUseCeiling: new SliRuntimeUseCeilingReceipt(
+                    CandidateOnly: false,
+                    PersistenceAuthorityGranted: true,
+                    DeploymentAuthorityGranted: false,
+                    HaltAuthorityGranted: false,
+                    ReasonCode: "sli-runtime-authority-granted")),
             sourceTheater: "prime",
             requestedTheater: "prime");
 
@@ -48,41 +64,81 @@ public sealed class SoulFrameTheaterAuthorizationProjectorTests
             requestedTheater: "community");
 
         Assert.Equal(SliTheaterAuthorizationState.Forbidden, receipt.AuthorizationState);
-        Assert.Equal("sli-scep-reject", receipt.ReasonCode);
+        Assert.Equal("sli-bridge-cross-theater-identification", receipt.ReasonCode);
+    }
+
+    [Fact]
+    public void DescribeCandidate_UnlawfulPromotion_IsForbidden()
+    {
+        var candidate = CreateCandidateReceipt(SliAuthorityClass.AuthorityBearing, SliUpdateLocus.Kernel);
+
+        var receipt = SoulFrameTheaterAuthorizationProjector.DescribeCandidate(
+            candidate,
+            sourceTheater: "prime",
+            requestedTheater: "prime");
+
+        Assert.Equal(SliTheaterAuthorizationState.Forbidden, receipt.AuthorizationState);
+        Assert.Equal("sli-bridge-unlawful-promotion", receipt.ReasonCode);
     }
 
     private static ZedThetaCandidateReceipt CreateCandidateReceipt(
         SliAuthorityClass authorityClass,
-        SliUpdateLocus updateLocus)
+        SliUpdateLocus updateLocus,
+        SliBridgeReviewReceipt? explicitBridgeReview = null,
+        SliRuntimeUseCeilingReceipt? runtimeUseCeiling = null)
     {
+        var packetDirective = new SliPacketDirective(
+            SliThinkingTier.Master,
+            SliPacketClass.Commitment,
+            SliEngramOperation.Write,
+            updateLocus,
+            authorityClass);
+        var activeBasin = updateLocus == SliUpdateLocus.Kernel
+            ? CompassDoctrineBasin.IdentityContinuity
+            : CompassDoctrineBasin.GeneralContinuityDiscourse;
+        var competingBasin = activeBasin;
+        var identityKernelBoundary = new IdentityKernelBoundaryReceipt(
+            CmeIdentityHandle: "cme:test",
+            IdentityKernelHandle: "kernel:test",
+            ContinuityAnchorHandle: "anchor:test",
+            KernelBound: updateLocus == SliUpdateLocus.Kernel,
+            CandidateLocus: updateLocus);
+        var validity = new SliPacketValidityReceipt(
+            SyntaxOk: true,
+            HexadOk: true,
+            ScepOk: true,
+            PolicyEligible: true,
+            ReasonCode: "sli-packet-valid");
+        var bridgeReview = SliBridgeContracts.CreateCandidateBridgeReview(
+            bridgeStage: "zed-theta-candidate",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: "sli-bridge://test",
+            thetaState: "theta-ready",
+            gammaState: "gamma-ready",
+            packetDirective: packetDirective,
+            identityKernelBoundary: identityKernelBoundary,
+            validity: validity,
+            activeBasin: activeBasin,
+            competingBasin: competingBasin,
+            anchorState: CompassAnchorState.Held,
+            selfTouchClass: CompassSelfTouchClass.ValidationTouch);
+
         return new ZedThetaCandidateReceipt(
             CandidateHandle: "zed-theta:test",
             Objective: "identity-continuity",
             PrimeState: "task-objective",
             ThetaState: "theta-ready",
             GammaState: "gamma-ready",
-            PacketDirective: new SliPacketDirective(
-                SliThinkingTier.Master,
-                SliPacketClass.Commitment,
-                SliEngramOperation.Write,
-                updateLocus,
-                authorityClass),
-            IdentityKernelBoundary: new IdentityKernelBoundaryReceipt(
-                CmeIdentityHandle: "cme:test",
-                IdentityKernelHandle: "kernel:test",
-                ContinuityAnchorHandle: "anchor:test",
-                KernelBound: updateLocus == SliUpdateLocus.Kernel,
-                CandidateLocus: updateLocus),
-            Validity: new SliPacketValidityReceipt(
-                SyntaxOk: true,
-                HexadOk: true,
-                ScepOk: true,
-                PolicyEligible: true,
-                ReasonCode: "sli-packet-valid"),
-            ActiveBasin: CompassDoctrineBasin.IdentityContinuity,
-            CompetingBasin: CompassDoctrineBasin.Unknown,
+            PacketDirective: packetDirective,
+            IdentityKernelBoundary: identityKernelBoundary,
+            Validity: validity,
+            ActiveBasin: activeBasin,
+            CompetingBasin: competingBasin,
             AnchorState: CompassAnchorState.Held,
             SelfTouchClass: CompassSelfTouchClass.ValidationTouch,
-            OeCoePosture: CompassOeCoePosture.OeDominant);
+            OeCoePosture: CompassOeCoePosture.OeDominant,
+            BridgeReview: explicitBridgeReview ?? bridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling ?? SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
     }
 }

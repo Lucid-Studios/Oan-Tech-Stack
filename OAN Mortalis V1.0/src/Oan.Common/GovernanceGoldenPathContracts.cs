@@ -159,7 +159,9 @@ public sealed record GovernanceCycleWorkResult(
     GovernedActionableContent ActionableContent,
     string ReturnIntakeHandle,
     string ReturnIntakeEnvelopeId,
-    CompassObservationSurface? CompassObservation = null);
+    CompassObservationSurface? CompassObservation = null,
+    SliBridgeReviewReceipt? BridgeReview = null,
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
 
 public sealed record ReturnCandidateReviewRequest(
     Guid CandidateId,
@@ -184,7 +186,9 @@ public sealed record ReturnCandidateReviewRequest(
     IReadOnlyList<GovernedOfficeAuthorityReceipt>? OfficeAuthorityReceipts = null,
     IReadOnlyList<GovernedOfficeIssuanceReceipt>? OfficeIssuanceReceipts = null,
     IReadOnlyList<GovernedWorkerHandoffReceipt>? WorkerHandoffReceipts = null,
-    IReadOnlyList<GovernedWorkerReturnReceipt>? WorkerReturnReceipts = null);
+    IReadOnlyList<GovernedWorkerReturnReceipt>? WorkerReturnReceipts = null,
+    SliBridgeReviewReceipt? BridgeReview = null,
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
 
 public sealed record GovernanceDecisionReceipt(
     Guid CandidateId,

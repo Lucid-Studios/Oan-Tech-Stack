@@ -609,8 +609,24 @@ public sealed class LispBridge
         ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
 
         var state = context.GoldenCodeState;
+        var candidateHandle = $"zed-theta:{traceId}";
+        var bridgeReview = SliBridgeContracts.CreateCandidateBridgeReview(
+            bridgeStage: "zed-theta-candidate",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: $"sli-bridge://{traceId}",
+            thetaState: state.ThetaState,
+            gammaState: state.GammaState,
+            packetDirective: state.PacketDirective,
+            identityKernelBoundary: state.IdentityKernelBoundary,
+            validity: state.PacketValidity,
+            activeBasin: state.ActiveBasin,
+            competingBasin: state.CompetingBasin,
+            anchorState: state.AnchorState,
+            selfTouchClass: state.SelfTouchClass);
+        var runtimeUseCeiling = SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
         return new ZedThetaCandidateReceipt(
-            CandidateHandle: $"zed-theta:{traceId}",
+            CandidateHandle: candidateHandle,
             Objective: context.Frame.TaskObjective,
             PrimeState: state.PrimeState,
             ThetaState: state.ThetaState,
@@ -622,7 +638,9 @@ public sealed class LispBridge
             CompetingBasin: state.CompetingBasin,
             AnchorState: state.AnchorState,
             SelfTouchClass: state.SelfTouchClass,
-            OeCoePosture: state.OeCoePosture);
+            OeCoePosture: state.OeCoePosture,
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling);
     }
 
     private static double EntropyFromTrace(IReadOnlyList<string> traceLines)

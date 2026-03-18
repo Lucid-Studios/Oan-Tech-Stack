@@ -41,35 +41,58 @@ public sealed class CognitionHostService : ICognitionEngine
         var decision = engramCount == 0 ? "collect-more-context" : "proceed-with-objective";
         var engramCandidate = confidence >= 0.5;
         var activeBasin = ResolveGoldenCodeActiveBasin(request.Context.TaskObjective);
+        var competingBasin = ResolveGoldenCodeCompetingBasin(activeBasin);
+        var updateLocus = activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf;
+        var packetDirective = new SliPacketDirective(
+            SliThinkingTier.Master,
+            engramCandidate ? SliPacketClass.Commitment : SliPacketClass.Observation,
+            engramCandidate ? SliEngramOperation.Write : SliEngramOperation.NoOp,
+            updateLocus,
+            SliAuthorityClass.CandidateBearing);
+        var identityKernelBoundary = new IdentityKernelBoundaryReceipt(
+            CmeIdentityHandle: $"cme:{request.Context.CMEId}",
+            IdentityKernelHandle: $"kernel:{request.Context.CMEId}",
+            ContinuityAnchorHandle: $"anchor:{request.Context.CMEId}:{activeBasin.ToString().ToLowerInvariant()}",
+            KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
+            CandidateLocus: updateLocus);
+        var validity = new SliPacketValidityReceipt(
+            SyntaxOk: true,
+            HexadOk: true,
+            ScepOk: true,
+            PolicyEligible: true,
+            ReasonCode: "sli-packet-valid");
+        var candidateHandle = $"zed-theta:{Guid.NewGuid():N}";
+        var bridgeReview = SliBridgeContracts.CreateCandidateBridgeReview(
+            bridgeStage: "zed-theta-candidate",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: $"sli-bridge://{candidateHandle}",
+            thetaState: "theta-ready",
+            gammaState: "gamma-ready",
+            packetDirective: packetDirective,
+            identityKernelBoundary: identityKernelBoundary,
+            validity: validity,
+            activeBasin: activeBasin,
+            competingBasin: competingBasin,
+            anchorState: CompassAnchorState.Weakened,
+            selfTouchClass: CompassSelfTouchClass.NoTouch);
+        var runtimeUseCeiling = SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
         var zedThetaCandidate = new ZedThetaCandidateReceipt(
-            CandidateHandle: $"zed-theta:{Guid.NewGuid():N}",
+            CandidateHandle: candidateHandle,
             Objective: request.Context.TaskObjective,
             PrimeState: "task-objective",
             ThetaState: "theta-ready",
             GammaState: "gamma-ready",
-            PacketDirective: new SliPacketDirective(
-                SliThinkingTier.Master,
-                engramCandidate ? SliPacketClass.Commitment : SliPacketClass.Observation,
-                engramCandidate ? SliEngramOperation.Write : SliEngramOperation.NoOp,
-                activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf,
-                SliAuthorityClass.CandidateBearing),
-            IdentityKernelBoundary: new IdentityKernelBoundaryReceipt(
-                CmeIdentityHandle: $"cme:{request.Context.CMEId}",
-                IdentityKernelHandle: $"kernel:{request.Context.CMEId}",
-                ContinuityAnchorHandle: $"anchor:{request.Context.CMEId}:{activeBasin.ToString().ToLowerInvariant()}",
-                KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
-                CandidateLocus: activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf),
-            Validity: new SliPacketValidityReceipt(
-                SyntaxOk: true,
-                HexadOk: true,
-                ScepOk: true,
-                PolicyEligible: true,
-                ReasonCode: "sli-packet-valid"),
+            PacketDirective: packetDirective,
+            IdentityKernelBoundary: identityKernelBoundary,
+            Validity: validity,
             ActiveBasin: activeBasin,
-            CompetingBasin: CompassDoctrineBasin.Unknown,
+            CompetingBasin: competingBasin,
             AnchorState: CompassAnchorState.Weakened,
             SelfTouchClass: CompassSelfTouchClass.NoTouch,
-            OeCoePosture: CompassOeCoePosture.Unresolved);
+            OeCoePosture: CompassOeCoePosture.Unresolved,
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling);
 
         var reasoning = $"Seed LLM evaluated objective '{request.Context.TaskObjective}' using {engramCount} relevant engrams.";
         var result = new CognitionResult
@@ -134,6 +157,18 @@ public sealed class CognitionHostService : ICognitionEngine
         }
 
         return CompassDoctrineBasin.Unknown;
+    }
+
+    private static CompassDoctrineBasin ResolveGoldenCodeCompetingBasin(CompassDoctrineBasin activeBasin)
+    {
+        return activeBasin switch
+        {
+            CompassDoctrineBasin.BoundedLocalityContinuity => CompassDoctrineBasin.FluidContinuityLaw,
+            CompassDoctrineBasin.FluidContinuityLaw => CompassDoctrineBasin.BoundedLocalityContinuity,
+            CompassDoctrineBasin.IdentityContinuity => CompassDoctrineBasin.IdentityContinuity,
+            CompassDoctrineBasin.GeneralContinuityDiscourse => CompassDoctrineBasin.GeneralContinuityDiscourse,
+            _ => CompassDoctrineBasin.Unknown
+        };
     }
 }
 

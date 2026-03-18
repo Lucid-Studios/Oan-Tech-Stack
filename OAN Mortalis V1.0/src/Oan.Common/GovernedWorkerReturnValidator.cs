@@ -22,6 +22,8 @@ public static class GovernedWorkerReturnValidator
             cmeId,
             returnPacket.WorkerPacketId,
             handoffReceipt.HandoffHandle);
+        var resolvedBridgeReview = returnPacket.BridgeReview ?? handoffPacket.BridgeReview ?? handoffReceipt.BridgeReview;
+        var resolvedRuntimeUseCeiling = returnPacket.RuntimeUseCeiling ?? handoffPacket.RuntimeUseCeiling ?? handoffReceipt.RuntimeUseCeiling;
 
         return new GovernedWorkerReturnReceipt(
             ReturnHandle: returnHandle,
@@ -44,7 +46,9 @@ public static class GovernedWorkerReturnValidator
             Validated: validationFailureCode is null,
             ValidationFailureCode: validationFailureCode,
             WitnessedBy: "CradleTek",
-            TimestampUtc: returnPacket.TimestampUtc);
+            TimestampUtc: returnPacket.TimestampUtc,
+            BridgeReview: resolvedBridgeReview,
+            RuntimeUseCeiling: resolvedRuntimeUseCeiling);
     }
 
     private static string? ValidateInternal(
@@ -56,6 +60,20 @@ public static class GovernedWorkerReturnValidator
             !string.Equals(handoffReceipt.HandoffPacketId, handoffPacket.HandoffPacketId, StringComparison.Ordinal))
         {
             return "handoff-packet-mismatch";
+        }
+
+        if (handoffPacket.BridgeReview is not null &&
+            handoffReceipt.BridgeReview is not null &&
+            handoffPacket.BridgeReview != handoffReceipt.BridgeReview)
+        {
+            return "bridge-review-mismatch";
+        }
+
+        if (handoffPacket.RuntimeUseCeiling is not null &&
+            handoffReceipt.RuntimeUseCeiling is not null &&
+            handoffPacket.RuntimeUseCeiling != handoffReceipt.RuntimeUseCeiling)
+        {
+            return "runtime-ceiling-mismatch";
         }
 
         if (returnPacket.WorkerSpecies != handoffPacket.WorkerSpecies)
@@ -102,6 +120,25 @@ public static class GovernedWorkerReturnValidator
         if (returnPacket.ProhibitedActionAttempts.Count > 0)
         {
             return "prohibited-action-attempt";
+        }
+
+        var handoffBridgeReview = handoffPacket.BridgeReview ?? handoffReceipt.BridgeReview;
+        var handoffRuntimeUseCeiling = handoffPacket.RuntimeUseCeiling ?? handoffReceipt.RuntimeUseCeiling;
+        var returnBridgeReview = returnPacket.BridgeReview ?? handoffBridgeReview;
+        var returnRuntimeUseCeiling = returnPacket.RuntimeUseCeiling ?? handoffRuntimeUseCeiling;
+
+        if (handoffBridgeReview is not null &&
+            returnBridgeReview is not null &&
+            returnBridgeReview != handoffBridgeReview)
+        {
+            return "bridge-witness-linkage-mismatch";
+        }
+
+        if (handoffRuntimeUseCeiling is not null &&
+            returnRuntimeUseCeiling is not null &&
+            returnRuntimeUseCeiling != handoffRuntimeUseCeiling)
+        {
+            return "runtime-ceiling-widened";
         }
 
         return null;

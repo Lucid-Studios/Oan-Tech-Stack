@@ -223,6 +223,24 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         context.WorkingMemory["zed_theta_engram_operation"] = cognitionResult.ZedThetaCandidate.PacketDirective.EngramOperation.ToString();
         context.WorkingMemory["zed_theta_update_locus"] = cognitionResult.ZedThetaCandidate.PacketDirective.UpdateLocus.ToString();
         context.WorkingMemory["zed_theta_validity_reason"] = cognitionResult.ZedThetaCandidate.Validity.ReasonCode;
+        if (cognitionResult.ZedThetaCandidate.BridgeReview is not null)
+        {
+            context.WorkingMemory["zed_theta_bridge_stage"] = cognitionResult.ZedThetaCandidate.BridgeReview.BridgeStage;
+            context.WorkingMemory["zed_theta_bridge_outcome"] = cognitionResult.ZedThetaCandidate.BridgeReview.OutcomeKind.ToString();
+            context.WorkingMemory["zed_theta_bridge_threshold"] = cognitionResult.ZedThetaCandidate.BridgeReview.ThresholdClass.ToString();
+            context.WorkingMemory["zed_theta_bridge_refusal"] = cognitionResult.ZedThetaCandidate.BridgeReview.RefusalClass.ToString();
+            context.WorkingMemory["zed_theta_bridge_reason"] = cognitionResult.ZedThetaCandidate.BridgeReview.ReasonCode;
+            context.WorkingMemory["zed_theta_bridge_witness_handle"] = cognitionResult.ZedThetaCandidate.BridgeReview.BridgeWitnessHandle;
+        }
+
+        if (cognitionResult.ZedThetaCandidate.RuntimeUseCeiling is not null)
+        {
+            context.WorkingMemory["zed_theta_runtime_candidate_only"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.CandidateOnly ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_persistence_authority"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.PersistenceAuthorityGranted ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_deployment_authority"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.DeploymentAuthorityGranted ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_halt_authority"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.HaltAuthorityGranted ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_reason"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.ReasonCode;
+        }
 
         var theaterAuthorization = SoulFrameTheaterAuthorizationProjector.DescribeCandidate(
             cognitionResult.ZedThetaCandidate,
@@ -324,6 +342,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 ["timestamp"] = cognitionResult.CompassState.Timestamp
             },
             ["zed_theta_candidate"] = cognitionResult.ZedThetaCandidate,
+            ["bridge_review"] = cognitionResult.ZedThetaCandidate.BridgeReview,
+            ["runtime_use_ceiling"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling,
             ["theater_authorization"] = theaterAuthorization,
             ["compass_observation"] = new Dictionary<string, object?>
             {
@@ -496,7 +516,9 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             ActionableContent: actionableContent,
             ReturnIntakeHandle: returnIntakeHandle,
             ReturnIntakeEnvelopeId: returnIntakeEnvelopeId,
-            CompassObservation: result.CompassObservation);
+            CompassObservation: result.CompassObservation,
+            BridgeReview: result.ZedThetaCandidate.BridgeReview,
+            RuntimeUseCeiling: result.ZedThetaCandidate.RuntimeUseCeiling);
     }
 
     private static IReadOnlyDictionary<string, string> BuildCommitMetadata(AgentiResult result)

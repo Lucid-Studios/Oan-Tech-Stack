@@ -729,7 +729,9 @@ namespace Oan.Cradle
                 SubmittedBy: "CradleTek",
                 CandidatePayload: workResult.CandidatePayload,
                 CollapseClassification: workResult.CollapseClassification,
-                RequestEnvelope: requestEnvelope);
+                RequestEnvelope: requestEnvelope,
+                BridgeReview: workResult.BridgeReview,
+                RuntimeUseCeiling: workResult.RuntimeUseCeiling);
         }
 
         private async Task WitnessCompassObservationAsync(

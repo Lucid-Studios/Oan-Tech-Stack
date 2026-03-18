@@ -40,6 +40,11 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.Contains("undeclared-tool-call", packet.ProhibitedActions);
         Assert.Contains("cryptic-sealed", packet.ForbiddenMemoryLanes);
         Assert.StartsWith("worker-handoff-packet://", packet.HandoffPacketId, StringComparison.Ordinal);
+        Assert.NotNull(packet.BridgeReview);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, packet.BridgeReview!.OutcomeKind);
+        Assert.Equal("agenticore-return://candidate/cme-worker-handoff/1", packet.BridgeReview.BridgeWitnessHandle);
+        Assert.NotNull(packet.RuntimeUseCeiling);
+        Assert.True(packet.RuntimeUseCeiling!.CandidateOnly);
 
         Assert.Equal(ConstructClass.BoundedWorker, receipt.ConstructClass);
         Assert.Equal(packet.HandoffPacketId, receipt.HandoffPacketId);
@@ -51,6 +56,8 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.Equal(CompassVisibilityClass.OperatorGuarded, receipt.DisclosureClass);
         Assert.Equal(MaturityPosture.DoctrineBacked, receipt.MaturityPosture);
         Assert.StartsWith("worker-handoff://", receipt.HandoffHandle, StringComparison.Ordinal);
+        Assert.Equal(packet.BridgeReview, receipt.BridgeReview);
+        Assert.Equal(packet.RuntimeUseCeiling, receipt.RuntimeUseCeiling);
     }
 
     [Theory]
@@ -272,7 +279,16 @@ public sealed class StewardWorkerHandoffProjectorTests
                 EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
                 SourceSubsystem: "AgentiCore"),
-            RequestEnvelope: envelope);
+            RequestEnvelope: envelope,
+            BridgeReview: SliBridgeContracts.CreateReview(
+                bridgeStage: "steward-worker-handoff-test",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: returnPointer,
+                outcomeKind: SliBridgeOutcomeKind.Ok,
+                thresholdClass: SliBridgeThresholdClass.WithinBand,
+                reasonCode: "sli-bridge-within-band"),
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
     }
 
     private static GovernedWeatherDisclosureReceipt CreateDisclosureReceipt(

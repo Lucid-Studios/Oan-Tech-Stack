@@ -15,5 +15,23 @@
   "disclosureClass": "OperatorGuarded",
   "executionClaimed": false,
   "mutationClaimed": false,
-  "timestampUtc": "2026-03-17T12:00:05+00:00"
+  "timestampUtc": "2026-03-17T12:00:05+00:00",
+  "bridgeReview": {
+    "bridgeStage": "worker-packet-fixture",
+    "sourceTheater": "prime",
+    "targetTheater": "prime",
+    "bridgeWitnessHandle": "agenticore-return://candidate/test",
+    "witnessPresent": true,
+    "outcomeKind": "Ok",
+    "thresholdClass": "WithinBand",
+    "refusalClass": "None",
+    "reasonCode": "sli-bridge-within-band"
+  },
+  "runtimeUseCeiling": {
+    "candidateOnly": true,
+    "persistenceAuthorityGranted": false,
+    "deploymentAuthorityGranted": false,
+    "haltAuthorityGranted": false,
+    "reasonCode": "sli-runtime-candidate-only"
+  }
 }

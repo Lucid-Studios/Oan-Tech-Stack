@@ -49,6 +49,9 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Stable, result.OraclePropositionAssessment.Grade);
         Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliBridgeThresholdClass.WithinBand, result.ProjectedBridgeReview.ThresholdClass);
+        Assert.True(result.ProjectedRuntimeUseCeiling.CandidateOnly);
         Assert.Equal("HumanPrincipal_A", result.MaskedHandles[ProtectedIntakeKind.HumanProtectedIntake]);
         Assert.Equal("CorporatePrincipal_A", result.MaskedHandles[ProtectedIntakeKind.CorporateProtectedIntake]);
         Assert.Equal("HumanPrincipal_A", result.OraclePropositionAssessment.Candidate.Subject.SymbolicHandle);
@@ -99,6 +102,7 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Stable, result.OraclePropositionAssessment.Grade);
         Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, result.ProjectedBridgeReview.OutcomeKind);
         Assert.Equal([PrimeRevealMode.None], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
         Assert.Single(result.MembraneDecisions);
@@ -127,6 +131,8 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
         Assert.Contains("topology.personal-swarm.denied", result.OraclePropositionAssessment.ReasonCodes);
+        Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal("sli-bridge-quarantine", result.ProjectedBridgeReview.ReasonCode);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -166,6 +172,8 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
         Assert.Contains("reveal.authorized-field.denied", result.OraclePropositionAssessment.ReasonCodes);
+        Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal("sli-bridge-blocked-reveal-escalation", result.ProjectedBridgeReview.ReasonCode);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(

@@ -2976,7 +2976,7 @@ public sealed class SliSymbolTable
         CompassDoctrineBasin activeBasin)
     {
         var advisoryBasin = context.LastClassifyResponse?.CompassAdvisory?.SuggestedCompetingBasin;
-        if (advisoryBasin.HasValue)
+        if (advisoryBasin.HasValue && advisoryBasin.Value != CompassDoctrineBasin.Unknown)
         {
             return advisoryBasin.Value;
         }
@@ -2985,6 +2985,8 @@ public sealed class SliSymbolTable
         {
             CompassDoctrineBasin.BoundedLocalityContinuity => CompassDoctrineBasin.FluidContinuityLaw,
             CompassDoctrineBasin.FluidContinuityLaw => CompassDoctrineBasin.BoundedLocalityContinuity,
+            CompassDoctrineBasin.IdentityContinuity => CompassDoctrineBasin.IdentityContinuity,
+            CompassDoctrineBasin.GeneralContinuityDiscourse => CompassDoctrineBasin.GeneralContinuityDiscourse,
             _ => CompassDoctrineBasin.Unknown
         };
     }
@@ -3073,7 +3075,8 @@ public sealed class SliSymbolTable
             advisory is not null &&
             advisory.Confidence >= 0.55 &&
             advisory.SuggestedActiveBasin == state.ActiveBasin &&
-            advisory.SuggestedCompetingBasin == state.CompetingBasin &&
+            (advisory.SuggestedCompetingBasin == state.CompetingBasin ||
+             advisory.SuggestedCompetingBasin == CompassDoctrineBasin.Unknown) &&
             advisory.SuggestedAnchorState == state.AnchorState &&
             advisory.SuggestedSelfTouchClass == state.SelfTouchClass;
 

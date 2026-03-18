@@ -76,7 +76,9 @@ public sealed record WorkerHandoffPacket(
     WorkerResidueDisposition ResidueDisposition,
     EvidenceSufficiencyState EvidenceSufficiencyState,
     MaturityPosture MaturityPosture,
-    DateTimeOffset TimestampUtc);
+    DateTimeOffset TimestampUtc,
+    SliBridgeReviewReceipt? BridgeReview = null,
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
 
 public sealed record WorkerReturnPacket(
     string WorkerPacketId,
@@ -92,7 +94,9 @@ public sealed record WorkerReturnPacket(
     CompassVisibilityClass DisclosureClass,
     bool ExecutionClaimed,
     bool MutationClaimed,
-    DateTimeOffset TimestampUtc);
+    DateTimeOffset TimestampUtc,
+    SliBridgeReviewReceipt? BridgeReview = null,
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
 
 public sealed record GovernedWorkerHandoffReceipt(
     string HandoffHandle,
@@ -113,7 +117,9 @@ public sealed record GovernedWorkerHandoffReceipt(
     string OfficeAuthorityHandle,
     string WeatherDisclosureHandle,
     string WitnessedBy,
-    DateTimeOffset TimestampUtc);
+    DateTimeOffset TimestampUtc,
+    SliBridgeReviewReceipt? BridgeReview = null,
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
 
 public sealed record GovernedWorkerReturnReceipt(
     string ReturnHandle,
@@ -136,4 +142,6 @@ public sealed record GovernedWorkerReturnReceipt(
     bool Validated,
     string? ValidationFailureCode,
     string WitnessedBy,
-    DateTimeOffset TimestampUtc);
+    DateTimeOffset TimestampUtc,
+    SliBridgeReviewReceipt? BridgeReview = null,
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
