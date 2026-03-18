@@ -1,0 +1,78 @@
+{
+  "id": "FRAG-D-ECOLOGY",
+  "title": "Site Ecology",
+  "nodes": [
+    {
+      "id": "D1",
+      "text": "parcel layout + canopy map",
+      "role": "origin",
+      "critical": true,
+      "deps": []
+    },
+    {
+      "id": "D2",
+      "text": "roughness length z\u2080 \u21a6 wind profile",
+      "role": "bridge",
+      "critical": true,
+      "deps": [
+        "D1"
+      ]
+    },
+    {
+      "id": "D3",
+      "text": "tree line deflects flow",
+      "role": "inversion",
+      "critical": false,
+      "deps": [
+        "D1",
+        "D2"
+      ]
+    },
+    {
+      "id": "D4",
+      "text": "micro-jets in gaps",
+      "role": "leap",
+      "critical": true,
+      "deps": [
+        "D3"
+      ]
+    },
+    {
+      "id": "D5",
+      "text": "channeling paths logged",
+      "role": "reflection",
+      "critical": false,
+      "deps": [
+        "D4"
+      ]
+    }
+  ],
+  "edges": [
+    [
+      "D2",
+      "D1"
+    ],
+    [
+      "D3",
+      "D1"
+    ],
+    [
+      "D3",
+      "D2"
+    ],
+    [
+      "D4",
+      "D3"
+    ],
+    [
+      "D5",
+      "D4"
+    ]
+  ],
+  "master_gloss": "Site roughness and canopy shape micro-wind; jets and channels emerge.",
+  "local_Z": {
+    "description": "Site roughness constant",
+    "sig": "sha256:3c8fc0f95b393b5e"
+  },
+  "parent_fragment": "FRAG-C-CORE"
+}

@@ -92,6 +92,14 @@ Minimum lawful runtime classes:
 
 These are runtime classes, not yet public contracts.
 
+## Recovered Experiment Lineage
+
+The recovered `Engrams and Phonology` family is preserved as bounded lineage in:
+
+- `runtime/research/test-fields/recovered-engrams-phonology/`
+
+Its role in this document is historical only. It is useful as an ancestor seam for fragment roles, Compass-style event emission, and measurable gate vocabulary, but it does not supersede the active runtime doctrine recorded here.
+
 ## Runtime States
 
 Every live engram should move through explicit runtime states rather than vague activation language.

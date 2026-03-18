@@ -23,7 +23,14 @@ public sealed class SliIngestionTests
         Assert.NotEmpty(result.MatchResult.KnownEngrams);
         Assert.Single(result.CanonicalDrafts);
         Assert.Equal("equation", result.CanonicalDrafts[0].RootKey);
+        Assert.Equal("equation", result.CanonicalSummary.PrimaryRootKey);
+        Assert.Equal(1, result.CanonicalSummary.DraftCount);
+        Assert.Equal(result.CanonicalDrafts[0].Branches.Count, result.CanonicalSummary.PrimaryBranchCount);
         Assert.Equal("equation", result.Diagnostic.DraftRootKey);
+        Assert.Equal(SliFragmentDiagnosticAuthorityClass.WitnessOnly, result.DiagnosticSummary.AuthorityClass);
+        Assert.False(result.DiagnosticSummary.AdmissionAuthorityGranted);
+        Assert.Equal(1, result.DiagnosticSummary.Baseline.ReviewCount);
+        Assert.Equal(3, result.DiagnosticSummary.Stress.VariantCount);
         Assert.Equal(7, result.Diagnostic.Nodes.Count);
         Assert.Equal(SliFragmentGateOutcome.Pass, result.Diagnostic.Gates.Structure);
         Assert.Equal(SliFragmentGateOutcome.Review, result.Diagnostic.Gates.Meaning);
@@ -44,8 +51,12 @@ public sealed class SliIngestionTests
             candidate => string.Equals(candidate.Token, "hypernumeration", StringComparison.OrdinalIgnoreCase));
         Assert.Single(result.CanonicalDrafts);
         Assert.Equal(result.CanonicalDrafts[0].RootKey, result.Diagnostic.DraftRootKey);
+        Assert.Equal(result.CanonicalDrafts[0].RootKey, result.CanonicalSummary.PrimaryRootKey);
+        Assert.Equal(result.CanonicalDrafts[0].RequestedClosureGrade, result.CanonicalSummary.PrimaryClosureGrade);
         Assert.Contains(result.Diagnostic.Nodes, node => node.Role == SliFragmentRole.Origin);
         Assert.Contains(result.Diagnostic.Nodes, node => node.Role == SliFragmentRole.Reflection);
+        Assert.Equal(SliFragmentDiagnosticAuthorityClass.WitnessOnly, result.DiagnosticSummary.AuthorityClass);
+        Assert.False(result.DiagnosticSummary.AdmissionAuthorityGranted);
         Assert.Equal(SliFragmentGateOutcome.Review, result.Diagnostic.Gates.Meaning);
         Assert.Equal(SliFragmentGateOutcome.Pass, result.Diagnostic.Gates.Functor);
         Assert.Equal(SliFragmentGateOutcome.Review, result.Diagnostic.Gates.Trace);
@@ -91,8 +102,17 @@ public sealed class SliIngestionTests
         var second = await engine.IngestAsync("Solve for x: 3x + 7 = 25");
 
         Assert.Equal(first.CanonicalDrafts[0].RootKey, second.CanonicalDrafts[0].RootKey);
+        Assert.Equal(first.CanonicalSummary, second.CanonicalSummary);
         Assert.Equal(first.Diagnostic.Metrics, second.Diagnostic.Metrics);
         Assert.Equal(first.Diagnostic.Gates, second.Diagnostic.Gates);
+        Assert.Equal(first.DiagnosticSummary.AuthorityClass, second.DiagnosticSummary.AuthorityClass);
+        Assert.Equal(first.DiagnosticSummary.AdmissionAuthorityGranted, second.DiagnosticSummary.AdmissionAuthorityGranted);
+        Assert.Equal(first.DiagnosticSummary.Baseline, second.DiagnosticSummary.Baseline);
+        Assert.Equal(first.DiagnosticSummary.Stress.VariantCount, second.DiagnosticSummary.Stress.VariantCount);
+        Assert.Equal(first.DiagnosticSummary.Stress.DegradedVariantCount, second.DiagnosticSummary.Stress.DegradedVariantCount);
+        Assert.Equal(first.DiagnosticSummary.Stress.WorstReviewCount, second.DiagnosticSummary.Stress.WorstReviewCount);
+        Assert.Equal(first.DiagnosticSummary.Stress.DegradedVariantKeys, second.DiagnosticSummary.Stress.DegradedVariantKeys);
+        Assert.Equal(first.DiagnosticSummary.Stress.WorstVariantKeys, second.DiagnosticSummary.Stress.WorstVariantKeys);
         Assert.Equal(
             first.Diagnostic.Nodes.Select(node => (node.NodeId, node.Role, node.Critical)),
             second.Diagnostic.Nodes.Select(node => (node.NodeId, node.Role, node.Critical)));
@@ -123,5 +143,9 @@ public sealed class SliIngestionTests
         Assert.True(elided.Metrics.EpsilonFunctor >= result.Diagnostic.Metrics.EpsilonFunctor);
         Assert.True(contradiction.Metrics.FalseInclude >= result.Diagnostic.Metrics.FalseInclude);
         Assert.Equal(baselineNodeCount, result.Diagnostic.Nodes.Count);
+        Assert.Equal(3, result.DiagnosticSummary.Stress.VariantCount);
+        Assert.True(result.DiagnosticSummary.Stress.DegradedVariantCount >= 1);
+        Assert.Equal(result.DiagnosticSummary.Stress.DegradedVariantCount, result.DiagnosticSummary.Stress.DegradedVariantKeys.Count);
+        Assert.Contains("elide_noncritical_bridge", result.DiagnosticSummary.Stress.DegradedVariantKeys);
     }
 }

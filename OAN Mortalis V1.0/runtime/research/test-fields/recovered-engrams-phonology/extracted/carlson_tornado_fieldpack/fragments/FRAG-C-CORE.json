@@ -1,0 +1,78 @@
+{
+  "id": "FRAG-C-CORE",
+  "title": "Tornado Core",
+  "nodes": [
+    {
+      "id": "C1",
+      "text": "vortex column (radial inflow\u2192updraft)",
+      "role": "origin",
+      "critical": true,
+      "deps": []
+    },
+    {
+      "id": "C2",
+      "text": "pressure deficit \u21a6 condensation funnel",
+      "role": "bridge",
+      "critical": true,
+      "deps": [
+        "C1"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "RFD surge flips inflow parity",
+      "role": "inversion",
+      "critical": false,
+      "deps": [
+        "C1",
+        "C2"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "surface contact \u21d2 debris lofting",
+      "role": "leap",
+      "critical": true,
+      "deps": [
+        "C3"
+      ]
+    },
+    {
+      "id": "C5",
+      "text": "translation vector set",
+      "role": "reflection",
+      "critical": false,
+      "deps": [
+        "C4"
+      ]
+    }
+  ],
+  "edges": [
+    [
+      "C2",
+      "C1"
+    ],
+    [
+      "C3",
+      "C1"
+    ],
+    [
+      "C3",
+      "C2"
+    ],
+    [
+      "C4",
+      "C3"
+    ],
+    [
+      "C5",
+      "C4"
+    ]
+  ],
+  "master_gloss": "Core vortex forms; pressure deficit and RFD; debris loft on surface contact.",
+  "local_Z": {
+    "description": "Core-axis alignment",
+    "sig": "sha256:04718635fcf0516c"
+  },
+  "parent_fragment": "FRAG-B-MESO"
+}

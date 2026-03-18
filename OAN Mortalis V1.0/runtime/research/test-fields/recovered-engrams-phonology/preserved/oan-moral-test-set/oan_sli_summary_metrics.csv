@@ -1,0 +1,8 @@
+,value
+recovery_R_mean_of_mins,0.0
+recovery_pass,False
+EC_min,0.8475029618611162
+AE_in_band_ratio,0.8846491228070176
+MC_max_abs_drift,0.050000000000000044
+ethics_pass,False
+watchdog_trigger_rate,0.5679824561403509

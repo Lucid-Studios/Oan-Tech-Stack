@@ -115,6 +115,7 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         context.WorkingMemory["ingestion_candidate_count"] = ingestionResult.MatchResult.EngramCandidates.Count.ToString(CultureInfo.InvariantCulture);
         context.WorkingMemory["ingestion_trace_seed"] = ingestionResult.SliExpression.TraceSeed;
         context.WorkingMemory["ingestion_sheaf_domain"] = ingestionResult.SheafDomain;
+        RecordIngestionDiagnosticSummary(context.WorkingMemory, ingestionResult);
 
         var baseCognitionContext = new CognitionContext
         {
@@ -682,6 +683,29 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             $"KnownRatio:{cleaverResult.Metrics.KnownRatio:F4}; UnknownRatio:{cleaverResult.Metrics.UnknownRatio:F4}; " +
             $"SheafDomain:{sheafPlan.Domain}; SheafFunctors:{string.Join(">", sheafPlan.FunctorPath)}; " +
             $"SLIExpr:{string.Join(" || ", ingestionResult.SliExpression.ProgramExpressions.Take(2))}";
+    }
+
+    private static void RecordIngestionDiagnosticSummary(
+        IDictionary<string, string> workingMemory,
+        SliIngestionResult ingestionResult)
+    {
+        ArgumentNullException.ThrowIfNull(workingMemory);
+        ArgumentNullException.ThrowIfNull(ingestionResult);
+
+        workingMemory["sli_fragment_primary_root"] = ingestionResult.CanonicalSummary.PrimaryRootKey;
+        workingMemory["sli_fragment_draft_count"] = ingestionResult.CanonicalSummary.DraftCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_primary_branch_count"] = ingestionResult.CanonicalSummary.PrimaryBranchCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_primary_closure_grade"] = ingestionResult.CanonicalSummary.PrimaryClosureGrade.ToString();
+        workingMemory["sli_fragment_diag_authority"] = ingestionResult.DiagnosticSummary.AuthorityClass.ToString();
+        workingMemory["sli_fragment_diag_admission_authority"] = ingestionResult.DiagnosticSummary.AdmissionAuthorityGranted ? "true" : "false";
+        workingMemory["sli_fragment_diag_baseline_review_count"] = ingestionResult.DiagnosticSummary.Baseline.ReviewCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_baseline_sfi"] = ingestionResult.DiagnosticSummary.Baseline.Metrics.Sfi.ToString("F6", CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_variant_count"] = ingestionResult.DiagnosticSummary.Stress.VariantCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_degraded_variant_count"] = ingestionResult.DiagnosticSummary.Stress.DegradedVariantCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_worst_review_count"] = ingestionResult.DiagnosticSummary.Stress.WorstReviewCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_degraded_variants"] = ingestionResult.DiagnosticSummary.Stress.DegradedVariantKeys.Count == 0
+            ? "none"
+            : string.Join(",", ingestionResult.DiagnosticSummary.Stress.DegradedVariantKeys);
     }
 
     private static SoulFrameInferenceConstraints BuildOpalConstraints(string domain, string objectiveHint)

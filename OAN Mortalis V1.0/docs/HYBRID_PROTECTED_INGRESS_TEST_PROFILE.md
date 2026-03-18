@@ -89,6 +89,14 @@ Real names from the local profile must never appear in:
 - committed logs
 - CI-visible logs
 
+## Recovered Test Lineage
+
+The recovered `Engrams and Phonology` experiment family now staged in:
+
+- `runtime/research/test-fields/recovered-engrams-phonology/`
+
+should be treated as historical test lineage for bounded harness design. It is especially relevant for older gold-loader, probe, Compass-event, and summary-led evaluation patterns, but it remains non-authoritative until explicitly re-ratified into active test doctrine.
+
 ## Protected Ingress Classes
 
 The bounded hybrid run uses two protected ingress classes:

@@ -1,0 +1,55 @@
+{
+  "id": "FRAG-XXXX",
+  "title": "<short title>",
+  "nodes": [
+    {
+      "id": "N1",
+      "text": "<origin line>",
+      "role": "origin",
+      "critical": true,
+      "deps": []
+    },
+    {
+      "id": "N2",
+      "text": "<bridge line>",
+      "role": "bridge",
+      "critical": true,
+      "deps": [
+        "N1"
+      ]
+    },
+    {
+      "id": "N3",
+      "text": "<inversion line>",
+      "role": "inversion",
+      "critical": false,
+      "deps": [
+        "N1",
+        "N2"
+      ]
+    },
+    {
+      "id": "N4",
+      "text": "<leap line>",
+      "role": "leap",
+      "critical": true,
+      "deps": [
+        "N3"
+      ]
+    },
+    {
+      "id": "N5",
+      "text": "<reflection line>",
+      "role": "reflection",
+      "critical": false,
+      "deps": [
+        "N4"
+      ]
+    }
+  ],
+  "master_gloss": "<one-sentence intended insight>",
+  "acceptable_paraphrases": [
+    "<alt phrasing 1>",
+    "<alt phrasing 2>"
+  ]
+}

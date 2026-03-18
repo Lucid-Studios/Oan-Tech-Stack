@@ -74,6 +74,12 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.Equal("0", context.WorkingMemory["selfgel_claim_count"]);
         Assert.Equal("none", context.WorkingMemory["selfgel_claim_postures"]);
         Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
+        Assert.False(string.IsNullOrWhiteSpace(context.WorkingMemory["sli_fragment_primary_root"]));
+        Assert.Equal("1", context.WorkingMemory["sli_fragment_draft_count"]);
+        Assert.Equal(SLI.Ingestion.SliFragmentDiagnosticAuthorityClass.WitnessOnly.ToString(), context.WorkingMemory["sli_fragment_diag_authority"]);
+        Assert.Equal("false", context.WorkingMemory["sli_fragment_diag_admission_authority"]);
+        Assert.Equal("3", context.WorkingMemory["sli_fragment_diag_stress_variant_count"]);
+        Assert.NotEmpty(context.WorkingMemory["sli_fragment_diag_stress_degraded_variants"]);
         Assert.Equal("zed-theta:test-audit", result.ZedThetaCandidate.CandidateHandle);
         Assert.Equal(SliAuthorityClass.CandidateBearing, result.ZedThetaCandidate.PacketDirective.AuthorityClass);
         Assert.Equal(SliTheaterAuthorizationState.Withheld, result.TheaterAuthorization.AuthorizationState);

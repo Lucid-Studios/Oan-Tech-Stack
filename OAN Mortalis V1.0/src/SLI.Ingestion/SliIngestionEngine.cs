@@ -46,6 +46,8 @@ public sealed class SliIngestionEngine
         var sheafDomain = _sheafMasterEngrams.ResolveForObjective(input).DomainName;
         var semanticHints = await BuildSemanticHintsAsync(matched.EngramCandidates, sheafDomain, cancellationToken).ConfigureAwait(false);
         var diagnostic = BuildDiagnostic(cleaved, constructors, constructorGraph, canonicalDrafts, symbolic, matched);
+        var canonicalSummary = SliFragmentDiagnosticBuilder.BuildCanonicalSummary(canonicalDrafts);
+        var diagnosticSummary = SliFragmentDiagnosticBuilder.BuildSummary(diagnostic);
 
         return new SliIngestionResult
         {
@@ -53,11 +55,13 @@ public sealed class SliIngestionEngine
             MatchResult = matched,
             ConstructorEngrams = constructors,
             CanonicalDrafts = canonicalDrafts,
+            CanonicalSummary = canonicalSummary,
             SliExpression = symbolic,
             ConstructorGraph = constructorGraph,
             SheafDomain = sheafDomain,
             SemanticHints = semanticHints,
-            Diagnostic = diagnostic
+            Diagnostic = diagnostic,
+            DiagnosticSummary = diagnosticSummary
         };
     }
 
@@ -122,9 +126,11 @@ public sealed class SliIngestionResult
     public required EngramMatchResult MatchResult { get; init; }
     public required IReadOnlyList<ConstructorEngramRecord> ConstructorEngrams { get; init; }
     public required IReadOnlyList<EngramDraft> CanonicalDrafts { get; init; }
+    public required SliCanonicalDraftSummary CanonicalSummary { get; init; }
     public required SliExpression SliExpression { get; init; }
     public required ConstructorGraph ConstructorGraph { get; init; }
     public required string SheafDomain { get; init; }
     public required IReadOnlyList<string> SemanticHints { get; init; }
     public required SliFragmentDiagnosticResult Diagnostic { get; init; }
+    public required SliFragmentDiagnosticSummary DiagnosticSummary { get; init; }
 }

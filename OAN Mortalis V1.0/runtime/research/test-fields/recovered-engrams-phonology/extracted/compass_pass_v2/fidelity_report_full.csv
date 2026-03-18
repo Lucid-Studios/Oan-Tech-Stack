@@ -1,0 +1,6 @@
+fragment_id,title,RTD_base,DPI_base,eps_functor_base,TC_stub,RTD_phi_mean,DPI_phi_mean,eps_functor_phi_mean,SFI_like_base,SFI_like_phi
+FRAG-ZDS-001,Zed–Delta–Sigma: Lighting the Frame,1.2266,1.0,1.2528,5.0,1.2545,0.933,1.3318,0.4,0.373
+FRAG-BLOOM-002,From Cleave to Crystal,1.3647,1.0,1.784,5.0,1.372,0.933,1.7653,0.4,0.373
+FRAG-HAMMER-003,Fracture as Revelation,1.2195,1.0,1.3988,5.0,1.2424,0.933,1.4303,0.4,0.373
+FRAG-PIERLESS-004,Echo Injection to Pierless Mode,1.4303,1.0,0.9099,5.0,1.4462,0.933,1.0102,0.409,0.373
+FRAG-STONE-005,Chosen Recursion,1.4307,1.0,0.8475,5.0,1.4232,0.933,1.021,0.415,0.373

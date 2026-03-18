@@ -62,6 +62,35 @@ public sealed record SliFragmentGateStatus(
     SliFragmentGateOutcome Functor,
     SliFragmentGateOutcome Trace);
 
+public enum SliFragmentDiagnosticAuthorityClass
+{
+    WitnessOnly = 0
+}
+
+public sealed record SliCanonicalDraftSummary(
+    int DraftCount,
+    string PrimaryRootKey,
+    int PrimaryBranchCount,
+    EngramClosureGrade PrimaryClosureGrade);
+
+public sealed record SliFragmentBaselineSummary(
+    SliFragmentMetricSet Metrics,
+    SliFragmentGateStatus Gates,
+    int ReviewCount);
+
+public sealed record SliFragmentStressSummary(
+    int VariantCount,
+    int DegradedVariantCount,
+    int WorstReviewCount,
+    IReadOnlyList<string> DegradedVariantKeys,
+    IReadOnlyList<string> WorstVariantKeys);
+
+public sealed record SliFragmentDiagnosticSummary(
+    SliFragmentDiagnosticAuthorityClass AuthorityClass,
+    bool AdmissionAuthorityGranted,
+    SliFragmentBaselineSummary Baseline,
+    SliFragmentStressSummary Stress);
+
 public sealed record SliStressVariantResult(
     string VariantKey,
     string Description,
@@ -126,6 +155,62 @@ internal static partial class SliFragmentDiagnosticBuilder
             Gates: baseline.Gates,
             WitnessSummary: witnessSummary,
             StressVariants: stressVariants);
+    }
+
+    public static SliCanonicalDraftSummary BuildCanonicalSummary(IReadOnlyList<EngramDraft> canonicalDrafts)
+    {
+        ArgumentNullException.ThrowIfNull(canonicalDrafts);
+        if (canonicalDrafts.Count == 0)
+        {
+            throw new ArgumentException("Canonical drafts must contain at least one item.", nameof(canonicalDrafts));
+        }
+
+        var primary = canonicalDrafts[0];
+        return new SliCanonicalDraftSummary(
+            DraftCount: canonicalDrafts.Count,
+            PrimaryRootKey: primary.RootKey,
+            PrimaryBranchCount: primary.Branches.Count,
+            PrimaryClosureGrade: primary.RequestedClosureGrade);
+    }
+
+    public static SliFragmentDiagnosticSummary BuildSummary(SliFragmentDiagnosticResult diagnostic)
+    {
+        ArgumentNullException.ThrowIfNull(diagnostic);
+
+        var baselineReviewCount = CountReviews(diagnostic.Gates);
+        var stressEvaluations = diagnostic.StressVariants
+            .Select(variant => new StressEvaluation(
+                variant.VariantKey,
+                CountReviews(variant.Gates),
+                variant.Metrics.Sfi))
+            .ToArray();
+
+        var degradedVariantKeys = stressEvaluations
+            .Where(evaluation => evaluation.ReviewCount > baselineReviewCount || evaluation.Sfi < diagnostic.Metrics.Sfi)
+            .Select(evaluation => evaluation.VariantKey)
+            .ToArray();
+
+        var worstReviewCount = stressEvaluations.Length == 0
+            ? baselineReviewCount
+            : Math.Max(baselineReviewCount, stressEvaluations.Max(evaluation => evaluation.ReviewCount));
+        var worstVariantKeys = stressEvaluations
+            .Where(evaluation => evaluation.ReviewCount == worstReviewCount)
+            .Select(evaluation => evaluation.VariantKey)
+            .ToArray();
+
+        return new SliFragmentDiagnosticSummary(
+            AuthorityClass: SliFragmentDiagnosticAuthorityClass.WitnessOnly,
+            AdmissionAuthorityGranted: false,
+            Baseline: new SliFragmentBaselineSummary(
+                Metrics: diagnostic.Metrics,
+                Gates: diagnostic.Gates,
+                ReviewCount: baselineReviewCount),
+            Stress: new SliFragmentStressSummary(
+                VariantCount: diagnostic.StressVariants.Count,
+                DegradedVariantCount: degradedVariantKeys.Length,
+                WorstReviewCount: worstReviewCount,
+                DegradedVariantKeys: degradedVariantKeys,
+                WorstVariantKeys: worstVariantKeys));
     }
 
     private static IReadOnlyList<SliStressVariantResult> BuildStressVariants(
@@ -541,6 +626,32 @@ internal static partial class SliFragmentDiagnosticBuilder
 
     private static double Round(double value) => Math.Round(value, 6, MidpointRounding.AwayFromZero);
 
+    private static int CountReviews(SliFragmentGateStatus gates)
+    {
+        var count = 0;
+        if (gates.Structure == SliFragmentGateOutcome.Review)
+        {
+            count++;
+        }
+
+        if (gates.Meaning == SliFragmentGateOutcome.Review)
+        {
+            count++;
+        }
+
+        if (gates.Functor == SliFragmentGateOutcome.Review)
+        {
+            count++;
+        }
+
+        if (gates.Trace == SliFragmentGateOutcome.Review)
+        {
+            count++;
+        }
+
+        return count;
+    }
+
     [GeneratedRegex(@"[A-Za-z][A-Za-z\-']*|[-+]?\d+[A-Za-z]|[-+]?\d+|[+\-*/=]", RegexOptions.Compiled)]
     private static partial Regex DiagnosticLexemeRegex();
 
@@ -597,4 +708,9 @@ internal static partial class SliFragmentDiagnosticBuilder
         IReadOnlyList<SliFragmentDiagnosticNode> Nodes,
         SliFragmentMetricSet Metrics,
         SliFragmentGateStatus Gates);
+
+    private sealed record StressEvaluation(
+        string VariantKey,
+        int ReviewCount,
+        double Sfi);
 }
