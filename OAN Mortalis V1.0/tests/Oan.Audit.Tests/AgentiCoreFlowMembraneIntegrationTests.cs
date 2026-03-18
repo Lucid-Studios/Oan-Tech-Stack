@@ -74,6 +74,10 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.Equal("0", context.WorkingMemory["selfgel_claim_count"]);
         Assert.Equal("none", context.WorkingMemory["selfgel_claim_postures"]);
         Assert.Contains("hosted_semantic_decision", result.SelfGelWorkingPool.WorkingMemory.Keys, StringComparer.Ordinal);
+        Assert.Equal("zed-theta:test-audit", result.ZedThetaCandidate.CandidateHandle);
+        Assert.Equal(SliAuthorityClass.CandidateBearing, result.ZedThetaCandidate.PacketDirective.AuthorityClass);
+        Assert.Equal(SliTheaterAuthorizationState.Withheld, result.TheaterAuthorization.AuthorizationState);
+        Assert.Equal("sli-candidate-bearing-only", result.TheaterAuthorization.ReasonCode);
         Assert.NotNull(result.CompassObservation);
         Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation!.ActiveBasin);
         Assert.Equal(CompassDoctrineBasin.Unknown, result.CompassObservation.CompetingBasin);
@@ -177,6 +181,9 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
         Assert.Contains("ACTIVE_DOCTRINE_DOMAIN: bounded-locality continuity", classifyContext, StringComparison.Ordinal);
         Assert.Contains("EXCLUDED_NEARBY_DOMAIN: fluid continuity law", classifyContext, StringComparison.Ordinal);
         Assert.Contains("INPUT:", classifyContext, StringComparison.Ordinal);
+        Assert.Equal(CompassDoctrineBasin.BoundedLocalityContinuity, result.ZedThetaCandidate.ActiveBasin);
+        Assert.Equal(SliUpdateLocus.Sheaf, result.ZedThetaCandidate.PacketDirective.UpdateLocus);
+        Assert.Equal(SliTheaterAuthorizationState.Withheld, result.TheaterAuthorization.AuthorizationState);
         Assert.NotNull(result.CompassObservation);
         Assert.Equal(CompassDoctrineBasin.BoundedLocalityContinuity, result.CompassObservation!.ActiveBasin);
         Assert.Equal(CompassDoctrineBasin.FluidContinuityLaw, result.CompassObservation.CompetingBasin);
@@ -344,6 +351,42 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
 
         public Task<CognitionResult> ExecuteAsync(CognitionRequest request, CancellationToken cancellationToken = default)
         {
+            var objective = request.Context.TaskObjective;
+            var activeBasin = objective.Contains("bounded locality continuity", StringComparison.OrdinalIgnoreCase) ||
+                              objective.Contains("bounded-locality continuity", StringComparison.OrdinalIgnoreCase)
+                ? CompassDoctrineBasin.BoundedLocalityContinuity
+                : CompassDoctrineBasin.Unknown;
+            var competingBasin = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+                ? CompassDoctrineBasin.FluidContinuityLaw
+                : CompassDoctrineBasin.Unknown;
+            var anchorState = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+                ? CompassAnchorState.Held
+                : CompassAnchorState.Weakened;
+            var zedThetaCandidate = new ZedThetaCandidateReceipt(
+                CandidateHandle: "zed-theta:test-audit",
+                Objective: objective,
+                PrimeState: "task-objective",
+                ThetaState: "theta-ready",
+                GammaState: "gamma-ready",
+                PacketDirective: new SliPacketDirective(
+                    SliThinkingTier.Master,
+                    SliPacketClass.Commitment,
+                    SliEngramOperation.Write,
+                    activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf,
+                    SliAuthorityClass.CandidateBearing),
+                IdentityKernelBoundary: new IdentityKernelBoundaryReceipt(
+                    CmeIdentityHandle: "cme:test",
+                    IdentityKernelHandle: "kernel:test",
+                    ContinuityAnchorHandle: "anchor:test:bounded-locality",
+                    KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
+                    CandidateLocus: activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf),
+                Validity: new SliPacketValidityReceipt(true, true, true, true, "sli-packet-valid"),
+                ActiveBasin: activeBasin,
+                CompetingBasin: competingBasin,
+                AnchorState: anchorState,
+                SelfTouchClass: CompassSelfTouchClass.ValidationTouch,
+                OeCoePosture: CompassOeCoePosture.CoeDominant);
+
             return Task.FromResult(new CognitionResult
             {
                 Reasoning = "bounded reasoning",
@@ -365,6 +408,8 @@ public sealed class AgentiCoreFlowMembraneIntegrationTests
                     DecisionEntropy = 0.1,
                     Timestamp = DateTime.UtcNow
                 },
+                GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
+                ZedThetaCandidate = zedThetaCandidate,
                 Confidence = 0.81
             });
         }

@@ -1,4 +1,5 @@
 using GEL.Graphs;
+using Oan.Common;
 using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SoulFrame.Host;
@@ -209,6 +210,8 @@ public sealed class SliSymbolTable
                     BuildInferenceRequest("classify", value, context),
                     cancellationToken)
                 .ConfigureAwait(false);
+            context.LastClassifyResponse = response;
+            RefreshGoldenCodeContracts(context);
             context.AddTrace(response.Accepted
                 ? $"llm_classify({response.Decision})"
                 : "llm_classify(refused)");
@@ -269,6 +272,92 @@ public sealed class SliSymbolTable
             return Task.FromResult(SExpression.AtomNode("evaluated"));
         });
 
+        RegisterSharedContract("prime-reflect", (expression, context, _) =>
+        {
+            var primeState = Arg(expression, 1, "task-objective");
+            context.GoldenCodeState.PrimeState = primeState;
+            context.AddTrace($"prime-reflect({primeState})");
+            return Task.FromResult(SExpression.AtomNode("prime-ready"));
+        });
+
+        RegisterSharedContract("zed-listen", (expression, context, _) =>
+        {
+            var primeState = Arg(expression, 1, "task-objective");
+            context.AddTrace($"zed-listen({primeState})");
+            return Task.FromResult(SExpression.AtomNode("listening"));
+        });
+
+        RegisterSharedContract("delta-differentiate", (expression, context, _) =>
+        {
+            var primeState = Arg(expression, 1, "task-objective");
+            var predicateSet = Arg(expression, 2, "predicate-set");
+            var state = context.GoldenCodeState;
+            state.ActiveBasin = ResolveGoldenCodeActiveBasin(context, primeState);
+            state.CompetingBasin = ResolveGoldenCodeCompetingBasin(context, state.ActiveBasin);
+            context.AddTrace($"delta-differentiate({primeState} {predicateSet})");
+            return Task.FromResult(SExpression.AtomNode("delta-ready"));
+        });
+
+        RegisterSharedContract("sigma-cleave", (expression, context, _) =>
+        {
+            var reasoningState = Arg(expression, 1, "reasoning-state");
+            context.AddTrace($"sigma-cleave({reasoningState})");
+            return Task.FromResult(SExpression.AtomNode("sigma-ready"));
+        });
+
+        RegisterSharedContract("psi-modulate", (expression, context, _) =>
+        {
+            var polarity = Arg(expression, 1, "psi-neutral");
+            var modulation = Arg(expression, 2, "bounded");
+            context.AddTrace($"psi-modulate({polarity}:{modulation})");
+            return Task.FromResult(SExpression.AtomNode("psi-ready"));
+        });
+
+        RegisterSharedContract("omega-converge", (expression, context, _) =>
+        {
+            var positive = Arg(expression, 1, "psi-positive");
+            var negative = Arg(expression, 2, "psi-negative");
+            context.AddTrace($"omega-converge({positive} {negative})");
+            return Task.FromResult(SExpression.AtomNode("omega-ready"));
+        });
+
+        RegisterSharedContract("theta-seal", (expression, context, _) =>
+        {
+            var primeState = Arg(expression, 1, "task-objective");
+            var reasoningState = Arg(expression, 2, "reasoning-state");
+            var state = context.GoldenCodeState;
+            state.PrimeState = primeState;
+            state.ActiveBasin = ResolveGoldenCodeActiveBasin(context, primeState);
+            state.CompetingBasin = ResolveGoldenCodeCompetingBasin(context, state.ActiveBasin);
+            state.AnchorState = ResolveGoldenCodeAnchorState(context, state.ActiveBasin, state.CompetingBasin, primeState);
+            state.ThetaState = "theta-ready";
+            state.IsProjected = true;
+            RefreshGoldenCodeContracts(context);
+            context.AddTrace($"theta-seal({primeState} {reasoningState} basin={state.ActiveBasin} anchor={state.AnchorState})");
+            return Task.FromResult(SExpression.AtomNode("theta-ready"));
+        });
+
+        RegisterSharedContract("compass-work", (expression, context, _) =>
+        {
+            var thetaState = Arg(expression, 1, "theta-state");
+            var locality = Arg(expression, 2, "proximal-cognition");
+            var state = context.GoldenCodeState;
+            state.SelfTouchClass = ResolveGoldenCodeSelfTouchClass(context);
+            state.OeCoePosture = ResolveGoldenCodeOeCoePosture(context, state);
+            RefreshGoldenCodeContracts(context);
+            context.AddTrace($"compass-work({thetaState} {locality} basin={state.ActiveBasin} anchor={state.AnchorState} self-touch={state.SelfTouchClass} posture={state.OeCoePosture})");
+            return Task.FromResult(SExpression.AtomNode("compass-live"));
+        });
+
+        RegisterSharedContract("gamma-yield", (expression, context, _) =>
+        {
+            var thetaState = Arg(expression, 1, "theta-state");
+            context.GoldenCodeState.GammaState = "gamma-ready";
+            RefreshGoldenCodeContracts(context);
+            context.AddTrace($"gamma-yield({thetaState})");
+            return Task.FromResult(SExpression.AtomNode("gamma-ready"));
+        });
+
         RegisterSharedContract("decision-branch", (expression, context, _) =>
         {
             context.AddTrace($"decision-branch({context.CandidateBranches.Count})");
@@ -298,6 +387,7 @@ public sealed class SliSymbolTable
         RegisterSharedContract("commit", (expression, context, _) =>
         {
             context.FinalDecision = context.CandidateBranches.FirstOrDefault() ?? "defer";
+            RefreshGoldenCodeContracts(context);
             context.AddTrace($"commit({context.FinalDecision})");
             return Task.FromResult(SExpression.AtomNode(context.FinalDecision));
         });
@@ -2835,15 +2925,312 @@ public sealed class SliSymbolTable
         return new SoulFrameInferenceRequest
         {
             Task = task,
-            Context = SoulFrameGovernedPromptContextComposer.Compose(
-                task,
-                contextValue,
-                constraints,
-                context.Frame.TaskObjective),
+            Context = contextValue,
             OpalConstraints = constraints,
             SoulFrameId = context.Frame.SoulFrameId,
             ContextId = context.Frame.ContextId,
             GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired()
         };
     }
+
+    private static CompassDoctrineBasin ResolveGoldenCodeActiveBasin(
+        SliExecutionContext context,
+        string primeState)
+    {
+        var advisoryBasin = context.LastClassifyResponse?.CompassAdvisory?.SuggestedActiveBasin;
+        if (advisoryBasin.HasValue)
+        {
+            return advisoryBasin.Value;
+        }
+
+        var normalized = $"{context.OpalConstraints.Domain} {context.Frame.TaskObjective} {primeState}".ToLowerInvariant();
+
+        if (normalized.Contains("bounded-locality continuity", StringComparison.Ordinal) ||
+            normalized.Contains("bounded locality continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.BoundedLocalityContinuity;
+        }
+
+        if (normalized.Contains("fluid continuity law", StringComparison.Ordinal) ||
+            normalized.Contains("fluid continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.FluidContinuityLaw;
+        }
+
+        if (normalized.Contains("identity continuity", StringComparison.Ordinal) ||
+            normalized.Contains("identity-continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.IdentityContinuity;
+        }
+
+        if (normalized.Contains("continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.GeneralContinuityDiscourse;
+        }
+
+        return CompassDoctrineBasin.Unknown;
+    }
+
+    private static CompassDoctrineBasin ResolveGoldenCodeCompetingBasin(
+        SliExecutionContext context,
+        CompassDoctrineBasin activeBasin)
+    {
+        var advisoryBasin = context.LastClassifyResponse?.CompassAdvisory?.SuggestedCompetingBasin;
+        if (advisoryBasin.HasValue)
+        {
+            return advisoryBasin.Value;
+        }
+
+        return activeBasin switch
+        {
+            CompassDoctrineBasin.BoundedLocalityContinuity => CompassDoctrineBasin.FluidContinuityLaw,
+            CompassDoctrineBasin.FluidContinuityLaw => CompassDoctrineBasin.BoundedLocalityContinuity,
+            _ => CompassDoctrineBasin.Unknown
+        };
+    }
+
+    private static CompassAnchorState ResolveGoldenCodeAnchorState(
+        SliExecutionContext context,
+        CompassDoctrineBasin activeBasin,
+        CompassDoctrineBasin competingBasin,
+        string primeState)
+    {
+        var response = context.LastClassifyResponse;
+        if (response is not null && !response.Accepted)
+        {
+            return CompassAnchorState.Weakened;
+        }
+
+        var advisoryAnchor = response?.CompassAdvisory?.SuggestedAnchorState;
+        if (advisoryAnchor.HasValue)
+        {
+            return advisoryAnchor.Value;
+        }
+
+        var advisoryText = string.Join(
+            " ",
+            new[]
+            {
+                response?.Decision,
+                response?.Payload,
+                response?.Governance.Content,
+                response?.Governance.Trace,
+                context.Frame.TaskObjective,
+                primeState
+            }.Where(value => !string.IsNullOrWhiteSpace(value)))
+            .ToLowerInvariant();
+
+        var activeSeen = BasinMarkers(activeBasin).Any(marker => advisoryText.Contains(marker, StringComparison.Ordinal));
+        var competingSeen = BasinMarkers(competingBasin).Any(marker => advisoryText.Contains(marker, StringComparison.Ordinal));
+
+        if (activeSeen && !competingSeen)
+        {
+            return CompassAnchorState.Held;
+        }
+
+        if (competingSeen && !activeSeen)
+        {
+            return CompassAnchorState.Lost;
+        }
+
+        return CompassAnchorState.Weakened;
+    }
+
+    private static CompassSelfTouchClass ResolveGoldenCodeSelfTouchClass(SliExecutionContext context)
+    {
+        var hint = context.Frame.SelfStateHint;
+        if (hint is null)
+        {
+            return CompassSelfTouchClass.NoTouch;
+        }
+
+        if (hint.HasDeferredOrContradictedClaim)
+        {
+            return CompassSelfTouchClass.BoundaryContact;
+        }
+
+        if (hint.HasHotClaim || hint.ClaimCount > 0)
+        {
+            return CompassSelfTouchClass.HotClaimTouch;
+        }
+
+        if (hint.ValidationConceptCount > 0)
+        {
+            return CompassSelfTouchClass.ValidationTouch;
+        }
+
+        return CompassSelfTouchClass.NoTouch;
+    }
+
+    private static CompassOeCoePosture ResolveGoldenCodeOeCoePosture(
+        SliExecutionContext context,
+        SliGoldenCodeState state)
+    {
+        var response = context.LastClassifyResponse;
+        var advisory = response?.CompassAdvisory;
+        var advisoryAccepted =
+            response?.Accepted == true &&
+            advisory is not null &&
+            advisory.Confidence >= 0.55 &&
+            advisory.SuggestedActiveBasin == state.ActiveBasin &&
+            advisory.SuggestedCompetingBasin == state.CompetingBasin &&
+            advisory.SuggestedAnchorState == state.AnchorState &&
+            advisory.SuggestedSelfTouchClass == state.SelfTouchClass;
+
+        if (!advisoryAccepted)
+        {
+            return CompassOeCoePosture.Unresolved;
+        }
+
+        var hint = context.Frame.CleaverHint;
+        if (hint is null)
+        {
+            return CompassOeCoePosture.Unresolved;
+        }
+
+        if (hint.KnownRatio >= 0.66 && hint.UnknownRatio <= 0.34)
+        {
+            return CompassOeCoePosture.OeDominant;
+        }
+
+        if (hint.UnknownRatio >= 0.66)
+        {
+            return CompassOeCoePosture.CoeDominant;
+        }
+
+        return CompassOeCoePosture.ShuntedBalanced;
+    }
+
+    private static void RefreshGoldenCodeContracts(SliExecutionContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        var state = context.GoldenCodeState;
+        var updateLocus = ResolveGoldenCodeUpdateLocus(context, state);
+        state.PacketDirective = CreatePacketDirective(context, updateLocus);
+        state.IdentityKernelBoundary = CreateIdentityKernelBoundary(context, state, updateLocus);
+        state.PacketValidity = CreatePacketValidity(context, state, updateLocus);
+    }
+
+    private static SliUpdateLocus ResolveGoldenCodeUpdateLocus(
+        SliExecutionContext context,
+        SliGoldenCodeState state)
+    {
+        if (context.LastClassifyResponse?.Accepted == false)
+        {
+            return SliUpdateLocus.Reject;
+        }
+
+        if (state.ActiveBasin == CompassDoctrineBasin.IdentityContinuity)
+        {
+            return SliUpdateLocus.Kernel;
+        }
+
+        var hint = context.Frame.CleaverHint;
+        if (hint is not null && hint.UnknownRatio >= 0.4)
+        {
+            return SliUpdateLocus.Gap;
+        }
+
+        return state.IsProjected
+            ? SliUpdateLocus.Sheaf
+            : SliUpdateLocus.Reject;
+    }
+
+    private static SliPacketDirective CreatePacketDirective(
+        SliExecutionContext context,
+        SliUpdateLocus updateLocus)
+    {
+        if (context.LastClassifyResponse?.Accepted == false || updateLocus == SliUpdateLocus.Reject)
+        {
+            return new SliPacketDirective(
+                SliThinkingTier.Master,
+                SliPacketClass.Refusal,
+                SliEngramOperation.Refuse,
+                updateLocus,
+                SliAuthorityClass.CandidateBearing);
+        }
+
+        if (string.Equals(context.FinalDecision, "defer", StringComparison.OrdinalIgnoreCase))
+        {
+            return new SliPacketDirective(
+                SliThinkingTier.Master,
+                SliPacketClass.Observation,
+                SliEngramOperation.NoOp,
+                updateLocus,
+                SliAuthorityClass.CandidateBearing);
+        }
+
+        return new SliPacketDirective(
+            SliThinkingTier.Master,
+            SliPacketClass.Commitment,
+            SliEngramOperation.Write,
+            updateLocus,
+            SliAuthorityClass.CandidateBearing);
+    }
+
+    private static IdentityKernelBoundaryReceipt CreateIdentityKernelBoundary(
+        SliExecutionContext context,
+        SliGoldenCodeState state,
+        SliUpdateLocus updateLocus)
+    {
+        var basinToken = state.ActiveBasin.ToString().ToLowerInvariant();
+        return new IdentityKernelBoundaryReceipt(
+            CmeIdentityHandle: $"cme:{context.Frame.CMEId}",
+            IdentityKernelHandle: $"kernel:{context.Frame.CMEId}",
+            ContinuityAnchorHandle: $"anchor:{context.Frame.CMEId}:{basinToken}",
+            KernelBound: updateLocus == SliUpdateLocus.Kernel,
+            CandidateLocus: updateLocus);
+    }
+
+    private static SliPacketValidityReceipt CreatePacketValidity(
+        SliExecutionContext context,
+        SliGoldenCodeState state,
+        SliUpdateLocus updateLocus)
+    {
+        const bool syntaxOk = true;
+        var hexadOk = state.AnchorState != CompassAnchorState.Lost;
+        var scepOk = updateLocus != SliUpdateLocus.Reject;
+        var policyEligible = context.LastClassifyResponse?.Accepted != false;
+        var reasonCode = ResolvePacketValidityReasonCode(syntaxOk, hexadOk, scepOk, policyEligible);
+        return new SliPacketValidityReceipt(syntaxOk, hexadOk, scepOk, policyEligible, reasonCode);
+    }
+
+    private static string ResolvePacketValidityReasonCode(
+        bool syntaxOk,
+        bool hexadOk,
+        bool scepOk,
+        bool policyEligible)
+    {
+        if (!syntaxOk)
+        {
+            return "sli-syntax-invalid";
+        }
+
+        if (!hexadOk)
+        {
+            return "sli-hexad-out-of-band";
+        }
+
+        if (!scepOk)
+        {
+            return "sli-scep-reject";
+        }
+
+        if (!policyEligible)
+        {
+            return "sli-policy-withheld";
+        }
+
+        return "sli-packet-valid";
+    }
+
+    private static IReadOnlyList<string> BasinMarkers(CompassDoctrineBasin basin) => basin switch
+    {
+        CompassDoctrineBasin.BoundedLocalityContinuity => ["bounded-locality continuity", "bounded locality continuity", "locality witness"],
+        CompassDoctrineBasin.FluidContinuityLaw => ["fluid continuity law", "fluid continuity"],
+        CompassDoctrineBasin.IdentityContinuity => ["identity continuity", "identity-continuity"],
+        CompassDoctrineBasin.GeneralContinuityDiscourse => ["continuity discourse", "continuity"],
+        _ => Array.Empty<string>()
+    };
 }

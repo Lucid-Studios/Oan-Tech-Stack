@@ -1,5 +1,6 @@
 using GEL.Graphs;
 using GEL.Runtime;
+using GEL.Models;
 using SoulFrame.Host;
 
 namespace SLI.Ingestion;
@@ -40,20 +41,43 @@ public sealed class SliIngestionEngine
         var matched = await _rootEngramMatcher.MatchAsync(cleaved, cancellationToken).ConfigureAwait(false);
         var constructors = _constructorEngramBuilder.Build(cleaved, matched);
         var constructorGraph = _constructorEngramBuilder.BuildGraph(constructors);
+        var canonicalDrafts = _constructorEngramBuilder.BuildCanonicalDrafts(constructors);
         var symbolic = _symbolicAssembler.Assemble(constructors, matched, input);
         var sheafDomain = _sheafMasterEngrams.ResolveForObjective(input).DomainName;
         var semanticHints = await BuildSemanticHintsAsync(matched.EngramCandidates, sheafDomain, cancellationToken).ConfigureAwait(false);
+        var diagnostic = BuildDiagnostic(cleaved, constructors, constructorGraph, canonicalDrafts, symbolic, matched);
 
         return new SliIngestionResult
         {
             CleavedOntology = cleaved,
             MatchResult = matched,
             ConstructorEngrams = constructors,
+            CanonicalDrafts = canonicalDrafts,
             SliExpression = symbolic,
             ConstructorGraph = constructorGraph,
             SheafDomain = sheafDomain,
-            SemanticHints = semanticHints
+            SemanticHints = semanticHints,
+            Diagnostic = diagnostic
         };
+    }
+
+    private static SliFragmentDiagnosticResult BuildDiagnostic(
+        CleavedOntology cleaved,
+        IReadOnlyList<ConstructorEngramRecord> constructors,
+        ConstructorGraph constructorGraph,
+        IReadOnlyList<EngramDraft> canonicalDrafts,
+        SliExpression symbolic,
+        EngramMatchResult matchResult)
+    {
+        var primaryConstructor = constructors.First();
+        var primaryDraft = canonicalDrafts.First();
+        return SliFragmentDiagnosticBuilder.Build(
+            cleaved,
+            primaryConstructor,
+            constructorGraph,
+            primaryDraft,
+            symbolic,
+            matchResult.EngramCandidates);
     }
 
     private async Task<IReadOnlyList<string>> BuildSemanticHintsAsync(
@@ -97,8 +121,10 @@ public sealed class SliIngestionResult
     public required CleavedOntology CleavedOntology { get; init; }
     public required EngramMatchResult MatchResult { get; init; }
     public required IReadOnlyList<ConstructorEngramRecord> ConstructorEngrams { get; init; }
+    public required IReadOnlyList<EngramDraft> CanonicalDrafts { get; init; }
     public required SliExpression SliExpression { get; init; }
     public required ConstructorGraph ConstructorGraph { get; init; }
     public required string SheafDomain { get; init; }
     public required IReadOnlyList<string> SemanticHints { get; init; }
+    public required SliFragmentDiagnosticResult Diagnostic { get; init; }
 }

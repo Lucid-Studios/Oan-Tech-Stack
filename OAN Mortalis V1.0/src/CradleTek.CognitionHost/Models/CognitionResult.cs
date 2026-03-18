@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Oan.Common;
 
 namespace CradleTek.CognitionHost.Models;
 
@@ -30,6 +31,12 @@ public sealed class CognitionResult
 
     [JsonPropertyName("compass_state")]
     public required CognitionCompassTelemetry CompassState { get; init; }
+
+    [JsonPropertyName("golden_code_compass")]
+    public required GoldenCodeCompassProjection GoldenCodeCompass { get; init; }
+
+    [JsonPropertyName("zed_theta_candidate")]
+    public required ZedThetaCandidateReceipt ZedThetaCandidate { get; init; }
 
     [JsonPropertyName("confidence")]
     public required double Confidence { get; init; }

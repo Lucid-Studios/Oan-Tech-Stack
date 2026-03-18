@@ -10,7 +10,7 @@ namespace Oan.Sli.Tests;
 public sealed class SliSemanticRequestAnchoringTests
 {
     [Fact]
-    public async Task LlmClassify_AnchorsBoundedLocalityDoctrineInRequestContext()
+    public async Task LlmClassify_AnchorsBoundedLocalityDoctrineWithoutPrecomposingContext()
     {
         var device = new RecordingSemanticDevice();
         var context = new SliExecutionContext(
@@ -41,10 +41,10 @@ public sealed class SliSemanticRequestAnchoringTests
 
         Assert.NotNull(device.LastRequest);
         Assert.Equal("bounded-locality continuity", device.LastRequest!.OpalConstraints.Domain);
-        Assert.Contains("ACTIVE_DOCTRINE_DOMAIN: bounded-locality continuity", device.LastRequest.Context, StringComparison.Ordinal);
-        Assert.Contains("EXCLUDED_NEARBY_DOMAIN: fluid continuity law", device.LastRequest.Context, StringComparison.Ordinal);
-        Assert.Contains("OBJECTIVE_HINT: maintain bounded locality continuity under masked locality witness", device.LastRequest.Context, StringComparison.Ordinal);
-        Assert.Contains("INPUT: task-objective", device.LastRequest.Context, StringComparison.Ordinal);
+        Assert.Equal("task-objective", device.LastRequest.Context);
+        Assert.NotNull(device.LastRequest.GovernanceProtocol);
+        Assert.True(device.LastRequest.GovernanceProtocol!.RequireStateEnvelope);
+        Assert.True(device.LastRequest.GovernanceProtocol.RequireTerminalState);
     }
 
     private sealed class RecordingSemanticDevice : ISoulFrameSemanticDevice

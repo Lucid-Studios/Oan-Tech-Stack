@@ -8,4 +8,6 @@ public sealed class CognitionContext
     public required string TaskObjective { get; init; }
     public required IReadOnlyList<CognitionEngramEntry> RelevantEngrams { get; init; }
     public IReadOnlyList<string>? SymbolicProgram { get; init; }
+    public CognitionSelfStateHint? SelfStateHint { get; init; }
+    public CognitionCleaverHint? CleaverHint { get; init; }
 }

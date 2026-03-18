@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CradleTek.Memory.Interfaces;
 using CradleTek.Memory.Models;
+using CradleTek.CognitionHost.Models;
 using Oan.Common;
 using SLI.Engine.Cognition;
 using SLI.Engine.Morphology;
@@ -21,8 +22,10 @@ public sealed class LispBridge
         "core.lisp",
         "parser.lisp",
         "reasoning.lisp",
+        "golden-code.lisp",
         "engram.lisp",
         "compass.lisp",
+        "diagnostics.lisp",
         "morphology.lisp",
         "locality.lisp",
         "rehearsal.lisp",
@@ -112,6 +115,7 @@ public sealed class LispBridge
         var compass = BuildCompassState(context.TraceLines);
         var decisionBranch = context.CandidateBranches.FirstOrDefault() ?? context.FinalDecision;
         var traceId = CreateDeterministicTraceId(frame.CMEId, frame.ContextId, traceHash).ToString("D");
+        var zedThetaCandidate = BuildZedThetaCandidate(context, traceId);
         return new LispExecutionResult
         {
             TraceId = traceId,
@@ -120,7 +124,9 @@ public sealed class LispBridge
             CleaveResidue = cleaveResidue,
             SymbolicTrace = trace,
             SymbolicTraceHash = traceHash,
-            CompassState = compass
+            CompassState = compass,
+            GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
+            ZedThetaCandidate = zedThetaCandidate
         };
     }
 
@@ -595,6 +601,30 @@ public sealed class LispBridge
         };
     }
 
+    private static ZedThetaCandidateReceipt BuildZedThetaCandidate(
+        SliExecutionContext context,
+        string traceId)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+
+        var state = context.GoldenCodeState;
+        return new ZedThetaCandidateReceipt(
+            CandidateHandle: $"zed-theta:{traceId}",
+            Objective: context.Frame.TaskObjective,
+            PrimeState: state.PrimeState,
+            ThetaState: state.ThetaState,
+            GammaState: state.GammaState,
+            PacketDirective: state.PacketDirective,
+            IdentityKernelBoundary: state.IdentityKernelBoundary,
+            Validity: state.PacketValidity,
+            ActiveBasin: state.ActiveBasin,
+            CompetingBasin: state.CompetingBasin,
+            AnchorState: state.AnchorState,
+            SelfTouchClass: state.SelfTouchClass,
+            OeCoePosture: state.OeCoePosture);
+    }
+
     private static double EntropyFromTrace(IReadOnlyList<string> traceLines)
     {
         if (traceLines.Count == 0)
@@ -650,6 +680,14 @@ public sealed class LispBridge
         var localityIndex = IndexOf(traceLines, "locality-bind(");
         var perspectiveIndex = IndexOf(traceLines, "perspective-configure(");
         var participationIndex = IndexOf(traceLines, "participation-configure(");
+        var primeIndex = IndexOf(traceLines, "prime-reflect(");
+        var zedIndex = IndexOf(traceLines, "zed-listen(");
+        var deltaIndex = IndexOf(traceLines, "delta-differentiate(");
+        var sigmaIndex = IndexOf(traceLines, "sigma-cleave(");
+        var psiIndex = IndexOf(traceLines, "psi-modulate(");
+        var omegaIndex = IndexOf(traceLines, "omega-converge(");
+        var thetaIndex = IndexOf(traceLines, "theta-seal(");
+        var compassWorkIndex = IndexOf(traceLines, "compass-work(");
         var compassIndex = IndexOf(traceLines, "compass-update(");
         var decisionIndex = IndexOf(traceLines, "decision-branch(");
         var cleaveIndex = IndexOf(traceLines, "cleave(");
@@ -659,6 +697,14 @@ public sealed class LispBridge
             localityIndex < 0 ||
             perspectiveIndex < 0 ||
             participationIndex < 0 ||
+            primeIndex < 0 ||
+            zedIndex < 0 ||
+            deltaIndex < 0 ||
+            sigmaIndex < 0 ||
+            psiIndex < 0 ||
+            omegaIndex < 0 ||
+            thetaIndex < 0 ||
+            compassWorkIndex < 0 ||
             compassIndex < 0 ||
             decisionIndex < 0 ||
             cleaveIndex < 0 ||
@@ -671,7 +717,15 @@ public sealed class LispBridge
             reasoningIndex < localityIndex &&
             localityIndex < perspectiveIndex &&
             perspectiveIndex < participationIndex &&
-            participationIndex < compassIndex &&
+            participationIndex < primeIndex &&
+            primeIndex < zedIndex &&
+            zedIndex < deltaIndex &&
+            deltaIndex < sigmaIndex &&
+            sigmaIndex < psiIndex &&
+            psiIndex < omegaIndex &&
+            omegaIndex < thetaIndex &&
+            thetaIndex < compassWorkIndex &&
+            compassWorkIndex < compassIndex &&
             compassIndex < decisionIndex &&
             decisionIndex < cleaveIndex &&
             cleaveIndex < commitIndex;

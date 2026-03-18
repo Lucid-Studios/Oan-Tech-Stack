@@ -3,6 +3,7 @@ using CradleTek.Memory.Models;
 using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SoulFrame.Host;
+using Oan.Common;
 
 namespace SLI.Engine.Runtime;
 
@@ -34,6 +35,8 @@ public sealed class SliExecutionContext
     internal SliMorphologyState MorphologyState { get; } = new();
     internal SliPropositionState PropositionState { get; } = new();
     internal SliHigherOrderLocalityState HigherOrderLocalityState { get; } = new();
+    internal SliGoldenCodeState GoldenCodeState { get; } = new();
+    internal SoulFrameInferenceResponse? LastClassifyResponse { get; set; }
     public string FinalDecision { get; set; } = "defer";
 
     public void AddTrace(string trace)
@@ -71,4 +74,35 @@ public sealed class SliExecutionContext
             MaxTokens = 128
         };
     }
+}
+
+internal sealed class SliGoldenCodeState
+{
+    public string PrimeState { get; set; } = "task-objective";
+    public string ThetaState { get; set; } = "theta-pending";
+    public string GammaState { get; set; } = "gamma-pending";
+    public CompassDoctrineBasin ActiveBasin { get; set; } = CompassDoctrineBasin.Unknown;
+    public CompassDoctrineBasin CompetingBasin { get; set; } = CompassDoctrineBasin.Unknown;
+    public CompassAnchorState AnchorState { get; set; } = CompassAnchorState.Unknown;
+    public CompassSelfTouchClass SelfTouchClass { get; set; } = CompassSelfTouchClass.NoTouch;
+    public CompassOeCoePosture OeCoePosture { get; set; } = CompassOeCoePosture.Unresolved;
+    public SliPacketDirective PacketDirective { get; set; } = new(
+        SliThinkingTier.Master,
+        SliPacketClass.Observation,
+        SliEngramOperation.NoOp,
+        SliUpdateLocus.Sheaf,
+        SliAuthorityClass.CandidateBearing);
+    public IdentityKernelBoundaryReceipt IdentityKernelBoundary { get; set; } = new(
+        CmeIdentityHandle: "cme:unknown",
+        IdentityKernelHandle: "kernel:unknown",
+        ContinuityAnchorHandle: "anchor:unknown",
+        KernelBound: false,
+        CandidateLocus: SliUpdateLocus.Sheaf);
+    public SliPacketValidityReceipt PacketValidity { get; set; } = new(
+        SyntaxOk: true,
+        HexadOk: true,
+        ScepOk: true,
+        PolicyEligible: true,
+        ReasonCode: "sli-packet-valid");
+    public bool IsProjected { get; set; }
 }

@@ -65,6 +65,8 @@ public sealed class SliCognitionEngine : ICognitionEngine
             SoulFrameId = request.Context.SoulFrameId,
             ContextId = request.Context.ContextId,
             TaskObjective = request.Context.TaskObjective,
+            SelfStateHint = request.Context.SelfStateHint,
+            CleaverHint = request.Context.CleaverHint,
             Engrams = request.Context.RelevantEngrams
                 .Select(entry => new EngramReference
                 {
@@ -154,6 +156,8 @@ public sealed class SliCognitionEngine : ICognitionEngine
                 DecisionEntropy = lispResult.CompassState.DecisionEntropy,
                 Timestamp = lispResult.CompassState.Timestamp
             },
+            GoldenCodeCompass = lispResult.GoldenCodeCompass,
+            ZedThetaCandidate = lispResult.ZedThetaCandidate,
             Confidence = confidence
         };
     }
@@ -205,6 +209,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
             "(locality-bootstrap context cme-self task-objective identity-continuity)",
             "(perspective-bounded-observer locality-state task-objective identity-continuity)",
             "(participation-bounded-cme locality-state)",
+            "(golden-code-bloom task-objective predicate-set reasoning-state)",
             "(compass-update context reasoning-state)",
             "(decision-branch cognition-state)",
             "(cleave branch-set)",
@@ -251,9 +256,12 @@ public sealed class SliCognitionEngine : ICognitionEngine
         SheafExecutionPlan sheafPlan)
     {
         var compass = lispResult.CompassState;
+        var goldenCodeSummary = SummarizeGoldenCodeBraid(lispResult.SymbolicTrace);
         var baseReasoning =
             $"SLI Lisp runtime executed {compass.SymbolicDepth} symbolic steps with Id={compass.IdForce:F3}, " +
             $"Superego={compass.SuperegoConstraint:F3}, Ego={compass.EgoStability:F3}, Value={compass.ValueElevation}. " +
+            $"CompassProjection(active={lispResult.GoldenCodeCompass.ActiveBasin}, competing={lispResult.GoldenCodeCompass.CompetingBasin}, anchor={lispResult.GoldenCodeCompass.AnchorState}, self-touch={lispResult.GoldenCodeCompass.SelfTouchClass}, posture={lispResult.GoldenCodeCompass.OeCoePosture}). " +
+            $"GoldenCode(prime={goldenCodeSummary.PrimeReflections}, psi={goldenCodeSummary.PsiModulations}, theta={goldenCodeSummary.ThetaSeals}, gamma={goldenCodeSummary.GammaYields}). " +
             $"Sheaf={sheafPlan.Domain}; Functors={string.Join(">", sheafPlan.FunctorPath)}; " +
             $"Cohomology(missing={sheafPlan.Cohomology.MissingMorphisms.Count}, inconsistent={sheafPlan.Cohomology.InconsistentSymbols.Count}, disconnected={sheafPlan.Cohomology.DisconnectedFunctorChains.Count}).";
 
@@ -263,6 +271,15 @@ public sealed class SliCognitionEngine : ICognitionEngine
         }
 
         return $"{baseReasoning} LowMind augmentation: {lowMindResult.Reasoning}";
+    }
+
+    private static GoldenCodeBraidSummary SummarizeGoldenCodeBraid(IReadOnlyList<string> trace)
+    {
+        return new GoldenCodeBraidSummary(
+            PrimeReflections: trace.Count(line => line.Contains("prime-reflect(", StringComparison.Ordinal)),
+            PsiModulations: trace.Count(line => line.Contains("psi-modulate(", StringComparison.Ordinal)),
+            ThetaSeals: trace.Count(line => line.Contains("theta-seal(", StringComparison.Ordinal)),
+            GammaYields: trace.Count(line => line.Contains("gamma-yield(", StringComparison.Ordinal)));
     }
 
     private static string HashHex(string value)
@@ -325,4 +342,10 @@ public sealed class SliCognitionEngine : ICognitionEngine
             _ => CognitionValueElevation.Neutral
         };
     }
+
+    private sealed record GoldenCodeBraidSummary(
+        int PrimeReflections,
+        int PsiModulations,
+        int ThetaSeals,
+        int GammaYields);
 }

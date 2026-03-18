@@ -39,7 +39,9 @@ public sealed class ContextAssembler
             ContextId = baseContext.ContextId,
             TaskObjective = TrimToLength(baseContext.TaskObjective, 180),
             RelevantEngrams = boundedEngrams,
-            SymbolicProgram = TrimProgram(baseContext.SymbolicProgram)
+            SymbolicProgram = TrimProgram(baseContext.SymbolicProgram),
+            SelfStateHint = baseContext.SelfStateHint,
+            CleaverHint = baseContext.CleaverHint
         };
 
         return new CognitionRequest

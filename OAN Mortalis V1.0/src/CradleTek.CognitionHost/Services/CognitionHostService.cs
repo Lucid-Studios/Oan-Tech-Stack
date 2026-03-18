@@ -1,5 +1,6 @@
 using CradleTek.CognitionHost.Interfaces;
 using CradleTek.CognitionHost.Models;
+using Oan.Common;
 
 namespace CradleTek.CognitionHost.Services;
 
@@ -39,6 +40,36 @@ public sealed class CognitionHostService : ICognitionEngine
         var confidence = Math.Clamp(0.45 + (engramCount * 0.08), 0.0, 0.98);
         var decision = engramCount == 0 ? "collect-more-context" : "proceed-with-objective";
         var engramCandidate = confidence >= 0.5;
+        var activeBasin = ResolveGoldenCodeActiveBasin(request.Context.TaskObjective);
+        var zedThetaCandidate = new ZedThetaCandidateReceipt(
+            CandidateHandle: $"zed-theta:{Guid.NewGuid():N}",
+            Objective: request.Context.TaskObjective,
+            PrimeState: "task-objective",
+            ThetaState: "theta-ready",
+            GammaState: "gamma-ready",
+            PacketDirective: new SliPacketDirective(
+                SliThinkingTier.Master,
+                engramCandidate ? SliPacketClass.Commitment : SliPacketClass.Observation,
+                engramCandidate ? SliEngramOperation.Write : SliEngramOperation.NoOp,
+                activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf,
+                SliAuthorityClass.CandidateBearing),
+            IdentityKernelBoundary: new IdentityKernelBoundaryReceipt(
+                CmeIdentityHandle: $"cme:{request.Context.CMEId}",
+                IdentityKernelHandle: $"kernel:{request.Context.CMEId}",
+                ContinuityAnchorHandle: $"anchor:{request.Context.CMEId}:{activeBasin.ToString().ToLowerInvariant()}",
+                KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
+                CandidateLocus: activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf),
+            Validity: new SliPacketValidityReceipt(
+                SyntaxOk: true,
+                HexadOk: true,
+                ScepOk: true,
+                PolicyEligible: true,
+                ReasonCode: "sli-packet-valid"),
+            ActiveBasin: activeBasin,
+            CompetingBasin: CompassDoctrineBasin.Unknown,
+            AnchorState: CompassAnchorState.Weakened,
+            SelfTouchClass: CompassSelfTouchClass.NoTouch,
+            OeCoePosture: CompassOeCoePosture.Unresolved);
 
         var reasoning = $"Seed LLM evaluated objective '{request.Context.TaskObjective}' using {engramCount} relevant engrams.";
         var result = new CognitionResult
@@ -62,6 +93,8 @@ public sealed class CognitionHostService : ICognitionEngine
                 DecisionEntropy = 0.5,
                 Timestamp = DateTime.UtcNow
             },
+            GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
+            ZedThetaCandidate = zedThetaCandidate,
             Confidence = confidence
         };
 
@@ -72,6 +105,35 @@ public sealed class CognitionHostService : ICognitionEngine
     {
         _initialized = false;
         return Task.CompletedTask;
+    }
+
+    private static CompassDoctrineBasin ResolveGoldenCodeActiveBasin(string objective)
+    {
+        var normalized = objective.ToLowerInvariant();
+        if (normalized.Contains("bounded-locality continuity", StringComparison.Ordinal) ||
+            normalized.Contains("bounded locality continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.BoundedLocalityContinuity;
+        }
+
+        if (normalized.Contains("fluid continuity law", StringComparison.Ordinal) ||
+            normalized.Contains("fluid continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.FluidContinuityLaw;
+        }
+
+        if (normalized.Contains("identity continuity", StringComparison.Ordinal) ||
+            normalized.Contains("identity-continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.IdentityContinuity;
+        }
+
+        if (normalized.Contains("continuity", StringComparison.Ordinal))
+        {
+            return CompassDoctrineBasin.GeneralContinuityDiscourse;
+        }
+
+        return CompassDoctrineBasin.Unknown;
     }
 }
 

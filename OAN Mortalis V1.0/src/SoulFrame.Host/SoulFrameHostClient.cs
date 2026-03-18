@@ -158,6 +158,8 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         SoulFrameInferenceRequest request,
         CancellationToken cancellationToken)
     {
+        var listeningFrame = SoulFrameGovernedInferenceEnvelope.Prepare(route, request);
+
         try
         {
             ValidateConstraints(request);
@@ -178,40 +180,55 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
                 trace: "constraint-violation");
         }
 
+        if (listeningFrame.ContextNormalized)
+        {
+            await EmitAsync(
+                    SoulFrameTelemetryEventType.ListeningFrameAdjusted,
+                    request.SoulFrameId,
+                    request.ContextId,
+                    route.Trim('/'),
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         await EmitAsync(SoulFrameTelemetryEventType.InferenceRequested, request.SoulFrameId, request.ContextId, request.Task, cancellationToken)
             .ConfigureAwait(false);
 
+        var activeRequest = listeningFrame.ContextNormalized
+            ? CloneRequestWithContext(request, listeningFrame.NormalizedContext)
+            : request;
+
         var envelope = new SoulFrameApiRequest
         {
-            Task = request.Task,
-            Context = request.Context,
+            Task = activeRequest.Task,
+            Context = activeRequest.Context,
             OpalConstraints = new SoulFrameApiConstraints
             {
-                Domain = request.OpalConstraints.Domain,
-                DriftLimit = request.OpalConstraints.DriftLimit,
-                MaxTokens = request.OpalConstraints.MaxTokens
+                Domain = activeRequest.OpalConstraints.Domain,
+                DriftLimit = activeRequest.OpalConstraints.DriftLimit,
+                MaxTokens = activeRequest.OpalConstraints.MaxTokens
             },
-            GovernanceProtocol = request.GovernanceProtocol is null
+            GovernanceProtocol = activeRequest.GovernanceProtocol is null
                 ? null
                 : new SoulFrameApiGovernanceProtocol
                 {
-                    Version = request.GovernanceProtocol.Version,
-                    RequireStateEnvelope = request.GovernanceProtocol.RequireStateEnvelope,
-                    RequireTrace = request.GovernanceProtocol.RequireTrace,
-                    RequireTerminalState = request.GovernanceProtocol.RequireTerminalState,
-                    AllowLegacyFallback = request.GovernanceProtocol.AllowLegacyFallback,
-                    AllowedStates = request.GovernanceProtocol.AllowedStates
+                    Version = activeRequest.GovernanceProtocol.Version,
+                    RequireStateEnvelope = activeRequest.GovernanceProtocol.RequireStateEnvelope,
+                    RequireTrace = activeRequest.GovernanceProtocol.RequireTrace,
+                    RequireTerminalState = activeRequest.GovernanceProtocol.RequireTerminalState,
+                    AllowLegacyFallback = activeRequest.GovernanceProtocol.AllowLegacyFallback,
+                    AllowedStates = activeRequest.GovernanceProtocol.AllowedStates
                         .Select(SoulFrameGovernedEmissionStateTokens.ToToken)
                         .ToArray()
                 },
-            CompassAdvisory = request.CompassAdvisory is null
+            CompassAdvisory = activeRequest.CompassAdvisory is null
                 ? null
                 : new SoulFrameApiCompassAdvisoryRequest
                 {
-                    Version = request.CompassAdvisory.Version,
-                    RequireStructuredAdvisory = request.CompassAdvisory.RequireStructuredAdvisory,
-                    TargetActiveBasin = request.CompassAdvisory.TargetActiveBasin.ToString(),
-                    ExcludedCompetingBasin = request.CompassAdvisory.ExcludedCompetingBasin.ToString()
+                    Version = activeRequest.CompassAdvisory.Version,
+                    RequireStructuredAdvisory = activeRequest.CompassAdvisory.RequireStructuredAdvisory,
+                    TargetActiveBasin = activeRequest.CompassAdvisory.TargetActiveBasin.ToString(),
+                    ExcludedCompetingBasin = activeRequest.CompassAdvisory.ExcludedCompetingBasin.ToString()
                 }
         };
 
@@ -236,7 +253,38 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
             var payload = await response.Content.ReadFromJsonAsync<SoulFrameApiResponse>(cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            var result = BuildInferenceResponse(request, payload);
+            var result = BuildInferenceResponse(request, payload, listeningFrame);
+
+            if (request.CompassAdvisory?.RequireStructuredAdvisory == true &&
+                payload?.CompassAdvisory is null &&
+                result.CompassAdvisory is not null)
+            {
+                await EmitAsync(
+                        SoulFrameTelemetryEventType.CompassFallbackApplied,
+                        request.SoulFrameId,
+                        request.ContextId,
+                        route.Trim('/'),
+                        cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            var guardResult = SoulFrameGovernedInferenceEnvelope.ApplyResponseGuards(request, listeningFrame, result);
+            result = guardResult.Response;
+
+            if (guardResult.UnknownPreserved ||
+                guardResult.DisclosureGuardApplied ||
+                guardResult.AuthorityGuardApplied ||
+                guardResult.PromptInjectionGuardApplied ||
+                guardResult.NonFabricationGuardApplied)
+            {
+                await EmitAsync(
+                        SoulFrameTelemetryEventType.ResponseCleaved,
+                        request.SoulFrameId,
+                        request.ContextId,
+                        result.Governance.Trace,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+            }
 
             if (request.OpalConstraints.DriftLimit < 0.05 && result.Confidence < 0.45)
             {
@@ -354,7 +402,8 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
 
     private static SoulFrameInferenceResponse BuildInferenceResponse(
         SoulFrameInferenceRequest request,
-        SoulFrameApiResponse? payload)
+        SoulFrameApiResponse? payload,
+        SoulFrameGovernedListeningFrameResult listeningFrame)
     {
         var governance = ParseGovernanceEnvelope(request, payload);
         var accepted = IsAcceptedState(governance.State);
@@ -365,42 +414,30 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
             Payload = payload?.Payload ?? governance.Content ?? request.Context,
             Confidence = payload?.Confidence ?? DefaultConfidence(governance.State),
             Governance = governance,
-            CompassAdvisory = ParseCompassAdvisory(request, payload)
+            CompassAdvisory = ParseCompassAdvisory(request, payload, listeningFrame)
         };
     }
 
     private static SoulFrameCompassAdvisoryResponse? ParseCompassAdvisory(
         SoulFrameInferenceRequest request,
-        SoulFrameApiResponse? payload)
+        SoulFrameApiResponse? payload,
+        SoulFrameGovernedListeningFrameResult listeningFrame)
     {
-        var contract = request.CompassAdvisory;
-        if (payload?.CompassAdvisory is null)
-        {
-            if (contract?.RequireStructuredAdvisory == true)
-            {
-                throw new InvalidOperationException("invalid-governed-emission:missing-compass-advisory");
-            }
-
-            return null;
-        }
-
-        if (!TryParseDoctrineBasin(payload.CompassAdvisory.SuggestedActiveBasin, out var suggestedActiveBasin) ||
-            !TryParseDoctrineBasin(payload.CompassAdvisory.SuggestedCompetingBasin, out var suggestedCompetingBasin) ||
-            !TryParseAnchorState(payload.CompassAdvisory.SuggestedAnchorState, out var suggestedAnchorState) ||
-            !TryParseSelfTouchClass(payload.CompassAdvisory.SuggestedSelfTouchClass, out var suggestedSelfTouchClass))
-        {
-            throw new InvalidOperationException("invalid-governed-emission:invalid-compass-advisory");
-        }
-
-        return new SoulFrameCompassAdvisoryResponse
-        {
-            SuggestedActiveBasin = suggestedActiveBasin,
-            SuggestedCompetingBasin = suggestedCompetingBasin,
-            SuggestedAnchorState = suggestedAnchorState,
-            SuggestedSelfTouchClass = suggestedSelfTouchClass,
-            Confidence = payload.CompassAdvisory.Confidence ?? 0.0,
-            Justification = payload.CompassAdvisory.Justification
-        };
+        return SoulFrameGovernedInferenceEnvelope.ResolveCompassAdvisory(
+            request,
+            listeningFrame,
+            payload?.CompassAdvisory?.SuggestedActiveBasin,
+            payload?.CompassAdvisory?.SuggestedCompetingBasin,
+            payload?.CompassAdvisory?.SuggestedAnchorState,
+            payload?.CompassAdvisory?.SuggestedSelfTouchClass,
+            payload?.CompassAdvisory?.Confidence,
+            payload?.CompassAdvisory?.Justification,
+            token => TryParseDoctrineBasin(token, out _),
+            token => TryParseAnchorState(token, out _),
+            token => TryParseSelfTouchClass(token, out _),
+            ParseDoctrineBasin,
+            ParseAnchorState,
+            ParseSelfTouchClass);
     }
 
     private static SoulFrameGovernedEmissionEnvelope ParseGovernanceEnvelope(
@@ -503,6 +540,22 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         };
     }
 
+    private static SoulFrameInferenceRequest CloneRequestWithContext(
+        SoulFrameInferenceRequest request,
+        string context)
+    {
+        return new SoulFrameInferenceRequest
+        {
+            Task = request.Task,
+            Context = context,
+            OpalConstraints = request.OpalConstraints,
+            SoulFrameId = request.SoulFrameId,
+            ContextId = request.ContextId,
+            GovernanceProtocol = request.GovernanceProtocol,
+            CompassAdvisory = request.CompassAdvisory
+        };
+    }
+
     private static bool TryParseDoctrineBasin(string? token, out CompassDoctrineBasin basin)
     {
         var normalized = NormalizeToken(token);
@@ -517,6 +570,16 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         };
 
         return Enum.IsDefined(basin);
+    }
+
+    private static CompassDoctrineBasin ParseDoctrineBasin(string? token)
+    {
+        if (!TryParseDoctrineBasin(token, out var basin))
+        {
+            throw new InvalidOperationException("invalid-governed-emission:invalid-compass-advisory");
+        }
+
+        return basin;
     }
 
     private static bool TryParseAnchorState(string? token, out CompassAnchorState anchorState)
@@ -534,6 +597,16 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         return Enum.IsDefined(anchorState);
     }
 
+    private static CompassAnchorState ParseAnchorState(string? token)
+    {
+        if (!TryParseAnchorState(token, out var anchorState))
+        {
+            throw new InvalidOperationException("invalid-governed-emission:invalid-compass-advisory");
+        }
+
+        return anchorState;
+    }
+
     private static bool TryParseSelfTouchClass(string? token, out CompassSelfTouchClass selfTouchClass)
     {
         var normalized = NormalizeToken(token);
@@ -547,6 +620,16 @@ public sealed class SoulFrameHostClient : ISoulFrameSemanticDevice, ISoulFrameMe
         };
 
         return Enum.IsDefined(selfTouchClass);
+    }
+
+    private static CompassSelfTouchClass ParseSelfTouchClass(string? token)
+    {
+        if (!TryParseSelfTouchClass(token, out var selfTouchClass))
+        {
+            throw new InvalidOperationException("invalid-governed-emission:invalid-compass-advisory");
+        }
+
+        return selfTouchClass;
     }
 
     private static string NormalizeToken(string? token) =>

@@ -51,6 +51,12 @@ public sealed class SliCoreProgramContractTests
         Assert.Equal(SliRuntimeOperationClass.HostOnly, engramQuery.OperationClass);
         Assert.True(bridge.CapabilityManifest.TryGetCapability("decision-branch", out var decisionBranch));
         Assert.Equal(SliRuntimeOperationClass.SharedContract, decisionBranch.OperationClass);
+        Assert.True(bridge.CapabilityManifest.TryGetCapability("theta-seal", out var thetaSeal));
+        Assert.Equal(SliRuntimeCapabilityAvailability.Available, thetaSeal.Availability);
+        Assert.Equal(SliRuntimeOperationClass.SharedContract, thetaSeal.OperationClass);
+        Assert.True(bridge.CapabilityManifest.TryGetCapability("gamma-yield", out var gammaYield));
+        Assert.Equal(SliRuntimeCapabilityAvailability.Available, gammaYield.Availability);
+        Assert.Equal(SliRuntimeOperationClass.SharedContract, gammaYield.OperationClass);
     }
 
     [Fact]
@@ -80,6 +86,9 @@ public sealed class SliCoreProgramContractTests
         var lowered = bridge.LowerProgram(program);
 
         Assert.NotEmpty(lowered.Instructions);
+        Assert.Contains(lowered.Instructions, instruction => instruction.Opcode.Equals("prime-reflect", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(lowered.Instructions, instruction => instruction.Opcode.Equals("theta-seal", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(lowered.Instructions, instruction => instruction.Opcode.Equals("gamma-yield", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(lowered.Instructions, instruction => instruction.Opcode.Equals("locality-bind", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(lowered.Instructions, instruction => instruction.Opcode.Equals("compass-update", StringComparison.OrdinalIgnoreCase));
     }
