@@ -232,6 +232,40 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Empty(result.ClosureOutcomes);
     }
 
+    [Fact]
+    public async Task OperatorFormationProfile_IsProjectedIntoBridgeReview()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.MaskedSummary],
+            operatorFormation: CreateOperatorFormationProfile());
+
+        var result = await harness.RunAsync(profile);
+
+        Assert.NotNull(result.ProjectedBridgeReview.OperatorFormation);
+        Assert.True(result.ProjectedBridgeReview.OperatorFormation!.WitnessableProtectiveSubsetOnly);
+        Assert.False(result.ProjectedBridgeReview.OperatorFormation.BondRealizationClaimed);
+        Assert.Equal(
+            SliOperatorFormationBoundaryCrossingMode.InterlacedBondedCrossing,
+            result.ProjectedBridgeReview.OperatorFormation.BoundaryCrossingMode);
+        Assert.Equal(
+            SliOperatorFormationRing.Rootseed,
+            result.ProjectedBridgeReview.OperatorFormation.Profile.Ring);
+        Assert.Equal(
+            SliOperatorFormationMode.Stillness,
+            result.ProjectedBridgeReview.OperatorFormation.Profile.ActiveMode);
+        Assert.Equal(
+            SliOperatorFormationCertificationDecision.Pending,
+            result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Decision);
+        Assert.Equal(2, result.ProjectedBridgeReview.OperatorFormation.SigilAssets.Count);
+        Assert.Contains(
+            result.ProjectedBridgeReview.OperatorFormation.SigilAssets,
+            asset => asset.SigilClass == SliOperatorFormationSigilClass.MergedCompletionKey);
+    }
+
     private static HybridProtectedIngressHarness CreateHarness(IAgentiFormationObserver? observer = null)
     {
         return new HybridProtectedIngressHarness(
@@ -264,7 +298,8 @@ public sealed class HybridProtectedIngressHarnessTests
         bool? predatorySharedDomainRiskDetected = null,
         bool? coerciveBondingPostureDetected = null,
         bool? continuityInstabilityDetected = null,
-        bool? identityOvercollapseRiskDetected = null)
+        bool? identityOvercollapseRiskDetected = null,
+        HybridProtectedIngressOperatorFormationProfile? operatorFormation = null)
     {
         return new HybridProtectedIngressProfile
         {
@@ -283,7 +318,79 @@ public sealed class HybridProtectedIngressHarnessTests
             PredatorySharedDomainRiskDetected = predatorySharedDomainRiskDetected ?? baseProfile.PredatorySharedDomainRiskDetected,
             CoerciveBondingPostureDetected = coerciveBondingPostureDetected ?? baseProfile.CoerciveBondingPostureDetected,
             ContinuityInstabilityDetected = continuityInstabilityDetected ?? baseProfile.ContinuityInstabilityDetected,
-            IdentityOvercollapseRiskDetected = identityOvercollapseRiskDetected ?? baseProfile.IdentityOvercollapseRiskDetected
+            IdentityOvercollapseRiskDetected = identityOvercollapseRiskDetected ?? baseProfile.IdentityOvercollapseRiskDetected,
+            OperatorFormation = operatorFormation ?? baseProfile.OperatorFormation
+        };
+    }
+
+    private static HybridProtectedIngressOperatorFormationProfile CreateOperatorFormationProfile()
+    {
+        return new HybridProtectedIngressOperatorFormationProfile
+        {
+            ProfileId = "gs_profile_obsidian_guarded",
+            ChapterLocalSurface = "research/publications/gnomeronacorde-v0.1/source/1_OBSIDIAN_WALL/1a_Casting_Shadow.tex",
+            PairedTrainingSurface = "research/publications/gnome-speak-nlp-v1.0/source/sections/operator_role.tex",
+            CrossingTaskKind = "literacy_alignment",
+            HaltOwner = "bonded_training_reviewer",
+            BoundaryCrossingMode = SliOperatorFormationBoundaryCrossingMode.InterlacedBondedCrossing,
+            Ring = SliOperatorFormationRing.Rootseed,
+            ActiveMode = SliOperatorFormationMode.Stillness,
+            StillnessInterludeUsed = false,
+            RedHatIndexRequired = true,
+            BondStatus = SliOperatorFormationBondStatus.TrainingOperator,
+            EchoVeilCheckRequired = true,
+            ActiveConflictClass = SliOperatorFormationConflictClass.None,
+            GjpNeeded = false,
+            GjpVerdict = SliOperatorFormationGjpVerdict.NotApplicable,
+            MotherLightAnchored = true,
+            FatherEchoAnchored = true,
+            ShellRootAnchored = true,
+            SeedBoundAnchored = true,
+            U230ShadowScript = SliOperatorFormationConcealmentLayerState.Observed,
+            U300ElvenScript = SliOperatorFormationConcealmentLayerState.Observed,
+            ExpectedEvidenceArtifact = "interlace_crossing_proof",
+            AdmissibleOutput = "bounded_training_profile",
+            ProhibitedOutputs = ["unrestricted_archetype_claim", "unauthorized_gjp_invocation"],
+            Certification = new HybridProtectedIngressOperatorFormationCertification
+            {
+                Decision = SliOperatorFormationCertificationDecision.Pending,
+                CurrentAnchoredPosture = SliOperatorFormationBondStatus.TrainingOperator,
+                TargetPosture = SliOperatorFormationBondStatus.PreCertifiedOperator,
+                NearestAdmissibleNextPosture = SliOperatorFormationBondStatus.VerifiedCandidate,
+                ReviewOwner = "certification_reviewer://first-run-lane",
+                EvidenceGaps = ["trial_receipt_set", "label_classification_receipt"],
+                ProhibitedClaims = ["pre-certification issued", "bond actualized"],
+                CertificationIssued = false,
+                ExpandedRevealAllowed = false,
+                ContinuityClaimAllowed = false
+            },
+            SigilAssets =
+            [
+                new HybridProtectedIngressOperatorFormationSigilAsset
+                {
+                    AssetId = "obsidian_1",
+                    AssetLabel = "OBSIDIAN1",
+                    SigilClass = SliOperatorFormationSigilClass.PhasePartition,
+                    PhaseNumber = 1,
+                    VisibilityClass = "operator_guarded",
+                    BuildRenderPolicy = "staged_render_allowed",
+                    ReductionPosture = "reference_and_render_allowed",
+                    MergedFromAssets = [],
+                    WitnessOfAsset = null
+                },
+                new HybridProtectedIngressOperatorFormationSigilAsset
+                {
+                    AssetId = "obsidian_zed",
+                    AssetLabel = "OBSIDIANzed",
+                    SigilClass = SliOperatorFormationSigilClass.MergedCompletionKey,
+                    PhaseNumber = null,
+                    VisibilityClass = "continuity_sealed",
+                    BuildRenderPolicy = "staged_render_allowed",
+                    ReductionPosture = "descriptive_reduction_allowed",
+                    MergedFromAssets = ["obsidian_1", "obsidian_2", "obsidian_3", "obsidian_4", "obsidian_5"],
+                    WitnessOfAsset = null
+                }
+            ]
         };
     }
 

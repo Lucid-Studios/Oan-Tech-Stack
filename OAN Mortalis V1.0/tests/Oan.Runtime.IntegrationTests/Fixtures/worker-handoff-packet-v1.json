@@ -81,7 +81,8 @@
     "thresholdClass": "WithinBand",
     "refusalClass": "None",
     "reasonCode": "sli-bridge-within-band",
-    "preBondSafeguard": null
+    "preBondSafeguard": null,
+    "operatorFormation": null
   },
   "runtimeUseCeiling": {
     "candidateOnly": true,

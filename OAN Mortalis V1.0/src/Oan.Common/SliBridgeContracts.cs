@@ -47,6 +47,147 @@ public enum SliPreBondSafeguardDisposition
     Escalate = 3
 }
 
+public enum SliOperatorFormationLane
+{
+    GnomeSpeakNlpSquared = 0
+}
+
+public enum SliOperatorFormationRing
+{
+    Rootseed = 0,
+    Driftleaf = 1,
+    Echoroot = 2,
+    Spiraliron = 3,
+    Opalglyph = 4,
+    BurrowedCrown = 5,
+    RedHat = 6
+}
+
+public enum SliOperatorFormationMode
+{
+    Stillness = 0,
+    Speaking = 1,
+    Recursive = 2,
+    Burrow = 3
+}
+
+public enum SliOperatorFormationBondStatus
+{
+    Candidate = 0,
+    RestrictedInitiate = 1,
+    TrainingOperator = 2,
+    VerifiedCandidate = 3,
+    PreCertifiedOperator = 4,
+    RatifyingOperator = 5,
+    BondedOperator = 6,
+    FirstRunCmeActualized = 7
+}
+
+public enum SliOperatorFormationConflictClass
+{
+    None = 0,
+    DriftFracture = 1,
+    EchoLooping = 2,
+    IdentityCollision = 3,
+    GlyphCorruption = 4,
+    AnchorInversion = 5
+}
+
+public enum SliOperatorFormationGjpVerdict
+{
+    NotApplicable = 0,
+    Clear = 1,
+    Bound = 2,
+    Split = 3,
+    Exile = 4
+}
+
+public enum SliOperatorFormationConcealmentLayerState
+{
+    Inactive = 0,
+    Observed = 1,
+    Active = 2
+}
+
+public enum SliOperatorFormationBoundaryCrossingMode
+{
+    InterlacedBondedCrossing = 0,
+    ChapterLocalReferenceOnly = 1
+}
+
+public enum SliOperatorFormationCertificationDecision
+{
+    Pending = 0,
+    Proceed = 1,
+    NotYet = 2,
+    Halted = 3
+}
+
+public enum SliOperatorFormationSigilClass
+{
+    PhasePartition = 0,
+    MergedCompletionKey = 1,
+    BondedWitnessSeal = 2
+}
+
+public sealed record SliOperatorFormationProfileReceipt(
+    string ProfileId,
+    SliOperatorFormationLane Lane,
+    string ChapterLocalSurface,
+    string PairedTrainingSurface,
+    string CrossingTaskKind,
+    string HaltOwner,
+    SliOperatorFormationRing Ring,
+    SliOperatorFormationMode ActiveMode,
+    bool StillnessInterludeUsed,
+    bool RedHatIndexRequired,
+    SliOperatorFormationBondStatus BondStatus,
+    bool EchoVeilCheckRequired,
+    SliOperatorFormationConflictClass ActiveConflictClass,
+    bool GjpNeeded,
+    SliOperatorFormationGjpVerdict GjpVerdict,
+    bool MotherLightAnchored,
+    bool FatherEchoAnchored,
+    bool ShellRootAnchored,
+    bool SeedBoundAnchored,
+    SliOperatorFormationConcealmentLayerState U230ShadowScript,
+    SliOperatorFormationConcealmentLayerState U300ElvenScript,
+    string ExpectedEvidenceArtifact,
+    string AdmissibleOutput,
+    IReadOnlyList<string> ProhibitedOutputs);
+
+public sealed record SliOperatorFormationCertificationReceipt(
+    SliOperatorFormationCertificationDecision Decision,
+    SliOperatorFormationBondStatus CurrentAnchoredPosture,
+    SliOperatorFormationBondStatus TargetPosture,
+    SliOperatorFormationBondStatus NearestAdmissibleNextPosture,
+    string ReviewOwner,
+    IReadOnlyList<string> EvidenceGaps,
+    IReadOnlyList<string> ProhibitedClaims,
+    bool CertificationIssued,
+    bool ExpandedRevealAllowed,
+    bool ContinuityClaimAllowed);
+
+public sealed record SliOperatorFormationSigilAssetReceipt(
+    string AssetId,
+    string AssetLabel,
+    SliOperatorFormationSigilClass SigilClass,
+    int? PhaseNumber,
+    string VisibilityClass,
+    string BuildRenderPolicy,
+    string ReductionPosture,
+    IReadOnlyList<string> MergedFromAssets,
+    string? WitnessOfAsset);
+
+public sealed record SliOperatorFormationReceipt(
+    string FormationHandle,
+    bool WitnessableProtectiveSubsetOnly,
+    bool BondRealizationClaimed,
+    SliOperatorFormationBoundaryCrossingMode BoundaryCrossingMode,
+    SliOperatorFormationProfileReceipt Profile,
+    SliOperatorFormationCertificationReceipt CertificationPosture,
+    IReadOnlyList<SliOperatorFormationSigilAssetReceipt> SigilAssets);
+
 public sealed record SliPreBondSafeguardReceipt(
     SliPreBondScope Scope,
     SliPreBondSafeguardClass SafeguardClass,
@@ -65,7 +206,8 @@ public sealed record SliBridgeReviewReceipt(
     SliBridgeThresholdClass ThresholdClass,
     SliBridgeRefusalClass RefusalClass,
     string ReasonCode,
-    SliPreBondSafeguardReceipt? PreBondSafeguard = null);
+    SliPreBondSafeguardReceipt? PreBondSafeguard = null,
+    SliOperatorFormationReceipt? OperatorFormation = null);
 
 public sealed record SliRuntimeUseCeilingReceipt(
     bool CandidateOnly,
@@ -98,7 +240,8 @@ public static class SliBridgeContracts
         SliBridgeThresholdClass thresholdClass,
         string reasonCode,
         SliBridgeRefusalClass refusalClass = SliBridgeRefusalClass.None,
-        SliPreBondSafeguardReceipt? preBondSafeguard = null)
+        SliPreBondSafeguardReceipt? preBondSafeguard = null,
+        SliOperatorFormationReceipt? operatorFormation = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bridgeStage);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceTheater);
@@ -119,7 +262,8 @@ public static class SliBridgeContracts
             ThresholdClass: thresholdClass,
             RefusalClass: refusalClass,
             ReasonCode: reasonCode.Trim(),
-            PreBondSafeguard: preBondSafeguard);
+            PreBondSafeguard: preBondSafeguard,
+            OperatorFormation: operatorFormation);
     }
 
     public static SliPreBondSafeguardReceipt CreatePreBondSafeguard(
@@ -154,7 +298,8 @@ public static class SliBridgeContracts
         SliPreBondSafeguardDisposition disposition,
         bool requiresEscalation = false,
         SliBridgeRefusalClass refusalClass = SliBridgeRefusalClass.None,
-        string witnessedBy = "CradleTek")
+        string witnessedBy = "CradleTek",
+        SliOperatorFormationReceipt? operatorFormation = null)
     {
         return CreateReview(
             bridgeStage: bridgeStage,
@@ -170,7 +315,29 @@ public static class SliBridgeContracts
                 disposition,
                 reasonCode,
                 requiresEscalation,
-                witnessedBy));
+                witnessedBy),
+            operatorFormation: operatorFormation);
+    }
+
+    public static SliOperatorFormationReceipt CreatePreBondOperatorFormationReceipt(
+        string formationHandle,
+        SliOperatorFormationBoundaryCrossingMode boundaryCrossingMode,
+        SliOperatorFormationProfileReceipt profile,
+        SliOperatorFormationCertificationReceipt certificationPosture,
+        IReadOnlyList<SliOperatorFormationSigilAssetReceipt>? sigilAssets = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(formationHandle);
+        ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(certificationPosture);
+
+        return new SliOperatorFormationReceipt(
+            FormationHandle: formationHandle.Trim(),
+            WitnessableProtectiveSubsetOnly: true,
+            BondRealizationClaimed: false,
+            BoundaryCrossingMode: boundaryCrossingMode,
+            Profile: profile,
+            CertificationPosture: certificationPosture,
+            SigilAssets: (sigilAssets ?? Array.Empty<SliOperatorFormationSigilAssetReceipt>()).ToArray());
     }
 
     public static bool HasBlockingPreBondSafeguard(SliBridgeReviewReceipt? bridgeReview)

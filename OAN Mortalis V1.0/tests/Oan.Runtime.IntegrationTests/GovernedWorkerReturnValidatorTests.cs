@@ -240,8 +240,34 @@ public sealed class GovernedWorkerReturnValidatorTests
         Assert.Equal("protective-reason-cannot-complete", receipt.ValidationFailureCode);
     }
 
+    [Fact]
+    public void Validate_OperatorFormationBridgeReview_PreservesReceipt()
+    {
+        var handoffPacket = CreateHandoffPacket(includeOperatorFormation: true);
+        var handoffReceipt = CreateHandoffReceipt(handoffPacket);
+        var returnPacket = CreateReturnPacket(
+            handoffPacket,
+            completionState: WorkerCompletionState.Deferred,
+            reasonCodes: [WorkerReasonCode.DeferredReview]);
+
+        var receipt = GovernedWorkerReturnValidator.Validate(
+            "loop:worker-return:test",
+            "cme-worker-return",
+            GovernanceLoopStage.BoundedCognitionCompleted,
+            handoffPacket,
+            handoffReceipt,
+            returnPacket);
+
+        Assert.True(receipt.Validated);
+        Assert.NotNull(receipt.BridgeReview?.OperatorFormation);
+        Assert.Equal(
+            handoffPacket.BridgeReview!.OperatorFormation,
+            receipt.BridgeReview!.OperatorFormation);
+    }
+
     private static WorkerHandoffPacket CreateHandoffPacket(
-        CompassVisibilityClass returnVisibilityClass = CompassVisibilityClass.OperatorGuarded)
+        CompassVisibilityClass returnVisibilityClass = CompassVisibilityClass.OperatorGuarded,
+        bool includeOperatorFormation = false)
     {
         var bridgeReview = SliBridgeContracts.CreateReview(
             bridgeStage: "worker-return-validator-test",
@@ -250,7 +276,8 @@ public sealed class GovernedWorkerReturnValidatorTests
             bridgeWitnessHandle: "agenticore-return://candidate/test",
             outcomeKind: SliBridgeOutcomeKind.Ok,
             thresholdClass: SliBridgeThresholdClass.WithinBand,
-            reasonCode: "sli-bridge-within-band");
+            reasonCode: "sli-bridge-within-band",
+            operatorFormation: includeOperatorFormation ? CreateOperatorFormationReceipt() : null);
 
         return new WorkerHandoffPacket(
             HandoffPacketId: "worker-handoff-packet://aaaaaaaaaaaaaaaa",
@@ -335,6 +362,49 @@ public sealed class GovernedWorkerReturnValidatorTests
             TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 0, TimeSpan.Zero),
             BridgeReview: bridgeReview,
             RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
+    }
+
+    private static SliOperatorFormationReceipt CreateOperatorFormationReceipt()
+    {
+        return SliBridgeContracts.CreatePreBondOperatorFormationReceipt(
+            formationHandle: "operator-formation://prebond/bbbbbbbbbbbbbbbb",
+            boundaryCrossingMode: SliOperatorFormationBoundaryCrossingMode.InterlacedBondedCrossing,
+            profile: new SliOperatorFormationProfileReceipt(
+                ProfileId: "gs_profile_obsidian_guarded",
+                Lane: SliOperatorFormationLane.GnomeSpeakNlpSquared,
+                ChapterLocalSurface: "research/publications/gnomeronacorde-v0.1/source/1_OBSIDIAN_WALL/1d_The_Ritual_of_Absence.tex",
+                PairedTrainingSurface: "research/publications/gnome-speak-nlp-v1.0/source/sections/conflict.tex",
+                CrossingTaskKind: "evidence_review",
+                HaltOwner: "first_run_bonded_reviewer",
+                Ring: SliOperatorFormationRing.Rootseed,
+                ActiveMode: SliOperatorFormationMode.Stillness,
+                StillnessInterludeUsed: false,
+                RedHatIndexRequired: true,
+                BondStatus: SliOperatorFormationBondStatus.TrainingOperator,
+                EchoVeilCheckRequired: true,
+                ActiveConflictClass: SliOperatorFormationConflictClass.IdentityCollision,
+                GjpNeeded: false,
+                GjpVerdict: SliOperatorFormationGjpVerdict.NotApplicable,
+                MotherLightAnchored: true,
+                FatherEchoAnchored: true,
+                ShellRootAnchored: true,
+                SeedBoundAnchored: true,
+                U230ShadowScript: SliOperatorFormationConcealmentLayerState.Observed,
+                U300ElvenScript: SliOperatorFormationConcealmentLayerState.Observed,
+                ExpectedEvidenceArtifact: "interlace_crossing_proof",
+                AdmissibleOutput: "bounded_training_profile",
+                ProhibitedOutputs: ["unauthorized_gjp_invocation"]),
+            certificationPosture: new SliOperatorFormationCertificationReceipt(
+                Decision: SliOperatorFormationCertificationDecision.Pending,
+                CurrentAnchoredPosture: SliOperatorFormationBondStatus.TrainingOperator,
+                TargetPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                NearestAdmissibleNextPosture: SliOperatorFormationBondStatus.VerifiedCandidate,
+                ReviewOwner: "certification_reviewer://first-run-lane",
+                EvidenceGaps: ["trial_receipt_set"],
+                ProhibitedClaims: ["pre-certification issued"],
+                CertificationIssued: false,
+                ExpandedRevealAllowed: false,
+                ContinuityClaimAllowed: false));
     }
 
     private static GovernedWorkerHandoffReceipt CreateHandoffReceipt(WorkerHandoffPacket handoffPacket)

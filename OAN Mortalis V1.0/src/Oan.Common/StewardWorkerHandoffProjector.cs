@@ -188,6 +188,12 @@ public static class StewardWorkerHandoffProjector
             sourceHandles.Add(bridgeReview.BridgeWitnessHandle);
         }
 
+        if (bridgeReview.OperatorFormation is not null &&
+            !string.IsNullOrWhiteSpace(bridgeReview.OperatorFormation.FormationHandle))
+        {
+            sourceHandles.Add(bridgeReview.OperatorFormation.FormationHandle);
+        }
+
         var packet = new WorkerHandoffPacket(
             HandoffPacketId: handoffPacketId,
             RequestingOffice: InternalGoverningCmeOffice.Steward,
