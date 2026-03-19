@@ -6,6 +6,7 @@ using CradleTek.Memory.Interfaces;
 using GEL.Runtime;
 using SLI.Engine.Models;
 using SLI.Engine.Parser;
+using SLI.Engine.Runtime;
 using SLI.Engine.Telemetry;
 using SoulFrame.Host;
 
@@ -266,13 +267,35 @@ public sealed class SliCognitionEngine : ICognitionEngine
             $"GoldenCode(prime={goldenCodeSummary.PrimeReflections}, psi={goldenCodeSummary.PsiModulations}, theta={goldenCodeSummary.ThetaSeals}, gamma={goldenCodeSummary.GammaYields}). " +
             $"Sheaf={sheafPlan.Domain}; Functors={string.Join(">", sheafPlan.FunctorPath)}; " +
             $"Cohomology(missing={sheafPlan.Cohomology.MissingMorphisms.Count}, inconsistent={sheafPlan.Cohomology.InconsistentSymbols.Count}, disconnected={sheafPlan.Cohomology.DisconnectedFunctorChains.Count}).";
+        var shardReduction = DescribeShardReduction(lispResult);
+        var reasoning = string.IsNullOrWhiteSpace(shardReduction)
+            ? baseReasoning
+            : $"{baseReasoning} {shardReduction}";
 
         if (lowMindResult is null)
         {
-            return baseReasoning;
+            return reasoning;
         }
 
-        return $"{baseReasoning} LowMind augmentation: {lowMindResult.Reasoning}";
+        return $"{reasoning} LowMind augmentation: {lowMindResult.Reasoning}";
+    }
+
+    internal static string DescribeShardReduction(LispExecutionResult lispResult)
+    {
+        ArgumentNullException.ThrowIfNull(lispResult);
+
+        var runtimeRun = lispResult.LiveRuntimeRun;
+        if (runtimeRun is null || !runtimeRun.ShardModeEnabled)
+        {
+            return string.Empty;
+        }
+
+        if (runtimeRun.ReductionOutcome == SliLocalityRelationOutcomeKind.Joined)
+        {
+            return $"CompassShards(reduction=Joined, packets={runtimeRun.ShardPackets.Count}, relations={runtimeRun.RelationEvents.Count}).";
+        }
+
+        return $"CompassShards(reduction={runtimeRun.ReductionOutcome}, reason={runtimeRun.ReductionReason}, compatibility=acting-shard-only).";
     }
 
     private static GoldenCodeBraidSummary SummarizeGoldenCodeBraid(IReadOnlyList<string> trace)

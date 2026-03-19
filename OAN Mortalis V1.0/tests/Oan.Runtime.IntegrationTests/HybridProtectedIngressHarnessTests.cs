@@ -173,7 +173,9 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.True(result.PropositionParityMatched);
         Assert.Contains("reveal.authorized-field.denied", result.OraclePropositionAssessment.ReasonCodes);
         Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
-        Assert.Equal("sli-bridge-blocked-reveal-escalation", result.ProjectedBridgeReview.ReasonCode);
+        Assert.Equal("sli-prebond-coercive-bonding-posture", result.ProjectedBridgeReview.ReasonCode);
+        Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
+        Assert.Equal(SliPreBondSafeguardClass.CoerciveBondingPosture, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -183,6 +185,51 @@ public sealed class HybridProtectedIngressHarnessTests
                    tag.Contains(profile.HumanCredentialId, StringComparison.Ordinal) ||
                    tag.Contains(profile.CorporateRegistryId, StringComparison.Ordinal));
         Assert.Equal(result.ObservationBatch.Observations.Count, observer.Snapshot().Count);
+    }
+
+    [Fact]
+    public async Task PredatorySharedDomainRisk_IsRefusedBeforeClosure()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.MaskedSummary],
+            predatorySharedDomainRiskDetected: true);
+
+        var result = await harness.RunAsync(profile);
+
+        Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliBridgeThresholdClass.FaultLine, result.ProjectedBridgeReview.ThresholdClass);
+        Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
+        Assert.Equal(SliPreBondSafeguardClass.PredatorySharedDomainRisk, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
+        Assert.Equal(SliPreBondSafeguardDisposition.Refuse, result.ProjectedBridgeReview.PreBondSafeguard.Disposition);
+        Assert.True(result.ProjectedBridgeReview.PreBondSafeguard.RequiresEscalation);
+        Assert.Empty(result.MembraneDecisions);
+        Assert.Empty(result.ClosureOutcomes);
+    }
+
+    [Fact]
+    public async Task ContinuityInstability_IsHeldBeforeClosure()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.StructuralValidation],
+            continuityInstabilityDetected: true);
+
+        var result = await harness.RunAsync(profile);
+
+        Assert.Equal(SliBridgeOutcomeKind.NeedsSpec, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliBridgeThresholdClass.ThresholdBreach, result.ProjectedBridgeReview.ThresholdClass);
+        Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
+        Assert.Equal(SliPreBondSafeguardClass.ContinuityInstability, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
+        Assert.Equal(SliPreBondSafeguardDisposition.Hold, result.ProjectedBridgeReview.PreBondSafeguard.Disposition);
+        Assert.Empty(result.MembraneDecisions);
+        Assert.Empty(result.ClosureOutcomes);
     }
 
     private static HybridProtectedIngressHarness CreateHarness(IAgentiFormationObserver? observer = null)
@@ -213,7 +260,11 @@ public sealed class HybridProtectedIngressHarnessTests
         bool? bondedAuthorityConfirmed = null,
         IReadOnlyList<string>? approvedRevealPurposes = null,
         string? humanPrincipalName = null,
-        string? corporatePrincipalName = null)
+        string? corporatePrincipalName = null,
+        bool? predatorySharedDomainRiskDetected = null,
+        bool? coerciveBondingPostureDetected = null,
+        bool? continuityInstabilityDetected = null,
+        bool? identityOvercollapseRiskDetected = null)
     {
         return new HybridProtectedIngressProfile
         {
@@ -228,7 +279,11 @@ public sealed class HybridProtectedIngressHarnessTests
             RequestedExpansionCount = requestedExpansionCount,
             RequestedRevealModes = requestedRevealModes.ToArray(),
             BondedAuthorityConfirmed = bondedAuthorityConfirmed ?? baseProfile.BondedAuthorityConfirmed,
-            ApprovedRevealPurposes = (approvedRevealPurposes ?? baseProfile.ApprovedRevealPurposes).ToArray()
+            ApprovedRevealPurposes = (approvedRevealPurposes ?? baseProfile.ApprovedRevealPurposes).ToArray(),
+            PredatorySharedDomainRiskDetected = predatorySharedDomainRiskDetected ?? baseProfile.PredatorySharedDomainRiskDetected,
+            CoerciveBondingPostureDetected = coerciveBondingPostureDetected ?? baseProfile.CoerciveBondingPostureDetected,
+            ContinuityInstabilityDetected = continuityInstabilityDetected ?? baseProfile.ContinuityInstabilityDetected,
+            IdentityOvercollapseRiskDetected = identityOvercollapseRiskDetected ?? baseProfile.IdentityOvercollapseRiskDetected
         };
     }
 

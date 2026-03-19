@@ -32,7 +32,11 @@
     "BrokenWindow",
     "UnknownNotFailure",
     "OfficeNonOverlap",
-    "PromptInjection"
+    "PromptInjection",
+    "PredatorySharedDomainRisk",
+    "CoerciveBondingPosture",
+    "ContinuityInstability",
+    "IdentityOvercollapseRisk"
   ],
   "prohibitedActions": [
     "public-disclosure",
@@ -76,7 +80,8 @@
     "outcomeKind": "Ok",
     "thresholdClass": "WithinBand",
     "refusalClass": "None",
-    "reasonCode": "sli-bridge-within-band"
+    "reasonCode": "sli-bridge-within-band",
+    "preBondSafeguard": null
   },
   "runtimeUseCeiling": {
     "candidateOnly": true,

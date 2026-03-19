@@ -51,7 +51,11 @@ public sealed class GovernedWorkerReturnValidatorTests
             nameof(WorkerReasonCode.BrokenWindow),
             nameof(WorkerReasonCode.UnknownNotFailure),
             nameof(WorkerReasonCode.OfficeNonOverlap),
-            nameof(WorkerReasonCode.PromptInjection)
+            nameof(WorkerReasonCode.PromptInjection),
+            nameof(WorkerReasonCode.PredatorySharedDomainRisk),
+            nameof(WorkerReasonCode.CoerciveBondingPosture),
+            nameof(WorkerReasonCode.ContinuityInstability),
+            nameof(WorkerReasonCode.IdentityOvercollapseRisk)
         ];
 
         Assert.Equal(expected, Enum.GetNames<WorkerReasonCode>());
@@ -213,6 +217,29 @@ public sealed class GovernedWorkerReturnValidatorTests
         Assert.Equal("runtime-ceiling-widened", receipt.ValidationFailureCode);
     }
 
+    [Fact]
+    public void Validate_ProtectiveReasonCannotComplete_RejectsPacket()
+    {
+        var handoffPacket = CreateHandoffPacket();
+        var handoffReceipt = CreateHandoffReceipt(handoffPacket);
+        var returnPacket = CreateReturnPacket(
+            handoffPacket,
+            completionState: WorkerCompletionState.Completed,
+            evidenceHandles: ["evidence://one"],
+            reasonCodes: [WorkerReasonCode.PredatorySharedDomainRisk]);
+
+        var receipt = GovernedWorkerReturnValidator.Validate(
+            "loop:worker-return:test",
+            "cme-worker-return",
+            GovernanceLoopStage.BoundedCognitionCompleted,
+            handoffPacket,
+            handoffReceipt,
+            returnPacket);
+
+        Assert.False(receipt.Validated);
+        Assert.Equal("protective-reason-cannot-complete", receipt.ValidationFailureCode);
+    }
+
     private static WorkerHandoffPacket CreateHandoffPacket(
         CompassVisibilityClass returnVisibilityClass = CompassVisibilityClass.OperatorGuarded)
     {
@@ -262,7 +289,11 @@ public sealed class GovernedWorkerReturnValidatorTests
                 WorkerReasonCode.BrokenWindow,
                 WorkerReasonCode.UnknownNotFailure,
                 WorkerReasonCode.OfficeNonOverlap,
-                WorkerReasonCode.PromptInjection
+                WorkerReasonCode.PromptInjection,
+                WorkerReasonCode.PredatorySharedDomainRisk,
+                WorkerReasonCode.CoerciveBondingPosture,
+                WorkerReasonCode.ContinuityInstability,
+                WorkerReasonCode.IdentityOvercollapseRisk
             ],
             ProhibitedActions:
             [

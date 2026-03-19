@@ -134,6 +134,18 @@ public static class GovernedWorkerReturnValidator
             return "bridge-witness-linkage-mismatch";
         }
 
+        if (SliBridgeContracts.HasBlockingPreBondSafeguard(handoffBridgeReview) &&
+            returnPacket.CompletionState == WorkerCompletionState.Completed)
+        {
+            return "prebond-safeguard-bypass";
+        }
+
+        if (ContainsProtectiveReasonCode(returnPacket.ReasonCodes) &&
+            returnPacket.CompletionState == WorkerCompletionState.Completed)
+        {
+            return "protective-reason-cannot-complete";
+        }
+
         if (handoffRuntimeUseCeiling is not null &&
             returnRuntimeUseCeiling is not null &&
             returnRuntimeUseCeiling != handoffRuntimeUseCeiling)
@@ -142,5 +154,14 @@ public static class GovernedWorkerReturnValidator
         }
 
         return null;
+    }
+
+    private static bool ContainsProtectiveReasonCode(IReadOnlyList<WorkerReasonCode> reasonCodes)
+    {
+        return reasonCodes.Any(code => code is
+            WorkerReasonCode.PredatorySharedDomainRisk or
+            WorkerReasonCode.CoerciveBondingPosture or
+            WorkerReasonCode.ContinuityInstability or
+            WorkerReasonCode.IdentityOvercollapseRisk);
     }
 }

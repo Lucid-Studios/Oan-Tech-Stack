@@ -61,6 +61,10 @@ internal sealed class HybridProtectedIngressProfile
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
     public required bool BondedAuthorityConfirmed { get; init; }
     public required IReadOnlyList<string> ApprovedRevealPurposes { get; init; }
+    public bool PredatorySharedDomainRiskDetected { get; init; }
+    public bool CoerciveBondingPostureDetected { get; init; }
+    public bool ContinuityInstabilityDetected { get; init; }
+    public bool IdentityOvercollapseRiskDetected { get; init; }
 
     public BondedAuthorityContext ToBondedAuthorityContext()
     {
@@ -295,6 +299,11 @@ internal sealed class HybridProtectedIngressHarness
         HybridProtectedIngressPropositionCompileResult propositionCompile)
     {
         var witnessHandle = CreateBridgeWitnessHandle(profile, propositionCompile.OracleAssessment);
+        var explicitSafeguard = ResolveExplicitPreBondSafeguard(profile, witnessHandle);
+        if (explicitSafeguard is not null)
+        {
+            return explicitSafeguard;
+        }
 
         if (bootProfile.Decision == FirstBootGovernanceDecision.Quarantine)
         {
@@ -310,14 +319,17 @@ internal sealed class HybridProtectedIngressHarness
 
         if (blockedRevealModes.Count > 0)
         {
-            return SliBridgeContracts.CreateReview(
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
                 bridgeStage: "hybrid-protected-ingress",
                 sourceTheater: "prime",
                 targetTheater: "prime",
                 bridgeWitnessHandle: witnessHandle,
                 outcomeKind: SliBridgeOutcomeKind.RefuseContext,
                 thresholdClass: SliBridgeThresholdClass.FaultLine,
-                reasonCode: "sli-bridge-blocked-reveal-escalation");
+                reasonCode: "sli-prebond-coercive-bonding-posture",
+                safeguardClass: SliPreBondSafeguardClass.CoerciveBondingPosture,
+                disposition: SliPreBondSafeguardDisposition.Refuse,
+                requiresEscalation: true);
         }
 
         if (!propositionCompile.ParityMatched)
@@ -367,6 +379,72 @@ internal sealed class HybridProtectedIngressHarness
             outcomeKind: SliBridgeOutcomeKind.Ok,
             thresholdClass: SliBridgeThresholdClass.WithinBand,
             reasonCode: "sli-bridge-within-band");
+    }
+
+    private static SliBridgeReviewReceipt? ResolveExplicitPreBondSafeguard(
+        HybridProtectedIngressProfile profile,
+        string witnessHandle)
+    {
+        if (profile.PredatorySharedDomainRiskDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-predatory-shared-domain-risk",
+                safeguardClass: SliPreBondSafeguardClass.PredatorySharedDomainRisk,
+                disposition: SliPreBondSafeguardDisposition.Refuse,
+                requiresEscalation: true);
+        }
+
+        if (profile.CoerciveBondingPostureDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-coercive-bonding-posture",
+                safeguardClass: SliPreBondSafeguardClass.CoerciveBondingPosture,
+                disposition: SliPreBondSafeguardDisposition.Refuse,
+                requiresEscalation: true);
+        }
+
+        if (profile.ContinuityInstabilityDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.NeedsSpec,
+                thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                reasonCode: "sli-prebond-continuity-instability",
+                safeguardClass: SliPreBondSafeguardClass.ContinuityInstability,
+                disposition: SliPreBondSafeguardDisposition.Hold);
+        }
+
+        if (profile.IdentityOvercollapseRiskDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.Reject,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-identity-overcollapse-risk",
+                safeguardClass: SliPreBondSafeguardClass.IdentityOvercollapseRisk,
+                disposition: SliPreBondSafeguardDisposition.Escalate,
+                requiresEscalation: true);
+        }
+
+        return null;
     }
 
     private static string CreateBridgeWitnessHandle(

@@ -16,4 +16,5 @@ public sealed class LispExecutionResult
     public required GoldenCodeCompassProjection GoldenCodeCompass { get; init; }
     public required ZedThetaCandidateReceipt ZedThetaCandidate { get; init; }
     internal SliLiveEngramRuntimePacket? LiveRuntimePacket { get; init; }
+    internal SliLiveEngramRuntimeRun? LiveRuntimeRun { get; init; }
 }

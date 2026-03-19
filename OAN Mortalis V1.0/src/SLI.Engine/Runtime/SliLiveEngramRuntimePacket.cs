@@ -20,7 +20,8 @@ internal enum SliLiveEngramRuntimeState
     Witnessed = 3,
     ResidueBearing = 4,
     ReturnCandidate = 5,
-    Obstructed = 6
+    Obstructed = 6,
+    Deferred = 7
 }
 
 internal enum SliLiveEngramOperationKind
@@ -46,6 +47,11 @@ internal sealed class SliLiveEngramRuntimePacket
     public required string EngramHandle { get; init; }
     public required SliLiveEngramKind EngramKind { get; init; }
     public required SliLiveEngramRuntimeState RuntimeState { get; init; }
+    public required string ShardId { get; init; }
+    public required SliLocalityShardKind ShardKind { get; init; }
+    public required string ParentExecutionId { get; init; }
+    public required string RootAnchor { get; init; }
+    public required string SymbolBoundaryRef { get; init; }
     public required string LocalityHandle { get; init; }
     public required string SourceHandle { get; init; }
     public required IReadOnlyList<string> InvariantSet { get; init; }
@@ -54,6 +60,18 @@ internal sealed class SliLiveEngramRuntimePacket
     public required IReadOnlyList<SliLiveEngramTraceEntry> TraceSet { get; init; }
     public required bool ReturnCandidateEligible { get; init; }
     public required string ReturnEligibilityReason { get; init; }
+}
+
+internal sealed class SliLiveEngramRuntimeRun
+{
+    public required string ExecutionId { get; init; }
+    public required bool ShardModeEnabled { get; init; }
+    public required string PrimaryShardId { get; init; }
+    public required IReadOnlyList<SliLiveEngramRuntimePacket> ShardPackets { get; init; }
+    public required IReadOnlyList<SliLocalityRelationEvent> RelationEvents { get; init; }
+    public required IReadOnlyList<SliLocalityObstructionRecord> Obstructions { get; init; }
+    public required SliLocalityRelationOutcomeKind ReductionOutcome { get; init; }
+    public required string ReductionReason { get; init; }
 }
 
 internal static class SliLiveEngramRuntimePacketFactory
@@ -67,7 +85,13 @@ internal static class SliLiveEngramRuntimePacketFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
         ArgumentNullException.ThrowIfNull(candidate);
 
-        var localityHandle = ResolveLocalityHandle(context);
+        if (context.ShardModeEnabled)
+        {
+            var run = CreateRunForCognition(context, traceId, candidate);
+            return ResolveCompatibilityPacket(run);
+        }
+
+        var localityHandle = ResolveSerialLocalityHandle(context);
         var sourceHandle = candidate.CandidateHandle;
         var residueSet = CollectCognitionResidues(context);
         var witnessSet = CollectCognitionWitnessSet(candidate);
@@ -83,6 +107,11 @@ internal static class SliLiveEngramRuntimePacketFactory
             EngramHandle = $"live-engram:{traceId}",
             EngramKind = engramKind,
             RuntimeState = runtimeState,
+            ShardId = "serial",
+            ShardKind = SliLocalityShardKind.Acting,
+            ParentExecutionId = context.ExecutionId,
+            RootAnchor = SliCompassLocalityShards.ResolveRootAnchor(context.Frame),
+            SymbolBoundaryRef = "serial-runtime-surface",
             LocalityHandle = localityHandle,
             SourceHandle = sourceHandle,
             InvariantSet = invariantSet,
@@ -103,12 +132,49 @@ internal static class SliLiveEngramRuntimePacketFactory
         };
     }
 
+    public static SliLiveEngramRuntimeRun CreateRunForCognition(
+        SliExecutionContext context,
+        string traceId,
+        ZedThetaCandidateReceipt candidate)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+        ArgumentNullException.ThrowIfNull(candidate);
+
+        var reductionOutcome = ResolveReductionOutcome(context.LocalityRelationEvents);
+        var reductionReason = ResolveReductionReason(context.LocalityRelationEvents, reductionOutcome);
+        var packets = context.LocalityShards
+            .OrderBy(ResolveShardOrder)
+            .Select(shard => CreateShardPacket(context, traceId, candidate, shard, reductionOutcome, reductionReason))
+            .ToArray();
+
+        return new SliLiveEngramRuntimeRun
+        {
+            ExecutionId = context.ExecutionId,
+            ShardModeEnabled = true,
+            PrimaryShardId = context.PrimaryShardId ?? SliCompassLocalityShards.ActingShardId,
+            ShardPackets = packets,
+            RelationEvents = context.LocalityRelationEvents.ToArray(),
+            Obstructions = context.LocalityObstructions.ToArray(),
+            ReductionOutcome = reductionOutcome,
+            ReductionReason = reductionReason
+        };
+    }
+
+    public static SliLiveEngramRuntimePacket ResolveCompatibilityPacket(SliLiveEngramRuntimeRun run)
+    {
+        ArgumentNullException.ThrowIfNull(run);
+
+        return run.ShardPackets.First(packet =>
+            string.Equals(packet.ShardId, run.PrimaryShardId, StringComparison.OrdinalIgnoreCase));
+    }
+
     public static SliLiveEngramRuntimePacket CreateForHigherOrderLocality(SliExecutionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         var localityState = context.HigherOrderLocalityState;
-        var localityHandle = ResolveLocalityHandle(context);
+        var localityHandle = ResolveSerialLocalityHandle(context);
         var sourceHandle = string.IsNullOrWhiteSpace(localityState.AccountabilityPacket.PacketHandle)
             ? localityHandle
             : localityState.AccountabilityPacket.PacketHandle;
@@ -129,6 +195,11 @@ internal static class SliLiveEngramRuntimePacketFactory
             EngramHandle = $"{localityHandle}:live-runtime",
             EngramKind = engramKind,
             RuntimeState = runtimeState,
+            ShardId = "serial",
+            ShardKind = SliLocalityShardKind.Acting,
+            ParentExecutionId = context.ExecutionId,
+            RootAnchor = SliCompassLocalityShards.ResolveRootAnchor(context.Frame),
+            SymbolBoundaryRef = "serial-runtime-surface",
             LocalityHandle = localityHandle,
             SourceHandle = sourceHandle,
             InvariantSet = invariantSet,
@@ -146,6 +217,164 @@ internal static class SliLiveEngramRuntimePacketFactory
             ReturnEligibilityReason = returnCandidateEligible
                 ? "accountability-review-ready"
                 : localityState.AccountabilityPacket.ReadinessStatus
+        };
+    }
+
+    private static SliLiveEngramRuntimePacket CreateShardPacket(
+        SliExecutionContext context,
+        string traceId,
+        ZedThetaCandidateReceipt candidate,
+        SliLocalityShardRecord shard,
+        SliLocalityRelationOutcomeKind reductionOutcome,
+        string reductionReason)
+    {
+        var sourceHandle = candidate.CandidateHandle;
+        var traceLines = context.GetShardTraceLines(shard.ShardId);
+        var residueSet = CollectShardResidues(context, shard, reductionOutcome, reductionReason);
+        var witnessSet = CollectShardWitnessSet(context, candidate, shard);
+        var invariantSet = CollectShardInvariantSet(context, candidate, shard);
+        var returnCandidateEligible = shard.ShardKind == SliLocalityShardKind.Acting &&
+            candidate.BridgeReview?.OutcomeKind == SliBridgeOutcomeKind.Ok &&
+            candidate.RuntimeUseCeiling?.CandidateOnly == true;
+
+        var runtimeState = ResolveShardRuntimeState(
+            shard,
+            candidate,
+            reductionOutcome,
+            residueSet.Count,
+            returnCandidateEligible);
+        var engramKind = ResolveShardEngramKind(shard.ShardKind, runtimeState);
+
+        return new SliLiveEngramRuntimePacket
+        {
+            EngramHandle = $"live-engram:{traceId}:{shard.ShardId}",
+            EngramKind = engramKind,
+            RuntimeState = runtimeState,
+            ShardId = shard.ShardId,
+            ShardKind = shard.ShardKind,
+            ParentExecutionId = shard.ParentExecutionId,
+            RootAnchor = shard.RootAnchor,
+            SymbolBoundaryRef = shard.SymbolBoundaryRef,
+            LocalityHandle = shard.LocalityHandle,
+            SourceHandle = sourceHandle,
+            InvariantSet = invariantSet,
+            ResidueSet = residueSet,
+            WitnessSet = witnessSet,
+            TraceSet = BuildTraceSet(
+                sourceHandle,
+                shard.LocalityHandle,
+                traceLines,
+                hasBraid: shard.ShardKind == SliLocalityShardKind.AdjacentIngestion &&
+                          reductionOutcome == SliLocalityRelationOutcomeKind.Joined,
+                hasWitness: shard.ShardKind != SliLocalityShardKind.AdjacentIngestion &&
+                            witnessSet.Count > 0,
+                hasResidue: residueSet.Count > 0,
+                hasReturnCandidate: returnCandidateEligible),
+            ReturnCandidateEligible = returnCandidateEligible,
+            ReturnEligibilityReason = returnCandidateEligible
+                ? "candidate-bearing-bridge-ok"
+                : shard.ShardKind == SliLocalityShardKind.Acting
+                    ? candidate.BridgeReview?.ReasonCode ?? "bridge-review-unavailable"
+                    : "non-primary-shard"
+        };
+    }
+
+    private static SliLocalityRelationOutcomeKind ResolveReductionOutcome(
+        IReadOnlyList<SliLocalityRelationEvent> relations)
+    {
+        var required = relations
+            .Where(evt => evt.RelationKind is SliLocalityRelationKind.WitnessOf or SliLocalityRelationKind.IngestsFrom)
+            .ToArray();
+
+        if (required.Any(evt => evt.Outcome == SliLocalityRelationOutcomeKind.Refused))
+        {
+            return SliLocalityRelationOutcomeKind.Refused;
+        }
+
+        if (required.Any(evt => evt.Outcome == SliLocalityRelationOutcomeKind.Obstructed))
+        {
+            return SliLocalityRelationOutcomeKind.Obstructed;
+        }
+
+        if (required.Length == 2 &&
+            required.All(evt => evt.Outcome == SliLocalityRelationOutcomeKind.Joined))
+        {
+            return SliLocalityRelationOutcomeKind.Joined;
+        }
+
+        return SliLocalityRelationOutcomeKind.Deferred;
+    }
+
+    private static string ResolveReductionReason(
+        IReadOnlyList<SliLocalityRelationEvent> relations,
+        SliLocalityRelationOutcomeKind reductionOutcome)
+    {
+        if (reductionOutcome == SliLocalityRelationOutcomeKind.Joined)
+        {
+            return "compass-shards-joined";
+        }
+
+        var firstRelevant = relations
+            .Where(evt => evt.RelationKind is SliLocalityRelationKind.WitnessOf or SliLocalityRelationKind.IngestsFrom)
+            .FirstOrDefault(evt => evt.Outcome == reductionOutcome);
+
+        return firstRelevant?.ReasonCode ?? "compass-shards-not-joined";
+    }
+
+    private static int ResolveShardOrder(SliLocalityShardRecord shard)
+    {
+        return shard.ShardKind switch
+        {
+            SliLocalityShardKind.Acting => 0,
+            SliLocalityShardKind.Witnessing => 1,
+            _ => 2
+        };
+    }
+
+    private static SliLiveEngramRuntimeState ResolveShardRuntimeState(
+        SliLocalityShardRecord shard,
+        ZedThetaCandidateReceipt candidate,
+        SliLocalityRelationOutcomeKind reductionOutcome,
+        int residueCount,
+        bool returnCandidateEligible)
+    {
+        if (shard.ShardKind == SliLocalityShardKind.Acting)
+        {
+            return ResolveCognitionRuntimeState(candidate, residueCount, returnCandidateEligible);
+        }
+
+        return shard.ShardKind switch
+        {
+            SliLocalityShardKind.Witnessing => reductionOutcome switch
+            {
+                SliLocalityRelationOutcomeKind.Joined => SliLiveEngramRuntimeState.Witnessed,
+                SliLocalityRelationOutcomeKind.Deferred => SliLiveEngramRuntimeState.Deferred,
+                _ => SliLiveEngramRuntimeState.Obstructed
+            },
+            SliLocalityShardKind.AdjacentIngestion => reductionOutcome switch
+            {
+                SliLocalityRelationOutcomeKind.Joined => SliLiveEngramRuntimeState.Braided,
+                SliLocalityRelationOutcomeKind.Deferred => SliLiveEngramRuntimeState.Deferred,
+                _ => SliLiveEngramRuntimeState.Obstructed
+            },
+            _ => SliLiveEngramRuntimeState.Loaded
+        };
+    }
+
+    private static SliLiveEngramKind ResolveShardEngramKind(
+        SliLocalityShardKind shardKind,
+        SliLiveEngramRuntimeState runtimeState)
+    {
+        if (shardKind == SliLocalityShardKind.Acting)
+        {
+            return ResolveCognitionEngramKind(runtimeState);
+        }
+
+        return shardKind switch
+        {
+            SliLocalityShardKind.Witnessing => SliLiveEngramKind.WitnessEngram,
+            SliLocalityShardKind.AdjacentIngestion => SliLiveEngramKind.HotWorkingEngram,
+            _ => SliLiveEngramKind.HotWorkingEngram
         };
     }
 
@@ -334,6 +563,27 @@ internal static class SliLiveEngramRuntimePacketFactory
         return invariants.ToArray();
     }
 
+    private static IReadOnlyList<string> CollectShardInvariantSet(
+        SliExecutionContext context,
+        ZedThetaCandidateReceipt candidate,
+        SliLocalityShardRecord shard)
+    {
+        var invariants = new HashSet<string>(CollectCognitionInvariantSet(context, candidate), StringComparer.OrdinalIgnoreCase)
+        {
+            $"shard-kind:{shard.ShardKind}",
+            $"boundary:{shard.SymbolBoundaryRef}"
+        };
+
+        foreach (var relation in context.LocalityRelationEvents.Where(evt =>
+                     string.Equals(evt.SourceShardId, shard.ShardId, StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(evt.TargetShardId, shard.ShardId, StringComparison.OrdinalIgnoreCase)))
+        {
+            invariants.Add($"relation:{relation.RelationKind}:{relation.Outcome}");
+        }
+
+        return invariants.ToArray();
+    }
+
     private static IReadOnlyList<string> CollectCognitionWitnessSet(ZedThetaCandidateReceipt candidate)
     {
         var witness = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -351,12 +601,56 @@ internal static class SliLiveEngramRuntimePacketFactory
         return witness.ToArray();
     }
 
+    private static IReadOnlyList<string> CollectShardWitnessSet(
+        SliExecutionContext context,
+        ZedThetaCandidateReceipt candidate,
+        SliLocalityShardRecord shard)
+    {
+        var witness = new HashSet<string>(CollectCognitionWitnessSet(candidate), StringComparer.OrdinalIgnoreCase);
+        foreach (var relation in context.LocalityRelationEvents.Where(evt =>
+                     string.Equals(evt.SourceShardId, shard.ShardId, StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(evt.TargetShardId, shard.ShardId, StringComparison.OrdinalIgnoreCase)))
+        {
+            witness.Add($"relation:{relation.RelationKind}:{relation.Outcome}:{relation.ReasonCode}");
+        }
+
+        return witness.ToArray();
+    }
+
     private static IReadOnlyList<string> CollectCognitionResidues(SliExecutionContext context)
     {
         var residues = new List<string>();
         residues.AddRange(context.PrunedBranches.Select(branch => $"cleave:{branch}"));
         residues.AddRange(CollectHigherOrderResidues(context.HigherOrderLocalityState));
         return residues;
+    }
+
+    private static IReadOnlyList<string> CollectShardResidues(
+        SliExecutionContext context,
+        SliLocalityShardRecord shard,
+        SliLocalityRelationOutcomeKind reductionOutcome,
+        string reductionReason)
+    {
+        var residues = new List<string>();
+        if (shard.ShardKind == SliLocalityShardKind.Acting)
+        {
+            residues.AddRange(CollectCognitionResidues(context));
+        }
+
+        residues.AddRange(context.LocalityObstructions
+            .Where(obstruction =>
+                string.Equals(obstruction.SourceShardId, shard.ShardId, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(obstruction.TargetShardId, shard.ShardId, StringComparison.OrdinalIgnoreCase))
+            .Select(obstruction => $"obstruction:{obstruction.AttemptedRelation}:{obstruction.ViolatedCondition}"));
+
+        if (reductionOutcome != SliLocalityRelationOutcomeKind.Joined)
+        {
+            residues.Add($"reduction:{reductionOutcome}:{reductionReason}");
+        }
+
+        return residues
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
     }
 
     private static IReadOnlyList<string> CollectHigherOrderInvariantSet(SliHigherOrderLocalityState localityState)
@@ -423,7 +717,7 @@ internal static class SliLiveEngramRuntimePacketFactory
             .ToArray();
     }
 
-    private static string ResolveLocalityHandle(SliExecutionContext context)
+    private static string ResolveSerialLocalityHandle(SliExecutionContext context)
     {
         return string.IsNullOrWhiteSpace(context.HigherOrderLocalityState.LocalityHandle)
             ? $"locality:{context.Frame.CMEId}:{context.Frame.ContextId:D}"

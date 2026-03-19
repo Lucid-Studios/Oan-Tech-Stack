@@ -89,7 +89,11 @@ public sealed class GovernedWorkerPacketFixtureTests
                 WorkerReasonCode.BrokenWindow,
                 WorkerReasonCode.UnknownNotFailure,
                 WorkerReasonCode.OfficeNonOverlap,
-                WorkerReasonCode.PromptInjection
+                WorkerReasonCode.PromptInjection,
+                WorkerReasonCode.PredatorySharedDomainRisk,
+                WorkerReasonCode.CoerciveBondingPosture,
+                WorkerReasonCode.ContinuityInstability,
+                WorkerReasonCode.IdentityOvercollapseRisk
             ],
             ProhibitedActions:
             [

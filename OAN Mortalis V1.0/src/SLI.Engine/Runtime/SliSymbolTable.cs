@@ -315,14 +315,18 @@ public sealed class SliSymbolTable
 
         RegisterSharedContract("omega-converge", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             var positive = Arg(expression, 1, "psi-positive");
             var negative = Arg(expression, 2, "psi-negative");
-            context.AddTrace($"omega-converge({positive} {negative})");
+            var detail = $"omega-converge({positive} {negative})";
+            context.AddTrace(detail);
+            ExportCompassTelemetry(context, SliCompassLocalityShards.GoldenCodeBloomTelemetryKey, detail);
             return Task.FromResult(SExpression.AtomNode("omega-ready"));
         });
 
         RegisterSharedContract("theta-seal", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             var primeState = Arg(expression, 1, "task-objective");
             var reasoningState = Arg(expression, 2, "reasoning-state");
             var state = context.GoldenCodeState;
@@ -333,24 +337,37 @@ public sealed class SliSymbolTable
             state.ThetaState = "theta-ready";
             state.IsProjected = true;
             RefreshGoldenCodeContracts(context);
-            context.AddTrace($"theta-seal({primeState} {reasoningState} basin={state.ActiveBasin} anchor={state.AnchorState})");
+            var detail = $"theta-seal({primeState} {reasoningState} basin={state.ActiveBasin} anchor={state.AnchorState})";
+            context.AddTrace(detail);
+            ExportCompassTelemetry(context, SliCompassLocalityShards.ThetaSealTelemetryKey, detail);
             return Task.FromResult(SExpression.AtomNode("theta-ready"));
         });
 
         RegisterSharedContract("compass-work", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.WitnessingShardId);
             var thetaState = Arg(expression, 1, "theta-state");
             var locality = Arg(expression, 2, "proximal-cognition");
+            var relation = context.ShardModeEnabled
+                ? SliLocalityRelationEvaluator.EvaluateWitnessOf(context, "compass-work")
+                : null;
             var state = context.GoldenCodeState;
             state.SelfTouchClass = ResolveGoldenCodeSelfTouchClass(context);
             state.OeCoePosture = ResolveGoldenCodeOeCoePosture(context, state);
             RefreshGoldenCodeContracts(context);
-            context.AddTrace($"compass-work({thetaState} {locality} basin={state.ActiveBasin} anchor={state.AnchorState} self-touch={state.SelfTouchClass} posture={state.OeCoePosture})");
+            var detail = $"compass-work({thetaState} {locality} basin={state.ActiveBasin} anchor={state.AnchorState} self-touch={state.SelfTouchClass} posture={state.OeCoePosture})";
+            context.AddTrace(detail);
+            if (relation is null || relation.Outcome == SliLocalityRelationOutcomeKind.Joined)
+            {
+                ExportCompassTelemetry(context, SliCompassLocalityShards.CompassWorkTelemetryKey, detail);
+            }
+
             return Task.FromResult(SExpression.AtomNode("compass-live"));
         });
 
         RegisterSharedContract("gamma-yield", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             var thetaState = Arg(expression, 1, "theta-state");
             context.GoldenCodeState.GammaState = "gamma-ready";
             RefreshGoldenCodeContracts(context);
@@ -360,20 +377,28 @@ public sealed class SliSymbolTable
 
         RegisterSharedContract("decision-branch", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             context.AddTrace($"decision-branch({context.CandidateBranches.Count})");
             return Task.FromResult(SExpression.AtomNode("branched"));
         });
 
         RegisterSharedContract("compass-update", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.AdjacentIngestionShardId);
             var arg1 = Arg(expression, 1, "context");
             var arg2 = Arg(expression, 2, "reasoning-state");
+            if (context.ShardModeEnabled)
+            {
+                SliLocalityRelationEvaluator.EvaluateIngestsFrom(context, "compass-update");
+            }
+
             context.AddTrace($"compass-update({arg1} {arg2})");
             return Task.FromResult(SExpression.AtomNode("compass-ok"));
         });
 
         RegisterSharedContract("cleave", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             var survivors = context.CandidateBranches.Take(1).ToList();
             var pruned = context.CandidateBranches.Skip(1).ToList();
             context.PrunedBranches.Clear();
@@ -386,6 +411,7 @@ public sealed class SliSymbolTable
 
         RegisterSharedContract("commit", (expression, context, _) =>
         {
+            EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             context.FinalDecision = context.CandidateBranches.FirstOrDefault() ?? "defer";
             RefreshGoldenCodeContracts(context);
             context.AddTrace($"commit({context.FinalDecision})");
@@ -2885,6 +2911,31 @@ public sealed class SliSymbolTable
         }
 
         return false;
+    }
+
+    private static void EnterCompassShard(SliExecutionContext context, string shardId)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        if (!context.ShardModeEnabled)
+        {
+            return;
+        }
+
+        context.EnterShard(shardId);
+    }
+
+    private static void ExportCompassTelemetry(SliExecutionContext context, string key, string detail)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        ArgumentException.ThrowIfNullOrWhiteSpace(detail);
+
+        if (!context.ShardModeEnabled)
+        {
+            return;
+        }
+
+        context.ExportShardSymbol(key, detail);
     }
 
     private static string Arg(SExpression expression, int index, string fallback)

@@ -101,7 +101,17 @@ public sealed class LispBridge
 
         var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(frame, _resolver, _semanticDevice);
+        if (SliCompassLocalityShards.IsPilotEligible(program))
+        {
+            context.EnableCompassShardMode();
+        }
+
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        if (context.ShardModeEnabled)
+        {
+            context.FinalizeCompassShardRun();
+        }
+
         EnforceCanonicalOrdering(context.TraceLines);
 
         var cleaveResidue = context.PrunedBranches.Count == 0
@@ -116,6 +126,9 @@ public sealed class LispBridge
         var decisionBranch = context.CandidateBranches.FirstOrDefault() ?? context.FinalDecision;
         var traceId = CreateDeterministicTraceId(frame.CMEId, frame.ContextId, traceHash).ToString("D");
         var zedThetaCandidate = BuildZedThetaCandidate(context, traceId);
+        var liveRuntimeRun = context.ShardModeEnabled
+            ? SliLiveEngramRuntimePacketFactory.CreateRunForCognition(context, traceId, zedThetaCandidate)
+            : null;
         return new LispExecutionResult
         {
             TraceId = traceId,
@@ -127,7 +140,10 @@ public sealed class LispBridge
             CompassState = compass,
             GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
             ZedThetaCandidate = zedThetaCandidate,
-            LiveRuntimePacket = SliLiveEngramRuntimePacketFactory.CreateForCognition(context, traceId, zedThetaCandidate)
+            LiveRuntimePacket = liveRuntimeRun is not null
+                ? SliLiveEngramRuntimePacketFactory.ResolveCompatibilityPacket(liveRuntimeRun)
+                : SliLiveEngramRuntimePacketFactory.CreateForCognition(context, traceId, zedThetaCandidate),
+            LiveRuntimeRun = liveRuntimeRun
         };
     }
 

@@ -111,15 +111,40 @@ public sealed class SliCognitionEngineTests
         Assert.NotNull(result.ZedThetaCandidate.RuntimeUseCeiling);
         Assert.True(result.ZedThetaCandidate.RuntimeUseCeiling!.CandidateOnly);
         Assert.NotNull(engine.LastExecutionResult);
+        Assert.NotNull(engine.LastExecutionResult!.LiveRuntimeRun);
         Assert.NotNull(engine.LastExecutionResult!.LiveRuntimePacket);
+        Assert.True(engine.LastExecutionResult.LiveRuntimeRun!.ShardModeEnabled);
+        Assert.Equal(SliLocalityRelationOutcomeKind.Joined, engine.LastExecutionResult.LiveRuntimeRun.ReductionOutcome);
+        Assert.Equal(3, engine.LastExecutionResult.LiveRuntimeRun.ShardPackets.Count);
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimeRun.ShardPackets, packet => packet.ShardKind == SliLocalityShardKind.Acting);
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimeRun.ShardPackets, packet => packet.ShardKind == SliLocalityShardKind.Witnessing);
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimeRun.ShardPackets, packet => packet.ShardKind == SliLocalityShardKind.AdjacentIngestion);
+        Assert.Equal(SliCompassLocalityShards.ActingShardId, engine.LastExecutionResult.LiveRuntimeRun.PrimaryShardId);
+        Assert.Equal(
+            4,
+            engine.LastExecutionResult.LiveRuntimeRun.RelationEvents.Count(evt => evt.RelationKind == SliLocalityRelationKind.AdjacentTo));
+        Assert.Contains(
+            engine.LastExecutionResult.LiveRuntimeRun.RelationEvents,
+            evt => evt.RelationKind == SliLocalityRelationKind.WitnessOf &&
+                   evt.Outcome == SliLocalityRelationOutcomeKind.Joined);
+        Assert.Contains(
+            engine.LastExecutionResult.LiveRuntimeRun.RelationEvents,
+            evt => evt.RelationKind == SliLocalityRelationKind.IngestsFrom &&
+                   evt.Outcome == SliLocalityRelationOutcomeKind.Joined);
         Assert.Equal(SliLiveEngramKind.GovernanceCandidateEngram, engine.LastExecutionResult.LiveRuntimePacket!.EngramKind);
         Assert.Equal(SliLiveEngramRuntimeState.ReturnCandidate, engine.LastExecutionResult.LiveRuntimePacket.RuntimeState);
+        Assert.Equal(SliCompassLocalityShards.ActingShardId, engine.LastExecutionResult.LiveRuntimePacket.ShardId);
+        Assert.Equal(SliLocalityShardKind.Acting, engine.LastExecutionResult.LiveRuntimePacket.ShardKind);
         Assert.Equal(result.ZedThetaCandidate.CandidateHandle, engine.LastExecutionResult.LiveRuntimePacket.SourceHandle);
         Assert.True(engine.LastExecutionResult.LiveRuntimePacket.ReturnCandidateEligible);
         Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.InvariantSet, invariant => invariant == "active-basin:IdentityContinuity");
         Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.Instantiate);
         Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.Witness);
         Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.ShapeReturnCandidate);
+        Assert.Equal(
+            engine.LastExecutionResult.LiveRuntimePacket.ShardId,
+            SliLiveEngramRuntimePacketFactory.ResolveCompatibilityPacket(engine.LastExecutionResult.LiveRuntimeRun).ShardId);
+        Assert.Contains("CompassShards(reduction=Joined", result.Reasoning, StringComparison.Ordinal);
         var compatibilityProjection = GoldenCodeCompassProjection.FromCandidateReceipt(result.ZedThetaCandidate);
         Assert.Equal(result.GoldenCodeCompass.ActiveBasin, compatibilityProjection.ActiveBasin);
         Assert.Equal(result.GoldenCodeCompass.CompetingBasin, compatibilityProjection.CompetingBasin);

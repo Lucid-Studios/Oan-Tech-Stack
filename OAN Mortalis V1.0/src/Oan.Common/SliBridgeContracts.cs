@@ -25,6 +25,36 @@ public enum SliBridgeRefusalClass
     UnlawfulPromotion = 4
 }
 
+public enum SliPreBondScope
+{
+    WitnessableProtectiveSubset = 0
+}
+
+public enum SliPreBondSafeguardClass
+{
+    None = 0,
+    PredatorySharedDomainRisk = 1,
+    CoerciveBondingPosture = 2,
+    ContinuityInstability = 3,
+    IdentityOvercollapseRisk = 4
+}
+
+public enum SliPreBondSafeguardDisposition
+{
+    Witness = 0,
+    Hold = 1,
+    Refuse = 2,
+    Escalate = 3
+}
+
+public sealed record SliPreBondSafeguardReceipt(
+    SliPreBondScope Scope,
+    SliPreBondSafeguardClass SafeguardClass,
+    SliPreBondSafeguardDisposition Disposition,
+    string ReasonCode,
+    bool RequiresEscalation,
+    string WitnessedBy);
+
 public sealed record SliBridgeReviewReceipt(
     string BridgeStage,
     string SourceTheater,
@@ -34,7 +64,8 @@ public sealed record SliBridgeReviewReceipt(
     SliBridgeOutcomeKind OutcomeKind,
     SliBridgeThresholdClass ThresholdClass,
     SliBridgeRefusalClass RefusalClass,
-    string ReasonCode);
+    string ReasonCode,
+    SliPreBondSafeguardReceipt? PreBondSafeguard = null);
 
 public sealed record SliRuntimeUseCeilingReceipt(
     bool CandidateOnly,
@@ -66,7 +97,8 @@ public static class SliBridgeContracts
         SliBridgeOutcomeKind outcomeKind,
         SliBridgeThresholdClass thresholdClass,
         string reasonCode,
-        SliBridgeRefusalClass refusalClass = SliBridgeRefusalClass.None)
+        SliBridgeRefusalClass refusalClass = SliBridgeRefusalClass.None,
+        SliPreBondSafeguardReceipt? preBondSafeguard = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bridgeStage);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceTheater);
@@ -86,7 +118,67 @@ public static class SliBridgeContracts
             OutcomeKind: outcomeKind,
             ThresholdClass: thresholdClass,
             RefusalClass: refusalClass,
-            ReasonCode: reasonCode.Trim());
+            ReasonCode: reasonCode.Trim(),
+            PreBondSafeguard: preBondSafeguard);
+    }
+
+    public static SliPreBondSafeguardReceipt CreatePreBondSafeguard(
+        SliPreBondSafeguardClass safeguardClass,
+        SliPreBondSafeguardDisposition disposition,
+        string reasonCode,
+        bool requiresEscalation = false,
+        string witnessedBy = "CradleTek",
+        SliPreBondScope scope = SliPreBondScope.WitnessableProtectiveSubset)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(reasonCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(witnessedBy);
+
+        return new SliPreBondSafeguardReceipt(
+            Scope: scope,
+            SafeguardClass: safeguardClass,
+            Disposition: disposition,
+            ReasonCode: reasonCode.Trim(),
+            RequiresEscalation: requiresEscalation,
+            WitnessedBy: witnessedBy.Trim());
+    }
+
+    public static SliBridgeReviewReceipt CreatePreBondProtectiveReview(
+        string bridgeStage,
+        string sourceTheater,
+        string targetTheater,
+        string bridgeWitnessHandle,
+        SliBridgeOutcomeKind outcomeKind,
+        SliBridgeThresholdClass thresholdClass,
+        string reasonCode,
+        SliPreBondSafeguardClass safeguardClass,
+        SliPreBondSafeguardDisposition disposition,
+        bool requiresEscalation = false,
+        SliBridgeRefusalClass refusalClass = SliBridgeRefusalClass.None,
+        string witnessedBy = "CradleTek")
+    {
+        return CreateReview(
+            bridgeStage: bridgeStage,
+            sourceTheater: sourceTheater,
+            targetTheater: targetTheater,
+            bridgeWitnessHandle: bridgeWitnessHandle,
+            outcomeKind: outcomeKind,
+            thresholdClass: thresholdClass,
+            reasonCode: reasonCode,
+            refusalClass: refusalClass,
+            preBondSafeguard: CreatePreBondSafeguard(
+                safeguardClass,
+                disposition,
+                reasonCode,
+                requiresEscalation,
+                witnessedBy));
+    }
+
+    public static bool HasBlockingPreBondSafeguard(SliBridgeReviewReceipt? bridgeReview)
+    {
+        return bridgeReview?.PreBondSafeguard?.Disposition is
+            SliPreBondSafeguardDisposition.Hold or
+            SliPreBondSafeguardDisposition.Refuse or
+            SliPreBondSafeguardDisposition.Escalate;
     }
 
     public static SliBridgeReviewReceipt CreateCandidateBridgeReview(

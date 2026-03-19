@@ -40,7 +40,11 @@ public enum WorkerReasonCode
     BrokenWindow = 7,
     UnknownNotFailure = 8,
     OfficeNonOverlap = 9,
-    PromptInjection = 10
+    PromptInjection = 10,
+    PredatorySharedDomainRisk = 11,
+    CoerciveBondingPosture = 12,
+    ContinuityInstability = 13,
+    IdentityOvercollapseRisk = 14
 }
 
 public sealed record WorkerHandoffPacket(

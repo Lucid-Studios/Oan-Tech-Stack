@@ -14,7 +14,11 @@ public static class StewardWorkerHandoffProjector
         WorkerReasonCode.BrokenWindow,
         WorkerReasonCode.UnknownNotFailure,
         WorkerReasonCode.OfficeNonOverlap,
-        WorkerReasonCode.PromptInjection
+        WorkerReasonCode.PromptInjection,
+        WorkerReasonCode.PredatorySharedDomainRisk,
+        WorkerReasonCode.CoerciveBondingPosture,
+        WorkerReasonCode.ContinuityInstability,
+        WorkerReasonCode.IdentityOvercollapseRisk
     ];
 
     private static readonly IReadOnlyDictionary<GovernedWorkerSpecies, StewardWorkerProfile> Profiles =
@@ -154,6 +158,7 @@ public static class StewardWorkerHandoffProjector
         var runtimeUseCeiling = reviewRequest.RuntimeUseCeiling
             ?? SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
         if (bridgeReview.OutcomeKind != SliBridgeOutcomeKind.Ok ||
+            SliBridgeContracts.HasBlockingPreBondSafeguard(bridgeReview) ||
             runtimeUseCeiling.CandidateOnly != true)
         {
             return null;

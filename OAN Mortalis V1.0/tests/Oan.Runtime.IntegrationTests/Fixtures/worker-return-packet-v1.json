@@ -25,7 +25,8 @@
     "outcomeKind": "Ok",
     "thresholdClass": "WithinBand",
     "refusalClass": "None",
-    "reasonCode": "sli-bridge-within-band"
+    "reasonCode": "sli-bridge-within-band",
+    "preBondSafeguard": null
   },
   "runtimeUseCeiling": {
     "candidateOnly": true,

@@ -166,14 +166,47 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.False(projection.HasValue);
     }
 
+    [Fact]
+    public void ProjectForLoop_BlockingPreBondSafeguard_ProjectsNoHandoff()
+    {
+        var loopKey = "loop:worker-handoff:prebond-safeguard";
+        var cmeId = "cme-worker-handoff";
+        var disclosureHandle = "weather-disclosure://7777777777777777";
+        var authorityHandle = "office-authority://8888888888888888";
+        var issuanceHandle = "office-issuance://9999999999999999";
+        var batch = CreateBatch(
+            loopKey,
+            cmeId,
+            CreateDisclosureReceipt(loopKey, cmeId, disclosureHandle),
+            CreateAuthorityReceipt(loopKey, cmeId, disclosureHandle, authorityHandle),
+            CreateIssuanceReceipt(loopKey, cmeId, disclosureHandle, authorityHandle, issuanceHandle),
+            CreateReviewRequest(
+                cmeId,
+                SliBridgeContracts.CreatePreBondProtectiveReview(
+                    bridgeStage: "steward-worker-handoff-test",
+                    sourceTheater: "prime",
+                    targetTheater: "prime",
+                    bridgeWitnessHandle: $"agenticore-return://candidate/{cmeId}/1",
+                    outcomeKind: SliBridgeOutcomeKind.NeedsSpec,
+                    thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                    reasonCode: "sli-prebond-continuity-instability",
+                    safeguardClass: SliPreBondSafeguardClass.ContinuityInstability,
+                    disposition: SliPreBondSafeguardDisposition.Hold)));
+
+        var projection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch);
+
+        Assert.False(projection.HasValue);
+    }
+
     private static GovernanceJournalReplayBatch CreateBatch(
         string loopKey,
         string cmeId,
         GovernedWeatherDisclosureReceipt disclosureReceipt,
         GovernedOfficeAuthorityReceipt authorityReceipt,
-        GovernedOfficeIssuanceReceipt issuanceReceipt)
+        GovernedOfficeIssuanceReceipt issuanceReceipt,
+        ReturnCandidateReviewRequest? explicitReviewRequest = null)
     {
-        var reviewRequest = CreateReviewRequest(cmeId);
+        var reviewRequest = explicitReviewRequest ?? CreateReviewRequest(cmeId);
         var reviewEntry = new GovernanceJournalEntry(
             LoopKey: loopKey,
             Kind: GovernanceJournalEntryKind.Annotation,
@@ -239,7 +272,9 @@ public sealed class StewardWorkerHandoffProjectorTests
         return new GovernanceJournalReplayBatch([reviewEntry, disclosureEntry, authorityEntry, issuanceEntry], []);
     }
 
-    private static ReturnCandidateReviewRequest CreateReviewRequest(string cmeId)
+    private static ReturnCandidateReviewRequest CreateReviewRequest(
+        string cmeId,
+        SliBridgeReviewReceipt? explicitBridgeReview = null)
     {
         var sessionHandle = $"soulframe-session://{cmeId}/1";
         var returnPointer = $"agenticore-return://candidate/{cmeId}/1";
@@ -280,7 +315,7 @@ public sealed class StewardWorkerHandoffProjectorTests
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
                 SourceSubsystem: "AgentiCore"),
             RequestEnvelope: envelope,
-            BridgeReview: SliBridgeContracts.CreateReview(
+            BridgeReview: explicitBridgeReview ?? SliBridgeContracts.CreateReview(
                 bridgeStage: "steward-worker-handoff-test",
                 sourceTheater: "prime",
                 targetTheater: "prime",
