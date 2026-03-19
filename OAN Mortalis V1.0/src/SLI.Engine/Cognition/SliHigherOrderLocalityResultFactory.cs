@@ -39,6 +39,7 @@ internal static class SliHigherOrderLocalityResultFactory
                 Residues = CloneResidues(state.Participation.Residues)
             },
             SymbolicTrace = context.TraceLines.ToArray(),
+            LiveRuntimePacket = SliLiveEngramRuntimePacketFactory.CreateForHigherOrderLocality(context),
             TargetLineage = targetLineage
         };
     }

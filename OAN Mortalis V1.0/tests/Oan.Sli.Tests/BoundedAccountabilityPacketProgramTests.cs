@@ -63,6 +63,13 @@ public sealed class BoundedAccountabilityPacketProgramTests
         Assert.False(result.Packet.IdentityBearingApplicable);
         Assert.Contains("self-anchor-polarity", result.Packet.PreservedInvariants);
         Assert.Contains("identity-nonbinding", result.Packet.PreservedInvariants);
+        Assert.NotNull(result.Locality.LiveRuntimePacket);
+        Assert.Equal(SliLiveEngramKind.ReturnCandidateEngram, result.Locality.LiveRuntimePacket!.EngramKind);
+        Assert.Equal(SliLiveEngramRuntimeState.ReturnCandidate, result.Locality.LiveRuntimePacket.RuntimeState);
+        Assert.True(result.Locality.LiveRuntimePacket.ReturnCandidateEligible);
+        Assert.Contains(result.Locality.LiveRuntimePacket.InvariantSet, invariant => invariant == "self-anchor-polarity");
+        Assert.Contains(result.Locality.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.Witness);
+        Assert.Contains(result.Locality.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.ShapeReturnCandidate);
     }
 
     [Fact]

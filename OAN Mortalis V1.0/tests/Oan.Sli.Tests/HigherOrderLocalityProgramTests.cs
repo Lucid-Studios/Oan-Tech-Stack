@@ -26,6 +26,10 @@ public sealed class HigherOrderLocalityProgramTests
         Assert.Equal(SliHigherOrderLocalityState.MaskedRevealPosture, result.RevealPosture);
         Assert.Equal(SliHigherOrderLocalityState.ObserveMode, result.Participation.Mode);
         Assert.Contains("locality-bind(context)", result.SymbolicTrace);
+        Assert.NotNull(result.LiveRuntimePacket);
+        Assert.Equal(SliLiveEngramKind.HotWorkingEngram, result.LiveRuntimePacket!.EngramKind);
+        Assert.Equal(SliLiveEngramRuntimeState.Loaded, result.LiveRuntimePacket.RuntimeState);
+        Assert.Contains(result.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.Bind);
     }
 
     [Fact]

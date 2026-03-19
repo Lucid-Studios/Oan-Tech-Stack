@@ -35,6 +35,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
 
     public DecisionSpline? LastDecisionSpline { get; private set; }
     public SliTraceEvent? LastTraceEvent { get; private set; }
+    internal LispExecutionResult? LastExecutionResult { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -89,6 +90,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
         var lispResult = await _lispBridge
             .ExecuteProgramAsync(program, contextFrame, cancellationToken)
             .ConfigureAwait(false);
+        LastExecutionResult = lispResult;
 
         CognitionResult? lowMindResult = null;
         if (_optionalLowMindEngine is not null)

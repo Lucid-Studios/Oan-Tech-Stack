@@ -2,6 +2,7 @@ using CradleTek.CognitionHost.Models;
 using CradleTek.Memory.Services;
 using Oan.Common;
 using SLI.Engine.Cognition;
+using SLI.Engine.Runtime;
 using SoulFrame.Host;
 using System.Text.Json;
 
@@ -109,6 +110,16 @@ public sealed class SliCognitionEngineTests
         Assert.Equal(SliBridgeOutcomeKind.Ok, result.ZedThetaCandidate.BridgeReview!.OutcomeKind);
         Assert.NotNull(result.ZedThetaCandidate.RuntimeUseCeiling);
         Assert.True(result.ZedThetaCandidate.RuntimeUseCeiling!.CandidateOnly);
+        Assert.NotNull(engine.LastExecutionResult);
+        Assert.NotNull(engine.LastExecutionResult!.LiveRuntimePacket);
+        Assert.Equal(SliLiveEngramKind.GovernanceCandidateEngram, engine.LastExecutionResult.LiveRuntimePacket!.EngramKind);
+        Assert.Equal(SliLiveEngramRuntimeState.ReturnCandidate, engine.LastExecutionResult.LiveRuntimePacket.RuntimeState);
+        Assert.Equal(result.ZedThetaCandidate.CandidateHandle, engine.LastExecutionResult.LiveRuntimePacket.SourceHandle);
+        Assert.True(engine.LastExecutionResult.LiveRuntimePacket.ReturnCandidateEligible);
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.InvariantSet, invariant => invariant == "active-basin:IdentityContinuity");
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.Instantiate);
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.Witness);
+        Assert.Contains(engine.LastExecutionResult.LiveRuntimePacket.TraceSet, entry => entry.Operation == SliLiveEngramOperationKind.ShapeReturnCandidate);
         var compatibilityProjection = GoldenCodeCompassProjection.FromCandidateReceipt(result.ZedThetaCandidate);
         Assert.Equal(result.GoldenCodeCompass.ActiveBasin, compatibilityProjection.ActiveBasin);
         Assert.Equal(result.GoldenCodeCompass.CompetingBasin, compatibilityProjection.CompetingBasin);

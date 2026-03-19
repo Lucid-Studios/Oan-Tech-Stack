@@ -126,7 +126,8 @@ public sealed class LispBridge
             SymbolicTraceHash = traceHash,
             CompassState = compass,
             GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
-            ZedThetaCandidate = zedThetaCandidate
+            ZedThetaCandidate = zedThetaCandidate,
+            LiveRuntimePacket = SliLiveEngramRuntimePacketFactory.CreateForCognition(context, traceId, zedThetaCandidate)
         };
     }
 

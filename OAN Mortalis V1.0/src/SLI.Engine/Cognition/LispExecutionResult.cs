@@ -1,5 +1,6 @@
 using CradleTek.CognitionHost.Models;
 using Oan.Common;
+using SLI.Engine.Runtime;
 
 namespace SLI.Engine.Cognition;
 
@@ -14,4 +15,5 @@ public sealed class LispExecutionResult
     public required CognitiveCompassState CompassState { get; init; }
     public required GoldenCodeCompassProjection GoldenCodeCompass { get; init; }
     public required ZedThetaCandidateReceipt ZedThetaCandidate { get; init; }
+    internal SliLiveEngramRuntimePacket? LiveRuntimePacket { get; init; }
 }
