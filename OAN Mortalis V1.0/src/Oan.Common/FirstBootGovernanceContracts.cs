@@ -66,6 +66,19 @@ public enum GoverningOfficeVisibilityScope
     PrimeRevealPosture = 6
 }
 
+public enum FirstBootGovernanceLayerState
+{
+    Preformalized = 0,
+    RoleBoundEceReady = 1
+}
+
+public enum RoleBoundEceState
+{
+    NotProvisioned = 0,
+    Preformalized = 1,
+    RoleBoundTestingReady = 2
+}
+
 public sealed record MaskedCrypticView(
     string ProtectedHandle,
     ProtectedIntakeKind IntakeKind,
@@ -128,6 +141,33 @@ public sealed record InternalGoverningCmeWitnessReceipt(
     bool BondedConfirmationRequired,
     string ReasonCode);
 
+public sealed record FirstBootRoleBoundEceReceipt(
+    string EceHandle,
+    InternalGoverningCmeOffice Office,
+    int FormationOrdinal,
+    RoleBoundEceState State,
+    string RoleBoundaryHandle,
+    IReadOnlyList<GoverningOfficeVisibilityScope> VisibilityScopes,
+    IReadOnlyList<InternalGoverningCmeOffice> RequiredPriorOffices,
+    bool WitnessOnly,
+    bool PrimeRevealWideningAllowed,
+    bool ExpansionAuthorizationAllowed,
+    string ReasonCode);
+
+public sealed record FirstBootGovernanceLayerReceipt(
+    string LayerHandle,
+    BootClass BootClass,
+    BootActivationState ActivationState,
+    FirstBootGovernanceLayerState State,
+    ExpansionRights ExpansionRights,
+    SwarmEligibility SwarmEligibility,
+    bool WitnessOnly,
+    bool SubordinateCmeAuthorizationAllowed,
+    bool RoleBoundEcesReady,
+    IReadOnlyList<InternalGoverningCmeOffice> FormedOffices,
+    IReadOnlyList<FirstBootRoleBoundEceReceipt> RoleBoundEces,
+    string ReasonCode);
+
 public interface IFirstBootGovernancePolicy
 {
     InternalGovernanceBootProfile EvaluateBootProfile(
@@ -147,6 +187,14 @@ public interface IFirstBootGovernancePolicy
 
     InternalGoverningCmeFormationRecord EvaluateFormationEligibility(
         InternalGoverningCmeFormationRequest request);
+
+    FirstBootGovernanceLayerReceipt ProjectGovernanceLayer(
+        BootClass bootClass,
+        BootActivationState activationState,
+        int requestedExpansionCount,
+        IReadOnlyList<InternalGoverningCmeOffice> formedOffices,
+        bool triadicCrossWitnessComplete = false,
+        bool bondedConfirmationComplete = false);
 }
 
 public sealed class DefaultFirstBootGovernancePolicy : IFirstBootGovernancePolicy
@@ -364,4 +412,122 @@ public sealed class DefaultFirstBootGovernancePolicy : IFirstBootGovernancePolic
             request.ActivationState,
             FormationEligible: true);
     }
+
+    public FirstBootGovernanceLayerReceipt ProjectGovernanceLayer(
+        BootClass bootClass,
+        BootActivationState activationState,
+        int requestedExpansionCount,
+        IReadOnlyList<InternalGoverningCmeOffice> formedOffices,
+        bool triadicCrossWitnessComplete = false,
+        bool bondedConfirmationComplete = false)
+    {
+        ArgumentNullException.ThrowIfNull(formedOffices);
+
+        var bootProfile = EvaluateBootProfile(
+            bootClass,
+            activationState,
+            requestedExpansionCount,
+            triadicCrossWitnessComplete,
+            bondedConfirmationComplete);
+        var formedOfficeSet = formedOffices
+            .Distinct()
+            .ToHashSet();
+        var orderedFormedOffices = OrderedOffices
+            .Where(formedOfficeSet.Contains)
+            .ToArray();
+        var roleBoundEces = OrderedOffices
+            .Select(office =>
+            {
+                var definition = GetOfficeDefinition(office);
+                var requiredPriorOffices = GetRequiredPriorOffices(office);
+                var isFormed = formedOfficeSet.Contains(office);
+                var state = !isFormed
+                    ? RoleBoundEceState.NotProvisioned
+                    : triadicCrossWitnessComplete
+                        ? RoleBoundEceState.RoleBoundTestingReady
+                        : RoleBoundEceState.Preformalized;
+                var reasonCode = state switch
+                {
+                    RoleBoundEceState.NotProvisioned => "role-bound-ece-not-provisioned",
+                    RoleBoundEceState.RoleBoundTestingReady => "role-bound-ece-testing-ready",
+                    _ => "role-bound-ece-preformalized"
+                };
+
+                return new FirstBootRoleBoundEceReceipt(
+                    EceHandle: CreateRoleBoundEceHandle(bootClass, office),
+                    Office: office,
+                    FormationOrdinal: definition.FormationOrdinal,
+                    State: state,
+                    RoleBoundaryHandle: CreateRoleBoundaryHandle(office),
+                    VisibilityScopes: definition.VisibilityScopes,
+                    RequiredPriorOffices: requiredPriorOffices,
+                    WitnessOnly: true,
+                    PrimeRevealWideningAllowed: false,
+                    ExpansionAuthorizationAllowed: false,
+                    ReasonCode: reasonCode);
+            })
+            .ToArray();
+
+        var roleBoundEcesReady = triadicCrossWitnessComplete &&
+                                     OrderedOffices.All(formedOfficeSet.Contains) &&
+                                     roleBoundEces.All(ece => ece.State == RoleBoundEceState.RoleBoundTestingReady);
+        var layerState = roleBoundEcesReady
+            ? FirstBootGovernanceLayerState.RoleBoundEceReady
+            : FirstBootGovernanceLayerState.Preformalized;
+        var subordinateCmeAuthorizationAllowed =
+            activationState == BootActivationState.ExpansionEligible &&
+            bootProfile.ExpansionRights == ExpansionRights.InternalGovernedOnly &&
+            triadicCrossWitnessComplete &&
+            bondedConfirmationComplete;
+        var reasonCode = layerState == FirstBootGovernanceLayerState.RoleBoundEceReady
+            ? "first-boot-governance-layer-role-bound-ece-ready"
+            : "first-boot-governance-layer-preformalized";
+
+        return new FirstBootGovernanceLayerReceipt(
+            LayerHandle: CreateGovernanceLayerHandle(bootClass, activationState),
+            BootClass: bootClass,
+            ActivationState: activationState,
+            State: layerState,
+            ExpansionRights: bootProfile.ExpansionRights,
+            SwarmEligibility: bootProfile.SwarmEligibility,
+            WitnessOnly: true,
+            SubordinateCmeAuthorizationAllowed: subordinateCmeAuthorizationAllowed,
+            RoleBoundEcesReady: roleBoundEcesReady,
+            FormedOffices: orderedFormedOffices,
+            RoleBoundEces: roleBoundEces,
+            ReasonCode: reasonCode);
+    }
+
+    private static IReadOnlyList<InternalGoverningCmeOffice> GetRequiredPriorOffices(InternalGoverningCmeOffice office)
+    {
+        return office switch
+        {
+            InternalGoverningCmeOffice.Steward => Array.Empty<InternalGoverningCmeOffice>(),
+            InternalGoverningCmeOffice.Father => [InternalGoverningCmeOffice.Steward],
+            InternalGoverningCmeOffice.Mother => [InternalGoverningCmeOffice.Steward, InternalGoverningCmeOffice.Father],
+            _ => throw new ArgumentOutOfRangeException(nameof(office), office, null)
+        };
+    }
+
+    private static string CreateGovernanceLayerHandle(BootClass bootClass, BootActivationState activationState)
+    {
+        return $"first-boot-governance://{bootClass.ToString().ToLowerInvariant()}/{activationState.ToString().ToLowerInvariant()}";
+    }
+
+    private static string CreateRoleBoundEceHandle(BootClass bootClass, InternalGoverningCmeOffice office)
+    {
+        return $"first-boot-governance://{bootClass.ToString().ToLowerInvariant()}/role-bound-ece/{office.ToString().ToLowerInvariant()}";
+    }
+
+    private static string CreateRoleBoundaryHandle(InternalGoverningCmeOffice office)
+    {
+        return $"first-boot-governance://boundary/{office.ToString().ToLowerInvariant()}";
+    }
+
+    private static readonly IReadOnlyList<InternalGoverningCmeOffice> OrderedOffices =
+    [
+        InternalGoverningCmeOffice.Steward,
+        InternalGoverningCmeOffice.Father,
+        InternalGoverningCmeOffice.Mother
+    ];
 }

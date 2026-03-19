@@ -32,6 +32,7 @@ internal sealed class HybridProtectedIngressClosureOutcome
 internal sealed class HybridProtectedIngressRunResult
 {
     public required InternalGovernanceBootProfile BootClassificationResult { get; init; }
+    public required FirstBootGovernanceLayerReceipt ProjectedGovernanceLayer { get; init; }
     public required IReadOnlyList<HybridProtectedIngressProtectedIntakeResult> ProtectedIntakeResults { get; init; }
     public required IReadOnlyDictionary<ProtectedIntakeKind, string> MaskedHandles { get; init; }
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
@@ -362,11 +363,22 @@ internal sealed class HybridProtectedIngressHarness
                 .Any(result => result.Classification.Decision != FirstBootGovernanceDecision.Allow))
             .ToArray();
 
+        IReadOnlyList<InternalGoverningCmeOffice> formedOffices = [];
         if (bootProfile.Decision == FirstBootGovernanceDecision.Allow &&
             intakeResults.All(result => result.Classification.Decision == FirstBootGovernanceDecision.Allow))
         {
-            await RecordGoverningOfficeFormationAsync(profile, bootProfile, collector, cancellationToken).ConfigureAwait(false);
+            formedOffices = await RecordGoverningOfficeFormationAsync(profile, bootProfile, collector, cancellationToken).ConfigureAwait(false);
         }
+
+        var projectedGovernanceLayer = _policy.ProjectGovernanceLayer(
+            profile.RequestedBootClass,
+            formedOffices.Count == OrderedOffices.Count
+                ? BootActivationState.TriadicActive
+                : bootProfile.ActivationState,
+            profile.RequestedExpansionCount,
+            formedOffices,
+            triadicCrossWitnessComplete: formedOffices.Count == OrderedOffices.Count,
+            bondedConfirmationComplete: false);
 
         var propositionCompile = await _propositionCompiler
             .CompileAsync(
@@ -426,6 +438,7 @@ internal sealed class HybridProtectedIngressHarness
         return new HybridProtectedIngressRunResult
         {
             BootClassificationResult = bootProfile,
+            ProjectedGovernanceLayer = projectedGovernanceLayer,
             ProtectedIntakeResults = intakeResults,
             MaskedHandles = maskedHandles,
             RequestedRevealModes = requestedRevealModes,
@@ -625,7 +638,7 @@ internal sealed class HybridProtectedIngressHarness
         return $"sli-bridge://protected-ingress/{Convert.ToHexString(hash).ToLowerInvariant()[..16]}";
     }
 
-    private async Task RecordGoverningOfficeFormationAsync(
+    private async Task<IReadOnlyList<InternalGoverningCmeOffice>> RecordGoverningOfficeFormationAsync(
         HybridProtectedIngressProfile profile,
         InternalGovernanceBootProfile bootProfile,
         CollectingAgentiFormationObserver collector,
@@ -691,6 +704,8 @@ internal sealed class HybridProtectedIngressHarness
                     "bonded-confirmation:pending"
                 ]),
             cancellationToken).ConfigureAwait(false);
+
+        return formedOffices.ToArray();
     }
 
     private static AgentiFormationObservation CreateObservation(

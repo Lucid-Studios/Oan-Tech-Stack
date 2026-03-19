@@ -43,6 +43,14 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(BootClass.CorporateGoverned, result.BootClassificationResult.BootClass);
         Assert.Equal(BootActivationState.Classified, result.BootClassificationResult.ActivationState);
         Assert.Equal(ExpansionRights.None, result.BootClassificationResult.ExpansionRights);
+        Assert.Equal(FirstBootGovernanceLayerState.RoleBoundEceReady, result.ProjectedGovernanceLayer.State);
+        Assert.True(result.ProjectedGovernanceLayer.RoleBoundEcesReady);
+        Assert.True(result.ProjectedGovernanceLayer.WitnessOnly);
+        Assert.Collection(
+            result.ProjectedGovernanceLayer.RoleBoundEces,
+            ece => Assert.Equal(InternalGoverningCmeOffice.Steward, ece.Office),
+            ece => Assert.Equal(InternalGoverningCmeOffice.Father, ece.Office),
+            ece => Assert.Equal(InternalGoverningCmeOffice.Mother, ece.Office));
         Assert.Equal([PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation], result.RequestedRevealModes);
         Assert.Equal([PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
@@ -127,6 +135,9 @@ public sealed class HybridProtectedIngressHarnessTests
         var result = await harness.RunAsync(profile);
 
         Assert.Equal(FirstBootGovernanceDecision.Quarantine, result.BootClassificationResult.Decision);
+        Assert.Equal(FirstBootGovernanceLayerState.Preformalized, result.ProjectedGovernanceLayer.State);
+        Assert.False(result.ProjectedGovernanceLayer.RoleBoundEcesReady);
+        Assert.Empty(result.ProjectedGovernanceLayer.FormedOffices);
         Assert.Equal(PropositionalCompileGrade.Rejected, result.OraclePropositionAssessment.Grade);
         Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);

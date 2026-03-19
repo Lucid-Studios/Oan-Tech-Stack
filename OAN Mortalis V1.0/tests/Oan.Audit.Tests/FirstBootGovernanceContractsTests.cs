@@ -205,4 +205,57 @@ public sealed class FirstBootGovernanceContractsTests
             ],
             mother.VisibilityScopes);
     }
+
+    [Fact]
+    public void ProjectGovernanceLayer_Preformalizes_RoleBoundEces_ForFirstBoot()
+    {
+        var layer = Policy.ProjectGovernanceLayer(
+            BootClass.CorporateGoverned,
+            BootActivationState.TriadicActive,
+            requestedExpansionCount: 1,
+            formedOffices:
+            [
+                InternalGoverningCmeOffice.Steward,
+                InternalGoverningCmeOffice.Father,
+                InternalGoverningCmeOffice.Mother
+            ],
+            triadicCrossWitnessComplete: true,
+            bondedConfirmationComplete: false);
+
+        Assert.Equal(FirstBootGovernanceLayerState.RoleBoundEceReady, layer.State);
+        Assert.True(layer.WitnessOnly);
+        Assert.True(layer.RoleBoundEcesReady);
+        Assert.False(layer.SubordinateCmeAuthorizationAllowed);
+        Assert.Equal(
+            [
+                InternalGoverningCmeOffice.Steward,
+                InternalGoverningCmeOffice.Father,
+                InternalGoverningCmeOffice.Mother
+            ],
+            layer.FormedOffices);
+        Assert.All(layer.RoleBoundEces, ece =>
+        {
+            Assert.Equal(RoleBoundEceState.RoleBoundTestingReady, ece.State);
+            Assert.True(ece.WitnessOnly);
+            Assert.False(ece.PrimeRevealWideningAllowed);
+            Assert.False(ece.ExpansionAuthorizationAllowed);
+        });
+    }
+
+    [Fact]
+    public void ProjectGovernanceLayer_WithNoFormedOffices_LeavesEcesUnprovisioned()
+    {
+        var layer = Policy.ProjectGovernanceLayer(
+            BootClass.CorporateGoverned,
+            BootActivationState.Classified,
+            requestedExpansionCount: 1,
+            formedOffices: [],
+            triadicCrossWitnessComplete: false,
+            bondedConfirmationComplete: false);
+
+        Assert.Equal(FirstBootGovernanceLayerState.Preformalized, layer.State);
+        Assert.False(layer.RoleBoundEcesReady);
+        Assert.Empty(layer.FormedOffices);
+        Assert.All(layer.RoleBoundEces, ece => Assert.Equal(RoleBoundEceState.NotProvisioned, ece.State));
+    }
 }
