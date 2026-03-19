@@ -54,8 +54,17 @@ internal sealed class HybridProtectedIngressOperatorFormationCertification
     public required SliOperatorFormationBondStatus TargetPosture { get; init; }
     public required SliOperatorFormationBondStatus NearestAdmissibleNextPosture { get; init; }
     public required string ReviewOwner { get; init; }
+    public required string RequiredBondedStandard { get; init; }
     public required IReadOnlyList<string> EvidenceGaps { get; init; }
+    public required IReadOnlyList<string> BlockingConditions { get; init; }
+    public required IReadOnlyList<string> NextActions { get; init; }
+    public required string HaltOwner { get; init; }
+    public required string HaltCondition { get; init; }
+    public required string ReentryRule { get; init; }
     public required IReadOnlyList<string> ProhibitedClaims { get; init; }
+    public string? LinkedVerificationRecord { get; init; }
+    public string? LinkedPreCertificationRecord { get; init; }
+    public string? GateArtifact { get; init; }
     public bool CertificationIssued { get; init; }
     public bool ExpandedRevealAllowed { get; init; }
     public bool ContinuityClaimAllowed { get; init; }
@@ -130,17 +139,26 @@ internal sealed class HybridProtectedIngressOperatorFormationProfile
             ExpectedEvidenceArtifact: ExpectedEvidenceArtifact.Trim(),
             AdmissibleOutput: AdmissibleOutput.Trim(),
             ProhibitedOutputs: ProhibitedOutputs.ToArray());
-        var certification = new SliOperatorFormationCertificationReceipt(
-            Decision: Certification.Decision,
-            CurrentAnchoredPosture: Certification.CurrentAnchoredPosture,
-            TargetPosture: Certification.TargetPosture,
-            NearestAdmissibleNextPosture: Certification.NearestAdmissibleNextPosture,
-            ReviewOwner: Certification.ReviewOwner.Trim(),
-            EvidenceGaps: Certification.EvidenceGaps.ToArray(),
-            ProhibitedClaims: Certification.ProhibitedClaims.ToArray(),
-            CertificationIssued: Certification.CertificationIssued,
-            ExpandedRevealAllowed: Certification.ExpandedRevealAllowed,
-            ContinuityClaimAllowed: Certification.ContinuityClaimAllowed);
+        var certification = SliBridgeContracts.CreateOperatorFormationCertificationReceipt(
+            decision: Certification.Decision,
+            currentAnchoredPosture: Certification.CurrentAnchoredPosture,
+            targetPosture: Certification.TargetPosture,
+            nearestAdmissibleNextPosture: Certification.NearestAdmissibleNextPosture,
+            reviewOwner: Certification.ReviewOwner,
+            evidenceGaps: Certification.EvidenceGaps,
+            prohibitedClaims: Certification.ProhibitedClaims,
+            certificationIssued: Certification.CertificationIssued,
+            expandedRevealAllowed: Certification.ExpandedRevealAllowed,
+            continuityClaimAllowed: Certification.ContinuityClaimAllowed,
+            requiredBondedStandard: Certification.RequiredBondedStandard,
+            blockingConditions: Certification.BlockingConditions,
+            nextActions: Certification.NextActions,
+            haltOwner: Certification.HaltOwner,
+            haltCondition: Certification.HaltCondition,
+            reentryRule: Certification.ReentryRule,
+            linkedVerificationRecord: Certification.LinkedVerificationRecord,
+            linkedPreCertificationRecord: Certification.LinkedPreCertificationRecord,
+            gateArtifact: Certification.GateArtifact);
         var sigils = SigilAssets
             .Select(asset => new SliOperatorFormationSigilAssetReceipt(
                 AssetId: asset.AssetId.Trim(),

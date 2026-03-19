@@ -123,6 +123,15 @@ public enum SliOperatorFormationCertificationDecision
     Halted = 3
 }
 
+public enum SliOperatorFormationProgressionState
+{
+    Holding = 0,
+    Blocked = 1,
+    NearestTransitionReady = 2,
+    TargetTransitionReady = 3,
+    Halted = 4
+}
+
 public enum SliOperatorFormationSigilClass
 {
     PhasePartition = 0,
@@ -166,7 +175,24 @@ public sealed record SliOperatorFormationCertificationReceipt(
     IReadOnlyList<string> ProhibitedClaims,
     bool CertificationIssued,
     bool ExpandedRevealAllowed,
-    bool ContinuityClaimAllowed);
+    bool ContinuityClaimAllowed,
+    SliOperatorFormationProgressionReceipt Progression);
+
+public sealed record SliOperatorFormationProgressionReceipt(
+    SliOperatorFormationProgressionState State,
+    string RequiredBondedStandard,
+    string? LinkedVerificationRecord,
+    string? LinkedPreCertificationRecord,
+    string? GateArtifact,
+    IReadOnlyList<string> BlockingConditions,
+    IReadOnlyList<string> NextActions,
+    string HaltOwner,
+    string HaltCondition,
+    string ReentryRule,
+    bool NearestTransitionAllowed,
+    bool TargetTransitionAllowed,
+    bool PromotionClaimAllowed,
+    string ReasonCode);
 
 public sealed record SliOperatorFormationSigilAssetReceipt(
     string AssetId,
@@ -340,12 +366,154 @@ public static class SliBridgeContracts
             SigilAssets: (sigilAssets ?? Array.Empty<SliOperatorFormationSigilAssetReceipt>()).ToArray());
     }
 
+    public static SliOperatorFormationCertificationReceipt CreateOperatorFormationCertificationReceipt(
+        SliOperatorFormationCertificationDecision decision,
+        SliOperatorFormationBondStatus currentAnchoredPosture,
+        SliOperatorFormationBondStatus targetPosture,
+        SliOperatorFormationBondStatus nearestAdmissibleNextPosture,
+        string reviewOwner,
+        IReadOnlyList<string> evidenceGaps,
+        IReadOnlyList<string> prohibitedClaims,
+        bool certificationIssued,
+        bool expandedRevealAllowed,
+        bool continuityClaimAllowed,
+        string requiredBondedStandard,
+        IReadOnlyList<string> blockingConditions,
+        IReadOnlyList<string> nextActions,
+        string haltOwner,
+        string haltCondition,
+        string reentryRule,
+        string? linkedVerificationRecord = null,
+        string? linkedPreCertificationRecord = null,
+        string? gateArtifact = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(reviewOwner);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requiredBondedStandard);
+        ArgumentException.ThrowIfNullOrWhiteSpace(haltOwner);
+        ArgumentException.ThrowIfNullOrWhiteSpace(haltCondition);
+        ArgumentException.ThrowIfNullOrWhiteSpace(reentryRule);
+
+        var normalizedEvidenceGaps = (evidenceGaps ?? Array.Empty<string>())
+            .Where(static gap => !string.IsNullOrWhiteSpace(gap))
+            .Select(static gap => gap.Trim())
+            .ToArray();
+        var normalizedBlockingConditions = (blockingConditions ?? Array.Empty<string>())
+            .Where(static condition => !string.IsNullOrWhiteSpace(condition))
+            .Select(static condition => condition.Trim())
+            .ToArray();
+        var normalizedNextActions = (nextActions ?? Array.Empty<string>())
+            .Where(static action => !string.IsNullOrWhiteSpace(action))
+            .Select(static action => action.Trim())
+            .ToArray();
+        var normalizedProhibitedClaims = (prohibitedClaims ?? Array.Empty<string>())
+            .Where(static claim => !string.IsNullOrWhiteSpace(claim))
+            .Select(static claim => claim.Trim())
+            .ToArray();
+
+        var gateMet = decision == SliOperatorFormationCertificationDecision.Proceed &&
+                      normalizedEvidenceGaps.Length == 0 &&
+                      normalizedBlockingConditions.Length == 0;
+        var nearestTransitionAllowed = gateMet &&
+                                       currentAnchoredPosture != nearestAdmissibleNextPosture;
+        var targetTransitionAllowed = gateMet &&
+                                      (nearestAdmissibleNextPosture == targetPosture ||
+                                       currentAnchoredPosture == targetPosture ||
+                                       certificationIssued);
+        var normalizedCertificationIssued = gateMet && certificationIssued;
+        var normalizedExpandedRevealAllowed = gateMet && expandedRevealAllowed;
+        var normalizedContinuityClaimAllowed = gateMet && continuityClaimAllowed;
+        var promotionClaimAllowed = targetTransitionAllowed && normalizedCertificationIssued;
+        var progressionState = ResolveOperatorFormationProgressionState(
+            decision,
+            normalizedEvidenceGaps,
+            normalizedBlockingConditions,
+            nearestTransitionAllowed,
+            targetTransitionAllowed);
+        var reasonCode = ResolveOperatorFormationProgressionReasonCode(
+            progressionState,
+            normalizedEvidenceGaps,
+            normalizedBlockingConditions);
+
+        return new SliOperatorFormationCertificationReceipt(
+            Decision: decision,
+            CurrentAnchoredPosture: currentAnchoredPosture,
+            TargetPosture: targetPosture,
+            NearestAdmissibleNextPosture: nearestAdmissibleNextPosture,
+            ReviewOwner: reviewOwner.Trim(),
+            EvidenceGaps: normalizedEvidenceGaps,
+            ProhibitedClaims: normalizedProhibitedClaims,
+            CertificationIssued: normalizedCertificationIssued,
+            ExpandedRevealAllowed: normalizedExpandedRevealAllowed,
+            ContinuityClaimAllowed: normalizedContinuityClaimAllowed,
+            Progression: new SliOperatorFormationProgressionReceipt(
+                State: progressionState,
+                RequiredBondedStandard: requiredBondedStandard.Trim(),
+                LinkedVerificationRecord: string.IsNullOrWhiteSpace(linkedVerificationRecord) ? null : linkedVerificationRecord.Trim(),
+                LinkedPreCertificationRecord: string.IsNullOrWhiteSpace(linkedPreCertificationRecord) ? null : linkedPreCertificationRecord.Trim(),
+                GateArtifact: string.IsNullOrWhiteSpace(gateArtifact) ? null : gateArtifact.Trim(),
+                BlockingConditions: normalizedBlockingConditions,
+                NextActions: normalizedNextActions,
+                HaltOwner: haltOwner.Trim(),
+                HaltCondition: haltCondition.Trim(),
+                ReentryRule: reentryRule.Trim(),
+                NearestTransitionAllowed: nearestTransitionAllowed,
+                TargetTransitionAllowed: targetTransitionAllowed,
+                PromotionClaimAllowed: promotionClaimAllowed,
+                ReasonCode: reasonCode));
+    }
+
     public static bool HasBlockingPreBondSafeguard(SliBridgeReviewReceipt? bridgeReview)
     {
         return bridgeReview?.PreBondSafeguard?.Disposition is
             SliPreBondSafeguardDisposition.Hold or
             SliPreBondSafeguardDisposition.Refuse or
             SliPreBondSafeguardDisposition.Escalate;
+    }
+
+    private static SliOperatorFormationProgressionState ResolveOperatorFormationProgressionState(
+        SliOperatorFormationCertificationDecision decision,
+        IReadOnlyList<string> evidenceGaps,
+        IReadOnlyList<string> blockingConditions,
+        bool nearestTransitionAllowed,
+        bool targetTransitionAllowed)
+    {
+        if (decision == SliOperatorFormationCertificationDecision.Halted)
+        {
+            return SliOperatorFormationProgressionState.Halted;
+        }
+
+        if (blockingConditions.Count > 0 || evidenceGaps.Count > 0)
+        {
+            return SliOperatorFormationProgressionState.Blocked;
+        }
+
+        if (targetTransitionAllowed)
+        {
+            return SliOperatorFormationProgressionState.TargetTransitionReady;
+        }
+
+        if (nearestTransitionAllowed)
+        {
+            return SliOperatorFormationProgressionState.NearestTransitionReady;
+        }
+
+        return SliOperatorFormationProgressionState.Holding;
+    }
+
+    private static string ResolveOperatorFormationProgressionReasonCode(
+        SliOperatorFormationProgressionState progressionState,
+        IReadOnlyList<string> evidenceGaps,
+        IReadOnlyList<string> blockingConditions)
+    {
+        return progressionState switch
+        {
+            SliOperatorFormationProgressionState.Halted => "operator-formation-halted",
+            SliOperatorFormationProgressionState.Blocked when blockingConditions.Count > 0 => "operator-formation-blocked",
+            SliOperatorFormationProgressionState.Blocked when evidenceGaps.Count > 0 => "operator-formation-evidence-incomplete",
+            SliOperatorFormationProgressionState.NearestTransitionReady => "operator-formation-nearest-transition-ready",
+            SliOperatorFormationProgressionState.TargetTransitionReady => "operator-formation-target-transition-ready",
+            _ => "operator-formation-holding"
+        };
     }
 
     public static SliBridgeReviewReceipt CreateCandidateBridgeReview(

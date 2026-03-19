@@ -264,6 +264,47 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Contains(
             result.ProjectedBridgeReview.OperatorFormation.SigilAssets,
             asset => asset.SigilClass == SliOperatorFormationSigilClass.MergedCompletionKey);
+        Assert.Equal(
+            SliOperatorFormationProgressionState.Blocked,
+            result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.State);
+        Assert.False(result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.PromotionClaimAllowed);
+        Assert.Equal(
+            "certification_reviewer://first-run-lane",
+            result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.HaltOwner);
+    }
+
+    [Fact]
+    public async Task OperatorFormationProgression_TargetTransitionReady_WhenGateIsMet()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.StructuralValidation],
+            operatorFormation: CreateOperatorFormationProfile(
+                decision: SliOperatorFormationCertificationDecision.Proceed,
+                evidenceGaps: [],
+                blockingConditions: [],
+                currentAnchoredPosture: SliOperatorFormationBondStatus.VerifiedCandidate,
+                nearestAdmissibleNextPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                targetPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                certificationIssued: true,
+                expandedRevealAllowed: true,
+                continuityClaimAllowed: true));
+
+        var result = await harness.RunAsync(profile);
+        var operatorFormation = result.ProjectedBridgeReview.OperatorFormation;
+        Assert.NotNull(operatorFormation);
+        var certification = operatorFormation!.CertificationPosture;
+
+        Assert.Equal(SliOperatorFormationProgressionState.TargetTransitionReady, certification.Progression.State);
+        Assert.True(certification.Progression.TargetTransitionAllowed);
+        Assert.True(certification.Progression.PromotionClaimAllowed);
+        Assert.True(certification.CertificationIssued);
+        Assert.True(certification.ExpandedRevealAllowed);
+        Assert.True(certification.ContinuityClaimAllowed);
+        Assert.Equal("operator-formation-target-transition-ready", certification.Progression.ReasonCode);
     }
 
     private static HybridProtectedIngressHarness CreateHarness(IAgentiFormationObserver? observer = null)
@@ -323,7 +364,16 @@ public sealed class HybridProtectedIngressHarnessTests
         };
     }
 
-    private static HybridProtectedIngressOperatorFormationProfile CreateOperatorFormationProfile()
+    private static HybridProtectedIngressOperatorFormationProfile CreateOperatorFormationProfile(
+        SliOperatorFormationCertificationDecision decision = SliOperatorFormationCertificationDecision.Pending,
+        IReadOnlyList<string>? evidenceGaps = null,
+        IReadOnlyList<string>? blockingConditions = null,
+        SliOperatorFormationBondStatus currentAnchoredPosture = SliOperatorFormationBondStatus.TrainingOperator,
+        SliOperatorFormationBondStatus nearestAdmissibleNextPosture = SliOperatorFormationBondStatus.VerifiedCandidate,
+        SliOperatorFormationBondStatus targetPosture = SliOperatorFormationBondStatus.PreCertifiedOperator,
+        bool certificationIssued = false,
+        bool expandedRevealAllowed = false,
+        bool continuityClaimAllowed = false)
     {
         return new HybridProtectedIngressOperatorFormationProfile
         {
@@ -353,16 +403,25 @@ public sealed class HybridProtectedIngressHarnessTests
             ProhibitedOutputs = ["unrestricted_archetype_claim", "unauthorized_gjp_invocation"],
             Certification = new HybridProtectedIngressOperatorFormationCertification
             {
-                Decision = SliOperatorFormationCertificationDecision.Pending,
-                CurrentAnchoredPosture = SliOperatorFormationBondStatus.TrainingOperator,
-                TargetPosture = SliOperatorFormationBondStatus.PreCertifiedOperator,
-                NearestAdmissibleNextPosture = SliOperatorFormationBondStatus.VerifiedCandidate,
+                Decision = decision,
+                CurrentAnchoredPosture = currentAnchoredPosture,
+                TargetPosture = targetPosture,
+                NearestAdmissibleNextPosture = nearestAdmissibleNextPosture,
                 ReviewOwner = "certification_reviewer://first-run-lane",
-                EvidenceGaps = ["trial_receipt_set", "label_classification_receipt"],
+                RequiredBondedStandard = "first_run_bonding://precertification/minimum-admissible-evidence",
+                EvidenceGaps = (evidenceGaps ?? ["trial_receipt_set", "label_classification_receipt"]).ToArray(),
+                BlockingConditions = (blockingConditions ?? ["incomplete_trial_evidence"]).ToArray(),
+                NextActions = ["Complete the current Gnome Speak trial block.", "Attach the chapter-local label-classification receipt."],
+                HaltOwner = "certification_reviewer://first-run-lane",
+                HaltCondition = "Halt if evidence lineage breaks or if protected meaning is flattened during remediation.",
+                ReentryRule = "Reenter certification review only after the missing trial receipt set and chapter-local classification outputs are attached.",
                 ProhibitedClaims = ["pre-certification issued", "bond actualized"],
-                CertificationIssued = false,
-                ExpandedRevealAllowed = false,
-                ContinuityClaimAllowed = false
+                LinkedVerificationRecord = "first_bonding://verification/pending",
+                LinkedPreCertificationRecord = null,
+                GateArtifact = "verification record",
+                CertificationIssued = certificationIssued,
+                ExpandedRevealAllowed = expandedRevealAllowed,
+                ContinuityClaimAllowed = continuityClaimAllowed
             },
             SigilAssets =
             [

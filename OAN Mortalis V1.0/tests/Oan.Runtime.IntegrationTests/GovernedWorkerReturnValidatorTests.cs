@@ -394,17 +394,25 @@ public sealed class GovernedWorkerReturnValidatorTests
                 ExpectedEvidenceArtifact: "interlace_crossing_proof",
                 AdmissibleOutput: "bounded_training_profile",
                 ProhibitedOutputs: ["unauthorized_gjp_invocation"]),
-            certificationPosture: new SliOperatorFormationCertificationReceipt(
-                Decision: SliOperatorFormationCertificationDecision.Pending,
-                CurrentAnchoredPosture: SliOperatorFormationBondStatus.TrainingOperator,
-                TargetPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
-                NearestAdmissibleNextPosture: SliOperatorFormationBondStatus.VerifiedCandidate,
-                ReviewOwner: "certification_reviewer://first-run-lane",
-                EvidenceGaps: ["trial_receipt_set"],
-                ProhibitedClaims: ["pre-certification issued"],
-                CertificationIssued: false,
-                ExpandedRevealAllowed: false,
-                ContinuityClaimAllowed: false));
+            certificationPosture: SliBridgeContracts.CreateOperatorFormationCertificationReceipt(
+                decision: SliOperatorFormationCertificationDecision.Pending,
+                currentAnchoredPosture: SliOperatorFormationBondStatus.TrainingOperator,
+                targetPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                nearestAdmissibleNextPosture: SliOperatorFormationBondStatus.VerifiedCandidate,
+                reviewOwner: "certification_reviewer://first-run-lane",
+                evidenceGaps: ["trial_receipt_set"],
+                prohibitedClaims: ["pre-certification issued"],
+                certificationIssued: false,
+                expandedRevealAllowed: false,
+                continuityClaimAllowed: false,
+                requiredBondedStandard: "first_run_bonding://precertification/minimum-admissible-evidence",
+                blockingConditions: ["incomplete_trial_evidence"],
+                nextActions: ["Complete the current Gnome Speak trial block."],
+                haltOwner: "certification_reviewer://first-run-lane",
+                haltCondition: "Halt if evidence lineage breaks.",
+                reentryRule: "Reenter after the trial receipt set is attached.",
+                linkedVerificationRecord: "first_bonding://verification/pending",
+                gateArtifact: "verification record"));
     }
 
     private static GovernedWorkerHandoffReceipt CreateHandoffReceipt(WorkerHandoffPacket handoffPacket)
