@@ -130,6 +130,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $PublicationCadenceLedgerState,
         [object] $DownstreamRuntimeObservationState,
         [object] $MultiIntervalGovernanceBraidState,
+        [object] $SchedulerExecutionReceiptState,
+        [object] $UnattendedIntervalConcordanceState,
+        [object] $StaleSurfaceContradictionWatchState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -360,6 +363,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'scheduler-execution-receipt' {
+            if ($null -ne $SchedulerExecutionReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'unattended-interval-concordance' {
+            if ($null -ne $UnattendedIntervalConcordanceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'stale-surface-contradiction-watch' {
+            if ($null -ne $StaleSurfaceContradictionWatchState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -425,6 +455,9 @@ $postPublishGovernanceLoopStatePath = Resolve-PathFromRepo -BasePath $resolvedRe
 $publicationCadenceLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.publicationCadenceLedgerStatePath)
 $downstreamRuntimeObservationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.downstreamRuntimeObservationStatePath)
 $multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.multiIntervalGovernanceBraidStatePath)
+$schedulerExecutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerExecutionReceiptStatePath)
+$unattendedIntervalConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.unattendedIntervalConcordanceStatePath)
+$staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.staleSurfaceContradictionWatchStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -449,6 +482,9 @@ $postPublishGovernanceLoopState = Read-JsonFileOrNull -Path $postPublishGovernan
 $publicationCadenceLedgerState = Read-JsonFileOrNull -Path $publicationCadenceLedgerStatePath
 $downstreamRuntimeObservationState = Read-JsonFileOrNull -Path $downstreamRuntimeObservationStatePath
 $multiIntervalGovernanceBraidState = Read-JsonFileOrNull -Path $multiIntervalGovernanceBraidStatePath
+$schedulerExecutionReceiptState = Read-JsonFileOrNull -Path $schedulerExecutionReceiptStatePath
+$unattendedIntervalConcordanceState = Read-JsonFileOrNull -Path $unattendedIntervalConcordanceStatePath
+$staleSurfaceContradictionWatchState = Read-JsonFileOrNull -Path $staleSurfaceContradictionWatchStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -620,6 +656,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -PublicationCadenceLedgerState $publicationCadenceLedgerState `
                 -DownstreamRuntimeObservationState $downstreamRuntimeObservationState `
                 -MultiIntervalGovernanceBraidState $multiIntervalGovernanceBraidState `
+                -SchedulerExecutionReceiptState $schedulerExecutionReceiptState `
+                -UnattendedIntervalConcordanceState $unattendedIntervalConcordanceState `
+                -StaleSurfaceContradictionWatchState $staleSurfaceContradictionWatchState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -690,6 +729,9 @@ $taskMapEntries = @(
                     -PublicationCadenceLedgerState $publicationCadenceLedgerState `
                     -DownstreamRuntimeObservationState $downstreamRuntimeObservationState `
                     -MultiIntervalGovernanceBraidState $multiIntervalGovernanceBraidState `
+                    -SchedulerExecutionReceiptState $schedulerExecutionReceiptState `
+                    -UnattendedIntervalConcordanceState $unattendedIntervalConcordanceState `
+                    -StaleSurfaceContradictionWatchState $staleSurfaceContradictionWatchState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -822,6 +864,15 @@ $statusPayload = [ordered]@{
         multiIntervalGovernanceBraidState = if ($null -ne $multiIntervalGovernanceBraidState) { [string] $multiIntervalGovernanceBraidState.braidState } else { $null }
         multiIntervalGovernanceBraidReason = if ($null -ne $multiIntervalGovernanceBraidState) { [string] $multiIntervalGovernanceBraidState.reasonCode } else { $null }
         multiIntervalGovernanceBraidNextAction = if ($null -ne $multiIntervalGovernanceBraidState) { [string] $multiIntervalGovernanceBraidState.nextAction } else { $null }
+        schedulerExecutionReceiptState = if ($null -ne $schedulerExecutionReceiptState) { [string] $schedulerExecutionReceiptState.receiptState } else { $null }
+        schedulerExecutionReceiptReason = if ($null -ne $schedulerExecutionReceiptState) { [string] $schedulerExecutionReceiptState.reasonCode } else { $null }
+        schedulerExecutionReceiptNextAction = if ($null -ne $schedulerExecutionReceiptState) { [string] $schedulerExecutionReceiptState.nextAction } else { $null }
+        unattendedIntervalConcordanceState = if ($null -ne $unattendedIntervalConcordanceState) { [string] $unattendedIntervalConcordanceState.concordanceState } else { $null }
+        unattendedIntervalConcordanceReason = if ($null -ne $unattendedIntervalConcordanceState) { [string] $unattendedIntervalConcordanceState.reasonCode } else { $null }
+        unattendedIntervalConcordanceNextAction = if ($null -ne $unattendedIntervalConcordanceState) { [string] $unattendedIntervalConcordanceState.nextAction } else { $null }
+        staleSurfaceContradictionWatchState = if ($null -ne $staleSurfaceContradictionWatchState) { [string] $staleSurfaceContradictionWatchState.watchState } else { $null }
+        staleSurfaceContradictionWatchReason = if ($null -ne $staleSurfaceContradictionWatchState) { [string] $staleSurfaceContradictionWatchState.reasonCode } else { $null }
+        staleSurfaceContradictionWatchNextAction = if ($null -ne $staleSurfaceContradictionWatchState) { [string] $staleSurfaceContradictionWatchState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1105,6 +1156,41 @@ if ($null -ne $multiIntervalGovernanceBraidState) {
     )
 }
 
+if ($null -ne $schedulerExecutionReceiptState) {
+    $markdownLines += @(
+        '## Scheduler Execution Receipt',
+        '',
+        ('- Receipt state: `{0}`' -f [string] $schedulerExecutionReceiptState.receiptState),
+        ('- Reason code: `{0}`' -f [string] $schedulerExecutionReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $schedulerExecutionReceiptState.nextAction),
+        ('- Last scheduled run (UTC): `{0}`' -f $(if ($schedulerExecutionReceiptState.lastScheduledRunUtc) { [string] $schedulerExecutionReceiptState.lastScheduledRunUtc } else { 'not-yet-run' })),
+        ''
+    )
+}
+
+if ($null -ne $unattendedIntervalConcordanceState) {
+    $markdownLines += @(
+        '## Unattended Interval Concordance',
+        '',
+        ('- Concordance state: `{0}`' -f [string] $unattendedIntervalConcordanceState.concordanceState),
+        ('- Reason code: `{0}`' -f [string] $unattendedIntervalConcordanceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $unattendedIntervalConcordanceState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $staleSurfaceContradictionWatchState) {
+    $markdownLines += @(
+        '## Stale Surface Contradiction Watch',
+        '',
+        ('- Watch state: `{0}`' -f [string] $staleSurfaceContradictionWatchState.watchState),
+        ('- Reason code: `{0}`' -f [string] $staleSurfaceContradictionWatchState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $staleSurfaceContradictionWatchState.nextAction),
+        ('- Contradictions: `{0}`' -f $(if ($staleSurfaceContradictionWatchState.contradictions -and @($staleSurfaceContradictionWatchState.contradictions).Count -gt 0) { ((@($staleSurfaceContradictionWatchState.contradictions) -join ', ')) } else { 'none' })),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1154,6 +1240,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -PublicationCadenceLedgerState $publicationCadenceLedgerState `
             -DownstreamRuntimeObservationState $downstreamRuntimeObservationState `
             -MultiIntervalGovernanceBraidState $multiIntervalGovernanceBraidState `
+            -SchedulerExecutionReceiptState $schedulerExecutionReceiptState `
+            -UnattendedIntervalConcordanceState $unattendedIntervalConcordanceState `
+            -StaleSurfaceContradictionWatchState $staleSurfaceContradictionWatchState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

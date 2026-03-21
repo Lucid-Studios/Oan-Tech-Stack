@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-09",
+  "activeTaskMapId": "automation-maturation-map-10",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -529,7 +529,7 @@
     {
       "id": "automation-maturation-map-09",
       "label": "Automation Maturation Map 09",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Operationalize the first multi-interval publication cycle once the initial publication loop is no longer singular.",
       "timeDilationPullForwardAllowed": false,
@@ -544,7 +544,7 @@
           "label": "Publication Cadence Ledger",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Track repeated publication intervals as one governed cadence instead of isolated publication events.",
           "completionSignal": "A publication cadence ledger can reconcile multiple intervals without losing the original receipt chain.",
           "escalatesWhen": [
@@ -557,7 +557,7 @@
           "label": "Downstream Runtime Observation",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Observe how downstream runtime surfaces continue to receive and reflect the published artifact across more than one interval.",
           "completionSignal": "A downstream observation surface can compare repeated runtime observations against the publication cadence ledger.",
           "escalatesWhen": [
@@ -570,12 +570,66 @@
           "label": "Multi-Interval Governance Braid",
           "owner": "Shared",
           "authority": "Seed may advise; HITL resolves",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Braid seeded governance and HITL review across more than one publication interval without improvising release authority.",
           "completionSignal": "A bounded multi-interval governance braid can reconcile cadence, downstream observation, and contradiction handling.",
           "escalatesWhen": [
             "the governance braid cannot reconcile repeated publication intervals",
             "seeded governance starts substituting for human ratification across cadence changes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-10",
+      "label": "Automation Maturation Map 10",
+      "status": "active",
+      "expectedReviewWindows": 2,
+      "goal": "Prove unattended scheduler execution across real intervals and watch dormant surfaces for contradiction without confusing honesty for failure.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "scheduler-execution-receipt",
+        "unattended-interval-concordance",
+        "stale-surface-contradiction-watch"
+      ],
+      "tasks": [
+        {
+          "id": "scheduler-execution-receipt",
+          "label": "Scheduler Execution Receipt",
+          "owner": "Automation",
+          "authority": "Machine-local only",
+          "status": "selected",
+          "purpose": "Capture the first real scheduler-driven automation run as a bounded receipt instead of assuming unattended life from registration alone.",
+          "completionSignal": "A scheduler execution receipt can show whether a real scheduled run has been observed and reconciled to the active cycle.",
+          "escalatesWhen": [
+            "the scheduler stays registered but never produces a real run receipt",
+            "scheduler execution receipts cannot be localized to the governed cycle"
+          ]
+        },
+        {
+          "id": "unattended-interval-concordance",
+          "label": "Unattended Interval Concordance",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Compare scheduler-driven execution truth against the current release-candidate cycle so unattended proof is evidence-led rather than assumed.",
+          "completionSignal": "An unattended interval concordance surface can show whether scheduled execution and cycle state remain in bounded agreement.",
+          "escalatesWhen": [
+            "scheduled execution drifts materially from recorded cycle truth",
+            "manual overhang hides the absence of unattended execution proof"
+          ]
+        },
+        {
+          "id": "stale-surface-contradiction-watch",
+          "label": "Stale Surface Contradiction Watch",
+          "owner": "Shared",
+          "authority": "Automation may detect; HITL resolves contradictions",
+          "status": "selected",
+          "purpose": "Watch dormant and publication-adjacent surfaces for ordering contradictions so the stack stays honest while it waits for real-world intervals to occur.",
+          "completionSignal": "A contradiction-watch surface can distinguish dormant-consistent state from actual surface-ordering contradictions.",
+          "escalatesWhen": [
+            "a downstream or cadence surface outruns its prerequisite evidence",
+            "dormant publication surfaces start narrating impossible state transitions"
           ]
         }
       ]

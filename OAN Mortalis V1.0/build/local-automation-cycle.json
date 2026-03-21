@@ -27,6 +27,9 @@
   "publicationCadenceLedgerOutputRoot": ".audit/runs/publication-cadence-ledger",
   "downstreamRuntimeObservationOutputRoot": ".audit/runs/downstream-runtime-observation",
   "multiIntervalGovernanceBraidOutputRoot": ".audit/runs/multi-interval-governance-braid",
+  "schedulerExecutionReceiptOutputRoot": ".audit/runs/scheduler-execution-receipts",
+  "unattendedIntervalConcordanceOutputRoot": ".audit/runs/unattended-interval-concordance",
+  "staleSurfaceContradictionWatchOutputRoot": ".audit/runs/stale-surface-contradiction-watch",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -52,6 +55,9 @@
   "publicationCadenceLedgerStatePath": ".audit/state/local-automation-publication-cadence-ledger-last-run.json",
   "downstreamRuntimeObservationStatePath": ".audit/state/local-automation-downstream-runtime-observation-last-run.json",
   "multiIntervalGovernanceBraidStatePath": ".audit/state/local-automation-multi-interval-governance-braid-last-run.json",
+  "schedulerExecutionReceiptStatePath": ".audit/state/local-automation-scheduler-execution-receipt-last-run.json",
+  "unattendedIntervalConcordanceStatePath": ".audit/state/local-automation-unattended-interval-concordance-last-run.json",
+  "staleSurfaceContradictionWatchStatePath": ".audit/state/local-automation-stale-surface-contradiction-watch-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -107,6 +113,9 @@
     "keepPublicationCadenceLedgerBundles": 8,
     "keepDownstreamRuntimeObservationBundles": 8,
     "keepMultiIntervalGovernanceBraidBundles": 8,
+    "keepSchedulerExecutionReceiptBundles": 8,
+    "keepUnattendedIntervalConcordanceBundles": 8,
+    "keepStaleSurfaceContradictionWatchBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

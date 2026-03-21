@@ -178,6 +178,9 @@ $postPublishGovernanceLoopStatePath = Resolve-PathFromRepo -BasePath $resolvedRe
 $publicationCadenceLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.publicationCadenceLedgerStatePath)
 $downstreamRuntimeObservationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.downstreamRuntimeObservationStatePath)
 $multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.multiIntervalGovernanceBraidStatePath)
+$schedulerExecutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerExecutionReceiptStatePath)
+$unattendedIntervalConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.unattendedIntervalConcordanceStatePath)
+$staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.staleSurfaceContradictionWatchStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -368,6 +371,12 @@ $statePayload.lastDownstreamRuntimeObservationBundle = [string] (Get-ObjectPrope
 $statePayload.downstreamRuntimeObservationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $downstreamRuntimeObservationStatePath
 $statePayload.lastMultiIntervalGovernanceBraidBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastMultiIntervalGovernanceBraidBundle')
 $statePayload.multiIntervalGovernanceBraidStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $multiIntervalGovernanceBraidStatePath
+$statePayload.lastSchedulerExecutionReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSchedulerExecutionReceiptBundle')
+$statePayload.schedulerExecutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerExecutionReceiptStatePath
+$statePayload.lastUnattendedIntervalConcordanceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastUnattendedIntervalConcordanceBundle')
+$statePayload.unattendedIntervalConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $unattendedIntervalConcordanceStatePath
+$statePayload.lastStaleSurfaceContradictionWatchBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastStaleSurfaceContradictionWatchBundle')
+$statePayload.staleSurfaceContradictionWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $staleSurfaceContradictionWatchStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -587,6 +596,33 @@ if (-not [string]::IsNullOrWhiteSpace($multiIntervalGovernanceBraidBundlePath)) 
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$schedulerExecutionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SchedulerExecution-Receipt.ps1'
+$schedulerExecutionReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerExecutionReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler execution receipt writer'
+$schedulerExecutionReceiptBundlePath = Get-ScriptOutputTail -Output $schedulerExecutionReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($schedulerExecutionReceiptBundlePath)) {
+    $statePayload.lastSchedulerExecutionReceiptBundle = $schedulerExecutionReceiptBundlePath
+    $statePayload.schedulerExecutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerExecutionReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$unattendedIntervalConcordanceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-UnattendedInterval-Concordance.ps1'
+$unattendedIntervalConcordanceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $unattendedIntervalConcordanceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Unattended interval concordance writer'
+$unattendedIntervalConcordanceBundlePath = Get-ScriptOutputTail -Output $unattendedIntervalConcordanceOutput
+if (-not [string]::IsNullOrWhiteSpace($unattendedIntervalConcordanceBundlePath)) {
+    $statePayload.lastUnattendedIntervalConcordanceBundle = $unattendedIntervalConcordanceBundlePath
+    $statePayload.unattendedIntervalConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $unattendedIntervalConcordanceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$staleSurfaceContradictionWatchScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-StaleSurface-ContradictionWatch.ps1'
+$staleSurfaceContradictionWatchOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $staleSurfaceContradictionWatchScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Stale surface contradiction watch writer'
+$staleSurfaceContradictionWatchBundlePath = Get-ScriptOutputTail -Output $staleSurfaceContradictionWatchOutput
+if (-not [string]::IsNullOrWhiteSpace($staleSurfaceContradictionWatchBundlePath)) {
+    $statePayload.lastStaleSurfaceContradictionWatchBundle = $staleSurfaceContradictionWatchBundlePath
+    $statePayload.staleSurfaceContradictionWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $staleSurfaceContradictionWatchStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -636,6 +672,12 @@ $summary = [ordered]@{
     downstreamRuntimeObservationStatePath = $statePayload.downstreamRuntimeObservationStatePath
     lastMultiIntervalGovernanceBraidBundle = $statePayload.lastMultiIntervalGovernanceBraidBundle
     multiIntervalGovernanceBraidStatePath = $statePayload.multiIntervalGovernanceBraidStatePath
+    lastSchedulerExecutionReceiptBundle = $statePayload.lastSchedulerExecutionReceiptBundle
+    schedulerExecutionReceiptStatePath = $statePayload.schedulerExecutionReceiptStatePath
+    lastUnattendedIntervalConcordanceBundle = $statePayload.lastUnattendedIntervalConcordanceBundle
+    unattendedIntervalConcordanceStatePath = $statePayload.unattendedIntervalConcordanceStatePath
+    lastStaleSurfaceContradictionWatchBundle = $statePayload.lastStaleSurfaceContradictionWatchBundle
+    staleSurfaceContradictionWatchStatePath = $statePayload.staleSurfaceContradictionWatchStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -732,6 +774,15 @@ if (-not [string]::IsNullOrWhiteSpace($downstreamRuntimeObservationBundlePath)) 
 }
 if (-not [string]::IsNullOrWhiteSpace($multiIntervalGovernanceBraidBundlePath)) {
     Write-Host ('[local-automation-cycle] MultiIntervalGovernanceBraid: {0}' -f $multiIntervalGovernanceBraidBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($schedulerExecutionReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] SchedulerExecutionReceipt: {0}' -f $schedulerExecutionReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($unattendedIntervalConcordanceBundlePath)) {
+    Write-Host ('[local-automation-cycle] UnattendedIntervalConcordance: {0}' -f $unattendedIntervalConcordanceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($staleSurfaceContradictionWatchBundlePath)) {
+    Write-Host ('[local-automation-cycle] StaleSurfaceContradictionWatch: {0}' -f $staleSurfaceContradictionWatchBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

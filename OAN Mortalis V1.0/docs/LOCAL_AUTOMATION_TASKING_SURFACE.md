@@ -34,7 +34,7 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 09`
+- `Automation Maturation Map 10`
 
 Next eligible map:
 
@@ -241,7 +241,7 @@ Current live output surfaces for this map:
 
 - Goal: operationalize the first multi-interval publication cycle once the initial publication loop is no longer singular
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Publication Cadence Ledger`
   - `Downstream Runtime Observation`
   - `Multi-Interval Governance Braid`
@@ -251,6 +251,21 @@ Current live output surfaces for this map:
 - publication cadence ledger bundles land under `.audit/runs/publication-cadence-ledger/` and update `.audit/state/local-automation-publication-cadence-ledger-last-run.json`
 - downstream runtime observation bundles land under `.audit/runs/downstream-runtime-observation/` and update `.audit/state/local-automation-downstream-runtime-observation-last-run.json`
 - multi-interval governance braid bundles land under `.audit/runs/multi-interval-governance-braid/` and update `.audit/state/local-automation-multi-interval-governance-braid-last-run.json`
+
+### Automation Maturation Map 10
+
+- Goal: prove unattended scheduler execution across real intervals and watch dormant surfaces for contradiction without confusing honesty for failure
+- Expected review windows: `2`
+- Selected tasks:
+  - `Scheduler Execution Receipt`
+  - `Unattended Interval Concordance`
+  - `Stale Surface Contradiction Watch`
+
+Current live output surfaces for this map:
+
+- scheduler execution receipt bundles land under `.audit/runs/scheduler-execution-receipts/` and update `.audit/state/local-automation-scheduler-execution-receipt-last-run.json`
+- unattended interval concordance bundles land under `.audit/runs/unattended-interval-concordance/` and update `.audit/state/local-automation-unattended-interval-concordance-last-run.json`
+- stale-surface contradiction watch bundles land under `.audit/runs/stale-surface-contradiction-watch/` and update `.audit/state/local-automation-stale-surface-contradiction-watch-last-run.json`
 
 ## Status Interpretation
 

@@ -302,6 +302,22 @@ That lane may not:
 - claim downstream runtime continuity from a single observation window
 - let the multi-interval braid substitute for ratification, contradiction handling, or governed publication receipts
 
+## Unattended Scheduler Witness Lane
+
+The local cycle now carries a bounded unattended scheduler witness lane beyond mere scheduler registration.
+
+That lane may:
+
+- capture a real scheduler execution receipt when an unattended run has actually occurred
+- compare unattended scheduler truth against the active release-candidate cycle without mistaking manual runs for autonomous proof
+- watch dormant publication-adjacent surfaces for ordering contradictions while the stack is still waiting on real-world intervals
+
+That lane may not:
+
+- fabricate unattended proof from scheduler registration alone
+- treat dormant-but-consistent surfaces as failure just because the world has not yet advanced
+- let contradiction watch invent publication or cadence transitions that the evidence chain has not actually crossed
+
 ## Operational Bias
 
 The active automation posture is:
