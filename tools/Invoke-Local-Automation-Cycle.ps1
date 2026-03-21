@@ -160,6 +160,9 @@ $notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Candi
 $seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededGovernanceStatePath)
 $schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerReconciliationStatePath)
 $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.cmeConsolidationStatePath)
+$promotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.promotionGateStatePath)
+$ciConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.ciConcordanceStatePath)
+$releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.releaseRatificationStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -314,6 +317,12 @@ $statePayload.lastSeededGovernanceBundle = [string] (Get-ObjectPropertyValueOrNu
 $statePayload.seededGovernanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededGovernanceStatePath
 $statePayload.schedulerReconciliationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerReconciliationStatePath
 $statePayload.cmeConsolidationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cmeConsolidationStatePath
+$statePayload.lastPromotionGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPromotionGateBundle')
+$statePayload.promotionGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $promotionGateStatePath
+$statePayload.lastCiConcordanceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCiConcordanceBundle')
+$statePayload.ciConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $ciConcordanceStatePath
+$statePayload.lastReleaseRatificationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReleaseRatificationBundle')
+$statePayload.releaseRatificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseRatificationStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -371,6 +380,33 @@ if (-not [string]::IsNullOrWhiteSpace($cmeConsolidationStatePathFromRun)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$promotionGateScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Promotion-GateBundle.ps1'
+$promotionGateOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $promotionGateScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Promotion gate bundle writer'
+$promotionGateBundlePath = Get-ScriptOutputTail -Output $promotionGateOutput
+if (-not [string]::IsNullOrWhiteSpace($promotionGateBundlePath)) {
+    $statePayload.lastPromotionGateBundle = $promotionGateBundlePath
+    $statePayload.promotionGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $promotionGateStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$ciConcordanceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CiArtifactConcordance.ps1'
+$ciConcordanceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $ciConcordanceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'CI artifact concordance writer'
+$ciConcordanceBundlePath = Get-ScriptOutputTail -Output $ciConcordanceOutput
+if (-not [string]::IsNullOrWhiteSpace($ciConcordanceBundlePath)) {
+    $statePayload.lastCiConcordanceBundle = $ciConcordanceBundlePath
+    $statePayload.ciConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $ciConcordanceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$releaseRatificationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Release-RatificationRehearsal.ps1'
+$releaseRatificationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $releaseRatificationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Release ratification rehearsal writer'
+$releaseRatificationBundlePath = Get-ScriptOutputTail -Output $releaseRatificationOutput
+if (-not [string]::IsNullOrWhiteSpace($releaseRatificationBundlePath)) {
+    $statePayload.lastReleaseRatificationBundle = $releaseRatificationBundlePath
+    $statePayload.releaseRatificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseRatificationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -384,6 +420,12 @@ $summary = [ordered]@{
     retentionStatePath = $statePayload.retentionStatePath
     schedulerReconciliationStatePath = $statePayload.schedulerReconciliationStatePath
     cmeConsolidationStatePath = $statePayload.cmeConsolidationStatePath
+    lastPromotionGateBundle = $statePayload.lastPromotionGateBundle
+    promotionGateStatePath = $statePayload.promotionGateStatePath
+    lastCiConcordanceBundle = $statePayload.lastCiConcordanceBundle
+    ciConcordanceStatePath = $statePayload.ciConcordanceStatePath
+    lastReleaseRatificationBundle = $statePayload.lastReleaseRatificationBundle
+    releaseRatificationStatePath = $statePayload.releaseRatificationStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -426,6 +468,15 @@ if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($cmeConsolidationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] CmeConsolidation: {0}' -f $cmeConsolidationStatePathFromRun)
+}
+if (-not [string]::IsNullOrWhiteSpace($promotionGateBundlePath)) {
+    Write-Host ('[local-automation-cycle] PromotionGate: {0}' -f $promotionGateBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($ciConcordanceBundlePath)) {
+    Write-Host ('[local-automation-cycle] CiConcordance: {0}' -f $ciConcordanceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($releaseRatificationBundlePath)) {
+    Write-Host ('[local-automation-cycle] ReleaseRatification: {0}' -f $releaseRatificationBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

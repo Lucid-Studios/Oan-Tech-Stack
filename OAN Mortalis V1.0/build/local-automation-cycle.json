@@ -9,6 +9,9 @@
   "blockedEscalationOutputRoot": ".audit/runs/blocked-escalations",
   "notificationOutputRoot": ".audit/runs/notifications",
   "seededGovernanceOutputRoot": ".audit/runs/seeded-governance",
+  "promotionGateOutputRoot": ".audit/runs/promotion-gates",
+  "ciConcordanceOutputRoot": ".audit/runs/ci-concordance",
+  "releaseRatificationOutputRoot": ".audit/runs/release-ratification",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -16,6 +19,9 @@
   "seededGovernanceStatePath": ".audit/state/local-automation-seeded-governance-last-run.json",
   "schedulerReconciliationStatePath": ".audit/state/local-automation-scheduler-reconciliation-last-run.json",
   "cmeConsolidationStatePath": ".audit/state/local-automation-cme-consolidation-state.json",
+  "promotionGateStatePath": ".audit/state/local-automation-promotion-gate-last-run.json",
+  "ciConcordanceStatePath": ".audit/state/local-automation-ci-concordance-last-run.json",
+  "releaseRatificationStatePath": ".audit/state/local-automation-release-ratification-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -51,6 +57,9 @@
     "keepBlockedEscalationBundles": 8,
     "keepNotificationBundles": 8,
     "keepSeededGovernanceBundles": 8,
+    "keepPromotionGateBundles": 8,
+    "keepCiConcordanceBundles": 8,
+    "keepReleaseRatificationBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

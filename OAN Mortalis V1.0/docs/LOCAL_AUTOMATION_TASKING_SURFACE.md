@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 03`
+- `Automation Maturation Map 04`
 
 Next eligible map:
 
-- `Automation Maturation Map 04`
+- `Automation Maturation Map 05`
 
 Time-dilation rule:
 
@@ -151,7 +151,7 @@ Current live output surfaces for this map:
 
 - Goal: introduce seeded governance participation into unattended build review, reconcile scheduler/runtime cadence truth, and expose a CME formalization consolidation surface without widening promotion authority
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Seeded Governance Lane`
   - `Scheduler Cadence Reconciliation`
   - `CME Formalization Consolidation Surface`
@@ -166,10 +166,25 @@ Current live output surfaces for this map:
 
 - Goal: close promotion and release rehearsal once seeded governance and runtime cadence are stable
 - Expected review windows: `2`
-- Queued tasks:
+- Selected tasks:
   - `Promotion Gate Bundle`
   - `CI Artifact Concordance`
   - `Release Ratification Rehearsal`
+
+Current live output surfaces for this map:
+
+- promotion gate bundles land under `.audit/runs/promotion-gates/` and update `.audit/state/local-automation-promotion-gate-last-run.json`
+- CI concordance bundles land under `.audit/runs/ci-concordance/` and update `.audit/state/local-automation-ci-concordance-last-run.json`
+- release ratification rehearsal bundles land under `.audit/runs/release-ratification/` and update `.audit/state/local-automation-release-ratification-last-run.json`
+
+### Automation Maturation Map 05
+
+- Goal: stabilize first publish intent and seeded promotion review once promotion evidence is consistently reproducible
+- Expected review windows: `2`
+- Queued tasks:
+  - `Seeded Promotion Review`
+  - `First Publish Intent Closure`
+  - `Release Handshake Surface`
 
 ## Status Interpretation
 

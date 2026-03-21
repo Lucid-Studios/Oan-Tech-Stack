@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-03",
+  "activeTaskMapId": "automation-maturation-map-04",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -205,7 +205,7 @@
     {
       "id": "automation-maturation-map-03",
       "label": "Automation Maturation Map 03",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Introduce seeded governance participation into unattended build review, reconcile scheduler/runtime cadence truth, and expose a CME formalization consolidation surface without widening promotion authority.",
       "timeDilationPullForwardAllowed": true,
@@ -220,7 +220,7 @@
           "label": "Seeded Governance Lane",
           "owner": "Shared",
           "authority": "Seed may classify; HITL decides promotion",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Let the seeded local host interpret routine build evidence, delta surfaces, and preflight posture without widening release authority.",
           "completionSignal": "A seeded governance bundle is emitted and classified as Accepted, Deferred, or Rejected with bounded provenance.",
           "escalatesWhen": [
@@ -233,7 +233,7 @@
           "label": "Scheduler Cadence Reconciliation",
           "owner": "Automation",
           "authority": "Machine-local only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Keep the Windows scheduled task aligned with the release-candidate cadence recorded in the live cycle state.",
           "completionSignal": "Scheduler reconciliation state shows the registered task is aligned to the declared cadence within tolerance.",
           "escalatesWhen": [
@@ -246,7 +246,7 @@
           "label": "CME Formalization Consolidation Surface",
           "owner": "Shared",
           "authority": "Advisory only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Expose whether the governing build layer is still exploratory, seed-assisted, braided, or crystallizing without narrating that as release authority.",
           "completionSignal": "A stable consolidation state is emitted from current automation, seed, and scheduler truth.",
           "escalatesWhen": [
@@ -259,7 +259,7 @@
     {
       "id": "automation-maturation-map-04",
       "label": "Automation Maturation Map 04",
-      "status": "queued",
+      "status": "active",
       "expectedReviewWindows": 2,
       "goal": "Close promotion and release rehearsal once seeded governance and runtime cadence are stable.",
       "timeDilationPullForwardAllowed": false,
@@ -274,7 +274,7 @@
           "label": "Promotion Gate Bundle",
           "owner": "Shared",
           "authority": "Automation may prepare; HITL ratifies",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Assemble the exact evidence bundle required for modular-set promotion without inferring authority from green output alone.",
           "completionSignal": "A bounded promotion gate bundle exists with explicit reasons for continue, defer, or block.",
           "escalatesWhen": [
@@ -287,7 +287,7 @@
           "label": "CI Artifact Concordance",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Prove local candidate artifacts and CI candidate artifacts agree on content and version posture.",
           "completionSignal": "Local and CI artifact manifests reconcile without unexplained drift.",
           "escalatesWhen": [
@@ -300,12 +300,66 @@
           "label": "Release Ratification Rehearsal",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Rehearse the first publish ratification path so promotion is evidence-led rather than improvised.",
           "completionSignal": "The release rehearsal produces a stable ratification checklist with no hidden machine-local assumptions.",
           "escalatesWhen": [
             "release rehearsal depends on undeclared deployables",
             "ratification still requires exploratory interpretation rather than bounded evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-05",
+      "label": "Automation Maturation Map 05",
+      "status": "queued",
+      "expectedReviewWindows": 2,
+      "goal": "Stabilize first publish intent and seeded promotion review once promotion evidence is consistently reproducible.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "seeded-promotion-review",
+        "first-publish-intent-closure",
+        "release-handshake-surface"
+      ],
+      "tasks": [
+        {
+          "id": "seeded-promotion-review",
+          "label": "Seeded Promotion Review",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL ratifies",
+          "status": "queued",
+          "purpose": "Let the seeded host synthesize the promotion gate, CI concordance, and ratification rehearsal into one bounded advisory review.",
+          "completionSignal": "A seeded promotion review bundle exists without widening promotion authority.",
+          "escalatesWhen": [
+            "seed review starts substituting for ratification",
+            "seed advice conflicts materially with promotion evidence"
+          ]
+        },
+        {
+          "id": "first-publish-intent-closure",
+          "label": "First Publish Intent Closure",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "queued",
+          "purpose": "State exactly what first publish means for the current modular set so automation is not guessing at the target.",
+          "completionSignal": "A bounded first-publish intent surface exists and matches declared deployables.",
+          "escalatesWhen": [
+            "publish intent exceeds declared deployables",
+            "publish intent conflicts with current version policy"
+          ]
+        },
+        {
+          "id": "release-handshake-surface",
+          "label": "Release Handshake Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Expose the last bounded handshake before a real publish request so the stack can show what is ready, deferred, and still blocked.",
+          "completionSignal": "A release handshake surface is emitted from current promotion evidence and advisory posture.",
+          "escalatesWhen": [
+            "handshake surface starts implying publication",
+            "release evidence cannot be localized into one surface"
           ]
         }
       ]

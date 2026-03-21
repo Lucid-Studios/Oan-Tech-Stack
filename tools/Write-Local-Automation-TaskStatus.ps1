@@ -112,6 +112,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $SeededGovernanceState,
         [object] $SchedulerReconciliationState,
         [object] $CmeConsolidationState,
+        [object] $PromotionGateState,
+        [object] $CiConcordanceState,
+        [object] $ReleaseRatificationState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -180,6 +183,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'promotion-gate-bundle' {
+            if ($null -ne $PromotionGateState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'ci-artifact-concordance' {
+            if ($null -ne $CiConcordanceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'release-ratification-rehearsal' {
+            if ($null -ne $ReleaseRatificationState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -227,12 +257,18 @@ $notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Candi
 $seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
 $schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerReconciliationStatePath)
 $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.cmeConsolidationStatePath)
+$promotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.promotionGateStatePath)
+$ciConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.ciConcordanceStatePath)
+$releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.releaseRatificationStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
 $seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
 $schedulerReconciliationState = Read-JsonFileOrNull -Path $schedulerReconciliationStatePath
 $cmeConsolidationState = Read-JsonFileOrNull -Path $cmeConsolidationStatePath
+$promotionGateState = Read-JsonFileOrNull -Path $promotionGateStatePath
+$ciConcordanceState = Read-JsonFileOrNull -Path $ciConcordanceStatePath
+$releaseRatificationState = Read-JsonFileOrNull -Path $releaseRatificationStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -386,6 +422,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -SeededGovernanceState $seededGovernanceState `
                 -SchedulerReconciliationState $schedulerReconciliationState `
                 -CmeConsolidationState $cmeConsolidationState `
+                -PromotionGateState $promotionGateState `
+                -CiConcordanceState $ciConcordanceState `
+                -ReleaseRatificationState $releaseRatificationState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -438,6 +477,9 @@ $taskMapEntries = @(
                     -SeededGovernanceState $seededGovernanceState `
                     -SchedulerReconciliationState $schedulerReconciliationState `
                     -CmeConsolidationState $cmeConsolidationState `
+                    -PromotionGateState $promotionGateState `
+                    -CiConcordanceState $ciConcordanceState `
+                    -ReleaseRatificationState $releaseRatificationState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -515,6 +557,12 @@ $statusPayload = [ordered]@{
         schedulerAligned = if ($null -ne $schedulerReconciliationState) { [bool] $schedulerReconciliationState.aligned } else { $null }
         cmeConsolidationState = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.consolidationState } else { $null }
         cmeConsolidationReason = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.reasonCode } else { $null }
+        promotionGateRecommendation = if ($null -ne $promotionGateState) { [string] $promotionGateState.recommendation } else { $null }
+        promotionGateReason = if ($null -ne $promotionGateState) { [string] $promotionGateState.reasonCode } else { $null }
+        ciConcordanceState = if ($null -ne $ciConcordanceState) { [string] $ciConcordanceState.concordanceState } else { $null }
+        ciConcordanceReason = if ($null -ne $ciConcordanceState) { [string] $ciConcordanceState.reasonCode } else { $null }
+        releaseRatificationState = if ($null -ne $releaseRatificationState) { [string] $releaseRatificationState.rehearsalState } else { $null }
+        releaseRatificationDecision = if ($null -ne $releaseRatificationState) { [string] $releaseRatificationState.nextHumanDecision } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -597,6 +645,36 @@ if ($null -ne $cmeConsolidationState) {
     )
 }
 
+if ($null -ne $promotionGateState) {
+    $markdownLines += @(
+        '## Promotion Gate',
+        '',
+        ('- Recommendation: `{0}`' -f [string] $promotionGateState.recommendation),
+        ('- Reason code: `{0}`' -f [string] $promotionGateState.reasonCode),
+        ''
+    )
+}
+
+if ($null -ne $ciConcordanceState) {
+    $markdownLines += @(
+        '## CI Concordance',
+        '',
+        ('- Concordance state: `{0}`' -f [string] $ciConcordanceState.concordanceState),
+        ('- Reason code: `{0}`' -f [string] $ciConcordanceState.reasonCode),
+        ''
+    )
+}
+
+if ($null -ne $releaseRatificationState) {
+    $markdownLines += @(
+        '## Release Ratification Rehearsal',
+        '',
+        ('- Rehearsal state: `{0}`' -f [string] $releaseRatificationState.rehearsalState),
+        ('- Next human decision: `{0}`' -f [string] $releaseRatificationState.nextHumanDecision),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -628,6 +706,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -SeededGovernanceState $seededGovernanceState `
             -SchedulerReconciliationState $schedulerReconciliationState `
             -CmeConsolidationState $cmeConsolidationState `
+            -PromotionGateState $promotionGateState `
+            -CiConcordanceState $ciConcordanceState `
+            -ReleaseRatificationState $releaseRatificationState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

@@ -116,6 +116,9 @@ The supporting scripts are:
 - `tools/Invoke-Local-Automation-Cycle.ps1`
 - `tools/Write-Release-Candidate-Digest.ps1`
 - `tools/Write-Local-AutomationNotification.ps1`
+- `tools/Write-Promotion-GateBundle.ps1`
+- `tools/Write-CiArtifactConcordance.ps1`
+- `tools/Write-Release-RatificationRehearsal.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -132,6 +135,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-seeded-governance-last-run.json`
 - `.audit/state/local-automation-scheduler-reconciliation-last-run.json`
 - `.audit/state/local-automation-cme-consolidation-state.json`
+- `.audit/state/local-automation-promotion-gate-last-run.json`
+- `.audit/state/local-automation-ci-concordance-last-run.json`
+- `.audit/state/local-automation-release-ratification-last-run.json`
 
 The formal tasking surface is:
 
@@ -169,6 +175,22 @@ That seeded lane may not:
 - overrule a blocked posture
 
 Seeded outputs are evidence artifacts, not autonomous release truth.
+
+## Promotion Evidence Lane
+
+The local cycle now carries a bounded promotion-evidence lane.
+
+That lane may:
+
+- prepare a promotion gate bundle from the latest digest and version decision
+- compare local published artifacts against declared CI workflow truth
+- rehearse the release ratification checklist without implying actual publication
+
+That lane may not:
+
+- promote versions automatically
+- claim CI proof that is not locally present
+- convert rehearsal into publication authority
 
 ## Operational Bias
 
