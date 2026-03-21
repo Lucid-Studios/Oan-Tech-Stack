@@ -1,7 +1,8 @@
 param(
     [string] $RepoRoot,
     [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json',
-    [string] $CycleStatePath = '.audit/state/local-automation-cycle.json'
+    [string] $CycleStatePath = '.audit/state/local-automation-cycle.json',
+    [string] $ActiveTaskMapStatePath = '.audit/state/local-automation-active-task-map-selection.json'
 )
 
 Set-StrictMode -Version Latest
@@ -66,10 +67,16 @@ function Get-OptionalDateTimeUtc {
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskingPolicyPath
 $resolvedCycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CycleStatePath
+$resolvedActiveTaskMapStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $ActiveTaskMapStatePath
 $taskingPolicy = Read-JsonFile -Path $resolvedTaskingPolicyPath
 $cycleState = Read-JsonFile -Path $resolvedCycleStatePath
+$activeTaskMapState = if (Test-Path -LiteralPath $resolvedActiveTaskMapStatePath -PathType Leaf) { Read-JsonFile -Path $resolvedActiveTaskMapStatePath } else { $null }
 
-$activeTaskMapId = [string] $taskingPolicy.activeTaskMapId
+$activeTaskMapId = if ($null -ne $activeTaskMapState -and -not [string]::IsNullOrWhiteSpace([string] $activeTaskMapState.activeTaskMapId)) {
+    [string] $activeTaskMapState.activeTaskMapId
+} else {
+    [string] $taskingPolicy.activeTaskMapId
+}
 $activeTaskMap = @($taskingPolicy.longFormTaskMaps | Where-Object { [string] $_.id -eq $activeTaskMapId } | Select-Object -First 1)
 if ($activeTaskMap -is [System.Array]) {
     $activeTaskMap = if ($activeTaskMap.Count -gt 0) { $activeTaskMap[0] } else { $null }

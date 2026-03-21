@@ -54,7 +54,10 @@ function Get-FileSha256 {
 }
 
 function Get-GitValue {
-    param([string[]] $Arguments)
+    param(
+        [string[]] $Arguments,
+        [string] $WorkingDirectory
+    )
 
     $escapedArguments = $Arguments | ForEach-Object {
         if ($_ -match '[\s"]') {
@@ -68,6 +71,9 @@ function Get-GitValue {
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
     $startInfo.FileName = 'git'
     $startInfo.Arguments = [string]::Join(' ', $escapedArguments)
+    if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+        $startInfo.WorkingDirectory = $WorkingDirectory
+    }
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.UseShellExecute = $false
@@ -157,7 +163,7 @@ function Invoke-AuditCommand {
     }
 
     $endedAt = Get-Date
-    $capturedText = ($captured | ForEach-Object { "$_" })
+    $capturedText = @($captured | ForEach-Object { "$_" })
     Set-Content -LiteralPath $LogPath -Value $capturedText -Encoding utf8
 
     return [ordered]@{
@@ -167,7 +173,7 @@ function Invoke-AuditCommand {
         exitCode = $exitCode
         succeeded = ($exitCode -eq 0)
         logPath = $LogPath
-        outputLines = $capturedText.Count
+        outputLines = @($capturedText).Count
     }
 }
 
@@ -279,7 +285,7 @@ $testScriptPath = Join-Path $repoRoot 'test.ps1'
 $verifyScriptPath = Join-Path $activeBuildRoot 'tools\verify-private-corpus.ps1'
 
 $runTimestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
-$commitSha = Get-GitValue -Arguments @('rev-parse', 'HEAD')
+$commitSha = Get-GitValue -Arguments @('rev-parse', 'HEAD') -WorkingDirectory $repoRoot
 $shortSha = if ($commitSha) { $commitSha.Substring(0, [Math]::Min(8, $commitSha.Length)) } else { 'nogit' }
 $runId = '{0}-{1}' -f $runTimestamp, $shortSha
 $bundleRoot = Join-Path $repoRoot $OutputRoot
@@ -306,11 +312,11 @@ $runMetadata = [ordered]@{
     solutionPath = Get-RelativePathString -BasePath $repoRoot -TargetPath $solutionPath
     configuration = $Configuration
     commitSha = $commitSha
-    branch = Get-GitValue -Arguments @('rev-parse', '--abbrev-ref', 'HEAD')
-    worktreeState = if ([string]::IsNullOrWhiteSpace((Get-GitValue -Arguments @('status', '--porcelain')))) { 'clean' } else { 'dirty' }
+    branch = Get-GitValue -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -WorkingDirectory $repoRoot
+    worktreeState = if ([string]::IsNullOrWhiteSpace((Get-GitValue -Arguments @('status', '--porcelain') -WorkingDirectory $repoRoot))) { 'clean' } else { 'dirty' }
     toolchain = [ordered]@{
         dotnet = ((& dotnet --version) | Out-String).Trim()
-        git = Get-GitValue -Arguments @('--version')
+        git = Get-GitValue -Arguments @('--version') -WorkingDirectory $repoRoot
         powershell = $PSVersionTable.PSVersion.ToString()
     }
     versionOverride = [ordered]@{

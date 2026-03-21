@@ -1,7 +1,8 @@
 param(
     [string] $RepoRoot,
     [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json'
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json',
+    [string] $ActiveTaskMapStatePath = '.audit/state/local-automation-active-task-map-selection.json'
 )
 
 Set-StrictMode -Version Latest
@@ -72,8 +73,10 @@ function Write-JsonFile {
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskingPolicyPath
+$resolvedActiveTaskMapStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $ActiveTaskMapStatePath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
 $taskingPolicy = Get-Content -Raw -LiteralPath $resolvedTaskingPolicyPath | ConvertFrom-Json
+$activeTaskMapState = Read-JsonFileOrNull -Path $resolvedActiveTaskMapStatePath
 
 $activeRunStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $taskingPolicy.activeLongFormRunStatePath)
 $outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.queuedTaskMapPromotionOutputRoot)
@@ -82,7 +85,11 @@ $startTaskMapRunScriptPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 
 $activeRun = Read-JsonFileOrNull -Path $activeRunStatePath
 $longFormTaskMaps = @($taskingPolicy.longFormTaskMaps)
-$activeTaskMapId = [string] $taskingPolicy.activeTaskMapId
+$activeTaskMapId = if ($null -ne $activeTaskMapState -and -not [string]::IsNullOrWhiteSpace([string] $activeTaskMapState.activeTaskMapId)) {
+    [string] $activeTaskMapState.activeTaskMapId
+} else {
+    [string] $taskingPolicy.activeTaskMapId
+}
 $activeTaskMap = @($longFormTaskMaps | Where-Object { [string] $_.id -eq $activeTaskMapId } | Select-Object -First 1)
 if ($activeTaskMap -is [System.Array]) {
     $activeTaskMap = if ($activeTaskMap.Count -gt 0) { $activeTaskMap[0] } else { $null }
@@ -115,18 +122,16 @@ if ($null -eq $activeTaskMap -or $null -eq $activeRun) {
     $reasonCode = 'queued-task-map-promotion-run-still-active'
     $nextAction = 'allow-current-run-to-collapse'
 } else {
-    foreach ($taskMap in $longFormTaskMaps) {
-        if ([string] $taskMap.id -eq [string] $activeTaskMap.id) {
-            $taskMap.status = 'advanced'
-        } elseif ([string] $taskMap.id -eq [string] $nextTaskMap.id) {
-            $taskMap.status = 'active'
-        }
+    $activeTaskMapStatePayload = [ordered]@{
+        schemaVersion = 1
+        generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
+        activeTaskMapId = [string] $nextTaskMap.id
+        previousTaskMapId = [string] $activeTaskMap.id
+        source = 'queued-task-map-promotion'
     }
+    Write-JsonFile -Path $resolvedActiveTaskMapStatePath -Value $activeTaskMapStatePayload
 
-    $taskingPolicy.activeTaskMapId = [string] $nextTaskMap.id
-    Write-JsonFile -Path $resolvedTaskingPolicyPath -Value $taskingPolicy
-
-    $startOutput = & powershell -ExecutionPolicy Bypass -File $startTaskMapRunScriptPath -RepoRoot $resolvedRepoRoot -TaskingPolicyPath ([string] $TaskingPolicyPath)
+    $startOutput = & powershell -ExecutionPolicy Bypass -File $startTaskMapRunScriptPath -RepoRoot $resolvedRepoRoot -TaskingPolicyPath ([string] $TaskingPolicyPath) -ActiveTaskMapStatePath ([string] $ActiveTaskMapStatePath)
     if ($LASTEXITCODE -ne 0) {
         throw 'Queued task map promotion could not start the next task map run.'
     }

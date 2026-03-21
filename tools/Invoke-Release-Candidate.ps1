@@ -1,6 +1,7 @@
 param(
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
+    [string] $RepoRoot,
     [string] $BaseRef,
     [string] $RequestedVersion,
     [string] $OutputRoot = '.audit/runs/release-candidates'
@@ -14,6 +15,10 @@ function Get-RelativePathString {
         [string] $BasePath,
         [string] $TargetPath
     )
+
+    if ([string]::IsNullOrWhiteSpace($TargetPath)) {
+        return $null
+    }
 
     $resolvedBase = [System.IO.Path]::GetFullPath($BasePath)
     if (Test-Path -LiteralPath $resolvedBase -PathType Leaf) {
@@ -32,6 +37,46 @@ function Get-ScriptOutputTail {
     return @($Output | ForEach-Object { "$_".Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Last 1)
 }
 
+function Get-GitValue {
+    param(
+        [string[]] $Arguments,
+        [string] $WorkingDirectory
+    )
+
+    $escapedArguments = $Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') {
+            '"' + ($_ -replace '"', '\"') + '"'
+        }
+        else {
+            $_
+        }
+    }
+
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = [string]::Join(' ', $escapedArguments)
+    if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+        $startInfo.WorkingDirectory = $WorkingDirectory
+    }
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    [void] $process.Start()
+    $stdout = $process.StandardOutput.ReadToEnd()
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+
+    if ($process.ExitCode -ne 0) {
+        return $null
+    }
+
+    return (@($stdout, $stderr) | Out-String).Trim()
+}
+
 function Write-JsonFile {
     param(
         [string] $Path,
@@ -46,7 +91,32 @@ function Write-JsonFile {
     $Value | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $Path -Encoding utf8
 }
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+function Invoke-ChildPowershellScript {
+    param(
+        [string[]] $ArgumentList,
+        [string] $FailureContext
+    )
+
+    $output = & powershell @ArgumentList 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $tail = Get-ScriptOutputTail -Output $output
+        if ($tail.Count -gt 0) {
+            throw '{0} failed with exit code {1}: {2}' -f $FailureContext, $LASTEXITCODE, $tail[0]
+        }
+
+        throw '{0} failed with exit code {1}.' -f $FailureContext, $LASTEXITCODE
+    }
+
+    return @($output)
+}
+
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+    $repoRoot = Split-Path -Parent $PSScriptRoot
+}
+else {
+    $repoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
+}
+
 $activeBuildRoot = Join-Path $repoRoot 'OAN Mortalis V1.0'
 $deployablesPath = Join-Path $activeBuildRoot 'build\deployables.json'
 $resolveVersionScriptPath = Join-Path $repoRoot 'tools\Resolve-Build-Version.ps1'
@@ -57,7 +127,10 @@ $subsystemAuditScriptPath = Join-Path $repoRoot 'tools\Invoke-Subsystem-Audit.ps
 $deployables = Get-Content -Raw -LiteralPath $deployablesPath | ConvertFrom-Json
 
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
-$commitSha = ((& git rev-parse HEAD) | Out-String).Trim()
+$commitSha = Get-GitValue -Arguments @('rev-parse', 'HEAD') -WorkingDirectory $repoRoot
+if ([string]::IsNullOrWhiteSpace($commitSha)) {
+    throw 'Release candidate conveyor could not resolve the current git commit from the repo root.'
+}
 $shortSha = $commitSha
 if ($commitSha.Length -gt 8) {
     $shortSha = $commitSha.Substring(0, 8)
@@ -87,27 +160,46 @@ if (-not [string]::IsNullOrWhiteSpace($RequestedVersion)) {
     $resolveArgs += @('-RequestedVersion', $RequestedVersion)
 }
 
-& powershell @resolveArgs | Out-Null
+$resolveOutput = Invoke-ChildPowershellScript -ArgumentList $resolveArgs -FailureContext 'Build-version resolution'
 $versionDecision = Get-Content -Raw -LiteralPath $versionDecisionPath | ConvertFrom-Json
 $buildVersion = [string] $versionDecision.versionDecision.proposedVersion
 $assemblyVersion = [string] $versionDecision.versionDecision.proposedAssemblyVersion
 
-$buildAuditOutput = & powershell -ExecutionPolicy Bypass -File $buildAuditScriptPath `
-    -Configuration $Configuration `
-    -OutputRoot '.audit/runs/release-candidate-build-audits' `
-    -BuildVersion $buildVersion `
-    -AssemblyVersion $assemblyVersion
+$buildAuditArgs = @(
+    '-ExecutionPolicy', 'Bypass',
+    '-File', $buildAuditScriptPath,
+    '-Configuration', $Configuration,
+    '-OutputRoot', '.audit/runs/release-candidate-build-audits',
+    '-BuildVersion', $buildVersion,
+    '-AssemblyVersion', $assemblyVersion
+)
+
+$buildAuditOutput = Invoke-ChildPowershellScript -ArgumentList $buildAuditArgs -FailureContext 'Build audit'
 
 $buildAuditBundlePath = Get-ScriptOutputTail -Output $buildAuditOutput
-if ([string]::IsNullOrWhiteSpace($buildAuditBundlePath)) {
-    throw 'Build audit did not return a bundle path.'
+if ([string]::IsNullOrWhiteSpace($buildAuditBundlePath) -or -not (Test-Path -LiteralPath $buildAuditBundlePath -PathType Container)) {
+    throw 'Build audit did not return a valid bundle path.'
 }
 
-$subsystemAuditOutput = & powershell -ExecutionPolicy Bypass -File $subsystemAuditScriptPath `
-    -Configuration $Configuration `
-    -AuditBundlePath $buildAuditBundlePath
+$subsystemAuditArgs = @(
+    '-ExecutionPolicy', 'Bypass',
+    '-File', $subsystemAuditScriptPath,
+    '-Configuration', $Configuration,
+    '-AuditBundlePath', $buildAuditBundlePath
+)
+
+$subsystemAuditOutput = Invoke-ChildPowershellScript -ArgumentList $subsystemAuditArgs -FailureContext 'Subsystem audit'
 
 $subsystemResultsPath = Get-ScriptOutputTail -Output $subsystemAuditOutput
+$subsystemResultsPathForManifest = $null
+if (-not [string]::IsNullOrWhiteSpace($subsystemResultsPath)) {
+    if (-not (Test-Path -LiteralPath $subsystemResultsPath -PathType Leaf)) {
+        throw 'Subsystem audit did not return a valid results path.'
+    }
+
+    $subsystemResultsPathForManifest = $subsystemResultsPath
+}
+
 $publishResults = New-Object System.Collections.Generic.List[object]
 
 foreach ($deployable in @($deployables.deployables | Where-Object { $_.includedInFirstPublish })) {
@@ -145,14 +237,22 @@ if ([bool] $versionDecision.versionDecision.requiresHitl -or
 
 $publishResultsArray = @($publishResults | ForEach-Object { $_ })
 
-& powershell -ExecutionPolicy Bypass -File $writeManifestScriptPath `
-    -RepoRoot $repoRoot `
-    -VersionDecisionPath $versionDecisionPath `
-    -BuildAuditBundlePath $buildAuditBundlePath `
-    -SubsystemResultsPath $subsystemResultsPath `
-    -PublishRoot $artifactPath `
-    -OutputPath $evidenceManifestPath `
-    -Status $status | Out-Null
+$writeManifestArgs = @(
+    '-ExecutionPolicy', 'Bypass',
+    '-File', $writeManifestScriptPath,
+    '-RepoRoot', $repoRoot,
+    '-VersionDecisionPath', $versionDecisionPath,
+    '-BuildAuditBundlePath', $buildAuditBundlePath,
+    '-PublishRoot', $artifactPath,
+    '-OutputPath', $evidenceManifestPath,
+    '-Status', $status
+)
+
+if (-not [string]::IsNullOrWhiteSpace($subsystemResultsPathForManifest)) {
+    $writeManifestArgs += @('-SubsystemResultsPath', $subsystemResultsPathForManifest)
+}
+
+$writeManifestOutput = Invoke-ChildPowershellScript -ArgumentList $writeManifestArgs -FailureContext 'Evidence manifest writer'
 
 $summaryLines = @(
     '# Release Candidate Summary',
@@ -162,7 +262,7 @@ $summaryLines = @(
     ('- Proposed version: `{0}`' -f $buildVersion),
     ('- Proposed assembly version: `{0}`' -f $assemblyVersion),
     ('- Build audit bundle: `{0}`' -f (Get-RelativePathString -BasePath $repoRoot -TargetPath $buildAuditBundlePath)),
-    ('- Subsystem results: `{0}`' -f (Get-RelativePathString -BasePath $repoRoot -TargetPath $subsystemResultsPath)),
+    ('- Subsystem results: `{0}`' -f $(if ($subsystemResultsPathForManifest) { Get-RelativePathString -BasePath $repoRoot -TargetPath $subsystemResultsPathForManifest } else { 'not-emitted' })),
     ''
 )
 

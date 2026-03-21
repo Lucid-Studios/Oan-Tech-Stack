@@ -219,6 +219,7 @@ if ($releaseCandidateDue) {
         '-ExecutionPolicy', 'Bypass',
         '-File', $invokeReleaseCandidateScriptPath,
         '-Configuration', $Configuration,
+        '-RepoRoot', $resolvedRepoRoot,
         '-OutputRoot', $releaseCandidateOutputRoot
     )
 

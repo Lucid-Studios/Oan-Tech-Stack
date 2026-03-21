@@ -53,7 +53,10 @@ if (-not $PSBoundParameters.ContainsKey('StartAt')) {
     }
 }
 
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-ExecutionPolicy Bypass -File "{0}" -Configuration {1}' -f $cycleScriptPath, $Configuration)
+$action = New-ScheduledTaskAction `
+    -Execute 'powershell.exe' `
+    -Argument ('-ExecutionPolicy Bypass -File "{0}" -Configuration {1} -RepoRoot "{2}"' -f $cycleScriptPath, $Configuration, $resolvedRepoRoot) `
+    -WorkingDirectory $resolvedRepoRoot
 $trigger = New-ScheduledTaskTrigger -Once -At $StartAt -RepetitionInterval (New-TimeSpan -Hours $IntervalHours) -RepetitionDuration (New-TimeSpan -Days 3650)
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
 $description = 'Runs the governed OAN release-candidate conveyor on a local cadence and emits a 24-hour digest for trust-verified HITL review.'

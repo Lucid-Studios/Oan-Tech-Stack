@@ -9,7 +9,10 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 function Get-GitLines {
-    param([string[]] $Arguments)
+    param(
+        [string[]] $Arguments,
+        [string] $WorkingDirectory
+    )
 
     $escapedArguments = $Arguments | ForEach-Object {
         if ($_ -match '[\s"]') {
@@ -23,6 +26,9 @@ function Get-GitLines {
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
     $startInfo.FileName = 'git'
     $startInfo.Arguments = [string]::Join(' ', $escapedArguments)
+    if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+        $startInfo.WorkingDirectory = $WorkingDirectory
+    }
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.UseShellExecute = $false
@@ -89,21 +95,21 @@ function Get-NextPatchVersion {
 function Get-ChangedFiles {
     param([string] $BaseRef)
 
-    $untracked = @(Get-GitLines -Arguments @('ls-files', '--others', '--exclude-standard'))
+    $untracked = @(Get-GitLines -Arguments @('ls-files', '--others', '--exclude-standard') -WorkingDirectory $RepoRoot)
 
     if (-not [string]::IsNullOrWhiteSpace($BaseRef)) {
-        $changed = @(Get-GitLines -Arguments @('diff', '--name-only', "$BaseRef..HEAD"))
+        $changed = @(Get-GitLines -Arguments @('diff', '--name-only', "$BaseRef..HEAD") -WorkingDirectory $RepoRoot)
         return @($changed + $untracked | Sort-Object -Unique)
     }
 
-    $worktreeChanged = @(Get-GitLines -Arguments @('diff', '--name-only', 'HEAD'))
+    $worktreeChanged = @(Get-GitLines -Arguments @('diff', '--name-only', 'HEAD') -WorkingDirectory $RepoRoot)
     if ($worktreeChanged.Count -gt 0 -or $untracked.Count -gt 0) {
         return @($worktreeChanged + $untracked | Sort-Object -Unique)
     }
 
-    $previousHead = @(Get-GitLines -Arguments @('rev-parse', '--verify', 'HEAD~1'))
+    $previousHead = @(Get-GitLines -Arguments @('rev-parse', '--verify', 'HEAD~1') -WorkingDirectory $RepoRoot)
     if ($previousHead.Count -gt 0) {
-        return @(Get-GitLines -Arguments @('diff', '--name-only', 'HEAD~1', 'HEAD'))
+        return @(Get-GitLines -Arguments @('diff', '--name-only', 'HEAD~1', 'HEAD') -WorkingDirectory $RepoRoot)
     }
 
     return @()

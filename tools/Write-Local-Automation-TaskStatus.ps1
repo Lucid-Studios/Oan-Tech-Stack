@@ -1,7 +1,8 @@
 param(
     [string] $RepoRoot,
     [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json'
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json',
+    [string] $ActiveTaskMapStatePath = '.audit/state/local-automation-active-task-map-selection.json'
 )
 
 Set-StrictMode -Version Latest
@@ -492,11 +493,17 @@ function Resolve-LongFormTaskLiveStatus {
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskingPolicyPath
+$resolvedActiveTaskMapStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $ActiveTaskMapStatePath
 $cyclePolicy = Read-JsonFile -Path $resolvedCyclePolicyPath
 $taskingPolicy = Read-JsonFile -Path $resolvedTaskingPolicyPath
+$activeTaskMapState = Read-JsonFileOrNull -Path $resolvedActiveTaskMapStatePath
 $taskDefinitions = @($taskingPolicy.tasks)
 $longFormTaskMaps = @($taskingPolicy.longFormTaskMaps)
-$activeTaskMapId = [string] $taskingPolicy.activeTaskMapId
+$activeTaskMapId = if ($null -ne $activeTaskMapState -and -not [string]::IsNullOrWhiteSpace([string] $activeTaskMapState.activeTaskMapId)) {
+    [string] $activeTaskMapState.activeTaskMapId
+} else {
+    [string] $taskingPolicy.activeTaskMapId
+}
 $activeLongFormRunStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $taskingPolicy.activeLongFormRunStatePath)
 $activeLongFormRun = $null
 if (Test-Path -LiteralPath $activeLongFormRunStatePath -PathType Leaf) {
