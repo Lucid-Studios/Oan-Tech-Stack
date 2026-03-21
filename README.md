@@ -167,6 +167,19 @@ This structure supports **deterministic system governance and auditability**.
 
 ---
 
+# Operational Hierarchy
+
+This repository treats modal tooling surfaces as layered, not equal.
+
+- `Codex` remains the build master for active repository work.
+- `Antigravity` may be used as a documentation-layer extension for cross-platform communication, repository orientation, and secondary analysis.
+- `Antigravity` does not replace repo-local executable truth, governance contracts, or verification commands.
+- Any analysis or recommendation from `Antigravity` must be validated against the current repository state before implementation.
+
+This keeps the operational space modular while preserving a single authoritative build surface.
+
+---
+
 # 🔁 Development Principles
 
 The OAN Mortalus stack follows several core engineering principles.

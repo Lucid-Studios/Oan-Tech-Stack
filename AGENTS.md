@@ -81,6 +81,14 @@ powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.0\tools\verify-privat
 
 Treat the `Documentation Repo` as an active governing documentation surface when it is available locally.
 
+Secondary tooling extension rule:
+
+- treat `Antigravity` as a documentation-layer extension for cross-platform communication, repository orientation, and secondary analysis
+- keep `Codex` in this workspace as the build master and active implementation authority
+- do not let `Antigravity` supersede repo-local executable truth, build verification, or governed mutation flow
+- require any `Antigravity`-derived recommendation to be validated against current repo state before implementation
+- do not treat `Antigravity` as an independent mutation authority or alternate build surface
+
 For agent work in this repository:
 
 - ground implementation in current repo-local executable truth first
