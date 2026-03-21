@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-06",
+  "activeTaskMapId": "automation-maturation-map-07",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -367,7 +367,7 @@
     {
       "id": "automation-maturation-map-06",
       "label": "Automation Maturation Map 06",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Prepare the first bounded publish request and post-publish evidence loop once the handshake surface is stable.",
       "timeDilationPullForwardAllowed": false,
@@ -382,7 +382,7 @@
           "label": "Publish Request Envelope",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Prepare the bounded publish request surface once the release handshake becomes stable.",
           "completionSignal": "A publish request envelope can be emitted without expanding deployable scope or publication authority by implication.",
           "escalatesWhen": [
@@ -395,7 +395,7 @@
           "label": "Post-Publish Evidence Loop",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Collect the first post-publish evidence bundle and reconcile it against the candidate and handshake surfaces.",
           "completionSignal": "A bounded post-publish evidence loop can compare the published artifact against the pre-publish evidence chain.",
           "escalatesWhen": [
@@ -408,7 +408,7 @@
           "label": "Seed Braid Escalation Lane",
           "owner": "Shared",
           "authority": "Seed may advise; HITL resolves",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Let the seed braid participate in escalation after the first publish lane begins to carry real-world consequences.",
           "completionSignal": "A bounded escalation lane exists for seeded review after publication without silently substituting for ratification.",
           "escalatesWhen": [
@@ -421,7 +421,7 @@
     {
       "id": "automation-maturation-map-07",
       "label": "Automation Maturation Map 07",
-      "status": "queued",
+      "status": "active",
       "expectedReviewWindows": 2,
       "goal": "Stabilize live publication execution and the first external evidence loop once a bounded publish request is ratified.",
       "timeDilationPullForwardAllowed": false,
@@ -436,7 +436,7 @@
           "label": "Published Runtime Receipt",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Capture the first bounded receipt that a real runtime artifact was published through the declared lane.",
           "completionSignal": "A published runtime receipt exists and can be reconciled to the publish request envelope.",
           "escalatesWhen": [
@@ -449,7 +449,7 @@
           "label": "Artifact Attestation Surface",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Compare the published runtime artifact against the candidate and post-publish evidence surfaces.",
           "completionSignal": "An attestation surface can show whether the published artifact matches the bounded pre-publish chain.",
           "escalatesWhen": [
@@ -462,12 +462,66 @@
           "label": "Post-Publish Drift Watch",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Watch the first post-publish interval for drift between the live runtime and the bounded evidence chain.",
           "completionSignal": "A drift-watch surface can report stable, divergent, or blocked post-publish posture.",
           "escalatesWhen": [
             "published runtime diverges from the evidence chain",
             "drift watch cannot localize the divergence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-08",
+      "label": "Automation Maturation Map 08",
+      "status": "queued",
+      "expectedReviewWindows": 2,
+      "goal": "Consolidate the first real publication loop into a stable operational governance surface once live publication is observed.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "operational-publication-ledger",
+        "external-consumer-concordance",
+        "post-publish-governance-loop"
+      ],
+      "tasks": [
+        {
+          "id": "operational-publication-ledger",
+          "label": "Operational Publication Ledger",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "queued",
+          "purpose": "Capture the bounded operational ledger entry once the first real publication is no longer hypothetical.",
+          "completionSignal": "A stable publication ledger can reconcile request, receipt, and runtime observation.",
+          "escalatesWhen": [
+            "publication ledger drifts from the bounded request chain",
+            "operational publication occurs without governed receipts"
+          ]
+        },
+        {
+          "id": "external-consumer-concordance",
+          "label": "External Consumer Concordance",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Compare the published surface seen by external consumers against the bounded publication evidence chain.",
+          "completionSignal": "A concordance surface can show whether external consumers receive the artifact the stack thinks it published.",
+          "escalatesWhen": [
+            "external consumer view diverges from the publication ledger",
+            "consumer concordance implies authority beyond observed evidence"
+          ]
+        },
+        {
+          "id": "post-publish-governance-loop",
+          "label": "Post-Publish Governance Loop",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves",
+          "status": "queued",
+          "purpose": "Stabilize the first complete governance loop after real publication enters the world.",
+          "completionSignal": "A bounded governance loop can carry publication, observation, and contradiction handling without collapsing into improvisation.",
+          "escalatesWhen": [
+            "governance loop cannot reconcile live publication with evidence",
+            "seeded governance starts substituting for human ratification post-publication"
           ]
         }
       ]

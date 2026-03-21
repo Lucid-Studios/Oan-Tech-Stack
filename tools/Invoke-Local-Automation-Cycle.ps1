@@ -169,6 +169,9 @@ $releaseHandshakeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 $publishRequestEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.publishRequestEnvelopeStatePath)
 $postPublishEvidenceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postPublishEvidenceStatePath)
 $seedBraidEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seedBraidEscalationStatePath)
+$publishedRuntimeReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.publishedRuntimeReceiptStatePath)
+$artifactAttestationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.artifactAttestationStatePath)
+$postPublishDriftWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postPublishDriftWatchStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -341,6 +344,12 @@ $statePayload.lastPostPublishEvidenceBundle = [string] (Get-ObjectPropertyValueO
 $statePayload.postPublishEvidenceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishEvidenceStatePath
 $statePayload.lastSeedBraidEscalationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSeedBraidEscalationBundle')
 $statePayload.seedBraidEscalationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seedBraidEscalationStatePath
+$statePayload.lastPublishedRuntimeReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPublishedRuntimeReceiptBundle')
+$statePayload.publishedRuntimeReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $publishedRuntimeReceiptStatePath
+$statePayload.lastArtifactAttestationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastArtifactAttestationBundle')
+$statePayload.artifactAttestationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $artifactAttestationStatePath
+$statePayload.lastPostPublishDriftWatchBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPostPublishDriftWatchBundle')
+$statePayload.postPublishDriftWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishDriftWatchStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -479,6 +488,33 @@ if (-not [string]::IsNullOrWhiteSpace($seedBraidEscalationBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$publishedRuntimeReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-PublishedRuntime-Receipt.ps1'
+$publishedRuntimeReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $publishedRuntimeReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Published runtime receipt writer'
+$publishedRuntimeReceiptBundlePath = Get-ScriptOutputTail -Output $publishedRuntimeReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($publishedRuntimeReceiptBundlePath)) {
+    $statePayload.lastPublishedRuntimeReceiptBundle = $publishedRuntimeReceiptBundlePath
+    $statePayload.publishedRuntimeReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $publishedRuntimeReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$artifactAttestationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Artifact-AttestationSurface.ps1'
+$artifactAttestationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $artifactAttestationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Artifact attestation writer'
+$artifactAttestationBundlePath = Get-ScriptOutputTail -Output $artifactAttestationOutput
+if (-not [string]::IsNullOrWhiteSpace($artifactAttestationBundlePath)) {
+    $statePayload.lastArtifactAttestationBundle = $artifactAttestationBundlePath
+    $statePayload.artifactAttestationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $artifactAttestationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$postPublishDriftWatchScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-PostPublish-DriftWatch.ps1'
+$postPublishDriftWatchOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $postPublishDriftWatchScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Post-publish drift watch writer'
+$postPublishDriftWatchBundlePath = Get-ScriptOutputTail -Output $postPublishDriftWatchOutput
+if (-not [string]::IsNullOrWhiteSpace($postPublishDriftWatchBundlePath)) {
+    $statePayload.lastPostPublishDriftWatchBundle = $postPublishDriftWatchBundlePath
+    $statePayload.postPublishDriftWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishDriftWatchStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -510,6 +546,12 @@ $summary = [ordered]@{
     postPublishEvidenceStatePath = $statePayload.postPublishEvidenceStatePath
     lastSeedBraidEscalationBundle = $statePayload.lastSeedBraidEscalationBundle
     seedBraidEscalationStatePath = $statePayload.seedBraidEscalationStatePath
+    lastPublishedRuntimeReceiptBundle = $statePayload.lastPublishedRuntimeReceiptBundle
+    publishedRuntimeReceiptStatePath = $statePayload.publishedRuntimeReceiptStatePath
+    lastArtifactAttestationBundle = $statePayload.lastArtifactAttestationBundle
+    artifactAttestationStatePath = $statePayload.artifactAttestationStatePath
+    lastPostPublishDriftWatchBundle = $statePayload.lastPostPublishDriftWatchBundle
+    postPublishDriftWatchStatePath = $statePayload.postPublishDriftWatchStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -579,6 +621,15 @@ if (-not [string]::IsNullOrWhiteSpace($postPublishEvidenceBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($seedBraidEscalationBundlePath)) {
     Write-Host ('[local-automation-cycle] SeedBraidEscalation: {0}' -f $seedBraidEscalationBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($publishedRuntimeReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] PublishedRuntimeReceipt: {0}' -f $publishedRuntimeReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($artifactAttestationBundlePath)) {
+    Write-Host ('[local-automation-cycle] ArtifactAttestation: {0}' -f $artifactAttestationBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($postPublishDriftWatchBundlePath)) {
+    Write-Host ('[local-automation-cycle] PostPublishDriftWatch: {0}' -f $postPublishDriftWatchBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

@@ -125,6 +125,9 @@ The supporting scripts are:
 - `tools/Write-Publish-RequestEnvelope.ps1`
 - `tools/Write-PostPublish-EvidenceLoop.ps1`
 - `tools/Write-SeedBraid-EscalationLane.ps1`
+- `tools/Write-PublishedRuntime-Receipt.ps1`
+- `tools/Write-Artifact-AttestationSurface.ps1`
+- `tools/Write-PostPublish-DriftWatch.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -150,6 +153,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-publish-request-envelope-last-run.json`
 - `.audit/state/local-automation-post-publish-evidence-last-run.json`
 - `.audit/state/local-automation-seed-braid-escalation-last-run.json`
+- `.audit/state/local-automation-published-runtime-receipt-last-run.json`
+- `.audit/state/local-automation-artifact-attestation-last-run.json`
+- `.audit/state/local-automation-post-publish-drift-watch-last-run.json`
 
 The formal tasking surface is:
 
@@ -235,6 +241,22 @@ That lane may not:
 - narrate a publish request as if it were an executed publication
 - invent post-publish evidence before a published artifact exists
 - let seed-braid escalation substitute for HITL in publication or contradiction resolution
+
+## Publication Observation Lane
+
+The local cycle now carries a bounded publication-observation lane beyond the publish-preparation seam.
+
+That lane may:
+
+- record that no real publication receipt has yet been observed
+- keep artifact attestation waiting until a real receipt exists
+- keep post-publish drift watch dormant until a live publication can actually drift
+
+That lane may not:
+
+- fabricate a published runtime receipt
+- claim artifact concordance without a real published artifact
+- narrate post-publish drift before the stack has crossed into live publication
 
 ## Operational Bias
 

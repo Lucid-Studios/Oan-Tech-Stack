@@ -121,6 +121,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $PublishRequestEnvelopeState,
         [object] $PostPublishEvidenceState,
         [object] $SeedBraidEscalationState,
+        [object] $PublishedRuntimeReceiptState,
+        [object] $ArtifactAttestationState,
+        [object] $PostPublishDriftWatchState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -270,6 +273,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'published-runtime-receipt' {
+            if ($null -ne $PublishedRuntimeReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'artifact-attestation-surface' {
+            if ($null -ne $ArtifactAttestationState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'post-publish-drift-watch' {
+            if ($null -ne $PostPublishDriftWatchState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -326,6 +356,9 @@ $releaseHandshakeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 $publishRequestEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.publishRequestEnvelopeStatePath)
 $postPublishEvidenceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postPublishEvidenceStatePath)
 $seedBraidEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seedBraidEscalationStatePath)
+$publishedRuntimeReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.publishedRuntimeReceiptStatePath)
+$artifactAttestationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.artifactAttestationStatePath)
+$postPublishDriftWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postPublishDriftWatchStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -341,6 +374,9 @@ $releaseHandshakeState = Read-JsonFileOrNull -Path $releaseHandshakeStatePath
 $publishRequestEnvelopeState = Read-JsonFileOrNull -Path $publishRequestEnvelopeStatePath
 $postPublishEvidenceState = Read-JsonFileOrNull -Path $postPublishEvidenceStatePath
 $seedBraidEscalationState = Read-JsonFileOrNull -Path $seedBraidEscalationStatePath
+$publishedRuntimeReceiptState = Read-JsonFileOrNull -Path $publishedRuntimeReceiptStatePath
+$artifactAttestationState = Read-JsonFileOrNull -Path $artifactAttestationStatePath
+$postPublishDriftWatchState = Read-JsonFileOrNull -Path $postPublishDriftWatchStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -503,6 +539,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -PublishRequestEnvelopeState $publishRequestEnvelopeState `
                 -PostPublishEvidenceState $postPublishEvidenceState `
                 -SeedBraidEscalationState $seedBraidEscalationState `
+                -PublishedRuntimeReceiptState $publishedRuntimeReceiptState `
+                -ArtifactAttestationState $artifactAttestationState `
+                -PostPublishDriftWatchState $postPublishDriftWatchState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -564,6 +603,9 @@ $taskMapEntries = @(
                     -PublishRequestEnvelopeState $publishRequestEnvelopeState `
                     -PostPublishEvidenceState $postPublishEvidenceState `
                     -SeedBraidEscalationState $seedBraidEscalationState `
+                    -PublishedRuntimeReceiptState $publishedRuntimeReceiptState `
+                    -ArtifactAttestationState $artifactAttestationState `
+                    -PostPublishDriftWatchState $postPublishDriftWatchState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -663,6 +705,15 @@ $statusPayload = [ordered]@{
         seedBraidEscalationState = if ($null -ne $seedBraidEscalationState) { [string] $seedBraidEscalationState.laneState } else { $null }
         seedBraidEscalationReason = if ($null -ne $seedBraidEscalationState) { [string] $seedBraidEscalationState.reasonCode } else { $null }
         seedBraidEscalationNextAction = if ($null -ne $seedBraidEscalationState) { [string] $seedBraidEscalationState.nextAction } else { $null }
+        publishedRuntimeReceiptState = if ($null -ne $publishedRuntimeReceiptState) { [string] $publishedRuntimeReceiptState.receiptState } else { $null }
+        publishedRuntimeReceiptReason = if ($null -ne $publishedRuntimeReceiptState) { [string] $publishedRuntimeReceiptState.reasonCode } else { $null }
+        publishedRuntimeReceiptNextAction = if ($null -ne $publishedRuntimeReceiptState) { [string] $publishedRuntimeReceiptState.nextAction } else { $null }
+        artifactAttestationState = if ($null -ne $artifactAttestationState) { [string] $artifactAttestationState.attestationState } else { $null }
+        artifactAttestationReason = if ($null -ne $artifactAttestationState) { [string] $artifactAttestationState.reasonCode } else { $null }
+        artifactAttestationNextAction = if ($null -ne $artifactAttestationState) { [string] $artifactAttestationState.nextAction } else { $null }
+        postPublishDriftWatchState = if ($null -ne $postPublishDriftWatchState) { [string] $postPublishDriftWatchState.driftWatchState } else { $null }
+        postPublishDriftWatchReason = if ($null -ne $postPublishDriftWatchState) { [string] $postPublishDriftWatchState.reasonCode } else { $null }
+        postPublishDriftWatchNextAction = if ($null -ne $postPublishDriftWatchState) { [string] $postPublishDriftWatchState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -841,6 +892,39 @@ if ($null -ne $seedBraidEscalationState) {
     )
 }
 
+if ($null -ne $publishedRuntimeReceiptState) {
+    $markdownLines += @(
+        '## Published Runtime Receipt',
+        '',
+        ('- Receipt state: `{0}`' -f [string] $publishedRuntimeReceiptState.receiptState),
+        ('- Reason code: `{0}`' -f [string] $publishedRuntimeReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $publishedRuntimeReceiptState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $artifactAttestationState) {
+    $markdownLines += @(
+        '## Artifact Attestation',
+        '',
+        ('- Attestation state: `{0}`' -f [string] $artifactAttestationState.attestationState),
+        ('- Reason code: `{0}`' -f [string] $artifactAttestationState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $artifactAttestationState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $postPublishDriftWatchState) {
+    $markdownLines += @(
+        '## Post-Publish Drift Watch',
+        '',
+        ('- Drift watch state: `{0}`' -f [string] $postPublishDriftWatchState.driftWatchState),
+        ('- Reason code: `{0}`' -f [string] $postPublishDriftWatchState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $postPublishDriftWatchState.nextAction),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -881,6 +965,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -PublishRequestEnvelopeState $publishRequestEnvelopeState `
             -PostPublishEvidenceState $postPublishEvidenceState `
             -SeedBraidEscalationState $seedBraidEscalationState `
+            -PublishedRuntimeReceiptState $publishedRuntimeReceiptState `
+            -ArtifactAttestationState $artifactAttestationState `
+            -PostPublishDriftWatchState $postPublishDriftWatchState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

@@ -18,6 +18,9 @@
   "publishRequestEnvelopeOutputRoot": ".audit/runs/publish-request-envelopes",
   "postPublishEvidenceOutputRoot": ".audit/runs/post-publish-evidence",
   "seedBraidEscalationOutputRoot": ".audit/runs/seed-braid-escalations",
+  "publishedRuntimeReceiptOutputRoot": ".audit/runs/published-runtime-receipts",
+  "artifactAttestationOutputRoot": ".audit/runs/artifact-attestations",
+  "postPublishDriftWatchOutputRoot": ".audit/runs/post-publish-drift-watch",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -34,6 +37,9 @@
   "publishRequestEnvelopeStatePath": ".audit/state/local-automation-publish-request-envelope-last-run.json",
   "postPublishEvidenceStatePath": ".audit/state/local-automation-post-publish-evidence-last-run.json",
   "seedBraidEscalationStatePath": ".audit/state/local-automation-seed-braid-escalation-last-run.json",
+  "publishedRuntimeReceiptStatePath": ".audit/state/local-automation-published-runtime-receipt-last-run.json",
+  "artifactAttestationStatePath": ".audit/state/local-automation-artifact-attestation-last-run.json",
+  "postPublishDriftWatchStatePath": ".audit/state/local-automation-post-publish-drift-watch-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -78,6 +84,9 @@
     "keepPublishRequestEnvelopeBundles": 8,
     "keepPostPublishEvidenceBundles": 8,
     "keepSeedBraidEscalationBundles": 8,
+    "keepPublishedRuntimeReceiptBundles": 8,
+    "keepArtifactAttestationBundles": 8,
+    "keepPostPublishDriftWatchBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [
