@@ -24,6 +24,7 @@ The live applied status surfaces are:
 
 - `.audit/state/local-automation-tasking-status.json`
 - `.audit/state/local-automation-tasking-status.md`
+- `.audit/state/local-automation-active-task-map-run.json`
 
 Those live surfaces apply the current automation state onto the formal task definitions below.
 
@@ -46,6 +47,28 @@ Time-dilation rule:
 - blocked or HITL-required posture prevents pull-forward
 
 This keeps acceleration lawful without turning early completion into uncontrolled scope widening.
+
+## Active Long-Form Run Law
+
+Each active long-form run must work inside one bounded review window.
+
+The current run window closes at the next declared release-candidate cadence unless a narrower window is declared by policy.
+
+Within that window the automation may:
+
+- consider `3` exploratory model structures
+- preserve those structures as bounded run phases
+- collapse them into `1` final fourth structure before the window ends
+
+That means the automation may stretch inside one active map, but it may not remain indefinitely exploratory.
+
+The live active-run surface is:
+
+- `.audit/state/local-automation-active-task-map-run.json`
+
+The active-run bundle root is:
+
+- `.audit/runs/long-form-task-maps/`
 
 ## Formal Tasks
 

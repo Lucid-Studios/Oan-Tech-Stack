@@ -4,7 +4,16 @@
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.0/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
   "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
+  "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
+  "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
   "activeTaskMapId": "automation-maturation-map-01",
+  "longFormRunPolicy": {
+    "exploratoryStructures": 3,
+    "finalCollapsedStructures": 1,
+    "collapseBeforeWindowEnd": true,
+    "timeframeSource": "nextReleaseCandidateRunUtc",
+    "rule": "Each active long-form run may consider three exploratory model structures and must collapse them into one final fourth structure before the current run window ends."
+  },
   "timeDilationPolicy": {
     "allowPullForward": true,
     "pullForwardMaxMaps": 1,

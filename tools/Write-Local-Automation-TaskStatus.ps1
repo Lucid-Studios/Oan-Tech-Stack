@@ -100,6 +100,11 @@ $taskingPolicy = Read-JsonFile -Path $resolvedTaskingPolicyPath
 $taskDefinitions = @($taskingPolicy.tasks)
 $longFormTaskMaps = @($taskingPolicy.longFormTaskMaps)
 $activeTaskMapId = [string] $taskingPolicy.activeTaskMapId
+$activeLongFormRunStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $taskingPolicy.activeLongFormRunStatePath)
+$activeLongFormRun = $null
+if (Test-Path -LiteralPath $activeLongFormRunStatePath -PathType Leaf) {
+    $activeLongFormRun = Read-JsonFile -Path $activeLongFormRunStatePath
+}
 
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $statusJsonPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $taskingPolicy.statusJsonPath)
@@ -337,6 +342,19 @@ $statusPayload = [ordered]@{
         canPullForwardFromNextMap = $canPullForwardFromNextMap
         eligibleNextTaskMapId = if ($null -ne $eligibleNextTaskMap) { [string] $eligibleNextTaskMap.id } else { $null }
         pullForwardRule = [string] $taskingPolicy.timeDilationPolicy.rule
+        activeRunStatePath = $activeLongFormRunStatePath
+        activeRun = if ($null -ne $activeLongFormRun) {
+            [ordered]@{
+                runId = [string] $activeLongFormRun.runId
+                runStatus = [string] $activeLongFormRun.runStatus
+                currentPhaseId = [string] $activeLongFormRun.currentPhaseId
+                currentPhaseLabel = [string] $activeLongFormRun.currentPhaseLabel
+                windowEndUtc = [string] $activeLongFormRun.timeframe.endUtc
+                iterationLaw = $activeLongFormRun.iterationLaw
+            }
+        } else {
+            $null
+        }
         taskMaps = $taskMapEntries
     }
     scheduler = $scheduler
@@ -406,6 +424,19 @@ if ($null -ne $activeLongFormTaskMap) {
 
     foreach ($task in @($activeLongFormTaskMap.tasks)) {
         $markdownLines += ('| {0} | {1} | {2} |' -f [string] $task.label, [string] $task.owner, [string] $task.status)
+    }
+
+    if ($null -ne $activeLongFormRun) {
+        $markdownLines += @(
+            '',
+            '## Active Long-Form Run',
+            '',
+            ('- Run ID: `{0}`' -f [string] $activeLongFormRun.runId),
+            ('- Run status: `{0}`' -f [string] $activeLongFormRun.runStatus),
+            ('- Current phase: `{0}`' -f [string] $activeLongFormRun.currentPhaseLabel),
+            ('- Window end (UTC): `{0}`' -f [string] $activeLongFormRun.timeframe.endUtc),
+            ('- Iteration law: `{0}`' -f [string] $activeLongFormRun.iterationLaw.rule)
+        )
     }
 }
 
