@@ -37,7 +37,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(
@@ -96,7 +96,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(
@@ -110,7 +110,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var result = await manager.RunGovernanceGoldenPathAsync(request);
         var replay = await journal.ReplayLoopAsync(result.LoopKey);
         var reviewRequest = replay.Select(entry => entry.ReviewRequest).First(requestItem => requestItem is not null)!;
-        var targetBridge = new SliGovernedTargetTelemetryBridge(new RecordingTelemetrySink(), journal);
+        var targetBridge = new SliGovernedTargetTelemetryBridge(new RecordingTelemetrySink(), journal, new TestPermissiveEgressRouter());
 
         await targetBridge.WitnessHigherOrderLocalityTargetExecutionAsync(
             [
@@ -161,7 +161,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
@@ -222,7 +222,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
@@ -290,7 +290,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, crypticLayer, telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -331,7 +331,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -371,7 +371,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -434,7 +434,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -463,7 +463,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -493,7 +493,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 

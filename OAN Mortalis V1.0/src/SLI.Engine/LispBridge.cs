@@ -130,7 +130,8 @@ public sealed class LispBridge
         var liveRuntimeRun = context.ShardModeEnabled
             ? SliLiveEngramRuntimePacketFactory.CreateRunForCognition(context, traceId, zedThetaCandidate)
             : null;
-        return new LispExecutionResult
+
+        var result = new LispExecutionResult
         {
             TraceId = traceId,
             Decision = context.FinalDecision,
@@ -147,6 +148,10 @@ public sealed class LispBridge
                 : SliLiveEngramRuntimePacketFactory.CreateForCognition(context, traceId, zedThetaCandidate),
             LiveRuntimeRun = liveRuntimeRun
         };
+
+        var snapshot = SliExecutionSnapshotFactory.CreateForCognition(context, result);
+        result.ExecutionSnapshot = snapshot;
+        return result;
     }
 
     internal async Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityProgramAsync(

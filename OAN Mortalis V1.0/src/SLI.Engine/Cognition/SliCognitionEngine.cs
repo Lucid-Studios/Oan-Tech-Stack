@@ -10,6 +10,7 @@ using SLI.Engine.Runtime;
 using SLI.Engine.Telemetry;
 using SoulFrame.Host;
 
+
 namespace SLI.Engine.Cognition;
 
 public sealed class SliCognitionEngine : ICognitionEngine
@@ -19,6 +20,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
     private readonly SheafMasterEngramService _sheafMasterEngrams;
     private readonly ICognitionEngine? _optionalLowMindEngine;
     private readonly IReadOnlyList<ICognitionObserver> _observers;
+    private readonly IReadOnlyList<ISliSnapshotRouter> _snapshotRouters;
     private bool _initialized;
 
     public SliCognitionEngine(
@@ -27,16 +29,29 @@ public sealed class SliCognitionEngine : ICognitionEngine
         SheafMasterEngramService? sheafMasterEngrams = null,
         ISoulFrameSemanticDevice? semanticDevice = null,
         IEnumerable<ICognitionObserver>? observers = null)
+        : this(resolver, optionalLowMindEngine, sheafMasterEngrams, semanticDevice, observers, null)
+    {
+    }
+
+    internal SliCognitionEngine(
+        IEngramResolver resolver,
+        ICognitionEngine? optionalLowMindEngine,
+        SheafMasterEngramService? sheafMasterEngrams,
+        ISoulFrameSemanticDevice? semanticDevice,
+        IEnumerable<ICognitionObserver>? observers,
+        IEnumerable<ISliSnapshotRouter>? snapshotRouters)
     {
         _lispBridge = new LispBridge(resolver, semanticDevice);
         _optionalLowMindEngine = optionalLowMindEngine;
         _sheafMasterEngrams = sheafMasterEngrams ?? new SheafMasterEngramService();
         _observers = observers?.ToList() ?? [NullCognitionObserver.Instance];
+        _snapshotRouters = snapshotRouters?.ToList() ?? [];
     }
 
     public DecisionSpline? LastDecisionSpline { get; private set; }
     public SliTraceEvent? LastTraceEvent { get; private set; }
     internal LispExecutionResult? LastExecutionResult { get; private set; }
+    internal SliExecutionSnapshot? LastExecutionSnapshot { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -92,6 +107,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
             .ExecuteProgramAsync(program, contextFrame, cancellationToken)
             .ConfigureAwait(false);
         LastExecutionResult = lispResult;
+        LastExecutionSnapshot = lispResult.ExecutionSnapshot;
 
         CognitionResult? lowMindResult = null;
         if (_optionalLowMindEngine is not null)
@@ -137,6 +153,14 @@ public sealed class SliCognitionEngine : ICognitionEngine
             SymbolicTraceHash = lispResult.SymbolicTraceHash,
             CompassState = lispResult.CompassState
         };
+
+        if (LastExecutionSnapshot is not null)
+        {
+            foreach (var router in _snapshotRouters)
+            {
+                await router.RouteAsync(LastExecutionSnapshot, cancellationToken).ConfigureAwait(false);
+            }
+        }
 
         return new CognitionResult
         {

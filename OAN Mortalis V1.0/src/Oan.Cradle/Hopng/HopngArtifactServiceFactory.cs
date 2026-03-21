@@ -1,4 +1,5 @@
 using CradleTek.Host.Interfaces;
+using Oan.Common;
 
 namespace Oan.Cradle;
 
@@ -10,10 +11,10 @@ public static class HopngArtifactServiceFactory
     public static bool IsLocalBridgeCompiled => false;
 #endif
 
-    public static IHopngArtifactService Create(string? explicitOutputRoot = null)
+    public static IHopngArtifactService Create(string? explicitOutputRoot = null, IManagedEgressRouter? egressRouter = null)
     {
 #if LOCAL_HDT_BRIDGE
-        return new LocalHdtHopngArtifactService(explicitOutputRoot);
+        return new LocalHdtHopngArtifactService(explicitOutputRoot, egressRouter);
 #else
         return new UnavailableHopngArtifactService();
 #endif

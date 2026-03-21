@@ -8,6 +8,12 @@ public sealed class CognitionHostService : ICognitionEngine
 {
     private RuntimePathConfiguration? _paths;
     private bool _initialized;
+    private readonly IManagedEgressRouter _egressRouter;
+
+    public CognitionHostService(IManagedEgressRouter? egressRouter = null)
+    {
+        _egressRouter = egressRouter ?? NullEgressRouter.Instance;
+    }
 
     public Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -18,7 +24,11 @@ public sealed class CognitionHostService : ICognitionEngine
 
         _paths = RuntimePathConfiguration.FromEnvironment();
         _paths.ValidateOutsideRepository(Directory.GetCurrentDirectory());
-        _paths.EnsureDirectories();
+        if (!_paths.EnsureDirectories(_egressRouter))
+        {
+            throw new InvalidOperationException("Managed egress router denied required cognition host path provisioning.");
+        }
+
         _initialized = true;
         return Task.CompletedTask;
     }
@@ -222,14 +232,27 @@ internal sealed class RuntimePathConfiguration
         EnsureOutsideRepo(CgoaPath, normalizedRepositoryRoot, "OAN_CGOA");
     }
 
-    public void EnsureDirectories()
+    public bool EnsureDirectories(IManagedEgressRouter egressRouter)
     {
-        Directory.CreateDirectory(RuntimeRoot);
-        Directory.CreateDirectory(ModelPath);
-        Directory.CreateDirectory(SelfGelPath);
-        Directory.CreateDirectory(CSelfGelPath);
-        Directory.CreateDirectory(GoaPath);
-        Directory.CreateDirectory(CgoaPath);
+        var envelope = new ManagedEgressEnvelope(
+            EffectKind: SliEgressEffectKind.StructuralCreation,
+            RetentionPosture: SliEgressRetentionPosture.GovernanceArtifact,
+            JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+            IdentityFormingAllowed: true,
+            TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+            AuthorityReason: "Provisioning required structural bounds for cognition host artifacts"
+        );
+
+        return egressRouter.TryRouteEgressAsync(envelope, () =>
+        {
+            Directory.CreateDirectory(RuntimeRoot);
+            Directory.CreateDirectory(ModelPath);
+            Directory.CreateDirectory(SelfGelPath);
+            Directory.CreateDirectory(CSelfGelPath);
+            Directory.CreateDirectory(GoaPath);
+            Directory.CreateDirectory(CgoaPath);
+            return Task.CompletedTask;
+        }).GetAwaiter().GetResult();
     }
 
     private static string ReadRequiredPath(string environmentVariable)

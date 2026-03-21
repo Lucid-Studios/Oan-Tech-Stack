@@ -20,7 +20,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
         var storageTelemetry = new RecordingTelemetrySink();
         var publicLayer = new PublicLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
 
@@ -230,7 +230,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
 
 #if LOCAL_HDT_BRIDGE
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
-        var hopngService = HopngArtifactServiceFactory.Create(outputRoot);
+        var hopngService = HopngArtifactServiceFactory.Create(outputRoot, new TestPermissiveEgressRouter());
         var governingTrafficArtifact = await hopngService.EmitAsync(hopngRequest);
 
         Assert.True(
@@ -264,7 +264,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
             governingTrafficArtifact.ValidationSummary);
 #else
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-inner-weather-hopng");
-        var hopngService = HopngArtifactServiceFactory.Create(outputRoot);
+        var hopngService = HopngArtifactServiceFactory.Create(outputRoot, new TestPermissiveEgressRouter());
         var governingTrafficArtifact = await hopngService.EmitAsync(hopngRequest);
 
         Assert.Equal(GovernedHopngArtifactOutcome.Unavailable, governingTrafficArtifact.Outcome);
@@ -287,7 +287,7 @@ public sealed class GovernedInnerWeatherIntegrationTests
         var storageTelemetry = new RecordingTelemetrySink();
         var publicLayer = new PublicLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
 

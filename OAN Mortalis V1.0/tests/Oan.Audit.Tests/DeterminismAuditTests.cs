@@ -32,8 +32,9 @@ namespace Oan.Audit.Tests
 
             _authority = new SoulFrameAuthority(_govTelemetry);
             
-            var publicStore = new PublicPlaneStore(Path.Combine(_testRoot, "public"), _storageTelemetry);
-            var crypticStore = new CrypticPlaneStore(Path.Combine(_testRoot, "cryptic"), _storageTelemetry);
+            var router = new TestPermissiveEgressRouter();
+            var publicStore = new PublicPlaneStore(Path.Combine(_testRoot, "public"), _storageTelemetry, router);
+            var crypticStore = new CrypticPlaneStore(Path.Combine(_testRoot, "cryptic"), _storageTelemetry, router);
             var harness = new DeterministicHarness(crypticStore);
 
             _stores = new StoreRegistry(
@@ -216,8 +217,9 @@ namespace Oan.Audit.Tests
             Directory.CreateDirectory(Path.Combine(_testRoot, "cryptic"));
             
             // Re-recreate core objects with same seed logic
-            var freshHarness = new DeterministicHarness(new CrypticPlaneStore(Path.Combine(_testRoot, "cryptic"), new MockTelemetrySink()));
-            var freshRouter = new RoutingEngine(_authority, _stores.Public, new CrypticPlaneStore(Path.Combine(_testRoot, "cryptic"), new MockTelemetrySink()), freshHarness);
+            var router = new TestPermissiveEgressRouter();
+            var freshHarness = new DeterministicHarness(new CrypticPlaneStore(Path.Combine(_testRoot, "cryptic"), new MockTelemetrySink(), router));
+            var freshRouter = new RoutingEngine(_authority, _stores.Public, new CrypticPlaneStore(Path.Combine(_testRoot, "cryptic"), new MockTelemetrySink(), router), freshHarness);
 
             var response2 = await freshRouter.ExecuteDuplexAsync(query, input);
             string storage2 = await File.ReadAllTextAsync(crypticPath);
@@ -225,15 +227,23 @@ namespace Oan.Audit.Tests
             Assert.Equal(response1.ComputeId(), response2.ComputeId());
             Assert.Equal(storage1, storage2);
         }
-    }
 
-    public class MockTelemetrySink : ITelemetrySink
-    {
-        public int EmitCount { get; private set; }
-        public Task EmitAsync(object telemetryEvent)
+        public class MockTelemetrySink : ITelemetrySink
         {
-            EmitCount++;
-            return Task.CompletedTask;
+            public int EmitCount { get; private set; }
+            public Task EmitAsync(object telemetryEvent)
+            {
+                EmitCount++;
+                return Task.CompletedTask;
+            }
+        }
+
+        private sealed class TestPermissiveEgressRouter : IManagedEgressRouter
+        {
+            public Task<bool> TryRouteEgressAsync(ManagedEgressEnvelope envelope, Func<Task> egressAction, CancellationToken cancellationToken = default)
+            {
+                return egressAction().ContinueWith(_ => true, cancellationToken);
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ public sealed class GovernanceOperationalControlIntegrationTests
         var publicLayer = new PublicLayerService();
         var crypticLayer = new CrypticLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var steward = CreateSteward(publicLayer, crypticLayer, telemetry, journal);
         var request = CreateGoldenPathRequest();
         var workResult = CreateApprovedWorkResult(request.IdentityId, request.SoulFrameId, request.CMEId);
@@ -59,7 +59,7 @@ public sealed class GovernanceOperationalControlIntegrationTests
         var publicLayer = new PublicLayerService();
         var crypticLayer = new CrypticLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var steward = CreateSteward(publicLayer, crypticLayer, telemetry, journal);
         var request = CreateGoldenPathRequest();
         var workResult = CreateDeferredWorkResult(request.IdentityId, request.SoulFrameId, request.CMEId);
@@ -111,7 +111,7 @@ public sealed class GovernanceOperationalControlIntegrationTests
         var telemetry = new GelTelemetryAdapter();
         var publicLayer = new PublicLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry, journal);
         var request = CreateGoldenPathRequest();
         var workResult = CreateApprovedWorkResult(request.IdentityId, request.SoulFrameId, request.CMEId);
@@ -147,7 +147,7 @@ public sealed class GovernanceOperationalControlIntegrationTests
         var telemetry = new GelTelemetryAdapter();
         var publicLayer = new PublicLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry, journal);
         var request = CreateGoldenPathRequest();
         var workResult = CreateApprovedWorkResult(request.IdentityId, request.SoulFrameId, request.CMEId);
@@ -188,9 +188,9 @@ public sealed class GovernanceOperationalControlIntegrationTests
             new PublicLayerService(),
             new MantleOfSovereigntyService(),
             governedPrimePublicationSink: new PublicLayerService(),
-            governanceReceiptJournal: new NdjsonGovernanceReceiptJournal(journalPath),
+            governanceReceiptJournal: new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter()),
             governanceCognitionService: new FakeGovernanceCognitionService(CreateApprovedWorkResult(Guid.NewGuid(), Guid.NewGuid(), "cme-runtime")),
-            steward: CreateSteward(new PublicLayerService(), new CrypticLayerService(), new GelTelemetryAdapter(), new NdjsonGovernanceReceiptJournal(journalPath))));
+            steward: CreateSteward(new PublicLayerService(), new CrypticLayerService(), new GelTelemetryAdapter(), new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter()))));
 
         var status = await manager.GetStatusByLoopKeyAsync(loopKey);
 

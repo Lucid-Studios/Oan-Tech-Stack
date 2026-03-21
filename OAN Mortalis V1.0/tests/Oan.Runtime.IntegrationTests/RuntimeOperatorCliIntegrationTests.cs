@@ -195,10 +195,10 @@ public sealed class RuntimeOperatorCliIntegrationTests
             new PublicLayerService(),
             new MantleOfSovereigntyService(),
             governedPrimePublicationSink: new PublicLayerService(),
-            governanceReceiptJournal: new NdjsonGovernanceReceiptJournal(journalPath),
+            governanceReceiptJournal: new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter()),
             governanceCognitionService: new FakeGovernanceCognitionService(CreateApprovedWorkResult(Guid.NewGuid(), Guid.NewGuid(), "cme-runtime")),
-            steward: CreateSteward(new PublicLayerService(), new CrypticLayerService(), new GelTelemetryAdapter(), new NdjsonGovernanceReceiptJournal(journalPath))));
-        var steward = CreateSteward(new PublicLayerService(), new CrypticLayerService(), new GelTelemetryAdapter(), new NdjsonGovernanceReceiptJournal(journalPath));
+            steward: CreateSteward(new PublicLayerService(), new CrypticLayerService(), new GelTelemetryAdapter(), new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter()))));
+        var steward = CreateSteward(new PublicLayerService(), new CrypticLayerService(), new GelTelemetryAdapter(), new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter()));
         var context = new RuntimeOperatorContext(manager, steward, manager);
 
         var response = await InvokeCliAsync(context, "status", "--loop-key", loopKey);
@@ -227,8 +227,11 @@ public sealed class RuntimeOperatorCliIntegrationTests
     {
         var runtimeRoot = Path.Combine(Path.GetTempPath(), $"oan-headless-{Guid.NewGuid():N}");
         Directory.CreateDirectory(runtimeRoot);
+        var publicRoot = Path.Combine(runtimeRoot, "public_root");
+        Directory.CreateDirectory(publicRoot);
+        File.WriteAllText(Path.Combine(publicRoot, "GEL.ndjson"), "{\"engram\":{\"variants\":[\"engram (1)\"]}}");
 
-        var host = await HeadlessRuntimeBootstrap.CreateEvaluateHostAsync(runtimeRoot);
+        var host = await HeadlessRuntimeBootstrap.CreateEvaluateHostAsync(runtimeRoot, new TestPermissiveEgressRouter());
         var result = await host.EvaluateAsync("agent-001", "theater-A", new { input = "CLI_TRIGGER" });
 
         Assert.Equal("agent-001", result.AgentId);
@@ -246,7 +249,7 @@ public sealed class RuntimeOperatorCliIntegrationTests
         var publicLayer = new PublicLayerService();
         var crypticLayer = new CrypticLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var steward = CreateSteward(publicLayer, crypticLayer, telemetry, journal);
         request = CreateGoldenPathRequest();
         workResult = mode == TestLoopMode.Deferred

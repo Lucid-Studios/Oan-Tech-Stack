@@ -18,4 +18,5 @@ public sealed class LispExecutionResult
     internal SliActualizationWebbingPacket? ActualizationPacket { get; init; }
     internal SliLiveEngramRuntimePacket? LiveRuntimePacket { get; init; }
     internal SliLiveEngramRuntimeRun? LiveRuntimeRun { get; init; }
+    internal SliExecutionSnapshot? ExecutionSnapshot { get; set; }
 }

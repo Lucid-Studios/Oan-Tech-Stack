@@ -23,17 +23,19 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
     private readonly GovernedProjectionDerivationService _projectionDerivation = new();
     private readonly TemporalPhaseStackService _phaseStack = new();
     private readonly Ed25519SignatureService _signatureService = new();
+    private readonly IManagedEgressRouter _egressRouter;
 
-    public LocalHdtHopngArtifactService(string? explicitOutputRoot = null)
+    public LocalHdtHopngArtifactService(string? explicitOutputRoot = null, IManagedEgressRouter? egressRouter = null)
     {
         _explicitOutputRoot = explicitOutputRoot;
+        _egressRouter = egressRouter ?? NullEgressRouter.Instance;
     }
 
     public string ContainerName => "cradletek-hopng";
 
     public Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-    public Task<GovernedHopngArtifactReceipt> EmitAsync(
+    public async Task<GovernedHopngArtifactReceipt> EmitAsync(
         GovernedHopngEmissionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -46,52 +48,89 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
         var artifactLayout = HopngArtifactLayout.Create(artifactDirectory, artifactSlug);
         var privateKeyPath = GetSharedPrivateKeyPath(outputRoot);
         var publicKeyPath = GetSharedPublicKeyPath(outputRoot);
-        Directory.CreateDirectory(artifactDirectory);
 
-        try
+        var envelope = new ManagedEgressEnvelope(
+            EffectKind: SliEgressEffectKind.ArtifactWrite,
+            RetentionPosture: SliEgressRetentionPosture.GovernanceArtifact,
+            JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+            IdentityFormingAllowed: true,
+            TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+            AuthorityReason: "Emitting governed HDT Hopng artifact to local workspace"
+        );
+
+        GovernedHopngArtifactReceipt? finalReceipt = null;
+
+        var authorized = await _egressRouter.TryRouteEgressAsync(envelope, () =>
         {
-            var newArtifact = _builder.Create(new NewHopngRequest(
-                OutputDirectory: artifactDirectory,
-                Name: artifactSlug,
-                Signer: Signer,
-                KeyId: KeyId,
-                DisplayName: $"{request.Profile} {request.LoopKey}",
-                ArtifactId: CreateArtifactId(request.LoopKey, request.Profile),
-                PrivateKeyPath: null,
-                PrivateKeyOutputPath: privateKeyPath,
-                PublicKeyOutputPath: publicKeyPath));
+            Directory.CreateDirectory(artifactDirectory);
 
-            var artifact = EnrichArtifact(newArtifact, request, privateKeyPath);
-            var validation = _validator.Validate(artifact.Layout.ManifestPath);
+            try
+            {
+                var newArtifact = _builder.Create(new NewHopngRequest(
+                    OutputDirectory: artifactDirectory,
+                    Name: artifactSlug,
+                    Signer: Signer,
+                    KeyId: KeyId,
+                    DisplayName: $"{request.Profile} {request.LoopKey}",
+                    ArtifactId: CreateArtifactId(request.LoopKey, request.Profile),
+                    PrivateKeyPath: null,
+                    PrivateKeyOutputPath: privateKeyPath,
+                    PublicKeyOutputPath: publicKeyPath));
 
-            var outcome = validation.Errors.Count == 0
-                ? GovernedHopngArtifactOutcome.Created
-                : GovernedHopngArtifactOutcome.FailedValidation;
-            var officeSummary = BuildOfficeAuthoritySummary(request.Snapshot);
-            var projectionSummary = request.Profile == GovernedHopngArtifactProfile.GoverningTrafficEvidence
-                ? BuildProjectionSummary(artifact, validation)
-                : BuildPhaseSummary(artifact, validation);
+                var artifact = EnrichArtifact(newArtifact, request, privateKeyPath);
+                var validation = _validator.Validate(artifact.Layout.ManifestPath);
 
-            return Task.FromResult(new GovernedHopngArtifactReceipt(
-                ArtifactHandle: artifactHandle,
-                LoopKey: request.LoopKey,
-                CandidateId: request.CandidateId,
-                CandidateProvenance: request.CandidateProvenance,
-                Profile: request.Profile,
-                Stage: request.Stage,
-                Outcome: outcome,
-                IssuedBy: Signer,
-                TimestampUtc: DateTimeOffset.UtcNow,
-                ArtifactId: artifact.Manifest.ArtifactId,
-                ManifestPath: artifact.Layout.ManifestPath,
-                ProjectionPath: artifact.Layout.ProjectionPath,
-                ValidationSummary: $"validation-errors:{validation.Errors.Count};{officeSummary}",
-                ProfileSummary: $"{projectionSummary};{officeSummary}",
-                FailureCode: outcome == GovernedHopngArtifactOutcome.Created ? null : "hopng-validation-failed"));
-        }
-        catch (Exception ex)
+                var outcome = validation.Errors.Count == 0
+                    ? GovernedHopngArtifactOutcome.Created
+                    : GovernedHopngArtifactOutcome.FailedValidation;
+                var officeSummary = BuildOfficeAuthoritySummary(request.Snapshot);
+                var projectionSummary = request.Profile == GovernedHopngArtifactProfile.GoverningTrafficEvidence
+                    ? BuildProjectionSummary(artifact, validation)
+                    : BuildPhaseSummary(artifact, validation);
+
+                finalReceipt = new GovernedHopngArtifactReceipt(
+                    ArtifactHandle: artifactHandle,
+                    LoopKey: request.LoopKey,
+                    CandidateId: request.CandidateId,
+                    CandidateProvenance: request.CandidateProvenance,
+                    Profile: request.Profile,
+                    Stage: request.Stage,
+                    Outcome: outcome,
+                    IssuedBy: Signer,
+                    TimestampUtc: DateTimeOffset.UtcNow,
+                    ArtifactId: artifact.Manifest.ArtifactId,
+                    ManifestPath: artifact.Layout.ManifestPath,
+                    ProjectionPath: artifact.Layout.ProjectionPath,
+                    ValidationSummary: $"validation-errors:{validation.Errors.Count};{officeSummary}",
+                    ProfileSummary: $"{projectionSummary};{officeSummary}",
+                    FailureCode: outcome == GovernedHopngArtifactOutcome.Created ? null : "hopng-validation-failed");
+            }
+            catch (Exception ex)
+            {
+                finalReceipt = new GovernedHopngArtifactReceipt(
+                    ArtifactHandle: artifactHandle,
+                    LoopKey: request.LoopKey,
+                    CandidateId: request.CandidateId,
+                    CandidateProvenance: request.CandidateProvenance,
+                    Profile: request.Profile,
+                    Stage: request.Stage,
+                    Outcome: GovernedHopngArtifactOutcome.Failed,
+                    IssuedBy: Signer,
+                    TimestampUtc: DateTimeOffset.UtcNow,
+                    ArtifactId: null,
+                    ManifestPath: File.Exists(artifactLayout.ManifestPath) ? artifactLayout.ManifestPath : null,
+                    ProjectionPath: File.Exists(artifactLayout.ProjectionPath) ? artifactLayout.ProjectionPath : null,
+                    ValidationSummary: ex.Message,
+                    ProfileSummary: ex.ToString(),
+                    FailureCode: $"hopng-emission-failed:{ex.GetType().Name}");
+            }
+
+            return Task.CompletedTask;
+        }, cancellationToken).ConfigureAwait(false);
+
+        if (!authorized)
         {
-            return Task.FromResult(new GovernedHopngArtifactReceipt(
+            return new GovernedHopngArtifactReceipt(
                 ArtifactHandle: artifactHandle,
                 LoopKey: request.LoopKey,
                 CandidateId: request.CandidateId,
@@ -102,12 +141,14 @@ public sealed class LocalHdtHopngArtifactService : IHopngArtifactService
                 IssuedBy: Signer,
                 TimestampUtc: DateTimeOffset.UtcNow,
                 ArtifactId: null,
-                ManifestPath: File.Exists(artifactLayout.ManifestPath) ? artifactLayout.ManifestPath : null,
-                ProjectionPath: File.Exists(artifactLayout.ProjectionPath) ? artifactLayout.ProjectionPath : null,
-                ValidationSummary: ex.Message,
-                ProfileSummary: ex.ToString(),
-                FailureCode: $"hopng-emission-failed:{ex.GetType().Name}"));
+                ManifestPath: null,
+                ProjectionPath: null,
+                ValidationSummary: "Egress Denied by Router",
+                ProfileSummary: "No emission was authorized.",
+                FailureCode: "egress-router-denied");
         }
+
+        return finalReceipt!;
     }
 
     private LoadedHopngArtifact EnrichArtifact(
