@@ -117,6 +117,9 @@ The supporting scripts are:
 - `tools/Write-Release-Candidate-Digest.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
+- `tools/Invoke-Seeded-Build-Governance.ps1`
+- `tools/Sync-Local-AutomationScheduler.ps1`
+- `tools/Write-CmeFormalization-ConsolidationStatus.ps1`
 
 The stable status surfaces are:
 
@@ -124,6 +127,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-cycle-last-run.json`
 - `.audit/state/local-automation-tasking-status.json`
 - `.audit/state/local-automation-tasking-status.md`
+- `.audit/state/local-automation-seeded-governance-last-run.json`
+- `.audit/state/local-automation-scheduler-reconciliation-last-run.json`
+- `.audit/state/local-automation-cme-consolidation-state.json`
 
 The formal tasking surface is:
 
@@ -135,6 +141,26 @@ The local cycle is intentionally biased toward continued build progress.
 It does not require a human to bless every green pass.
 
 It does require a human to review at least once every `24` hours, or sooner if the stack enters a blocked state.
+
+## Seeded Governance Lane
+
+The local cycle may now braid a seeded local host into unattended build review.
+
+That seeded lane may:
+
+- interpret routine build evidence
+- run the local preflight profile
+- classify posture as `Accepted`, `Deferred`, or `Rejected`
+- contribute advisory provenance to the build surface
+
+That seeded lane may not:
+
+- promote versions
+- widen authority
+- publish by implication
+- overrule a blocked posture
+
+Seeded outputs are evidence artifacts, not autonomous release truth.
 
 ## Operational Bias
 

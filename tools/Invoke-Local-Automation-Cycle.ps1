@@ -142,6 +142,9 @@ $blockedEscalationOutputRoot = [string] $policy.blockedEscalationOutputRoot
 $statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.statePath)
 $retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.retentionStatePath)
 $blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.blockedEscalationStatePath)
+$seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededGovernanceStatePath)
+$schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerReconciliationStatePath)
+$cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.cmeConsolidationStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -285,24 +288,14 @@ $statePayload = [ordered]@{
     releaseCandidateTriggered = $releaseCandidateDue
     digestTriggered = $digestDue
 }
-
-Write-JsonFile -Path $statePath -Value $statePayload
-
-$summary = [ordered]@{
-    schemaVersion = 1
-    generatedAtUtc = $nowUtc.ToString('o')
-    statePath = $statePath
-    lastReleaseCandidateBundle = $releaseCandidateBundlePath
-    lastKnownStatus = $latestStatus
-    lastDigestBundle = $digestBundlePath
-    nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
-    nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
-}
-
 $summaryPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '.audit/state/local-automation-cycle-last-run.json'
 $statePayload.lastBlockedEscalationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBlockedEscalationBundle')
 $statePayload.blockedEscalationTriggered = $false
 $statePayload.retentionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $retentionStatePath
+$statePayload.lastSeededGovernanceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSeededGovernanceBundle')
+$statePayload.seededGovernanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededGovernanceStatePath
+$statePayload.schedulerReconciliationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerReconciliationStatePath
+$statePayload.cmeConsolidationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cmeConsolidationStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -335,6 +328,46 @@ if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$seededGovernanceScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Seeded-Build-Governance.ps1'
+$seededGovernanceOutput = & powershell -ExecutionPolicy Bypass -File $seededGovernanceScriptPath -Configuration $Configuration -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$seededGovernanceBundlePath = Get-ScriptOutputTail -Output $seededGovernanceOutput
+if (-not [string]::IsNullOrWhiteSpace($seededGovernanceBundlePath)) {
+    $statePayload.lastSeededGovernanceBundle = $seededGovernanceBundlePath
+    $statePayload.seededGovernanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededGovernanceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$schedulerSyncScriptPath = Join-Path $resolvedRepoRoot 'tools\Sync-Local-AutomationScheduler.ps1'
+$schedulerSyncOutput = & powershell -ExecutionPolicy Bypass -File $schedulerSyncScriptPath -Configuration $Configuration -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$schedulerSyncStatePathFromRun = Get-ScriptOutputTail -Output $schedulerSyncOutput
+if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
+    $statePayload.schedulerReconciliationStatePath = $schedulerSyncStatePathFromRun
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$cmeConsolidationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CmeFormalization-ConsolidationStatus.ps1'
+$cmeConsolidationOutput = & powershell -ExecutionPolicy Bypass -File $cmeConsolidationScriptPath -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$cmeConsolidationStatePathFromRun = Get-ScriptOutputTail -Output $cmeConsolidationOutput
+if (-not [string]::IsNullOrWhiteSpace($cmeConsolidationStatePathFromRun)) {
+    $statePayload.cmeConsolidationStatePath = $cmeConsolidationStatePathFromRun
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$summary = [ordered]@{
+    schemaVersion = 1
+    generatedAtUtc = $nowUtc.ToString('o')
+    statePath = $statePath
+    lastReleaseCandidateBundle = $releaseCandidateBundlePath
+    lastKnownStatus = $latestStatus
+    lastDigestBundle = $digestBundlePath
+    lastSeededGovernanceBundle = $seededGovernanceBundlePath
+    retentionStatePath = $statePayload.retentionStatePath
+    schedulerReconciliationStatePath = $statePayload.schedulerReconciliationStatePath
+    cmeConsolidationStatePath = $statePayload.cmeConsolidationStatePath
+    nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
+    nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
+}
+
 Write-JsonFile -Path $summaryPath -Value $summary
 
 $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
@@ -345,6 +378,15 @@ Write-Host ('[local-automation-cycle] Status: {0}' -f $latestStatus)
 Write-Host ('[local-automation-cycle] State: {0}' -f $statePath)
 if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Retention: {0}' -f $retentionStatePathFromRun)
+}
+if (-not [string]::IsNullOrWhiteSpace($seededGovernanceBundlePath)) {
+    Write-Host ('[local-automation-cycle] SeededGovernance: {0}' -f $seededGovernanceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] SchedulerSync: {0}' -f $schedulerSyncStatePathFromRun)
+}
+if (-not [string]::IsNullOrWhiteSpace($cmeConsolidationStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] CmeConsolidation: {0}' -f $cmeConsolidationStatePathFromRun)
 }
 if (-not [string]::IsNullOrWhiteSpace($blockedEscalationBundlePath)) {
     Write-Host ('[local-automation-cycle] BlockedEscalation: {0}' -f $blockedEscalationBundlePath)

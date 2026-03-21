@@ -7,14 +7,37 @@
   "releaseCandidateOutputRoot": ".audit/runs/release-candidates",
   "digestOutputRoot": ".audit/runs/release-digests",
   "blockedEscalationOutputRoot": ".audit/runs/blocked-escalations",
+  "seededGovernanceOutputRoot": ".audit/runs/seeded-governance",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
+  "seededGovernanceStatePath": ".audit/state/local-automation-seeded-governance-last-run.json",
+  "schedulerReconciliationStatePath": ".audit/state/local-automation-scheduler-reconciliation-last-run.json",
+  "cmeConsolidationStatePath": ".audit/state/local-automation-cme-consolidation-state.json",
+  "seededGovernancePolicy": {
+    "enabled": true,
+    "attemptLocalPreflight": true,
+    "hostEndpoint": "http://127.0.0.1:8181",
+    "unreachableDisposition": "Deferred",
+    "acceptedReadinessStatuses": [
+      "ReadyForTelemetryStaging"
+    ],
+    "deferredReadinessStatuses": [
+      "Borderline"
+    ],
+    "rejectedReadinessStatuses": [
+      "NotReady"
+    ]
+  },
+  "schedulerReconciliationPolicy": {
+    "driftToleranceMinutes": 3
+  },
   "retentionPolicy": {
     "keepReleaseCandidateBundles": 8,
     "keepDigestBundles": 8,
     "keepLongFormTaskMapRuns": 8,
     "keepBlockedEscalationBundles": 8,
+    "keepSeededGovernanceBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

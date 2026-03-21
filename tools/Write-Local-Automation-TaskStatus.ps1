@@ -109,6 +109,9 @@ function Resolve-LongFormTaskLiveStatus {
         [string] $LatestDigestBundlePath,
         [object] $RetentionState,
         [object] $BlockedEscalationState,
+        [object] $SeededGovernanceState,
+        [object] $SchedulerReconciliationState,
+        [object] $CmeConsolidationState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -144,6 +147,37 @@ function Resolve-LongFormTaskLiveStatus {
 
             if ($PolicyStatus -eq 'selected') {
                 return 'armed'
+            }
+        }
+        'seeded-governance-lane' {
+            if ($null -ne $SeededGovernanceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'scheduler-cadence-reconciliation' {
+            if ($null -ne $SchedulerReconciliationState) {
+                if ([bool] $SchedulerReconciliationState.aligned) {
+                    return 'completed'
+                }
+
+                return 'active'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'cme-formalization-consolidation-surface' {
+            if ($null -ne $CmeConsolidationState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
             }
         }
     }
@@ -189,8 +223,14 @@ $latestDigestBundlePath = if (-not [string]::IsNullOrWhiteSpace($lastDigestBundl
 }
 $retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.retentionStatePath)
 $blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationStatePath)
+$seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
+$schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerReconciliationStatePath)
+$cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.cmeConsolidationStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
+$seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
+$schedulerReconciliationState = Read-JsonFileOrNull -Path $schedulerReconciliationStatePath
+$cmeConsolidationState = Read-JsonFileOrNull -Path $cmeConsolidationStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -341,6 +381,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -LatestDigestBundlePath $latestDigestBundlePath `
                 -RetentionState $retentionState `
                 -BlockedEscalationState $blockedEscalationState `
+                -SeededGovernanceState $seededGovernanceState `
+                -SchedulerReconciliationState $schedulerReconciliationState `
+                -CmeConsolidationState $cmeConsolidationState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -390,6 +433,9 @@ $taskMapEntries = @(
                     -LatestDigestBundlePath $latestDigestBundlePath `
                     -RetentionState $retentionState `
                     -BlockedEscalationState $blockedEscalationState `
+                    -SeededGovernanceState $seededGovernanceState `
+                    -SchedulerReconciliationState $schedulerReconciliationState `
+                    -CmeConsolidationState $cmeConsolidationState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -457,6 +503,13 @@ $statusPayload = [ordered]@{
         requiresImmediateHitl = $requiresImmediateHitl
         lastReleaseCandidateBundle = $lastReleaseCandidateBundle
         lastDigestBundle = $lastDigestBundle
+        seededGovernanceDisposition = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.disposition } else { $null }
+        seededGovernanceReason = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.dispositionReason } else { $null }
+        seededGovernanceProvenance = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.provenance } else { $null }
+        schedulerReconciliationAction = if ($null -ne $schedulerReconciliationState) { [string] $schedulerReconciliationState.actionTaken } else { $null }
+        schedulerAligned = if ($null -ne $schedulerReconciliationState) { [bool] $schedulerReconciliationState.aligned } else { $null }
+        cmeConsolidationState = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.consolidationState } else { $null }
+        cmeConsolidationReason = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.reasonCode } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -494,6 +547,40 @@ if ($scheduler.registered) {
     )
 }
 
+if ($null -ne $seededGovernanceState) {
+    $markdownLines += @(
+        '## Seeded Governance',
+        '',
+        ('- Disposition: `{0}`' -f [string] $seededGovernanceState.disposition),
+        ('- Reason: `{0}`' -f [string] $seededGovernanceState.dispositionReason),
+        ('- Provenance: `{0}`' -f [string] $seededGovernanceState.provenance),
+        ''
+    )
+}
+
+if ($null -ne $schedulerReconciliationState) {
+    $markdownLines += @(
+        '## Scheduler Reconciliation',
+        '',
+        ('- Action taken: `{0}`' -f [string] $schedulerReconciliationState.actionTaken),
+        ('- Aligned: `{0}`' -f [bool] $schedulerReconciliationState.aligned),
+        ('- Desired next run (UTC): `{0}`' -f [string] $schedulerReconciliationState.desiredNextRunUtc),
+        ('- Final next run (UTC): `{0}`' -f [string] $schedulerReconciliationState.finalNextRunUtc),
+        ''
+    )
+}
+
+if ($null -ne $cmeConsolidationState) {
+    $markdownLines += @(
+        '## CME Consolidation',
+        '',
+        ('- Consolidation state: `{0}`' -f [string] $cmeConsolidationState.consolidationState),
+        ('- Reason code: `{0}`' -f [string] $cmeConsolidationState.reasonCode),
+        ('- Consecutive accepted seed runs: `{0}`' -f [int] $cmeConsolidationState.consecutiveAcceptedCount),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -522,6 +609,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -LatestDigestBundlePath $latestDigestBundlePath `
             -RetentionState $retentionState `
             -BlockedEscalationState $blockedEscalationState `
+            -SeededGovernanceState $seededGovernanceState `
+            -SchedulerReconciliationState $schedulerReconciliationState `
+            -CmeConsolidationState $cmeConsolidationState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

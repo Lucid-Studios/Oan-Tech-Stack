@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 02`
+- `Automation Maturation Map 03`
 
 Next eligible map:
 
-- `none currently declared`
+- `Automation Maturation Map 04`
 
 Time-dilation rule:
 
@@ -131,7 +131,7 @@ The active-run bundle root is:
 
 - Goal: deepen unattended evidence quality without crossing into ungated promotion authority
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Delta Summary Surface`
   - `Artifact Retention Pruning`
   - `Blocked Escalation Bundle`
@@ -141,6 +141,30 @@ Current live output surfaces for this map:
 - delta summaries land inside each digest bundle as `delta-summary.json` and `delta-summary.md`
 - retention pruning writes its last-run state to `.audit/state/local-automation-retention-last-run.json`
 - blocked escalation bundles land under `.audit/runs/blocked-escalations/` and update `.audit/state/local-automation-blocked-escalation-last-run.json` when the posture is `blocked`
+
+### Automation Maturation Map 03
+
+- Goal: introduce seeded governance participation into unattended build review, reconcile scheduler/runtime cadence truth, and expose a CME formalization consolidation surface without widening promotion authority
+- Expected review windows: `2`
+- Selected tasks:
+  - `Seeded Governance Lane`
+  - `Scheduler Cadence Reconciliation`
+  - `CME Formalization Consolidation Surface`
+
+Current live output surfaces for this map:
+
+- seeded governance bundles land under `.audit/runs/seeded-governance/` and update `.audit/state/local-automation-seeded-governance-last-run.json`
+- scheduler reconciliation writes `.audit/state/local-automation-scheduler-reconciliation-last-run.json`
+- CME consolidation writes `.audit/state/local-automation-cme-consolidation-state.json` and its paired Markdown surface
+
+### Automation Maturation Map 04
+
+- Goal: close promotion and release rehearsal once seeded governance and runtime cadence are stable
+- Expected review windows: `2`
+- Queued tasks:
+  - `Promotion Gate Bundle`
+  - `CI Artifact Concordance`
+  - `Release Ratification Rehearsal`
 
 ## Status Interpretation
 

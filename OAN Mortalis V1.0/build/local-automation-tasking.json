@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-02",
+  "activeTaskMapId": "automation-maturation-map-03",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -151,7 +151,7 @@
     {
       "id": "automation-maturation-map-02",
       "label": "Automation Maturation Map 02",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Deepen unattended evidence quality without crossing into ungated promotion authority.",
       "timeDilationPullForwardAllowed": false,
@@ -166,7 +166,7 @@
           "label": "Delta Summary Surface",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Summarize what changed between the latest release-candidate bundle and the previous one.",
           "completionSignal": "Latest digest includes a bounded delta summary without inferring maturity.",
           "escalatesWhen": [
@@ -179,7 +179,7 @@
           "label": "Artifact Retention Pruning",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Prune or compact old local evidence bundles according to declared retention policy while preserving review truth.",
           "completionSignal": "Retention policy can delete or compact stale local bundles without harming active review surfaces.",
           "escalatesWhen": [
@@ -192,12 +192,120 @@
           "label": "Blocked Escalation Bundle",
           "owner": "Shared",
           "authority": "Automation may prepare; HITL interprets",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Prepare a bounded escalation bundle when the automation posture becomes blocked.",
           "completionSignal": "A blocked posture produces one stable bundle that points to the exact failing evidence surfaces.",
           "escalatesWhen": [
             "escalation bundle widens into autonomous remediation",
             "blocked evidence cannot be localized"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-03",
+      "label": "Automation Maturation Map 03",
+      "status": "active",
+      "expectedReviewWindows": 2,
+      "goal": "Introduce seeded governance participation into unattended build review, reconcile scheduler/runtime cadence truth, and expose a CME formalization consolidation surface without widening promotion authority.",
+      "timeDilationPullForwardAllowed": true,
+      "taskIds": [
+        "seeded-governance-lane",
+        "scheduler-cadence-reconciliation",
+        "cme-formalization-consolidation-surface"
+      ],
+      "tasks": [
+        {
+          "id": "seeded-governance-lane",
+          "label": "Seeded Governance Lane",
+          "owner": "Shared",
+          "authority": "Seed may classify; HITL decides promotion",
+          "status": "selected",
+          "purpose": "Let the seeded local host interpret routine build evidence, delta surfaces, and preflight posture without widening release authority.",
+          "completionSignal": "A seeded governance bundle is emitted and classified as Accepted, Deferred, or Rejected with bounded provenance.",
+          "escalatesWhen": [
+            "seed feedback tries to promote or publish by implication",
+            "seed host availability or readiness remains unresolved across review windows"
+          ]
+        },
+        {
+          "id": "scheduler-cadence-reconciliation",
+          "label": "Scheduler Cadence Reconciliation",
+          "owner": "Automation",
+          "authority": "Machine-local only",
+          "status": "selected",
+          "purpose": "Keep the Windows scheduled task aligned with the release-candidate cadence recorded in the live cycle state.",
+          "completionSignal": "Scheduler reconciliation state shows the registered task is aligned to the declared cadence within tolerance.",
+          "escalatesWhen": [
+            "the scheduler cannot be registered or rescheduled locally",
+            "cycle next-run truth and scheduler next-run truth keep drifting materially"
+          ]
+        },
+        {
+          "id": "cme-formalization-consolidation-surface",
+          "label": "CME Formalization Consolidation Surface",
+          "owner": "Shared",
+          "authority": "Advisory only",
+          "status": "selected",
+          "purpose": "Expose whether the governing build layer is still exploratory, seed-assisted, braided, or crystallizing without narrating that as release authority.",
+          "completionSignal": "A stable consolidation state is emitted from current automation, seed, and scheduler truth.",
+          "escalatesWhen": [
+            "consolidation logic starts pretending exploratory state is authoritative",
+            "seed and scheduler truth remain materially contradictory"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-04",
+      "label": "Automation Maturation Map 04",
+      "status": "queued",
+      "expectedReviewWindows": 2,
+      "goal": "Close promotion and release rehearsal once seeded governance and runtime cadence are stable.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "promotion-gate-bundle",
+        "ci-artifact-concordance",
+        "release-ratification-rehearsal"
+      ],
+      "tasks": [
+        {
+          "id": "promotion-gate-bundle",
+          "label": "Promotion Gate Bundle",
+          "owner": "Shared",
+          "authority": "Automation may prepare; HITL ratifies",
+          "status": "queued",
+          "purpose": "Assemble the exact evidence bundle required for modular-set promotion without inferring authority from green output alone.",
+          "completionSignal": "A bounded promotion gate bundle exists with explicit reasons for continue, defer, or block.",
+          "escalatesWhen": [
+            "promotion evidence is incomplete",
+            "promotion logic starts inferring maturity from tests alone"
+          ]
+        },
+        {
+          "id": "ci-artifact-concordance",
+          "label": "CI Artifact Concordance",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Prove local candidate artifacts and CI candidate artifacts agree on content and version posture.",
+          "completionSignal": "Local and CI artifact manifests reconcile without unexplained drift.",
+          "escalatesWhen": [
+            "artifact manifests diverge materially",
+            "CI artifact production is missing or incomplete"
+          ]
+        },
+        {
+          "id": "release-ratification-rehearsal",
+          "label": "Release Ratification Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "queued",
+          "purpose": "Rehearse the first publish ratification path so promotion is evidence-led rather than improvised.",
+          "completionSignal": "The release rehearsal produces a stable ratification checklist with no hidden machine-local assumptions.",
+          "escalatesWhen": [
+            "release rehearsal depends on undeclared deployables",
+            "ratification still requires exploratory interpretation rather than bounded evidence"
           ]
         }
       ]
