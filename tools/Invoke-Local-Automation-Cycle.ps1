@@ -172,6 +172,9 @@ $seedBraidEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot
 $publishedRuntimeReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.publishedRuntimeReceiptStatePath)
 $artifactAttestationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.artifactAttestationStatePath)
 $postPublishDriftWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postPublishDriftWatchStatePath)
+$operationalPublicationLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.operationalPublicationLedgerStatePath)
+$externalConsumerConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.externalConsumerConcordanceStatePath)
+$postPublishGovernanceLoopStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postPublishGovernanceLoopStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -350,6 +353,12 @@ $statePayload.lastArtifactAttestationBundle = [string] (Get-ObjectPropertyValueO
 $statePayload.artifactAttestationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $artifactAttestationStatePath
 $statePayload.lastPostPublishDriftWatchBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPostPublishDriftWatchBundle')
 $statePayload.postPublishDriftWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishDriftWatchStatePath
+$statePayload.lastOperationalPublicationLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastOperationalPublicationLedgerBundle')
+$statePayload.operationalPublicationLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operationalPublicationLedgerStatePath
+$statePayload.lastExternalConsumerConcordanceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastExternalConsumerConcordanceBundle')
+$statePayload.externalConsumerConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $externalConsumerConcordanceStatePath
+$statePayload.lastPostPublishGovernanceLoopBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPostPublishGovernanceLoopBundle')
+$statePayload.postPublishGovernanceLoopStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishGovernanceLoopStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -515,6 +524,33 @@ if (-not [string]::IsNullOrWhiteSpace($postPublishDriftWatchBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$operationalPublicationLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-OperationalPublication-Ledger.ps1'
+$operationalPublicationLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $operationalPublicationLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Operational publication ledger writer'
+$operationalPublicationLedgerBundlePath = Get-ScriptOutputTail -Output $operationalPublicationLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($operationalPublicationLedgerBundlePath)) {
+    $statePayload.lastOperationalPublicationLedgerBundle = $operationalPublicationLedgerBundlePath
+    $statePayload.operationalPublicationLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operationalPublicationLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$externalConsumerConcordanceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ExternalConsumer-Concordance.ps1'
+$externalConsumerConcordanceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $externalConsumerConcordanceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'External consumer concordance writer'
+$externalConsumerConcordanceBundlePath = Get-ScriptOutputTail -Output $externalConsumerConcordanceOutput
+if (-not [string]::IsNullOrWhiteSpace($externalConsumerConcordanceBundlePath)) {
+    $statePayload.lastExternalConsumerConcordanceBundle = $externalConsumerConcordanceBundlePath
+    $statePayload.externalConsumerConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $externalConsumerConcordanceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$postPublishGovernanceLoopScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-PostPublish-GovernanceLoop.ps1'
+$postPublishGovernanceLoopOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $postPublishGovernanceLoopScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Post-publish governance loop writer'
+$postPublishGovernanceLoopBundlePath = Get-ScriptOutputTail -Output $postPublishGovernanceLoopOutput
+if (-not [string]::IsNullOrWhiteSpace($postPublishGovernanceLoopBundlePath)) {
+    $statePayload.lastPostPublishGovernanceLoopBundle = $postPublishGovernanceLoopBundlePath
+    $statePayload.postPublishGovernanceLoopStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishGovernanceLoopStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -552,6 +588,12 @@ $summary = [ordered]@{
     artifactAttestationStatePath = $statePayload.artifactAttestationStatePath
     lastPostPublishDriftWatchBundle = $statePayload.lastPostPublishDriftWatchBundle
     postPublishDriftWatchStatePath = $statePayload.postPublishDriftWatchStatePath
+    lastOperationalPublicationLedgerBundle = $statePayload.lastOperationalPublicationLedgerBundle
+    operationalPublicationLedgerStatePath = $statePayload.operationalPublicationLedgerStatePath
+    lastExternalConsumerConcordanceBundle = $statePayload.lastExternalConsumerConcordanceBundle
+    externalConsumerConcordanceStatePath = $statePayload.externalConsumerConcordanceStatePath
+    lastPostPublishGovernanceLoopBundle = $statePayload.lastPostPublishGovernanceLoopBundle
+    postPublishGovernanceLoopStatePath = $statePayload.postPublishGovernanceLoopStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -630,6 +672,15 @@ if (-not [string]::IsNullOrWhiteSpace($artifactAttestationBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($postPublishDriftWatchBundlePath)) {
     Write-Host ('[local-automation-cycle] PostPublishDriftWatch: {0}' -f $postPublishDriftWatchBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($operationalPublicationLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] OperationalPublicationLedger: {0}' -f $operationalPublicationLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($externalConsumerConcordanceBundlePath)) {
+    Write-Host ('[local-automation-cycle] ExternalConsumerConcordance: {0}' -f $externalConsumerConcordanceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($postPublishGovernanceLoopBundlePath)) {
+    Write-Host ('[local-automation-cycle] PostPublishGovernanceLoop: {0}' -f $postPublishGovernanceLoopBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

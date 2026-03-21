@@ -124,6 +124,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $PublishedRuntimeReceiptState,
         [object] $ArtifactAttestationState,
         [object] $PostPublishDriftWatchState,
+        [object] $OperationalPublicationLedgerState,
+        [object] $ExternalConsumerConcordanceState,
+        [object] $PostPublishGovernanceLoopState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -300,6 +303,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'operational-publication-ledger' {
+            if ($null -ne $OperationalPublicationLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'external-consumer-concordance' {
+            if ($null -ne $ExternalConsumerConcordanceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'post-publish-governance-loop' {
+            if ($null -ne $PostPublishGovernanceLoopState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -359,6 +389,9 @@ $seedBraidEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot
 $publishedRuntimeReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.publishedRuntimeReceiptStatePath)
 $artifactAttestationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.artifactAttestationStatePath)
 $postPublishDriftWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postPublishDriftWatchStatePath)
+$operationalPublicationLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operationalPublicationLedgerStatePath)
+$externalConsumerConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.externalConsumerConcordanceStatePath)
+$postPublishGovernanceLoopStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postPublishGovernanceLoopStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -377,6 +410,9 @@ $seedBraidEscalationState = Read-JsonFileOrNull -Path $seedBraidEscalationStateP
 $publishedRuntimeReceiptState = Read-JsonFileOrNull -Path $publishedRuntimeReceiptStatePath
 $artifactAttestationState = Read-JsonFileOrNull -Path $artifactAttestationStatePath
 $postPublishDriftWatchState = Read-JsonFileOrNull -Path $postPublishDriftWatchStatePath
+$operationalPublicationLedgerState = Read-JsonFileOrNull -Path $operationalPublicationLedgerStatePath
+$externalConsumerConcordanceState = Read-JsonFileOrNull -Path $externalConsumerConcordanceStatePath
+$postPublishGovernanceLoopState = Read-JsonFileOrNull -Path $postPublishGovernanceLoopStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -542,6 +578,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -PublishedRuntimeReceiptState $publishedRuntimeReceiptState `
                 -ArtifactAttestationState $artifactAttestationState `
                 -PostPublishDriftWatchState $postPublishDriftWatchState `
+                -OperationalPublicationLedgerState $operationalPublicationLedgerState `
+                -ExternalConsumerConcordanceState $externalConsumerConcordanceState `
+                -PostPublishGovernanceLoopState $postPublishGovernanceLoopState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -606,6 +645,9 @@ $taskMapEntries = @(
                     -PublishedRuntimeReceiptState $publishedRuntimeReceiptState `
                     -ArtifactAttestationState $artifactAttestationState `
                     -PostPublishDriftWatchState $postPublishDriftWatchState `
+                    -OperationalPublicationLedgerState $operationalPublicationLedgerState `
+                    -ExternalConsumerConcordanceState $externalConsumerConcordanceState `
+                    -PostPublishGovernanceLoopState $postPublishGovernanceLoopState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -714,6 +756,15 @@ $statusPayload = [ordered]@{
         postPublishDriftWatchState = if ($null -ne $postPublishDriftWatchState) { [string] $postPublishDriftWatchState.driftWatchState } else { $null }
         postPublishDriftWatchReason = if ($null -ne $postPublishDriftWatchState) { [string] $postPublishDriftWatchState.reasonCode } else { $null }
         postPublishDriftWatchNextAction = if ($null -ne $postPublishDriftWatchState) { [string] $postPublishDriftWatchState.nextAction } else { $null }
+        operationalPublicationLedgerState = if ($null -ne $operationalPublicationLedgerState) { [string] $operationalPublicationLedgerState.ledgerState } else { $null }
+        operationalPublicationLedgerReason = if ($null -ne $operationalPublicationLedgerState) { [string] $operationalPublicationLedgerState.reasonCode } else { $null }
+        operationalPublicationLedgerNextAction = if ($null -ne $operationalPublicationLedgerState) { [string] $operationalPublicationLedgerState.nextAction } else { $null }
+        externalConsumerConcordanceState = if ($null -ne $externalConsumerConcordanceState) { [string] $externalConsumerConcordanceState.concordanceState } else { $null }
+        externalConsumerConcordanceReason = if ($null -ne $externalConsumerConcordanceState) { [string] $externalConsumerConcordanceState.reasonCode } else { $null }
+        externalConsumerConcordanceNextAction = if ($null -ne $externalConsumerConcordanceState) { [string] $externalConsumerConcordanceState.nextAction } else { $null }
+        postPublishGovernanceLoopState = if ($null -ne $postPublishGovernanceLoopState) { [string] $postPublishGovernanceLoopState.governanceLoopState } else { $null }
+        postPublishGovernanceLoopReason = if ($null -ne $postPublishGovernanceLoopState) { [string] $postPublishGovernanceLoopState.reasonCode } else { $null }
+        postPublishGovernanceLoopNextAction = if ($null -ne $postPublishGovernanceLoopState) { [string] $postPublishGovernanceLoopState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -925,6 +976,39 @@ if ($null -ne $postPublishDriftWatchState) {
     )
 }
 
+if ($null -ne $operationalPublicationLedgerState) {
+    $markdownLines += @(
+        '## Operational Publication Ledger',
+        '',
+        ('- Ledger state: `{0}`' -f [string] $operationalPublicationLedgerState.ledgerState),
+        ('- Reason code: `{0}`' -f [string] $operationalPublicationLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $operationalPublicationLedgerState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $externalConsumerConcordanceState) {
+    $markdownLines += @(
+        '## External Consumer Concordance',
+        '',
+        ('- Concordance state: `{0}`' -f [string] $externalConsumerConcordanceState.concordanceState),
+        ('- Reason code: `{0}`' -f [string] $externalConsumerConcordanceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $externalConsumerConcordanceState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $postPublishGovernanceLoopState) {
+    $markdownLines += @(
+        '## Post-Publish Governance Loop',
+        '',
+        ('- Governance loop state: `{0}`' -f [string] $postPublishGovernanceLoopState.governanceLoopState),
+        ('- Reason code: `{0}`' -f [string] $postPublishGovernanceLoopState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $postPublishGovernanceLoopState.nextAction),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -968,6 +1052,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -PublishedRuntimeReceiptState $publishedRuntimeReceiptState `
             -ArtifactAttestationState $artifactAttestationState `
             -PostPublishDriftWatchState $postPublishDriftWatchState `
+            -OperationalPublicationLedgerState $operationalPublicationLedgerState `
+            -ExternalConsumerConcordanceState $externalConsumerConcordanceState `
+            -PostPublishGovernanceLoopState $postPublishGovernanceLoopState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

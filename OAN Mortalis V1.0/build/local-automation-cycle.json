@@ -21,6 +21,9 @@
   "publishedRuntimeReceiptOutputRoot": ".audit/runs/published-runtime-receipts",
   "artifactAttestationOutputRoot": ".audit/runs/artifact-attestations",
   "postPublishDriftWatchOutputRoot": ".audit/runs/post-publish-drift-watch",
+  "operationalPublicationLedgerOutputRoot": ".audit/runs/operational-publication-ledger",
+  "externalConsumerConcordanceOutputRoot": ".audit/runs/external-consumer-concordance",
+  "postPublishGovernanceLoopOutputRoot": ".audit/runs/post-publish-governance-loop",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -40,6 +43,9 @@
   "publishedRuntimeReceiptStatePath": ".audit/state/local-automation-published-runtime-receipt-last-run.json",
   "artifactAttestationStatePath": ".audit/state/local-automation-artifact-attestation-last-run.json",
   "postPublishDriftWatchStatePath": ".audit/state/local-automation-post-publish-drift-watch-last-run.json",
+  "operationalPublicationLedgerStatePath": ".audit/state/local-automation-operational-publication-ledger-last-run.json",
+  "externalConsumerConcordanceStatePath": ".audit/state/local-automation-external-consumer-concordance-last-run.json",
+  "postPublishGovernanceLoopStatePath": ".audit/state/local-automation-post-publish-governance-loop-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -87,6 +93,9 @@
     "keepPublishedRuntimeReceiptBundles": 8,
     "keepArtifactAttestationBundles": 8,
     "keepPostPublishDriftWatchBundles": 8,
+    "keepOperationalPublicationLedgerBundles": 8,
+    "keepExternalConsumerConcordanceBundles": 8,
+    "keepPostPublishGovernanceLoopBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

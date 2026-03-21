@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 07`
+- `Automation Maturation Map 08`
 
 Next eligible map:
 
-- `Automation Maturation Map 08`
+- `Automation Maturation Map 09`
 
 Time-dilation rule:
 
@@ -211,7 +211,7 @@ Current live output surfaces for this map:
 
 - Goal: stabilize live publication execution and the first external evidence loop once a bounded publish request is ratified
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Published Runtime Receipt`
   - `Artifact Attestation Surface`
   - `Post-Publish Drift Watch`
@@ -226,10 +226,25 @@ Current live output surfaces for this map:
 
 - Goal: consolidate the first real publication loop into a stable operational governance surface once live publication is observed
 - Expected review windows: `2`
-- Queued tasks:
+- Selected tasks:
   - `Operational Publication Ledger`
   - `External Consumer Concordance`
   - `Post-Publish Governance Loop`
+
+Current live output surfaces for this map:
+
+- operational publication ledger bundles land under `.audit/runs/operational-publication-ledger/` and update `.audit/state/local-automation-operational-publication-ledger-last-run.json`
+- external consumer concordance bundles land under `.audit/runs/external-consumer-concordance/` and update `.audit/state/local-automation-external-consumer-concordance-last-run.json`
+- post-publish governance loop bundles land under `.audit/runs/post-publish-governance-loop/` and update `.audit/state/local-automation-post-publish-governance-loop-last-run.json`
+
+### Automation Maturation Map 09
+
+- Goal: operationalize the first multi-interval publication cycle once the initial publication loop is no longer singular
+- Expected review windows: `2`
+- Queued tasks:
+  - `Publication Cadence Ledger`
+  - `Downstream Runtime Observation`
+  - `Multi-Interval Governance Braid`
 
 ## Status Interpretation
 

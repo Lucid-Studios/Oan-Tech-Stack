@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-07",
+  "activeTaskMapId": "automation-maturation-map-08",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -421,7 +421,7 @@
     {
       "id": "automation-maturation-map-07",
       "label": "Automation Maturation Map 07",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Stabilize live publication execution and the first external evidence loop once a bounded publish request is ratified.",
       "timeDilationPullForwardAllowed": false,
@@ -436,7 +436,7 @@
           "label": "Published Runtime Receipt",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Capture the first bounded receipt that a real runtime artifact was published through the declared lane.",
           "completionSignal": "A published runtime receipt exists and can be reconciled to the publish request envelope.",
           "escalatesWhen": [
@@ -449,7 +449,7 @@
           "label": "Artifact Attestation Surface",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Compare the published runtime artifact against the candidate and post-publish evidence surfaces.",
           "completionSignal": "An attestation surface can show whether the published artifact matches the bounded pre-publish chain.",
           "escalatesWhen": [
@@ -462,7 +462,7 @@
           "label": "Post-Publish Drift Watch",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Watch the first post-publish interval for drift between the live runtime and the bounded evidence chain.",
           "completionSignal": "A drift-watch surface can report stable, divergent, or blocked post-publish posture.",
           "escalatesWhen": [
@@ -475,7 +475,7 @@
     {
       "id": "automation-maturation-map-08",
       "label": "Automation Maturation Map 08",
-      "status": "queued",
+      "status": "active",
       "expectedReviewWindows": 2,
       "goal": "Consolidate the first real publication loop into a stable operational governance surface once live publication is observed.",
       "timeDilationPullForwardAllowed": false,
@@ -490,7 +490,7 @@
           "label": "Operational Publication Ledger",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Capture the bounded operational ledger entry once the first real publication is no longer hypothetical.",
           "completionSignal": "A stable publication ledger can reconcile request, receipt, and runtime observation.",
           "escalatesWhen": [
@@ -503,7 +503,7 @@
           "label": "External Consumer Concordance",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Compare the published surface seen by external consumers against the bounded publication evidence chain.",
           "completionSignal": "A concordance surface can show whether external consumers receive the artifact the stack thinks it published.",
           "escalatesWhen": [
@@ -516,12 +516,66 @@
           "label": "Post-Publish Governance Loop",
           "owner": "Shared",
           "authority": "Seed may advise; HITL resolves",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Stabilize the first complete governance loop after real publication enters the world.",
           "completionSignal": "A bounded governance loop can carry publication, observation, and contradiction handling without collapsing into improvisation.",
           "escalatesWhen": [
             "governance loop cannot reconcile live publication with evidence",
             "seeded governance starts substituting for human ratification post-publication"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-09",
+      "label": "Automation Maturation Map 09",
+      "status": "queued",
+      "expectedReviewWindows": 2,
+      "goal": "Operationalize the first multi-interval publication cycle once the initial publication loop is no longer singular.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "publication-cadence-ledger",
+        "downstream-runtime-observation",
+        "multi-interval-governance-braid"
+      ],
+      "tasks": [
+        {
+          "id": "publication-cadence-ledger",
+          "label": "Publication Cadence Ledger",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "queued",
+          "purpose": "Track repeated publication intervals as one governed cadence instead of isolated publication events.",
+          "completionSignal": "A publication cadence ledger can reconcile multiple intervals without losing the original receipt chain.",
+          "escalatesWhen": [
+            "publication cadence diverges from the bounded operational ledger",
+            "new publication intervals occur without governed cadence entries"
+          ]
+        },
+        {
+          "id": "downstream-runtime-observation",
+          "label": "Downstream Runtime Observation",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Observe how downstream runtime surfaces continue to receive and reflect the published artifact across more than one interval.",
+          "completionSignal": "A downstream observation surface can compare repeated runtime observations against the publication cadence ledger.",
+          "escalatesWhen": [
+            "downstream observation drifts from the cadence ledger",
+            "downstream observation implies authority beyond observed evidence"
+          ]
+        },
+        {
+          "id": "multi-interval-governance-braid",
+          "label": "Multi-Interval Governance Braid",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves",
+          "status": "queued",
+          "purpose": "Braid seeded governance and HITL review across more than one publication interval without improvising release authority.",
+          "completionSignal": "A bounded multi-interval governance braid can reconcile cadence, downstream observation, and contradiction handling.",
+          "escalatesWhen": [
+            "the governance braid cannot reconcile repeated publication intervals",
+            "seeded governance starts substituting for human ratification across cadence changes"
           ]
         }
       ]

@@ -128,6 +128,9 @@ The supporting scripts are:
 - `tools/Write-PublishedRuntime-Receipt.ps1`
 - `tools/Write-Artifact-AttestationSurface.ps1`
 - `tools/Write-PostPublish-DriftWatch.ps1`
+- `tools/Write-OperationalPublication-Ledger.ps1`
+- `tools/Write-ExternalConsumer-Concordance.ps1`
+- `tools/Write-PostPublish-GovernanceLoop.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -156,6 +159,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-published-runtime-receipt-last-run.json`
 - `.audit/state/local-automation-artifact-attestation-last-run.json`
 - `.audit/state/local-automation-post-publish-drift-watch-last-run.json`
+- `.audit/state/local-automation-operational-publication-ledger-last-run.json`
+- `.audit/state/local-automation-external-consumer-concordance-last-run.json`
+- `.audit/state/local-automation-post-publish-governance-loop-last-run.json`
 
 The formal tasking surface is:
 
@@ -257,6 +263,22 @@ That lane may not:
 - fabricate a published runtime receipt
 - claim artifact concordance without a real published artifact
 - narrate post-publish drift before the stack has crossed into live publication
+
+## Operational Publication Consolidation Lane
+
+The local cycle now carries a bounded operational-publication lane beyond the first observation seam.
+
+That lane may:
+
+- keep an operational publication ledger in a truthful pre-publication posture until real publication is observed
+- compare the bounded publication chain against what an external consumer surface would actually receive
+- braid post-publication governance into one bounded loop without implying ratified publication
+
+That lane may not:
+
+- fabricate an operational publication ledger before the first real receipt exists
+- claim external concordance without a real consumer-observable surface
+- let the governance loop substitute for publication ratification or post-publication human review
 
 ## Operational Bias
 
