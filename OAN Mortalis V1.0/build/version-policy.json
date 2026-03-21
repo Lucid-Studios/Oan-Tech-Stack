@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "versionOwner": "Directory.Build.props",
+  "versionScheme": "BuildVersion.ModularSet.PatchSet",
+  "currentVersion": "1.0.0",
+  "currentAssemblyVersion": "1.0.0.0",
+  "targetFirstPublishVersion": "1.1.0",
+  "autoIncrementPolicy": {
+    "patchOnPromotableProjectChange": true,
+    "patchOnBuildAndDocsOnlyChange": false,
+    "modularSetPromotionRequiresHitl": true,
+    "newDeployableRequiresHitl": true
+  },
+  "reasonCodes": {
+    "patchAuto": "version-patch-auto",
+    "patchRequested": "version-patch-requested",
+    "noPromotableChange": "version-no-promotable-change",
+    "modularSetHold": "version-modular-set-hold",
+    "newDeployableHold": "version-new-deployable-hold",
+    "unknownProjectHold": "version-unknown-project-hold"
+  }
+}

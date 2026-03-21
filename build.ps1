@@ -4,6 +4,10 @@ param(
 
     [switch] $NoRestore,
 
+    [string] $BuildVersion,
+
+    [string] $AssemblyVersion,
+
     [switch] $SkipHygieneCheck,
 
     [switch] $ValidateHopng,
@@ -92,8 +96,22 @@ if ($NoRestore) {
     $buildArgs += "--no-restore"
 }
 
+if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
+    $buildArgs += ("-p:OanBuildVersion={0}" -f $BuildVersion)
+}
+
+if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
+    $buildArgs += ("-p:OanAssemblyVersion={0}" -f $AssemblyVersion)
+}
+
 Write-Host "[build] Solution: $solutionPath"
 Write-Host "[build] Configuration: $Configuration"
+if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
+    Write-Host "[build] Build version: $BuildVersion"
+}
+if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
+    Write-Host "[build] Assembly version: $AssemblyVersion"
+}
 
 & dotnet @buildArgs
 if ($LASTEXITCODE -ne 0) {

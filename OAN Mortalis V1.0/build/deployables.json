@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "deployables": [
+    {
+      "name": "Oan.Runtime.Headless",
+      "projectPath": "src/Oan.Runtime.Headless/Oan.Runtime.Headless.csproj",
+      "family": "Oan",
+      "artifactKind": "dotnet-publish",
+      "publishLane": "runtime-host",
+      "includedInFirstPublish": true,
+      "promotable": true,
+      "requiresHitlForPublication": true,
+      "requiredTests": [
+        "tests/Oan.Spinal.Tests/Oan.Spinal.Tests.csproj",
+        "tests/Oan.SoulFrame.Tests/Oan.SoulFrame.Tests.csproj",
+        "tests/Oan.Sli.Tests/Oan.Sli.Tests.csproj",
+        "tests/Oan.Audit.Tests/Oan.Audit.Tests.csproj",
+        "tests/Oan.Runtime.IntegrationTests/Oan.Runtime.IntegrationTests.csproj"
+      ],
+      "requiredAudits": [
+        "workspace-path-hygiene",
+        "build-audit",
+        "subsystem-audit:CradleTek",
+        "subsystem-audit:SoulFrame",
+        "subsystem-audit:AgentiCore",
+        "subsystem-audit:GovernanceConnective",
+        "subsystem-audit:SLI"
+      ]
+    }
+  ]
+}
