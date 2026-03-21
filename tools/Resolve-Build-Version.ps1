@@ -89,19 +89,19 @@ function Get-NextPatchVersion {
 function Get-ChangedFiles {
     param([string] $BaseRef)
 
-    $untracked = Get-GitLines -Arguments @('ls-files', '--others', '--exclude-standard')
+    $untracked = @(Get-GitLines -Arguments @('ls-files', '--others', '--exclude-standard'))
 
     if (-not [string]::IsNullOrWhiteSpace($BaseRef)) {
-        $changed = Get-GitLines -Arguments @('diff', '--name-only', "$BaseRef..HEAD")
+        $changed = @(Get-GitLines -Arguments @('diff', '--name-only', "$BaseRef..HEAD"))
         return @($changed + $untracked | Sort-Object -Unique)
     }
 
-    $worktreeChanged = Get-GitLines -Arguments @('diff', '--name-only', 'HEAD')
+    $worktreeChanged = @(Get-GitLines -Arguments @('diff', '--name-only', 'HEAD'))
     if ($worktreeChanged.Count -gt 0 -or $untracked.Count -gt 0) {
         return @($worktreeChanged + $untracked | Sort-Object -Unique)
     }
 
-    $previousHead = Get-GitLines -Arguments @('rev-parse', '--verify', 'HEAD~1')
+    $previousHead = @(Get-GitLines -Arguments @('rev-parse', '--verify', 'HEAD~1'))
     if ($previousHead.Count -gt 0) {
         return @(Get-GitLines -Arguments @('diff', '--name-only', 'HEAD~1', 'HEAD'))
     }

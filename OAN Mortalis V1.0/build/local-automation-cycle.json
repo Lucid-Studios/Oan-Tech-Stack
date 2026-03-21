@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "defaultConfiguration": "Release",
+  "localReleaseCandidateCadenceHours": 6,
+  "mandatoryHitlDigestCadenceHours": 24,
+  "digestWindowHours": 24,
+  "releaseCandidateOutputRoot": ".audit/runs/release-candidates",
+  "digestOutputRoot": ".audit/runs/release-digests",
+  "statePath": ".audit/state/local-automation-cycle.json",
+  "mechanicalContinuationStatuses": [
+    "candidate-ready",
+    "hitl-required"
+  ],
+  "blockedStatus": "blocked"
+}

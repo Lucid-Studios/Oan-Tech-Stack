@@ -98,6 +98,31 @@ Those artifacts are for:
 
 They are not identity-forming runtime memory.
 
+## Local Trust-Verified Cycle
+
+The repo now carries a local automation cycle for longer unattended stretches:
+
+- release-candidate conveyor cadence: every `6` hours
+- mandatory HITL digest cadence: every `24` hours
+- blocked status: stop immediately
+- `hitl-required` status: keep verification moving, freeze promotion, surface it in the next digest
+
+This cycle is declared in:
+
+- `build/local-automation-cycle.json`
+
+The supporting scripts are:
+
+- `tools/Invoke-Local-Automation-Cycle.ps1`
+- `tools/Write-Release-Candidate-Digest.ps1`
+- `tools/Install-Local-AutomationCycleTask.ps1`
+
+The local cycle is intentionally biased toward continued build progress.
+
+It does not require a human to bless every green pass.
+
+It does require a human to review at least once every `24` hours, or sooner if the stack enters a blocked state.
+
 ## Operational Bias
 
 The active automation posture is:
