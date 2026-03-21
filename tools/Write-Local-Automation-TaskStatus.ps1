@@ -136,6 +136,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $UnattendedProofCollapseState,
         [object] $DormantWindowLedgerState,
         [object] $SilentCadenceIntegrityState,
+        [object] $LongFormPhaseWitnessState,
+        [object] $LongFormWindowBoundaryState,
+        [object] $AutonomousLongFormCollapseState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -420,6 +423,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'long-form-phase-witness' {
+            if ($null -ne $LongFormPhaseWitnessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'long-form-window-boundary' {
+            if ($null -ne $LongFormWindowBoundaryState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'autonomous-long-form-collapse' {
+            if ($null -ne $AutonomousLongFormCollapseState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -491,6 +521,9 @@ $staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resol
 $unattendedProofCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.unattendedProofCollapseStatePath)
 $dormantWindowLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.dormantWindowLedgerStatePath)
 $silentCadenceIntegrityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.silentCadenceIntegrityStatePath)
+$longFormPhaseWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.longFormPhaseWitnessStatePath)
+$longFormWindowBoundaryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.longFormWindowBoundaryStatePath)
+$autonomousLongFormCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.autonomousLongFormCollapseStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -521,6 +554,9 @@ $staleSurfaceContradictionWatchState = Read-JsonFileOrNull -Path $staleSurfaceCo
 $unattendedProofCollapseState = Read-JsonFileOrNull -Path $unattendedProofCollapseStatePath
 $dormantWindowLedgerState = Read-JsonFileOrNull -Path $dormantWindowLedgerStatePath
 $silentCadenceIntegrityState = Read-JsonFileOrNull -Path $silentCadenceIntegrityStatePath
+$longFormPhaseWitnessState = Read-JsonFileOrNull -Path $longFormPhaseWitnessStatePath
+$longFormWindowBoundaryState = Read-JsonFileOrNull -Path $longFormWindowBoundaryStatePath
+$autonomousLongFormCollapseState = Read-JsonFileOrNull -Path $autonomousLongFormCollapseStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -698,6 +734,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -UnattendedProofCollapseState $unattendedProofCollapseState `
                 -DormantWindowLedgerState $dormantWindowLedgerState `
                 -SilentCadenceIntegrityState $silentCadenceIntegrityState `
+                -LongFormPhaseWitnessState $longFormPhaseWitnessState `
+                -LongFormWindowBoundaryState $longFormWindowBoundaryState `
+                -AutonomousLongFormCollapseState $autonomousLongFormCollapseState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -774,6 +813,9 @@ $taskMapEntries = @(
                     -UnattendedProofCollapseState $unattendedProofCollapseState `
                     -DormantWindowLedgerState $dormantWindowLedgerState `
                     -SilentCadenceIntegrityState $silentCadenceIntegrityState `
+                    -LongFormPhaseWitnessState $longFormPhaseWitnessState `
+                    -LongFormWindowBoundaryState $longFormWindowBoundaryState `
+                    -AutonomousLongFormCollapseState $autonomousLongFormCollapseState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -925,6 +967,15 @@ $statusPayload = [ordered]@{
         silentCadenceIntegrityState = if ($null -ne $silentCadenceIntegrityState) { [string] $silentCadenceIntegrityState.integrityState } else { $null }
         silentCadenceIntegrityReason = if ($null -ne $silentCadenceIntegrityState) { [string] $silentCadenceIntegrityState.reasonCode } else { $null }
         silentCadenceIntegrityNextAction = if ($null -ne $silentCadenceIntegrityState) { [string] $silentCadenceIntegrityState.nextAction } else { $null }
+        longFormPhaseWitnessState = if ($null -ne $longFormPhaseWitnessState) { [string] $longFormPhaseWitnessState.witnessState } else { $null }
+        longFormPhaseWitnessReason = if ($null -ne $longFormPhaseWitnessState) { [string] $longFormPhaseWitnessState.reasonCode } else { $null }
+        longFormPhaseWitnessNextAction = if ($null -ne $longFormPhaseWitnessState) { [string] $longFormPhaseWitnessState.nextAction } else { $null }
+        longFormWindowBoundaryState = if ($null -ne $longFormWindowBoundaryState) { [string] $longFormWindowBoundaryState.boundaryState } else { $null }
+        longFormWindowBoundaryReason = if ($null -ne $longFormWindowBoundaryState) { [string] $longFormWindowBoundaryState.reasonCode } else { $null }
+        longFormWindowBoundaryNextAction = if ($null -ne $longFormWindowBoundaryState) { [string] $longFormWindowBoundaryState.nextAction } else { $null }
+        autonomousLongFormCollapseState = if ($null -ne $autonomousLongFormCollapseState) { [string] $autonomousLongFormCollapseState.collapseState } else { $null }
+        autonomousLongFormCollapseReason = if ($null -ne $autonomousLongFormCollapseState) { [string] $autonomousLongFormCollapseState.reasonCode } else { $null }
+        autonomousLongFormCollapseNextAction = if ($null -ne $autonomousLongFormCollapseState) { [string] $autonomousLongFormCollapseState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1277,6 +1328,43 @@ if ($null -ne $silentCadenceIntegrityState) {
     )
 }
 
+if ($null -ne $longFormPhaseWitnessState) {
+    $markdownLines += @(
+        '## Long-Form Phase Witness',
+        '',
+        ('- Witness state: `{0}`' -f [string] $longFormPhaseWitnessState.witnessState),
+        ('- Reason code: `{0}`' -f [string] $longFormPhaseWitnessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $longFormPhaseWitnessState.nextAction),
+        ('- Target phase: `{0}`' -f [string] $longFormPhaseWitnessState.targetPhaseLabel),
+        ''
+    )
+}
+
+if ($null -ne $longFormWindowBoundaryState) {
+    $markdownLines += @(
+        '## Long-Form Window Boundary',
+        '',
+        ('- Boundary state: `{0}`' -f [string] $longFormWindowBoundaryState.boundaryState),
+        ('- Reason code: `{0}`' -f [string] $longFormWindowBoundaryState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $longFormWindowBoundaryState.nextAction),
+        ('- Minutes remaining: `{0}`' -f $(if ($null -ne $longFormWindowBoundaryState.minutesRemaining) { [string] $longFormWindowBoundaryState.minutesRemaining } else { 'unknown' })),
+        ''
+    )
+}
+
+if ($null -ne $autonomousLongFormCollapseState) {
+    $markdownLines += @(
+        '## Autonomous Long-Form Collapse',
+        '',
+        ('- Collapse state: `{0}`' -f [string] $autonomousLongFormCollapseState.collapseState),
+        ('- Reason code: `{0}`' -f [string] $autonomousLongFormCollapseState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $autonomousLongFormCollapseState.nextAction),
+        ('- Run status: `{0}`' -f [string] $autonomousLongFormCollapseState.runStatus),
+        ('- Current phase: `{0}`' -f [string] $autonomousLongFormCollapseState.currentPhaseLabel),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1332,6 +1420,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -UnattendedProofCollapseState $unattendedProofCollapseState `
             -DormantWindowLedgerState $dormantWindowLedgerState `
             -SilentCadenceIntegrityState $silentCadenceIntegrityState `
+            -LongFormPhaseWitnessState $longFormPhaseWitnessState `
+            -LongFormWindowBoundaryState $longFormWindowBoundaryState `
+            -AutonomousLongFormCollapseState $autonomousLongFormCollapseState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

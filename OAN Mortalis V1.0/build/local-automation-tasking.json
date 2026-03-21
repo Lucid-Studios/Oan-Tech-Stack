@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-11",
+  "activeTaskMapId": "automation-maturation-map-12",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -637,7 +637,7 @@
     {
       "id": "automation-maturation-map-11",
       "label": "Automation Maturation Map 11",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Carry unattended waiting truth across real cadence windows, collapse scheduler proof when it arrives, and prove stable silence is integrity rather than neglect.",
       "timeDilationPullForwardAllowed": false,
@@ -684,6 +684,60 @@
           "escalatesWhen": [
             "candidate-ready posture emits transition noise without cause",
             "daily review edges are allowed to go stale without surfacing the breach"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-12",
+      "label": "Automation Maturation Map 12",
+      "status": "active",
+      "expectedReviewWindows": 2,
+      "goal": "Let the active long-form run witness real unattended evidence, advance its exploratory structures lawfully, and collapse at the window edge without pretending scheduler proof that has not arrived.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "long-form-phase-witness",
+        "long-form-window-boundary",
+        "autonomous-long-form-collapse"
+      ],
+      "tasks": [
+        {
+          "id": "long-form-phase-witness",
+          "label": "Long-Form Phase Witness",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Determine which exploratory or final structure the active long-form run has actually earned from unattended evidence without skipping phases by narrative implication.",
+          "completionSignal": "A long-form phase witness bundle can name the current active phase and the next lawful target phase from live unattended evidence.",
+          "escalatesWhen": [
+            "the active phase advances without supporting unattended evidence",
+            "the witness tries to collapse the run before the boundary or proof warrants it"
+          ]
+        },
+        {
+          "id": "long-form-window-boundary",
+          "label": "Long-Form Window Boundary",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Track whether the active long-form run remains safely within its current review window, is nearing collapse, or has reached the boundary where a final structure must be recorded.",
+          "completionSignal": "A window-boundary receipt can say whether the run is within window, nearing edge, or at collapse time.",
+          "escalatesWhen": [
+            "the active run passes its window edge without a recorded boundary surface",
+            "the boundary receipt contradicts the run timeframe"
+          ]
+        },
+        {
+          "id": "autonomous-long-form-collapse",
+          "label": "Autonomous Long-Form Collapse",
+          "owner": "Shared",
+          "authority": "Automation may update run state; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Apply witnessed unattended evidence and boundary truth onto the active long-form run so the machine can walk its own exploratory structures and collapse them lawfully.",
+          "completionSignal": "The active long-form run state and bundle reflect the current lawful phase without manual rewriting.",
+          "escalatesWhen": [
+            "run-state collapse outruns the phase witness",
+            "window-edge collapse would hide the absence of scheduler proof instead of recording it honestly"
           ]
         }
       ]

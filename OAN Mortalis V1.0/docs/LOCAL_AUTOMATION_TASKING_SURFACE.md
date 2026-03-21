@@ -34,7 +34,7 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 11`
+- `Automation Maturation Map 12`
 
 Next eligible map:
 
@@ -281,6 +281,21 @@ Current live output surfaces for this map:
 - unattended proof collapse bundles land under `.audit/runs/unattended-proof-collapse/` and update `.audit/state/local-automation-unattended-proof-collapse-last-run.json`
 - dormant window ledger bundles land under `.audit/runs/dormant-window-ledger/` and update `.audit/state/local-automation-dormant-window-ledger-last-run.json`
 - silent cadence integrity bundles land under `.audit/runs/silent-cadence-integrity/` and update `.audit/state/local-automation-silent-cadence-integrity-last-run.json`
+
+### Automation Maturation Map 12
+
+- Goal: let the active long-form run witness real unattended evidence, advance its exploratory structures lawfully, and collapse at the window edge without pretending scheduler proof that has not arrived
+- Expected review windows: `2`
+- Selected tasks:
+  - `Long-Form Phase Witness`
+  - `Long-Form Window Boundary`
+  - `Autonomous Long-Form Collapse`
+
+Current live output surfaces for this map:
+
+- long-form phase witness bundles land under `.audit/runs/long-form-phase-witness/` and update `.audit/state/local-automation-long-form-phase-witness-last-run.json`
+- long-form window boundary bundles land under `.audit/runs/long-form-window-boundary/` and update `.audit/state/local-automation-long-form-window-boundary-last-run.json`
+- autonomous long-form collapse bundles land under `.audit/runs/autonomous-long-form-collapse/` and update `.audit/state/local-automation-autonomous-long-form-collapse-last-run.json`
 
 ## Status Interpretation
 

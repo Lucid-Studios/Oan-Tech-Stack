@@ -33,6 +33,9 @@
   "unattendedProofCollapseOutputRoot": ".audit/runs/unattended-proof-collapse",
   "dormantWindowLedgerOutputRoot": ".audit/runs/dormant-window-ledger",
   "silentCadenceIntegrityOutputRoot": ".audit/runs/silent-cadence-integrity",
+  "longFormPhaseWitnessOutputRoot": ".audit/runs/long-form-phase-witness",
+  "longFormWindowBoundaryOutputRoot": ".audit/runs/long-form-window-boundary",
+  "autonomousLongFormCollapseOutputRoot": ".audit/runs/autonomous-long-form-collapse",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -64,6 +67,9 @@
   "unattendedProofCollapseStatePath": ".audit/state/local-automation-unattended-proof-collapse-last-run.json",
   "dormantWindowLedgerStatePath": ".audit/state/local-automation-dormant-window-ledger-last-run.json",
   "silentCadenceIntegrityStatePath": ".audit/state/local-automation-silent-cadence-integrity-last-run.json",
+  "longFormPhaseWitnessStatePath": ".audit/state/local-automation-long-form-phase-witness-last-run.json",
+  "longFormWindowBoundaryStatePath": ".audit/state/local-automation-long-form-window-boundary-last-run.json",
+  "autonomousLongFormCollapseStatePath": ".audit/state/local-automation-autonomous-long-form-collapse-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -125,6 +131,9 @@
     "keepUnattendedProofCollapseBundles": 8,
     "keepDormantWindowLedgerBundles": 8,
     "keepSilentCadenceIntegrityBundles": 8,
+    "keepLongFormPhaseWitnessBundles": 8,
+    "keepLongFormWindowBoundaryBundles": 8,
+    "keepAutonomousLongFormCollapseBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

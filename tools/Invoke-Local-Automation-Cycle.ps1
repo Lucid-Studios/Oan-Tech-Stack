@@ -184,6 +184,9 @@ $staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resol
 $unattendedProofCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.unattendedProofCollapseStatePath)
 $dormantWindowLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dormantWindowLedgerStatePath)
 $silentCadenceIntegrityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.silentCadenceIntegrityStatePath)
+$longFormPhaseWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.longFormPhaseWitnessStatePath)
+$longFormWindowBoundaryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.longFormWindowBoundaryStatePath)
+$autonomousLongFormCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.autonomousLongFormCollapseStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -386,6 +389,12 @@ $statePayload.lastDormantWindowLedgerBundle = [string] (Get-ObjectPropertyValueO
 $statePayload.dormantWindowLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dormantWindowLedgerStatePath
 $statePayload.lastSilentCadenceIntegrityBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSilentCadenceIntegrityBundle')
 $statePayload.silentCadenceIntegrityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $silentCadenceIntegrityStatePath
+$statePayload.lastLongFormPhaseWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastLongFormPhaseWitnessBundle')
+$statePayload.longFormPhaseWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $longFormPhaseWitnessStatePath
+$statePayload.lastLongFormWindowBoundaryBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastLongFormWindowBoundaryBundle')
+$statePayload.longFormWindowBoundaryStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $longFormWindowBoundaryStatePath
+$statePayload.lastAutonomousLongFormCollapseBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastAutonomousLongFormCollapseBundle')
+$statePayload.autonomousLongFormCollapseStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $autonomousLongFormCollapseStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -659,6 +668,33 @@ if (-not [string]::IsNullOrWhiteSpace($silentCadenceIntegrityBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$longFormPhaseWitnessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-LongForm-PhaseWitness.ps1'
+$longFormPhaseWitnessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $longFormPhaseWitnessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Long-form phase witness writer'
+$longFormPhaseWitnessBundlePath = Get-ScriptOutputTail -Output $longFormPhaseWitnessOutput
+if (-not [string]::IsNullOrWhiteSpace($longFormPhaseWitnessBundlePath)) {
+    $statePayload.lastLongFormPhaseWitnessBundle = $longFormPhaseWitnessBundlePath
+    $statePayload.longFormPhaseWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $longFormPhaseWitnessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$longFormWindowBoundaryScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-LongForm-WindowBoundaryReceipt.ps1'
+$longFormWindowBoundaryOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $longFormWindowBoundaryScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Long-form window boundary writer'
+$longFormWindowBoundaryBundlePath = Get-ScriptOutputTail -Output $longFormWindowBoundaryOutput
+if (-not [string]::IsNullOrWhiteSpace($longFormWindowBoundaryBundlePath)) {
+    $statePayload.lastLongFormWindowBoundaryBundle = $longFormWindowBoundaryBundlePath
+    $statePayload.longFormWindowBoundaryStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $longFormWindowBoundaryStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$autonomousLongFormCollapseScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Autonomous-LongFormRunCollapse.ps1'
+$autonomousLongFormCollapseOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $autonomousLongFormCollapseScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Autonomous long-form collapse writer'
+$autonomousLongFormCollapseBundlePath = Get-ScriptOutputTail -Output $autonomousLongFormCollapseOutput
+if (-not [string]::IsNullOrWhiteSpace($autonomousLongFormCollapseBundlePath)) {
+    $statePayload.lastAutonomousLongFormCollapseBundle = $autonomousLongFormCollapseBundlePath
+    $statePayload.autonomousLongFormCollapseStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $autonomousLongFormCollapseStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -720,6 +756,12 @@ $summary = [ordered]@{
     dormantWindowLedgerStatePath = $statePayload.dormantWindowLedgerStatePath
     lastSilentCadenceIntegrityBundle = $statePayload.lastSilentCadenceIntegrityBundle
     silentCadenceIntegrityStatePath = $statePayload.silentCadenceIntegrityStatePath
+    lastLongFormPhaseWitnessBundle = $statePayload.lastLongFormPhaseWitnessBundle
+    longFormPhaseWitnessStatePath = $statePayload.longFormPhaseWitnessStatePath
+    lastLongFormWindowBoundaryBundle = $statePayload.lastLongFormWindowBoundaryBundle
+    longFormWindowBoundaryStatePath = $statePayload.longFormWindowBoundaryStatePath
+    lastAutonomousLongFormCollapseBundle = $statePayload.lastAutonomousLongFormCollapseBundle
+    autonomousLongFormCollapseStatePath = $statePayload.autonomousLongFormCollapseStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -834,6 +876,15 @@ if (-not [string]::IsNullOrWhiteSpace($dormantWindowLedgerBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($silentCadenceIntegrityBundlePath)) {
     Write-Host ('[local-automation-cycle] SilentCadenceIntegrity: {0}' -f $silentCadenceIntegrityBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($longFormPhaseWitnessBundlePath)) {
+    Write-Host ('[local-automation-cycle] LongFormPhaseWitness: {0}' -f $longFormPhaseWitnessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($longFormWindowBoundaryBundlePath)) {
+    Write-Host ('[local-automation-cycle] LongFormWindowBoundary: {0}' -f $longFormWindowBoundaryBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($autonomousLongFormCollapseBundlePath)) {
+    Write-Host ('[local-automation-cycle] AutonomousLongFormCollapse: {0}' -f $autonomousLongFormCollapseBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

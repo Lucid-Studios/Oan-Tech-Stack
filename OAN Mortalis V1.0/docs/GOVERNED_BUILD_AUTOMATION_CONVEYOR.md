@@ -137,6 +137,9 @@ The supporting scripts are:
 - `tools/Write-UnattendedProof-Collapse.ps1`
 - `tools/Write-DormantWindow-Ledger.ps1`
 - `tools/Write-SilentCadence-Integrity.ps1`
+- `tools/Write-LongForm-PhaseWitness.ps1`
+- `tools/Write-LongForm-WindowBoundaryReceipt.ps1`
+- `tools/Invoke-Autonomous-LongFormRunCollapse.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -177,6 +180,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-unattended-proof-collapse-last-run.json`
 - `.audit/state/local-automation-dormant-window-ledger-last-run.json`
 - `.audit/state/local-automation-silent-cadence-integrity-last-run.json`
+- `.audit/state/local-automation-long-form-phase-witness-last-run.json`
+- `.audit/state/local-automation-long-form-window-boundary-last-run.json`
+- `.audit/state/local-automation-autonomous-long-form-collapse-last-run.json`
 
 The formal tasking surface is:
 
@@ -210,6 +216,22 @@ That lane may not:
 - narrate scheduler proof before a real scheduled run exists
 - convert dormant waiting into faux readiness beyond current evidence
 - treat quiet cadence as permission to skip the daily review edge
+
+## Long-Form Run Governance Lane
+
+The local cycle now carries a bounded long-form run governance lane beyond unattended continuity.
+
+That lane may:
+
+- witness which exploratory or final structure the active run has truly earned
+- monitor the current run window so collapse happens lawfully at the boundary
+- update the active run state from evidence instead of leaving it frozen in its opening phase
+
+That lane may not:
+
+- advance phases by narrative convenience
+- collapse the active run early just because the map exists
+- hide absent scheduler proof when a final structure must still be recorded honestly
 
 ## Seeded Governance Lane
 
