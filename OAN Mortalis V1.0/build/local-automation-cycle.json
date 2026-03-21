@@ -7,13 +7,25 @@
   "releaseCandidateOutputRoot": ".audit/runs/release-candidates",
   "digestOutputRoot": ".audit/runs/release-digests",
   "blockedEscalationOutputRoot": ".audit/runs/blocked-escalations",
+  "notificationOutputRoot": ".audit/runs/notifications",
   "seededGovernanceOutputRoot": ".audit/runs/seeded-governance",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
+  "notificationStatePath": ".audit/state/local-automation-notification-last-run.json",
   "seededGovernanceStatePath": ".audit/state/local-automation-seeded-governance-last-run.json",
   "schedulerReconciliationStatePath": ".audit/state/local-automation-scheduler-reconciliation-last-run.json",
   "cmeConsolidationStatePath": ".audit/state/local-automation-cme-consolidation-state.json",
+  "notificationPolicy": {
+    "enabled": true,
+    "notifyOnStatuses": [
+      "hitl-required",
+      "blocked"
+    ],
+    "bestEffortWindowsPopup": true,
+    "popupTimeoutSeconds": 12,
+    "onlyNotifyOnTransition": true
+  },
   "seededGovernancePolicy": {
     "enabled": true,
     "attemptLocalPreflight": true,
@@ -37,6 +49,7 @@
     "keepDigestBundles": 8,
     "keepLongFormTaskMapRuns": 8,
     "keepBlockedEscalationBundles": 8,
+    "keepNotificationBundles": 8,
     "keepSeededGovernanceBundles": 8,
     "preserveReferencedBundles": true
   },

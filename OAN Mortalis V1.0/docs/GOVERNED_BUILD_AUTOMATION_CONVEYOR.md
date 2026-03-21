@@ -115,6 +115,7 @@ The supporting scripts are:
 
 - `tools/Invoke-Local-Automation-Cycle.ps1`
 - `tools/Write-Release-Candidate-Digest.ps1`
+- `tools/Write-Local-AutomationNotification.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -125,6 +126,7 @@ The stable status surfaces are:
 
 - `.audit/state/local-automation-cycle.json`
 - `.audit/state/local-automation-cycle-last-run.json`
+- `.audit/state/local-automation-notification-last-run.json`
 - `.audit/state/local-automation-tasking-status.json`
 - `.audit/state/local-automation-tasking-status.md`
 - `.audit/state/local-automation-seeded-governance-last-run.json`
@@ -141,6 +143,12 @@ The local cycle is intentionally biased toward continued build progress.
 It does not require a human to bless every green pass.
 
 It does require a human to review at least once every `24` hours, or sooner if the stack enters a blocked state.
+
+The cycle now includes a bounded notification seam:
+
+- it stays quiet while posture remains `candidate-ready`
+- it emits a local notification bundle when posture transitions into `hitl-required` or `blocked`
+- it attempts a best-effort Windows popup without failing the build if the popup channel is unavailable
 
 ## Seeded Governance Lane
 

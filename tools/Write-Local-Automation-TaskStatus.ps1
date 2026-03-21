@@ -223,11 +223,13 @@ $latestDigestBundlePath = if (-not [string]::IsNullOrWhiteSpace($lastDigestBundl
 }
 $retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.retentionStatePath)
 $blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationStatePath)
+$notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.notificationStatePath)
 $seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
 $schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerReconciliationStatePath)
 $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.cmeConsolidationStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
+$notificationState = Read-JsonFileOrNull -Path $notificationStatePath
 $seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
 $schedulerReconciliationState = Read-JsonFileOrNull -Path $schedulerReconciliationStatePath
 $cmeConsolidationState = Read-JsonFileOrNull -Path $cmeConsolidationStatePath
@@ -506,6 +508,9 @@ $statusPayload = [ordered]@{
         seededGovernanceDisposition = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.disposition } else { $null }
         seededGovernanceReason = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.dispositionReason } else { $null }
         seededGovernanceProvenance = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.provenance } else { $null }
+        notificationTriggered = if ($null -ne $notificationState) { [bool] $notificationState.triggered } else { $null }
+        notificationTriggerReason = if ($null -ne $notificationState) { [string] $notificationState.triggerReason } else { $null }
+        lastNotificationBundle = if ($null -ne $notificationState) { [string] $notificationState.lastNotificationBundle } else { $null }
         schedulerReconciliationAction = if ($null -ne $schedulerReconciliationState) { [string] $schedulerReconciliationState.actionTaken } else { $null }
         schedulerAligned = if ($null -ne $schedulerReconciliationState) { [bool] $schedulerReconciliationState.aligned } else { $null }
         cmeConsolidationState = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.consolidationState } else { $null }
@@ -554,6 +559,17 @@ if ($null -ne $seededGovernanceState) {
         ('- Disposition: `{0}`' -f [string] $seededGovernanceState.disposition),
         ('- Reason: `{0}`' -f [string] $seededGovernanceState.dispositionReason),
         ('- Provenance: `{0}`' -f [string] $seededGovernanceState.provenance),
+        ''
+    )
+}
+
+if ($null -ne $notificationState) {
+    $markdownLines += @(
+        '## Notification Surface',
+        '',
+        ('- Triggered on last cycle: `{0}`' -f [bool] $notificationState.triggered),
+        ('- Trigger reason: `{0}`' -f [string] $notificationState.triggerReason),
+        ('- Last notification bundle: `{0}`' -f $(if ([string] $notificationState.lastNotificationBundle) { [string] $notificationState.lastNotificationBundle } else { 'none' })),
         ''
     )
 }

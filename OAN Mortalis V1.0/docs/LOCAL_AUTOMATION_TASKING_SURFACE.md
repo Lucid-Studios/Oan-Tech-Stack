@@ -127,6 +127,11 @@ The active-run bundle root is:
   - `First Scheduled Run Capture`
   - `Status Freshness Reconciliation`
 
+Current live output surfaces carried forward from this map:
+
+- transition-triggered notifications land under `.audit/runs/notifications/`
+- the last evaluated notification state lives at `.audit/state/local-automation-notification-last-run.json`
+
 ### Automation Maturation Map 02
 
 - Goal: deepen unattended evidence quality without crossing into ungated promotion authority

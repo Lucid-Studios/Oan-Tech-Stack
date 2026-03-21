@@ -113,6 +113,20 @@ function Get-ScriptOutputTail {
     return @($Output | ForEach-Object { "$_".Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Last 1)
 }
 
+function Invoke-ChildPowershellScript {
+    param(
+        [string[]] $ArgumentList,
+        [string] $FailureContext
+    )
+
+    $output = & powershell @ArgumentList
+    if ($LASTEXITCODE -ne 0) {
+        throw '{0} failed with exit code {1}.' -f $FailureContext, $LASTEXITCODE
+    }
+
+    return @($output)
+}
+
 function Get-LatestBundlePath {
     param([string] $RootPath)
 
@@ -142,6 +156,7 @@ $blockedEscalationOutputRoot = [string] $policy.blockedEscalationOutputRoot
 $statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.statePath)
 $retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.retentionStatePath)
 $blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.blockedEscalationStatePath)
+$notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.notificationStatePath)
 $seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededGovernanceStatePath)
 $schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerReconciliationStatePath)
 $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.cmeConsolidationStatePath)
@@ -153,6 +168,7 @@ $digestWindowHours = [int] $policy.digestWindowHours
 $blockedStatus = [string] $policy.blockedStatus
 
 $state = Read-JsonFileOrNull -Path $statePath
+$previousStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastKnownStatus')
 $nowUtc = (Get-Date).ToUniversalTime()
 $lastReleaseCandidateRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReleaseCandidateRunUtc')
 $lastDigestUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDigestUtc')
@@ -184,7 +200,7 @@ if ($releaseCandidateDue) {
         $releaseCandidateArgs += @('-RequestedVersion', $RequestedVersion)
     }
 
-    $releaseCandidateOutput = & powershell @releaseCandidateArgs
+    $releaseCandidateOutput = Invoke-ChildPowershellScript -ArgumentList $releaseCandidateArgs -FailureContext 'Release-candidate conveyor'
 
     $releaseCandidateBundlePath = Get-ScriptOutputTail -Output $releaseCandidateOutput
     if ([string]::IsNullOrWhiteSpace($releaseCandidateBundlePath)) {
@@ -243,7 +259,7 @@ if ($digestDue) {
         '-NextMandatoryReviewUtc', $digestReportedNextMandatoryReviewUtc.ToString('o')
     )
 
-    $digestOutput = & powershell @digestArgs
+    $digestOutput = Invoke-ChildPowershellScript -ArgumentList $digestArgs -FailureContext 'Daily HITL digest writer'
 
     $digestBundlePath = Get-ScriptOutputTail -Output $digestOutput
     if ([string]::IsNullOrWhiteSpace($digestBundlePath)) {
@@ -292,6 +308,8 @@ $summaryPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '
 $statePayload.lastBlockedEscalationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBlockedEscalationBundle')
 $statePayload.blockedEscalationTriggered = $false
 $statePayload.retentionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $retentionStatePath
+$statePayload.lastNotificationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastNotificationBundle')
+$statePayload.notificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $notificationStatePath
 $statePayload.lastSeededGovernanceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSeededGovernanceBundle')
 $statePayload.seededGovernanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededGovernanceStatePath
 $statePayload.schedulerReconciliationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerReconciliationStatePath
@@ -313,7 +331,7 @@ if ($latestStatus -eq $blockedStatus) {
         $blockedEscalationArgs += @('-DigestBundlePath', $digestBundlePath)
     }
 
-    $blockedEscalationOutput = & powershell @blockedEscalationArgs
+    $blockedEscalationOutput = Invoke-ChildPowershellScript -ArgumentList $blockedEscalationArgs -FailureContext 'Blocked escalation bundle writer'
     $blockedEscalationBundlePath = Get-ScriptOutputTail -Output $blockedEscalationOutput
     $statePayload.lastBlockedEscalationBundle = $blockedEscalationBundlePath
     $statePayload.blockedEscalationTriggered = $true
@@ -321,7 +339,7 @@ if ($latestStatus -eq $blockedStatus) {
 }
 
 $retentionScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Automation-RetentionPruning.ps1'
-$retentionOutput = & powershell -ExecutionPolicy Bypass -File $retentionScriptPath -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$retentionOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $retentionScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Automation retention pruning'
 $retentionStatePathFromRun = Get-ScriptOutputTail -Output $retentionOutput
 if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
     $statePayload.retentionStatePath = $retentionStatePathFromRun
@@ -329,7 +347,7 @@ if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
 }
 
 $seededGovernanceScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Seeded-Build-Governance.ps1'
-$seededGovernanceOutput = & powershell -ExecutionPolicy Bypass -File $seededGovernanceScriptPath -Configuration $Configuration -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$seededGovernanceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $seededGovernanceScriptPath, '-Configuration', $Configuration, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Seeded build governance'
 $seededGovernanceBundlePath = Get-ScriptOutputTail -Output $seededGovernanceOutput
 if (-not [string]::IsNullOrWhiteSpace($seededGovernanceBundlePath)) {
     $statePayload.lastSeededGovernanceBundle = $seededGovernanceBundlePath
@@ -338,7 +356,7 @@ if (-not [string]::IsNullOrWhiteSpace($seededGovernanceBundlePath)) {
 }
 
 $schedulerSyncScriptPath = Join-Path $resolvedRepoRoot 'tools\Sync-Local-AutomationScheduler.ps1'
-$schedulerSyncOutput = & powershell -ExecutionPolicy Bypass -File $schedulerSyncScriptPath -Configuration $Configuration -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$schedulerSyncOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerSyncScriptPath, '-Configuration', $Configuration, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler reconciliation'
 $schedulerSyncStatePathFromRun = Get-ScriptOutputTail -Output $schedulerSyncOutput
 if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
     $statePayload.schedulerReconciliationStatePath = $schedulerSyncStatePathFromRun
@@ -346,7 +364,7 @@ if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
 }
 
 $cmeConsolidationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CmeFormalization-ConsolidationStatus.ps1'
-$cmeConsolidationOutput = & powershell -ExecutionPolicy Bypass -File $cmeConsolidationScriptPath -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$cmeConsolidationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $cmeConsolidationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'CME consolidation writer'
 $cmeConsolidationStatePathFromRun = Get-ScriptOutputTail -Output $cmeConsolidationOutput
 if (-not [string]::IsNullOrWhiteSpace($cmeConsolidationStatePathFromRun)) {
     $statePayload.cmeConsolidationStatePath = $cmeConsolidationStatePathFromRun
@@ -360,6 +378,8 @@ $summary = [ordered]@{
     lastReleaseCandidateBundle = $releaseCandidateBundlePath
     lastKnownStatus = $latestStatus
     lastDigestBundle = $digestBundlePath
+    lastNotificationBundle = $statePayload.lastNotificationBundle
+    notificationStatePath = $statePayload.notificationStatePath
     lastSeededGovernanceBundle = $seededGovernanceBundlePath
     retentionStatePath = $statePayload.retentionStatePath
     schedulerReconciliationStatePath = $statePayload.schedulerReconciliationStatePath
@@ -371,7 +391,26 @@ $summary = [ordered]@{
 Write-JsonFile -Path $summaryPath -Value $summary
 
 $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
-$taskStatusOutput = & powershell -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot
+$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
+$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
+
+$notificationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-AutomationNotification.ps1'
+$notificationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $notificationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-PreviousStatus', $previousStatus, '-CurrentStatus', $latestStatus) -FailureContext 'Automation notification writer'
+$notificationStatePathFromRun = Get-ScriptOutputTail -Output $notificationOutput
+if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun) -and (Test-Path -LiteralPath $notificationStatePathFromRun -PathType Leaf)) {
+    $notificationStateFromRun = Read-JsonFileOrNull -Path $notificationStatePathFromRun
+    $statePayload.notificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $notificationStatePathFromRun
+    if ($null -ne $notificationStateFromRun) {
+        $statePayload.lastNotificationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $notificationStateFromRun -PropertyName 'lastNotificationBundle')
+    }
+
+    $summary.lastNotificationBundle = $statePayload.lastNotificationBundle
+    $summary.notificationStatePath = $statePayload.notificationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+    Write-JsonFile -Path $summaryPath -Value $summary
+}
+
+$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
 $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
 Write-Host ('[local-automation-cycle] Status: {0}' -f $latestStatus)
@@ -387,6 +426,9 @@ if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($cmeConsolidationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] CmeConsolidation: {0}' -f $cmeConsolidationStatePathFromRun)
+}
+if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)
 }
 if (-not [string]::IsNullOrWhiteSpace($blockedEscalationBundlePath)) {
     Write-Host ('[local-automation-cycle] BlockedEscalation: {0}' -f $blockedEscalationBundlePath)
