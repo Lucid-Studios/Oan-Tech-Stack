@@ -175,6 +175,9 @@ $postPublishDriftWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRo
 $operationalPublicationLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.operationalPublicationLedgerStatePath)
 $externalConsumerConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.externalConsumerConcordanceStatePath)
 $postPublishGovernanceLoopStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postPublishGovernanceLoopStatePath)
+$publicationCadenceLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.publicationCadenceLedgerStatePath)
+$downstreamRuntimeObservationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.downstreamRuntimeObservationStatePath)
+$multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.multiIntervalGovernanceBraidStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -359,6 +362,12 @@ $statePayload.lastExternalConsumerConcordanceBundle = [string] (Get-ObjectProper
 $statePayload.externalConsumerConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $externalConsumerConcordanceStatePath
 $statePayload.lastPostPublishGovernanceLoopBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPostPublishGovernanceLoopBundle')
 $statePayload.postPublishGovernanceLoopStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishGovernanceLoopStatePath
+$statePayload.lastPublicationCadenceLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPublicationCadenceLedgerBundle')
+$statePayload.publicationCadenceLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $publicationCadenceLedgerStatePath
+$statePayload.lastDownstreamRuntimeObservationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDownstreamRuntimeObservationBundle')
+$statePayload.downstreamRuntimeObservationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $downstreamRuntimeObservationStatePath
+$statePayload.lastMultiIntervalGovernanceBraidBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastMultiIntervalGovernanceBraidBundle')
+$statePayload.multiIntervalGovernanceBraidStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $multiIntervalGovernanceBraidStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -551,6 +560,33 @@ if (-not [string]::IsNullOrWhiteSpace($postPublishGovernanceLoopBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$publicationCadenceLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Publication-CadenceLedger.ps1'
+$publicationCadenceLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $publicationCadenceLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Publication cadence ledger writer'
+$publicationCadenceLedgerBundlePath = Get-ScriptOutputTail -Output $publicationCadenceLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($publicationCadenceLedgerBundlePath)) {
+    $statePayload.lastPublicationCadenceLedgerBundle = $publicationCadenceLedgerBundlePath
+    $statePayload.publicationCadenceLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $publicationCadenceLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$downstreamRuntimeObservationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-DownstreamRuntime-Observation.ps1'
+$downstreamRuntimeObservationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $downstreamRuntimeObservationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Downstream runtime observation writer'
+$downstreamRuntimeObservationBundlePath = Get-ScriptOutputTail -Output $downstreamRuntimeObservationOutput
+if (-not [string]::IsNullOrWhiteSpace($downstreamRuntimeObservationBundlePath)) {
+    $statePayload.lastDownstreamRuntimeObservationBundle = $downstreamRuntimeObservationBundlePath
+    $statePayload.downstreamRuntimeObservationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $downstreamRuntimeObservationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$multiIntervalGovernanceBraidScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-MultiInterval-GovernanceBraid.ps1'
+$multiIntervalGovernanceBraidOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $multiIntervalGovernanceBraidScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Multi-interval governance braid writer'
+$multiIntervalGovernanceBraidBundlePath = Get-ScriptOutputTail -Output $multiIntervalGovernanceBraidOutput
+if (-not [string]::IsNullOrWhiteSpace($multiIntervalGovernanceBraidBundlePath)) {
+    $statePayload.lastMultiIntervalGovernanceBraidBundle = $multiIntervalGovernanceBraidBundlePath
+    $statePayload.multiIntervalGovernanceBraidStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $multiIntervalGovernanceBraidStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -594,6 +630,12 @@ $summary = [ordered]@{
     externalConsumerConcordanceStatePath = $statePayload.externalConsumerConcordanceStatePath
     lastPostPublishGovernanceLoopBundle = $statePayload.lastPostPublishGovernanceLoopBundle
     postPublishGovernanceLoopStatePath = $statePayload.postPublishGovernanceLoopStatePath
+    lastPublicationCadenceLedgerBundle = $statePayload.lastPublicationCadenceLedgerBundle
+    publicationCadenceLedgerStatePath = $statePayload.publicationCadenceLedgerStatePath
+    lastDownstreamRuntimeObservationBundle = $statePayload.lastDownstreamRuntimeObservationBundle
+    downstreamRuntimeObservationStatePath = $statePayload.downstreamRuntimeObservationStatePath
+    lastMultiIntervalGovernanceBraidBundle = $statePayload.lastMultiIntervalGovernanceBraidBundle
+    multiIntervalGovernanceBraidStatePath = $statePayload.multiIntervalGovernanceBraidStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -681,6 +723,15 @@ if (-not [string]::IsNullOrWhiteSpace($externalConsumerConcordanceBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($postPublishGovernanceLoopBundlePath)) {
     Write-Host ('[local-automation-cycle] PostPublishGovernanceLoop: {0}' -f $postPublishGovernanceLoopBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($publicationCadenceLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] PublicationCadenceLedger: {0}' -f $publicationCadenceLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($downstreamRuntimeObservationBundlePath)) {
+    Write-Host ('[local-automation-cycle] DownstreamRuntimeObservation: {0}' -f $downstreamRuntimeObservationBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($multiIntervalGovernanceBraidBundlePath)) {
+    Write-Host ('[local-automation-cycle] MultiIntervalGovernanceBraid: {0}' -f $multiIntervalGovernanceBraidBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

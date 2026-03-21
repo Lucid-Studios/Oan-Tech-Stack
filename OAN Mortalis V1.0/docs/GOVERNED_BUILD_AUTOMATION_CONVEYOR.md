@@ -286,6 +286,22 @@ That lane may not:
 - claim external concordance without a real consumer-observable surface
 - let the governance loop substitute for publication ratification or post-publication human review
 
+## Multi-Interval Publication Cadence Lane
+
+The local cycle now carries a bounded multi-interval cadence lane after the first operational publication loop is formalized.
+
+That lane may:
+
+- keep a publication cadence ledger truthful about whether the stack has actually crossed into repeated intervals
+- observe downstream runtime surfaces across more than one interval without inferring extra authority
+- braid seeded governance and HITL review across repeated intervals without improvising publication law
+
+That lane may not:
+
+- fabricate repeated cadence before a second governed interval exists
+- claim downstream runtime continuity from a single observation window
+- let the multi-interval braid substitute for ratification, contradiction handling, or governed publication receipts
+
 ## Operational Bias
 
 The active automation posture is:

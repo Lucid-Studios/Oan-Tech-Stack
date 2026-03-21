@@ -127,6 +127,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $OperationalPublicationLedgerState,
         [object] $ExternalConsumerConcordanceState,
         [object] $PostPublishGovernanceLoopState,
+        [object] $PublicationCadenceLedgerState,
+        [object] $DownstreamRuntimeObservationState,
+        [object] $MultiIntervalGovernanceBraidState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -330,6 +333,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'publication-cadence-ledger' {
+            if ($null -ne $PublicationCadenceLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'downstream-runtime-observation' {
+            if ($null -ne $DownstreamRuntimeObservationState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'multi-interval-governance-braid' {
+            if ($null -ne $MultiIntervalGovernanceBraidState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -392,6 +422,9 @@ $postPublishDriftWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRo
 $operationalPublicationLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operationalPublicationLedgerStatePath)
 $externalConsumerConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.externalConsumerConcordanceStatePath)
 $postPublishGovernanceLoopStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postPublishGovernanceLoopStatePath)
+$publicationCadenceLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.publicationCadenceLedgerStatePath)
+$downstreamRuntimeObservationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.downstreamRuntimeObservationStatePath)
+$multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.multiIntervalGovernanceBraidStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -413,6 +446,9 @@ $postPublishDriftWatchState = Read-JsonFileOrNull -Path $postPublishDriftWatchSt
 $operationalPublicationLedgerState = Read-JsonFileOrNull -Path $operationalPublicationLedgerStatePath
 $externalConsumerConcordanceState = Read-JsonFileOrNull -Path $externalConsumerConcordanceStatePath
 $postPublishGovernanceLoopState = Read-JsonFileOrNull -Path $postPublishGovernanceLoopStatePath
+$publicationCadenceLedgerState = Read-JsonFileOrNull -Path $publicationCadenceLedgerStatePath
+$downstreamRuntimeObservationState = Read-JsonFileOrNull -Path $downstreamRuntimeObservationStatePath
+$multiIntervalGovernanceBraidState = Read-JsonFileOrNull -Path $multiIntervalGovernanceBraidStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -581,6 +617,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -OperationalPublicationLedgerState $operationalPublicationLedgerState `
                 -ExternalConsumerConcordanceState $externalConsumerConcordanceState `
                 -PostPublishGovernanceLoopState $postPublishGovernanceLoopState `
+                -PublicationCadenceLedgerState $publicationCadenceLedgerState `
+                -DownstreamRuntimeObservationState $downstreamRuntimeObservationState `
+                -MultiIntervalGovernanceBraidState $multiIntervalGovernanceBraidState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -648,6 +687,9 @@ $taskMapEntries = @(
                     -OperationalPublicationLedgerState $operationalPublicationLedgerState `
                     -ExternalConsumerConcordanceState $externalConsumerConcordanceState `
                     -PostPublishGovernanceLoopState $postPublishGovernanceLoopState `
+                    -PublicationCadenceLedgerState $publicationCadenceLedgerState `
+                    -DownstreamRuntimeObservationState $downstreamRuntimeObservationState `
+                    -MultiIntervalGovernanceBraidState $multiIntervalGovernanceBraidState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -771,6 +813,15 @@ $statusPayload = [ordered]@{
         postPublishGovernanceLoopState = if ($null -ne $postPublishGovernanceLoopState) { [string] $postPublishGovernanceLoopState.governanceLoopState } else { $null }
         postPublishGovernanceLoopReason = if ($null -ne $postPublishGovernanceLoopState) { [string] $postPublishGovernanceLoopState.reasonCode } else { $null }
         postPublishGovernanceLoopNextAction = if ($null -ne $postPublishGovernanceLoopState) { [string] $postPublishGovernanceLoopState.nextAction } else { $null }
+        publicationCadenceLedgerState = if ($null -ne $publicationCadenceLedgerState) { [string] $publicationCadenceLedgerState.cadenceState } else { $null }
+        publicationCadenceLedgerReason = if ($null -ne $publicationCadenceLedgerState) { [string] $publicationCadenceLedgerState.reasonCode } else { $null }
+        publicationCadenceLedgerNextAction = if ($null -ne $publicationCadenceLedgerState) { [string] $publicationCadenceLedgerState.nextAction } else { $null }
+        downstreamRuntimeObservationState = if ($null -ne $downstreamRuntimeObservationState) { [string] $downstreamRuntimeObservationState.observationState } else { $null }
+        downstreamRuntimeObservationReason = if ($null -ne $downstreamRuntimeObservationState) { [string] $downstreamRuntimeObservationState.reasonCode } else { $null }
+        downstreamRuntimeObservationNextAction = if ($null -ne $downstreamRuntimeObservationState) { [string] $downstreamRuntimeObservationState.nextAction } else { $null }
+        multiIntervalGovernanceBraidState = if ($null -ne $multiIntervalGovernanceBraidState) { [string] $multiIntervalGovernanceBraidState.braidState } else { $null }
+        multiIntervalGovernanceBraidReason = if ($null -ne $multiIntervalGovernanceBraidState) { [string] $multiIntervalGovernanceBraidState.reasonCode } else { $null }
+        multiIntervalGovernanceBraidNextAction = if ($null -ne $multiIntervalGovernanceBraidState) { [string] $multiIntervalGovernanceBraidState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1021,6 +1072,39 @@ if ($null -ne $postPublishGovernanceLoopState) {
     )
 }
 
+if ($null -ne $publicationCadenceLedgerState) {
+    $markdownLines += @(
+        '## Publication Cadence Ledger',
+        '',
+        ('- Cadence state: `{0}`' -f [string] $publicationCadenceLedgerState.cadenceState),
+        ('- Reason code: `{0}`' -f [string] $publicationCadenceLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $publicationCadenceLedgerState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $downstreamRuntimeObservationState) {
+    $markdownLines += @(
+        '## Downstream Runtime Observation',
+        '',
+        ('- Observation state: `{0}`' -f [string] $downstreamRuntimeObservationState.observationState),
+        ('- Reason code: `{0}`' -f [string] $downstreamRuntimeObservationState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $downstreamRuntimeObservationState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $multiIntervalGovernanceBraidState) {
+    $markdownLines += @(
+        '## Multi-Interval Governance Braid',
+        '',
+        ('- Braid state: `{0}`' -f [string] $multiIntervalGovernanceBraidState.braidState),
+        ('- Reason code: `{0}`' -f [string] $multiIntervalGovernanceBraidState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $multiIntervalGovernanceBraidState.nextAction),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1067,6 +1151,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -OperationalPublicationLedgerState $operationalPublicationLedgerState `
             -ExternalConsumerConcordanceState $externalConsumerConcordanceState `
             -PostPublishGovernanceLoopState $postPublishGovernanceLoopState `
+            -PublicationCadenceLedgerState $publicationCadenceLedgerState `
+            -DownstreamRuntimeObservationState $downstreamRuntimeObservationState `
+            -MultiIntervalGovernanceBraidState $multiIntervalGovernanceBraidState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

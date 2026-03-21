@@ -24,6 +24,9 @@
   "operationalPublicationLedgerOutputRoot": ".audit/runs/operational-publication-ledger",
   "externalConsumerConcordanceOutputRoot": ".audit/runs/external-consumer-concordance",
   "postPublishGovernanceLoopOutputRoot": ".audit/runs/post-publish-governance-loop",
+  "publicationCadenceLedgerOutputRoot": ".audit/runs/publication-cadence-ledger",
+  "downstreamRuntimeObservationOutputRoot": ".audit/runs/downstream-runtime-observation",
+  "multiIntervalGovernanceBraidOutputRoot": ".audit/runs/multi-interval-governance-braid",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -46,6 +49,9 @@
   "operationalPublicationLedgerStatePath": ".audit/state/local-automation-operational-publication-ledger-last-run.json",
   "externalConsumerConcordanceStatePath": ".audit/state/local-automation-external-consumer-concordance-last-run.json",
   "postPublishGovernanceLoopStatePath": ".audit/state/local-automation-post-publish-governance-loop-last-run.json",
+  "publicationCadenceLedgerStatePath": ".audit/state/local-automation-publication-cadence-ledger-last-run.json",
+  "downstreamRuntimeObservationStatePath": ".audit/state/local-automation-downstream-runtime-observation-last-run.json",
+  "multiIntervalGovernanceBraidStatePath": ".audit/state/local-automation-multi-interval-governance-braid-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -98,6 +104,9 @@
     "keepOperationalPublicationLedgerBundles": 8,
     "keepExternalConsumerConcordanceBundles": 8,
     "keepPostPublishGovernanceLoopBundles": 8,
+    "keepPublicationCadenceLedgerBundles": 8,
+    "keepDownstreamRuntimeObservationBundles": 8,
+    "keepMultiIntervalGovernanceBraidBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 08`
+- `Automation Maturation Map 09`
 
 Next eligible map:
 
-- `Automation Maturation Map 09`
+- no further map declared yet
 
 Time-dilation rule:
 
@@ -226,7 +226,7 @@ Current live output surfaces for this map:
 
 - Goal: consolidate the first real publication loop into a stable operational governance surface once live publication is observed
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Operational Publication Ledger`
   - `External Consumer Concordance`
   - `Post-Publish Governance Loop`
@@ -241,10 +241,16 @@ Current live output surfaces for this map:
 
 - Goal: operationalize the first multi-interval publication cycle once the initial publication loop is no longer singular
 - Expected review windows: `2`
-- Queued tasks:
+- Selected tasks:
   - `Publication Cadence Ledger`
   - `Downstream Runtime Observation`
   - `Multi-Interval Governance Braid`
+
+Current live output surfaces for this map:
+
+- publication cadence ledger bundles land under `.audit/runs/publication-cadence-ledger/` and update `.audit/state/local-automation-publication-cadence-ledger-last-run.json`
+- downstream runtime observation bundles land under `.audit/runs/downstream-runtime-observation/` and update `.audit/state/local-automation-downstream-runtime-observation-last-run.json`
+- multi-interval governance braid bundles land under `.audit/runs/multi-interval-governance-braid/` and update `.audit/state/local-automation-multi-interval-governance-braid-last-run.json`
 
 ## Status Interpretation
 
