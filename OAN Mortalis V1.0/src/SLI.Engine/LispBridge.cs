@@ -126,6 +126,7 @@ public sealed class LispBridge
         var decisionBranch = context.CandidateBranches.FirstOrDefault() ?? context.FinalDecision;
         var traceId = CreateDeterministicTraceId(frame.CMEId, frame.ContextId, traceHash).ToString("D");
         var zedThetaCandidate = BuildZedThetaCandidate(context, traceId);
+        var actualizationPacket = SliActualizationWebbingPacketFactory.CreateForCognition(context, traceId, zedThetaCandidate);
         var liveRuntimeRun = context.ShardModeEnabled
             ? SliLiveEngramRuntimePacketFactory.CreateRunForCognition(context, traceId, zedThetaCandidate)
             : null;
@@ -140,6 +141,7 @@ public sealed class LispBridge
             CompassState = compass,
             GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
             ZedThetaCandidate = zedThetaCandidate,
+            ActualizationPacket = actualizationPacket,
             LiveRuntimePacket = liveRuntimeRun is not null
                 ? SliLiveEngramRuntimePacketFactory.ResolveCompatibilityPacket(liveRuntimeRun)
                 : SliLiveEngramRuntimePacketFactory.CreateForCognition(context, traceId, zedThetaCandidate),

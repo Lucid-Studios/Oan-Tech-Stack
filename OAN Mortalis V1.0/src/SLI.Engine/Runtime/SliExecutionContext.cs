@@ -15,6 +15,7 @@ public sealed class SliExecutionContext
     private readonly Dictionary<string, List<string>> _shardTraceLines = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<SliLocalityRelationEvent> _localityRelationEvents = [];
     private readonly List<SliLocalityObstructionRecord> _localityObstructions = [];
+    private readonly List<SliActualizationWebbingEvent> _actualizationWebbingEvents = [];
 
     public SliExecutionContext(
         ContextFrame frame,
@@ -45,6 +46,7 @@ public sealed class SliExecutionContext
     internal IReadOnlyCollection<SliLocalityShardRecord> LocalityShards => _localityShards.Values.ToArray();
     internal IReadOnlyList<SliLocalityRelationEvent> LocalityRelationEvents => _localityRelationEvents;
     internal IReadOnlyList<SliLocalityObstructionRecord> LocalityObstructions => _localityObstructions;
+    internal IReadOnlyList<SliActualizationWebbingEvent> ActualizationWebbingEvents => _actualizationWebbingEvents;
     internal SliMorphologyState MorphologyState { get; } = new();
     internal SliPropositionState PropositionState { get; } = new();
     internal SliHigherOrderLocalityState HigherOrderLocalityState { get; } = new();
@@ -226,6 +228,27 @@ public sealed class SliExecutionContext
         _localityObstructions.Add(obstructionRecord);
     }
 
+    internal void RecordActualizationStage(
+        SliActualizationStageKind stage,
+        string detail,
+        string cycleMarker)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(detail);
+        ArgumentException.ThrowIfNullOrWhiteSpace(cycleMarker);
+
+        var shardId = CurrentShardId ??
+            (ShardModeEnabled
+                ? PrimaryShardId ?? SliCompassLocalityShards.ActingShardId
+                : "serial");
+        var localityHandle = ResolveCurrentLocalityHandle(shardId);
+        _actualizationWebbingEvents.Add(new SliActualizationWebbingEvent(
+            Stage: stage,
+            Detail: detail,
+            ShardId: shardId,
+            LocalityHandle: localityHandle,
+            CycleMarker: cycleMarker));
+    }
+
     internal void FinalizeCompassShardRun()
     {
         if (!ShardModeEnabled)
@@ -268,6 +291,20 @@ public sealed class SliExecutionContext
                 string.Equals(targetShardId, SliCompassLocalityShards.WitnessingShardId, StringComparison.OrdinalIgnoreCase)) ||
                (string.Equals(sourceShardId, SliCompassLocalityShards.WitnessingShardId, StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(targetShardId, SliCompassLocalityShards.AdjacentIngestionShardId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private string ResolveCurrentLocalityHandle(string shardId)
+    {
+        if (ShardModeEnabled &&
+            _localityShards.TryGetValue(shardId, out var shard) &&
+            !string.IsNullOrWhiteSpace(shard.LocalityHandle))
+        {
+            return shard.LocalityHandle;
+        }
+
+        return string.IsNullOrWhiteSpace(HigherOrderLocalityState.LocalityHandle)
+            ? $"locality:{Frame.CMEId}:{Frame.ContextId:D}"
+            : HigherOrderLocalityState.LocalityHandle;
     }
 
     private static SoulFrameInferenceConstraints BuildConstraints(string objective)

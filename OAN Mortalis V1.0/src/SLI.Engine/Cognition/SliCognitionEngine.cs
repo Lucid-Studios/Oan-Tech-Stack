@@ -267,10 +267,18 @@ public sealed class SliCognitionEngine : ICognitionEngine
             $"GoldenCode(prime={goldenCodeSummary.PrimeReflections}, psi={goldenCodeSummary.PsiModulations}, theta={goldenCodeSummary.ThetaSeals}, gamma={goldenCodeSummary.GammaYields}). " +
             $"Sheaf={sheafPlan.Domain}; Functors={string.Join(">", sheafPlan.FunctorPath)}; " +
             $"Cohomology(missing={sheafPlan.Cohomology.MissingMorphisms.Count}, inconsistent={sheafPlan.Cohomology.InconsistentSymbols.Count}, disconnected={sheafPlan.Cohomology.DisconnectedFunctorChains.Count}).";
+        var actualizationSummary = DescribeActualization(lispResult);
         var shardReduction = DescribeShardReduction(lispResult);
-        var reasoning = string.IsNullOrWhiteSpace(shardReduction)
-            ? baseReasoning
-            : $"{baseReasoning} {shardReduction}";
+        var reasoning = baseReasoning;
+        if (!string.IsNullOrWhiteSpace(actualizationSummary))
+        {
+            reasoning = $"{reasoning} {actualizationSummary}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(shardReduction))
+        {
+            reasoning = $"{reasoning} {shardReduction}";
+        }
 
         if (lowMindResult is null)
         {
@@ -278,6 +286,20 @@ public sealed class SliCognitionEngine : ICognitionEngine
         }
 
         return $"{reasoning} LowMind augmentation: {lowMindResult.Reasoning}";
+    }
+
+    internal static string DescribeActualization(LispExecutionResult lispResult)
+    {
+        ArgumentNullException.ThrowIfNull(lispResult);
+
+        var actualization = lispResult.ActualizationPacket;
+        if (actualization is null)
+        {
+            return string.Empty;
+        }
+
+        return
+            $"Actualization(claim={actualization.ClaimClass}, contradiction={actualization.ContradictionClass}, route={actualization.ValidationRoute}, disposition={actualization.Disposition}, stages={actualization.WebbingEvents.Count}, candidate-bearing={actualization.CandidateEngramBearing.ToString().ToLowerInvariant()}).";
     }
 
     internal static string DescribeShardReduction(LispExecutionResult lispResult)

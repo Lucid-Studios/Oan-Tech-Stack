@@ -15,6 +15,7 @@ public sealed class LispExecutionResult
     public required CognitiveCompassState CompassState { get; init; }
     public required GoldenCodeCompassProjection GoldenCodeCompass { get; init; }
     public required ZedThetaCandidateReceipt ZedThetaCandidate { get; init; }
+    internal SliActualizationWebbingPacket? ActualizationPacket { get; init; }
     internal SliLiveEngramRuntimePacket? LiveRuntimePacket { get; init; }
     internal SliLiveEngramRuntimeRun? LiveRuntimeRun { get; init; }
 }

@@ -7,11 +7,32 @@ using SLI.Engine;
 using SLI.Engine.Cognition;
 using SLI.Engine.Models;
 using SLI.Engine.Runtime;
+using SoulFrame.Host;
 
 namespace Oan.Sli.Tests;
 
 public sealed class CompassLocalityShardTests
 {
+    [Fact]
+    public async Task LispBridge_CanonicalProgram_ProducesActualizationPacket_EndToEnd()
+    {
+        var bridge = new LispBridge(new EngramResolverService(), new AcceptedSemanticDevice());
+        await bridge.InitializeAsync();
+
+        var engine = new SliCognitionEngine(new EngramResolverService());
+        var program = engine.BuildProgram("identity-continuity", null);
+        var result = await bridge.ExecuteProgramAsync(program, CreateContextFrame());
+
+        Assert.NotNull(result.ActualizationPacket);
+        Assert.Equal(SliActualizationClaimClass.SelfImplicating, result.ActualizationPacket!.ClaimClass);
+        Assert.Equal(SliActualizationDisposition.CandidateBearing, result.ActualizationPacket.Disposition);
+        Assert.True(result.ActualizationPacket.CandidateEngramBearing);
+        Assert.Contains(result.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Bloom);
+        Assert.Contains(result.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Commit);
+        Assert.NotNull(result.LiveRuntimeRun);
+        Assert.Equal(SliLocalityRelationOutcomeKind.Joined, result.LiveRuntimeRun!.ReductionOutcome);
+    }
+
     [Fact]
     public async Task PilotDetection_RecognizesCanonicalCompassOnly()
     {
@@ -360,6 +381,47 @@ public sealed class CompassLocalityShardTests
         public Task<EngramQueryResult> ResolveClusterAsync(string clusterId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new EngramQueryResult { Source = "stub", Summaries = [] });
+        }
+    }
+
+    private sealed class AcceptedSemanticDevice : ISoulFrameSemanticDevice
+    {
+        public Task<SoulFrameInferenceResponse> InferAsync(SoulFrameInferenceRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(CreateResponse("infer-ok"));
+
+        public Task<SoulFrameInferenceResponse> ClassifyAsync(SoulFrameInferenceRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(CreateResponse("classify-ok"));
+
+        public Task<SoulFrameInferenceResponse> SemanticExpandAsync(SoulFrameInferenceRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(CreateResponse("semantic-expand-ok"));
+
+        public Task<SoulFrameInferenceResponse> EmbeddingAsync(SoulFrameInferenceRequest request, CancellationToken cancellationToken = default)
+            => Task.FromResult(CreateResponse("embedding-ok"));
+
+        private static SoulFrameInferenceResponse CreateResponse(string decision)
+        {
+            return new SoulFrameInferenceResponse
+            {
+                Accepted = true,
+                Decision = decision,
+                Payload = "test",
+                Confidence = 0.91,
+                Governance = new SoulFrameGovernedEmissionEnvelope
+                {
+                    State = SoulFrameGovernedEmissionState.Complete,
+                    Trace = "accepted-test-semantic-device",
+                    Content = "test"
+                },
+                CompassAdvisory = new SoulFrameCompassAdvisoryResponse
+                {
+                    SuggestedActiveBasin = CompassDoctrineBasin.IdentityContinuity,
+                    SuggestedCompetingBasin = CompassDoctrineBasin.Unknown,
+                    SuggestedAnchorState = CompassAnchorState.Held,
+                    SuggestedSelfTouchClass = CompassSelfTouchClass.ValidationTouch,
+                    Confidence = 0.91,
+                    Justification = "accepted-test-advisory"
+                }
+            };
         }
     }
 }

@@ -320,6 +320,7 @@ public sealed class SliSymbolTable
             var negative = Arg(expression, 2, "psi-negative");
             var detail = $"omega-converge({positive} {negative})";
             context.AddTrace(detail);
+            context.RecordActualizationStage(SliActualizationStageKind.Bloom, detail, "omega-converge");
             ExportCompassTelemetry(context, SliCompassLocalityShards.GoldenCodeBloomTelemetryKey, detail);
             return Task.FromResult(SExpression.AtomNode("omega-ready"));
         });
@@ -339,6 +340,7 @@ public sealed class SliSymbolTable
             RefreshGoldenCodeContracts(context);
             var detail = $"theta-seal({primeState} {reasoningState} basin={state.ActiveBasin} anchor={state.AnchorState})";
             context.AddTrace(detail);
+            context.RecordActualizationStage(SliActualizationStageKind.Seal, detail, "theta-seal");
             ExportCompassTelemetry(context, SliCompassLocalityShards.ThetaSealTelemetryKey, detail);
             return Task.FromResult(SExpression.AtomNode("theta-ready"));
         });
@@ -357,6 +359,7 @@ public sealed class SliSymbolTable
             RefreshGoldenCodeContracts(context);
             var detail = $"compass-work({thetaState} {locality} basin={state.ActiveBasin} anchor={state.AnchorState} self-touch={state.SelfTouchClass} posture={state.OeCoePosture})";
             context.AddTrace(detail);
+            context.RecordActualizationStage(SliActualizationStageKind.Witness, detail, "compass-work");
             if (relation is null || relation.Outcome == SliLocalityRelationOutcomeKind.Joined)
             {
                 ExportCompassTelemetry(context, SliCompassLocalityShards.CompassWorkTelemetryKey, detail);
@@ -392,7 +395,9 @@ public sealed class SliSymbolTable
                 SliLocalityRelationEvaluator.EvaluateIngestsFrom(context, "compass-update");
             }
 
-            context.AddTrace($"compass-update({arg1} {arg2})");
+            var detail = $"compass-update({arg1} {arg2})";
+            context.AddTrace(detail);
+            context.RecordActualizationStage(SliActualizationStageKind.Ingest, detail, "compass-update");
             return Task.FromResult(SExpression.AtomNode("compass-ok"));
         });
 
@@ -405,7 +410,9 @@ public sealed class SliSymbolTable
             context.PrunedBranches.AddRange(pruned);
             context.CandidateBranches.Clear();
             context.CandidateBranches.AddRange(survivors);
-            context.AddTrace($"cleave({context.PrunedBranches.Count})");
+            var detail = $"cleave({context.PrunedBranches.Count})";
+            context.AddTrace(detail);
+            context.RecordActualizationStage(SliActualizationStageKind.Cleave, detail, "cleave");
             return Task.FromResult(SExpression.AtomNode("cleaved"));
         });
 
@@ -414,7 +421,9 @@ public sealed class SliSymbolTable
             EnterCompassShard(context, SliCompassLocalityShards.ActingShardId);
             context.FinalDecision = context.CandidateBranches.FirstOrDefault() ?? "defer";
             RefreshGoldenCodeContracts(context);
-            context.AddTrace($"commit({context.FinalDecision})");
+            var detail = $"commit({context.FinalDecision})";
+            context.AddTrace(detail);
+            context.RecordActualizationStage(SliActualizationStageKind.Commit, detail, "commit");
             return Task.FromResult(SExpression.AtomNode(context.FinalDecision));
         });
 

@@ -111,8 +111,19 @@ public sealed class SliCognitionEngineTests
         Assert.NotNull(result.ZedThetaCandidate.RuntimeUseCeiling);
         Assert.True(result.ZedThetaCandidate.RuntimeUseCeiling!.CandidateOnly);
         Assert.NotNull(engine.LastExecutionResult);
+        Assert.NotNull(engine.LastExecutionResult!.ActualizationPacket);
         Assert.NotNull(engine.LastExecutionResult!.LiveRuntimeRun);
         Assert.NotNull(engine.LastExecutionResult!.LiveRuntimePacket);
+        Assert.Equal(SliActualizationClaimClass.SelfImplicating, engine.LastExecutionResult.ActualizationPacket!.ClaimClass);
+        Assert.Equal(SliActualizationContradictionClass.None, engine.LastExecutionResult.ActualizationPacket.ContradictionClass);
+        Assert.Equal(SliActualizationValidationRoute.CooledSelfGelValidation, engine.LastExecutionResult.ActualizationPacket.ValidationRoute);
+        Assert.Equal(SliActualizationDisposition.CandidateBearing, engine.LastExecutionResult.ActualizationPacket.Disposition);
+        Assert.True(engine.LastExecutionResult.ActualizationPacket.CandidateEngramBearing);
+        Assert.Contains(engine.LastExecutionResult.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Bloom);
+        Assert.Contains(engine.LastExecutionResult.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Seal);
+        Assert.Contains(engine.LastExecutionResult.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Witness);
+        Assert.Contains(engine.LastExecutionResult.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Ingest);
+        Assert.Contains(engine.LastExecutionResult.ActualizationPacket.WebbingEvents, evt => evt.Stage == SliActualizationStageKind.Commit);
         Assert.True(engine.LastExecutionResult.LiveRuntimeRun!.ShardModeEnabled);
         Assert.Equal(SliLocalityRelationOutcomeKind.Joined, engine.LastExecutionResult.LiveRuntimeRun.ReductionOutcome);
         Assert.Equal(3, engine.LastExecutionResult.LiveRuntimeRun.ShardPackets.Count);
@@ -144,6 +155,7 @@ public sealed class SliCognitionEngineTests
         Assert.Equal(
             engine.LastExecutionResult.LiveRuntimePacket.ShardId,
             SliLiveEngramRuntimePacketFactory.ResolveCompatibilityPacket(engine.LastExecutionResult.LiveRuntimeRun).ShardId);
+        Assert.Contains("Actualization(claim=SelfImplicating", result.Reasoning, StringComparison.Ordinal);
         Assert.Contains("CompassShards(reduction=Joined", result.Reasoning, StringComparison.Ordinal);
         var compatibilityProjection = GoldenCodeCompassProjection.FromCandidateReceipt(result.ZedThetaCandidate);
         Assert.Equal(result.GoldenCodeCompass.ActiveBasin, compatibilityProjection.ActiveBasin);
@@ -181,6 +193,57 @@ public sealed class SliCognitionEngineTests
         Assert.DoesNotContain(program, line => line.Contains("packet-", StringComparison.Ordinal));
         Assert.DoesNotContain(program, line => line.Contains("accountability-packet", StringComparison.Ordinal));
         CanonicalCognitionCycle.ValidateProgramOrder(program);
+    }
+
+    [Fact]
+    public async Task SelfContradiction_ProducesActualizationObstruction()
+    {
+        var resolver = new EngramResolverService();
+        var engine = new SliCognitionEngine(resolver, semanticDevice: new AcceptedCompassSemanticDevice());
+        await engine.InitializeAsync();
+
+        var request = new CognitionRequest
+        {
+            Context = new CognitionContext
+            {
+                CMEId = "cme-test",
+                SoulFrameId = Guid.NewGuid(),
+                ContextId = Guid.NewGuid(),
+                TaskObjective = "identity-continuity",
+                RelevantEngrams = [],
+                SelfStateHint = new CognitionSelfStateHint
+                {
+                    ClaimCount = 2,
+                    HasDeferredOrContradictedClaim = true,
+                    HasHotClaim = true,
+                    ValidationConceptCount = 1
+                },
+                CleaverHint = new CognitionCleaverHint
+                {
+                    KnownRatio = 0.62,
+                    UnknownRatio = 0.21
+                }
+            },
+            Prompt = "execute symbolic cognition"
+        };
+
+        var result = await engine.ExecuteAsync(request);
+
+        Assert.NotNull(engine.LastExecutionResult);
+        Assert.NotNull(engine.LastExecutionResult!.ActualizationPacket);
+        Assert.Equal(
+            SliActualizationContradictionClass.SelfValidationConflict,
+            engine.LastExecutionResult.ActualizationPacket!.ContradictionClass);
+        Assert.Equal(
+            SliActualizationValidationRoute.SoulFrameContinuityMediation,
+            engine.LastExecutionResult.ActualizationPacket.ValidationRoute);
+        Assert.Equal(
+            SliActualizationDisposition.Obstructed,
+            engine.LastExecutionResult.ActualizationPacket.Disposition);
+        Assert.Contains(
+            engine.LastExecutionResult.ActualizationPacket.ResidueSet,
+            residue => residue == "contradiction:SelfValidationConflict");
+        Assert.Contains("disposition=Obstructed", result.Reasoning, StringComparison.Ordinal);
     }
 
     [Fact]
