@@ -33,6 +33,23 @@ function Resolve-PathFromRepo {
     return [System.IO.Path]::GetFullPath((Join-Path $BasePath $CandidatePath))
 }
 
+function Get-RelativePathString {
+    param(
+        [string] $BasePath,
+        [string] $TargetPath
+    )
+
+    $resolvedBase = [System.IO.Path]::GetFullPath($BasePath)
+    if (Test-Path -LiteralPath $resolvedBase -PathType Leaf) {
+        $resolvedBase = Split-Path -Parent $resolvedBase
+    }
+
+    $resolvedTarget = [System.IO.Path]::GetFullPath($TargetPath)
+    $baseUri = New-Object System.Uri(($resolvedBase.TrimEnd('\') + '\'))
+    $targetUri = New-Object System.Uri($resolvedTarget)
+    return [System.Uri]::UnescapeDataString($baseUri.MakeRelativeUri($targetUri).ToString()).Replace('\', '/')
+}
+
 function Write-JsonFile {
     param(
         [string] $Path,
@@ -121,7 +138,10 @@ $policy = Get-Content -Raw -LiteralPath $resolvedPolicyPath | ConvertFrom-Json
 
 $releaseCandidateOutputRoot = [string] $policy.releaseCandidateOutputRoot
 $digestOutputRoot = [string] $policy.digestOutputRoot
+$blockedEscalationOutputRoot = [string] $policy.blockedEscalationOutputRoot
 $statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.statePath)
+$retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.retentionStatePath)
+$blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.blockedEscalationStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -183,6 +203,7 @@ if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 $latestStatus = [string] $manifest.status
 $latestRunGeneratedAtUtc = [datetime]::Parse([string] $manifest.generatedAtUtc, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
+$nowUtc = (Get-Date).ToUniversalTime()
 
 $digestDue = $ForceDigest.IsPresent
 if (-not $digestDue) {
@@ -279,6 +300,41 @@ $summary = [ordered]@{
 }
 
 $summaryPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '.audit/state/local-automation-cycle-last-run.json'
+$statePayload.lastBlockedEscalationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBlockedEscalationBundle')
+$statePayload.blockedEscalationTriggered = $false
+$statePayload.retentionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $retentionStatePath
+Write-JsonFile -Path $statePath -Value $statePayload
+
+$blockedEscalationBundlePath = $null
+if ($latestStatus -eq $blockedStatus) {
+    $blockedEscalationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Blocked-EscalationBundle.ps1'
+    $blockedEscalationArgs = @(
+        '-ExecutionPolicy', 'Bypass',
+        '-File', $blockedEscalationScriptPath,
+        '-RepoRoot', $resolvedRepoRoot,
+        '-ManifestPath', $manifestPath,
+        '-CyclePolicyPath', $resolvedPolicyPath
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($digestBundlePath)) {
+        $blockedEscalationArgs += @('-DigestBundlePath', $digestBundlePath)
+    }
+
+    $blockedEscalationOutput = & powershell @blockedEscalationArgs
+    $blockedEscalationBundlePath = Get-ScriptOutputTail -Output $blockedEscalationOutput
+    $statePayload.lastBlockedEscalationBundle = $blockedEscalationBundlePath
+    $statePayload.blockedEscalationTriggered = $true
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$retentionScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Automation-RetentionPruning.ps1'
+$retentionOutput = & powershell -ExecutionPolicy Bypass -File $retentionScriptPath -RepoRoot $resolvedRepoRoot -CyclePolicyPath $resolvedPolicyPath
+$retentionStatePathFromRun = Get-ScriptOutputTail -Output $retentionOutput
+if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
+    $statePayload.retentionStatePath = $retentionStatePathFromRun
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 Write-JsonFile -Path $summaryPath -Value $summary
 
 $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
@@ -287,6 +343,12 @@ $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
 Write-Host ('[local-automation-cycle] Status: {0}' -f $latestStatus)
 Write-Host ('[local-automation-cycle] State: {0}' -f $statePath)
+if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] Retention: {0}' -f $retentionStatePathFromRun)
+}
+if (-not [string]::IsNullOrWhiteSpace($blockedEscalationBundlePath)) {
+    Write-Host ('[local-automation-cycle] BlockedEscalation: {0}' -f $blockedEscalationBundlePath)
+}
 if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) {
     Write-Host ('[local-automation-cycle] TaskStatus: {0}' -f $taskStatusPath)
 }

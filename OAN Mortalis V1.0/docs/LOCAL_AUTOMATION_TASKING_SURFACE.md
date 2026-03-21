@@ -136,6 +136,12 @@ The active-run bundle root is:
   - `Artifact Retention Pruning`
   - `Blocked Escalation Bundle`
 
+Current live output surfaces for this map:
+
+- delta summaries land inside each digest bundle as `delta-summary.json` and `delta-summary.md`
+- retention pruning writes its last-run state to `.audit/state/local-automation-retention-last-run.json`
+- blocked escalation bundles land under `.audit/runs/blocked-escalations/` and update `.audit/state/local-automation-blocked-escalation-last-run.json` when the posture is `blocked`
+
 ## Status Interpretation
 
 The task board must distinguish between:

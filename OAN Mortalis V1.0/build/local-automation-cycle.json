@@ -6,7 +6,17 @@
   "digestWindowHours": 24,
   "releaseCandidateOutputRoot": ".audit/runs/release-candidates",
   "digestOutputRoot": ".audit/runs/release-digests",
+  "blockedEscalationOutputRoot": ".audit/runs/blocked-escalations",
   "statePath": ".audit/state/local-automation-cycle.json",
+  "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
+  "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
+  "retentionPolicy": {
+    "keepReleaseCandidateBundles": 8,
+    "keepDigestBundles": 8,
+    "keepLongFormTaskMapRuns": 8,
+    "keepBlockedEscalationBundles": 8,
+    "preserveReferencedBundles": true
+  },
   "mechanicalContinuationStatuses": [
     "candidate-ready",
     "hitl-required"

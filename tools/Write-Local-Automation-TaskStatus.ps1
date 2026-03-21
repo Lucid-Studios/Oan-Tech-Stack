@@ -34,6 +34,16 @@ function Read-JsonFile {
     return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
 }
 
+function Read-JsonFileOrNull {
+    param([string] $Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $null
+    }
+
+    return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+}
+
 function Write-JsonFile {
     param(
         [string] $Path,
@@ -92,6 +102,55 @@ function Get-MeaningfulScheduledDateTimeUtcStringOrNull {
     return $utcValue.ToString('o')
 }
 
+function Resolve-LongFormTaskLiveStatus {
+    param(
+        [string] $TaskId,
+        [string] $PolicyStatus,
+        [string] $LatestDigestBundlePath,
+        [object] $RetentionState,
+        [object] $BlockedEscalationState,
+        [string] $LastKnownStatus,
+        [string] $BlockedStatus
+    )
+
+    switch ($TaskId) {
+        'delta-summary-surface' {
+            if (-not [string]::IsNullOrWhiteSpace($LatestDigestBundlePath) -and
+                (Test-Path -LiteralPath (Join-Path $LatestDigestBundlePath 'delta-summary.json') -PathType Leaf)) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'artifact-retention-pruning' {
+            if ($null -ne $RetentionState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'blocked-escalation-bundle' {
+            if ($LastKnownStatus -eq $BlockedStatus) {
+                if ($null -ne $BlockedEscalationState) {
+                    return 'completed'
+                }
+
+                return 'awaiting-blocked-bundle'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'armed'
+            }
+        }
+    }
+
+    return $PolicyStatus
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskingPolicyPath
@@ -123,6 +182,15 @@ $lastDigestUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -
 $nextMandatoryHitlReviewUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextMandatoryHitlReviewUtc')
 $lastReleaseCandidateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastReleaseCandidateBundle')
 $lastDigestBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastDigestBundle')
+$latestDigestBundlePath = if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
+    Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $lastDigestBundle
+} else {
+    $null
+}
+$retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.retentionStatePath)
+$blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationStatePath)
+$retentionState = Read-JsonFileOrNull -Path $retentionStatePath
+$blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -264,7 +332,20 @@ $eligibleNextTaskMap = $null
 if ($null -ne $activeLongFormTaskMap) {
     $activeLongFormTasks = @($activeLongFormTaskMap.tasks)
     $activeLongFormTasksTotal = $activeLongFormTasks.Count
-    $activeLongFormTasksCompleted = @($activeLongFormTasks | Where-Object { [string] $_.status -eq 'completed' }).Count
+    $activeLongFormTaskStatuses = @(
+        $activeLongFormTasks |
+        ForEach-Object {
+            Resolve-LongFormTaskLiveStatus `
+                -TaskId ([string] $_.id) `
+                -PolicyStatus ([string] $_.status) `
+                -LatestDigestBundlePath $latestDigestBundlePath `
+                -RetentionState $retentionState `
+                -BlockedEscalationState $blockedEscalationState `
+                -LastKnownStatus $lastKnownStatus `
+                -BlockedStatus ([string] $cyclePolicy.blockedStatus)
+        }
+    )
+    $activeLongFormTasksCompleted = @($activeLongFormTaskStatuses | Where-Object { $_ -eq 'completed' }).Count
 
     if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
         $activeLongFormTaskMapStatus = 'blocked'
@@ -299,7 +380,33 @@ if ($null -ne $activeLongFormTaskMap) {
 $taskMapEntries = @(
     foreach ($taskMap in $longFormTaskMaps) {
         $taskMapTasks = @($taskMap.tasks)
-        $completedCount = @($taskMapTasks | Where-Object { [string] $_.status -eq 'completed' }).Count
+        $taskMapTaskEntries = @(
+            $taskMapTasks |
+            ForEach-Object {
+                $policyStatus = [string] $_.status
+                $liveStatus = Resolve-LongFormTaskLiveStatus `
+                    -TaskId ([string] $_.id) `
+                    -PolicyStatus $policyStatus `
+                    -LatestDigestBundlePath $latestDigestBundlePath `
+                    -RetentionState $retentionState `
+                    -BlockedEscalationState $blockedEscalationState `
+                    -LastKnownStatus $lastKnownStatus `
+                    -BlockedStatus ([string] $cyclePolicy.blockedStatus)
+
+                [ordered]@{
+                    id = [string] $_.id
+                    label = [string] $_.label
+                    owner = [string] $_.owner
+                    authority = [string] $_.authority
+                    status = $policyStatus
+                    liveStatus = $liveStatus
+                    purpose = [string] $_.purpose
+                    completionSignal = [string] $_.completionSignal
+                    escalatesWhen = @($_.escalatesWhen | ForEach-Object { [string] $_ })
+                }
+            }
+        )
+        $completedCount = @($taskMapTaskEntries | Where-Object { [string] $_.liveStatus -eq 'completed' }).Count
         [ordered]@{
             id = [string] $taskMap.id
             label = [string] $taskMap.label
@@ -309,21 +416,7 @@ $taskMapEntries = @(
             completedTaskCount = $completedCount
             totalTaskCount = $taskMapTasks.Count
             taskIds = @($taskMap.taskIds | ForEach-Object { [string] $_ })
-            tasks = @(
-                $taskMapTasks |
-                ForEach-Object {
-                    [ordered]@{
-                        id = [string] $_.id
-                        label = [string] $_.label
-                        owner = [string] $_.owner
-                        authority = [string] $_.authority
-                        status = [string] $_.status
-                        purpose = [string] $_.purpose
-                        completionSignal = [string] $_.completionSignal
-                        escalatesWhen = @($_.escalatesWhen | ForEach-Object { [string] $_ })
-                    }
-                }
-            )
+            tasks = $taskMapTaskEntries
         }
     }
 )
@@ -418,12 +511,20 @@ if ($null -ne $activeLongFormTaskMap) {
 
     $markdownLines += @(
         '',
-        '| Task | Owner | Status |',
-        '| --- | --- | --- |'
+        '| Task | Owner | Policy | Live |',
+        '| --- | --- | --- | --- |'
     )
 
     foreach ($task in @($activeLongFormTaskMap.tasks)) {
-        $markdownLines += ('| {0} | {1} | {2} |' -f [string] $task.label, [string] $task.owner, [string] $task.status)
+        $taskLiveStatus = Resolve-LongFormTaskLiveStatus `
+            -TaskId ([string] $task.id) `
+            -PolicyStatus ([string] $task.status) `
+            -LatestDigestBundlePath $latestDigestBundlePath `
+            -RetentionState $retentionState `
+            -BlockedEscalationState $blockedEscalationState `
+            -LastKnownStatus $lastKnownStatus `
+            -BlockedStatus ([string] $cyclePolicy.blockedStatus)
+        $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
     }
 
     if ($null -ne $activeLongFormRun) {
