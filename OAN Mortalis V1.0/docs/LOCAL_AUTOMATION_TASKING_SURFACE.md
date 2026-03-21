@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 01`
+- `Automation Maturation Map 02`
 
 Next eligible map:
 
-- `Automation Maturation Map 02`
+- `none currently declared`
 
 Time-dilation rule:
 
@@ -122,7 +122,7 @@ The active-run bundle root is:
 
 - Goal: make the current local automation cycle report transitions, first scheduled execution truth, and status freshness without requiring manual probing
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Notification Surface`
   - `First Scheduled Run Capture`
   - `Status Freshness Reconciliation`
@@ -131,7 +131,7 @@ The active-run bundle root is:
 
 - Goal: deepen unattended evidence quality without crossing into ungated promotion authority
 - Expected review windows: `2`
-- Queued tasks:
+- Selected tasks:
   - `Delta Summary Surface`
   - `Artifact Retention Pruning`
   - `Blocked Escalation Bundle`

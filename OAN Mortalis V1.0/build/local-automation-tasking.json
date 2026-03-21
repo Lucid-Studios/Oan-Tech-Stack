@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-01",
+  "activeTaskMapId": "automation-maturation-map-02",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -97,7 +97,7 @@
     {
       "id": "automation-maturation-map-01",
       "label": "Automation Maturation Map 01",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Make the current local automation cycle report transitions, first scheduled execution truth, and status freshness without requiring manual probing.",
       "timeDilationPullForwardAllowed": true,
@@ -112,7 +112,7 @@
           "label": "Notification Surface",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Emit a bounded local notification or inbox surface when posture changes from clear-to-continue to hitl-required or blocked.",
           "completionSignal": "A posture transition produces a stable local notification artifact without widening publication authority.",
           "escalatesWhen": [
@@ -125,7 +125,7 @@
           "label": "First Scheduled Run Capture",
           "owner": "Automation",
           "authority": "Machine-local only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Capture and report the first scheduler-driven execution so the machine proves it can move without manual invocation.",
           "completionSignal": "Task board records a real scheduler last-run time and links it to the latest release-candidate bundle.",
           "escalatesWhen": [
@@ -138,7 +138,7 @@
           "label": "Status Freshness Reconciliation",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Keep cycle state, digest state, task board state, and scheduler state in agreement after unattended runs.",
           "completionSignal": "The task board can prove which live artifact is newest and whether any status surface is stale.",
           "escalatesWhen": [
@@ -151,7 +151,7 @@
     {
       "id": "automation-maturation-map-02",
       "label": "Automation Maturation Map 02",
-      "status": "queued-next",
+      "status": "active",
       "expectedReviewWindows": 2,
       "goal": "Deepen unattended evidence quality without crossing into ungated promotion authority.",
       "timeDilationPullForwardAllowed": false,
@@ -166,7 +166,7 @@
           "label": "Delta Summary Surface",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Summarize what changed between the latest release-candidate bundle and the previous one.",
           "completionSignal": "Latest digest includes a bounded delta summary without inferring maturity.",
           "escalatesWhen": [
@@ -179,7 +179,7 @@
           "label": "Artifact Retention Pruning",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Prune or compact old local evidence bundles according to declared retention policy while preserving review truth.",
           "completionSignal": "Retention policy can delete or compact stale local bundles without harming active review surfaces.",
           "escalatesWhen": [
@@ -192,7 +192,7 @@
           "label": "Blocked Escalation Bundle",
           "owner": "Shared",
           "authority": "Automation may prepare; HITL interprets",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Prepare a bounded escalation bundle when the automation posture becomes blocked.",
           "completionSignal": "A blocked posture produces one stable bundle that points to the exact failing evidence surfaces.",
           "escalatesWhen": [
