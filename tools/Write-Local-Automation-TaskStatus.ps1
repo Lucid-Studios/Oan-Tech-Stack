@@ -97,6 +97,7 @@ $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Can
 $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskingPolicyPath
 $cyclePolicy = Read-JsonFile -Path $resolvedCyclePolicyPath
 $taskingPolicy = Read-JsonFile -Path $resolvedTaskingPolicyPath
+$taskDefinitions = @($taskingPolicy.tasks)
 
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $statusJsonPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $taskingPolicy.statusJsonPath)
@@ -178,30 +179,64 @@ if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
     $promotionWatchStatus = 'hitl-required'
 }
 
+$schedulerWatchStatus = if (-not [bool] $scheduler.registered) {
+    'scheduler-unregistered'
+} elseif ([string]::IsNullOrWhiteSpace([string] $scheduler.nextRunTimeUtc)) {
+    'scheduler-missing-next-run'
+} else {
+    'scheduler-ready'
+}
+
 $taskEntries = @(
-    [ordered]@{
-        id = 'release-candidate-cycle'
-        label = 'Release Candidate Cycle'
-        status = $releaseCandidateTaskStatus
-        lastRunUtc = if ($null -ne $lastReleaseCandidateRunUtc) { $lastReleaseCandidateRunUtc.ToString('o') } else { $null }
-        nextRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
-        latestBundle = $lastReleaseCandidateBundle
-    },
-    [ordered]@{
-        id = 'daily-hitl-digest'
-        label = 'Daily HITL Digest'
-        status = $dailyDigestTaskStatus
-        lastRunUtc = if ($null -ne $lastDigestUtc) { $lastDigestUtc.ToString('o') } else { $null }
-        nextRunUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
-        latestBundle = $lastDigestBundle
-    },
-    [ordered]@{
-        id = 'promotion-watch'
-        label = 'Promotion Watch'
-        status = $promotionWatchStatus
-        lastRunUtc = if ($null -ne $lastDigestUtc) { $lastDigestUtc.ToString('o') } else { $null }
-        nextRunUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
-        latestBundle = $lastDigestBundle
+    foreach ($taskDefinition in $taskDefinitions) {
+        $taskId = [string] $taskDefinition.id
+        $status = 'uninitialized'
+        $lastRunUtc = $null
+        $nextRunUtc = $null
+        $latestBundle = $null
+
+        switch ($taskId) {
+            'release-candidate-cycle' {
+                $status = $releaseCandidateTaskStatus
+                $lastRunUtc = if ($null -ne $lastReleaseCandidateRunUtc) { $lastReleaseCandidateRunUtc.ToString('o') } else { $null }
+                $nextRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
+                $latestBundle = $lastReleaseCandidateBundle
+            }
+            'daily-hitl-digest' {
+                $status = $dailyDigestTaskStatus
+                $lastRunUtc = if ($null -ne $lastDigestUtc) { $lastDigestUtc.ToString('o') } else { $null }
+                $nextRunUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
+                $latestBundle = $lastDigestBundle
+            }
+            'promotion-watch' {
+                $status = $promotionWatchStatus
+                $lastRunUtc = if ($null -ne $lastDigestUtc) { $lastDigestUtc.ToString('o') } else { $null }
+                $nextRunUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
+                $latestBundle = $lastDigestBundle
+            }
+            'scheduler-watch' {
+                $status = $schedulerWatchStatus
+                $lastRunUtc = [string] $scheduler.lastRunTimeUtc
+                $nextRunUtc = [string] $scheduler.nextRunTimeUtc
+                $latestBundle = [string] $scheduler.taskName
+            }
+        }
+
+        [ordered]@{
+            id = $taskId
+            label = [string] $taskDefinition.label
+            taskClass = [string] $taskDefinition.taskClass
+            owner = [string] $taskDefinition.owner
+            authority = [string] $taskDefinition.authority
+            purpose = [string] $taskDefinition.purpose
+            completionSignal = [string] $taskDefinition.completionSignal
+            outputs = @($taskDefinition.outputs | ForEach-Object { [string] $_ })
+            escalatesWhen = @($taskDefinition.escalatesWhen | ForEach-Object { [string] $_ })
+            status = $status
+            lastRunUtc = $lastRunUtc
+            nextRunUtc = $nextRunUtc
+            latestBundle = $latestBundle
+        }
     }
 )
 
@@ -210,6 +245,7 @@ $statusPayload = [ordered]@{
     generatedAtUtc = $nowUtc.ToString('o')
     cyclePolicyPath = $resolvedCyclePolicyPath
     taskingPolicyPath = $resolvedTaskingPolicyPath
+    formalSurfaceMarkdownPath = [string] $taskingPolicy.formalSurfaceMarkdownPath
     scheduler = $scheduler
     currentPosture = [ordered]@{
         lastKnownStatus = $lastKnownStatus
@@ -229,6 +265,7 @@ $markdownLines = @(
     '# Local Automation Tasking Status',
     '',
     ('- Generated at (UTC): `{0}`' -f $statusPayload.generatedAtUtc),
+    ('- Formal tasking surface: `{0}`' -f $statusPayload.formalSurfaceMarkdownPath),
     ('- Scheduler task: `{0}`' -f $scheduler.taskName),
     ('- Scheduler registered: `{0}`' -f $scheduler.registered),
     ('- Scheduler state: `{0}`' -f $scheduler.state),
@@ -253,12 +290,12 @@ if ($scheduler.registered) {
 $markdownLines += @(
     '## Tasks',
     '',
-    '| Task | Status | Last Run (UTC) | Next Run (UTC) |',
-    '| --- | --- | --- | --- |'
+    '| Task | Owner | Status | Last Run (UTC) | Next Run (UTC) |',
+    '| --- | --- | --- | --- | --- |'
 )
 
 foreach ($task in $taskEntries) {
-    $markdownLines += ('| {0} | {1} | {2} | {3} |' -f $task.label, $task.status, $(if ($task.lastRunUtc) { $task.lastRunUtc } else { 'not-yet-run' }), $(if ($task.nextRunUtc) { $task.nextRunUtc } else { 'not-scheduled' }))
+    $markdownLines += ('| {0} | {1} | {2} | {3} | {4} |' -f $task.label, $task.owner, $task.status, $(if ($task.lastRunUtc) { $task.lastRunUtc } else { 'not-yet-run' }), $(if ($task.nextRunUtc) { $task.nextRunUtc } else { 'not-scheduled' }))
 }
 
 Set-Content -LiteralPath $statusMarkdownPath -Value $markdownLines -Encoding utf8

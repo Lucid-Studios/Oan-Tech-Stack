@@ -1,26 +1,81 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
+  "formalSurfaceMarkdownPath": "OAN Mortalis V1.0/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
   "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "tasks": [
     {
       "id": "release-candidate-cycle",
       "label": "Release Candidate Cycle",
+      "taskClass": "mechanical-verification",
+      "owner": "Automation",
+      "authority": "Mechanical only",
       "cadenceHours": 6,
-      "purpose": "Run the governed release-candidate conveyor and publish the latest candidate evidence bundle."
+      "purpose": "Run the governed release-candidate conveyor and publish the latest candidate evidence bundle.",
+      "completionSignal": "Latest release-candidate bundle contains a build-evidence manifest.",
+      "outputs": [
+        ".audit/runs/release-candidates/",
+        ".audit/state/local-automation-cycle-last-run.json"
+      ],
+      "escalatesWhen": [
+        "local cycle status becomes blocked",
+        "release-candidate run cannot emit a valid evidence bundle"
+      ]
     },
     {
       "id": "daily-hitl-digest",
       "label": "Daily HITL Digest",
+      "taskClass": "review-preparation",
+      "owner": "Automation",
+      "authority": "Mechanical only",
       "cadenceHours": 24,
-      "purpose": "Emit the daily review surface that tells us whether the build can continue unattended or now owes human review."
+      "purpose": "Emit the daily review surface that tells us whether the build can continue unattended or now owes human review.",
+      "completionSignal": "Latest digest bundle contains release-candidate-digest.json and release-candidate-digest.md.",
+      "outputs": [
+        ".audit/runs/release-digests/",
+        ".audit/state/local-automation-tasking-status.md"
+      ],
+      "escalatesWhen": [
+        "digest posture requires immediate HITL",
+        "digest bundle cannot be produced"
+      ]
     },
     {
       "id": "promotion-watch",
       "label": "Promotion Watch",
+      "taskClass": "governance-watch",
+      "owner": "Shared",
+      "authority": "Automation may classify; HITL decides promotion",
       "trigger": "latest digest posture",
-      "purpose": "Track whether the current automation posture is clear to continue, requires HITL, or is blocked."
+      "purpose": "Track whether the current automation posture is clear to continue, requires HITL, or is blocked.",
+      "completionSignal": "Current posture is reflected in local-automation-tasking-status.json.",
+      "outputs": [
+        ".audit/state/local-automation-tasking-status.json",
+        ".audit/state/local-automation-tasking-status.md"
+      ],
+      "escalatesWhen": [
+        "recommended action changes to review-required-before-promotion",
+        "latest posture changes to blocked"
+      ]
+    },
+    {
+      "id": "scheduler-watch",
+      "label": "Scheduler Watch",
+      "taskClass": "orchestration",
+      "owner": "Automation",
+      "authority": "Machine-local only",
+      "trigger": "scheduled task registration and next-run clock",
+      "purpose": "Track whether the local Windows scheduler is registered, ready, and aligned to the next release-candidate cadence.",
+      "completionSignal": "Scheduled task is registered and exposes a next run time.",
+      "outputs": [
+        "Windows Scheduled Task: OAN Mortalis Governed Automation Cycle",
+        ".audit/state/local-automation-tasking-status.json"
+      ],
+      "escalatesWhen": [
+        "scheduled task is not registered",
+        "scheduled task has no next run time"
+      ]
     }
   ]
 }

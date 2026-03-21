@@ -125,6 +125,11 @@ The stable status surfaces are:
 - `.audit/state/local-automation-tasking-status.json`
 - `.audit/state/local-automation-tasking-status.md`
 
+The formal tasking surface is:
+
+- `build/local-automation-tasking.json`
+- `docs/LOCAL_AUTOMATION_TASKING_SURFACE.md`
+
 The local cycle is intentionally biased toward continued build progress.
 
 It does not require a human to bless every green pass.
