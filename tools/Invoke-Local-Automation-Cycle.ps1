@@ -195,8 +195,10 @@ if (-not $digestDue) {
     }
 }
 
-$nextMandatoryReviewUtc = if ($latestStatus -eq $blockedStatus) {
+$digestReportedNextMandatoryReviewUtc = if ($latestStatus -eq $blockedStatus) {
     $nowUtc
+} elseif ($digestDue) {
+    $nowUtc.AddHours($digestCadenceHours)
 } elseif ($null -eq $lastDigestUtc) {
     $nowUtc.AddHours($digestCadenceHours)
 } else {
@@ -214,7 +216,7 @@ if ($digestDue) {
         '-OutputRoot', $digestOutputRoot,
         '-WindowHours', $digestWindowHours,
         '-ReferenceTimeUtc', $nowUtc.ToString('o'),
-        '-NextMandatoryReviewUtc', $nextMandatoryReviewUtc.ToString('o')
+        '-NextMandatoryReviewUtc', $digestReportedNextMandatoryReviewUtc.ToString('o')
     )
 
     $digestOutput = & powershell @digestArgs
