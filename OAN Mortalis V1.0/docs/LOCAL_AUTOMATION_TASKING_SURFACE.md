@@ -38,7 +38,13 @@ Current active map:
 
 Next eligible map:
 
-- no further map declared yet
+- `Automation Maturation Map 13`
+
+Queued batch:
+
+- `Automation Maturation Map 13`
+- `Automation Maturation Map 14`
+- `Automation Maturation Map 15`
 
 Time-dilation rule:
 
@@ -296,6 +302,39 @@ Current live output surfaces for this map:
 - long-form phase witness bundles land under `.audit/runs/long-form-phase-witness/` and update `.audit/state/local-automation-long-form-phase-witness-last-run.json`
 - long-form window boundary bundles land under `.audit/runs/long-form-window-boundary/` and update `.audit/state/local-automation-long-form-window-boundary-last-run.json`
 - autonomous long-form collapse bundles land under `.audit/runs/autonomous-long-form-collapse/` and update `.audit/state/local-automation-autonomous-long-form-collapse-last-run.json`
+
+### Automation Maturation Map 13
+
+- Goal: harvest the first scheduler-proven interval into a governed surface, distinguish scheduled proof from manual continuity, and promote into the next lawful batch without improvisation
+- Expected review windows: `2`
+- Selected tasks:
+  - `Scheduler Proof Harvest`
+  - `Interval Origin Clarification`
+  - `Queued Task Map Promotion`
+
+Current live output surfaces for this map:
+
+- scheduler proof harvest bundles land under `.audit/runs/scheduler-proof-harvest/` and update `.audit/state/local-automation-scheduler-proof-harvest-last-run.json`
+- interval origin clarification bundles land under `.audit/runs/interval-origin-clarification/` and update `.audit/state/local-automation-interval-origin-clarification-last-run.json`
+- queued task map promotion bundles land under `.audit/runs/queued-task-map-promotion/` and update `.audit/state/local-automation-queued-task-map-promotion-last-run.json`
+
+### Automation Maturation Map 14
+
+- Goal: reconcile the first scheduler-proven cadence into a stable observed interval chain without confusing observation for publication or maturity
+- Expected review windows: `2`
+- Selected tasks:
+  - `Observed Cadence Ledger`
+  - `Manual Overhang Reconciliation`
+  - `Scheduler Interval Governance Braid`
+
+### Automation Maturation Map 15
+
+- Goal: let seeded governance read quiet intervals for lawful surplus work selection while keeping pull-forward bounded to the next declared map only
+- Expected review windows: `2`
+- Selected tasks:
+  - `Seeded Interval Reflection`
+  - `Pause Potential Surface`
+  - `Bounded Pull-Forward Selector`
 
 ## Status Interpretation
 

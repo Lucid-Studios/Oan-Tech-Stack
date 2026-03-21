@@ -187,6 +187,9 @@ $silentCadenceIntegrityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoR
 $longFormPhaseWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.longFormPhaseWitnessStatePath)
 $longFormWindowBoundaryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.longFormWindowBoundaryStatePath)
 $autonomousLongFormCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.autonomousLongFormCollapseStatePath)
+$schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerProofHarvestStatePath)
+$intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.intervalOriginClarificationStatePath)
+$queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.queuedTaskMapPromotionStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -395,6 +398,12 @@ $statePayload.lastLongFormWindowBoundaryBundle = [string] (Get-ObjectPropertyVal
 $statePayload.longFormWindowBoundaryStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $longFormWindowBoundaryStatePath
 $statePayload.lastAutonomousLongFormCollapseBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastAutonomousLongFormCollapseBundle')
 $statePayload.autonomousLongFormCollapseStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $autonomousLongFormCollapseStatePath
+$statePayload.lastSchedulerProofHarvestBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSchedulerProofHarvestBundle')
+$statePayload.schedulerProofHarvestStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerProofHarvestStatePath
+$statePayload.lastIntervalOriginClarificationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastIntervalOriginClarificationBundle')
+$statePayload.intervalOriginClarificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $intervalOriginClarificationStatePath
+$statePayload.lastQueuedTaskMapPromotionBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQueuedTaskMapPromotionBundle')
+$statePayload.queuedTaskMapPromotionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $queuedTaskMapPromotionStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -695,6 +704,33 @@ if (-not [string]::IsNullOrWhiteSpace($autonomousLongFormCollapseBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$schedulerProofHarvestScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SchedulerProof-Harvest.ps1'
+$schedulerProofHarvestOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerProofHarvestScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler proof harvest writer'
+$schedulerProofHarvestBundlePath = Get-ScriptOutputTail -Output $schedulerProofHarvestOutput
+if (-not [string]::IsNullOrWhiteSpace($schedulerProofHarvestBundlePath)) {
+    $statePayload.lastSchedulerProofHarvestBundle = $schedulerProofHarvestBundlePath
+    $statePayload.schedulerProofHarvestStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerProofHarvestStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$intervalOriginClarificationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Interval-OriginClarification.ps1'
+$intervalOriginClarificationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $intervalOriginClarificationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Interval origin clarification writer'
+$intervalOriginClarificationBundlePath = Get-ScriptOutputTail -Output $intervalOriginClarificationOutput
+if (-not [string]::IsNullOrWhiteSpace($intervalOriginClarificationBundlePath)) {
+    $statePayload.lastIntervalOriginClarificationBundle = $intervalOriginClarificationBundlePath
+    $statePayload.intervalOriginClarificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $intervalOriginClarificationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$queuedTaskMapPromotionScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Queued-TaskMapPromotion.ps1'
+$queuedTaskMapPromotionOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $queuedTaskMapPromotionScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Queued task map promotion writer'
+$queuedTaskMapPromotionBundlePath = Get-ScriptOutputTail -Output $queuedTaskMapPromotionOutput
+if (-not [string]::IsNullOrWhiteSpace($queuedTaskMapPromotionBundlePath)) {
+    $statePayload.lastQueuedTaskMapPromotionBundle = $queuedTaskMapPromotionBundlePath
+    $statePayload.queuedTaskMapPromotionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $queuedTaskMapPromotionStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -762,6 +798,12 @@ $summary = [ordered]@{
     longFormWindowBoundaryStatePath = $statePayload.longFormWindowBoundaryStatePath
     lastAutonomousLongFormCollapseBundle = $statePayload.lastAutonomousLongFormCollapseBundle
     autonomousLongFormCollapseStatePath = $statePayload.autonomousLongFormCollapseStatePath
+    lastSchedulerProofHarvestBundle = $statePayload.lastSchedulerProofHarvestBundle
+    schedulerProofHarvestStatePath = $statePayload.schedulerProofHarvestStatePath
+    lastIntervalOriginClarificationBundle = $statePayload.lastIntervalOriginClarificationBundle
+    intervalOriginClarificationStatePath = $statePayload.intervalOriginClarificationStatePath
+    lastQueuedTaskMapPromotionBundle = $statePayload.lastQueuedTaskMapPromotionBundle
+    queuedTaskMapPromotionStatePath = $statePayload.queuedTaskMapPromotionStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -885,6 +927,15 @@ if (-not [string]::IsNullOrWhiteSpace($longFormWindowBoundaryBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($autonomousLongFormCollapseBundlePath)) {
     Write-Host ('[local-automation-cycle] AutonomousLongFormCollapse: {0}' -f $autonomousLongFormCollapseBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($schedulerProofHarvestBundlePath)) {
+    Write-Host ('[local-automation-cycle] SchedulerProofHarvest: {0}' -f $schedulerProofHarvestBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($intervalOriginClarificationBundlePath)) {
+    Write-Host ('[local-automation-cycle] IntervalOriginClarification: {0}' -f $intervalOriginClarificationBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($queuedTaskMapPromotionBundlePath)) {
+    Write-Host ('[local-automation-cycle] QueuedTaskMapPromotion: {0}' -f $queuedTaskMapPromotionBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

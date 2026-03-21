@@ -741,6 +741,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-13",
+      "label": "Automation Maturation Map 13",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Harvest the first scheduler-proven interval into a governed surface, distinguish scheduled proof from manual continuity, and promote into the next lawful batch without improvisation.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "scheduler-proof-harvest",
+        "interval-origin-clarification",
+        "queued-task-map-promotion"
+      ],
+      "tasks": [
+        {
+          "id": "scheduler-proof-harvest",
+          "label": "Scheduler Proof Harvest",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Collapse the first real scheduler-driven interval into one bounded proof surface instead of leaving scheduler evidence fragmented across separate receipts.",
+          "completionSignal": "A scheduler proof harvest bundle can say whether scheduled proof is still pending, materially observed, or contradicted.",
+          "escalatesWhen": [
+            "scheduler proof is narrated as harvested before a real scheduled run is observed",
+            "harvested proof disagrees materially with unattended proof collapse"
+          ]
+        },
+        {
+          "id": "interval-origin-clarification",
+          "label": "Interval Origin Clarification",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Distinguish whether the latest continuity evidence comes from manual continuation, scheduler-driven execution, or an unreconciled mixture of both.",
+          "completionSignal": "An interval-origin clarification bundle can name the current origin class without pretending that manual continuity and scheduled proof are interchangeable.",
+          "escalatesWhen": [
+            "manual continuity is silently presented as scheduled proof",
+            "scheduler-observed intervals cannot be reconciled to the latest release-candidate run"
+          ]
+        },
+        {
+          "id": "queued-task-map-promotion",
+          "label": "Queued Task Map Promotion",
+          "owner": "Shared",
+          "authority": "Automation may promote within declared next-map law; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Promote the active long-form task map into the next declared map only after the current run has lawfully collapsed and the next map is actually declared.",
+          "completionSignal": "A queued task map promotion bundle can say whether promotion is awaiting collapse, promoted, held, or blocked.",
+          "escalatesWhen": [
+            "promotion skips beyond the next declared map",
+            "map promotion occurs while the active long-form run remains uncollapsed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-14",
+      "label": "Automation Maturation Map 14",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Reconcile the first scheduler-proven cadence into a stable observed interval chain without confusing observation for publication or maturity.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "observed-cadence-ledger",
+        "manual-overhang-reconciliation",
+        "scheduler-interval-governance-braid"
+      ],
+      "tasks": [
+        {
+          "id": "observed-cadence-ledger",
+          "label": "Observed Cadence Ledger",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Record scheduler-observed continuity as a cadence-bearing surface once the first real scheduled interval has been harvested.",
+          "completionSignal": "An observed cadence ledger can reconcile repeated scheduled intervals without inventing publication or promotion authority.",
+          "escalatesWhen": [
+            "cadence is declared from manual-only intervals",
+            "scheduler-observed continuity cannot be localized into one bounded ledger"
+          ]
+        },
+        {
+          "id": "manual-overhang-reconciliation",
+          "label": "Manual Overhang Reconciliation",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Keep leftover manual continuity evidence from being silently blended into the scheduler-proven chain.",
+          "completionSignal": "A manual-overhang reconciliation bundle can say whether manual continuation remains present, reconciled, or contradictory.",
+          "escalatesWhen": [
+            "manual overhang is discarded instead of classified",
+            "manual overhang blocks scheduler cadence without being named"
+          ]
+        },
+        {
+          "id": "scheduler-interval-governance-braid",
+          "label": "Scheduler Interval Governance Braid",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Braid scheduler-observed cadence, manual reconciliation, and governance posture into one bounded interval chain.",
+          "completionSignal": "A scheduler interval governance braid can show whether cadence-bearing continuity is stable, deferred, or contradictory.",
+          "escalatesWhen": [
+            "the braid implies authority beyond observed cadence evidence",
+            "scheduler and manual continuity remain materially contradictory across review windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-15",
+      "label": "Automation Maturation Map 15",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Let seeded governance read quiet intervals for lawful surplus work selection while keeping pull-forward bounded to the next declared map only.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "seeded-interval-reflection",
+        "pause-potential-surface",
+        "bounded-pull-forward-selector"
+      ],
+      "tasks": [
+        {
+          "id": "seeded-interval-reflection",
+          "label": "Seeded Interval Reflection",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Let the seeded host interpret whether a quiet interval is merely dormant, cadence-bearing, or carrying lawful potential for the next bounded map.",
+          "completionSignal": "A seeded interval reflection bundle can classify the current quiet interval without widening authority or scope.",
+          "escalatesWhen": [
+            "seeded reflection starts implying unbounded future work",
+            "seeded interpretation contradicts the bounded interval evidence chain"
+          ]
+        },
+        {
+          "id": "pause-potential-surface",
+          "label": "Pause Potential Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Expose how much lawful surplus remains inside a quiet interval so pause is treated as structured potential rather than empty delay.",
+          "completionSignal": "A pause potential surface can show whether the current interval has no pull-forward room, bounded room, or contradiction.",
+          "escalatesWhen": [
+            "pause potential is narrated without bounded interval evidence",
+            "surplus work exceeds the next declared map"
+          ]
+        },
+        {
+          "id": "bounded-pull-forward-selector",
+          "label": "Bounded Pull-Forward Selector",
+          "owner": "Shared",
+          "authority": "Automation may select only from the next declared map; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Select lawful next work only from the next declared map when quiet intervals finish early, preserving the no-skip pull-forward law.",
+          "completionSignal": "A bounded pull-forward selector can name which next-map work is eligible without widening beyond the immediate successor map.",
+          "escalatesWhen": [
+            "selection skips beyond the next declared map",
+            "pull-forward selection occurs while contradiction or HITL posture is active"
+          ]
+        }
+      ]
     }
   ]
 }

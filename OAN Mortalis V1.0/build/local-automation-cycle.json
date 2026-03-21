@@ -36,6 +36,9 @@
   "longFormPhaseWitnessOutputRoot": ".audit/runs/long-form-phase-witness",
   "longFormWindowBoundaryOutputRoot": ".audit/runs/long-form-window-boundary",
   "autonomousLongFormCollapseOutputRoot": ".audit/runs/autonomous-long-form-collapse",
+  "schedulerProofHarvestOutputRoot": ".audit/runs/scheduler-proof-harvest",
+  "intervalOriginClarificationOutputRoot": ".audit/runs/interval-origin-clarification",
+  "queuedTaskMapPromotionOutputRoot": ".audit/runs/queued-task-map-promotion",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -70,6 +73,9 @@
   "longFormPhaseWitnessStatePath": ".audit/state/local-automation-long-form-phase-witness-last-run.json",
   "longFormWindowBoundaryStatePath": ".audit/state/local-automation-long-form-window-boundary-last-run.json",
   "autonomousLongFormCollapseStatePath": ".audit/state/local-automation-autonomous-long-form-collapse-last-run.json",
+  "schedulerProofHarvestStatePath": ".audit/state/local-automation-scheduler-proof-harvest-last-run.json",
+  "intervalOriginClarificationStatePath": ".audit/state/local-automation-interval-origin-clarification-last-run.json",
+  "queuedTaskMapPromotionStatePath": ".audit/state/local-automation-queued-task-map-promotion-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -134,6 +140,9 @@
     "keepLongFormPhaseWitnessBundles": 8,
     "keepLongFormWindowBoundaryBundles": 8,
     "keepAutonomousLongFormCollapseBundles": 8,
+    "keepSchedulerProofHarvestBundles": 8,
+    "keepIntervalOriginClarificationBundles": 8,
+    "keepQueuedTaskMapPromotionBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

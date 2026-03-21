@@ -183,6 +183,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-long-form-phase-witness-last-run.json`
 - `.audit/state/local-automation-long-form-window-boundary-last-run.json`
 - `.audit/state/local-automation-autonomous-long-form-collapse-last-run.json`
+- `.audit/state/local-automation-scheduler-proof-harvest-last-run.json`
+- `.audit/state/local-automation-interval-origin-clarification-last-run.json`
+- `.audit/state/local-automation-queued-task-map-promotion-last-run.json`
 
 The formal tasking surface is:
 
@@ -232,6 +235,22 @@ That lane may not:
 - advance phases by narrative convenience
 - collapse the active run early just because the map exists
 - hide absent scheduler proof when a final structure must still be recorded honestly
+
+## Queued Batch Handoff Lane
+
+The local cycle now carries a bounded queued-batch handoff lane beyond long-form governance.
+
+That lane may:
+
+- harvest the first scheduler-proven interval into one bounded surface
+- distinguish manual continuity from scheduler-observed continuity
+- promote only into the next declared task map once the current long-form run has lawfully collapsed
+
+That lane may not:
+
+- skip beyond the immediate next declared map
+- claim scheduler proof from manual-only continuity
+- promote the next map while the current run is still active
 
 ## Seeded Governance Lane
 

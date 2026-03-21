@@ -139,6 +139,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $LongFormPhaseWitnessState,
         [object] $LongFormWindowBoundaryState,
         [object] $AutonomousLongFormCollapseState,
+        [object] $SchedulerProofHarvestState,
+        [object] $IntervalOriginClarificationState,
+        [object] $QueuedTaskMapPromotionState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -450,6 +453,37 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'scheduler-proof-harvest' {
+            if ($null -ne $SchedulerProofHarvestState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'interval-origin-clarification' {
+            if ($null -ne $IntervalOriginClarificationState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'queued-task-map-promotion' {
+            if ($null -ne $QueuedTaskMapPromotionState) {
+                if ([bool] (Get-ObjectPropertyValueOrNull -InputObject $QueuedTaskMapPromotionState -PropertyName 'promoted')) {
+                    return 'completed'
+                }
+
+                return [string] (Get-ObjectPropertyValueOrNull -InputObject $QueuedTaskMapPromotionState -PropertyName 'promotionState')
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -524,6 +558,9 @@ $silentCadenceIntegrityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoR
 $longFormPhaseWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.longFormPhaseWitnessStatePath)
 $longFormWindowBoundaryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.longFormWindowBoundaryStatePath)
 $autonomousLongFormCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.autonomousLongFormCollapseStatePath)
+$schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerProofHarvestStatePath)
+$intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intervalOriginClarificationStatePath)
+$queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.queuedTaskMapPromotionStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -557,6 +594,9 @@ $silentCadenceIntegrityState = Read-JsonFileOrNull -Path $silentCadenceIntegrity
 $longFormPhaseWitnessState = Read-JsonFileOrNull -Path $longFormPhaseWitnessStatePath
 $longFormWindowBoundaryState = Read-JsonFileOrNull -Path $longFormWindowBoundaryStatePath
 $autonomousLongFormCollapseState = Read-JsonFileOrNull -Path $autonomousLongFormCollapseStatePath
+$schedulerProofHarvestState = Read-JsonFileOrNull -Path $schedulerProofHarvestStatePath
+$intervalOriginClarificationState = Read-JsonFileOrNull -Path $intervalOriginClarificationStatePath
+$queuedTaskMapPromotionState = Read-JsonFileOrNull -Path $queuedTaskMapPromotionStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -694,6 +734,7 @@ $activeLongFormTasksCompleted = 0
 $activeLongFormTasksTotal = 0
 $canPullForwardFromNextMap = $false
 $eligibleNextTaskMap = $null
+$queuedBatchTaskMaps = @()
 
 if ($null -ne $activeLongFormTaskMap) {
     $activeLongFormTasks = @($activeLongFormTaskMap.tasks)
@@ -737,6 +778,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -LongFormPhaseWitnessState $longFormPhaseWitnessState `
                 -LongFormWindowBoundaryState $longFormWindowBoundaryState `
                 -AutonomousLongFormCollapseState $autonomousLongFormCollapseState `
+                -SchedulerProofHarvestState $schedulerProofHarvestState `
+                -IntervalOriginClarificationState $intervalOriginClarificationState `
+                -QueuedTaskMapPromotionState $queuedTaskMapPromotionState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -757,6 +801,10 @@ if ($null -ne $activeLongFormTaskMap) {
     if ($taskMapIndex -ge 0 -and ($taskMapIndex + 1) -lt $longFormTaskMaps.Count) {
         $eligibleNextTaskMap = $longFormTaskMaps[$taskMapIndex + 1]
     }
+    $queuedBatchTaskMaps = @()
+    if ($taskMapIndex -ge 0 -and ($taskMapIndex + 1) -lt $longFormTaskMaps.Count) {
+        $queuedBatchTaskMaps = @($longFormTaskMaps | Select-Object -Skip ($taskMapIndex + 1) -First 3)
+    }
 
     $timeDilationPolicy = $taskingPolicy.PSObject.Properties['timeDilationPolicy']
     $allowPullForward = $false
@@ -766,8 +814,14 @@ if ($null -ne $activeLongFormTaskMap) {
         $pullForwardMaxMaps = [int] $timeDilationPolicy.Value.pullForwardMaxMaps
     }
 
+    $activeRunCollapsed = $true
+    if ($null -ne $activeLongFormRun) {
+        $activeRunCollapsed = @('collapsed', 'completed') -contains ([string] $activeLongFormRun.runStatus)
+    }
+
     if ($allowPullForward -and $pullForwardMaxMaps -ge 1 -and
         $activeLongFormTaskMapStatus -eq 'completed' -and
+        $activeRunCollapsed -and
         $null -ne $eligibleNextTaskMap) {
         $canPullForwardFromNextMap = $true
     }
@@ -816,6 +870,9 @@ $taskMapEntries = @(
                     -LongFormPhaseWitnessState $longFormPhaseWitnessState `
                     -LongFormWindowBoundaryState $longFormWindowBoundaryState `
                     -AutonomousLongFormCollapseState $autonomousLongFormCollapseState `
+                    -SchedulerProofHarvestState $schedulerProofHarvestState `
+                    -IntervalOriginClarificationState $intervalOriginClarificationState `
+                    -QueuedTaskMapPromotionState $queuedTaskMapPromotionState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -860,6 +917,8 @@ $statusPayload = [ordered]@{
         activeTaskMapTotalTaskCount = $activeLongFormTasksTotal
         canPullForwardFromNextMap = $canPullForwardFromNextMap
         eligibleNextTaskMapId = if ($null -ne $eligibleNextTaskMap) { [string] $eligibleNextTaskMap.id } else { $null }
+        queuedBatchTaskMapIds = @($queuedBatchTaskMaps | ForEach-Object { [string] $_.id })
+        queuedBatchTaskMapLabels = @($queuedBatchTaskMaps | ForEach-Object { [string] $_.label })
         pullForwardRule = [string] $taskingPolicy.timeDilationPolicy.rule
         activeRunStatePath = $activeLongFormRunStatePath
         activeRun = if ($null -ne $activeLongFormRun) {
@@ -976,6 +1035,15 @@ $statusPayload = [ordered]@{
         autonomousLongFormCollapseState = if ($null -ne $autonomousLongFormCollapseState) { [string] $autonomousLongFormCollapseState.collapseState } else { $null }
         autonomousLongFormCollapseReason = if ($null -ne $autonomousLongFormCollapseState) { [string] $autonomousLongFormCollapseState.reasonCode } else { $null }
         autonomousLongFormCollapseNextAction = if ($null -ne $autonomousLongFormCollapseState) { [string] $autonomousLongFormCollapseState.nextAction } else { $null }
+        schedulerProofHarvestState = if ($null -ne $schedulerProofHarvestState) { [string] $schedulerProofHarvestState.harvestState } else { $null }
+        schedulerProofHarvestReason = if ($null -ne $schedulerProofHarvestState) { [string] $schedulerProofHarvestState.reasonCode } else { $null }
+        schedulerProofHarvestNextAction = if ($null -ne $schedulerProofHarvestState) { [string] $schedulerProofHarvestState.nextAction } else { $null }
+        intervalOriginClarificationState = if ($null -ne $intervalOriginClarificationState) { [string] $intervalOriginClarificationState.originState } else { $null }
+        intervalOriginClarificationReason = if ($null -ne $intervalOriginClarificationState) { [string] $intervalOriginClarificationState.reasonCode } else { $null }
+        intervalOriginClarificationNextAction = if ($null -ne $intervalOriginClarificationState) { [string] $intervalOriginClarificationState.nextAction } else { $null }
+        queuedTaskMapPromotionState = if ($null -ne $queuedTaskMapPromotionState) { [string] $queuedTaskMapPromotionState.promotionState } else { $null }
+        queuedTaskMapPromotionReason = if ($null -ne $queuedTaskMapPromotionState) { [string] $queuedTaskMapPromotionState.reasonCode } else { $null }
+        queuedTaskMapPromotionNextAction = if ($null -ne $queuedTaskMapPromotionState) { [string] $queuedTaskMapPromotionState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -992,6 +1060,7 @@ $markdownLines = @(
     ('- Active long-form task map: `{0}`' -f $activeTaskMapId),
     ('- Active map posture: `{0}`' -f $activeLongFormTaskMapStatus),
     ('- Pull-forward allowed from next map: `{0}`' -f $canPullForwardFromNextMap),
+    ('- Queued next maps: `{0}`' -f $(if (@($queuedBatchTaskMaps).Count -gt 0) { ((@($queuedBatchTaskMaps | ForEach-Object { [string] $_.label }) -join ' -> ')) } else { 'none' })),
     ('- Scheduler task: `{0}`' -f $scheduler.taskName),
     ('- Scheduler registered: `{0}`' -f $scheduler.registered),
     ('- Scheduler state: `{0}`' -f $scheduler.state),
@@ -1365,6 +1434,40 @@ if ($null -ne $autonomousLongFormCollapseState) {
     )
 }
 
+if ($null -ne $schedulerProofHarvestState) {
+    $markdownLines += @(
+        '## Scheduler Proof Harvest',
+        '',
+        ('- Harvest state: `{0}`' -f [string] $schedulerProofHarvestState.harvestState),
+        ('- Reason code: `{0}`' -f [string] $schedulerProofHarvestState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $schedulerProofHarvestState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $intervalOriginClarificationState) {
+    $markdownLines += @(
+        '## Interval Origin Clarification',
+        '',
+        ('- Origin state: `{0}`' -f [string] $intervalOriginClarificationState.originState),
+        ('- Reason code: `{0}`' -f [string] $intervalOriginClarificationState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $intervalOriginClarificationState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $queuedTaskMapPromotionState) {
+    $markdownLines += @(
+        '## Queued Task Map Promotion',
+        '',
+        ('- Promotion state: `{0}`' -f [string] $queuedTaskMapPromotionState.promotionState),
+        ('- Reason code: `{0}`' -f [string] $queuedTaskMapPromotionState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $queuedTaskMapPromotionState.nextAction),
+        ('- Promoted: `{0}`' -f [bool] $queuedTaskMapPromotionState.promoted),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1378,6 +1481,10 @@ if ($null -ne $activeLongFormTaskMap) {
 
     if ($null -ne $eligibleNextTaskMap) {
         $markdownLines += ('- Eligible next map: `{0}`' -f [string] $eligibleNextTaskMap.label)
+    }
+
+    if (@($queuedBatchTaskMaps).Count -gt 0) {
+        $markdownLines += ('- Queued batch: `{0}`' -f ((@($queuedBatchTaskMaps | ForEach-Object { [string] $_.label }) -join ' -> ')))
     }
 
     $markdownLines += @(
@@ -1423,6 +1530,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -LongFormPhaseWitnessState $longFormPhaseWitnessState `
             -LongFormWindowBoundaryState $longFormWindowBoundaryState `
             -AutonomousLongFormCollapseState $autonomousLongFormCollapseState `
+            -SchedulerProofHarvestState $schedulerProofHarvestState `
+            -IntervalOriginClarificationState $intervalOriginClarificationState `
+            -QueuedTaskMapPromotionState $queuedTaskMapPromotionState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
