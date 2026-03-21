@@ -119,6 +119,9 @@ The supporting scripts are:
 - `tools/Write-Promotion-GateBundle.ps1`
 - `tools/Write-CiArtifactConcordance.ps1`
 - `tools/Write-Release-RatificationRehearsal.ps1`
+- `tools/Write-FirstPublish-IntentClosure.ps1`
+- `tools/Write-Seeded-PromotionReview.ps1`
+- `tools/Write-Release-HandshakeSurface.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -138,6 +141,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-promotion-gate-last-run.json`
 - `.audit/state/local-automation-ci-concordance-last-run.json`
 - `.audit/state/local-automation-release-ratification-last-run.json`
+- `.audit/state/local-automation-first-publish-intent-last-run.json`
+- `.audit/state/local-automation-seeded-promotion-review-last-run.json`
+- `.audit/state/local-automation-release-handshake-last-run.json`
 
 The formal tasking surface is:
 
@@ -191,6 +197,22 @@ That lane may not:
 - promote versions automatically
 - claim CI proof that is not locally present
 - convert rehearsal into publication authority
+
+## Release Handshake Lane
+
+The local cycle now carries a bounded release-handshake lane between promotion evidence and any future publish request.
+
+That lane may:
+
+- declare first publish intent from current deployable and version truth
+- let the seed produce an advisory promotion review
+- collapse promotion evidence into one handshake surface that says what is ready, deferred, or still blocked
+
+That lane may not:
+
+- infer first publish scope beyond declared deployables
+- let seeded review substitute for ratification
+- imply that a handshake surface is itself a publication act
 
 ## Operational Bias
 

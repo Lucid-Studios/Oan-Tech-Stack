@@ -163,6 +163,9 @@ $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 $promotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.promotionGateStatePath)
 $ciConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.ciConcordanceStatePath)
 $releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.releaseRatificationStatePath)
+$seededPromotionReviewStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededPromotionReviewStatePath)
+$firstPublishIntentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.firstPublishIntentStatePath)
+$releaseHandshakeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.releaseHandshakeStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -323,6 +326,12 @@ $statePayload.lastCiConcordanceBundle = [string] (Get-ObjectPropertyValueOrNull 
 $statePayload.ciConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $ciConcordanceStatePath
 $statePayload.lastReleaseRatificationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReleaseRatificationBundle')
 $statePayload.releaseRatificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseRatificationStatePath
+$statePayload.lastSeededPromotionReviewBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSeededPromotionReviewBundle')
+$statePayload.seededPromotionReviewStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededPromotionReviewStatePath
+$statePayload.lastFirstPublishIntentBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastFirstPublishIntentBundle')
+$statePayload.firstPublishIntentStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $firstPublishIntentStatePath
+$statePayload.lastReleaseHandshakeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReleaseHandshakeBundle')
+$statePayload.releaseHandshakeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseHandshakeStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -407,6 +416,33 @@ if (-not [string]::IsNullOrWhiteSpace($releaseRatificationBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$firstPublishIntentScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-FirstPublish-IntentClosure.ps1'
+$firstPublishIntentOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $firstPublishIntentScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'First publish intent writer'
+$firstPublishIntentBundlePath = Get-ScriptOutputTail -Output $firstPublishIntentOutput
+if (-not [string]::IsNullOrWhiteSpace($firstPublishIntentBundlePath)) {
+    $statePayload.lastFirstPublishIntentBundle = $firstPublishIntentBundlePath
+    $statePayload.firstPublishIntentStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $firstPublishIntentStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$seededPromotionReviewScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Seeded-PromotionReview.ps1'
+$seededPromotionReviewOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $seededPromotionReviewScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Seeded promotion review writer'
+$seededPromotionReviewBundlePath = Get-ScriptOutputTail -Output $seededPromotionReviewOutput
+if (-not [string]::IsNullOrWhiteSpace($seededPromotionReviewBundlePath)) {
+    $statePayload.lastSeededPromotionReviewBundle = $seededPromotionReviewBundlePath
+    $statePayload.seededPromotionReviewStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededPromotionReviewStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$releaseHandshakeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Release-HandshakeSurface.ps1'
+$releaseHandshakeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $releaseHandshakeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Release handshake writer'
+$releaseHandshakeBundlePath = Get-ScriptOutputTail -Output $releaseHandshakeOutput
+if (-not [string]::IsNullOrWhiteSpace($releaseHandshakeBundlePath)) {
+    $statePayload.lastReleaseHandshakeBundle = $releaseHandshakeBundlePath
+    $statePayload.releaseHandshakeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseHandshakeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -426,6 +462,12 @@ $summary = [ordered]@{
     ciConcordanceStatePath = $statePayload.ciConcordanceStatePath
     lastReleaseRatificationBundle = $statePayload.lastReleaseRatificationBundle
     releaseRatificationStatePath = $statePayload.releaseRatificationStatePath
+    lastFirstPublishIntentBundle = $statePayload.lastFirstPublishIntentBundle
+    firstPublishIntentStatePath = $statePayload.firstPublishIntentStatePath
+    lastSeededPromotionReviewBundle = $statePayload.lastSeededPromotionReviewBundle
+    seededPromotionReviewStatePath = $statePayload.seededPromotionReviewStatePath
+    lastReleaseHandshakeBundle = $statePayload.lastReleaseHandshakeBundle
+    releaseHandshakeStatePath = $statePayload.releaseHandshakeStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -477,6 +519,15 @@ if (-not [string]::IsNullOrWhiteSpace($ciConcordanceBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($releaseRatificationBundlePath)) {
     Write-Host ('[local-automation-cycle] ReleaseRatification: {0}' -f $releaseRatificationBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($firstPublishIntentBundlePath)) {
+    Write-Host ('[local-automation-cycle] FirstPublishIntent: {0}' -f $firstPublishIntentBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($seededPromotionReviewBundlePath)) {
+    Write-Host ('[local-automation-cycle] SeededPromotionReview: {0}' -f $seededPromotionReviewBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($releaseHandshakeBundlePath)) {
+    Write-Host ('[local-automation-cycle] ReleaseHandshake: {0}' -f $releaseHandshakeBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

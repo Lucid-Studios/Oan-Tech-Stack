@@ -115,6 +115,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $PromotionGateState,
         [object] $CiConcordanceState,
         [object] $ReleaseRatificationState,
+        [object] $SeededPromotionReviewState,
+        [object] $FirstPublishIntentState,
+        [object] $ReleaseHandshakeState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -210,6 +213,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'seeded-promotion-review' {
+            if ($null -ne $SeededPromotionReviewState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'first-publish-intent-closure' {
+            if ($null -ne $FirstPublishIntentState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'release-handshake-surface' {
+            if ($null -ne $ReleaseHandshakeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -260,6 +290,9 @@ $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 $promotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.promotionGateStatePath)
 $ciConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.ciConcordanceStatePath)
 $releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.releaseRatificationStatePath)
+$seededPromotionReviewStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededPromotionReviewStatePath)
+$firstPublishIntentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.firstPublishIntentStatePath)
+$releaseHandshakeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.releaseHandshakeStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -269,6 +302,9 @@ $cmeConsolidationState = Read-JsonFileOrNull -Path $cmeConsolidationStatePath
 $promotionGateState = Read-JsonFileOrNull -Path $promotionGateStatePath
 $ciConcordanceState = Read-JsonFileOrNull -Path $ciConcordanceStatePath
 $releaseRatificationState = Read-JsonFileOrNull -Path $releaseRatificationStatePath
+$seededPromotionReviewState = Read-JsonFileOrNull -Path $seededPromotionReviewStatePath
+$firstPublishIntentState = Read-JsonFileOrNull -Path $firstPublishIntentStatePath
+$releaseHandshakeState = Read-JsonFileOrNull -Path $releaseHandshakeStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -425,6 +461,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -PromotionGateState $promotionGateState `
                 -CiConcordanceState $ciConcordanceState `
                 -ReleaseRatificationState $releaseRatificationState `
+                -SeededPromotionReviewState $seededPromotionReviewState `
+                -FirstPublishIntentState $firstPublishIntentState `
+                -ReleaseHandshakeState $releaseHandshakeState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -480,6 +519,9 @@ $taskMapEntries = @(
                     -PromotionGateState $promotionGateState `
                     -CiConcordanceState $ciConcordanceState `
                     -ReleaseRatificationState $releaseRatificationState `
+                    -SeededPromotionReviewState $seededPromotionReviewState `
+                    -FirstPublishIntentState $firstPublishIntentState `
+                    -ReleaseHandshakeState $releaseHandshakeState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -563,6 +605,13 @@ $statusPayload = [ordered]@{
         ciConcordanceReason = if ($null -ne $ciConcordanceState) { [string] $ciConcordanceState.reasonCode } else { $null }
         releaseRatificationState = if ($null -ne $releaseRatificationState) { [string] $releaseRatificationState.rehearsalState } else { $null }
         releaseRatificationDecision = if ($null -ne $releaseRatificationState) { [string] $releaseRatificationState.nextHumanDecision } else { $null }
+        seededPromotionReviewDisposition = if ($null -ne $seededPromotionReviewState) { [string] $seededPromotionReviewState.disposition } else { $null }
+        seededPromotionReviewReason = if ($null -ne $seededPromotionReviewState) { [string] $seededPromotionReviewState.reasonCode } else { $null }
+        firstPublishIntentState = if ($null -ne $firstPublishIntentState) { [string] $firstPublishIntentState.intentState } else { $null }
+        firstPublishIntentReason = if ($null -ne $firstPublishIntentState) { [string] $firstPublishIntentState.reasonCode } else { $null }
+        releaseHandshakeState = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.handshakeState } else { $null }
+        releaseHandshakeReason = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.reasonCode } else { $null }
+        releaseHandshakeNextAction = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -675,6 +724,39 @@ if ($null -ne $releaseRatificationState) {
     )
 }
 
+if ($null -ne $seededPromotionReviewState) {
+    $markdownLines += @(
+        '## Seeded Promotion Review',
+        '',
+        ('- Disposition: `{0}`' -f [string] $seededPromotionReviewState.disposition),
+        ('- Reason code: `{0}`' -f [string] $seededPromotionReviewState.reasonCode),
+        ('- Provenance: `{0}`' -f [string] $seededPromotionReviewState.provenance),
+        ''
+    )
+}
+
+if ($null -ne $firstPublishIntentState) {
+    $markdownLines += @(
+        '## First Publish Intent',
+        '',
+        ('- Intent state: `{0}`' -f [string] $firstPublishIntentState.intentState),
+        ('- Reason code: `{0}`' -f [string] $firstPublishIntentState.reasonCode),
+        ('- Target first publish version: `{0}`' -f [string] $firstPublishIntentState.targetFirstPublishVersion),
+        ''
+    )
+}
+
+if ($null -ne $releaseHandshakeState) {
+    $markdownLines += @(
+        '## Release Handshake',
+        '',
+        ('- Handshake state: `{0}`' -f [string] $releaseHandshakeState.handshakeState),
+        ('- Reason code: `{0}`' -f [string] $releaseHandshakeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $releaseHandshakeState.nextAction),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -709,6 +791,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -PromotionGateState $promotionGateState `
             -CiConcordanceState $ciConcordanceState `
             -ReleaseRatificationState $releaseRatificationState `
+            -SeededPromotionReviewState $seededPromotionReviewState `
+            -FirstPublishIntentState $firstPublishIntentState `
+            -ReleaseHandshakeState $releaseHandshakeState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

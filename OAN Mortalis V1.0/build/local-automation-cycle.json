@@ -12,6 +12,9 @@
   "promotionGateOutputRoot": ".audit/runs/promotion-gates",
   "ciConcordanceOutputRoot": ".audit/runs/ci-concordance",
   "releaseRatificationOutputRoot": ".audit/runs/release-ratification",
+  "seededPromotionReviewOutputRoot": ".audit/runs/seeded-promotion-review",
+  "firstPublishIntentOutputRoot": ".audit/runs/first-publish-intent",
+  "releaseHandshakeOutputRoot": ".audit/runs/release-handshake",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -22,6 +25,9 @@
   "promotionGateStatePath": ".audit/state/local-automation-promotion-gate-last-run.json",
   "ciConcordanceStatePath": ".audit/state/local-automation-ci-concordance-last-run.json",
   "releaseRatificationStatePath": ".audit/state/local-automation-release-ratification-last-run.json",
+  "seededPromotionReviewStatePath": ".audit/state/local-automation-seeded-promotion-review-last-run.json",
+  "firstPublishIntentStatePath": ".audit/state/local-automation-first-publish-intent-last-run.json",
+  "releaseHandshakeStatePath": ".audit/state/local-automation-release-handshake-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -60,6 +66,9 @@
     "keepPromotionGateBundles": 8,
     "keepCiConcordanceBundles": 8,
     "keepReleaseRatificationBundles": 8,
+    "keepSeededPromotionReviewBundles": 8,
+    "keepFirstPublishIntentBundles": 8,
+    "keepReleaseHandshakeBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

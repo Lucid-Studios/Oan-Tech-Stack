@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 04`
+- `Automation Maturation Map 05`
 
 Next eligible map:
 
-- `Automation Maturation Map 05`
+- `Automation Maturation Map 06`
 
 Time-dilation rule:
 
@@ -166,7 +166,7 @@ Current live output surfaces for this map:
 
 - Goal: close promotion and release rehearsal once seeded governance and runtime cadence are stable
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Promotion Gate Bundle`
   - `CI Artifact Concordance`
   - `Release Ratification Rehearsal`
@@ -181,10 +181,25 @@ Current live output surfaces for this map:
 
 - Goal: stabilize first publish intent and seeded promotion review once promotion evidence is consistently reproducible
 - Expected review windows: `2`
-- Queued tasks:
+- Selected tasks:
   - `Seeded Promotion Review`
   - `First Publish Intent Closure`
   - `Release Handshake Surface`
+
+Current live output surfaces for this map:
+
+- seeded promotion review bundles land under `.audit/runs/seeded-promotion-review/` and update `.audit/state/local-automation-seeded-promotion-review-last-run.json`
+- first publish intent bundles land under `.audit/runs/first-publish-intent/` and update `.audit/state/local-automation-first-publish-intent-last-run.json`
+- release handshake bundles land under `.audit/runs/release-handshake/` and update `.audit/state/local-automation-release-handshake-last-run.json`
+
+### Automation Maturation Map 06
+
+- Goal: prepare the first bounded publish request and post-publish evidence loop once the handshake surface is stable
+- Expected review windows: `2`
+- Queued tasks:
+  - `Publish Request Envelope`
+  - `Post-Publish Evidence Loop`
+  - `Seed Braid Escalation Lane`
 
 ## Status Interpretation
 
