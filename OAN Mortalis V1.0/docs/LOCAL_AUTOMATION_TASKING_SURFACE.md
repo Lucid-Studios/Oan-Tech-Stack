@@ -167,6 +167,7 @@ Current live output surfaces for this map:
 - seeded governance bundles land under `.audit/runs/seeded-governance/` and update `.audit/state/local-automation-seeded-governance-last-run.json`
 - scheduler reconciliation writes `.audit/state/local-automation-scheduler-reconciliation-last-run.json`
 - CME consolidation writes `.audit/state/local-automation-cme-consolidation-state.json` and its paired Markdown surface
+- the carried-forward CME formation and office ledger writes `.audit/state/local-automation-cme-formation-office-ledger-last-run.json` and its bundle root under `.audit/runs/cme-formation-office-ledger/`
 
 ### Automation Maturation Map 04
 

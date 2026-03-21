@@ -160,6 +160,7 @@ $notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Candi
 $seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededGovernanceStatePath)
 $schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerReconciliationStatePath)
 $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.cmeConsolidationStatePath)
+$cmeFormationAndOfficeLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.cmeFormationAndOfficeLedgerStatePath)
 $promotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.promotionGateStatePath)
 $ciConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.ciConcordanceStatePath)
 $releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.releaseRatificationStatePath)
@@ -345,6 +346,8 @@ $statePayload.lastSeededGovernanceBundle = [string] (Get-ObjectPropertyValueOrNu
 $statePayload.seededGovernanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededGovernanceStatePath
 $statePayload.schedulerReconciliationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerReconciliationStatePath
 $statePayload.cmeConsolidationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cmeConsolidationStatePath
+$statePayload.lastCmeFormationAndOfficeLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCmeFormationAndOfficeLedgerBundle')
+$statePayload.cmeFormationAndOfficeLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cmeFormationAndOfficeLedgerStatePath
 $statePayload.lastPromotionGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPromotionGateBundle')
 $statePayload.promotionGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $promotionGateStatePath
 $statePayload.lastCiConcordanceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCiConcordanceBundle')
@@ -513,6 +516,15 @@ $releaseHandshakeBundlePath = Get-ScriptOutputTail -Output $releaseHandshakeOutp
 if (-not [string]::IsNullOrWhiteSpace($releaseHandshakeBundlePath)) {
     $statePayload.lastReleaseHandshakeBundle = $releaseHandshakeBundlePath
     $statePayload.releaseHandshakeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseHandshakeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$cmeFormationAndOfficeLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CmeFormationAndOfficeLedger.ps1'
+$cmeFormationAndOfficeLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $cmeFormationAndOfficeLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'CME formation and office ledger writer'
+$cmeFormationAndOfficeLedgerBundlePath = Get-ScriptOutputTail -Output $cmeFormationAndOfficeLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($cmeFormationAndOfficeLedgerBundlePath)) {
+    $statePayload.lastCmeFormationAndOfficeLedgerBundle = $cmeFormationAndOfficeLedgerBundlePath
+    $statePayload.cmeFormationAndOfficeLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cmeFormationAndOfficeLedgerStatePath
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
@@ -745,6 +757,8 @@ $summary = [ordered]@{
     retentionStatePath = $statePayload.retentionStatePath
     schedulerReconciliationStatePath = $statePayload.schedulerReconciliationStatePath
     cmeConsolidationStatePath = $statePayload.cmeConsolidationStatePath
+    lastCmeFormationAndOfficeLedgerBundle = $statePayload.lastCmeFormationAndOfficeLedgerBundle
+    cmeFormationAndOfficeLedgerStatePath = $statePayload.cmeFormationAndOfficeLedgerStatePath
     lastPromotionGateBundle = $statePayload.lastPromotionGateBundle
     promotionGateStatePath = $statePayload.promotionGateStatePath
     lastCiConcordanceBundle = $statePayload.lastCiConcordanceBundle

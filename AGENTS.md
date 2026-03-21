@@ -42,6 +42,7 @@ Follow these governing documents before inventing new structure:
 - `OAN Mortalis V1.0/docs/WORKSPACE_RULES.md`
 - `OAN Mortalis V1.0/docs/DOCUMENTATION_REPO_GOVERNANCE_UPTAKE_MODEL.md`
 - `OAN Mortalis V1.0/docs/EVIDENCE_LED_DOCUMENTATION_REVISION_LAW.md`
+- `OAN Mortalis V1.0/docs/CME_FORMATION_AND_OFFICE_LEDGER_CONTRACT.md`
 
 ## Family Model
 
@@ -93,6 +94,7 @@ For agent work in this repository:
 
 - ground implementation in current repo-local executable truth first
 - consult the `Documentation Repo` for stabilized conceptual truth and theory digestion when available
+- when work touches automation, seeded governance, or CME office formation, consult current repo-local telemetry under `.audit/state/` when it exists before inferring office, continuity, or readiness
 - never hard-code an external documentation-repo path into tracked files
 - state plainly when the external documentation surface is unavailable in a working session
 

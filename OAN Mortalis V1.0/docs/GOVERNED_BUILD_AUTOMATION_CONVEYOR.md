@@ -145,6 +145,7 @@ The supporting scripts are:
 - `tools/Invoke-Seeded-Build-Governance.ps1`
 - `tools/Sync-Local-AutomationScheduler.ps1`
 - `tools/Write-CmeFormalization-ConsolidationStatus.ps1`
+- `tools/Write-CmeFormationAndOfficeLedger.ps1`
 
 The stable status surfaces are:
 
@@ -156,6 +157,7 @@ The stable status surfaces are:
 - `.audit/state/local-automation-seeded-governance-last-run.json`
 - `.audit/state/local-automation-scheduler-reconciliation-last-run.json`
 - `.audit/state/local-automation-cme-consolidation-state.json`
+- `.audit/state/local-automation-cme-formation-office-ledger-last-run.json`
 - `.audit/state/local-automation-promotion-gate-last-run.json`
 - `.audit/state/local-automation-ci-concordance-last-run.json`
 - `.audit/state/local-automation-release-ratification-last-run.json`
@@ -271,6 +273,22 @@ That seeded lane may not:
 - overrule a blocked posture
 
 Seeded outputs are evidence artifacts, not autonomous release truth.
+
+## CME Formation And Office Ledger Lane
+
+The local cycle now carries a bounded CME formation and office ledger lane.
+
+That lane may:
+
+- materialize capability, formation, office, and continuity surfaces from current automation evidence
+- keep `Ability` as the hinge between capability and office
+- expose provisional or open offices without implying ratified authority or career continuity
+
+That lane may not:
+
+- flatten talent into skill, skill into ability, ability into office, or office into career
+- imply office merely because a role label is useful
+- narrate career continuity before repeated lawful office-bearing evidence exists
 
 The seeded lane now carries a ready-on-call posture:
 

@@ -538,6 +538,7 @@ $notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Candi
 $seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
 $schedulerReconciliationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerReconciliationStatePath)
 $cmeConsolidationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.cmeConsolidationStatePath)
+$cmeFormationAndOfficeLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.cmeFormationAndOfficeLedgerStatePath)
 $promotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.promotionGateStatePath)
 $ciConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.ciConcordanceStatePath)
 $releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.releaseRatificationStatePath)
@@ -574,6 +575,7 @@ $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
 $seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
 $schedulerReconciliationState = Read-JsonFileOrNull -Path $schedulerReconciliationStatePath
 $cmeConsolidationState = Read-JsonFileOrNull -Path $cmeConsolidationStatePath
+$cmeFormationAndOfficeLedgerState = Read-JsonFileOrNull -Path $cmeFormationAndOfficeLedgerStatePath
 $promotionGateState = Read-JsonFileOrNull -Path $promotionGateStatePath
 $ciConcordanceState = Read-JsonFileOrNull -Path $ciConcordanceStatePath
 $releaseRatificationState = Read-JsonFileOrNull -Path $releaseRatificationStatePath
@@ -962,6 +964,13 @@ $statusPayload = [ordered]@{
         schedulerAligned = if ($null -ne $schedulerReconciliationState) { [bool] $schedulerReconciliationState.aligned } else { $null }
         cmeConsolidationState = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.consolidationState } else { $null }
         cmeConsolidationReason = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.reasonCode } else { $null }
+        cmeFormationAndOfficeLedgerState = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.ledgerState } else { $null }
+        cmeFormationAndOfficeLedgerReason = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.reasonCode } else { $null }
+        cmeFormationAndOfficeLedgerNextAction = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.nextAction } else { $null }
+        cmeCapabilityLedgerState = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.capabilityLedgerState } else { $null }
+        cmeFormationLedgerState = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.formationLedgerState } else { $null }
+        cmeOfficeLedgerState = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.officeLedgerState } else { $null }
+        cmeCareerContinuityLedgerState = if ($null -ne $cmeFormationAndOfficeLedgerState) { [string] $cmeFormationAndOfficeLedgerState.careerContinuityLedgerState } else { $null }
         promotionGateRecommendation = if ($null -ne $promotionGateState) { [string] $promotionGateState.recommendation } else { $null }
         promotionGateReason = if ($null -ne $promotionGateState) { [string] $promotionGateState.reasonCode } else { $null }
         ciConcordanceState = if ($null -ne $ciConcordanceState) { [string] $ciConcordanceState.concordanceState } else { $null }
@@ -1133,6 +1142,21 @@ if ($null -ne $cmeConsolidationState) {
         ('- Consolidation state: `{0}`' -f [string] $cmeConsolidationState.consolidationState),
         ('- Reason code: `{0}`' -f [string] $cmeConsolidationState.reasonCode),
         ('- Consecutive accepted seed runs: `{0}`' -f [int] $cmeConsolidationState.consecutiveAcceptedCount),
+        ''
+    )
+}
+
+if ($null -ne $cmeFormationAndOfficeLedgerState) {
+    $markdownLines += @(
+        '## CME Formation and Office Ledger',
+        '',
+        ('- Ledger state: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.ledgerState),
+        ('- Reason code: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.nextAction),
+        ('- Capability ledger state: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.capabilityLedgerState),
+        ('- Formation ledger state: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.formationLedgerState),
+        ('- Office ledger state: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.officeLedgerState),
+        ('- Career continuity state: `{0}`' -f [string] $cmeFormationAndOfficeLedgerState.careerContinuityLedgerState),
         ''
     )
 }
