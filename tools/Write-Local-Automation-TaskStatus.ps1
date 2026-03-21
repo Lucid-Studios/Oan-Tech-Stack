@@ -98,6 +98,8 @@ $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 $cyclePolicy = Read-JsonFile -Path $resolvedCyclePolicyPath
 $taskingPolicy = Read-JsonFile -Path $resolvedTaskingPolicyPath
 $taskDefinitions = @($taskingPolicy.tasks)
+$longFormTaskMaps = @($taskingPolicy.longFormTaskMaps)
+$activeTaskMapId = [string] $taskingPolicy.activeTaskMapId
 
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $statusJsonPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $taskingPolicy.statusJsonPath)
@@ -240,12 +242,103 @@ $taskEntries = @(
     }
 )
 
+$activeLongFormTaskMap = $null
+if (-not [string]::IsNullOrWhiteSpace($activeTaskMapId)) {
+    $activeLongFormTaskMap = @($longFormTaskMaps | Where-Object { [string] $_.id -eq $activeTaskMapId } | Select-Object -First 1)
+    if ($activeLongFormTaskMap -is [System.Array]) {
+        $activeLongFormTaskMap = if ($activeLongFormTaskMap.Count -gt 0) { $activeLongFormTaskMap[0] } else { $null }
+    }
+}
+
+$activeLongFormTaskMapStatus = 'uninitialized'
+$activeLongFormTasksCompleted = 0
+$activeLongFormTasksTotal = 0
+$canPullForwardFromNextMap = $false
+$eligibleNextTaskMap = $null
+
+if ($null -ne $activeLongFormTaskMap) {
+    $activeLongFormTasks = @($activeLongFormTaskMap.tasks)
+    $activeLongFormTasksTotal = $activeLongFormTasks.Count
+    $activeLongFormTasksCompleted = @($activeLongFormTasks | Where-Object { [string] $_.status -eq 'completed' }).Count
+
+    if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
+        $activeLongFormTaskMapStatus = 'blocked'
+    } elseif ($requiresImmediateHitl -or $lastKnownStatus -eq 'hitl-required') {
+        $activeLongFormTaskMapStatus = 'waiting-for-hitl'
+    } elseif ($activeLongFormTasksTotal -gt 0 -and $activeLongFormTasksCompleted -ge $activeLongFormTasksTotal) {
+        $activeLongFormTaskMapStatus = 'completed'
+    } else {
+        $activeLongFormTaskMapStatus = 'in-progress'
+    }
+
+    $taskMapIndex = [array]::IndexOf($longFormTaskMaps, $activeLongFormTaskMap)
+    if ($taskMapIndex -ge 0 -and ($taskMapIndex + 1) -lt $longFormTaskMaps.Count) {
+        $eligibleNextTaskMap = $longFormTaskMaps[$taskMapIndex + 1]
+    }
+
+    $timeDilationPolicy = $taskingPolicy.PSObject.Properties['timeDilationPolicy']
+    $allowPullForward = $false
+    $pullForwardMaxMaps = 0
+    if ($null -ne $timeDilationPolicy) {
+        $allowPullForward = [bool] $timeDilationPolicy.Value.allowPullForward
+        $pullForwardMaxMaps = [int] $timeDilationPolicy.Value.pullForwardMaxMaps
+    }
+
+    if ($allowPullForward -and $pullForwardMaxMaps -ge 1 -and
+        $activeLongFormTaskMapStatus -eq 'completed' -and
+        $null -ne $eligibleNextTaskMap) {
+        $canPullForwardFromNextMap = $true
+    }
+}
+
+$taskMapEntries = @(
+    foreach ($taskMap in $longFormTaskMaps) {
+        $taskMapTasks = @($taskMap.tasks)
+        $completedCount = @($taskMapTasks | Where-Object { [string] $_.status -eq 'completed' }).Count
+        [ordered]@{
+            id = [string] $taskMap.id
+            label = [string] $taskMap.label
+            status = [string] $taskMap.status
+            expectedReviewWindows = [int] $taskMap.expectedReviewWindows
+            goal = [string] $taskMap.goal
+            completedTaskCount = $completedCount
+            totalTaskCount = $taskMapTasks.Count
+            taskIds = @($taskMap.taskIds | ForEach-Object { [string] $_ })
+            tasks = @(
+                $taskMapTasks |
+                ForEach-Object {
+                    [ordered]@{
+                        id = [string] $_.id
+                        label = [string] $_.label
+                        owner = [string] $_.owner
+                        authority = [string] $_.authority
+                        status = [string] $_.status
+                        purpose = [string] $_.purpose
+                        completionSignal = [string] $_.completionSignal
+                        escalatesWhen = @($_.escalatesWhen | ForEach-Object { [string] $_ })
+                    }
+                }
+            )
+        }
+    }
+)
+
 $statusPayload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
     cyclePolicyPath = $resolvedCyclePolicyPath
     taskingPolicyPath = $resolvedTaskingPolicyPath
     formalSurfaceMarkdownPath = [string] $taskingPolicy.formalSurfaceMarkdownPath
+    longFormTasking = [ordered]@{
+        activeTaskMapId = $activeTaskMapId
+        activeTaskMapStatus = $activeLongFormTaskMapStatus
+        activeTaskMapCompletedTaskCount = $activeLongFormTasksCompleted
+        activeTaskMapTotalTaskCount = $activeLongFormTasksTotal
+        canPullForwardFromNextMap = $canPullForwardFromNextMap
+        eligibleNextTaskMapId = if ($null -ne $eligibleNextTaskMap) { [string] $eligibleNextTaskMap.id } else { $null }
+        pullForwardRule = [string] $taskingPolicy.timeDilationPolicy.rule
+        taskMaps = $taskMapEntries
+    }
     scheduler = $scheduler
     currentPosture = [ordered]@{
         lastKnownStatus = $lastKnownStatus
@@ -266,6 +359,9 @@ $markdownLines = @(
     '',
     ('- Generated at (UTC): `{0}`' -f $statusPayload.generatedAtUtc),
     ('- Formal tasking surface: `{0}`' -f $statusPayload.formalSurfaceMarkdownPath),
+    ('- Active long-form task map: `{0}`' -f $activeTaskMapId),
+    ('- Active map posture: `{0}`' -f $activeLongFormTaskMapStatus),
+    ('- Pull-forward allowed from next map: `{0}`' -f $canPullForwardFromNextMap),
     ('- Scheduler task: `{0}`' -f $scheduler.taskName),
     ('- Scheduler registered: `{0}`' -f $scheduler.registered),
     ('- Scheduler state: `{0}`' -f $scheduler.state),
@@ -285,6 +381,32 @@ if ($scheduler.registered) {
         ('- Next scheduled run (UTC): `{0}`' -f $(if ($scheduler.nextRunTimeUtc) { $scheduler.nextRunTimeUtc } else { 'not-available' })),
         ''
     )
+}
+
+if ($null -ne $activeLongFormTaskMap) {
+    $markdownLines += @(
+        '## Long-Form Task Map',
+        '',
+        ('- Active map: `{0}`' -f $activeLongFormTaskMap.label),
+        ('- Goal: `{0}`' -f $activeLongFormTaskMap.goal),
+        ('- Expected review windows: `{0}`' -f $activeLongFormTaskMap.expectedReviewWindows),
+        ('- Completed tasks: `{0}/{1}`' -f $activeLongFormTasksCompleted, $activeLongFormTasksTotal),
+        ('- Pull-forward rule: `{0}`' -f [string] $taskingPolicy.timeDilationPolicy.rule)
+    )
+
+    if ($null -ne $eligibleNextTaskMap) {
+        $markdownLines += ('- Eligible next map: `{0}`' -f [string] $eligibleNextTaskMap.label)
+    }
+
+    $markdownLines += @(
+        '',
+        '| Task | Owner | Status |',
+        '| --- | --- | --- |'
+    )
+
+    foreach ($task in @($activeLongFormTaskMap.tasks)) {
+        $markdownLines += ('| {0} | {1} | {2} |' -f [string] $task.label, [string] $task.owner, [string] $task.status)
+    }
 }
 
 $markdownLines += @(

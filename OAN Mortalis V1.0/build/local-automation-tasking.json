@@ -1,9 +1,15 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.0/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
   "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
+  "activeTaskMapId": "automation-maturation-map-01",
+  "timeDilationPolicy": {
+    "allowPullForward": true,
+    "pullForwardMaxMaps": 1,
+    "rule": "If the active long-form task map completes earlier than its expected review windows, the agentic working group may pull work only from the next declared task map and not beyond it."
+  },
   "tasks": [
     {
       "id": "release-candidate-cycle",
@@ -75,6 +81,116 @@
       "escalatesWhen": [
         "scheduled task is not registered",
         "scheduled task has no next run time"
+      ]
+    }
+  ],
+  "longFormTaskMaps": [
+    {
+      "id": "automation-maturation-map-01",
+      "label": "Automation Maturation Map 01",
+      "status": "active",
+      "expectedReviewWindows": 2,
+      "goal": "Make the current local automation cycle report transitions, first scheduled execution truth, and status freshness without requiring manual probing.",
+      "timeDilationPullForwardAllowed": true,
+      "taskIds": [
+        "notification-surface",
+        "first-scheduled-run-capture",
+        "status-freshness-reconciliation"
+      ],
+      "tasks": [
+        {
+          "id": "notification-surface",
+          "label": "Notification Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Emit a bounded local notification or inbox surface when posture changes from clear-to-continue to hitl-required or blocked.",
+          "completionSignal": "A posture transition produces a stable local notification artifact without widening publication authority.",
+          "escalatesWhen": [
+            "notification output requires external authority",
+            "notification cannot distinguish hitl-required from blocked"
+          ]
+        },
+        {
+          "id": "first-scheduled-run-capture",
+          "label": "First Scheduled Run Capture",
+          "owner": "Automation",
+          "authority": "Machine-local only",
+          "status": "selected",
+          "purpose": "Capture and report the first scheduler-driven execution so the machine proves it can move without manual invocation.",
+          "completionSignal": "Task board records a real scheduler last-run time and links it to the latest release-candidate bundle.",
+          "escalatesWhen": [
+            "scheduled execution fails to produce a bundle",
+            "scheduler advances without state refresh"
+          ]
+        },
+        {
+          "id": "status-freshness-reconciliation",
+          "label": "Status Freshness Reconciliation",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Keep cycle state, digest state, task board state, and scheduler state in agreement after unattended runs.",
+          "completionSignal": "The task board can prove which live artifact is newest and whether any status surface is stale.",
+          "escalatesWhen": [
+            "task board timestamps drift from cycle or digest truth",
+            "scheduler next-run and cycle next-run disagree materially"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-02",
+      "label": "Automation Maturation Map 02",
+      "status": "queued-next",
+      "expectedReviewWindows": 2,
+      "goal": "Deepen unattended evidence quality without crossing into ungated promotion authority.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "delta-summary-surface",
+        "artifact-retention-pruning",
+        "blocked-escalation-bundle"
+      ],
+      "tasks": [
+        {
+          "id": "delta-summary-surface",
+          "label": "Delta Summary Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Summarize what changed between the latest release-candidate bundle and the previous one.",
+          "completionSignal": "Latest digest includes a bounded delta summary without inferring maturity.",
+          "escalatesWhen": [
+            "delta logic starts inferring authority or promotion",
+            "previous bundle truth is unavailable"
+          ]
+        },
+        {
+          "id": "artifact-retention-pruning",
+          "label": "Artifact Retention Pruning",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Prune or compact old local evidence bundles according to declared retention policy while preserving review truth.",
+          "completionSignal": "Retention policy can delete or compact stale local bundles without harming active review surfaces.",
+          "escalatesWhen": [
+            "pruning would delete the current active review surface",
+            "retention classification becomes governance-significant"
+          ]
+        },
+        {
+          "id": "blocked-escalation-bundle",
+          "label": "Blocked Escalation Bundle",
+          "owner": "Shared",
+          "authority": "Automation may prepare; HITL interprets",
+          "status": "queued",
+          "purpose": "Prepare a bounded escalation bundle when the automation posture becomes blocked.",
+          "completionSignal": "A blocked posture produces one stable bundle that points to the exact failing evidence surfaces.",
+          "escalatesWhen": [
+            "escalation bundle widens into autonomous remediation",
+            "blocked evidence cannot be localized"
+          ]
+        }
       ]
     }
   ]

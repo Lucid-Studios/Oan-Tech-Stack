@@ -27,6 +27,26 @@ The live applied status surfaces are:
 
 Those live surfaces apply the current automation state onto the formal task definitions below.
 
+## Long-Form Task Maps
+
+The tasking surface also carries bounded long-form maps.
+
+Current active map:
+
+- `Automation Maturation Map 01`
+
+Next eligible map:
+
+- `Automation Maturation Map 02`
+
+Time-dilation rule:
+
+- if the active map completes earlier than expected, the agentic working group may pull work only from the next declared map
+- no pull-forward may skip beyond that next map
+- blocked or HITL-required posture prevents pull-forward
+
+This keeps acceleration lawful without turning early completion into uncontrolled scope widening.
+
 ## Formal Tasks
 
 ### Release Candidate Cycle
@@ -72,6 +92,26 @@ Those live surfaces apply the current automation state onto the formal task defi
 - Escalates when:
   - the scheduled task is not registered
   - the scheduled task has no next run time
+
+## First Long-Form Task Set
+
+### Automation Maturation Map 01
+
+- Goal: make the current local automation cycle report transitions, first scheduled execution truth, and status freshness without requiring manual probing
+- Expected review windows: `2`
+- Selected tasks:
+  - `Notification Surface`
+  - `First Scheduled Run Capture`
+  - `Status Freshness Reconciliation`
+
+### Automation Maturation Map 02
+
+- Goal: deepen unattended evidence quality without crossing into ungated promotion authority
+- Expected review windows: `2`
+- Queued tasks:
+  - `Delta Summary Surface`
+  - `Artifact Retention Pruning`
+  - `Blocked Escalation Bundle`
 
 ## Status Interpretation
 
