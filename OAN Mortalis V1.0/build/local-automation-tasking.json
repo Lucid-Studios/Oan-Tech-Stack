@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
+  "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
+  "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
+  "tasks": [
+    {
+      "id": "release-candidate-cycle",
+      "label": "Release Candidate Cycle",
+      "cadenceHours": 6,
+      "purpose": "Run the governed release-candidate conveyor and publish the latest candidate evidence bundle."
+    },
+    {
+      "id": "daily-hitl-digest",
+      "label": "Daily HITL Digest",
+      "cadenceHours": 24,
+      "purpose": "Emit the daily review surface that tells us whether the build can continue unattended or now owes human review."
+    },
+    {
+      "id": "promotion-watch",
+      "label": "Promotion Watch",
+      "trigger": "latest digest posture",
+      "purpose": "Track whether the current automation posture is clear to continue, requires HITL, or is blocked."
+    }
+  ]
+}

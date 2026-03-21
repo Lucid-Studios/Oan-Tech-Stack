@@ -281,8 +281,15 @@ $summary = [ordered]@{
 $summaryPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '.audit/state/local-automation-cycle-last-run.json'
 Write-JsonFile -Path $summaryPath -Value $summary
 
+$taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
+$taskStatusOutput = & powershell -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot
+$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
+
 Write-Host ('[local-automation-cycle] Status: {0}' -f $latestStatus)
 Write-Host ('[local-automation-cycle] State: {0}' -f $statePath)
+if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) {
+    Write-Host ('[local-automation-cycle] TaskStatus: {0}' -f $taskStatusPath)
+}
 
 if ($latestStatus -eq $blockedStatus) {
     throw 'Local automation cycle ended in blocked status.'

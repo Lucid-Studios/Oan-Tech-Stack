@@ -115,7 +115,15 @@ The supporting scripts are:
 
 - `tools/Invoke-Local-Automation-Cycle.ps1`
 - `tools/Write-Release-Candidate-Digest.ps1`
+- `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
+
+The stable status surfaces are:
+
+- `.audit/state/local-automation-cycle.json`
+- `.audit/state/local-automation-cycle-last-run.json`
+- `.audit/state/local-automation-tasking-status.json`
+- `.audit/state/local-automation-tasking-status.md`
 
 The local cycle is intentionally biased toward continued build progress.
 
