@@ -67,6 +67,7 @@ A lawful documentation revision cycle should produce one or more of the followin
 - updated readiness debt where implementation lags doctrine
 - updated migration notes where older terms or placements remain in code
 - updated implementation targets where new seams become actionable
+- bounded research-subject briefs where discussion surfaces are real enough to investigate but not yet mature enough to harden into admitted build truth
 - explicit statement that no governed documentation changes were warranted for unaffected surfaces
 
 ## Build Discipline Relation
