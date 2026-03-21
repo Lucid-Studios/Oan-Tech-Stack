@@ -34,7 +34,7 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 10`
+- `Automation Maturation Map 11`
 
 Next eligible map:
 
@@ -266,6 +266,21 @@ Current live output surfaces for this map:
 - scheduler execution receipt bundles land under `.audit/runs/scheduler-execution-receipts/` and update `.audit/state/local-automation-scheduler-execution-receipt-last-run.json`
 - unattended interval concordance bundles land under `.audit/runs/unattended-interval-concordance/` and update `.audit/state/local-automation-unattended-interval-concordance-last-run.json`
 - stale-surface contradiction watch bundles land under `.audit/runs/stale-surface-contradiction-watch/` and update `.audit/state/local-automation-stale-surface-contradiction-watch-last-run.json`
+
+### Automation Maturation Map 11
+
+- Goal: carry unattended waiting truth across real cadence windows, collapse scheduler proof when it arrives, and prove stable silence is integrity rather than neglect
+- Expected review windows: `2`
+- Selected tasks:
+  - `Unattended Proof Collapse`
+  - `Dormant Window Ledger`
+  - `Silent Cadence Integrity`
+
+Current live output surfaces for this map:
+
+- unattended proof collapse bundles land under `.audit/runs/unattended-proof-collapse/` and update `.audit/state/local-automation-unattended-proof-collapse-last-run.json`
+- dormant window ledger bundles land under `.audit/runs/dormant-window-ledger/` and update `.audit/state/local-automation-dormant-window-ledger-last-run.json`
+- silent cadence integrity bundles land under `.audit/runs/silent-cadence-integrity/` and update `.audit/state/local-automation-silent-cadence-integrity-last-run.json`
 
 ## Status Interpretation
 

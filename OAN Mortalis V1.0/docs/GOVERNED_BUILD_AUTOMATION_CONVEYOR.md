@@ -131,6 +131,12 @@ The supporting scripts are:
 - `tools/Write-OperationalPublication-Ledger.ps1`
 - `tools/Write-ExternalConsumer-Concordance.ps1`
 - `tools/Write-PostPublish-GovernanceLoop.ps1`
+- `tools/Write-SchedulerExecution-Receipt.ps1`
+- `tools/Write-UnattendedInterval-Concordance.ps1`
+- `tools/Write-StaleSurface-ContradictionWatch.ps1`
+- `tools/Write-UnattendedProof-Collapse.ps1`
+- `tools/Write-DormantWindow-Ledger.ps1`
+- `tools/Write-SilentCadence-Integrity.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -162,6 +168,15 @@ The stable status surfaces are:
 - `.audit/state/local-automation-operational-publication-ledger-last-run.json`
 - `.audit/state/local-automation-external-consumer-concordance-last-run.json`
 - `.audit/state/local-automation-post-publish-governance-loop-last-run.json`
+- `.audit/state/local-automation-publication-cadence-ledger-last-run.json`
+- `.audit/state/local-automation-downstream-runtime-observation-last-run.json`
+- `.audit/state/local-automation-multi-interval-governance-braid-last-run.json`
+- `.audit/state/local-automation-scheduler-execution-receipt-last-run.json`
+- `.audit/state/local-automation-unattended-interval-concordance-last-run.json`
+- `.audit/state/local-automation-stale-surface-contradiction-watch-last-run.json`
+- `.audit/state/local-automation-unattended-proof-collapse-last-run.json`
+- `.audit/state/local-automation-dormant-window-ledger-last-run.json`
+- `.audit/state/local-automation-silent-cadence-integrity-last-run.json`
 
 The formal tasking surface is:
 
@@ -179,6 +194,22 @@ The cycle now includes a bounded notification seam:
 - it stays quiet while posture remains `candidate-ready`
 - it emits a local notification bundle when posture transitions into `hitl-required` or `blocked`
 - it attempts a best-effort Windows popup without failing the build if the popup channel is unavailable
+
+## Unattended Continuity Lane
+
+The local cycle now carries a bounded unattended continuity lane beyond scheduler registration.
+
+That lane may:
+
+- collapse the first real scheduler proof when it actually appears
+- count dormant-consistent cadence windows without confusing them for execution proof
+- verify that stable `candidate-ready` stretches remain quiet until a real review edge or contradiction arrives
+
+That lane may not:
+
+- narrate scheduler proof before a real scheduled run exists
+- convert dormant waiting into faux readiness beyond current evidence
+- treat quiet cadence as permission to skip the daily review edge
 
 ## Seeded Governance Lane
 

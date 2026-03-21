@@ -181,6 +181,9 @@ $multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolve
 $schedulerExecutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerExecutionReceiptStatePath)
 $unattendedIntervalConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.unattendedIntervalConcordanceStatePath)
 $staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.staleSurfaceContradictionWatchStatePath)
+$unattendedProofCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.unattendedProofCollapseStatePath)
+$dormantWindowLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dormantWindowLedgerStatePath)
+$silentCadenceIntegrityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.silentCadenceIntegrityStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -377,6 +380,12 @@ $statePayload.lastUnattendedIntervalConcordanceBundle = [string] (Get-ObjectProp
 $statePayload.unattendedIntervalConcordanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $unattendedIntervalConcordanceStatePath
 $statePayload.lastStaleSurfaceContradictionWatchBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastStaleSurfaceContradictionWatchBundle')
 $statePayload.staleSurfaceContradictionWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $staleSurfaceContradictionWatchStatePath
+$statePayload.lastUnattendedProofCollapseBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastUnattendedProofCollapseBundle')
+$statePayload.unattendedProofCollapseStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $unattendedProofCollapseStatePath
+$statePayload.lastDormantWindowLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDormantWindowLedgerBundle')
+$statePayload.dormantWindowLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dormantWindowLedgerStatePath
+$statePayload.lastSilentCadenceIntegrityBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSilentCadenceIntegrityBundle')
+$statePayload.silentCadenceIntegrityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $silentCadenceIntegrityStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -623,6 +632,33 @@ if (-not [string]::IsNullOrWhiteSpace($staleSurfaceContradictionWatchBundlePath)
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$unattendedProofCollapseScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-UnattendedProof-Collapse.ps1'
+$unattendedProofCollapseOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $unattendedProofCollapseScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Unattended proof collapse writer'
+$unattendedProofCollapseBundlePath = Get-ScriptOutputTail -Output $unattendedProofCollapseOutput
+if (-not [string]::IsNullOrWhiteSpace($unattendedProofCollapseBundlePath)) {
+    $statePayload.lastUnattendedProofCollapseBundle = $unattendedProofCollapseBundlePath
+    $statePayload.unattendedProofCollapseStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $unattendedProofCollapseStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$dormantWindowLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-DormantWindow-Ledger.ps1'
+$dormantWindowLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $dormantWindowLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Dormant window ledger writer'
+$dormantWindowLedgerBundlePath = Get-ScriptOutputTail -Output $dormantWindowLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($dormantWindowLedgerBundlePath)) {
+    $statePayload.lastDormantWindowLedgerBundle = $dormantWindowLedgerBundlePath
+    $statePayload.dormantWindowLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dormantWindowLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$silentCadenceIntegrityScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SilentCadence-Integrity.ps1'
+$silentCadenceIntegrityOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $silentCadenceIntegrityScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Silent cadence integrity writer'
+$silentCadenceIntegrityBundlePath = Get-ScriptOutputTail -Output $silentCadenceIntegrityOutput
+if (-not [string]::IsNullOrWhiteSpace($silentCadenceIntegrityBundlePath)) {
+    $statePayload.lastSilentCadenceIntegrityBundle = $silentCadenceIntegrityBundlePath
+    $statePayload.silentCadenceIntegrityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $silentCadenceIntegrityStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -678,6 +714,12 @@ $summary = [ordered]@{
     unattendedIntervalConcordanceStatePath = $statePayload.unattendedIntervalConcordanceStatePath
     lastStaleSurfaceContradictionWatchBundle = $statePayload.lastStaleSurfaceContradictionWatchBundle
     staleSurfaceContradictionWatchStatePath = $statePayload.staleSurfaceContradictionWatchStatePath
+    lastUnattendedProofCollapseBundle = $statePayload.lastUnattendedProofCollapseBundle
+    unattendedProofCollapseStatePath = $statePayload.unattendedProofCollapseStatePath
+    lastDormantWindowLedgerBundle = $statePayload.lastDormantWindowLedgerBundle
+    dormantWindowLedgerStatePath = $statePayload.dormantWindowLedgerStatePath
+    lastSilentCadenceIntegrityBundle = $statePayload.lastSilentCadenceIntegrityBundle
+    silentCadenceIntegrityStatePath = $statePayload.silentCadenceIntegrityStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -783,6 +825,15 @@ if (-not [string]::IsNullOrWhiteSpace($unattendedIntervalConcordanceBundlePath))
 }
 if (-not [string]::IsNullOrWhiteSpace($staleSurfaceContradictionWatchBundlePath)) {
     Write-Host ('[local-automation-cycle] StaleSurfaceContradictionWatch: {0}' -f $staleSurfaceContradictionWatchBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($unattendedProofCollapseBundlePath)) {
+    Write-Host ('[local-automation-cycle] UnattendedProofCollapse: {0}' -f $unattendedProofCollapseBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($dormantWindowLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] DormantWindowLedger: {0}' -f $dormantWindowLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($silentCadenceIntegrityBundlePath)) {
+    Write-Host ('[local-automation-cycle] SilentCadenceIntegrity: {0}' -f $silentCadenceIntegrityBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)

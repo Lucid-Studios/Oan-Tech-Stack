@@ -30,6 +30,9 @@
   "schedulerExecutionReceiptOutputRoot": ".audit/runs/scheduler-execution-receipts",
   "unattendedIntervalConcordanceOutputRoot": ".audit/runs/unattended-interval-concordance",
   "staleSurfaceContradictionWatchOutputRoot": ".audit/runs/stale-surface-contradiction-watch",
+  "unattendedProofCollapseOutputRoot": ".audit/runs/unattended-proof-collapse",
+  "dormantWindowLedgerOutputRoot": ".audit/runs/dormant-window-ledger",
+  "silentCadenceIntegrityOutputRoot": ".audit/runs/silent-cadence-integrity",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -58,6 +61,9 @@
   "schedulerExecutionReceiptStatePath": ".audit/state/local-automation-scheduler-execution-receipt-last-run.json",
   "unattendedIntervalConcordanceStatePath": ".audit/state/local-automation-unattended-interval-concordance-last-run.json",
   "staleSurfaceContradictionWatchStatePath": ".audit/state/local-automation-stale-surface-contradiction-watch-last-run.json",
+  "unattendedProofCollapseStatePath": ".audit/state/local-automation-unattended-proof-collapse-last-run.json",
+  "dormantWindowLedgerStatePath": ".audit/state/local-automation-dormant-window-ledger-last-run.json",
+  "silentCadenceIntegrityStatePath": ".audit/state/local-automation-silent-cadence-integrity-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -116,6 +122,9 @@
     "keepSchedulerExecutionReceiptBundles": 8,
     "keepUnattendedIntervalConcordanceBundles": 8,
     "keepStaleSurfaceContradictionWatchBundles": 8,
+    "keepUnattendedProofCollapseBundles": 8,
+    "keepDormantWindowLedgerBundles": 8,
+    "keepSilentCadenceIntegrityBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

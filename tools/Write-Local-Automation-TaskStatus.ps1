@@ -133,6 +133,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $SchedulerExecutionReceiptState,
         [object] $UnattendedIntervalConcordanceState,
         [object] $StaleSurfaceContradictionWatchState,
+        [object] $UnattendedProofCollapseState,
+        [object] $DormantWindowLedgerState,
+        [object] $SilentCadenceIntegrityState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -390,6 +393,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'unattended-proof-collapse' {
+            if ($null -ne $UnattendedProofCollapseState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'dormant-window-ledger' {
+            if ($null -ne $DormantWindowLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'silent-cadence-integrity' {
+            if ($null -ne $SilentCadenceIntegrityState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -458,6 +488,9 @@ $multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolve
 $schedulerExecutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerExecutionReceiptStatePath)
 $unattendedIntervalConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.unattendedIntervalConcordanceStatePath)
 $staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.staleSurfaceContradictionWatchStatePath)
+$unattendedProofCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.unattendedProofCollapseStatePath)
+$dormantWindowLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.dormantWindowLedgerStatePath)
+$silentCadenceIntegrityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.silentCadenceIntegrityStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -485,6 +518,9 @@ $multiIntervalGovernanceBraidState = Read-JsonFileOrNull -Path $multiIntervalGov
 $schedulerExecutionReceiptState = Read-JsonFileOrNull -Path $schedulerExecutionReceiptStatePath
 $unattendedIntervalConcordanceState = Read-JsonFileOrNull -Path $unattendedIntervalConcordanceStatePath
 $staleSurfaceContradictionWatchState = Read-JsonFileOrNull -Path $staleSurfaceContradictionWatchStatePath
+$unattendedProofCollapseState = Read-JsonFileOrNull -Path $unattendedProofCollapseStatePath
+$dormantWindowLedgerState = Read-JsonFileOrNull -Path $dormantWindowLedgerStatePath
+$silentCadenceIntegrityState = Read-JsonFileOrNull -Path $silentCadenceIntegrityStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -659,6 +695,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -SchedulerExecutionReceiptState $schedulerExecutionReceiptState `
                 -UnattendedIntervalConcordanceState $unattendedIntervalConcordanceState `
                 -StaleSurfaceContradictionWatchState $staleSurfaceContradictionWatchState `
+                -UnattendedProofCollapseState $unattendedProofCollapseState `
+                -DormantWindowLedgerState $dormantWindowLedgerState `
+                -SilentCadenceIntegrityState $silentCadenceIntegrityState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -732,6 +771,9 @@ $taskMapEntries = @(
                     -SchedulerExecutionReceiptState $schedulerExecutionReceiptState `
                     -UnattendedIntervalConcordanceState $unattendedIntervalConcordanceState `
                     -StaleSurfaceContradictionWatchState $staleSurfaceContradictionWatchState `
+                    -UnattendedProofCollapseState $unattendedProofCollapseState `
+                    -DormantWindowLedgerState $dormantWindowLedgerState `
+                    -SilentCadenceIntegrityState $silentCadenceIntegrityState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -873,6 +915,16 @@ $statusPayload = [ordered]@{
         staleSurfaceContradictionWatchState = if ($null -ne $staleSurfaceContradictionWatchState) { [string] $staleSurfaceContradictionWatchState.watchState } else { $null }
         staleSurfaceContradictionWatchReason = if ($null -ne $staleSurfaceContradictionWatchState) { [string] $staleSurfaceContradictionWatchState.reasonCode } else { $null }
         staleSurfaceContradictionWatchNextAction = if ($null -ne $staleSurfaceContradictionWatchState) { [string] $staleSurfaceContradictionWatchState.nextAction } else { $null }
+        unattendedProofCollapseState = if ($null -ne $unattendedProofCollapseState) { [string] $unattendedProofCollapseState.collapseState } else { $null }
+        unattendedProofCollapseReason = if ($null -ne $unattendedProofCollapseState) { [string] $unattendedProofCollapseState.reasonCode } else { $null }
+        unattendedProofCollapseNextAction = if ($null -ne $unattendedProofCollapseState) { [string] $unattendedProofCollapseState.nextAction } else { $null }
+        dormantWindowLedgerState = if ($null -ne $dormantWindowLedgerState) { [string] $dormantWindowLedgerState.ledgerState } else { $null }
+        dormantWindowLedgerReason = if ($null -ne $dormantWindowLedgerState) { [string] $dormantWindowLedgerState.reasonCode } else { $null }
+        dormantWindowLedgerNextAction = if ($null -ne $dormantWindowLedgerState) { [string] $dormantWindowLedgerState.nextAction } else { $null }
+        dormantWindowLedgerCount = if ($null -ne $dormantWindowLedgerState) { [int] $dormantWindowLedgerState.consecutiveDormantWindows } else { $null }
+        silentCadenceIntegrityState = if ($null -ne $silentCadenceIntegrityState) { [string] $silentCadenceIntegrityState.integrityState } else { $null }
+        silentCadenceIntegrityReason = if ($null -ne $silentCadenceIntegrityState) { [string] $silentCadenceIntegrityState.reasonCode } else { $null }
+        silentCadenceIntegrityNextAction = if ($null -ne $silentCadenceIntegrityState) { [string] $silentCadenceIntegrityState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1191,6 +1243,40 @@ if ($null -ne $staleSurfaceContradictionWatchState) {
     )
 }
 
+if ($null -ne $unattendedProofCollapseState) {
+    $markdownLines += @(
+        '## Unattended Proof Collapse',
+        '',
+        ('- Collapse state: `{0}`' -f [string] $unattendedProofCollapseState.collapseState),
+        ('- Reason code: `{0}`' -f [string] $unattendedProofCollapseState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $unattendedProofCollapseState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $dormantWindowLedgerState) {
+    $markdownLines += @(
+        '## Dormant Window Ledger',
+        '',
+        ('- Ledger state: `{0}`' -f [string] $dormantWindowLedgerState.ledgerState),
+        ('- Reason code: `{0}`' -f [string] $dormantWindowLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $dormantWindowLedgerState.nextAction),
+        ('- Consecutive dormant windows: `{0}`' -f [int] $dormantWindowLedgerState.consecutiveDormantWindows),
+        ''
+    )
+}
+
+if ($null -ne $silentCadenceIntegrityState) {
+    $markdownLines += @(
+        '## Silent Cadence Integrity',
+        '',
+        ('- Integrity state: `{0}`' -f [string] $silentCadenceIntegrityState.integrityState),
+        ('- Reason code: `{0}`' -f [string] $silentCadenceIntegrityState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $silentCadenceIntegrityState.nextAction),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1243,6 +1329,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -SchedulerExecutionReceiptState $schedulerExecutionReceiptState `
             -UnattendedIntervalConcordanceState $unattendedIntervalConcordanceState `
             -StaleSurfaceContradictionWatchState $staleSurfaceContradictionWatchState `
+            -UnattendedProofCollapseState $unattendedProofCollapseState `
+            -DormantWindowLedgerState $dormantWindowLedgerState `
+            -SilentCadenceIntegrityState $silentCadenceIntegrityState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

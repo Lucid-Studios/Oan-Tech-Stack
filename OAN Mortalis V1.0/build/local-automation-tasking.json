@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-10",
+  "activeTaskMapId": "automation-maturation-map-11",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -583,7 +583,7 @@
     {
       "id": "automation-maturation-map-10",
       "label": "Automation Maturation Map 10",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Prove unattended scheduler execution across real intervals and watch dormant surfaces for contradiction without confusing honesty for failure.",
       "timeDilationPullForwardAllowed": false,
@@ -630,6 +630,60 @@
           "escalatesWhen": [
             "a downstream or cadence surface outruns its prerequisite evidence",
             "dormant publication surfaces start narrating impossible state transitions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-11",
+      "label": "Automation Maturation Map 11",
+      "status": "active",
+      "expectedReviewWindows": 2,
+      "goal": "Carry unattended waiting truth across real cadence windows, collapse scheduler proof when it arrives, and prove stable silence is integrity rather than neglect.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "unattended-proof-collapse",
+        "dormant-window-ledger",
+        "silent-cadence-integrity"
+      ],
+      "tasks": [
+        {
+          "id": "unattended-proof-collapse",
+          "label": "Unattended Proof Collapse",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Collapse scheduler execution, unattended concordance, and contradiction-watch truth into one bounded unattended proof surface without pretending proof exists before it does.",
+          "completionSignal": "An unattended proof collapse bundle can say whether unattended proof is still pending, materially matched, or held by contradiction.",
+          "escalatesWhen": [
+            "scheduler proof is narrated as collapsed before a real scheduled run exists",
+            "contradiction-watch and unattended proof collapse disagree materially"
+          ]
+        },
+        {
+          "id": "dormant-window-ledger",
+          "label": "Dormant Window Ledger",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Track how many real candidate windows have remained dormant-consistent so waiting is counted as evidence-bearing continuity rather than empty delay.",
+          "completionSignal": "A dormant window ledger can count consecutive dormant-consistent windows without losing the active release-candidate run it is observing.",
+          "escalatesWhen": [
+            "dormant windows are counted without a new candidate interval",
+            "dormant waiting is silently converted into proof of scheduler execution"
+          ]
+        },
+        {
+          "id": "silent-cadence-integrity",
+          "label": "Silent Cadence Integrity",
+          "owner": "Shared",
+          "authority": "Automation may detect; HITL resolves contradictions",
+          "status": "selected",
+          "purpose": "Verify that candidate-ready unattended stretches stay quiet until a real review edge or contradiction arrives, so the machine does not demand attention just because it is alive.",
+          "completionSignal": "A silent cadence integrity surface can distinguish stable quiet from overdue review, noisy false escalation, or blocked posture.",
+          "escalatesWhen": [
+            "candidate-ready posture emits transition noise without cause",
+            "daily review edges are allowed to go stale without surfacing the breach"
           ]
         }
       ]
