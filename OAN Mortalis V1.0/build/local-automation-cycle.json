@@ -15,6 +15,9 @@
   "seededPromotionReviewOutputRoot": ".audit/runs/seeded-promotion-review",
   "firstPublishIntentOutputRoot": ".audit/runs/first-publish-intent",
   "releaseHandshakeOutputRoot": ".audit/runs/release-handshake",
+  "publishRequestEnvelopeOutputRoot": ".audit/runs/publish-request-envelopes",
+  "postPublishEvidenceOutputRoot": ".audit/runs/post-publish-evidence",
+  "seedBraidEscalationOutputRoot": ".audit/runs/seed-braid-escalations",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -28,6 +31,9 @@
   "seededPromotionReviewStatePath": ".audit/state/local-automation-seeded-promotion-review-last-run.json",
   "firstPublishIntentStatePath": ".audit/state/local-automation-first-publish-intent-last-run.json",
   "releaseHandshakeStatePath": ".audit/state/local-automation-release-handshake-last-run.json",
+  "publishRequestEnvelopeStatePath": ".audit/state/local-automation-publish-request-envelope-last-run.json",
+  "postPublishEvidenceStatePath": ".audit/state/local-automation-post-publish-evidence-last-run.json",
+  "seedBraidEscalationStatePath": ".audit/state/local-automation-seed-braid-escalation-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -69,6 +75,9 @@
     "keepSeededPromotionReviewBundles": 8,
     "keepFirstPublishIntentBundles": 8,
     "keepReleaseHandshakeBundles": 8,
+    "keepPublishRequestEnvelopeBundles": 8,
+    "keepPostPublishEvidenceBundles": 8,
+    "keepSeedBraidEscalationBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

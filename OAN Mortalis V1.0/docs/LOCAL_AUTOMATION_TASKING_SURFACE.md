@@ -34,11 +34,11 @@ The tasking surface also carries bounded long-form maps.
 
 Current active map:
 
-- `Automation Maturation Map 05`
+- `Automation Maturation Map 06`
 
 Next eligible map:
 
-- `Automation Maturation Map 06`
+- `Automation Maturation Map 07`
 
 Time-dilation rule:
 
@@ -181,7 +181,7 @@ Current live output surfaces for this map:
 
 - Goal: stabilize first publish intent and seeded promotion review once promotion evidence is consistently reproducible
 - Expected review windows: `2`
-- Selected tasks:
+- Advanced tasks:
   - `Seeded Promotion Review`
   - `First Publish Intent Closure`
   - `Release Handshake Surface`
@@ -196,10 +196,25 @@ Current live output surfaces for this map:
 
 - Goal: prepare the first bounded publish request and post-publish evidence loop once the handshake surface is stable
 - Expected review windows: `2`
-- Queued tasks:
+- Selected tasks:
   - `Publish Request Envelope`
   - `Post-Publish Evidence Loop`
   - `Seed Braid Escalation Lane`
+
+Current live output surfaces for this map:
+
+- publish request envelopes land under `.audit/runs/publish-request-envelopes/` and update `.audit/state/local-automation-publish-request-envelope-last-run.json`
+- post-publish evidence loop bundles land under `.audit/runs/post-publish-evidence/` and update `.audit/state/local-automation-post-publish-evidence-last-run.json`
+- seed braid escalation bundles land under `.audit/runs/seed-braid-escalations/` and update `.audit/state/local-automation-seed-braid-escalation-last-run.json`
+
+### Automation Maturation Map 07
+
+- Goal: stabilize live publication execution and the first external evidence loop once a bounded publish request is ratified
+- Expected review windows: `2`
+- Queued tasks:
+  - `Published Runtime Receipt`
+  - `Artifact Attestation Surface`
+  - `Post-Publish Drift Watch`
 
 ## Status Interpretation
 

@@ -118,6 +118,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $SeededPromotionReviewState,
         [object] $FirstPublishIntentState,
         [object] $ReleaseHandshakeState,
+        [object] $PublishRequestEnvelopeState,
+        [object] $PostPublishEvidenceState,
+        [object] $SeedBraidEscalationState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -240,6 +243,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'publish-request-envelope' {
+            if ($null -ne $PublishRequestEnvelopeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'post-publish-evidence-loop' {
+            if ($null -ne $PostPublishEvidenceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'seed-braid-escalation-lane' {
+            if ($null -ne $SeedBraidEscalationState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -293,6 +323,9 @@ $releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot
 $seededPromotionReviewStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededPromotionReviewStatePath)
 $firstPublishIntentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.firstPublishIntentStatePath)
 $releaseHandshakeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.releaseHandshakeStatePath)
+$publishRequestEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.publishRequestEnvelopeStatePath)
+$postPublishEvidenceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postPublishEvidenceStatePath)
+$seedBraidEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seedBraidEscalationStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -305,6 +338,9 @@ $releaseRatificationState = Read-JsonFileOrNull -Path $releaseRatificationStateP
 $seededPromotionReviewState = Read-JsonFileOrNull -Path $seededPromotionReviewStatePath
 $firstPublishIntentState = Read-JsonFileOrNull -Path $firstPublishIntentStatePath
 $releaseHandshakeState = Read-JsonFileOrNull -Path $releaseHandshakeStatePath
+$publishRequestEnvelopeState = Read-JsonFileOrNull -Path $publishRequestEnvelopeStatePath
+$postPublishEvidenceState = Read-JsonFileOrNull -Path $postPublishEvidenceStatePath
+$seedBraidEscalationState = Read-JsonFileOrNull -Path $seedBraidEscalationStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -464,6 +500,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -SeededPromotionReviewState $seededPromotionReviewState `
                 -FirstPublishIntentState $firstPublishIntentState `
                 -ReleaseHandshakeState $releaseHandshakeState `
+                -PublishRequestEnvelopeState $publishRequestEnvelopeState `
+                -PostPublishEvidenceState $postPublishEvidenceState `
+                -SeedBraidEscalationState $seedBraidEscalationState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -522,6 +561,9 @@ $taskMapEntries = @(
                     -SeededPromotionReviewState $seededPromotionReviewState `
                     -FirstPublishIntentState $firstPublishIntentState `
                     -ReleaseHandshakeState $releaseHandshakeState `
+                    -PublishRequestEnvelopeState $publishRequestEnvelopeState `
+                    -PostPublishEvidenceState $postPublishEvidenceState `
+                    -SeedBraidEscalationState $seedBraidEscalationState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -612,6 +654,15 @@ $statusPayload = [ordered]@{
         releaseHandshakeState = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.handshakeState } else { $null }
         releaseHandshakeReason = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.reasonCode } else { $null }
         releaseHandshakeNextAction = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.nextAction } else { $null }
+        publishRequestEnvelopeState = if ($null -ne $publishRequestEnvelopeState) { [string] $publishRequestEnvelopeState.requestState } else { $null }
+        publishRequestEnvelopeReason = if ($null -ne $publishRequestEnvelopeState) { [string] $publishRequestEnvelopeState.reasonCode } else { $null }
+        publishRequestEnvelopeNextAction = if ($null -ne $publishRequestEnvelopeState) { [string] $publishRequestEnvelopeState.nextAction } else { $null }
+        postPublishEvidenceState = if ($null -ne $postPublishEvidenceState) { [string] $postPublishEvidenceState.loopState } else { $null }
+        postPublishEvidenceReason = if ($null -ne $postPublishEvidenceState) { [string] $postPublishEvidenceState.reasonCode } else { $null }
+        postPublishEvidenceNextAction = if ($null -ne $postPublishEvidenceState) { [string] $postPublishEvidenceState.nextAction } else { $null }
+        seedBraidEscalationState = if ($null -ne $seedBraidEscalationState) { [string] $seedBraidEscalationState.laneState } else { $null }
+        seedBraidEscalationReason = if ($null -ne $seedBraidEscalationState) { [string] $seedBraidEscalationState.reasonCode } else { $null }
+        seedBraidEscalationNextAction = if ($null -ne $seedBraidEscalationState) { [string] $seedBraidEscalationState.nextAction } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -757,6 +808,39 @@ if ($null -ne $releaseHandshakeState) {
     )
 }
 
+if ($null -ne $publishRequestEnvelopeState) {
+    $markdownLines += @(
+        '## Publish Request Envelope',
+        '',
+        ('- Request state: `{0}`' -f [string] $publishRequestEnvelopeState.requestState),
+        ('- Reason code: `{0}`' -f [string] $publishRequestEnvelopeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $publishRequestEnvelopeState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $postPublishEvidenceState) {
+    $markdownLines += @(
+        '## Post-Publish Evidence Loop',
+        '',
+        ('- Loop state: `{0}`' -f [string] $postPublishEvidenceState.loopState),
+        ('- Reason code: `{0}`' -f [string] $postPublishEvidenceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $postPublishEvidenceState.nextAction),
+        ''
+    )
+}
+
+if ($null -ne $seedBraidEscalationState) {
+    $markdownLines += @(
+        '## Seed Braid Escalation',
+        '',
+        ('- Lane state: `{0}`' -f [string] $seedBraidEscalationState.laneState),
+        ('- Reason code: `{0}`' -f [string] $seedBraidEscalationState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $seedBraidEscalationState.nextAction),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -794,6 +878,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -SeededPromotionReviewState $seededPromotionReviewState `
             -FirstPublishIntentState $firstPublishIntentState `
             -ReleaseHandshakeState $releaseHandshakeState `
+            -PublishRequestEnvelopeState $publishRequestEnvelopeState `
+            -PostPublishEvidenceState $postPublishEvidenceState `
+            -SeedBraidEscalationState $seedBraidEscalationState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

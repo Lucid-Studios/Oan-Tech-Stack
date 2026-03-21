@@ -122,6 +122,9 @@ The supporting scripts are:
 - `tools/Write-FirstPublish-IntentClosure.ps1`
 - `tools/Write-Seeded-PromotionReview.ps1`
 - `tools/Write-Release-HandshakeSurface.ps1`
+- `tools/Write-Publish-RequestEnvelope.ps1`
+- `tools/Write-PostPublish-EvidenceLoop.ps1`
+- `tools/Write-SeedBraid-EscalationLane.ps1`
 - `tools/Write-Local-Automation-TaskStatus.ps1`
 - `tools/Install-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-Seeded-Build-Governance.ps1`
@@ -144,6 +147,9 @@ The stable status surfaces are:
 - `.audit/state/local-automation-first-publish-intent-last-run.json`
 - `.audit/state/local-automation-seeded-promotion-review-last-run.json`
 - `.audit/state/local-automation-release-handshake-last-run.json`
+- `.audit/state/local-automation-publish-request-envelope-last-run.json`
+- `.audit/state/local-automation-post-publish-evidence-last-run.json`
+- `.audit/state/local-automation-seed-braid-escalation-last-run.json`
 
 The formal tasking surface is:
 
@@ -213,6 +219,22 @@ That lane may not:
 - infer first publish scope beyond declared deployables
 - let seeded review substitute for ratification
 - imply that a handshake surface is itself a publication act
+
+## Bounded Publish Lane
+
+The local cycle now carries a bounded publish-preparation lane beyond the release handshake.
+
+That lane may:
+
+- prepare a publish request envelope without implying that ratification already happened
+- keep a post-publish evidence loop in an explicitly waiting posture until publication is real
+- expose a seed-braid escalation surface for post-publish contradiction handling
+
+That lane may not:
+
+- narrate a publish request as if it were an executed publication
+- invent post-publish evidence before a published artifact exists
+- let seed-braid escalation substitute for HITL in publication or contradiction resolution
 
 ## Operational Bias
 

@@ -6,7 +6,7 @@
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
   "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
   "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
-  "activeTaskMapId": "automation-maturation-map-05",
+  "activeTaskMapId": "automation-maturation-map-06",
   "longFormRunPolicy": {
     "exploratoryStructures": 3,
     "finalCollapsedStructures": 1,
@@ -313,7 +313,7 @@
     {
       "id": "automation-maturation-map-05",
       "label": "Automation Maturation Map 05",
-      "status": "active",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Stabilize first publish intent and seeded promotion review once promotion evidence is consistently reproducible.",
       "timeDilationPullForwardAllowed": false,
@@ -328,7 +328,7 @@
           "label": "Seeded Promotion Review",
           "owner": "Shared",
           "authority": "Seed may advise; HITL ratifies",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Let the seeded host synthesize the promotion gate, CI concordance, and ratification rehearsal into one bounded advisory review.",
           "completionSignal": "A seeded promotion review bundle exists without widening promotion authority.",
           "escalatesWhen": [
@@ -341,7 +341,7 @@
           "label": "First Publish Intent Closure",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "State exactly what first publish means for the current modular set so automation is not guessing at the target.",
           "completionSignal": "A bounded first-publish intent surface exists and matches declared deployables.",
           "escalatesWhen": [
@@ -354,7 +354,7 @@
           "label": "Release Handshake Surface",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "selected",
+          "status": "advanced",
           "purpose": "Expose the last bounded handshake before a real publish request so the stack can show what is ready, deferred, and still blocked.",
           "completionSignal": "A release handshake surface is emitted from current promotion evidence and advisory posture.",
           "escalatesWhen": [
@@ -367,7 +367,7 @@
     {
       "id": "automation-maturation-map-06",
       "label": "Automation Maturation Map 06",
-      "status": "queued",
+      "status": "active",
       "expectedReviewWindows": 2,
       "goal": "Prepare the first bounded publish request and post-publish evidence loop once the handshake surface is stable.",
       "timeDilationPullForwardAllowed": false,
@@ -382,7 +382,7 @@
           "label": "Publish Request Envelope",
           "owner": "Shared",
           "authority": "HITL required",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Prepare the bounded publish request surface once the release handshake becomes stable.",
           "completionSignal": "A publish request envelope can be emitted without expanding deployable scope or publication authority by implication.",
           "escalatesWhen": [
@@ -395,7 +395,7 @@
           "label": "Post-Publish Evidence Loop",
           "owner": "Automation",
           "authority": "Mechanical only",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Collect the first post-publish evidence bundle and reconcile it against the candidate and handshake surfaces.",
           "completionSignal": "A bounded post-publish evidence loop can compare the published artifact against the pre-publish evidence chain.",
           "escalatesWhen": [
@@ -408,12 +408,66 @@
           "label": "Seed Braid Escalation Lane",
           "owner": "Shared",
           "authority": "Seed may advise; HITL resolves",
-          "status": "queued",
+          "status": "selected",
           "purpose": "Let the seed braid participate in escalation after the first publish lane begins to carry real-world consequences.",
           "completionSignal": "A bounded escalation lane exists for seeded review after publication without silently substituting for ratification.",
           "escalatesWhen": [
             "seed escalation starts overriding HITL",
             "post-publish contradictions remain unresolved across review windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-07",
+      "label": "Automation Maturation Map 07",
+      "status": "queued",
+      "expectedReviewWindows": 2,
+      "goal": "Stabilize live publication execution and the first external evidence loop once a bounded publish request is ratified.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "published-runtime-receipt",
+        "artifact-attestation-surface",
+        "post-publish-drift-watch"
+      ],
+      "tasks": [
+        {
+          "id": "published-runtime-receipt",
+          "label": "Published Runtime Receipt",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "queued",
+          "purpose": "Capture the first bounded receipt that a real runtime artifact was published through the declared lane.",
+          "completionSignal": "A published runtime receipt exists and can be reconciled to the publish request envelope.",
+          "escalatesWhen": [
+            "publication occurs without a bounded receipt",
+            "published receipt cannot be matched to the request envelope"
+          ]
+        },
+        {
+          "id": "artifact-attestation-surface",
+          "label": "Artifact Attestation Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Compare the published runtime artifact against the candidate and post-publish evidence surfaces.",
+          "completionSignal": "An attestation surface can show whether the published artifact matches the bounded pre-publish chain.",
+          "escalatesWhen": [
+            "artifact attestation detects unexplained drift",
+            "attestation starts implying authority beyond evidence"
+          ]
+        },
+        {
+          "id": "post-publish-drift-watch",
+          "label": "Post-Publish Drift Watch",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "queued",
+          "purpose": "Watch the first post-publish interval for drift between the live runtime and the bounded evidence chain.",
+          "completionSignal": "A drift-watch surface can report stable, divergent, or blocked post-publish posture.",
+          "escalatesWhen": [
+            "published runtime diverges from the evidence chain",
+            "drift watch cannot localize the divergence"
           ]
         }
       ]

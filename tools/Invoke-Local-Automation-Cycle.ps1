@@ -166,6 +166,9 @@ $releaseRatificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot
 $seededPromotionReviewStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededPromotionReviewStatePath)
 $firstPublishIntentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.firstPublishIntentStatePath)
 $releaseHandshakeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.releaseHandshakeStatePath)
+$publishRequestEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.publishRequestEnvelopeStatePath)
+$postPublishEvidenceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postPublishEvidenceStatePath)
+$seedBraidEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seedBraidEscalationStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -332,6 +335,12 @@ $statePayload.lastFirstPublishIntentBundle = [string] (Get-ObjectPropertyValueOr
 $statePayload.firstPublishIntentStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $firstPublishIntentStatePath
 $statePayload.lastReleaseHandshakeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReleaseHandshakeBundle')
 $statePayload.releaseHandshakeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $releaseHandshakeStatePath
+$statePayload.lastPublishRequestEnvelopeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPublishRequestEnvelopeBundle')
+$statePayload.publishRequestEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $publishRequestEnvelopeStatePath
+$statePayload.lastPostPublishEvidenceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPostPublishEvidenceBundle')
+$statePayload.postPublishEvidenceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishEvidenceStatePath
+$statePayload.lastSeedBraidEscalationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSeedBraidEscalationBundle')
+$statePayload.seedBraidEscalationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seedBraidEscalationStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -443,6 +452,33 @@ if (-not [string]::IsNullOrWhiteSpace($releaseHandshakeBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$publishRequestEnvelopeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Publish-RequestEnvelope.ps1'
+$publishRequestEnvelopeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $publishRequestEnvelopeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Publish request envelope writer'
+$publishRequestEnvelopeBundlePath = Get-ScriptOutputTail -Output $publishRequestEnvelopeOutput
+if (-not [string]::IsNullOrWhiteSpace($publishRequestEnvelopeBundlePath)) {
+    $statePayload.lastPublishRequestEnvelopeBundle = $publishRequestEnvelopeBundlePath
+    $statePayload.publishRequestEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $publishRequestEnvelopeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$postPublishEvidenceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-PostPublish-EvidenceLoop.ps1'
+$postPublishEvidenceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $postPublishEvidenceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Post-publish evidence writer'
+$postPublishEvidenceBundlePath = Get-ScriptOutputTail -Output $postPublishEvidenceOutput
+if (-not [string]::IsNullOrWhiteSpace($postPublishEvidenceBundlePath)) {
+    $statePayload.lastPostPublishEvidenceBundle = $postPublishEvidenceBundlePath
+    $statePayload.postPublishEvidenceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postPublishEvidenceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$seedBraidEscalationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SeedBraid-EscalationLane.ps1'
+$seedBraidEscalationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $seedBraidEscalationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Seed braid escalation writer'
+$seedBraidEscalationBundlePath = Get-ScriptOutputTail -Output $seedBraidEscalationOutput
+if (-not [string]::IsNullOrWhiteSpace($seedBraidEscalationBundlePath)) {
+    $statePayload.lastSeedBraidEscalationBundle = $seedBraidEscalationBundlePath
+    $statePayload.seedBraidEscalationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seedBraidEscalationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -468,6 +504,12 @@ $summary = [ordered]@{
     seededPromotionReviewStatePath = $statePayload.seededPromotionReviewStatePath
     lastReleaseHandshakeBundle = $statePayload.lastReleaseHandshakeBundle
     releaseHandshakeStatePath = $statePayload.releaseHandshakeStatePath
+    lastPublishRequestEnvelopeBundle = $statePayload.lastPublishRequestEnvelopeBundle
+    publishRequestEnvelopeStatePath = $statePayload.publishRequestEnvelopeStatePath
+    lastPostPublishEvidenceBundle = $statePayload.lastPostPublishEvidenceBundle
+    postPublishEvidenceStatePath = $statePayload.postPublishEvidenceStatePath
+    lastSeedBraidEscalationBundle = $statePayload.lastSeedBraidEscalationBundle
+    seedBraidEscalationStatePath = $statePayload.seedBraidEscalationStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -528,6 +570,15 @@ if (-not [string]::IsNullOrWhiteSpace($seededPromotionReviewBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($releaseHandshakeBundlePath)) {
     Write-Host ('[local-automation-cycle] ReleaseHandshake: {0}' -f $releaseHandshakeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($publishRequestEnvelopeBundlePath)) {
+    Write-Host ('[local-automation-cycle] PublishRequestEnvelope: {0}' -f $publishRequestEnvelopeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($postPublishEvidenceBundlePath)) {
+    Write-Host ('[local-automation-cycle] PostPublishEvidence: {0}' -f $postPublishEvidenceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($seedBraidEscalationBundlePath)) {
+    Write-Host ('[local-automation-cycle] SeedBraidEscalation: {0}' -f $seedBraidEscalationBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Notification: {0}' -f $notificationStatePathFromRun)
