@@ -90,5 +90,21 @@
     "deploymentAuthorityGranted": false,
     "haltAuthorityGranted": false,
     "reasonCode": "sli-runtime-candidate-only"
+  },
+  "jurisdictionEnvelope": {
+    "envelopeHandle": "jurisdiction-envelope://actualized/fad339a123c75784",
+    "surfaceClass": "Actualized",
+    "bootClass": "CorporateGoverned",
+    "sourceGovernanceLayerHandle": "first-boot-governance://corporategoverned/triadicactive",
+    "sourceFormationHandle": null,
+    "witnessOnly": true,
+    "bondRealizationClaimed": false,
+    "auditDepth": "Standard",
+    "oversightRequirement": "StewardReview",
+    "retentionClass": "GovernanceEventOnly",
+    "revealModeCeiling": "StructuralValidation",
+    "subordinateCmeAuthorizationAllowed": false,
+    "humanReviewRequired": true,
+    "reasonCode": "jurisdiction-actualized-first-boot-formed"
   }
 }

@@ -242,6 +242,13 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             context.WorkingMemory["zed_theta_runtime_reason"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.ReasonCode;
         }
 
+        if (cognitionResult.ZedThetaCandidate.JurisdictionEnvelope is not null)
+        {
+            context.WorkingMemory["zed_theta_jurisdiction_surface"] = cognitionResult.ZedThetaCandidate.JurisdictionEnvelope.SurfaceClass.ToString();
+            context.WorkingMemory["zed_theta_jurisdiction_reason"] = cognitionResult.ZedThetaCandidate.JurisdictionEnvelope.ReasonCode;
+            context.WorkingMemory["zed_theta_jurisdiction_witness_only"] = cognitionResult.ZedThetaCandidate.JurisdictionEnvelope.WitnessOnly ? "true" : "false";
+        }
+
         var theaterAuthorization = SoulFrameTheaterAuthorizationProjector.DescribeCandidate(
             cognitionResult.ZedThetaCandidate,
             sourceTheater: "prime",
@@ -518,7 +525,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             ReturnIntakeEnvelopeId: returnIntakeEnvelopeId,
             CompassObservation: result.CompassObservation,
             BridgeReview: result.ZedThetaCandidate.BridgeReview,
-            RuntimeUseCeiling: result.ZedThetaCandidate.RuntimeUseCeiling);
+            RuntimeUseCeiling: result.ZedThetaCandidate.RuntimeUseCeiling,
+            JurisdictionEnvelope: result.ZedThetaCandidate.JurisdictionEnvelope);
     }
 
     private static IReadOnlyDictionary<string, string> BuildCommitMetadata(AgentiResult result)

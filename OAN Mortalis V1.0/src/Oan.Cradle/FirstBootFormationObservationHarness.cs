@@ -5,7 +5,8 @@ namespace Oan.Cradle;
 public sealed record FirstBootGovernanceObservationResult(
     AgentiFormationObservationBatch ObservationBatch,
     InternalGovernanceBootProfile BootClassificationResult,
-    FirstBootGovernanceLayerReceipt ProjectedGovernanceLayer);
+    FirstBootGovernanceLayerReceipt ProjectedGovernanceLayer,
+    SliJurisdictionEnvelopeReceipt ProjectedJurisdictionEnvelope);
 
 public sealed class FirstBootFormationObservationHarness
 {
@@ -165,11 +166,13 @@ public sealed class FirstBootFormationObservationHarness
             formedOffices,
             triadicCrossWitnessComplete: true,
             bondedConfirmationComplete: false);
+        var jurisdictionEnvelope = SliJurisdictionContracts.ProjectFirstBootEnvelope(governanceLayer);
 
         return new FirstBootGovernanceObservationResult(
             new AgentiFormationObservationBatch(observations),
             bootProfile,
-            governanceLayer);
+            governanceLayer,
+            jurisdictionEnvelope);
     }
 
     private async Task<AgentiFormationObservation> CreateAndRecordAsync(

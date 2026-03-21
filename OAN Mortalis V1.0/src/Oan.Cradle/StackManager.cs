@@ -731,7 +731,8 @@ namespace Oan.Cradle
                 CollapseClassification: workResult.CollapseClassification,
                 RequestEnvelope: requestEnvelope,
                 BridgeReview: workResult.BridgeReview,
-                RuntimeUseCeiling: workResult.RuntimeUseCeiling);
+                RuntimeUseCeiling: workResult.RuntimeUseCeiling,
+                JurisdictionEnvelope: workResult.JurisdictionEnvelope);
         }
 
         private async Task WitnessCompassObservationAsync(

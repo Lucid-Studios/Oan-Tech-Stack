@@ -258,4 +258,51 @@ public sealed class FirstBootGovernanceContractsTests
         Assert.Empty(layer.FormedOffices);
         Assert.All(layer.RoleBoundEces, ece => Assert.Equal(RoleBoundEceState.NotProvisioned, ece.State));
     }
+
+    [Fact]
+    public void ProjectFirstBootEnvelope_RoleBoundLayer_ProjectsActualized()
+    {
+        var layer = Policy.ProjectGovernanceLayer(
+            BootClass.CorporateGoverned,
+            BootActivationState.TriadicActive,
+            requestedExpansionCount: 1,
+            formedOffices:
+            [
+                InternalGoverningCmeOffice.Steward,
+                InternalGoverningCmeOffice.Father,
+                InternalGoverningCmeOffice.Mother
+            ],
+            triadicCrossWitnessComplete: true,
+            bondedConfirmationComplete: false);
+
+        var envelope = SliJurisdictionContracts.ProjectFirstBootEnvelope(layer);
+
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, envelope.SurfaceClass);
+        Assert.True(envelope.WitnessOnly);
+        Assert.False(envelope.BondRealizationClaimed);
+        Assert.Equal(SliJurisdictionAuditDepth.Standard, envelope.AuditDepth);
+        Assert.Equal(SliJurisdictionOversightRequirement.StewardReview, envelope.OversightRequirement);
+        Assert.Equal(SliJurisdictionRetentionClass.GovernanceEventOnly, envelope.RetentionClass);
+        Assert.Equal(PrimeRevealMode.StructuralValidation, envelope.RevealModeCeiling);
+        Assert.Equal(SliJurisdictionContracts.ReasonActualizedFirstBootFormed, envelope.ReasonCode);
+    }
+
+    [Fact]
+    public void ProjectFirstBootEnvelope_PreformalizedLayer_RemainsActualizedButRestrictive()
+    {
+        var layer = Policy.ProjectGovernanceLayer(
+            BootClass.CorporateGoverned,
+            BootActivationState.Classified,
+            requestedExpansionCount: 1,
+            formedOffices: [],
+            triadicCrossWitnessComplete: false,
+            bondedConfirmationComplete: false);
+
+        var envelope = SliJurisdictionContracts.ProjectFirstBootEnvelope(layer);
+
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, envelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionContracts.ReasonEnvelopePreformalized, envelope.ReasonCode);
+        Assert.True(envelope.WitnessOnly);
+        Assert.False(envelope.SubordinateCmeAuthorizationAllowed);
+    }
 }

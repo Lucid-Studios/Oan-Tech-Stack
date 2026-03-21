@@ -33,6 +33,8 @@ internal sealed class HybridProtectedIngressRunResult
 {
     public required InternalGovernanceBootProfile BootClassificationResult { get; init; }
     public required FirstBootGovernanceLayerReceipt ProjectedGovernanceLayer { get; init; }
+    public required SliJurisdictionEnvelopeReceipt ProjectedJurisdictionEnvelope { get; init; }
+    public required SliJurisdictionTransitionReceipt ProjectedJurisdictionTransition { get; init; }
     public required IReadOnlyList<HybridProtectedIngressProtectedIntakeResult> ProtectedIntakeResults { get; init; }
     public required IReadOnlyDictionary<ProtectedIntakeKind, string> MaskedHandles { get; init; }
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
@@ -394,6 +396,17 @@ internal sealed class HybridProtectedIngressHarness
             bootProfile,
             blockedRevealModes,
             propositionCompile);
+        var projectedJurisdictionEnvelope = SliJurisdictionContracts.ProjectProtectedIngressEnvelope(
+            projectedGovernanceLayer,
+            projectedBridgeReview,
+            projectedRuntimeUseCeiling,
+            projectedBridgeReview.OperatorFormation);
+        var projectedJurisdictionTransition = SliJurisdictionContracts.EvaluateTransition(
+            SliJurisdictionContracts.ProjectFirstBootEnvelope(projectedGovernanceLayer),
+            SliJurisdictionSurfaceClass.Industrialized,
+            bridgeReview: projectedBridgeReview,
+            runtimeUseCeiling: projectedRuntimeUseCeiling,
+            operatorFormation: projectedBridgeReview.OperatorFormation);
 
         var membraneDecisions = new List<HybridProtectedIngressMembraneDecision>();
         var closureOutcomes = new List<HybridProtectedIngressClosureOutcome>();
@@ -439,6 +452,8 @@ internal sealed class HybridProtectedIngressHarness
         {
             BootClassificationResult = bootProfile,
             ProjectedGovernanceLayer = projectedGovernanceLayer,
+            ProjectedJurisdictionEnvelope = projectedJurisdictionEnvelope,
+            ProjectedJurisdictionTransition = projectedJurisdictionTransition,
             ProtectedIntakeResults = intakeResults,
             MaskedHandles = maskedHandles,
             RequestedRevealModes = requestedRevealModes,

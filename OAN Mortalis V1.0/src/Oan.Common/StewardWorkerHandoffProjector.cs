@@ -157,6 +157,7 @@ public static class StewardWorkerHandoffProjector
         var bridgeReview = reviewRequest.BridgeReview ?? CreateFallbackBridgeReview(reviewRequest);
         var runtimeUseCeiling = reviewRequest.RuntimeUseCeiling
             ?? SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+        var jurisdictionEnvelope = reviewRequest.JurisdictionEnvelope;
         if (bridgeReview.OutcomeKind != SliBridgeOutcomeKind.Ok ||
             SliBridgeContracts.HasBlockingPreBondSafeguard(bridgeReview) ||
             runtimeUseCeiling.CandidateOnly != true)
@@ -194,6 +195,12 @@ public static class StewardWorkerHandoffProjector
             sourceHandles.Add(bridgeReview.OperatorFormation.FormationHandle);
         }
 
+        if (jurisdictionEnvelope is not null &&
+            !string.IsNullOrWhiteSpace(jurisdictionEnvelope.EnvelopeHandle))
+        {
+            sourceHandles.Add(jurisdictionEnvelope.EnvelopeHandle);
+        }
+
         var packet = new WorkerHandoffPacket(
             HandoffPacketId: handoffPacketId,
             RequestingOffice: InternalGoverningCmeOffice.Steward,
@@ -229,7 +236,8 @@ public static class StewardWorkerHandoffProjector
             MaturityPosture: MaturityPosture.DoctrineBacked,
             TimestampUtc: timestampUtc,
             BridgeReview: bridgeReview,
-            RuntimeUseCeiling: runtimeUseCeiling);
+            RuntimeUseCeiling: runtimeUseCeiling,
+            JurisdictionEnvelope: jurisdictionEnvelope);
 
         var handoffHandle = WorkerGovernanceKeys.CreateWorkerHandoffHandle(
             loopKey,
@@ -257,7 +265,8 @@ public static class StewardWorkerHandoffProjector
             WitnessedBy: "CradleTek",
             TimestampUtc: packet.TimestampUtc,
             BridgeReview: bridgeReview,
-            RuntimeUseCeiling: runtimeUseCeiling);
+            RuntimeUseCeiling: runtimeUseCeiling,
+            JurisdictionEnvelope: jurisdictionEnvelope);
 
         return (packet, receipt);
     }

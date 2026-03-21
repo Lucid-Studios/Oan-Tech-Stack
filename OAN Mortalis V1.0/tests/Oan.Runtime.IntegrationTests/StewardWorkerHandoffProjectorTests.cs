@@ -232,6 +232,32 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.Equal(packet.BridgeReview.OperatorFormation, receipt.BridgeReview!.OperatorFormation);
     }
 
+    [Fact]
+    public void ProjectForLoop_JurisdictionEnvelope_PreservesEnvelope()
+    {
+        var loopKey = "loop:worker-handoff:jurisdiction";
+        var cmeId = "cme-worker-handoff";
+        var disclosureHandle = "weather-disclosure://jurisdiction";
+        var authorityHandle = "office-authority://jurisdiction";
+        var issuanceHandle = "office-issuance://jurisdiction";
+        var jurisdictionEnvelope = CreateActualizedEnvelope();
+        var batch = CreateBatch(
+            loopKey,
+            cmeId,
+            CreateDisclosureReceipt(loopKey, cmeId, disclosureHandle),
+            CreateAuthorityReceipt(loopKey, cmeId, disclosureHandle, authorityHandle),
+            CreateIssuanceReceipt(loopKey, cmeId, disclosureHandle, authorityHandle, issuanceHandle),
+            CreateReviewRequest(cmeId, explicitJurisdictionEnvelope: jurisdictionEnvelope));
+
+        var projection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch);
+
+        Assert.True(projection.HasValue);
+        var (packet, receipt) = projection!.Value;
+        Assert.Equal(jurisdictionEnvelope, packet.JurisdictionEnvelope);
+        Assert.Equal(jurisdictionEnvelope, receipt.JurisdictionEnvelope);
+        Assert.Contains(jurisdictionEnvelope.EnvelopeHandle, packet.SourceHandles);
+    }
+
     private static GovernanceJournalReplayBatch CreateBatch(
         string loopKey,
         string cmeId,
@@ -308,7 +334,8 @@ public sealed class StewardWorkerHandoffProjectorTests
 
     private static ReturnCandidateReviewRequest CreateReviewRequest(
         string cmeId,
-        SliBridgeReviewReceipt? explicitBridgeReview = null)
+        SliBridgeReviewReceipt? explicitBridgeReview = null,
+        SliJurisdictionEnvelopeReceipt? explicitJurisdictionEnvelope = null)
     {
         var sessionHandle = $"soulframe-session://{cmeId}/1";
         var returnPointer = $"agenticore-return://candidate/{cmeId}/1";
@@ -357,7 +384,31 @@ public sealed class StewardWorkerHandoffProjectorTests
                 outcomeKind: SliBridgeOutcomeKind.Ok,
                 thresholdClass: SliBridgeThresholdClass.WithinBand,
                 reasonCode: "sli-bridge-within-band"),
-            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling(),
+            JurisdictionEnvelope: explicitJurisdictionEnvelope);
+    }
+
+    private static SliJurisdictionEnvelopeReceipt CreateActualizedEnvelope()
+    {
+        return SliJurisdictionContracts.ProjectFirstBootEnvelope(
+            new FirstBootGovernanceLayerReceipt(
+                LayerHandle: "first-boot-governance://corporategoverned/triadicactive",
+                BootClass: BootClass.CorporateGoverned,
+                ActivationState: BootActivationState.TriadicActive,
+                State: FirstBootGovernanceLayerState.RoleBoundEceReady,
+                ExpansionRights: ExpansionRights.None,
+                SwarmEligibility: SwarmEligibility.Denied,
+                WitnessOnly: true,
+                SubordinateCmeAuthorizationAllowed: false,
+                RoleBoundEcesReady: true,
+                FormedOffices:
+                [
+                    InternalGoverningCmeOffice.Steward,
+                    InternalGoverningCmeOffice.Father,
+                    InternalGoverningCmeOffice.Mother
+                ],
+                RoleBoundEces: [],
+                ReasonCode: "first-boot-governance-layer-role-bound-ece-ready"));
     }
 
     private static SliOperatorFormationReceipt CreateOperatorFormationReceipt()

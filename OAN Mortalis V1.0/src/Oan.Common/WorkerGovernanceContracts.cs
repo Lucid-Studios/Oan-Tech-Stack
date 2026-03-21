@@ -82,7 +82,8 @@ public sealed record WorkerHandoffPacket(
     MaturityPosture MaturityPosture,
     DateTimeOffset TimestampUtc,
     SliBridgeReviewReceipt? BridgeReview = null,
-    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null,
+    SliJurisdictionEnvelopeReceipt? JurisdictionEnvelope = null);
 
 public sealed record WorkerReturnPacket(
     string WorkerPacketId,
@@ -100,7 +101,8 @@ public sealed record WorkerReturnPacket(
     bool MutationClaimed,
     DateTimeOffset TimestampUtc,
     SliBridgeReviewReceipt? BridgeReview = null,
-    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null,
+    SliJurisdictionEnvelopeReceipt? JurisdictionEnvelope = null);
 
 public sealed record GovernedWorkerHandoffReceipt(
     string HandoffHandle,
@@ -123,7 +125,8 @@ public sealed record GovernedWorkerHandoffReceipt(
     string WitnessedBy,
     DateTimeOffset TimestampUtc,
     SliBridgeReviewReceipt? BridgeReview = null,
-    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null,
+    SliJurisdictionEnvelopeReceipt? JurisdictionEnvelope = null);
 
 public sealed record GovernedWorkerReturnReceipt(
     string ReturnHandle,
@@ -148,4 +151,6 @@ public sealed record GovernedWorkerReturnReceipt(
     string WitnessedBy,
     DateTimeOffset TimestampUtc,
     SliBridgeReviewReceipt? BridgeReview = null,
-    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null,
+    SliJurisdictionEnvelopeReceipt? JurisdictionEnvelope = null,
+    SliJurisdictionTransitionReceipt? JurisdictionTransition = null);

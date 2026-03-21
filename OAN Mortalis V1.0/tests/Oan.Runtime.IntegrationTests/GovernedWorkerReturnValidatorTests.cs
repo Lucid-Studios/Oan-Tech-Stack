@@ -34,6 +34,7 @@ public sealed class GovernedWorkerReturnValidatorTests
         Assert.Equal(returnPacket.ReasonCodes, receipt.ReasonCodes);
         Assert.Equal(handoffPacket.BridgeReview, receipt.BridgeReview);
         Assert.Equal(handoffPacket.RuntimeUseCeiling, receipt.RuntimeUseCeiling);
+        Assert.Equal(handoffPacket.JurisdictionEnvelope, receipt.JurisdictionEnvelope);
     }
 
     [Fact]
@@ -265,9 +266,94 @@ public sealed class GovernedWorkerReturnValidatorTests
             receipt.BridgeReview!.OperatorFormation);
     }
 
+    [Fact]
+    public void Validate_AllowedJurisdictionTransition_AcceptsPacket()
+    {
+        var handoffPacket = CreateHandoffPacket(
+            includeOperatorFormation: true,
+            jurisdictionEnvelope: CreateActualizedEnvelope());
+        var handoffReceipt = CreateHandoffReceipt(handoffPacket);
+        var returnPacket = CreateReturnPacket(
+            handoffPacket,
+            evidenceHandles: ["evidence://one"],
+            reasonCodes: [WorkerReasonCode.NeedsSpecification],
+            jurisdictionEnvelope: CreateIndustrializedEnvelope());
+
+        var receipt = GovernedWorkerReturnValidator.Validate(
+            "loop:worker-return:test",
+            "cme-worker-return",
+            GovernanceLoopStage.BoundedCognitionCompleted,
+            handoffPacket,
+            handoffReceipt,
+            returnPacket);
+
+        Assert.True(receipt.Validated);
+        Assert.NotNull(receipt.JurisdictionTransition);
+        Assert.Equal(SliJurisdictionTransitionDecision.Allow, receipt.JurisdictionTransition!.Decision);
+        Assert.Equal(
+            SliJurisdictionContracts.ReasonTransitionActualizedToIndustrializedAllowed,
+            receipt.JurisdictionTransition.ReasonCode);
+        Assert.Equal(SliJurisdictionSurfaceClass.Industrialized, receipt.JurisdictionEnvelope!.SurfaceClass);
+    }
+
+    [Fact]
+    public void Validate_MissingOperatorFormationJurisdictionTransition_RejectsPacket()
+    {
+        var handoffPacket = CreateHandoffPacket(jurisdictionEnvelope: CreateActualizedEnvelope());
+        var handoffReceipt = CreateHandoffReceipt(handoffPacket);
+        var returnPacket = CreateReturnPacket(
+            handoffPacket,
+            jurisdictionEnvelope: CreateIndustrializedEnvelope());
+
+        var receipt = GovernedWorkerReturnValidator.Validate(
+            "loop:worker-return:test",
+            "cme-worker-return",
+            GovernanceLoopStage.BoundedCognitionCompleted,
+            handoffPacket,
+            handoffReceipt,
+            returnPacket);
+
+        Assert.False(receipt.Validated);
+        Assert.Equal("jurisdiction-transition-not-allowed", receipt.ValidationFailureCode);
+        Assert.NotNull(receipt.JurisdictionTransition);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, receipt.JurisdictionTransition!.Decision);
+        Assert.Equal(
+            SliJurisdictionContracts.ReasonTransitionMissingOperatorFormation,
+            receipt.JurisdictionTransition.ReasonCode);
+    }
+
+    [Fact]
+    public void Validate_CivicWideningWithoutReduction_RejectsPacket()
+    {
+        var handoffPacket = CreateHandoffPacket(
+            includeOperatorFormation: true,
+            jurisdictionEnvelope: CreateIndustrializedEnvelope());
+        var handoffReceipt = CreateHandoffReceipt(handoffPacket);
+        var returnPacket = CreateReturnPacket(
+            handoffPacket,
+            jurisdictionEnvelope: CreateCivicEnvelope());
+
+        var receipt = GovernedWorkerReturnValidator.Validate(
+            "loop:worker-return:test",
+            "cme-worker-return",
+            GovernanceLoopStage.BoundedCognitionCompleted,
+            handoffPacket,
+            handoffReceipt,
+            returnPacket);
+
+        Assert.False(receipt.Validated);
+        Assert.Equal("jurisdiction-transition-not-allowed", receipt.ValidationFailureCode);
+        Assert.NotNull(receipt.JurisdictionTransition);
+        Assert.Equal(SliJurisdictionTransitionDecision.Refuse, receipt.JurisdictionTransition!.Decision);
+        Assert.Equal(
+            SliJurisdictionContracts.ReasonTransitionCivicRevealWideningRefused,
+            receipt.JurisdictionTransition.ReasonCode);
+    }
+
     private static WorkerHandoffPacket CreateHandoffPacket(
         CompassVisibilityClass returnVisibilityClass = CompassVisibilityClass.OperatorGuarded,
-        bool includeOperatorFormation = false)
+        bool includeOperatorFormation = false,
+        SliJurisdictionEnvelopeReceipt? jurisdictionEnvelope = null)
     {
         var bridgeReview = SliBridgeContracts.CreateReview(
             bridgeStage: "worker-return-validator-test",
@@ -361,7 +447,8 @@ public sealed class GovernedWorkerReturnValidatorTests
             MaturityPosture: MaturityPosture.DoctrineBacked,
             TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 0, TimeSpan.Zero),
             BridgeReview: bridgeReview,
-            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling());
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling(),
+            JurisdictionEnvelope: jurisdictionEnvelope);
     }
 
     private static SliOperatorFormationReceipt CreateOperatorFormationReceipt()
@@ -438,7 +525,8 @@ public sealed class GovernedWorkerReturnValidatorTests
             WitnessedBy: "CradleTek",
             TimestampUtc: handoffPacket.TimestampUtc,
             BridgeReview: handoffPacket.BridgeReview,
-            RuntimeUseCeiling: handoffPacket.RuntimeUseCeiling);
+            RuntimeUseCeiling: handoffPacket.RuntimeUseCeiling,
+            JurisdictionEnvelope: handoffPacket.JurisdictionEnvelope);
     }
 
     private static WorkerReturnPacket CreateReturnPacket(
@@ -453,7 +541,8 @@ public sealed class GovernedWorkerReturnValidatorTests
         bool executionClaimed = false,
         bool mutationClaimed = false,
         SliBridgeReviewReceipt? bridgeReview = null,
-        SliRuntimeUseCeilingReceipt? runtimeUseCeiling = null)
+        SliRuntimeUseCeilingReceipt? runtimeUseCeiling = null,
+        SliJurisdictionEnvelopeReceipt? jurisdictionEnvelope = null)
     {
         return new WorkerReturnPacket(
             WorkerPacketId: "worker-return-packet://1111111111111111",
@@ -471,6 +560,76 @@ public sealed class GovernedWorkerReturnValidatorTests
             MutationClaimed: mutationClaimed,
             TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 5, TimeSpan.Zero),
             BridgeReview: bridgeReview ?? handoffPacket.BridgeReview,
-            RuntimeUseCeiling: runtimeUseCeiling ?? handoffPacket.RuntimeUseCeiling);
+            RuntimeUseCeiling: runtimeUseCeiling ?? handoffPacket.RuntimeUseCeiling,
+            JurisdictionEnvelope: jurisdictionEnvelope);
+    }
+
+    private static SliJurisdictionEnvelopeReceipt CreateActualizedEnvelope()
+    {
+        return SliJurisdictionContracts.ProjectFirstBootEnvelope(
+            new FirstBootGovernanceLayerReceipt(
+                LayerHandle: "first-boot-governance://corporategoverned/triadicactive",
+                BootClass: BootClass.CorporateGoverned,
+                ActivationState: BootActivationState.TriadicActive,
+                State: FirstBootGovernanceLayerState.RoleBoundEceReady,
+                ExpansionRights: ExpansionRights.None,
+                SwarmEligibility: SwarmEligibility.Denied,
+                WitnessOnly: true,
+                SubordinateCmeAuthorizationAllowed: false,
+                RoleBoundEcesReady: true,
+                FormedOffices:
+                [
+                    InternalGoverningCmeOffice.Steward,
+                    InternalGoverningCmeOffice.Father,
+                    InternalGoverningCmeOffice.Mother
+                ],
+                RoleBoundEces: [],
+                ReasonCode: "first-boot-governance-layer-role-bound-ece-ready"));
+    }
+
+    private static SliJurisdictionEnvelopeReceipt CreateIndustrializedEnvelope()
+    {
+        return SliJurisdictionContracts.ProjectProtectedIngressEnvelope(
+            new FirstBootGovernanceLayerReceipt(
+                LayerHandle: "first-boot-governance://corporategoverned/triadicactive",
+                BootClass: BootClass.CorporateGoverned,
+                ActivationState: BootActivationState.TriadicActive,
+                State: FirstBootGovernanceLayerState.RoleBoundEceReady,
+                ExpansionRights: ExpansionRights.None,
+                SwarmEligibility: SwarmEligibility.Denied,
+                WitnessOnly: true,
+                SubordinateCmeAuthorizationAllowed: false,
+                RoleBoundEcesReady: true,
+                FormedOffices:
+                [
+                    InternalGoverningCmeOffice.Steward,
+                    InternalGoverningCmeOffice.Father,
+                    InternalGoverningCmeOffice.Mother
+                ],
+                RoleBoundEces: [],
+                ReasonCode: "first-boot-governance-layer-role-bound-ece-ready"),
+            SliBridgeContracts.CreateReview(
+                bridgeStage: "worker-return-validator-test",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: "agenticore-return://candidate/test",
+                outcomeKind: SliBridgeOutcomeKind.Ok,
+                thresholdClass: SliBridgeThresholdClass.WithinBand,
+                reasonCode: "sli-bridge-within-band",
+                operatorFormation: CreateOperatorFormationReceipt()),
+            SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling(),
+            CreateOperatorFormationReceipt());
+    }
+
+    private static SliJurisdictionEnvelopeReceipt CreateCivicEnvelope()
+    {
+        return SliJurisdictionContracts.ProjectCivicEnvelope(
+            CreateIndustrializedEnvelope(),
+            new CommunityWeatherPacket(
+                Status: CommunityWeatherStatus.Unstable,
+                StewardAttention: CommunityStewardAttentionState.Recommended,
+                AnchorState: CompassDriftState.Weakened,
+                VisibilityClass: CompassVisibilityClass.CommunityLegible,
+                TimestampUtc: new DateTimeOffset(2026, 3, 19, 10, 0, 0, TimeSpan.Zero)));
     }
 }

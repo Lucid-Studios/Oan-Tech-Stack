@@ -89,7 +89,8 @@ public sealed record ZedThetaCandidateReceipt(
     CompassSelfTouchClass SelfTouchClass,
     CompassOeCoePosture OeCoePosture,
     SliBridgeReviewReceipt? BridgeReview = null,
-    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null);
+    SliRuntimeUseCeilingReceipt? RuntimeUseCeiling = null,
+    SliJurisdictionEnvelopeReceipt? JurisdictionEnvelope = null);
 
 public sealed record SliTheaterAuthorizationReceipt(
     string CandidateHandle,

@@ -36,7 +36,12 @@ public sealed class HybridProtectedIngressHarnessTests
     {
         var observer = new InMemoryAgentiFormationObserver();
         var harness = CreateHarness(observer);
-        var profile = LoadExampleProfile();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation],
+            operatorFormation: CreateOperatorFormationProfile());
 
         var result = await harness.RunAsync(profile);
 
@@ -60,6 +65,10 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(SliBridgeOutcomeKind.Ok, result.ProjectedBridgeReview.OutcomeKind);
         Assert.Equal(SliBridgeThresholdClass.WithinBand, result.ProjectedBridgeReview.ThresholdClass);
         Assert.True(result.ProjectedRuntimeUseCeiling.CandidateOnly);
+        Assert.Equal(SliJurisdictionSurfaceClass.Industrialized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionContracts.ReasonIndustrializedIngressCandidate, result.ProjectedJurisdictionEnvelope.ReasonCode);
+        Assert.Equal(SliJurisdictionTransitionDecision.Allow, result.ProjectedJurisdictionTransition.Decision);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionActualizedToIndustrializedAllowed, result.ProjectedJurisdictionTransition.ReasonCode);
         Assert.Equal("HumanPrincipal_A", result.MaskedHandles[ProtectedIntakeKind.HumanProtectedIntake]);
         Assert.Equal("CorporatePrincipal_A", result.MaskedHandles[ProtectedIntakeKind.CorporateProtectedIntake]);
         Assert.Equal("HumanPrincipal_A", result.OraclePropositionAssessment.Candidate.Subject.SymbolicHandle);
@@ -111,6 +120,9 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
         Assert.Equal(SliBridgeOutcomeKind.Ok, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionMissingOperatorFormation, result.ProjectedJurisdictionTransition.ReasonCode);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, result.ProjectedJurisdictionTransition.Decision);
         Assert.Equal([PrimeRevealMode.None], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
         Assert.Single(result.MembraneDecisions);
@@ -144,6 +156,9 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Contains("topology.personal-swarm.denied", result.OraclePropositionAssessment.ReasonCodes);
         Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
         Assert.Equal("sli-bridge-quarantine", result.ProjectedBridgeReview.ReasonCode);
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, result.ProjectedJurisdictionTransition.Decision);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionBridgeNotOk, result.ProjectedJurisdictionTransition.ReasonCode);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -187,6 +202,9 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal("sli-prebond-coercive-bonding-posture", result.ProjectedBridgeReview.ReasonCode);
         Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
         Assert.Equal(SliPreBondSafeguardClass.CoerciveBondingPosture, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, result.ProjectedJurisdictionTransition.Decision);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionBridgeNotOk, result.ProjectedJurisdictionTransition.ReasonCode);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -282,6 +300,8 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(
             "certification_reviewer://first-run-lane",
             result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.HaltOwner);
+        Assert.Equal(SliJurisdictionSurfaceClass.Industrialized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionTransitionDecision.Allow, result.ProjectedJurisdictionTransition.Decision);
     }
 
     [Fact]
