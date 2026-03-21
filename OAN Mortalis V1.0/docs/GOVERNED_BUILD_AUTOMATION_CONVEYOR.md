@@ -200,6 +200,12 @@ That seeded lane may not:
 
 Seeded outputs are evidence artifacts, not autonomous release truth.
 
+The seeded lane now carries a ready-on-call posture:
+
+- if the local seed host is already healthy, automation uses it directly
+- if the host is cold but the runtime is provisioned, automation may attempt to stand it up before deferring
+- if the runtime is not provisioned, the lane must report that directly instead of collapsing all failure into generic host unavailability
+
 ## Promotion Evidence Lane
 
 The local cycle now carries a bounded promotion-evidence lane.

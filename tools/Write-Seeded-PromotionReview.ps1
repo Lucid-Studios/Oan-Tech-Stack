@@ -89,6 +89,26 @@ function Test-HostEndpointReachable {
     }
 }
 
+function Invoke-SeedReadiness {
+    param(
+        [string] $ResolvedRepoRoot,
+        [string] $ResolvedHostEndpoint,
+        [int] $StartupWaitSeconds
+    )
+
+    $ensureSeedReadyScriptPath = Join-Path $ResolvedRepoRoot 'tools\Ensure-Seeded-GovernanceReady.ps1'
+    $readinessOutput = & powershell -ExecutionPolicy Bypass -File $ensureSeedReadyScriptPath `
+        -HostEndpoint $ResolvedHostEndpoint `
+        -StartupWaitSeconds $StartupWaitSeconds
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Seed readiness worker failed with exit code $LASTEXITCODE."
+    }
+
+    $json = @($readinessOutput) -join [Environment]::NewLine
+    return $json | ConvertFrom-Json
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
@@ -121,6 +141,22 @@ $hostEndpoint = if (-not [string]::IsNullOrWhiteSpace([string] $seedPolicy.hostE
 
 $endpointUri = [uri] $hostEndpoint
 $hostReachable = Test-HostEndpointReachable -Endpoint $endpointUri
+$readyState = if ($hostReachable) { 'ready' } else { 'not-ready' }
+$readyReasonCode = if ($hostReachable) { 'seed-runtime-already-healthy' } else { 'seed-host-unavailable' }
+$readyActionTaken = 'none'
+$startAttempted = $false
+$startSucceeded = $false
+
+if ([bool] $seedPolicy.ensureReadyOnCall) {
+    $seedReadiness = Invoke-SeedReadiness -ResolvedRepoRoot $resolvedRepoRoot -ResolvedHostEndpoint $hostEndpoint -StartupWaitSeconds ([int] $seedPolicy.startupWaitSeconds)
+    $hostReachable = [bool] $seedReadiness.hostReachable
+    $readyState = [string] $seedReadiness.readyState
+    $readyReasonCode = [string] $seedReadiness.reasonCode
+    $readyActionTaken = [string] $seedReadiness.actionTaken
+    $startAttempted = [bool] $seedReadiness.startAttempted
+    $startSucceeded = [bool] $seedReadiness.startSucceeded
+}
+
 $disposition = 'Deferred'
 $reasonCode = 'seeded-promotion-review-not-started'
 $provenance = 'SeedAssisted'
@@ -133,7 +169,7 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $reasonCode = 'seeded-promotion-review-missing-evidence'
 } elseif (-not $hostReachable) {
     $disposition = 'Deferred'
-    $reasonCode = 'seeded-promotion-review-host-unavailable'
+    $reasonCode = if ($readyReasonCode) { $readyReasonCode } else { 'seeded-promotion-review-host-unavailable' }
 } elseif ([string] $promotionGateState.recommendation -eq 'block' -or [string] $ciConcordanceState.concordanceState -eq 'blocked') {
     $disposition = 'Rejected'
     $reasonCode = 'seeded-promotion-review-evidence-blocked'
@@ -161,6 +197,11 @@ $payload = [ordered]@{
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
     hostEndpoint = $hostEndpoint
     hostReachable = $hostReachable
+    readyState = $readyState
+    readyReasonCode = $readyReasonCode
+    readyActionTaken = $readyActionTaken
+    startAttempted = $startAttempted
+    startSucceeded = $startSucceeded
     disposition = $disposition
     reasonCode = $reasonCode
     provenance = $provenance
@@ -178,6 +219,11 @@ $markdownLines = @(
     ('- Generated at (UTC): `{0}`' -f $payload.generatedAtUtc),
     ('- Host endpoint: `{0}`' -f $payload.hostEndpoint),
     ('- Host reachable: `{0}`' -f $payload.hostReachable),
+    ('- Ready state: `{0}`' -f $payload.readyState),
+    ('- Ready reason: `{0}`' -f $payload.readyReasonCode),
+    ('- Ready action: `{0}`' -f $payload.readyActionTaken),
+    ('- Start attempted: `{0}`' -f $payload.startAttempted),
+    ('- Start succeeded: `{0}`' -f $payload.startSucceeded),
     ('- Disposition: `{0}`' -f $payload.disposition),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Provenance: `{0}`' -f $payload.provenance),
@@ -196,6 +242,11 @@ $statePayload = [ordered]@{
     disposition = $payload.disposition
     reasonCode = $payload.reasonCode
     provenance = $payload.provenance
+    readyState = $payload.readyState
+    readyReasonCode = $payload.readyReasonCode
+    readyActionTaken = $payload.readyActionTaken
+    startAttempted = $payload.startAttempted
+    startSucceeded = $payload.startSucceeded
 }
 
 Write-JsonFile -Path $seededPromotionReviewStatePath -Value $statePayload

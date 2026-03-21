@@ -59,6 +59,8 @@
   "seededGovernancePolicy": {
     "enabled": true,
     "attemptLocalPreflight": true,
+    "ensureReadyOnCall": true,
+    "startupWaitSeconds": 20,
     "hostEndpoint": "http://127.0.0.1:8181",
     "unreachableDisposition": "Deferred",
     "acceptedReadinessStatuses": [

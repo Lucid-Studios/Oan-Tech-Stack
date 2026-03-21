@@ -718,6 +718,9 @@ $statusPayload = [ordered]@{
         seededGovernanceDisposition = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.disposition } else { $null }
         seededGovernanceReason = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.dispositionReason } else { $null }
         seededGovernanceProvenance = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.provenance } else { $null }
+        seededGovernanceReadyState = if ($null -ne $seededGovernanceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyState') } else { $null }
+        seededGovernanceReadyReason = if ($null -ne $seededGovernanceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyReasonCode') } else { $null }
+        seededGovernanceReadyAction = if ($null -ne $seededGovernanceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyActionTaken') } else { $null }
         notificationTriggered = if ($null -ne $notificationState) { [bool] $notificationState.triggered } else { $null }
         notificationTriggerReason = if ($null -ne $notificationState) { [string] $notificationState.triggerReason } else { $null }
         lastNotificationBundle = if ($null -ne $notificationState) { [string] $notificationState.lastNotificationBundle } else { $null }
@@ -733,6 +736,9 @@ $statusPayload = [ordered]@{
         releaseRatificationDecision = if ($null -ne $releaseRatificationState) { [string] $releaseRatificationState.nextHumanDecision } else { $null }
         seededPromotionReviewDisposition = if ($null -ne $seededPromotionReviewState) { [string] $seededPromotionReviewState.disposition } else { $null }
         seededPromotionReviewReason = if ($null -ne $seededPromotionReviewState) { [string] $seededPromotionReviewState.reasonCode } else { $null }
+        seededPromotionReviewReadyState = if ($null -ne $seededPromotionReviewState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $seededPromotionReviewState -PropertyName 'readyState') } else { $null }
+        seededPromotionReviewReadyReason = if ($null -ne $seededPromotionReviewState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $seededPromotionReviewState -PropertyName 'readyReasonCode') } else { $null }
+        seededPromotionReviewReadyAction = if ($null -ne $seededPromotionReviewState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $seededPromotionReviewState -PropertyName 'readyActionTaken') } else { $null }
         firstPublishIntentState = if ($null -ne $firstPublishIntentState) { [string] $firstPublishIntentState.intentState } else { $null }
         firstPublishIntentReason = if ($null -ne $firstPublishIntentState) { [string] $firstPublishIntentState.reasonCode } else { $null }
         releaseHandshakeState = if ($null -ne $releaseHandshakeState) { [string] $releaseHandshakeState.handshakeState } else { $null }
@@ -809,6 +815,9 @@ if ($null -ne $seededGovernanceState) {
         ('- Disposition: `{0}`' -f [string] $seededGovernanceState.disposition),
         ('- Reason: `{0}`' -f [string] $seededGovernanceState.dispositionReason),
         ('- Provenance: `{0}`' -f [string] $seededGovernanceState.provenance),
+        ('- Ready state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyState')),
+        ('- Ready reason: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyReasonCode')),
+        ('- Ready action: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyActionTaken')),
         ''
     )
 }
@@ -884,6 +893,9 @@ if ($null -ne $seededPromotionReviewState) {
         ('- Disposition: `{0}`' -f [string] $seededPromotionReviewState.disposition),
         ('- Reason code: `{0}`' -f [string] $seededPromotionReviewState.reasonCode),
         ('- Provenance: `{0}`' -f [string] $seededPromotionReviewState.provenance),
+        ('- Ready state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $seededPromotionReviewState -PropertyName 'readyState')),
+        ('- Ready reason: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $seededPromotionReviewState -PropertyName 'readyReasonCode')),
+        ('- Ready action: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $seededPromotionReviewState -PropertyName 'readyActionTaken')),
         ''
     )
 }

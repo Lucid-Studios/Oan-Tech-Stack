@@ -70,6 +70,36 @@ function Write-JsonFile {
     $Value | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $Path -Encoding utf8
 }
 
+function Get-ObjectPropertyValueOrNull {
+    param(
+        [object] $InputObject,
+        [string[]] $PropertyNames
+    )
+
+    if ($null -eq $InputObject) {
+        return $null
+    }
+
+    foreach ($propertyName in $PropertyNames) {
+        $property = $InputObject.PSObject.Properties[$propertyName]
+        if ($null -ne $property) {
+            return $property.Value
+        }
+    }
+
+    return $null
+}
+
+function Normalize-SeedStatus {
+    param([string] $Value)
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return ''
+    }
+
+    return ($Value.ToLowerInvariant() -replace '[^a-z0-9]', '')
+}
+
 function Test-HostEndpointReachable {
     param([uri] $Endpoint)
 
@@ -89,6 +119,26 @@ function Test-HostEndpointReachable {
     finally {
         $client.Dispose()
     }
+}
+
+function Invoke-SeedReadiness {
+    param(
+        [string] $ResolvedRepoRoot,
+        [string] $ResolvedHostEndpoint,
+        [int] $StartupWaitSeconds
+    )
+
+    $ensureSeedReadyScriptPath = Join-Path $ResolvedRepoRoot 'tools\Ensure-Seeded-GovernanceReady.ps1'
+    $readinessOutput = & powershell -ExecutionPolicy Bypass -File $ensureSeedReadyScriptPath `
+        -HostEndpoint $ResolvedHostEndpoint `
+        -StartupWaitSeconds $StartupWaitSeconds
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Seed readiness worker failed with exit code $LASTEXITCODE."
+    }
+
+    $json = @($readinessOutput) -join [Environment]::NewLine
+    return $json | ConvertFrom-Json
 }
 
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
@@ -141,6 +191,11 @@ $disposition = 'Deferred'
 $dispositionReason = 'seed-governance-not-started'
 $provenance = 'SeedAssisted'
 $hostReachable = $false
+$readyState = 'unknown'
+$readyReasonCode = 'seed-readiness-not-evaluated'
+$readyActionTaken = 'none'
+$startAttempted = $false
+$startSucceeded = $false
 $preflightAttempted = $false
 $preflightSucceeded = $false
 $preflightReadinessStatus = $null
@@ -159,9 +214,23 @@ if (-not [bool] $seedPolicy.enabled) {
     $endpointUri = [uri] $hostEndpoint
     $hostReachable = Test-HostEndpointReachable -Endpoint $endpointUri
 
+    if ([bool] $seedPolicy.ensureReadyOnCall) {
+        $seedReadiness = Invoke-SeedReadiness -ResolvedRepoRoot $resolvedRepoRoot -ResolvedHostEndpoint $hostEndpoint -StartupWaitSeconds ([int] $seedPolicy.startupWaitSeconds)
+        $hostReachable = [bool] $seedReadiness.hostReachable
+        $readyState = [string] $seedReadiness.readyState
+        $readyReasonCode = [string] $seedReadiness.reasonCode
+        $readyActionTaken = [string] $seedReadiness.actionTaken
+        $startAttempted = [bool] $seedReadiness.startAttempted
+        $startSucceeded = [bool] $seedReadiness.startSucceeded
+    } else {
+        $readyState = if ($hostReachable) { 'ready' } else { 'not-ready' }
+        $readyReasonCode = if ($hostReachable) { 'seed-runtime-already-healthy' } else { 'seed-host-unavailable' }
+        $readyActionTaken = 'none'
+    }
+
     if (-not $hostReachable) {
         $disposition = [string] $seedPolicy.unreachableDisposition
-        $dispositionReason = 'seed-host-unavailable'
+        $dispositionReason = if ($readyReasonCode) { $readyReasonCode } else { 'seed-host-unavailable' }
     } elseif (-not [bool] $seedPolicy.attemptLocalPreflight) {
         $disposition = 'Deferred'
         $dispositionReason = 'seed-preflight-disabled'
@@ -177,20 +246,21 @@ if (-not [bool] $seedPolicy.enabled) {
             $preflightSummaryPath = Join-Path $preflightOutputRoot 'run-summary.json'
             $preflightSummary = Get-Content -Raw -LiteralPath $preflightSummaryPath | ConvertFrom-Json
             $preflightSucceeded = $true
-            $preflightReadinessStatus = [string] $preflightSummary.ReadinessStatus
-            $preflightCriticalFailureCount = [int] $preflightSummary.CriticalFailureCount
+            $preflightReadinessStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('ReadinessStatus', 'readiness_status'))
+            $preflightCriticalFailureCount = [int] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('CriticalFailureCount', 'critical_failure_count'))
 
-            $acceptedStatuses = @($seedPolicy.acceptedReadinessStatuses | ForEach-Object { [string] $_ })
-            $deferredStatuses = @($seedPolicy.deferredReadinessStatuses | ForEach-Object { [string] $_ })
-            $rejectedStatuses = @($seedPolicy.rejectedReadinessStatuses | ForEach-Object { [string] $_ })
+            $acceptedStatuses = @($seedPolicy.acceptedReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
+            $deferredStatuses = @($seedPolicy.deferredReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
+            $rejectedStatuses = @($seedPolicy.rejectedReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
+            $normalizedPreflightReadinessStatus = Normalize-SeedStatus -Value $preflightReadinessStatus
 
-            if ($preflightCriticalFailureCount -gt 0 -or $rejectedStatuses -contains $preflightReadinessStatus) {
+            if ($preflightCriticalFailureCount -gt 0 -or $rejectedStatuses -contains $normalizedPreflightReadinessStatus) {
                 $disposition = 'Rejected'
                 $dispositionReason = 'seed-preflight-not-ready'
-            } elseif ($acceptedStatuses -contains $preflightReadinessStatus) {
+            } elseif ($acceptedStatuses -contains $normalizedPreflightReadinessStatus) {
                 $disposition = 'Accepted'
                 $dispositionReason = 'seed-preflight-ready'
-            } elseif ($deferredStatuses -contains $preflightReadinessStatus) {
+            } elseif ($deferredStatuses -contains $normalizedPreflightReadinessStatus) {
                 $disposition = 'Deferred'
                 $dispositionReason = 'seed-preflight-borderline'
             } else {
@@ -223,13 +293,18 @@ $bundlePayload = [ordered]@{
     digestBundlePath = if ($null -ne $resolvedDigestBundle) { Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $resolvedDigestBundle } else { $null }
     hostEndpoint = $hostEndpoint
     hostReachable = $hostReachable
+    readyState = $readyState
+    readyReasonCode = $readyReasonCode
+    readyActionTaken = $readyActionTaken
+    startAttempted = $startAttempted
+    startSucceeded = $startSucceeded
     preflightAttempted = $preflightAttempted
     preflightSucceeded = $preflightSucceeded
     preflightOutputRoot = if ($preflightAttempted) { Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $preflightOutputRoot } else { $null }
     preflightSummaryPath = if ($preflightSummaryPath) { Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $preflightSummaryPath } else { $null }
     preflightReadinessStatus = $preflightReadinessStatus
     preflightCriticalFailureCount = $preflightCriticalFailureCount
-    preflightSuiteVersion = if ($null -ne $preflightSummary) { [string] $preflightSummary.SuiteVersion } else { $null }
+    preflightSuiteVersion = if ($null -ne $preflightSummary) { [string] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('SuiteVersion', 'suite_version')) } else { $null }
     disposition = $disposition
     dispositionReason = $dispositionReason
     provenance = $provenance
@@ -248,6 +323,11 @@ $markdownLines = @(
     ('- Provenance: `{0}`' -f $bundlePayload.provenance),
     ('- Host endpoint: `{0}`' -f $bundlePayload.hostEndpoint),
     ('- Host reachable: `{0}`' -f $bundlePayload.hostReachable),
+    ('- Ready state: `{0}`' -f $bundlePayload.readyState),
+    ('- Ready reason: `{0}`' -f $bundlePayload.readyReasonCode),
+    ('- Ready action: `{0}`' -f $bundlePayload.readyActionTaken),
+    ('- Start attempted: `{0}`' -f $bundlePayload.startAttempted),
+    ('- Start succeeded: `{0}`' -f $bundlePayload.startSucceeded),
     ('- Preflight attempted: `{0}`' -f $bundlePayload.preflightAttempted),
     ('- Preflight succeeded: `{0}`' -f $bundlePayload.preflightSucceeded)
 )
@@ -277,6 +357,11 @@ $statePayload = [ordered]@{
     disposition = $bundlePayload.disposition
     dispositionReason = $bundlePayload.dispositionReason
     provenance = $bundlePayload.provenance
+    readyState = $bundlePayload.readyState
+    readyReasonCode = $bundlePayload.readyReasonCode
+    readyActionTaken = $bundlePayload.readyActionTaken
+    startAttempted = $bundlePayload.startAttempted
+    startSucceeded = $bundlePayload.startSucceeded
     preflightAttempted = $bundlePayload.preflightAttempted
     preflightSucceeded = $bundlePayload.preflightSucceeded
     preflightReadinessStatus = $bundlePayload.preflightReadinessStatus
