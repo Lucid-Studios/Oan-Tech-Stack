@@ -41,6 +41,9 @@
   "intervalOriginClarificationOutputRoot": ".audit/runs/interval-origin-clarification",
   "queuedTaskMapPromotionOutputRoot": ".audit/runs/queued-task-map-promotion",
   "masterThreadOrchestrationOutputRoot": ".audit/runs/master-thread-orchestration",
+  "runtimeDeployabilityEnvelopeOutputRoot": ".audit/runs/runtime-deployability-envelope",
+  "sanctuaryRuntimeReadinessOutputRoot": ".audit/runs/sanctuary-runtime-readiness",
+  "runtimeWorkSurfaceAdmissibilityOutputRoot": ".audit/runs/runtime-work-surface-admissibility",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -80,6 +83,9 @@
   "intervalOriginClarificationStatePath": ".audit/state/local-automation-interval-origin-clarification-last-run.json",
   "queuedTaskMapPromotionStatePath": ".audit/state/local-automation-queued-task-map-promotion-last-run.json",
   "masterThreadOrchestrationStatePath": ".audit/state/master-thread-orchestration-status.json",
+  "runtimeDeployabilityEnvelopeStatePath": ".audit/state/local-automation-runtime-deployability-envelope-last-run.json",
+  "sanctuaryRuntimeReadinessStatePath": ".audit/state/local-automation-sanctuary-runtime-readiness-last-run.json",
+  "runtimeWorkSurfaceAdmissibilityStatePath": ".audit/state/local-automation-runtime-work-surface-admissibility-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -148,6 +154,9 @@
     "keepSchedulerProofHarvestBundles": 8,
     "keepIntervalOriginClarificationBundles": 8,
     "keepQueuedTaskMapPromotionBundles": 8,
+    "keepRuntimeDeployabilityEnvelopeBundles": 8,
+    "keepSanctuaryRuntimeReadinessBundles": 8,
+    "keepRuntimeWorkSurfaceAdmissibilityBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

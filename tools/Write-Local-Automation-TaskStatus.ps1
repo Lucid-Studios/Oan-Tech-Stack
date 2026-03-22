@@ -143,6 +143,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $SchedulerProofHarvestState,
         [object] $IntervalOriginClarificationState,
         [object] $QueuedTaskMapPromotionState,
+        [object] $RuntimeDeployabilityEnvelopeState,
+        [object] $SanctuaryRuntimeReadinessState,
+        [object] $RuntimeWorkSurfaceAdmissibilityState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -485,6 +488,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'runtime-deployability-envelope' {
+            if ($null -ne $RuntimeDeployabilityEnvelopeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'sanctuary-runtime-readiness-receipt' {
+            if ($null -ne $SanctuaryRuntimeReadinessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'runtime-work-surface-admissibility' {
+            if ($null -ne $RuntimeWorkSurfaceAdmissibilityState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -570,6 +600,9 @@ $schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRo
 $intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intervalOriginClarificationStatePath)
 $queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.queuedTaskMapPromotionStatePath)
 $masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.masterThreadOrchestrationStatePath)
+$runtimeDeployabilityEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeDeployabilityEnvelopeStatePath)
+$sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeReadinessStatePath)
+$runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkSurfaceAdmissibilityStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -608,6 +641,9 @@ $schedulerProofHarvestState = Read-JsonFileOrNull -Path $schedulerProofHarvestSt
 $intervalOriginClarificationState = Read-JsonFileOrNull -Path $intervalOriginClarificationStatePath
 $queuedTaskMapPromotionState = Read-JsonFileOrNull -Path $queuedTaskMapPromotionStatePath
 $masterThreadOrchestrationState = Read-JsonFileOrNull -Path $masterThreadOrchestrationStatePath
+$runtimeDeployabilityEnvelopeState = Read-JsonFileOrNull -Path $runtimeDeployabilityEnvelopeStatePath
+$sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
+$runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSurfaceAdmissibilityStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -792,17 +828,25 @@ if ($null -ne $activeLongFormTaskMap) {
                 -SchedulerProofHarvestState $schedulerProofHarvestState `
                 -IntervalOriginClarificationState $intervalOriginClarificationState `
                 -QueuedTaskMapPromotionState $queuedTaskMapPromotionState `
+                -RuntimeDeployabilityEnvelopeState $runtimeDeployabilityEnvelopeState `
+                -SanctuaryRuntimeReadinessState $sanctuaryRuntimeReadinessState `
+                -RuntimeWorkSurfaceAdmissibilityState $runtimeWorkSurfaceAdmissibilityState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
     )
     $activeLongFormTasksCompleted = @($activeLongFormTaskStatuses | Where-Object { $_ -eq 'completed' }).Count
 
+    $activeRunCollapsed = $true
+    if ($null -ne $activeLongFormRun) {
+        $activeRunCollapsed = @('collapsed', 'completed') -contains ([string] $activeLongFormRun.runStatus)
+    }
+
     if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
         $activeLongFormTaskMapStatus = 'blocked'
     } elseif ($requiresImmediateHitl -or $lastKnownStatus -eq 'hitl-required') {
         $activeLongFormTaskMapStatus = 'waiting-for-hitl'
-    } elseif ($activeLongFormTasksTotal -gt 0 -and $activeLongFormTasksCompleted -ge $activeLongFormTasksTotal) {
+    } elseif ($activeLongFormTasksTotal -gt 0 -and $activeLongFormTasksCompleted -ge $activeLongFormTasksTotal -and $activeRunCollapsed) {
         $activeLongFormTaskMapStatus = 'completed'
     } else {
         $activeLongFormTaskMapStatus = 'in-progress'
@@ -823,11 +867,6 @@ if ($null -ne $activeLongFormTaskMap) {
     if ($null -ne $timeDilationPolicy) {
         $allowPullForward = [bool] $timeDilationPolicy.Value.allowPullForward
         $pullForwardMaxMaps = [int] $timeDilationPolicy.Value.pullForwardMaxMaps
-    }
-
-    $activeRunCollapsed = $true
-    if ($null -ne $activeLongFormRun) {
-        $activeRunCollapsed = @('collapsed', 'completed') -contains ([string] $activeLongFormRun.runStatus)
     }
 
     if ($allowPullForward -and $pullForwardMaxMaps -ge 1 -and
@@ -884,6 +923,9 @@ $taskMapEntries = @(
                     -SchedulerProofHarvestState $schedulerProofHarvestState `
                     -IntervalOriginClarificationState $intervalOriginClarificationState `
                     -QueuedTaskMapPromotionState $queuedTaskMapPromotionState `
+                    -RuntimeDeployabilityEnvelopeState $runtimeDeployabilityEnvelopeState `
+                    -SanctuaryRuntimeReadinessState $sanctuaryRuntimeReadinessState `
+                    -RuntimeWorkSurfaceAdmissibilityState $runtimeWorkSurfaceAdmissibilityState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1062,6 +1104,17 @@ $statusPayload = [ordered]@{
         queuedTaskMapPromotionState = if ($null -ne $queuedTaskMapPromotionState) { [string] $queuedTaskMapPromotionState.promotionState } else { $null }
         queuedTaskMapPromotionReason = if ($null -ne $queuedTaskMapPromotionState) { [string] $queuedTaskMapPromotionState.reasonCode } else { $null }
         queuedTaskMapPromotionNextAction = if ($null -ne $queuedTaskMapPromotionState) { [string] $queuedTaskMapPromotionState.nextAction } else { $null }
+        runtimeDeployabilityEnvelopeState = if ($null -ne $runtimeDeployabilityEnvelopeState) { [string] $runtimeDeployabilityEnvelopeState.envelopeState } else { $null }
+        runtimeDeployabilityEnvelopeReason = if ($null -ne $runtimeDeployabilityEnvelopeState) { [string] $runtimeDeployabilityEnvelopeState.reasonCode } else { $null }
+        runtimeDeployabilityEnvelopeNextAction = if ($null -ne $runtimeDeployabilityEnvelopeState) { [string] $runtimeDeployabilityEnvelopeState.nextAction } else { $null }
+        sanctuaryRuntimeReadinessState = if ($null -ne $sanctuaryRuntimeReadinessState) { [string] $sanctuaryRuntimeReadinessState.readinessState } else { $null }
+        sanctuaryRuntimeReadinessReason = if ($null -ne $sanctuaryRuntimeReadinessState) { [string] $sanctuaryRuntimeReadinessState.reasonCode } else { $null }
+        sanctuaryRuntimeReadinessNextAction = if ($null -ne $sanctuaryRuntimeReadinessState) { [string] $sanctuaryRuntimeReadinessState.nextAction } else { $null }
+        runtimeWorkSurfaceAdmissibilityState = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [string] $runtimeWorkSurfaceAdmissibilityState.admissibilityState } else { $null }
+        runtimeWorkSurfaceAdmissibilityReason = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [string] $runtimeWorkSurfaceAdmissibilityState.reasonCode } else { $null }
+        runtimeWorkSurfaceAdmissibilityNextAction = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [string] $runtimeWorkSurfaceAdmissibilityState.nextAction } else { $null }
+        runtimeWorkAdmissibleSurfaceCount = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [int] $runtimeWorkSurfaceAdmissibilityState.admissibleSurfaceCount } else { $null }
+        runtimeWorkDeniedSurfaceCount = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [int] $runtimeWorkSurfaceAdmissibilityState.deniedSurfaceCount } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1534,6 +1587,45 @@ if ($null -ne $masterThreadOrchestrationState) {
         ('- Releasable instructions: `{0}`' -f [int] $masterThreadOrchestrationState.releasableInstructionCount),
         ('- Latest instruction id: `{0}`' -f $(if ($null -ne $latestInstruction) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestInstruction -PropertyName 'instructionId') } else { 'none' })),
         ('- Latest instruction state: `{0}`' -f $(if ($null -ne $latestInstruction) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestInstruction -PropertyName 'effectiveLifecycleState') } else { 'none' })),
+        ''
+    )
+}
+
+if ($null -ne $runtimeDeployabilityEnvelopeState) {
+    $markdownLines += @(
+        '## Runtime Deployability Envelope',
+        '',
+        ('- Envelope state: `{0}`' -f [string] $runtimeDeployabilityEnvelopeState.envelopeState),
+        ('- Reason code: `{0}`' -f [string] $runtimeDeployabilityEnvelopeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $runtimeDeployabilityEnvelopeState.nextAction),
+        ('- Candidate status: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeDeployabilityEnvelopeState -PropertyName 'candidateStatus')),
+        ('- Ready promotable deployables: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeDeployabilityEnvelopeState -PropertyName 'readyPromotableDeployableCount')),
+        ''
+    )
+}
+
+if ($null -ne $sanctuaryRuntimeReadinessState) {
+    $markdownLines += @(
+        '## Sanctuary Runtime Readiness',
+        '',
+        ('- Readiness state: `{0}`' -f [string] $sanctuaryRuntimeReadinessState.readinessState),
+        ('- Reason code: `{0}`' -f [string] $sanctuaryRuntimeReadinessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $sanctuaryRuntimeReadinessState.nextAction),
+        ('- Working state class: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'workingStateClass')),
+        ('- CME office state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'cmeOfficeLedgerState')),
+        ''
+    )
+}
+
+if ($null -ne $runtimeWorkSurfaceAdmissibilityState) {
+    $markdownLines += @(
+        '## Runtime Work Surface Admissibility',
+        '',
+        ('- Admissibility state: `{0}`' -f [string] $runtimeWorkSurfaceAdmissibilityState.admissibilityState),
+        ('- Reason code: `{0}`' -f [string] $runtimeWorkSurfaceAdmissibilityState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $runtimeWorkSurfaceAdmissibilityState.nextAction),
+        ('- Admissible surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibleSurfaceCount')),
+        ('- Denied surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'deniedSurfaceCount')),
         ''
     )
 }

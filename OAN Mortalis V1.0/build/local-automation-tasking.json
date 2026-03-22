@@ -903,6 +903,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-16",
+      "label": "Automation Maturation Map 16",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Prove the current headless deployable can host a bounded Sanctuary working state and expose which runtime work surfaces are presently admissible without narrating bonded participation or deep cryptic descent too early.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "runtime-deployability-envelope",
+        "sanctuary-runtime-readiness-receipt",
+        "runtime-work-surface-admissibility"
+      ],
+      "tasks": [
+        {
+          "id": "runtime-deployability-envelope",
+          "label": "Runtime Deployability Envelope",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Collapse declared deployables and current release-candidate artifacts into one bounded runtime deployability surface so candidate packaging is not inferred from scattered evidence.",
+          "completionSignal": "A deployability envelope can say whether the current declared runtime host is merely candidate-only, awaiting evidence, or deployable-candidate-ready.",
+          "escalatesWhen": [
+            "declared deployables and candidate artifacts disagree materially",
+            "deployability is narrated beyond current candidate evidence"
+          ]
+        },
+        {
+          "id": "sanctuary-runtime-readiness-receipt",
+          "label": "Sanctuary Runtime Readiness Receipt",
+          "owner": "Shared",
+          "authority": "Automation may classify; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Determine whether a bounded Sanctuary working state is ready on the current local candidate runtime without pretending bonded operator participation already exists.",
+          "completionSignal": "A readiness receipt can say whether Sanctuary runtime work is blocked, awaiting governed readiness, or bounded-working-state-ready.",
+          "escalatesWhen": [
+            "runtime readiness is claimed without deployability evidence",
+            "bounded runtime readiness is collapsed into bonded runtime participation"
+          ]
+        },
+        {
+          "id": "runtime-work-surface-admissibility",
+          "label": "Runtime Work Surface Admissibility",
+          "owner": "Shared",
+          "authority": "Automation may disclose; host law and nexus adjudicate access",
+          "status": "selected",
+          "purpose": "Expose which runtime work surfaces are admissible now, which are denied, and what office or state would be required to cross without making observation itself into authorization.",
+          "completionSignal": "A runtime work-surface admissibility bundle can name bounded internal work, provisional runtime work, and denied surfaces with reason-coded requirements.",
+          "escalatesWhen": [
+            "runtime surface disclosure implies access grant",
+            "denied surfaces are blurred into ambient runtime capability"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-17",
+      "label": "Automation Maturation Map 17",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Prepare reach-aware boundary legibility and bonded operator locality readiness once bounded Sanctuary runtime work is lawfully present.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "reach-access-topology-ledger",
+        "bonded-operator-locality-readiness",
+        "protected-state-legibility-surface"
+      ],
+      "tasks": [
+        {
+          "id": "reach-access-topology-ledger",
+          "label": "Reach Access Topology Ledger",
+          "owner": "Shared",
+          "authority": "Automation may disclose; host law and nexus adjudicate",
+          "status": "selected",
+          "purpose": "Expose access topology, inventory, and required-office surfaces through reach without allowing visibility to imply access grant.",
+          "completionSignal": "A reach access-topology ledger can name what surfaces exist, what is denied, and what office or state would be required to cross.",
+          "escalatesWhen": [
+            "reach disclosure implies ambient grant",
+            "protected interiority is exposed instead of made legible"
+          ]
+        },
+        {
+          "id": "bonded-operator-locality-readiness",
+          "label": "Bonded Operator Locality Readiness",
+          "owner": "Shared",
+          "authority": "Advisory only",
+          "status": "selected",
+          "purpose": "Determine whether the operator-side locality is ready to participate in a bonded event without collapsing it into remote control or administrative afterthought.",
+          "completionSignal": "A readiness surface can say whether operator locality participation remains dormant, withheld, provisional, or ready for bounded rehearsal.",
+          "escalatesWhen": [
+            "operator locality is narrated as already co-realized",
+            "bonded participation is claimed without lawful reach or office surfaces"
+          ]
+        },
+        {
+          "id": "protected-state-legibility-surface",
+          "label": "Protected State Legibility Surface",
+          "owner": "Shared",
+          "authority": "Automation may disclose; protected interiority remains withheld",
+          "status": "selected",
+          "purpose": "Provide governed legibility into protected runtime states so readiness, denial, and strain can be witnessed without exposing raw protected interiority.",
+          "completionSignal": "A protected-state legibility bundle can disclose readiness, denial reasons, and required state without violating protected interiors.",
+          "escalatesWhen": [
+            "legibility becomes raw introspection",
+            "protected state disclosure silently widens authority"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-18",
+      "label": "Automation Maturation Map 18",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Bind the singular nexus portal, duplex predicate envelopes, and the first operator.actual work-session rehearsal without collapsing locality, office, or authority.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "nexus-singular-portal-facade",
+        "duplex-predicate-envelope",
+        "operator-actual-work-session-rehearsal"
+      ],
+      "tasks": [
+        {
+          "id": "nexus-singular-portal-facade",
+          "label": "Nexus Singular Portal Facade",
+          "owner": "SLI",
+          "authority": "Code-facing contact surface only",
+          "status": "selected",
+          "purpose": "Bind the currently fragmented nexus witness surfaces behind one lawful portal so office-bearing work stops depending on scattered fragment calls.",
+          "completionSignal": "A single nexus facade can disclose topology, mutation, relaxation, readiness, and gate-legibility without absorbing sovereignty.",
+          "escalatesWhen": [
+            "the portal starts deciding admissibility",
+            "fragmented direct access remains the real runtime path"
+          ]
+        },
+        {
+          "id": "duplex-predicate-envelope",
+          "label": "Duplex Predicate Envelope",
+          "owner": "AgentiCore",
+          "authority": "Governed utility surface only",
+          "status": "selected",
+          "purpose": "Bind requested work and governance conditions into one duplex predicate envelope so runtime participation is never flattened into flat instruction text.",
+          "completionSignal": "A duplex predicate envelope can carry work-predicate and governance-predicate together across the utility surface.",
+          "escalatesWhen": [
+            "predicate duplexing collapses into one flat action",
+            "utility transport starts impersonating governance"
+          ]
+        },
+        {
+          "id": "operator-actual-work-session-rehearsal",
+          "label": "Operator.actual Work Session Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded rehearsal only",
+          "status": "selected",
+          "purpose": "Rehearse the first bounded operator.actual work session as a co-realized participation locality instead of a console over a hidden engine.",
+          "completionSignal": "A rehearsal bundle can show what is lawfully co-realized, what remains denied, and how return or dissolution would occur.",
+          "escalatesWhen": [
+            "operator rehearsal implies ratified co-realization",
+            "locality or office collapses during rehearsal design"
+          ]
+        }
+      ]
     }
   ]
 }

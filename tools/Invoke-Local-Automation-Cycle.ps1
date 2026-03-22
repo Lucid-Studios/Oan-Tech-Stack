@@ -192,6 +192,9 @@ $schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRo
 $intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.intervalOriginClarificationStatePath)
 $queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.queuedTaskMapPromotionStatePath)
 $masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.masterThreadOrchestrationStatePath)
+$runtimeDeployabilityEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeDeployabilityEnvelopeStatePath)
+$sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sanctuaryRuntimeReadinessStatePath)
+$runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeWorkSurfaceAdmissibilityStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -410,6 +413,12 @@ $statePayload.intervalOriginClarificationStatePath = Get-RelativePathString -Bas
 $statePayload.lastQueuedTaskMapPromotionBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQueuedTaskMapPromotionBundle')
 $statePayload.queuedTaskMapPromotionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $queuedTaskMapPromotionStatePath
 $statePayload.masterThreadOrchestrationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $masterThreadOrchestrationStatePath
+$statePayload.lastRuntimeDeployabilityEnvelopeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRuntimeDeployabilityEnvelopeBundle')
+$statePayload.runtimeDeployabilityEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeDeployabilityEnvelopeStatePath
+$statePayload.lastSanctuaryRuntimeReadinessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSanctuaryRuntimeReadinessBundle')
+$statePayload.sanctuaryRuntimeReadinessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sanctuaryRuntimeReadinessStatePath
+$statePayload.lastRuntimeWorkSurfaceAdmissibilityBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRuntimeWorkSurfaceAdmissibilityBundle')
+$statePayload.runtimeWorkSurfaceAdmissibilityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeWorkSurfaceAdmissibilityStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -746,6 +755,33 @@ if (-not [string]::IsNullOrWhiteSpace($queuedTaskMapPromotionBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$runtimeDeployabilityEnvelopeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Runtime-DeployabilityEnvelope.ps1'
+$runtimeDeployabilityEnvelopeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $runtimeDeployabilityEnvelopeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Runtime deployability envelope writer'
+$runtimeDeployabilityEnvelopeBundlePath = Get-ScriptOutputTail -Output $runtimeDeployabilityEnvelopeOutput
+if (-not [string]::IsNullOrWhiteSpace($runtimeDeployabilityEnvelopeBundlePath)) {
+    $statePayload.lastRuntimeDeployabilityEnvelopeBundle = $runtimeDeployabilityEnvelopeBundlePath
+    $statePayload.runtimeDeployabilityEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeDeployabilityEnvelopeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$sanctuaryRuntimeReadinessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Sanctuary-RuntimeReadinessReceipt.ps1'
+$sanctuaryRuntimeReadinessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $sanctuaryRuntimeReadinessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Sanctuary runtime readiness writer'
+$sanctuaryRuntimeReadinessBundlePath = Get-ScriptOutputTail -Output $sanctuaryRuntimeReadinessOutput
+if (-not [string]::IsNullOrWhiteSpace($sanctuaryRuntimeReadinessBundlePath)) {
+    $statePayload.lastSanctuaryRuntimeReadinessBundle = $sanctuaryRuntimeReadinessBundlePath
+    $statePayload.sanctuaryRuntimeReadinessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sanctuaryRuntimeReadinessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$runtimeWorkSurfaceAdmissibilityScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Runtime-WorkSurfaceAdmissibility.ps1'
+$runtimeWorkSurfaceAdmissibilityOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $runtimeWorkSurfaceAdmissibilityScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Runtime work-surface admissibility writer'
+$runtimeWorkSurfaceAdmissibilityBundlePath = Get-ScriptOutputTail -Output $runtimeWorkSurfaceAdmissibilityOutput
+if (-not [string]::IsNullOrWhiteSpace($runtimeWorkSurfaceAdmissibilityBundlePath)) {
+    $statePayload.lastRuntimeWorkSurfaceAdmissibilityBundle = $runtimeWorkSurfaceAdmissibilityBundlePath
+    $statePayload.runtimeWorkSurfaceAdmissibilityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeWorkSurfaceAdmissibilityStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -822,6 +858,12 @@ $summary = [ordered]@{
     lastQueuedTaskMapPromotionBundle = $statePayload.lastQueuedTaskMapPromotionBundle
     queuedTaskMapPromotionStatePath = $statePayload.queuedTaskMapPromotionStatePath
     masterThreadOrchestrationStatePath = $statePayload.masterThreadOrchestrationStatePath
+    lastRuntimeDeployabilityEnvelopeBundle = $statePayload.lastRuntimeDeployabilityEnvelopeBundle
+    runtimeDeployabilityEnvelopeStatePath = $statePayload.runtimeDeployabilityEnvelopeStatePath
+    lastSanctuaryRuntimeReadinessBundle = $statePayload.lastSanctuaryRuntimeReadinessBundle
+    sanctuaryRuntimeReadinessStatePath = $statePayload.sanctuaryRuntimeReadinessStatePath
+    lastRuntimeWorkSurfaceAdmissibilityBundle = $statePayload.lastRuntimeWorkSurfaceAdmissibilityBundle
+    runtimeWorkSurfaceAdmissibilityStatePath = $statePayload.runtimeWorkSurfaceAdmissibilityStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -983,6 +1025,15 @@ if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] MasterThreadOrchestration: {0}' -f $masterThreadOrchestrationStatePathFromRun)
+}
+if (-not [string]::IsNullOrWhiteSpace($runtimeDeployabilityEnvelopeBundlePath)) {
+    Write-Host ('[local-automation-cycle] RuntimeDeployabilityEnvelope: {0}' -f $runtimeDeployabilityEnvelopeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($sanctuaryRuntimeReadinessBundlePath)) {
+    Write-Host ('[local-automation-cycle] SanctuaryRuntimeReadiness: {0}' -f $sanctuaryRuntimeReadinessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($runtimeWorkSurfaceAdmissibilityBundlePath)) {
+    Write-Host ('[local-automation-cycle] RuntimeWorkSurfaceAdmissibility: {0}' -f $runtimeWorkSurfaceAdmissibilityBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

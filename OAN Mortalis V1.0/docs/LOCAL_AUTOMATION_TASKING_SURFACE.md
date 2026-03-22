@@ -32,19 +32,10 @@ Those live surfaces apply the current automation state onto the formal task defi
 
 The tasking surface also carries bounded long-form maps.
 
-Current active map:
+The live active map, next eligible map, and queued batch are reported in:
 
-- `Automation Maturation Map 12`
-
-Next eligible map:
-
-- `Automation Maturation Map 13`
-
-Queued batch:
-
-- `Automation Maturation Map 13`
-- `Automation Maturation Map 14`
-- `Automation Maturation Map 15`
+- `.audit/state/local-automation-tasking-status.json`
+- `.audit/state/local-automation-tasking-status.md`
 
 Time-dilation rule:
 
@@ -328,6 +319,12 @@ Current live output surfaces for this map:
   - `Manual Overhang Reconciliation`
   - `Scheduler Interval Governance Braid`
 
+Current live output surfaces for this map:
+
+- observed cadence truth remains bounded to the scheduler-proof, interval-origin, and unattended-proof surfaces until its dedicated ledger root is declared
+- manual overhang reconciliation remains bounded to the interval-origin and unattended-proof surfaces until its dedicated receipt exists
+- scheduler interval governance braid remains expressed through the long-form tasking status until its dedicated bundle root is declared
+
 ### Automation Maturation Map 15
 
 - Goal: let seeded governance read quiet intervals for lawful surplus work selection while keeping pull-forward bounded to the next declared map only
@@ -336,6 +333,53 @@ Current live output surfaces for this map:
   - `Seeded Interval Reflection`
   - `Pause Potential Surface`
   - `Bounded Pull-Forward Selector`
+
+Current live output surfaces for this map:
+
+- seeded interval reflection remains bounded to the seeded governance and scheduler-proof surfaces until its dedicated advisory bundle is declared
+- pause potential remains expressed through long-form phase, dormant-window, and cadence integrity surfaces until its dedicated bundle is declared
+- bounded pull-forward selection is reflected through `.audit/state/local-automation-active-task-map-selection.json` and `.audit/state/local-automation-tasking-status.json`
+
+### Automation Maturation Map 16
+
+- Goal: prove the current headless deployable can host a bounded Sanctuary working state and expose which runtime work surfaces are presently admissible without narrating bonded participation or deep cryptic descent too early
+- Expected review windows: `2`
+- Selected tasks:
+  - `Runtime Deployability Envelope`
+  - `Sanctuary Runtime Readiness Receipt`
+  - `Runtime Work Surface Admissibility`
+
+Current live output surfaces for this map:
+
+- runtime deployability envelopes land under `.audit/runs/runtime-deployability-envelope/` and update `.audit/state/local-automation-runtime-deployability-envelope-last-run.json`
+- Sanctuary runtime readiness receipts land under `.audit/runs/sanctuary-runtime-readiness/` and update `.audit/state/local-automation-sanctuary-runtime-readiness-last-run.json`
+- runtime work-surface admissibility bundles land under `.audit/runs/runtime-work-surface-admissibility/` and update `.audit/state/local-automation-runtime-work-surface-admissibility-last-run.json`
+
+### Automation Maturation Map 17
+
+- Goal: prepare reach-aware boundary legibility and bonded operator locality readiness once bounded Sanctuary runtime work is lawfully present
+- Expected review windows: `2`
+- Selected tasks:
+  - `Reach Access Topology Ledger`
+  - `Bonded Operator Locality Readiness`
+  - `Protected State Legibility Surface`
+
+Current live output surfaces for this map:
+
+- these surfaces are declared runway only until the next promotion edge lawfully activates them
+
+### Automation Maturation Map 18
+
+- Goal: bind the singular nexus portal, duplex predicate envelopes, and the first `Operator.actual` work-session rehearsal without collapsing locality, office, or authority
+- Expected review windows: `2`
+- Selected tasks:
+  - `Nexus Singular Portal Facade`
+  - `Duplex Predicate Envelope`
+  - `Operator.actual Work Session Rehearsal`
+
+Current live output surfaces for this map:
+
+- these surfaces are declared runway only until the prior runtime and reach maps collapse lawfully into them
 
 ## Status Interpretation
 
