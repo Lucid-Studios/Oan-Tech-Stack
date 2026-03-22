@@ -1221,6 +1221,24 @@ if (-not [string]::IsNullOrWhiteSpace($duplexPredicateEnvelopeBundlePath)) {
 if (-not [string]::IsNullOrWhiteSpace($operatorActualWorkSessionRehearsalBundlePath)) {
     Write-Host ('[local-automation-cycle] OperatorActualWorkSessionRehearsal: {0}' -f $operatorActualWorkSessionRehearsalBundlePath)
 }
+if (-not [string]::IsNullOrWhiteSpace($identityInvariantThreadRootBundlePath)) {
+    Write-Host ('[local-automation-cycle] IdentityInvariantThreadRoot: {0}' -f $identityInvariantThreadRootBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($governedThreadBirthReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] GovernedThreadBirthReceipt: {0}' -f $governedThreadBirthReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($interWorkerBraidHandoffPacketBundlePath)) {
+    Write-Host ('[local-automation-cycle] InterWorkerBraidHandoffPacket: {0}' -f $interWorkerBraidHandoffPacketBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($agentiCoreActualUtilitySurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] AgentiCoreActualUtilitySurface: {0}' -f $agentiCoreActualUtilitySurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($reachDuplexRealizationSeamBundlePath)) {
+    Write-Host ('[local-automation-cycle] ReachDuplexRealizationSeam: {0}' -f $reachDuplexRealizationSeamBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($bondedParticipationLocalityLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] BondedParticipationLocalityLedger: {0}' -f $bondedParticipationLocalityLedgerBundlePath)
+}
 
 if ($latestStatus -eq $blockedStatus) {
     throw 'Local automation cycle ended in blocked status.'

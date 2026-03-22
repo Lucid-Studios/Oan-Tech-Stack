@@ -189,11 +189,13 @@ public sealed class SliExecutionContext
         }
 
         if (!_shardSymbols.TryGetValue(sourceShardId, out var sourceSymbols) ||
-            !sourceSymbols.TryGetValue(key, out value))
+            !sourceSymbols.TryGetValue(key, out var importedValue) ||
+            importedValue is null)
         {
             return false;
         }
 
+        value = importedValue;
         ExportShardSymbol(targetShardId, alias, value);
         return true;
     }
@@ -203,9 +205,16 @@ public sealed class SliExecutionContext
         ArgumentException.ThrowIfNullOrWhiteSpace(shardId);
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
+        if (_shardSymbols.TryGetValue(shardId, out var symbols) &&
+            symbols.TryGetValue(key, out var shardValue) &&
+            shardValue is not null)
+        {
+            value = shardValue;
+            return true;
+        }
+
         value = string.Empty;
-        return _shardSymbols.TryGetValue(shardId, out var symbols) &&
-               symbols.TryGetValue(key, out value);
+        return false;
     }
 
     internal IReadOnlyList<string> GetShardTraceLines(string shardId)
