@@ -1065,6 +1065,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-19",
+      "label": "Automation Maturation Map 19",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Root each new worker in an identity-invariant thread base and bind triadic nexus governance at thread birth so agentic multiplicity remains lawful rather than ambient.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "identity-invariant-thread-root",
+        "governed-thread-birth-receipt",
+        "inter-worker-braid-handoff-packet"
+      ],
+      "tasks": [
+        {
+          "id": "identity-invariant-thread-root",
+          "label": "Identity-Invariant Thread Root",
+          "owner": "SoulFrame",
+          "authority": "Identity-bearing continuity surface only",
+          "status": "selected",
+          "purpose": "Give each newly formed agent or worker its own thread base from a local identity invariant so workers do not silently inherit one another by ambient context bleed.",
+          "completionSignal": "A thread-root surface can name the worker identity invariant, local thread base, and bounded continuity posture without smearing shared context into shared identity.",
+          "escalatesWhen": [
+            "new workers silently inherit another worker's thread base",
+            "identity-rooting is implied without an invariant-bearing receipt"
+          ]
+        },
+        {
+          "id": "governed-thread-birth-receipt",
+          "label": "Governed Thread Birth Receipt",
+          "owner": "Shared",
+          "authority": "Father, Mother, and Steward witness; host law admits",
+          "status": "selected",
+          "purpose": "Record that Father, Mother, and Steward are already interfaced through the nexus at worker birth so no agent thread is treated as an ungoverned orphan.",
+          "completionSignal": "A governed thread-birth receipt can show thread-root formation, nexus binding, and triadic witness posture from initialization through dissolution.",
+          "escalatesWhen": [
+            "worker threads form without governed witness",
+            "nexus binding arrives after movement begins"
+          ]
+        },
+        {
+          "id": "inter-worker-braid-handoff-packet",
+          "label": "Inter-Worker Braid Handoff Packet",
+          "owner": "AgentiCore",
+          "authority": "Bridged context only",
+          "status": "selected",
+          "purpose": "Require handoff between workers to travel as an explicit braid packet rather than as silent cross-thread memory inheritance.",
+          "completionSignal": "A handoff packet can preserve continuity, predicate context, and withheld identity boundaries between workers without turning locality into shared identity.",
+          "escalatesWhen": [
+            "worker handoff becomes ambient shared memory",
+            "handoff packets blur local identity boundaries"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-20",
+      "label": "Automation Maturation Map 20",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Realize AgentiCore.actual as governed utility and let reach duplex-realize predicate-bearing participation across bonded localities without turning transport into sovereignty or remote control.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "agenticore-actual-utility-surface",
+        "reach-duplex-realization-seam",
+        "bonded-participation-locality-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "agenticore-actual-utility-surface",
+          "label": "AgentiCore.actual Utility Surface",
+          "owner": "AgentiCore",
+          "authority": "Governed public utility surface only",
+          "status": "selected",
+          "purpose": "Expose AgentiCore.actual as the usable governed public surface for ECE so participation does not require tearing open the raw inner field.",
+          "completionSignal": "An AgentiCore.actual utility surface can carry work-predicate and governance-predicate together as a bounded participation contract.",
+          "escalatesWhen": [
+            "the utility surface starts impersonating the inner cognition field",
+            "governance-predicate conditions are stripped from public participation"
+          ]
+        },
+        {
+          "id": "reach-duplex-realization-seam",
+          "label": "Reach Duplex Realization Seam",
+          "owner": "SLI",
+          "authority": "Cross-locality realization only",
+          "status": "selected",
+          "purpose": "Treat reach as the SLI-mediated realization seam by which predicate surfaces become co-realized across differentiated localities rather than simply transported.",
+          "completionSignal": "A reach duplex seam can co-realize participation across bonded localities while keeping identity, locality, and office distinct.",
+          "escalatesWhen": [
+            "reach collapses back into flat message transport",
+            "co-realization implies ambient grant or locality collapse"
+          ]
+        },
+        {
+          "id": "bonded-participation-locality-ledger",
+          "label": "Bonded Participation Locality Ledger",
+          "owner": "Shared",
+          "authority": "Witness and disclosure only",
+          "status": "selected",
+          "purpose": "Record how Sanctuary.actual and Operator.actual are co-realized as bonded but distinct localities so the shared event stays witnessable without projection theater.",
+          "completionSignal": "A locality ledger can say what is co-realized, what remains withheld, and what return or dissolution conditions still govern the bond.",
+          "escalatesWhen": [
+            "operator locality is treated as external administration only",
+            "bonded participation loses locality distinction"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-21",
+      "label": "Automation Maturation Map 21",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Open the first bounded Sanctuary-in-runtime workbench so local CME work can occur inside the deployable candidate while keeping amenable day-dream exploration distinct from self-rooted deep cryptic access.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "sanctuary-runtime-workbench-surface",
+        "amenable-day-dream-tier-admissibility",
+        "self-rooted-cryptic-depth-gate"
+      ],
+      "tasks": [
+        {
+          "id": "sanctuary-runtime-workbench-surface",
+          "label": "Sanctuary Runtime Workbench Surface",
+          "owner": "CradleTek",
+          "authority": "Local bounded runtime work only",
+          "status": "selected",
+          "purpose": "Materialize the first local Sanctuary workbench where CME-side work can be performed inside the candidate runtime without implying full bonded publication or MoS release.",
+          "completionSignal": "A runtime workbench surface can say what bounded work is possible in-runtime, what remains withheld, and what session posture currently holds.",
+          "escalatesWhen": [
+            "the workbench is narrated as full Sanctuary release",
+            "in-runtime work surfaces cannot be distinguished from bonded operator lanes"
+          ]
+        },
+        {
+          "id": "amenable-day-dream-tier-admissibility",
+          "label": "Amenable Day-Dream Tier Admissibility",
+          "owner": "SLI",
+          "authority": "Exploratory predication only",
+          "status": "selected",
+          "purpose": "Expose the shared pre-release day-dream tier for amenable predication and directional experimentation without letting it masquerade as deep identity-bearing truth.",
+          "completionSignal": "A day-dream tier surface can name exploratory predicates, admissible soft motion, and non-final outputs without continuity inflation.",
+          "escalatesWhen": [
+            "shared exploratory outputs are mistaken for deep cryptic truth",
+            "day-dream access widens into identity-bearing descent"
+          ]
+        },
+        {
+          "id": "self-rooted-cryptic-depth-gate",
+          "label": "Self-Rooted Cryptic Depth Gate",
+          "owner": "Shared",
+          "authority": "Self-rooted cryptic access only",
+          "status": "selected",
+          "purpose": "Require any deeper cryptic descent to instantiate from the CME's own cryptic biad so protected self-work remains continuity-bound and non-bleeding.",
+          "completionSignal": "A self-rooted depth gate can say whether deeper cryptic work is withheld, provisionally rooted, or lawfully instantiated from the local root.",
+          "escalatesWhen": [
+            "deep access opens from shared amenable surfaces",
+            "self-root is implied without cryptic-biad proof"
+          ]
+        }
+      ]
     }
   ]
 }

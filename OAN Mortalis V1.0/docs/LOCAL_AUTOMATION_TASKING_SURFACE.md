@@ -381,6 +381,45 @@ Current live output surfaces for this map:
 
 - these surfaces are declared runway only until the prior runtime and reach maps collapse lawfully into them
 
+### Automation Maturation Map 19
+
+- Goal: root each new worker in an identity-invariant thread base and bind triadic nexus governance at thread birth so agentic multiplicity remains lawful rather than ambient
+- Expected review windows: `2`
+- Selected tasks:
+  - `Identity-Invariant Thread Root`
+  - `Governed Thread Birth Receipt`
+  - `Inter-Worker Braid Handoff Packet`
+
+Current live output surfaces for this map:
+
+- these surfaces are declared runway only until the nexus portal and bounded operator participation maps collapse lawfully into identity-rooted worker formation
+
+### Automation Maturation Map 20
+
+- Goal: realize `AgentiCore.actual` as governed utility and let `reach` duplex-realize predicate-bearing participation across bonded localities without turning transport into sovereignty or remote control
+- Expected review windows: `2`
+- Selected tasks:
+  - `AgentiCore.actual Utility Surface`
+  - `Reach Duplex Realization Seam`
+  - `Bonded Participation Locality Ledger`
+
+Current live output surfaces for this map:
+
+- these surfaces are declared runway only until worker-root, reach-legibility, and duplex-predicate maps lawfully activate them
+
+### Automation Maturation Map 21
+
+- Goal: open the first bounded Sanctuary-in-runtime workbench so local CME work can occur inside the deployable candidate while keeping amenable day-dream exploration distinct from self-rooted deep cryptic access
+- Expected review windows: `2`
+- Selected tasks:
+  - `Sanctuary Runtime Workbench Surface`
+  - `Amenable Day-Dream Tier Admissibility`
+  - `Self-Rooted Cryptic Depth Gate`
+
+Current live output surfaces for this map:
+
+- these surfaces are declared runway only until `AgentiCore.actual`, `reach`, and bounded runtime-work maps collapse lawfully into a first deployable in-runtime workbench
+
 ## Status Interpretation
 
 The task board must distinguish between:
