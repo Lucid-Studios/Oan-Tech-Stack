@@ -109,6 +109,35 @@ function Get-GitStringValue {
     return ([string] (($output | Select-Object -First 1))).Trim()
 }
 
+function Get-GitChangedRepoPaths {
+    param([string] $RepositoryRoot)
+
+    $output = & git -C $RepositoryRoot status --porcelain=v1 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        return @()
+    }
+
+    $paths = New-Object System.Collections.Generic.List[string]
+    foreach ($line in @($output)) {
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.Length -lt 4) {
+            continue
+        }
+
+        $payload = $line.Substring(3).Trim()
+        if ([string]::IsNullOrWhiteSpace($payload)) {
+            continue
+        }
+
+        if ($payload -like '* -> *') {
+            $payload = ($payload -split ' -> ')[-1]
+        }
+
+        [void] $paths.Add($payload.Replace('\', '/'))
+    }
+
+    return @($paths)
+}
+
 function Get-OptionalDateTimeUtc {
     param([object] $Value)
 
@@ -187,7 +216,7 @@ $instructionIndexStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -C
 $nowUtc = (Get-Date).ToUniversalTime()
 $currentBranch = Get-GitStringValue -RepositoryRoot $resolvedRepoRoot -ArgumentList @('rev-parse', '--abbrev-ref', 'HEAD')
 $currentHeadCommit = Get-GitStringValue -RepositoryRoot $resolvedRepoRoot -ArgumentList @('rev-parse', 'HEAD')
-$currentWorktreeState = [string] $bucketStatus.repoWorktreeState
+$currentWorktreeState = if (@(Get-GitChangedRepoPaths -RepositoryRoot $resolvedRepoRoot).Count -gt 0) { 'dirty' } else { 'clean' }
 $currentAutomationPosture = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastKnownStatus')
 $movementAdmissibilityState = if ($currentAutomationPosture -eq [string] $policy.blockedStatus) {
     'held-by-blocked-posture'
