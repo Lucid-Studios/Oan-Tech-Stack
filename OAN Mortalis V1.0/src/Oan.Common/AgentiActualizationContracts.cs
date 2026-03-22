@@ -55,6 +55,56 @@ public sealed record BondedParticipationLocalityLedgerReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record BondedCoWorkSessionRehearsalReceipt(
+    string RehearsalHandle,
+    string CMEId,
+    string SessionLedgerHandle,
+    string UtilitySurfaceHandle,
+    string RealizationHandle,
+    string LocalityLedgerHandle,
+    string SanctuaryActualLocality,
+    string OperatorActualLocality,
+    IReadOnlyList<string> SharedWorkLoop,
+    IReadOnlyList<string> DuplexPredicateLanes,
+    IReadOnlyList<string> WithheldLanes,
+    string RehearsalState,
+    bool LocalityCollapseDenied,
+    bool RemoteControlDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record ReachReturnDissolutionReceipt(
+    string ReturnReceiptHandle,
+    string CMEId,
+    string RehearsalHandle,
+    string RealizationHandle,
+    string SourceLocality,
+    string TargetLocality,
+    string ReturnState,
+    string DissolutionState,
+    bool BondedEventReturned,
+    bool BondedEventDissolved,
+    bool AmbientGrantDenied,
+    bool LocalityDistinctionPreserved,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record LocalityDistinctionWitnessLedgerReceipt(
+    string WitnessLedgerHandle,
+    string CMEId,
+    string RehearsalHandle,
+    string ReturnReceiptHandle,
+    string SanctuaryActualLocality,
+    string OperatorActualLocality,
+    IReadOnlyList<string> SharedSurfaces,
+    IReadOnlyList<string> SanctuaryLocalSurfaces,
+    IReadOnlyList<string> OperatorLocalSurfaces,
+    IReadOnlyList<string> WithheldSurfaces,
+    bool LocalityCollapseDetected,
+    bool ProjectionTheaterDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -63,6 +113,9 @@ public static class AgentiActualizationProjector
     private const string ReachEnvelopePrefix = "reach-duplex-envelope://";
     private const string AgentiActualSurfacePrefix = "agenticore-actual-surface://";
     private const string BondedSpacePrefix = "bonded-space://";
+    private const string RuntimeWorkbenchSessionPrefix = "runtime-workbench-session-ledger://";
+    private const string BondedLocalityLedgerPrefix = "bonded-locality-ledger://";
+    private const string ReachRealizationPrefix = "reach-duplex-realization://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -204,6 +257,155 @@ public static class AgentiActualizationProjector
             RemoteControlDenied: true,
             ReturnCondition: utilitySurface.ReturnCondition,
             ReasonCode: "bonded-participation-locality-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BondedCoWorkSessionRehearsalReceipt CreateBondedCoWorkSessionRehearsal(
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        AgentiActualUtilitySurfaceReceipt utilitySurface,
+        ReachDuplexRealizationReceipt realization,
+        BondedParticipationLocalityLedgerReceipt localityLedger,
+        IReadOnlyList<string> sharedWorkLoop,
+        IReadOnlyList<string> duplexPredicateLanes,
+        IReadOnlyList<string> withheldLanes,
+        string rehearsalState = "bounded-cowork-rehearsal-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(utilitySurface);
+        ArgumentNullException.ThrowIfNull(realization);
+        ArgumentNullException.ThrowIfNull(localityLedger);
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, RuntimeWorkbenchSessionPrefix, nameof(sessionLedger));
+        EnsurePrefix(realization.RealizationHandle, ReachRealizationPrefix, nameof(realization));
+        EnsurePrefix(localityLedger.LedgerHandle, BondedLocalityLedgerPrefix, nameof(localityLedger));
+        ArgumentNullException.ThrowIfNull(sharedWorkLoop);
+        ArgumentNullException.ThrowIfNull(duplexPredicateLanes);
+        ArgumentNullException.ThrowIfNull(withheldLanes);
+        ArgumentException.ThrowIfNullOrWhiteSpace(rehearsalState);
+
+        if (!string.Equals(sessionLedger.CMEId, utilitySurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(utilitySurface.CMEId, realization.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(realization.CMEId, localityLedger.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Bonded co-work rehearsal requires session, utility, reach, and locality receipts to remain inside one CME continuity surface.");
+        }
+
+        return new BondedCoWorkSessionRehearsalReceipt(
+            RehearsalHandle: AgentiActualizationKeys.CreateBondedCoWorkSessionRehearsalHandle(
+                sessionLedger.CMEId,
+                sessionLedger.SessionLedgerHandle,
+                realization.RealizationHandle,
+                localityLedger.LedgerHandle),
+            CMEId: sessionLedger.CMEId,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            UtilitySurfaceHandle: utilitySurface.UtilitySurfaceHandle,
+            RealizationHandle: realization.RealizationHandle,
+            LocalityLedgerHandle: localityLedger.LedgerHandle,
+            SanctuaryActualLocality: utilitySurface.SanctuaryActualLocality,
+            OperatorActualLocality: utilitySurface.OperatorActualLocality,
+            SharedWorkLoop: (sharedWorkLoop ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray(),
+            DuplexPredicateLanes: (duplexPredicateLanes ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray(),
+            WithheldLanes: (withheldLanes ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray(),
+            RehearsalState: rehearsalState.Trim(),
+            LocalityCollapseDenied: true,
+            RemoteControlDenied: true,
+            ReasonCode: "bonded-cowork-session-rehearsal-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static ReachReturnDissolutionReceipt CreateReachReturnDissolutionReceipt(
+        BondedCoWorkSessionRehearsalReceipt rehearsal,
+        ReachDuplexRealizationReceipt realization,
+        string returnState = "returned-through-reach",
+        string dissolutionState = "dissolution-witnessed",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(rehearsal);
+        ArgumentNullException.ThrowIfNull(realization);
+        EnsurePrefix(rehearsal.RehearsalHandle, "bonded-cowork-session-rehearsal://", nameof(rehearsal));
+        EnsurePrefix(realization.RealizationHandle, ReachRealizationPrefix, nameof(realization));
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dissolutionState);
+
+        if (!string.Equals(rehearsal.CMEId, realization.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(rehearsal.RealizationHandle, realization.RealizationHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Reach return dissolution requires bonded co-work and realization receipts to remain inside one realized bonded event.");
+        }
+
+        var normalizedReturnState = returnState.Trim();
+        var normalizedDissolutionState = dissolutionState.Trim();
+        var bondedEventReturned = normalizedReturnState.Contains("returned", StringComparison.OrdinalIgnoreCase);
+        var bondedEventDissolved = normalizedDissolutionState.Contains("dissolution", StringComparison.OrdinalIgnoreCase);
+
+        return new ReachReturnDissolutionReceipt(
+            ReturnReceiptHandle: AgentiActualizationKeys.CreateReachReturnDissolutionReceiptHandle(
+                rehearsal.CMEId,
+                rehearsal.RehearsalHandle,
+                normalizedReturnState,
+                normalizedDissolutionState),
+            CMEId: rehearsal.CMEId,
+            RehearsalHandle: rehearsal.RehearsalHandle,
+            RealizationHandle: realization.RealizationHandle,
+            SourceLocality: realization.SourceLocality,
+            TargetLocality: realization.TargetLocality,
+            ReturnState: normalizedReturnState,
+            DissolutionState: normalizedDissolutionState,
+            BondedEventReturned: bondedEventReturned,
+            BondedEventDissolved: bondedEventDissolved,
+            AmbientGrantDenied: true,
+            LocalityDistinctionPreserved: rehearsal.LocalityCollapseDenied && realization.LocalityCollapseDenied,
+            ReasonCode: "reach-return-dissolution-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static LocalityDistinctionWitnessLedgerReceipt CreateLocalityDistinctionWitnessLedger(
+        BondedCoWorkSessionRehearsalReceipt rehearsal,
+        ReachReturnDissolutionReceipt returnReceipt,
+        IReadOnlyList<string> sharedSurfaces,
+        IReadOnlyList<string> sanctuaryLocalSurfaces,
+        IReadOnlyList<string> operatorLocalSurfaces,
+        IReadOnlyList<string> withheldSurfaces,
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(rehearsal);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        EnsurePrefix(rehearsal.RehearsalHandle, "bonded-cowork-session-rehearsal://", nameof(rehearsal));
+        EnsurePrefix(returnReceipt.ReturnReceiptHandle, "reach-return-dissolution://", nameof(returnReceipt));
+        ArgumentNullException.ThrowIfNull(sharedSurfaces);
+        ArgumentNullException.ThrowIfNull(sanctuaryLocalSurfaces);
+        ArgumentNullException.ThrowIfNull(operatorLocalSurfaces);
+        ArgumentNullException.ThrowIfNull(withheldSurfaces);
+
+        if (!string.Equals(rehearsal.CMEId, returnReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(rehearsal.RehearsalHandle, returnReceipt.RehearsalHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Locality distinction witness requires rehearsal and return receipts to remain inside one bonded co-work event.");
+        }
+
+        var normalizedSharedSurfaces = (sharedSurfaces ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray();
+        var normalizedSanctuaryLocalSurfaces = (sanctuaryLocalSurfaces ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray();
+        var normalizedOperatorLocalSurfaces = (operatorLocalSurfaces ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray();
+        var normalizedWithheldSurfaces = (withheldSurfaces ?? Array.Empty<string>()).Where(static item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.Ordinal).ToArray();
+        var localityCollapseDetected = normalizedSanctuaryLocalSurfaces.Intersect(normalizedOperatorLocalSurfaces, StringComparer.Ordinal).Any();
+
+        return new LocalityDistinctionWitnessLedgerReceipt(
+            WitnessLedgerHandle: AgentiActualizationKeys.CreateLocalityDistinctionWitnessLedgerHandle(
+                rehearsal.CMEId,
+                rehearsal.RehearsalHandle,
+                returnReceipt.ReturnReceiptHandle),
+            CMEId: rehearsal.CMEId,
+            RehearsalHandle: rehearsal.RehearsalHandle,
+            ReturnReceiptHandle: returnReceipt.ReturnReceiptHandle,
+            SanctuaryActualLocality: rehearsal.SanctuaryActualLocality,
+            OperatorActualLocality: rehearsal.OperatorActualLocality,
+            SharedSurfaces: normalizedSharedSurfaces,
+            SanctuaryLocalSurfaces: normalizedSanctuaryLocalSurfaces,
+            OperatorLocalSurfaces: normalizedOperatorLocalSurfaces,
+            WithheldSurfaces: normalizedWithheldSurfaces,
+            LocalityCollapseDetected: localityCollapseDetected,
+            ProjectionTheaterDenied: !localityCollapseDetected,
+            ReasonCode: "locality-distinction-witness-ledger-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

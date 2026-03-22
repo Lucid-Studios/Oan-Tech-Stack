@@ -456,7 +456,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces remain declared runway only until bounded co-work can be rehearsed through `reach` without collapsing locality, office, or return law
+- bonded co-work session rehearsal bundles land under `.audit/runs/bonded-cowork-session-rehearsal/` and update `.audit/state/local-automation-bonded-cowork-session-rehearsal-last-run.json`
+- reach return-dissolution receipts land under `.audit/runs/reach-return-dissolution-receipt/` and update `.audit/state/local-automation-reach-return-dissolution-receipt-last-run.json`
+- locality distinction witness ledgers land under `.audit/runs/locality-distinction-witness-ledger/` and update `.audit/state/local-automation-locality-distinction-witness-ledger-last-run.json`
+- these surfaces witness bonded co-work rehearsal, explicit reach return and dissolution, and differentiated locality carriage without implying habitation ratification or raw protected interior exposure
 
 ### Automation Maturation Map 24
 

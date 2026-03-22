@@ -164,6 +164,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $RuntimeWorkbenchSessionLedgerState,
         [object] $DayDreamCollapseReceiptState,
         [object] $CrypticDepthReturnReceiptState,
+        [object] $BondedCoWorkSessionRehearsalState,
+        [object] $ReachReturnDissolutionReceiptState,
+        [object] $LocalityDistinctionWitnessLedgerState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -695,6 +698,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'bonded-cowork-session-rehearsal' {
+            if ($null -ne $BondedCoWorkSessionRehearsalState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'reach-return-dissolution-receipt' {
+            if ($null -ne $ReachReturnDissolutionReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'locality-distinction-witness-ledger' {
+            if ($null -ne $LocalityDistinctionWitnessLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -801,6 +831,9 @@ $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedR
 $runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkbenchSessionLedgerStatePath)
 $dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.dayDreamCollapseReceiptStatePath)
 $crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.crypticDepthReturnReceiptStatePath)
+$bondedCoWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedCoWorkSessionRehearsalStatePath)
+$reachReturnDissolutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachReturnDissolutionReceiptStatePath)
+$localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.localityDistinctionWitnessLedgerStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -860,6 +893,9 @@ $selfRootedCrypticDepthGateState = Read-JsonFileOrNull -Path $selfRootedCrypticD
 $runtimeWorkbenchSessionLedgerState = Read-JsonFileOrNull -Path $runtimeWorkbenchSessionLedgerStatePath
 $dayDreamCollapseReceiptState = Read-JsonFileOrNull -Path $dayDreamCollapseReceiptStatePath
 $crypticDepthReturnReceiptState = Read-JsonFileOrNull -Path $crypticDepthReturnReceiptStatePath
+$bondedCoWorkSessionRehearsalState = Read-JsonFileOrNull -Path $bondedCoWorkSessionRehearsalStatePath
+$reachReturnDissolutionReceiptState = Read-JsonFileOrNull -Path $reachReturnDissolutionReceiptStatePath
+$localityDistinctionWitnessLedgerState = Read-JsonFileOrNull -Path $localityDistinctionWitnessLedgerStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1065,6 +1101,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
                 -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
                 -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
+                -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
+                -ReachReturnDissolutionReceiptState $reachReturnDissolutionReceiptState `
+                -LocalityDistinctionWitnessLedgerState $localityDistinctionWitnessLedgerState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1178,6 +1217,9 @@ $taskMapEntries = @(
                     -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
                     -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
                     -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
+                    -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
+                    -ReachReturnDissolutionReceiptState $reachReturnDissolutionReceiptState `
+                    -LocalityDistinctionWitnessLedgerState $localityDistinctionWitnessLedgerState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1463,6 +1505,33 @@ $statusPayload = [ordered]@{
         crypticDepthReturnReturnedCleanly = if ($null -ne $crypticDepthReturnReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'returnedCleanly') } else { $null }
         crypticDepthReturnSharedAmenableLaneClear = if ($null -ne $crypticDepthReturnReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'sharedAmenableLaneClear') } else { $null }
         crypticDepthReturnIdentityBleedDetected = if ($null -ne $crypticDepthReturnReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'identityBleedDetected') } else { $null }
+        bondedCoWorkSessionRehearsalState = if ($null -ne $bondedCoWorkSessionRehearsalState) { [string] $bondedCoWorkSessionRehearsalState.rehearsalReceiptState } else { $null }
+        bondedCoWorkSessionRehearsalReason = if ($null -ne $bondedCoWorkSessionRehearsalState) { [string] $bondedCoWorkSessionRehearsalState.reasonCode } else { $null }
+        bondedCoWorkSessionRehearsalNextAction = if ($null -ne $bondedCoWorkSessionRehearsalState) { [string] $bondedCoWorkSessionRehearsalState.nextAction } else { $null }
+        bondedCoWorkSessionRehearsalPhase = if ($null -ne $bondedCoWorkSessionRehearsalState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'rehearsalState') } else { $null }
+        bondedCoWorkSessionRehearsalSharedWorkLoopCount = if ($null -ne $bondedCoWorkSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'sharedWorkLoopCount') } else { $null }
+        bondedCoWorkSessionRehearsalDuplexPredicateLaneCount = if ($null -ne $bondedCoWorkSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'duplexPredicateLaneCount') } else { $null }
+        bondedCoWorkSessionRehearsalWithheldLaneCount = if ($null -ne $bondedCoWorkSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'withheldLaneCount') } else { $null }
+        bondedCoWorkSessionRehearsalRemoteControlDenied = if ($null -ne $bondedCoWorkSessionRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'remoteControlDenied') } else { $null }
+        bondedCoWorkSessionRehearsalLocalityCollapseDenied = if ($null -ne $bondedCoWorkSessionRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'localityCollapseDenied') } else { $null }
+        reachReturnDissolutionReceiptState = if ($null -ne $reachReturnDissolutionReceiptState) { [string] $reachReturnDissolutionReceiptState.returnReceiptState } else { $null }
+        reachReturnDissolutionReceiptReason = if ($null -ne $reachReturnDissolutionReceiptState) { [string] $reachReturnDissolutionReceiptState.reasonCode } else { $null }
+        reachReturnDissolutionReceiptNextAction = if ($null -ne $reachReturnDissolutionReceiptState) { [string] $reachReturnDissolutionReceiptState.nextAction } else { $null }
+        reachReturnDissolutionReturnState = if ($null -ne $reachReturnDissolutionReceiptState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'returnState') } else { $null }
+        reachReturnDissolutionDissolutionState = if ($null -ne $reachReturnDissolutionReceiptState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'dissolutionState') } else { $null }
+        reachReturnDissolutionBondedEventReturned = if ($null -ne $reachReturnDissolutionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'bondedEventReturned') } else { $null }
+        reachReturnDissolutionBondedEventDissolved = if ($null -ne $reachReturnDissolutionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'bondedEventDissolved') } else { $null }
+        reachReturnDissolutionAmbientGrantDenied = if ($null -ne $reachReturnDissolutionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'ambientGrantDenied') } else { $null }
+        reachReturnDissolutionLocalityDistinctionPreserved = if ($null -ne $reachReturnDissolutionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'localityDistinctionPreserved') } else { $null }
+        localityDistinctionWitnessLedgerState = if ($null -ne $localityDistinctionWitnessLedgerState) { [string] $localityDistinctionWitnessLedgerState.witnessLedgerState } else { $null }
+        localityDistinctionWitnessLedgerReason = if ($null -ne $localityDistinctionWitnessLedgerState) { [string] $localityDistinctionWitnessLedgerState.reasonCode } else { $null }
+        localityDistinctionWitnessLedgerNextAction = if ($null -ne $localityDistinctionWitnessLedgerState) { [string] $localityDistinctionWitnessLedgerState.nextAction } else { $null }
+        localityDistinctionWitnessLedgerSharedSurfaceCount = if ($null -ne $localityDistinctionWitnessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'sharedSurfaceCount') } else { $null }
+        localityDistinctionWitnessLedgerSanctuaryLocalSurfaceCount = if ($null -ne $localityDistinctionWitnessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'sanctuaryLocalSurfaceCount') } else { $null }
+        localityDistinctionWitnessLedgerOperatorLocalSurfaceCount = if ($null -ne $localityDistinctionWitnessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'operatorLocalSurfaceCount') } else { $null }
+        localityDistinctionWitnessLedgerWithheldSurfaceCount = if ($null -ne $localityDistinctionWitnessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'withheldSurfaceCount') } else { $null }
+        localityDistinctionWitnessLedgerLocalityCollapseDetected = if ($null -ne $localityDistinctionWitnessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'localityCollapseDetected') } else { $null }
+        localityDistinctionWitnessLedgerProjectionTheaterDenied = if ($null -ne $localityDistinctionWitnessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'projectionTheaterDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2245,6 +2314,56 @@ if ($null -ne $crypticDepthReturnReceiptState) {
     )
 }
 
+if ($null -ne $bondedCoWorkSessionRehearsalState) {
+    $markdownLines += @(
+        '## Bonded Co-Work Session Rehearsal',
+        '',
+        ('- Rehearsal state: `{0}`' -f [string] $bondedCoWorkSessionRehearsalState.rehearsalReceiptState),
+        ('- Reason code: `{0}`' -f [string] $bondedCoWorkSessionRehearsalState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $bondedCoWorkSessionRehearsalState.nextAction),
+        ('- Shared work-loop count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'sharedWorkLoopCount')),
+        ('- Duplex predicate-lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'duplexPredicateLaneCount')),
+        ('- Withheld lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'withheldLaneCount')),
+        ('- Remote control denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'remoteControlDenied')),
+        ('- Locality collapse denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCoWorkSessionRehearsalState -PropertyName 'localityCollapseDenied')),
+        ''
+    )
+}
+
+if ($null -ne $reachReturnDissolutionReceiptState) {
+    $markdownLines += @(
+        '## Reach Return Dissolution Receipt',
+        '',
+        ('- Return-receipt state: `{0}`' -f [string] $reachReturnDissolutionReceiptState.returnReceiptState),
+        ('- Reason code: `{0}`' -f [string] $reachReturnDissolutionReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $reachReturnDissolutionReceiptState.nextAction),
+        ('- Return state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'returnState')),
+        ('- Dissolution state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'dissolutionState')),
+        ('- Bonded event returned: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'bondedEventReturned')),
+        ('- Bonded event dissolved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'bondedEventDissolved')),
+        ('- Ambient grant denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'ambientGrantDenied')),
+        ('- Locality distinction preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachReturnDissolutionReceiptState -PropertyName 'localityDistinctionPreserved')),
+        ''
+    )
+}
+
+if ($null -ne $localityDistinctionWitnessLedgerState) {
+    $markdownLines += @(
+        '## Locality Distinction Witness Ledger',
+        '',
+        ('- Witness-ledger state: `{0}`' -f [string] $localityDistinctionWitnessLedgerState.witnessLedgerState),
+        ('- Reason code: `{0}`' -f [string] $localityDistinctionWitnessLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $localityDistinctionWitnessLedgerState.nextAction),
+        ('- Shared surface count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'sharedSurfaceCount')),
+        ('- Sanctuary-local surface count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'sanctuaryLocalSurfaceCount')),
+        ('- Operator-local surface count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'operatorLocalSurfaceCount')),
+        ('- Withheld surface count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'withheldSurfaceCount')),
+        ('- Locality collapse detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'localityCollapseDetected')),
+        ('- Projection theater denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'projectionTheaterDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2331,6 +2450,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
             -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
             -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
+            -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
+            -ReachReturnDissolutionReceiptState $reachReturnDissolutionReceiptState `
+            -LocalityDistinctionWitnessLedgerState $localityDistinctionWitnessLedgerState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

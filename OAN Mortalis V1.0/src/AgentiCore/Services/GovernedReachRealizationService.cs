@@ -102,4 +102,72 @@ public sealed class GovernedReachRealizationService
             withheldSurfaces,
             timestampUtc);
     }
+
+    public BondedCoWorkSessionRehearsalReceipt CreateBondedCoWorkSessionRehearsal(
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        AgentiActualUtilitySurfaceReceipt utilitySurface,
+        ReachDuplexRealizationReceipt realization,
+        BondedParticipationLocalityLedgerReceipt localityLedger,
+        IReadOnlyList<string> sharedWorkLoop,
+        IReadOnlyList<string> duplexPredicateLanes,
+        IReadOnlyList<string> withheldLanes,
+        string rehearsalState = "bounded-cowork-rehearsal-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(utilitySurface);
+        ArgumentNullException.ThrowIfNull(realization);
+        ArgumentNullException.ThrowIfNull(localityLedger);
+
+        return AgentiActualizationProjector.CreateBondedCoWorkSessionRehearsal(
+            sessionLedger,
+            utilitySurface,
+            realization,
+            localityLedger,
+            sharedWorkLoop,
+            duplexPredicateLanes,
+            withheldLanes,
+            rehearsalState,
+            timestampUtc);
+    }
+
+    public ReachReturnDissolutionReceipt CreateReachReturnDissolutionReceipt(
+        BondedCoWorkSessionRehearsalReceipt rehearsal,
+        ReachDuplexRealizationReceipt realization,
+        string returnState = "returned-through-reach",
+        string dissolutionState = "dissolution-witnessed",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(rehearsal);
+        ArgumentNullException.ThrowIfNull(realization);
+
+        return AgentiActualizationProjector.CreateReachReturnDissolutionReceipt(
+            rehearsal,
+            realization,
+            returnState,
+            dissolutionState,
+            timestampUtc);
+    }
+
+    public LocalityDistinctionWitnessLedgerReceipt CreateLocalityDistinctionWitnessLedger(
+        BondedCoWorkSessionRehearsalReceipt rehearsal,
+        ReachReturnDissolutionReceipt returnReceipt,
+        IReadOnlyList<string> sharedSurfaces,
+        IReadOnlyList<string> sanctuaryLocalSurfaces,
+        IReadOnlyList<string> operatorLocalSurfaces,
+        IReadOnlyList<string> withheldSurfaces,
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(rehearsal);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+
+        return AgentiActualizationProjector.CreateLocalityDistinctionWitnessLedger(
+            rehearsal,
+            returnReceipt,
+            sharedSurfaces,
+            sanctuaryLocalSurfaces,
+            operatorLocalSurfaces,
+            withheldSurfaces,
+            timestampUtc);
+    }
 }

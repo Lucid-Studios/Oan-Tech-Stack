@@ -59,6 +59,46 @@ public static class AgentiActualizationKeys
         return $"bonded-locality-ledger://{ComputeDigest(cmeId, realizationHandle, sanctuaryActualLocality, operatorActualLocality)}";
     }
 
+    public static string CreateBondedCoWorkSessionRehearsalHandle(
+        string cmeId,
+        string sessionLedgerHandle,
+        string realizationHandle,
+        string localityLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(realizationHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(localityLedgerHandle);
+
+        return $"bonded-cowork-session-rehearsal://{ComputeDigest(cmeId, sessionLedgerHandle, realizationHandle, localityLedgerHandle)}";
+    }
+
+    public static string CreateReachReturnDissolutionReceiptHandle(
+        string cmeId,
+        string rehearsalHandle,
+        string returnState,
+        string dissolutionState)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(rehearsalHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dissolutionState);
+
+        return $"reach-return-dissolution://{ComputeDigest(cmeId, rehearsalHandle, returnState, dissolutionState)}";
+    }
+
+    public static string CreateLocalityDistinctionWitnessLedgerHandle(
+        string cmeId,
+        string rehearsalHandle,
+        string returnReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(rehearsalHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnReceiptHandle);
+
+        return $"locality-distinction-witness-ledger://{ComputeDigest(cmeId, rehearsalHandle, returnReceiptHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

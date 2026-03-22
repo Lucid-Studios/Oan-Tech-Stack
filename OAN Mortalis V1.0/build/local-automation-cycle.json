@@ -62,6 +62,9 @@
   "runtimeWorkbenchSessionLedgerOutputRoot": ".audit/runs/runtime-workbench-session-ledger",
   "dayDreamCollapseReceiptOutputRoot": ".audit/runs/day-dream-collapse-receipt",
   "crypticDepthReturnReceiptOutputRoot": ".audit/runs/cryptic-depth-return-receipt",
+  "bondedCoWorkSessionRehearsalOutputRoot": ".audit/runs/bonded-cowork-session-rehearsal",
+  "reachReturnDissolutionReceiptOutputRoot": ".audit/runs/reach-return-dissolution-receipt",
+  "localityDistinctionWitnessLedgerOutputRoot": ".audit/runs/locality-distinction-witness-ledger",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -122,6 +125,9 @@
   "runtimeWorkbenchSessionLedgerStatePath": ".audit/state/local-automation-runtime-workbench-session-ledger-last-run.json",
   "dayDreamCollapseReceiptStatePath": ".audit/state/local-automation-day-dream-collapse-receipt-last-run.json",
   "crypticDepthReturnReceiptStatePath": ".audit/state/local-automation-cryptic-depth-return-receipt-last-run.json",
+  "bondedCoWorkSessionRehearsalStatePath": ".audit/state/local-automation-bonded-cowork-session-rehearsal-last-run.json",
+  "reachReturnDissolutionReceiptStatePath": ".audit/state/local-automation-reach-return-dissolution-receipt-last-run.json",
+  "localityDistinctionWitnessLedgerStatePath": ".audit/state/local-automation-locality-distinction-witness-ledger-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -211,6 +217,9 @@
     "keepRuntimeWorkbenchSessionLedgerBundles": 8,
     "keepDayDreamCollapseReceiptBundles": 8,
     "keepCrypticDepthReturnReceiptBundles": 8,
+    "keepBondedCoWorkSessionRehearsalBundles": 8,
+    "keepReachReturnDissolutionReceiptBundles": 8,
+    "keepLocalityDistinctionWitnessLedgerBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

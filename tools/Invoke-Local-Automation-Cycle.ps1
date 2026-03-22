@@ -213,6 +213,9 @@ $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedR
 $runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeWorkbenchSessionLedgerStatePath)
 $dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dayDreamCollapseReceiptStatePath)
 $crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.crypticDepthReturnReceiptStatePath)
+$bondedCoWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedCoWorkSessionRehearsalStatePath)
+$reachReturnDissolutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.reachReturnDissolutionReceiptStatePath)
+$localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.localityDistinctionWitnessLedgerStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -473,6 +476,12 @@ $statePayload.lastDayDreamCollapseReceiptBundle = [string] (Get-ObjectPropertyVa
 $statePayload.dayDreamCollapseReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dayDreamCollapseReceiptStatePath
 $statePayload.lastCrypticDepthReturnReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCrypticDepthReturnReceiptBundle')
 $statePayload.crypticDepthReturnReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $crypticDepthReturnReceiptStatePath
+$statePayload.lastBondedCoWorkSessionRehearsalBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBondedCoWorkSessionRehearsalBundle')
+$statePayload.bondedCoWorkSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedCoWorkSessionRehearsalStatePath
+$statePayload.lastReachReturnDissolutionReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReachReturnDissolutionReceiptBundle')
+$statePayload.reachReturnDissolutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachReturnDissolutionReceiptStatePath
+$statePayload.lastLocalityDistinctionWitnessLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastLocalityDistinctionWitnessLedgerBundle')
+$statePayload.localityDistinctionWitnessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $localityDistinctionWitnessLedgerStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -998,6 +1007,33 @@ if (-not [string]::IsNullOrWhiteSpace($crypticDepthReturnReceiptBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$bondedCoWorkSessionRehearsalScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BondedCoWork-SessionRehearsal.ps1'
+$bondedCoWorkSessionRehearsalOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $bondedCoWorkSessionRehearsalScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bonded co-work session rehearsal writer'
+$bondedCoWorkSessionRehearsalBundlePath = Get-ScriptOutputTail -Output $bondedCoWorkSessionRehearsalOutput
+if (-not [string]::IsNullOrWhiteSpace($bondedCoWorkSessionRehearsalBundlePath)) {
+    $statePayload.lastBondedCoWorkSessionRehearsalBundle = $bondedCoWorkSessionRehearsalBundlePath
+    $statePayload.bondedCoWorkSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedCoWorkSessionRehearsalStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$reachReturnDissolutionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ReachReturn-DissolutionReceipt.ps1'
+$reachReturnDissolutionReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $reachReturnDissolutionReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Reach return dissolution receipt writer'
+$reachReturnDissolutionReceiptBundlePath = Get-ScriptOutputTail -Output $reachReturnDissolutionReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($reachReturnDissolutionReceiptBundlePath)) {
+    $statePayload.lastReachReturnDissolutionReceiptBundle = $reachReturnDissolutionReceiptBundlePath
+    $statePayload.reachReturnDissolutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachReturnDissolutionReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$localityDistinctionWitnessLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-LocalityDistinction-WitnessLedger.ps1'
+$localityDistinctionWitnessLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $localityDistinctionWitnessLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Locality distinction witness ledger writer'
+$localityDistinctionWitnessLedgerBundlePath = Get-ScriptOutputTail -Output $localityDistinctionWitnessLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($localityDistinctionWitnessLedgerBundlePath)) {
+    $statePayload.lastLocalityDistinctionWitnessLedgerBundle = $localityDistinctionWitnessLedgerBundlePath
+    $statePayload.localityDistinctionWitnessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $localityDistinctionWitnessLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1116,6 +1152,12 @@ $summary = [ordered]@{
     dayDreamCollapseReceiptStatePath = $statePayload.dayDreamCollapseReceiptStatePath
     lastCrypticDepthReturnReceiptBundle = $statePayload.lastCrypticDepthReturnReceiptBundle
     crypticDepthReturnReceiptStatePath = $statePayload.crypticDepthReturnReceiptStatePath
+    lastBondedCoWorkSessionRehearsalBundle = $statePayload.lastBondedCoWorkSessionRehearsalBundle
+    bondedCoWorkSessionRehearsalStatePath = $statePayload.bondedCoWorkSessionRehearsalStatePath
+    lastReachReturnDissolutionReceiptBundle = $statePayload.lastReachReturnDissolutionReceiptBundle
+    reachReturnDissolutionReceiptStatePath = $statePayload.reachReturnDissolutionReceiptStatePath
+    lastLocalityDistinctionWitnessLedgerBundle = $statePayload.lastLocalityDistinctionWitnessLedgerBundle
+    localityDistinctionWitnessLedgerStatePath = $statePayload.localityDistinctionWitnessLedgerStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1340,6 +1382,15 @@ if (-not [string]::IsNullOrWhiteSpace($dayDreamCollapseReceiptBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($crypticDepthReturnReceiptBundlePath)) {
     Write-Host ('[local-automation-cycle] CrypticDepthReturnReceipt: {0}' -f $crypticDepthReturnReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($bondedCoWorkSessionRehearsalBundlePath)) {
+    Write-Host ('[local-automation-cycle] BondedCoWorkSessionRehearsal: {0}' -f $bondedCoWorkSessionRehearsalBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($reachReturnDissolutionReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] ReachReturnDissolutionReceipt: {0}' -f $reachReturnDissolutionReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($localityDistinctionWitnessLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] LocalityDistinctionWitnessLedger: {0}' -f $localityDistinctionWitnessLedgerBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {
