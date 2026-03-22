@@ -1069,7 +1069,7 @@
     {
       "id": "automation-maturation-map-19",
       "label": "Automation Maturation Map 19",
-      "status": "declared",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Root each new worker in an identity-invariant thread base and bind triadic nexus governance at thread birth so agentic multiplicity remains lawful rather than ambient.",
       "timeDilationPullForwardAllowed": false,

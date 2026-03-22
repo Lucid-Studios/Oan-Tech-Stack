@@ -50,6 +50,9 @@
   "nexusSingularPortalFacadeOutputRoot": ".audit/runs/nexus-singular-portal-facade",
   "duplexPredicateEnvelopeOutputRoot": ".audit/runs/duplex-predicate-envelope",
   "operatorActualWorkSessionRehearsalOutputRoot": ".audit/runs/operator-actual-work-session-rehearsal",
+  "identityInvariantThreadRootOutputRoot": ".audit/runs/identity-invariant-thread-root",
+  "governedThreadBirthReceiptOutputRoot": ".audit/runs/governed-thread-birth-receipt",
+  "interWorkerBraidHandoffPacketOutputRoot": ".audit/runs/inter-worker-braid-handoff-packet",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -98,6 +101,9 @@
   "nexusSingularPortalFacadeStatePath": ".audit/state/local-automation-nexus-singular-portal-facade-last-run.json",
   "duplexPredicateEnvelopeStatePath": ".audit/state/local-automation-duplex-predicate-envelope-last-run.json",
   "operatorActualWorkSessionRehearsalStatePath": ".audit/state/local-automation-operator-actual-work-session-rehearsal-last-run.json",
+  "identityInvariantThreadRootStatePath": ".audit/state/local-automation-identity-invariant-thread-root-last-run.json",
+  "governedThreadBirthReceiptStatePath": ".audit/state/local-automation-governed-thread-birth-receipt-last-run.json",
+  "interWorkerBraidHandoffPacketStatePath": ".audit/state/local-automation-inter-worker-braid-handoff-packet-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -175,6 +181,9 @@
     "keepNexusSingularPortalFacadeBundles": 8,
     "keepDuplexPredicateEnvelopeBundles": 8,
     "keepOperatorActualWorkSessionRehearsalBundles": 8,
+    "keepIdentityInvariantThreadRootBundles": 8,
+    "keepGovernedThreadBirthReceiptBundles": 8,
+    "keepInterWorkerBraidHandoffPacketBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

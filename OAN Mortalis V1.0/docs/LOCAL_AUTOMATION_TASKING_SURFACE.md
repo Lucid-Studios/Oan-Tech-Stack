@@ -381,7 +381,7 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces are declared runway only until the prior runtime and reach maps collapse lawfully into them
+- these surfaces are now emitted from the active cycle and can witness singular portal, duplex predicate, and bounded `Operator.actual` rehearsal without implying bonded operator actuality or deep cryptic descent
 
 ### Automation Maturation Map 19
 
@@ -394,7 +394,8 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces are declared runway only until the nexus portal and bounded operator participation maps collapse lawfully into identity-rooted worker formation
+- these surfaces are now bound into the automation cycle as preactivation receipts for worker individuality, triadic thread birth, and explicit braid handoff
+- they do not imply live multi-worker expansion until `Map 19` becomes the active collapse and worker movement is actually exercised through those receipts
 
 ### Automation Maturation Map 20
 

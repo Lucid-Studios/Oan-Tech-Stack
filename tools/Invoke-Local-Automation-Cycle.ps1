@@ -201,6 +201,9 @@ $protectedStateLegibilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $reso
 $nexusSingularPortalFacadeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.nexusSingularPortalFacadeStatePath)
 $duplexPredicateEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.duplexPredicateEnvelopeStatePath)
 $operatorActualWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.operatorActualWorkSessionRehearsalStatePath)
+$identityInvariantThreadRootStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.identityInvariantThreadRootStatePath)
+$governedThreadBirthReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.governedThreadBirthReceiptStatePath)
+$interWorkerBraidHandoffPacketStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.interWorkerBraidHandoffPacketStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -437,6 +440,12 @@ $statePayload.lastDuplexPredicateEnvelopeBundle = [string] (Get-ObjectPropertyVa
 $statePayload.duplexPredicateEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $duplexPredicateEnvelopeStatePath
 $statePayload.lastOperatorActualWorkSessionRehearsalBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastOperatorActualWorkSessionRehearsalBundle')
 $statePayload.operatorActualWorkSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operatorActualWorkSessionRehearsalStatePath
+$statePayload.lastIdentityInvariantThreadRootBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastIdentityInvariantThreadRootBundle')
+$statePayload.identityInvariantThreadRootStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $identityInvariantThreadRootStatePath
+$statePayload.lastGovernedThreadBirthReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastGovernedThreadBirthReceiptBundle')
+$statePayload.governedThreadBirthReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $governedThreadBirthReceiptStatePath
+$statePayload.lastInterWorkerBraidHandoffPacketBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastInterWorkerBraidHandoffPacketBundle')
+$statePayload.interWorkerBraidHandoffPacketStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $interWorkerBraidHandoffPacketStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -854,6 +863,33 @@ if (-not [string]::IsNullOrWhiteSpace($operatorActualWorkSessionRehearsalBundleP
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$identityInvariantThreadRootScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-IdentityInvariant-ThreadRoot.ps1'
+$identityInvariantThreadRootOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $identityInvariantThreadRootScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Identity-invariant thread-root writer'
+$identityInvariantThreadRootBundlePath = Get-ScriptOutputTail -Output $identityInvariantThreadRootOutput
+if (-not [string]::IsNullOrWhiteSpace($identityInvariantThreadRootBundlePath)) {
+    $statePayload.lastIdentityInvariantThreadRootBundle = $identityInvariantThreadRootBundlePath
+    $statePayload.identityInvariantThreadRootStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $identityInvariantThreadRootStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$governedThreadBirthReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Governed-ThreadBirthReceipt.ps1'
+$governedThreadBirthReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $governedThreadBirthReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Governed thread-birth receipt writer'
+$governedThreadBirthReceiptBundlePath = Get-ScriptOutputTail -Output $governedThreadBirthReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($governedThreadBirthReceiptBundlePath)) {
+    $statePayload.lastGovernedThreadBirthReceiptBundle = $governedThreadBirthReceiptBundlePath
+    $statePayload.governedThreadBirthReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $governedThreadBirthReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$interWorkerBraidHandoffPacketScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-InterWorker-BraidHandoffPacket.ps1'
+$interWorkerBraidHandoffPacketOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $interWorkerBraidHandoffPacketScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Inter-worker braid-handoff packet writer'
+$interWorkerBraidHandoffPacketBundlePath = Get-ScriptOutputTail -Output $interWorkerBraidHandoffPacketOutput
+if (-not [string]::IsNullOrWhiteSpace($interWorkerBraidHandoffPacketBundlePath)) {
+    $statePayload.lastInterWorkerBraidHandoffPacketBundle = $interWorkerBraidHandoffPacketBundlePath
+    $statePayload.interWorkerBraidHandoffPacketStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $interWorkerBraidHandoffPacketStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -948,6 +984,12 @@ $summary = [ordered]@{
     duplexPredicateEnvelopeStatePath = $statePayload.duplexPredicateEnvelopeStatePath
     lastOperatorActualWorkSessionRehearsalBundle = $statePayload.lastOperatorActualWorkSessionRehearsalBundle
     operatorActualWorkSessionRehearsalStatePath = $statePayload.operatorActualWorkSessionRehearsalStatePath
+    lastIdentityInvariantThreadRootBundle = $statePayload.lastIdentityInvariantThreadRootBundle
+    identityInvariantThreadRootStatePath = $statePayload.identityInvariantThreadRootStatePath
+    lastGovernedThreadBirthReceiptBundle = $statePayload.lastGovernedThreadBirthReceiptBundle
+    governedThreadBirthReceiptStatePath = $statePayload.governedThreadBirthReceiptStatePath
+    lastInterWorkerBraidHandoffPacketBundle = $statePayload.lastInterWorkerBraidHandoffPacketBundle
+    interWorkerBraidHandoffPacketStatePath = $statePayload.interWorkerBraidHandoffPacketStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }

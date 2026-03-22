@@ -152,6 +152,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $NexusSingularPortalFacadeState,
         [object] $DuplexPredicateEnvelopeState,
         [object] $OperatorActualWorkSessionRehearsalState,
+        [object] $IdentityInvariantThreadRootState,
+        [object] $GovernedThreadBirthReceiptState,
+        [object] $InterWorkerBraidHandoffPacketState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -575,6 +578,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'identity-invariant-thread-root' {
+            if ($null -ne $IdentityInvariantThreadRootState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'governed-thread-birth-receipt' {
+            if ($null -ne $GovernedThreadBirthReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'inter-worker-braid-handoff-packet' {
+            if ($null -ne $InterWorkerBraidHandoffPacketState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -669,6 +699,9 @@ $protectedStateLegibilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $reso
 $nexusSingularPortalFacadeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.nexusSingularPortalFacadeStatePath)
 $duplexPredicateEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.duplexPredicateEnvelopeStatePath)
 $operatorActualWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorActualWorkSessionRehearsalStatePath)
+$identityInvariantThreadRootStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.identityInvariantThreadRootStatePath)
+$governedThreadBirthReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.governedThreadBirthReceiptStatePath)
+$interWorkerBraidHandoffPacketStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.interWorkerBraidHandoffPacketStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -716,6 +749,9 @@ $protectedStateLegibilitySurfaceState = Read-JsonFileOrNull -Path $protectedStat
 $nexusSingularPortalFacadeState = Read-JsonFileOrNull -Path $nexusSingularPortalFacadeStatePath
 $duplexPredicateEnvelopeState = Read-JsonFileOrNull -Path $duplexPredicateEnvelopeStatePath
 $operatorActualWorkSessionRehearsalState = Read-JsonFileOrNull -Path $operatorActualWorkSessionRehearsalStatePath
+$identityInvariantThreadRootState = Read-JsonFileOrNull -Path $identityInvariantThreadRootStatePath
+$governedThreadBirthReceiptState = Read-JsonFileOrNull -Path $governedThreadBirthReceiptStatePath
+$interWorkerBraidHandoffPacketState = Read-JsonFileOrNull -Path $interWorkerBraidHandoffPacketStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -909,6 +945,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -NexusSingularPortalFacadeState $nexusSingularPortalFacadeState `
                 -DuplexPredicateEnvelopeState $duplexPredicateEnvelopeState `
                 -OperatorActualWorkSessionRehearsalState $operatorActualWorkSessionRehearsalState `
+                -IdentityInvariantThreadRootState $identityInvariantThreadRootState `
+                -GovernedThreadBirthReceiptState $governedThreadBirthReceiptState `
+                -InterWorkerBraidHandoffPacketState $interWorkerBraidHandoffPacketState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1010,6 +1049,9 @@ $taskMapEntries = @(
                     -NexusSingularPortalFacadeState $nexusSingularPortalFacadeState `
                     -DuplexPredicateEnvelopeState $duplexPredicateEnvelopeState `
                     -OperatorActualWorkSessionRehearsalState $operatorActualWorkSessionRehearsalState `
+                    -IdentityInvariantThreadRootState $identityInvariantThreadRootState `
+                    -GovernedThreadBirthReceiptState $governedThreadBirthReceiptState `
+                    -InterWorkerBraidHandoffPacketState $interWorkerBraidHandoffPacketState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1224,6 +1266,18 @@ $statusPayload = [ordered]@{
         operatorActualWorkSessionRehearsalNextAction = if ($null -ne $operatorActualWorkSessionRehearsalState) { [string] $operatorActualWorkSessionRehearsalState.nextAction } else { $null }
         operatorActualWorkSessionRehearsalCoRealizedSurfaceCount = if ($null -ne $operatorActualWorkSessionRehearsalState) { [int] $operatorActualWorkSessionRehearsalState.coRealizedSurfaceCount } else { $null }
         operatorActualWorkSessionRehearsalWithheldSurfaceCount = if ($null -ne $operatorActualWorkSessionRehearsalState) { [int] $operatorActualWorkSessionRehearsalState.withheldSurfaceCount } else { $null }
+        identityInvariantThreadRootState = if ($null -ne $identityInvariantThreadRootState) { [string] $identityInvariantThreadRootState.threadRootState } else { $null }
+        identityInvariantThreadRootReason = if ($null -ne $identityInvariantThreadRootState) { [string] $identityInvariantThreadRootState.reasonCode } else { $null }
+        identityInvariantThreadRootNextAction = if ($null -ne $identityInvariantThreadRootState) { [string] $identityInvariantThreadRootState.nextAction } else { $null }
+        identityInvariantThreadRootSourceFileCount = if ($null -ne $identityInvariantThreadRootState) { [int] $identityInvariantThreadRootState.sourceFileCount } else { $null }
+        governedThreadBirthReceiptState = if ($null -ne $governedThreadBirthReceiptState) { [string] $governedThreadBirthReceiptState.receiptState } else { $null }
+        governedThreadBirthReceiptReason = if ($null -ne $governedThreadBirthReceiptState) { [string] $governedThreadBirthReceiptState.reasonCode } else { $null }
+        governedThreadBirthReceiptNextAction = if ($null -ne $governedThreadBirthReceiptState) { [string] $governedThreadBirthReceiptState.nextAction } else { $null }
+        governedThreadBirthReceiptWitnessedOfficeCount = if ($null -ne $governedThreadBirthReceiptState) { [int] $governedThreadBirthReceiptState.witnessedOfficeCount } else { $null }
+        interWorkerBraidHandoffPacketState = if ($null -ne $interWorkerBraidHandoffPacketState) { [string] $interWorkerBraidHandoffPacketState.packetState } else { $null }
+        interWorkerBraidHandoffPacketReason = if ($null -ne $interWorkerBraidHandoffPacketState) { [string] $interWorkerBraidHandoffPacketState.reasonCode } else { $null }
+        interWorkerBraidHandoffPacketNextAction = if ($null -ne $interWorkerBraidHandoffPacketState) { [string] $interWorkerBraidHandoffPacketState.nextAction } else { $null }
+        interWorkerBraidHandoffPacketIdentityInheritanceDenied = if ($null -ne $interWorkerBraidHandoffPacketState) { [bool] $interWorkerBraidHandoffPacketState.identityInheritanceDenied } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1823,6 +1877,48 @@ if ($null -ne $operatorActualWorkSessionRehearsalState) {
     )
 }
 
+if ($null -ne $identityInvariantThreadRootState) {
+    $markdownLines += @(
+        '## Identity-Invariant Thread Root',
+        '',
+        ('- Thread-root state: `{0}`' -f [string] $identityInvariantThreadRootState.threadRootState),
+        ('- Reason code: `{0}`' -f [string] $identityInvariantThreadRootState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $identityInvariantThreadRootState.nextAction),
+        ('- Runtime readiness state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'runtimeReadinessState')),
+        ('- Thread-root projection bound: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'threadRootProjectionBound')),
+        ('- Service binding bound: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'serviceBindingBound')),
+        ''
+    )
+}
+
+if ($null -ne $governedThreadBirthReceiptState) {
+    $markdownLines += @(
+        '## Governed Thread Birth Receipt',
+        '',
+        ('- Receipt state: `{0}`' -f [string] $governedThreadBirthReceiptState.receiptState),
+        ('- Reason code: `{0}`' -f [string] $governedThreadBirthReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $governedThreadBirthReceiptState.nextAction),
+        ('- Thread-root state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $governedThreadBirthReceiptState -PropertyName 'threadRootState')),
+        ('- Nexus portal state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $governedThreadBirthReceiptState -PropertyName 'nexusPortalState')),
+        ('- Witnessed offices: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $governedThreadBirthReceiptState -PropertyName 'witnessedOfficeCount')),
+        ''
+    )
+}
+
+if ($null -ne $interWorkerBraidHandoffPacketState) {
+    $markdownLines += @(
+        '## Inter-Worker Braid Handoff Packet',
+        '',
+        ('- Packet state: `{0}`' -f [string] $interWorkerBraidHandoffPacketState.packetState),
+        ('- Reason code: `{0}`' -f [string] $interWorkerBraidHandoffPacketState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $interWorkerBraidHandoffPacketState.nextAction),
+        ('- Thread-birth state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interWorkerBraidHandoffPacketState -PropertyName 'threadBirthState')),
+        ('- Duplex state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interWorkerBraidHandoffPacketState -PropertyName 'duplexState')),
+        ('- Identity inheritance denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interWorkerBraidHandoffPacketState -PropertyName 'identityInheritanceDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1897,6 +1993,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -NexusSingularPortalFacadeState $nexusSingularPortalFacadeState `
             -DuplexPredicateEnvelopeState $duplexPredicateEnvelopeState `
             -OperatorActualWorkSessionRehearsalState $operatorActualWorkSessionRehearsalState `
+            -IdentityInvariantThreadRootState $identityInvariantThreadRootState `
+            -GovernedThreadBirthReceiptState $governedThreadBirthReceiptState `
+            -InterWorkerBraidHandoffPacketState $interWorkerBraidHandoffPacketState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
