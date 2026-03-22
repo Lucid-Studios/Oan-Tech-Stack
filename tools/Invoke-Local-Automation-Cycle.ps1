@@ -829,6 +829,10 @@ $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automatio
 $taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
 $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
+$workspaceBucketStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Workspace-BucketStatus.ps1'
+$workspaceBucketStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $workspaceBucketStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Workspace bucket status writer'
+$workspaceBucketStatusPath = Get-ScriptOutputTail -Output $workspaceBucketStatusOutput
+
 $notificationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-AutomationNotification.ps1'
 $notificationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $notificationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-PreviousStatus', $previousStatus, '-CurrentStatus', $latestStatus) -FailureContext 'Automation notification writer'
 $notificationStatePathFromRun = Get-ScriptOutputTail -Output $notificationOutput
@@ -960,6 +964,9 @@ if (-not [string]::IsNullOrWhiteSpace($blockedEscalationBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) {
     Write-Host ('[local-automation-cycle] TaskStatus: {0}' -f $taskStatusPath)
+}
+if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) {
+    Write-Host ('[local-automation-cycle] WorkspaceBuckets: {0}' -f $workspaceBucketStatusPath)
 }
 
 if ($latestStatus -eq $blockedStatus) {
