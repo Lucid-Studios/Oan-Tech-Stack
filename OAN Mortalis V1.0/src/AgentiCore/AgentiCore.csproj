@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\AgentiCore.Runtime\AgentiCore.Runtime.csproj" />
     <ProjectReference Include="..\CradleTek.CognitionHost\CradleTek.CognitionHost.csproj" />
     <ProjectReference Include="..\CradleTek.Host\CradleTek.Host.csproj" />
     <ProjectReference Include="..\CradleTek.Memory\CradleTek.Memory.csproj" />

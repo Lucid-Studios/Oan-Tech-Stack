@@ -417,6 +417,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepInterWorkerBraidHandoffPacketBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.agentiCoreActualUtilitySurfaceOutputRoot)
+        keep = [int] $retentionPolicy.keepAgentiCoreActualUtilitySurfaceBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachDuplexRealizationSeamOutputRoot)
+        keep = [int] $retentionPolicy.keepReachDuplexRealizationSeamBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedParticipationLocalityLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepBondedParticipationLocalityLedgerBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)
         keep = [int] $retentionPolicy.keepBlockedEscalationBundles
     }

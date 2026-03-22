@@ -155,6 +155,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $IdentityInvariantThreadRootState,
         [object] $GovernedThreadBirthReceiptState,
         [object] $InterWorkerBraidHandoffPacketState,
+        [object] $AgentiCoreActualUtilitySurfaceState,
+        [object] $ReachDuplexRealizationSeamState,
+        [object] $BondedParticipationLocalityLedgerState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -605,6 +608,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'agenticore-actual-utility-surface' {
+            if ($null -ne $AgentiCoreActualUtilitySurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'reach-duplex-realization-seam' {
+            if ($null -ne $ReachDuplexRealizationSeamState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'bonded-participation-locality-ledger' {
+            if ($null -ne $BondedParticipationLocalityLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -702,6 +732,9 @@ $operatorActualWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $r
 $identityInvariantThreadRootStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.identityInvariantThreadRootStatePath)
 $governedThreadBirthReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.governedThreadBirthReceiptStatePath)
 $interWorkerBraidHandoffPacketStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.interWorkerBraidHandoffPacketStatePath)
+$agentiCoreActualUtilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.agentiCoreActualUtilitySurfaceStatePath)
+$reachDuplexRealizationSeamStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachDuplexRealizationSeamStatePath)
+$bondedParticipationLocalityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedParticipationLocalityLedgerStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -752,6 +785,9 @@ $operatorActualWorkSessionRehearsalState = Read-JsonFileOrNull -Path $operatorAc
 $identityInvariantThreadRootState = Read-JsonFileOrNull -Path $identityInvariantThreadRootStatePath
 $governedThreadBirthReceiptState = Read-JsonFileOrNull -Path $governedThreadBirthReceiptStatePath
 $interWorkerBraidHandoffPacketState = Read-JsonFileOrNull -Path $interWorkerBraidHandoffPacketStatePath
+$agentiCoreActualUtilitySurfaceState = Read-JsonFileOrNull -Path $agentiCoreActualUtilitySurfaceStatePath
+$reachDuplexRealizationSeamState = Read-JsonFileOrNull -Path $reachDuplexRealizationSeamStatePath
+$bondedParticipationLocalityLedgerState = Read-JsonFileOrNull -Path $bondedParticipationLocalityLedgerStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -948,6 +984,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -IdentityInvariantThreadRootState $identityInvariantThreadRootState `
                 -GovernedThreadBirthReceiptState $governedThreadBirthReceiptState `
                 -InterWorkerBraidHandoffPacketState $interWorkerBraidHandoffPacketState `
+                -AgentiCoreActualUtilitySurfaceState $agentiCoreActualUtilitySurfaceState `
+                -ReachDuplexRealizationSeamState $reachDuplexRealizationSeamState `
+                -BondedParticipationLocalityLedgerState $bondedParticipationLocalityLedgerState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1052,6 +1091,9 @@ $taskMapEntries = @(
                     -IdentityInvariantThreadRootState $identityInvariantThreadRootState `
                     -GovernedThreadBirthReceiptState $governedThreadBirthReceiptState `
                     -InterWorkerBraidHandoffPacketState $interWorkerBraidHandoffPacketState `
+                    -AgentiCoreActualUtilitySurfaceState $agentiCoreActualUtilitySurfaceState `
+                    -ReachDuplexRealizationSeamState $reachDuplexRealizationSeamState `
+                    -BondedParticipationLocalityLedgerState $bondedParticipationLocalityLedgerState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1278,6 +1320,19 @@ $statusPayload = [ordered]@{
         interWorkerBraidHandoffPacketReason = if ($null -ne $interWorkerBraidHandoffPacketState) { [string] $interWorkerBraidHandoffPacketState.reasonCode } else { $null }
         interWorkerBraidHandoffPacketNextAction = if ($null -ne $interWorkerBraidHandoffPacketState) { [string] $interWorkerBraidHandoffPacketState.nextAction } else { $null }
         interWorkerBraidHandoffPacketIdentityInheritanceDenied = if ($null -ne $interWorkerBraidHandoffPacketState) { [bool] $interWorkerBraidHandoffPacketState.identityInheritanceDenied } else { $null }
+        agentiCoreActualUtilitySurfaceState = if ($null -ne $agentiCoreActualUtilitySurfaceState) { [string] $agentiCoreActualUtilitySurfaceState.utilityState } else { $null }
+        agentiCoreActualUtilitySurfaceReason = if ($null -ne $agentiCoreActualUtilitySurfaceState) { [string] $agentiCoreActualUtilitySurfaceState.reasonCode } else { $null }
+        agentiCoreActualUtilitySurfaceNextAction = if ($null -ne $agentiCoreActualUtilitySurfaceState) { [string] $agentiCoreActualUtilitySurfaceState.nextAction } else { $null }
+        agentiCoreActualUtilitySurfacePosture = if ($null -ne $agentiCoreActualUtilitySurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $agentiCoreActualUtilitySurfaceState -PropertyName 'utilityPosture') } else { $null }
+        reachDuplexRealizationSeamState = if ($null -ne $reachDuplexRealizationSeamState) { [string] $reachDuplexRealizationSeamState.seamState } else { $null }
+        reachDuplexRealizationSeamReason = if ($null -ne $reachDuplexRealizationSeamState) { [string] $reachDuplexRealizationSeamState.reasonCode } else { $null }
+        reachDuplexRealizationSeamNextAction = if ($null -ne $reachDuplexRealizationSeamState) { [string] $reachDuplexRealizationSeamState.nextAction } else { $null }
+        reachDuplexRealizationSeamGrantImplied = if ($null -ne $reachDuplexRealizationSeamState) { [bool] $reachDuplexRealizationSeamState.grantImplied } else { $null }
+        bondedParticipationLocalityLedgerState = if ($null -ne $bondedParticipationLocalityLedgerState) { [string] $bondedParticipationLocalityLedgerState.ledgerState } else { $null }
+        bondedParticipationLocalityLedgerReason = if ($null -ne $bondedParticipationLocalityLedgerState) { [string] $bondedParticipationLocalityLedgerState.reasonCode } else { $null }
+        bondedParticipationLocalityLedgerNextAction = if ($null -ne $bondedParticipationLocalityLedgerState) { [string] $bondedParticipationLocalityLedgerState.nextAction } else { $null }
+        bondedParticipationLocalityLedgerCoRealizedSurfaceCount = if ($null -ne $bondedParticipationLocalityLedgerState) { [int] $bondedParticipationLocalityLedgerState.coRealizedSurfaceCount } else { $null }
+        bondedParticipationLocalityLedgerWithheldSurfaceCount = if ($null -ne $bondedParticipationLocalityLedgerState) { [int] $bondedParticipationLocalityLedgerState.withheldSurfaceCount } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1919,6 +1974,51 @@ if ($null -ne $interWorkerBraidHandoffPacketState) {
     )
 }
 
+if ($null -ne $agentiCoreActualUtilitySurfaceState) {
+    $markdownLines += @(
+        '## AgentiCore.actual Utility Surface',
+        '',
+        ('- Utility state: `{0}`' -f [string] $agentiCoreActualUtilitySurfaceState.utilityState),
+        ('- Reason code: `{0}`' -f [string] $agentiCoreActualUtilitySurfaceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $agentiCoreActualUtilitySurfaceState.nextAction),
+        ('- Utility posture: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $agentiCoreActualUtilitySurfaceState -PropertyName 'utilityPosture')),
+        ('- Thread-birth state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $agentiCoreActualUtilitySurfaceState -PropertyName 'threadBirthState')),
+        ('- Duplex state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $agentiCoreActualUtilitySurfaceState -PropertyName 'duplexState')),
+        ''
+    )
+}
+
+if ($null -ne $reachDuplexRealizationSeamState) {
+    $markdownLines += @(
+        '## Reach Duplex Realization Seam',
+        '',
+        ('- Seam state: `{0}`' -f [string] $reachDuplexRealizationSeamState.seamState),
+        ('- Reason code: `{0}`' -f [string] $reachDuplexRealizationSeamState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $reachDuplexRealizationSeamState.nextAction),
+        ('- Utility state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachDuplexRealizationSeamState -PropertyName 'utilityState')),
+        ('- Reach topology state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachDuplexRealizationSeamState -PropertyName 'reachAccessTopologyState')),
+        ('- Protected legibility state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachDuplexRealizationSeamState -PropertyName 'protectedLegibilityState')),
+        ('- Grant implied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachDuplexRealizationSeamState -PropertyName 'grantImplied')),
+        ''
+    )
+}
+
+if ($null -ne $bondedParticipationLocalityLedgerState) {
+    $markdownLines += @(
+        '## Bonded Participation Locality Ledger',
+        '',
+        ('- Ledger state: `{0}`' -f [string] $bondedParticipationLocalityLedgerState.ledgerState),
+        ('- Reason code: `{0}`' -f [string] $bondedParticipationLocalityLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $bondedParticipationLocalityLedgerState.nextAction),
+        ('- Reach seam state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedParticipationLocalityLedgerState -PropertyName 'reachSeamState')),
+        ('- Operator rehearsal state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedParticipationLocalityLedgerState -PropertyName 'operatorRehearsalState')),
+        ('- Operator locality state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedParticipationLocalityLedgerState -PropertyName 'operatorLocalityState')),
+        ('- Co-realized surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedParticipationLocalityLedgerState -PropertyName 'coRealizedSurfaceCount')),
+        ('- Withheld surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedParticipationLocalityLedgerState -PropertyName 'withheldSurfaceCount')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1996,6 +2096,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -IdentityInvariantThreadRootState $identityInvariantThreadRootState `
             -GovernedThreadBirthReceiptState $governedThreadBirthReceiptState `
             -InterWorkerBraidHandoffPacketState $interWorkerBraidHandoffPacketState `
+            -AgentiCoreActualUtilitySurfaceState $agentiCoreActualUtilitySurfaceState `
+            -ReachDuplexRealizationSeamState $reachDuplexRealizationSeamState `
+            -BondedParticipationLocalityLedgerState $bondedParticipationLocalityLedgerState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

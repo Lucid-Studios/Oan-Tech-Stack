@@ -408,7 +408,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces are declared runway only until worker-root, reach-legibility, and duplex-predicate maps lawfully activate them
+- `AgentiCore.actual` utility-surface bundles land under `.audit/runs/agenticore-actual-utility-surface/` and update `.audit/state/local-automation-agenticore-actual-utility-surface-last-run.json`
+- reach duplex-realization seam bundles land under `.audit/runs/reach-duplex-realization-seam/` and update `.audit/state/local-automation-reach-duplex-realization-seam-last-run.json`
+- bonded participation locality-ledger bundles land under `.audit/runs/bonded-participation-locality-ledger/` and update `.audit/state/local-automation-bonded-participation-locality-ledger-last-run.json`
+- these surfaces witness governed utility, cross-locality realization, and provisional bonded locality without implying sovereign access grant or fully ratified bonded `Operator.actual`
 
 ### Automation Maturation Map 21
 

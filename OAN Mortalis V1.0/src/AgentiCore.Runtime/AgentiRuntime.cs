@@ -40,4 +40,19 @@ public sealed class AgentiRuntime : IOanService
             bridgeResponse,
             DateTimeOffset.UtcNow);
     }
+
+    public async Task<ReachDuplexRealizationDispatchReceipt> SendReachDuplexRealizationAsync(
+        ReachDuplexRealizationEnvelope envelope,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(envelope);
+
+        var packet = ReachDuplexRealizationSurfaceContracts.CreatePacket(envelope);
+        var bridgeResponse = await _sliBridge.SendPacketAsync(packet, cancellationToken).ConfigureAwait(false);
+        return ReachDuplexRealizationSurfaceContracts.CreateDispatchReceipt(
+            envelope,
+            packet,
+            bridgeResponse,
+            DateTimeOffset.UtcNow);
+    }
 }

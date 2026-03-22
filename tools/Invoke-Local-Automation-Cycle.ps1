@@ -204,6 +204,9 @@ $operatorActualWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $r
 $identityInvariantThreadRootStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.identityInvariantThreadRootStatePath)
 $governedThreadBirthReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.governedThreadBirthReceiptStatePath)
 $interWorkerBraidHandoffPacketStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.interWorkerBraidHandoffPacketStatePath)
+$agentiCoreActualUtilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.agentiCoreActualUtilitySurfaceStatePath)
+$reachDuplexRealizationSeamStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.reachDuplexRealizationSeamStatePath)
+$bondedParticipationLocalityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedParticipationLocalityLedgerStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -446,6 +449,12 @@ $statePayload.lastGovernedThreadBirthReceiptBundle = [string] (Get-ObjectPropert
 $statePayload.governedThreadBirthReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $governedThreadBirthReceiptStatePath
 $statePayload.lastInterWorkerBraidHandoffPacketBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastInterWorkerBraidHandoffPacketBundle')
 $statePayload.interWorkerBraidHandoffPacketStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $interWorkerBraidHandoffPacketStatePath
+$statePayload.lastAgentiCoreActualUtilitySurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastAgentiCoreActualUtilitySurfaceBundle')
+$statePayload.agentiCoreActualUtilitySurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $agentiCoreActualUtilitySurfaceStatePath
+$statePayload.lastReachDuplexRealizationSeamBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReachDuplexRealizationSeamBundle')
+$statePayload.reachDuplexRealizationSeamStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachDuplexRealizationSeamStatePath
+$statePayload.lastBondedParticipationLocalityLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBondedParticipationLocalityLedgerBundle')
+$statePayload.bondedParticipationLocalityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedParticipationLocalityLedgerStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -890,6 +899,33 @@ if (-not [string]::IsNullOrWhiteSpace($interWorkerBraidHandoffPacketBundlePath))
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$agentiCoreActualUtilitySurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-AgentiCoreActual-UtilitySurface.ps1'
+$agentiCoreActualUtilitySurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $agentiCoreActualUtilitySurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'AgentiCore.actual utility-surface writer'
+$agentiCoreActualUtilitySurfaceBundlePath = Get-ScriptOutputTail -Output $agentiCoreActualUtilitySurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($agentiCoreActualUtilitySurfaceBundlePath)) {
+    $statePayload.lastAgentiCoreActualUtilitySurfaceBundle = $agentiCoreActualUtilitySurfaceBundlePath
+    $statePayload.agentiCoreActualUtilitySurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $agentiCoreActualUtilitySurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$reachDuplexRealizationSeamScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Reach-DuplexRealizationSeam.ps1'
+$reachDuplexRealizationSeamOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $reachDuplexRealizationSeamScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Reach duplex-realization seam writer'
+$reachDuplexRealizationSeamBundlePath = Get-ScriptOutputTail -Output $reachDuplexRealizationSeamOutput
+if (-not [string]::IsNullOrWhiteSpace($reachDuplexRealizationSeamBundlePath)) {
+    $statePayload.lastReachDuplexRealizationSeamBundle = $reachDuplexRealizationSeamBundlePath
+    $statePayload.reachDuplexRealizationSeamStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachDuplexRealizationSeamStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$bondedParticipationLocalityLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BondedParticipation-LocalityLedger.ps1'
+$bondedParticipationLocalityLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $bondedParticipationLocalityLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bonded participation locality-ledger writer'
+$bondedParticipationLocalityLedgerBundlePath = Get-ScriptOutputTail -Output $bondedParticipationLocalityLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($bondedParticipationLocalityLedgerBundlePath)) {
+    $statePayload.lastBondedParticipationLocalityLedgerBundle = $bondedParticipationLocalityLedgerBundlePath
+    $statePayload.bondedParticipationLocalityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedParticipationLocalityLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -990,6 +1026,12 @@ $summary = [ordered]@{
     governedThreadBirthReceiptStatePath = $statePayload.governedThreadBirthReceiptStatePath
     lastInterWorkerBraidHandoffPacketBundle = $statePayload.lastInterWorkerBraidHandoffPacketBundle
     interWorkerBraidHandoffPacketStatePath = $statePayload.interWorkerBraidHandoffPacketStatePath
+    lastAgentiCoreActualUtilitySurfaceBundle = $statePayload.lastAgentiCoreActualUtilitySurfaceBundle
+    agentiCoreActualUtilitySurfaceStatePath = $statePayload.agentiCoreActualUtilitySurfaceStatePath
+    lastReachDuplexRealizationSeamBundle = $statePayload.lastReachDuplexRealizationSeamBundle
+    reachDuplexRealizationSeamStatePath = $statePayload.reachDuplexRealizationSeamStatePath
+    lastBondedParticipationLocalityLedgerBundle = $statePayload.lastBondedParticipationLocalityLedgerBundle
+    bondedParticipationLocalityLedgerStatePath = $statePayload.bondedParticipationLocalityLedgerStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
