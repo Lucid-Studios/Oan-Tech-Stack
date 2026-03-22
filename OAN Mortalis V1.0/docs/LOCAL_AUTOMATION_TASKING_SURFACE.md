@@ -426,6 +426,45 @@ Current live output surfaces for this map:
 
 - these surfaces are declared runway only until `AgentiCore.actual`, `reach`, and bounded runtime-work maps collapse lawfully into a first deployable in-runtime workbench
 
+### Automation Maturation Map 22
+
+- Goal: turn the bounded Sanctuary-in-runtime workbench into a governed session surface where amenable day-dream motion can collapse into bounded work and self-rooted cryptic depth can return without residue or continuity inflation
+- Expected review windows: `2`
+- Selected tasks:
+  - `Runtime Workbench Session Ledger`
+  - `Day-Dream Collapse Receipt`
+  - `Cryptic Depth Return Receipt`
+
+Current live output surfaces for this map:
+
+- these surfaces remain declared runway only until the first bounded Sanctuary workbench exists and can emit session, collapse, and return receipts without continuity inflation
+
+### Automation Maturation Map 23
+
+- Goal: rehearse the first bonded co-work loop between `Sanctuary.actual` and `Operator.actual` inside the workbench era while keeping duplex participation, return, and dissolution lawful
+- Expected review windows: `2`
+- Selected tasks:
+  - `Bonded Co-Work Session Rehearsal`
+  - `Reach Return Dissolution Receipt`
+  - `Locality Distinction Witness Ledger`
+
+Current live output surfaces for this map:
+
+- these surfaces remain declared runway only until bounded co-work can be rehearsed through `reach` without collapsing locality, office, or return law
+
+### Automation Maturation Map 24
+
+- Goal: prepare the local host for bounded Sanctuary habitation so recurring CME-side runtime work can begin without overstating bonded release, publication maturity, or MoS-bearing depth
+- Expected review windows: `2`
+- Selected tasks:
+  - `Local Host Sanctuary Residency Envelope`
+  - `Runtime Habitation Readiness Ledger`
+  - `Bounded Inhabitation Launch Rehearsal`
+
+Current live output surfaces for this map:
+
+- these surfaces remain declared runway only until bounded habitation can be rehearsed on the local host with explicit entry, readiness, and return truth
+
 ## Status Interpretation
 
 The task board must distinguish between:

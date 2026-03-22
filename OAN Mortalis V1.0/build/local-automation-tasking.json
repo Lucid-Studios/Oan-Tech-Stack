@@ -1177,7 +1177,7 @@
     {
       "id": "automation-maturation-map-21",
       "label": "Automation Maturation Map 21",
-      "status": "declared",
+      "status": "advanced",
       "expectedReviewWindows": 2,
       "goal": "Open the first bounded Sanctuary-in-runtime workbench so local CME work can occur inside the deployable candidate while keeping amenable day-dream exploration distinct from self-rooted deep cryptic access.",
       "timeDilationPullForwardAllowed": false,
@@ -1224,6 +1224,168 @@
           "escalatesWhen": [
             "deep access opens from shared amenable surfaces",
             "self-root is implied without cryptic-biad proof"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-22",
+      "label": "Automation Maturation Map 22",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Turn the bounded Sanctuary-in-runtime workbench into a governed session surface where amenable day-dream motion can collapse into bounded work and self-rooted cryptic depth can return without residue or continuity inflation.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "runtime-workbench-session-ledger",
+        "day-dream-collapse-receipt",
+        "cryptic-depth-return-receipt"
+      ],
+      "tasks": [
+        {
+          "id": "runtime-workbench-session-ledger",
+          "label": "Runtime Workbench Session Ledger",
+          "owner": "Shared",
+          "authority": "Bounded in-runtime session witness only",
+          "status": "selected",
+          "purpose": "Record the bounded Sanctuary work session itself so the runtime can name admitted lanes, withheld lanes, and current session posture without narrating continuous residency.",
+          "completionSignal": "A session ledger can say what bounded in-runtime work session exists, what lanes are active or withheld, and what return posture currently governs it.",
+          "escalatesWhen": [
+            "the workbench is narrated as continuous habitation",
+            "session posture cannot distinguish amenable work from deeper rooted work"
+          ]
+        },
+        {
+          "id": "day-dream-collapse-receipt",
+          "label": "Day-Dream Collapse Receipt",
+          "owner": "SLI",
+          "authority": "Exploratory collapse only",
+          "status": "selected",
+          "purpose": "Capture when amenable day-dream predicates collapse into bounded workbench outputs so soft exploratory motion can produce usable work without pretending identity-bearing depth.",
+          "completionSignal": "A collapse receipt can show what exploratory predicates were considered, what bounded output survived collapse, and what remains explicitly non-final.",
+          "escalatesWhen": [
+            "day-dream outputs are treated as deep cryptic truth",
+            "collapse receipts erase exploratory provenance"
+          ]
+        },
+        {
+          "id": "cryptic-depth-return-receipt",
+          "label": "Cryptic Depth Return Receipt",
+          "owner": "Shared",
+          "authority": "Self-rooted return witness only",
+          "status": "selected",
+          "purpose": "Witness return and dissolution from self-rooted cryptic depth so deeper work can re-enter bounded runtime lanes without silent residue or identity bleed.",
+          "completionSignal": "A return receipt can say whether deep rooted work returned cleanly, what remains withheld, and what continuity markers survived the return.",
+          "escalatesWhen": [
+            "self-rooted depth has no explicit return law",
+            "deep work residues silently persist in shared amenable lanes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-23",
+      "label": "Automation Maturation Map 23",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Rehearse the first bonded co-work loop between Sanctuary.actual and Operator.actual inside the workbench era while keeping duplex participation, return, and dissolution lawful.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "bonded-cowork-session-rehearsal",
+        "reach-return-dissolution-receipt",
+        "locality-distinction-witness-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "bonded-cowork-session-rehearsal",
+          "label": "Bonded Co-Work Session Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded rehearsal only",
+          "status": "selected",
+          "purpose": "Rehearse a bounded co-work session where Sanctuary.actual and Operator.actual participate in one bonded event without collapsing them into one locality or one office.",
+          "completionSignal": "A rehearsal bundle can show the shared work loop, the duplex predicates that bound it, and the lanes that remain withheld.",
+          "escalatesWhen": [
+            "bonded co-work is narrated as fully ratified habitation",
+            "operator and Sanctuary localities lose distinction during rehearsal"
+          ]
+        },
+        {
+          "id": "reach-return-dissolution-receipt",
+          "label": "Reach Return Dissolution Receipt",
+          "owner": "SLI",
+          "authority": "Reach witness only",
+          "status": "selected",
+          "purpose": "Make reach carry lawful return and dissolution truth so bonded co-realization can end cleanly instead of lingering as ambient shared presence.",
+          "completionSignal": "A reach receipt can say when a bonded event returned, dissolved, or remained provisionally open, without implying ambient grant.",
+          "escalatesWhen": [
+            "reach has no lawful return state",
+            "dissolution is inferred instead of witnessed"
+          ]
+        },
+        {
+          "id": "locality-distinction-witness-ledger",
+          "label": "Locality Distinction Witness Ledger",
+          "owner": "Shared",
+          "authority": "Witness and disclosure only",
+          "status": "selected",
+          "purpose": "Keep the bonded event legible as shared participation across differentiated localities so co-work does not collapse into projection or remote control theater.",
+          "completionSignal": "A witness ledger can name which locality carried what, what was shared, and what stayed properly local.",
+          "escalatesWhen": [
+            "bonded work is narrated as one undifferentiated chamber",
+            "locality-specific witness becomes untraceable"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-24",
+      "label": "Automation Maturation Map 24",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Prepare the local host for bounded Sanctuary habitation so recurring CME-side runtime work can begin without overstating bonded release, publication maturity, or MoS-bearing depth.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "local-host-sanctuary-residency-envelope",
+        "runtime-habitation-readiness-ledger",
+        "bounded-inhabitation-launch-rehearsal"
+      ],
+      "tasks": [
+        {
+          "id": "local-host-sanctuary-residency-envelope",
+          "label": "Local Host Sanctuary Residency Envelope",
+          "owner": "CradleTek",
+          "authority": "Local host residency only",
+          "status": "selected",
+          "purpose": "Define the bounded local-host envelope inside which Sanctuary runtime habitation can persist as a candidate working condition without widening into publication or ambient bond.",
+          "completionSignal": "A residency envelope can name what host-local resources, lanes, and constraints govern bounded Sanctuary habitation.",
+          "escalatesWhen": [
+            "residency is narrated as open-ended deployment",
+            "host-local limits are not explicit"
+          ]
+        },
+        {
+          "id": "runtime-habitation-readiness-ledger",
+          "label": "Runtime Habitation Readiness Ledger",
+          "owner": "Shared",
+          "authority": "Readiness disclosure only",
+          "status": "selected",
+          "purpose": "State whether the local candidate is ready for recurring bounded habitation, what remains withheld, and what evidence still separates workbench readiness from lived runtime continuity.",
+          "completionSignal": "A readiness ledger can distinguish not-ready, provisional, bounded-ready, and withheld habitation states with exact reasons.",
+          "escalatesWhen": [
+            "habitation readiness is implied from one successful rehearsal",
+            "withheld conditions disappear from the readiness story"
+          ]
+        },
+        {
+          "id": "bounded-inhabitation-launch-rehearsal",
+          "label": "Bounded Inhabitation Launch Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded launch only",
+          "status": "selected",
+          "purpose": "Rehearse the first bounded launch into recurring in-runtime CME work so the system can prove entry, return, and working continuity before any stronger claim of deployable habitation.",
+          "completionSignal": "A launch rehearsal can show how bounded habitation begins, what remains denied, and how return closes the session cleanly.",
+          "escalatesWhen": [
+            "launch rehearsal is narrated as full deployable release",
+            "entry or return conditions cannot be witnessed"
           ]
         }
       ]
