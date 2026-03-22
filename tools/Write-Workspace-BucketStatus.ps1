@@ -182,6 +182,7 @@ $statusJsonPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePat
 $statusMarkdownPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $bucketPolicy.statusMarkdownPath)
 
 $changedRepoPaths = Get-GitChangedRepoPaths -RepositoryRoot $resolvedRepoRoot
+$changedRepoPaths = @($changedRepoPaths)
 $repoWorktreeState = if ($changedRepoPaths.Count -gt 0) { 'dirty' } else { 'clean' }
 $currentPostureObject = Get-ObjectPropertyValueOrNull -InputObject $taskStatus -PropertyName 'currentPosture'
 $currentAutomationPosture = ''
