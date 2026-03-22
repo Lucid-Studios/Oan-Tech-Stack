@@ -44,6 +44,9 @@
   "runtimeDeployabilityEnvelopeOutputRoot": ".audit/runs/runtime-deployability-envelope",
   "sanctuaryRuntimeReadinessOutputRoot": ".audit/runs/sanctuary-runtime-readiness",
   "runtimeWorkSurfaceAdmissibilityOutputRoot": ".audit/runs/runtime-work-surface-admissibility",
+  "reachAccessTopologyLedgerOutputRoot": ".audit/runs/reach-access-topology-ledger",
+  "bondedOperatorLocalityReadinessOutputRoot": ".audit/runs/bonded-operator-locality-readiness",
+  "protectedStateLegibilitySurfaceOutputRoot": ".audit/runs/protected-state-legibility-surface",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -86,6 +89,9 @@
   "runtimeDeployabilityEnvelopeStatePath": ".audit/state/local-automation-runtime-deployability-envelope-last-run.json",
   "sanctuaryRuntimeReadinessStatePath": ".audit/state/local-automation-sanctuary-runtime-readiness-last-run.json",
   "runtimeWorkSurfaceAdmissibilityStatePath": ".audit/state/local-automation-runtime-work-surface-admissibility-last-run.json",
+  "reachAccessTopologyLedgerStatePath": ".audit/state/local-automation-reach-access-topology-ledger-last-run.json",
+  "bondedOperatorLocalityReadinessStatePath": ".audit/state/local-automation-bonded-operator-locality-readiness-last-run.json",
+  "protectedStateLegibilitySurfaceStatePath": ".audit/state/local-automation-protected-state-legibility-surface-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -157,6 +163,9 @@
     "keepRuntimeDeployabilityEnvelopeBundles": 8,
     "keepSanctuaryRuntimeReadinessBundles": 8,
     "keepRuntimeWorkSurfaceAdmissibilityBundles": 8,
+    "keepReachAccessTopologyLedgerBundles": 8,
+    "keepBondedOperatorLocalityReadinessBundles": 8,
+    "keepProtectedStateLegibilitySurfaceBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

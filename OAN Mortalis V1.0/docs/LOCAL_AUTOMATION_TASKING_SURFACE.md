@@ -366,7 +366,9 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces are declared runway only until the next promotion edge lawfully activates them
+- reach access-topology ledgers land under `.audit/runs/reach-access-topology-ledger/` and update `.audit/state/local-automation-reach-access-topology-ledger-last-run.json`
+- bonded operator locality readiness bundles land under `.audit/runs/bonded-operator-locality-readiness/` and update `.audit/state/local-automation-bonded-operator-locality-readiness-last-run.json`
+- protected-state legibility bundles land under `.audit/runs/protected-state-legibility-surface/` and update `.audit/state/local-automation-protected-state-legibility-surface-last-run.json`
 
 ### Automation Maturation Map 18
 

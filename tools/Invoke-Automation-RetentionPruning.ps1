@@ -138,6 +138,9 @@ function Get-ProtectedDirectorySet {
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastRuntimeDeployabilityEnvelopeBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastSanctuaryRuntimeReadinessBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastRuntimeWorkSurfaceAdmissibilityBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastReachAccessTopologyLedgerBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastBondedOperatorLocalityReadinessBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastProtectedStateLegibilitySurfaceBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $BlockedEscalationState -PropertyName 'bundlePath')
     )) {
         if (-not [string]::IsNullOrWhiteSpace($candidate)) {
@@ -370,6 +373,18 @@ $roots = @(
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkSurfaceAdmissibilityOutputRoot)
         keep = [int] $retentionPolicy.keepRuntimeWorkSurfaceAdmissibilityBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachAccessTopologyLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepReachAccessTopologyLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessOutputRoot)
+        keep = [int] $retentionPolicy.keepBondedOperatorLocalityReadinessBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.protectedStateLegibilitySurfaceOutputRoot)
+        keep = [int] $retentionPolicy.keepProtectedStateLegibilitySurfaceBundles
     },
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)

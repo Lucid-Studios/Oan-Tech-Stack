@@ -195,6 +195,9 @@ $masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRe
 $runtimeDeployabilityEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeDeployabilityEnvelopeStatePath)
 $sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sanctuaryRuntimeReadinessStatePath)
 $runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeWorkSurfaceAdmissibilityStatePath)
+$reachAccessTopologyLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.reachAccessTopologyLedgerStatePath)
+$bondedOperatorLocalityReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedOperatorLocalityReadinessStatePath)
+$protectedStateLegibilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.protectedStateLegibilitySurfaceStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -782,6 +785,33 @@ if (-not [string]::IsNullOrWhiteSpace($runtimeWorkSurfaceAdmissibilityBundlePath
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$reachAccessTopologyLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Reach-AccessTopologyLedger.ps1'
+$reachAccessTopologyLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $reachAccessTopologyLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Reach access-topology ledger writer'
+$reachAccessTopologyLedgerBundlePath = Get-ScriptOutputTail -Output $reachAccessTopologyLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($reachAccessTopologyLedgerBundlePath)) {
+    $statePayload.lastReachAccessTopologyLedgerBundle = $reachAccessTopologyLedgerBundlePath
+    $statePayload.reachAccessTopologyLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachAccessTopologyLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$bondedOperatorLocalityReadinessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Bonded-OperatorLocalityReadiness.ps1'
+$bondedOperatorLocalityReadinessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $bondedOperatorLocalityReadinessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bonded operator locality readiness writer'
+$bondedOperatorLocalityReadinessBundlePath = Get-ScriptOutputTail -Output $bondedOperatorLocalityReadinessOutput
+if (-not [string]::IsNullOrWhiteSpace($bondedOperatorLocalityReadinessBundlePath)) {
+    $statePayload.lastBondedOperatorLocalityReadinessBundle = $bondedOperatorLocalityReadinessBundlePath
+    $statePayload.bondedOperatorLocalityReadinessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedOperatorLocalityReadinessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$protectedStateLegibilitySurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ProtectedState-LegibilitySurface.ps1'
+$protectedStateLegibilitySurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $protectedStateLegibilitySurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Protected-state legibility writer'
+$protectedStateLegibilitySurfaceBundlePath = Get-ScriptOutputTail -Output $protectedStateLegibilitySurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($protectedStateLegibilitySurfaceBundlePath)) {
+    $statePayload.lastProtectedStateLegibilitySurfaceBundle = $protectedStateLegibilitySurfaceBundlePath
+    $statePayload.protectedStateLegibilitySurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedStateLegibilitySurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -864,6 +894,12 @@ $summary = [ordered]@{
     sanctuaryRuntimeReadinessStatePath = $statePayload.sanctuaryRuntimeReadinessStatePath
     lastRuntimeWorkSurfaceAdmissibilityBundle = $statePayload.lastRuntimeWorkSurfaceAdmissibilityBundle
     runtimeWorkSurfaceAdmissibilityStatePath = $statePayload.runtimeWorkSurfaceAdmissibilityStatePath
+    lastReachAccessTopologyLedgerBundle = $statePayload.lastReachAccessTopologyLedgerBundle
+    reachAccessTopologyLedgerStatePath = $statePayload.reachAccessTopologyLedgerStatePath
+    lastBondedOperatorLocalityReadinessBundle = $statePayload.lastBondedOperatorLocalityReadinessBundle
+    bondedOperatorLocalityReadinessStatePath = $statePayload.bondedOperatorLocalityReadinessStatePath
+    lastProtectedStateLegibilitySurfaceBundle = $statePayload.lastProtectedStateLegibilitySurfaceBundle
+    protectedStateLegibilitySurfaceStatePath = $statePayload.protectedStateLegibilitySurfaceStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1034,6 +1070,15 @@ if (-not [string]::IsNullOrWhiteSpace($sanctuaryRuntimeReadinessBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($runtimeWorkSurfaceAdmissibilityBundlePath)) {
     Write-Host ('[local-automation-cycle] RuntimeWorkSurfaceAdmissibility: {0}' -f $runtimeWorkSurfaceAdmissibilityBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($reachAccessTopologyLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] ReachAccessTopologyLedger: {0}' -f $reachAccessTopologyLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($bondedOperatorLocalityReadinessBundlePath)) {
+    Write-Host ('[local-automation-cycle] BondedOperatorLocalityReadiness: {0}' -f $bondedOperatorLocalityReadinessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($protectedStateLegibilitySurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] ProtectedStateLegibilitySurface: {0}' -f $protectedStateLegibilitySurfaceBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

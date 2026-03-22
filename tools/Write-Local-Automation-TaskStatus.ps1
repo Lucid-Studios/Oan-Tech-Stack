@@ -146,6 +146,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $RuntimeDeployabilityEnvelopeState,
         [object] $SanctuaryRuntimeReadinessState,
         [object] $RuntimeWorkSurfaceAdmissibilityState,
+        [object] $ReachAccessTopologyLedgerState,
+        [object] $BondedOperatorLocalityReadinessState,
+        [object] $ProtectedStateLegibilitySurfaceState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -515,6 +518,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'reach-access-topology-ledger' {
+            if ($null -ne $ReachAccessTopologyLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'bonded-operator-locality-readiness' {
+            if ($null -ne $BondedOperatorLocalityReadinessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'protected-state-legibility-surface' {
+            if ($null -ne $ProtectedStateLegibilitySurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -603,6 +633,9 @@ $masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRe
 $runtimeDeployabilityEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeDeployabilityEnvelopeStatePath)
 $sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeReadinessStatePath)
 $runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkSurfaceAdmissibilityStatePath)
+$reachAccessTopologyLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachAccessTopologyLedgerStatePath)
+$bondedOperatorLocalityReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessStatePath)
+$protectedStateLegibilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.protectedStateLegibilitySurfaceStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -644,6 +677,9 @@ $masterThreadOrchestrationState = Read-JsonFileOrNull -Path $masterThreadOrchest
 $runtimeDeployabilityEnvelopeState = Read-JsonFileOrNull -Path $runtimeDeployabilityEnvelopeStatePath
 $sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
 $runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSurfaceAdmissibilityStatePath
+$reachAccessTopologyLedgerState = Read-JsonFileOrNull -Path $reachAccessTopologyLedgerStatePath
+$bondedOperatorLocalityReadinessState = Read-JsonFileOrNull -Path $bondedOperatorLocalityReadinessStatePath
+$protectedStateLegibilitySurfaceState = Read-JsonFileOrNull -Path $protectedStateLegibilitySurfaceStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -831,6 +867,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -RuntimeDeployabilityEnvelopeState $runtimeDeployabilityEnvelopeState `
                 -SanctuaryRuntimeReadinessState $sanctuaryRuntimeReadinessState `
                 -RuntimeWorkSurfaceAdmissibilityState $runtimeWorkSurfaceAdmissibilityState `
+                -ReachAccessTopologyLedgerState $reachAccessTopologyLedgerState `
+                -BondedOperatorLocalityReadinessState $bondedOperatorLocalityReadinessState `
+                -ProtectedStateLegibilitySurfaceState $protectedStateLegibilitySurfaceState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -926,6 +965,9 @@ $taskMapEntries = @(
                     -RuntimeDeployabilityEnvelopeState $runtimeDeployabilityEnvelopeState `
                     -SanctuaryRuntimeReadinessState $sanctuaryRuntimeReadinessState `
                     -RuntimeWorkSurfaceAdmissibilityState $runtimeWorkSurfaceAdmissibilityState `
+                    -ReachAccessTopologyLedgerState $reachAccessTopologyLedgerState `
+                    -BondedOperatorLocalityReadinessState $bondedOperatorLocalityReadinessState `
+                    -ProtectedStateLegibilitySurfaceState $protectedStateLegibilitySurfaceState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1115,6 +1157,17 @@ $statusPayload = [ordered]@{
         runtimeWorkSurfaceAdmissibilityNextAction = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [string] $runtimeWorkSurfaceAdmissibilityState.nextAction } else { $null }
         runtimeWorkAdmissibleSurfaceCount = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [int] $runtimeWorkSurfaceAdmissibilityState.admissibleSurfaceCount } else { $null }
         runtimeWorkDeniedSurfaceCount = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [int] $runtimeWorkSurfaceAdmissibilityState.deniedSurfaceCount } else { $null }
+        reachAccessTopologyLedgerState = if ($null -ne $reachAccessTopologyLedgerState) { [string] $reachAccessTopologyLedgerState.ledgerState } else { $null }
+        reachAccessTopologyLedgerReason = if ($null -ne $reachAccessTopologyLedgerState) { [string] $reachAccessTopologyLedgerState.reasonCode } else { $null }
+        reachAccessTopologyLedgerNextAction = if ($null -ne $reachAccessTopologyLedgerState) { [string] $reachAccessTopologyLedgerState.nextAction } else { $null }
+        reachAccessTopologyDisclosedSurfaceCount = if ($null -ne $reachAccessTopologyLedgerState) { [int] $reachAccessTopologyLedgerState.disclosedSurfaceCount } else { $null }
+        bondedOperatorLocalityReadinessState = if ($null -ne $bondedOperatorLocalityReadinessState) { [string] $bondedOperatorLocalityReadinessState.readinessState } else { $null }
+        bondedOperatorLocalityReadinessReason = if ($null -ne $bondedOperatorLocalityReadinessState) { [string] $bondedOperatorLocalityReadinessState.reasonCode } else { $null }
+        bondedOperatorLocalityReadinessNextAction = if ($null -ne $bondedOperatorLocalityReadinessState) { [string] $bondedOperatorLocalityReadinessState.nextAction } else { $null }
+        protectedStateLegibilitySurfaceState = if ($null -ne $protectedStateLegibilitySurfaceState) { [string] $protectedStateLegibilitySurfaceState.legibilityState } else { $null }
+        protectedStateLegibilitySurfaceReason = if ($null -ne $protectedStateLegibilitySurfaceState) { [string] $protectedStateLegibilitySurfaceState.reasonCode } else { $null }
+        protectedStateLegibilitySurfaceNextAction = if ($null -ne $protectedStateLegibilitySurfaceState) { [string] $protectedStateLegibilitySurfaceState.nextAction } else { $null }
+        protectedStateLegibilityVisibleSignalCount = if ($null -ne $protectedStateLegibilitySurfaceState) { [int] $protectedStateLegibilitySurfaceState.visibleSignalCount } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1626,6 +1679,46 @@ if ($null -ne $runtimeWorkSurfaceAdmissibilityState) {
         ('- Next action: `{0}`' -f [string] $runtimeWorkSurfaceAdmissibilityState.nextAction),
         ('- Admissible surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibleSurfaceCount')),
         ('- Denied surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'deniedSurfaceCount')),
+        ''
+    )
+}
+
+if ($null -ne $reachAccessTopologyLedgerState) {
+    $markdownLines += @(
+        '## Reach Access Topology Ledger',
+        '',
+        ('- Ledger state: `{0}`' -f [string] $reachAccessTopologyLedgerState.ledgerState),
+        ('- Reason code: `{0}`' -f [string] $reachAccessTopologyLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $reachAccessTopologyLedgerState.nextAction),
+        ('- Disclosed surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachAccessTopologyLedgerState -PropertyName 'disclosedSurfaceCount')),
+        ('- Denied surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachAccessTopologyLedgerState -PropertyName 'deniedSurfaceCount')),
+        ('- Inventory entries: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $reachAccessTopologyLedgerState -PropertyName 'inventoryEntryCount')),
+        ''
+    )
+}
+
+if ($null -ne $bondedOperatorLocalityReadinessState) {
+    $markdownLines += @(
+        '## Bonded Operator Locality Readiness',
+        '',
+        ('- Readiness state: `{0}`' -f [string] $bondedOperatorLocalityReadinessState.readinessState),
+        ('- Reason code: `{0}`' -f [string] $bondedOperatorLocalityReadinessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $bondedOperatorLocalityReadinessState.nextAction),
+        ('- Runtime readiness state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedOperatorLocalityReadinessState -PropertyName 'runtimeReadinessState')),
+        ('- Reach ledger state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedOperatorLocalityReadinessState -PropertyName 'reachLedgerState')),
+        ''
+    )
+}
+
+if ($null -ne $protectedStateLegibilitySurfaceState) {
+    $markdownLines += @(
+        '## Protected State Legibility Surface',
+        '',
+        ('- Legibility state: `{0}`' -f [string] $protectedStateLegibilitySurfaceState.legibilityState),
+        ('- Reason code: `{0}`' -f [string] $protectedStateLegibilitySurfaceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $protectedStateLegibilitySurfaceState.nextAction),
+        ('- Protected interiority exposure: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedStateLegibilitySurfaceState -PropertyName 'protectedInteriorityExposure')),
+        ('- Visible signals: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedStateLegibilitySurfaceState -PropertyName 'visibleSignalCount')),
         ''
     )
 }
