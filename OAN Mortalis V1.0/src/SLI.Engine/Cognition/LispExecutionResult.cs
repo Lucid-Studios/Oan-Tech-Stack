@@ -1,5 +1,6 @@
 using CradleTek.CognitionHost.Models;
 using Oan.Common;
+using SLI.Engine.Nexus;
 using SLI.Engine.Runtime;
 
 namespace SLI.Engine.Cognition;
@@ -19,4 +20,5 @@ public sealed class LispExecutionResult
     internal SliLiveEngramRuntimePacket? LiveRuntimePacket { get; init; }
     internal SliLiveEngramRuntimeRun? LiveRuntimeRun { get; init; }
     internal SliExecutionSnapshot? ExecutionSnapshot { get; set; }
+    internal ICrypticWebNexus? CrypticWebNexus { get; set; }
 }

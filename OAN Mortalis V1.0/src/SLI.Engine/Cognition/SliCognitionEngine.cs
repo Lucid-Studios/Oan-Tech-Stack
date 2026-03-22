@@ -5,6 +5,7 @@ using CradleTek.CognitionHost.Models;
 using CradleTek.Memory.Interfaces;
 using GEL.Runtime;
 using SLI.Engine.Models;
+using SLI.Engine.Nexus;
 using SLI.Engine.Parser;
 using SLI.Engine.Runtime;
 using SLI.Engine.Telemetry;
@@ -52,6 +53,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
     public SliTraceEvent? LastTraceEvent { get; private set; }
     internal LispExecutionResult? LastExecutionResult { get; private set; }
     internal SliExecutionSnapshot? LastExecutionSnapshot { get; private set; }
+    internal ICrypticWebNexus? LastCrypticWebNexus { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -108,6 +110,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
             .ConfigureAwait(false);
         LastExecutionResult = lispResult;
         LastExecutionSnapshot = lispResult.ExecutionSnapshot;
+        LastCrypticWebNexus = lispResult.CrypticWebNexus;
 
         CognitionResult? lowMindResult = null;
         if (_optionalLowMindEngine is not null)

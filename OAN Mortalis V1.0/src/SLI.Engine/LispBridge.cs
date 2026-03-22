@@ -5,6 +5,7 @@ using CradleTek.Memory.Models;
 using CradleTek.CognitionHost.Models;
 using Oan.Common;
 using SLI.Engine.Cognition;
+using SLI.Engine.Nexus;
 using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SLI.Engine.Parser;
@@ -151,6 +152,7 @@ public sealed class LispBridge
 
         var snapshot = SliExecutionSnapshotFactory.CreateForCognition(context, result);
         result.ExecutionSnapshot = snapshot;
+        result.CrypticWebNexus = CrypticWebNexusFactory.Create(snapshot);
         return result;
     }
 
