@@ -40,6 +40,7 @@
   "schedulerProofHarvestOutputRoot": ".audit/runs/scheduler-proof-harvest",
   "intervalOriginClarificationOutputRoot": ".audit/runs/interval-origin-clarification",
   "queuedTaskMapPromotionOutputRoot": ".audit/runs/queued-task-map-promotion",
+  "masterThreadOrchestrationOutputRoot": ".audit/runs/master-thread-orchestration",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -78,6 +79,7 @@
   "schedulerProofHarvestStatePath": ".audit/state/local-automation-scheduler-proof-harvest-last-run.json",
   "intervalOriginClarificationStatePath": ".audit/state/local-automation-interval-origin-clarification-last-run.json",
   "queuedTaskMapPromotionStatePath": ".audit/state/local-automation-queued-task-map-promotion-last-run.json",
+  "masterThreadOrchestrationStatePath": ".audit/state/master-thread-orchestration-status.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [

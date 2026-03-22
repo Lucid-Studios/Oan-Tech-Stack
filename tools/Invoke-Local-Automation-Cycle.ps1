@@ -191,6 +191,7 @@ $autonomousLongFormCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedR
 $schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.schedulerProofHarvestStatePath)
 $intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.intervalOriginClarificationStatePath)
 $queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.queuedTaskMapPromotionStatePath)
+$masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.masterThreadOrchestrationStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -408,6 +409,7 @@ $statePayload.lastIntervalOriginClarificationBundle = [string] (Get-ObjectProper
 $statePayload.intervalOriginClarificationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $intervalOriginClarificationStatePath
 $statePayload.lastQueuedTaskMapPromotionBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQueuedTaskMapPromotionBundle')
 $statePayload.queuedTaskMapPromotionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $queuedTaskMapPromotionStatePath
+$statePayload.masterThreadOrchestrationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $masterThreadOrchestrationStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -819,19 +821,30 @@ $summary = [ordered]@{
     intervalOriginClarificationStatePath = $statePayload.intervalOriginClarificationStatePath
     lastQueuedTaskMapPromotionBundle = $statePayload.lastQueuedTaskMapPromotionBundle
     queuedTaskMapPromotionStatePath = $statePayload.queuedTaskMapPromotionStatePath
+    masterThreadOrchestrationStatePath = $statePayload.masterThreadOrchestrationStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
 
 Write-JsonFile -Path $summaryPath -Value $summary
 
-$taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
-$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
-$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
-
 $workspaceBucketStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Workspace-BucketStatus.ps1'
 $workspaceBucketStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $workspaceBucketStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Workspace bucket status writer'
 $workspaceBucketStatusPath = Get-ScriptOutputTail -Output $workspaceBucketStatusOutput
+
+$masterThreadOrchestrationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-MasterThread-OrchestrationStatus.ps1'
+$masterThreadOrchestrationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $masterThreadOrchestrationScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Master-thread orchestration writer'
+$masterThreadOrchestrationStatePathFromRun = Get-ScriptOutputTail -Output $masterThreadOrchestrationOutput
+if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun) -and (Test-Path -LiteralPath $masterThreadOrchestrationStatePathFromRun -PathType Leaf)) {
+    $statePayload.masterThreadOrchestrationStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $masterThreadOrchestrationStatePathFromRun
+    $summary.masterThreadOrchestrationStatePath = $statePayload.masterThreadOrchestrationStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+    Write-JsonFile -Path $summaryPath -Value $summary
+}
+
+$taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
+$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
+$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
 $notificationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-AutomationNotification.ps1'
 $notificationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $notificationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-PreviousStatus', $previousStatus, '-CurrentStatus', $latestStatus) -FailureContext 'Automation notification writer'
@@ -967,6 +980,9 @@ if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) {
     Write-Host ('[local-automation-cycle] WorkspaceBuckets: {0}' -f $workspaceBucketStatusPath)
+}
+if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] MasterThreadOrchestration: {0}' -f $masterThreadOrchestrationStatePathFromRun)
 }
 
 if ($latestStatus -eq $blockedStatus) {

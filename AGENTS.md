@@ -95,6 +95,7 @@ For agent work in this repository:
 - ground implementation in current repo-local executable truth first
 - consult the `Documentation Repo` for stabilized conceptual truth and theory digestion when available
 - when work touches automation, seeded governance, or CME office formation, consult current repo-local telemetry under `.audit/state/` when it exists before inferring office, continuity, or readiness
+- when work touches bucket orchestration or delayed automation handoff, consult the master-thread orchestration surfaces under `.audit/state/master-thread-orchestration-*.json` before issuing new instruction intent
 - never hard-code an external documentation-repo path into tracked files
 - state plainly when the external documentation surface is unavailable in a working session
 

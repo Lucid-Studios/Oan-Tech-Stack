@@ -569,6 +569,7 @@ $autonomousLongFormCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedR
 $schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerProofHarvestStatePath)
 $intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intervalOriginClarificationStatePath)
 $queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.queuedTaskMapPromotionStatePath)
+$masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.masterThreadOrchestrationStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -606,6 +607,7 @@ $autonomousLongFormCollapseState = Read-JsonFileOrNull -Path $autonomousLongForm
 $schedulerProofHarvestState = Read-JsonFileOrNull -Path $schedulerProofHarvestStatePath
 $intervalOriginClarificationState = Read-JsonFileOrNull -Path $intervalOriginClarificationStatePath
 $queuedTaskMapPromotionState = Read-JsonFileOrNull -Path $queuedTaskMapPromotionStatePath
+$masterThreadOrchestrationState = Read-JsonFileOrNull -Path $masterThreadOrchestrationStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1063,6 +1065,19 @@ $statusPayload = [ordered]@{
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
+    orchestration = [ordered]@{
+        state = if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.orchestrationState } else { $null }
+        reasonCode = if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.reasonCode } else { $null }
+        nextAction = if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.nextAction } else { $null }
+        codexRunOnceSupportState = if ($null -ne $masterThreadOrchestrationState) { [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'codexAutomationSupport') -PropertyName 'supportState') } else { $null }
+        movementAdmissibilityState = if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.movementAdmissibilityState } else { $null }
+        eligibleTargetBucketLabels = if ($null -ne $masterThreadOrchestrationState) { @($masterThreadOrchestrationState.eligibleTargetBucketLabels) } else { @() }
+        instructionCount = if ($null -ne $masterThreadOrchestrationState) { [int] $masterThreadOrchestrationState.instructionCount } else { 0 }
+        queuedInstructionCount = if ($null -ne $masterThreadOrchestrationState) { [int] $masterThreadOrchestrationState.queuedInstructionCount } else { 0 }
+        releasableInstructionCount = if ($null -ne $masterThreadOrchestrationState) { [int] $masterThreadOrchestrationState.releasableInstructionCount } else { 0 }
+        latestInstructionId = if ($null -ne $masterThreadOrchestrationState) { [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'latestInstruction') -PropertyName 'instructionId') } else { $null }
+        latestInstructionState = if ($null -ne $masterThreadOrchestrationState) { [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'latestInstruction') -PropertyName 'effectiveLifecycleState') } else { $null }
+    }
     tasks = $taskEntries
 }
 
@@ -1083,6 +1098,8 @@ $markdownLines = @(
     ('- Current posture: `{0}`' -f $lastKnownStatus),
     ('- Recommended action: `{0}`' -f $recommendedAction),
     ('- Requires immediate HITL: `{0}`' -f $requiresImmediateHitl),
+    ('- Master-thread orchestration: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.orchestrationState } else { 'uninitialized' })),
+    ('- Orchestration next action: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.nextAction } else { 'uninitialized' })),
     ('- Next release-candidate run (UTC): `{0}`' -f $(if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { 'uninitialized' })),
     ('- Next mandatory HITL review (UTC): `{0}`' -f $(if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { 'uninitialized' })),
     ''
@@ -1495,6 +1512,28 @@ if ($null -ne $queuedTaskMapPromotionState) {
         ('- Reason code: `{0}`' -f [string] $queuedTaskMapPromotionState.reasonCode),
         ('- Next action: `{0}`' -f [string] $queuedTaskMapPromotionState.nextAction),
         ('- Promoted: `{0}`' -f [bool] $queuedTaskMapPromotionState.promoted),
+        ''
+    )
+}
+
+if ($null -ne $masterThreadOrchestrationState) {
+    $eligibleBucketLabels = @($masterThreadOrchestrationState.eligibleTargetBucketLabels)
+    $latestInstruction = Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'latestInstruction'
+
+    $markdownLines += @(
+        '## Master Thread Orchestration',
+        '',
+        ('- Orchestration state: `{0}`' -f [string] $masterThreadOrchestrationState.orchestrationState),
+        ('- Reason code: `{0}`' -f [string] $masterThreadOrchestrationState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $masterThreadOrchestrationState.nextAction),
+        ('- Codex run-once support: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'codexAutomationSupport') -PropertyName 'supportState')),
+        ('- Movement admissibility: `{0}`' -f [string] $masterThreadOrchestrationState.movementAdmissibilityState),
+        ('- Eligible target buckets: `{0}`' -f $(if ($eligibleBucketLabels.Count -gt 0) { ($eligibleBucketLabels -join '`, `') } else { 'none' })),
+        ('- Total instructions: `{0}`' -f [int] $masterThreadOrchestrationState.instructionCount),
+        ('- Queued instructions: `{0}`' -f [int] $masterThreadOrchestrationState.queuedInstructionCount),
+        ('- Releasable instructions: `{0}`' -f [int] $masterThreadOrchestrationState.releasableInstructionCount),
+        ('- Latest instruction id: `{0}`' -f $(if ($null -ne $latestInstruction) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestInstruction -PropertyName 'instructionId') } else { 'none' })),
+        ('- Latest instruction state: `{0}`' -f $(if ($null -ne $latestInstruction) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestInstruction -PropertyName 'effectiveLifecycleState') } else { 'none' })),
         ''
     )
 }
