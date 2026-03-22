@@ -210,6 +210,9 @@ $bondedParticipationLocalityLedgerStatePath = Resolve-PathFromRepo -BasePath $re
 $sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sanctuaryRuntimeWorkbenchSurfaceStatePath)
 $amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.amenableDayDreamTierAdmissibilityStatePath)
 $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.selfRootedCrypticDepthGateStatePath)
+$runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeWorkbenchSessionLedgerStatePath)
+$dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dayDreamCollapseReceiptStatePath)
+$crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.crypticDepthReturnReceiptStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -464,6 +467,12 @@ $statePayload.lastAmenableDayDreamTierAdmissibilityBundle = [string] (Get-Object
 $statePayload.amenableDayDreamTierAdmissibilityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $amenableDayDreamTierAdmissibilityStatePath
 $statePayload.lastSelfRootedCrypticDepthGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSelfRootedCrypticDepthGateBundle')
 $statePayload.selfRootedCrypticDepthGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $selfRootedCrypticDepthGateStatePath
+$statePayload.lastRuntimeWorkbenchSessionLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRuntimeWorkbenchSessionLedgerBundle')
+$statePayload.runtimeWorkbenchSessionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeWorkbenchSessionLedgerStatePath
+$statePayload.lastDayDreamCollapseReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDayDreamCollapseReceiptBundle')
+$statePayload.dayDreamCollapseReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dayDreamCollapseReceiptStatePath
+$statePayload.lastCrypticDepthReturnReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCrypticDepthReturnReceiptBundle')
+$statePayload.crypticDepthReturnReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $crypticDepthReturnReceiptStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -962,6 +971,33 @@ if (-not [string]::IsNullOrWhiteSpace($selfRootedCrypticDepthGateBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$runtimeWorkbenchSessionLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-RuntimeWorkbench-SessionLedger.ps1'
+$runtimeWorkbenchSessionLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $runtimeWorkbenchSessionLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Runtime workbench session-ledger writer'
+$runtimeWorkbenchSessionLedgerBundlePath = Get-ScriptOutputTail -Output $runtimeWorkbenchSessionLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($runtimeWorkbenchSessionLedgerBundlePath)) {
+    $statePayload.lastRuntimeWorkbenchSessionLedgerBundle = $runtimeWorkbenchSessionLedgerBundlePath
+    $statePayload.runtimeWorkbenchSessionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeWorkbenchSessionLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$dayDreamCollapseReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-DayDream-CollapseReceipt.ps1'
+$dayDreamCollapseReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $dayDreamCollapseReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Day-dream collapse receipt writer'
+$dayDreamCollapseReceiptBundlePath = Get-ScriptOutputTail -Output $dayDreamCollapseReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($dayDreamCollapseReceiptBundlePath)) {
+    $statePayload.lastDayDreamCollapseReceiptBundle = $dayDreamCollapseReceiptBundlePath
+    $statePayload.dayDreamCollapseReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dayDreamCollapseReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$crypticDepthReturnReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CrypticDepth-ReturnReceipt.ps1'
+$crypticDepthReturnReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $crypticDepthReturnReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Cryptic-depth return receipt writer'
+$crypticDepthReturnReceiptBundlePath = Get-ScriptOutputTail -Output $crypticDepthReturnReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($crypticDepthReturnReceiptBundlePath)) {
+    $statePayload.lastCrypticDepthReturnReceiptBundle = $crypticDepthReturnReceiptBundlePath
+    $statePayload.crypticDepthReturnReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $crypticDepthReturnReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1074,6 +1110,12 @@ $summary = [ordered]@{
     amenableDayDreamTierAdmissibilityStatePath = $statePayload.amenableDayDreamTierAdmissibilityStatePath
     lastSelfRootedCrypticDepthGateBundle = $statePayload.lastSelfRootedCrypticDepthGateBundle
     selfRootedCrypticDepthGateStatePath = $statePayload.selfRootedCrypticDepthGateStatePath
+    lastRuntimeWorkbenchSessionLedgerBundle = $statePayload.lastRuntimeWorkbenchSessionLedgerBundle
+    runtimeWorkbenchSessionLedgerStatePath = $statePayload.runtimeWorkbenchSessionLedgerStatePath
+    lastDayDreamCollapseReceiptBundle = $statePayload.lastDayDreamCollapseReceiptBundle
+    dayDreamCollapseReceiptStatePath = $statePayload.dayDreamCollapseReceiptStatePath
+    lastCrypticDepthReturnReceiptBundle = $statePayload.lastCrypticDepthReturnReceiptBundle
+    crypticDepthReturnReceiptStatePath = $statePayload.crypticDepthReturnReceiptStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1289,6 +1331,15 @@ if (-not [string]::IsNullOrWhiteSpace($amenableDayDreamTierAdmissibilityBundlePa
 }
 if (-not [string]::IsNullOrWhiteSpace($selfRootedCrypticDepthGateBundlePath)) {
     Write-Host ('[local-automation-cycle] SelfRootedCrypticDepthGate: {0}' -f $selfRootedCrypticDepthGateBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($runtimeWorkbenchSessionLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] RuntimeWorkbenchSessionLedger: {0}' -f $runtimeWorkbenchSessionLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($dayDreamCollapseReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] DayDreamCollapseReceipt: {0}' -f $dayDreamCollapseReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($crypticDepthReturnReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] CrypticDepthReturnReceipt: {0}' -f $crypticDepthReturnReceiptBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

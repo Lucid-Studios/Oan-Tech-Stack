@@ -161,6 +161,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $SanctuaryRuntimeWorkbenchSurfaceState,
         [object] $AmenableDayDreamTierAdmissibilityState,
         [object] $SelfRootedCrypticDepthGateState,
+        [object] $RuntimeWorkbenchSessionLedgerState,
+        [object] $DayDreamCollapseReceiptState,
+        [object] $CrypticDepthReturnReceiptState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -665,6 +668,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'runtime-workbench-session-ledger' {
+            if ($null -ne $RuntimeWorkbenchSessionLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'day-dream-collapse-receipt' {
+            if ($null -ne $DayDreamCollapseReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'cryptic-depth-return-receipt' {
+            if ($null -ne $CrypticDepthReturnReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -768,6 +798,9 @@ $bondedParticipationLocalityLedgerStatePath = Resolve-PathFromRepo -BasePath $re
 $sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeWorkbenchSurfaceStatePath)
 $amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.amenableDayDreamTierAdmissibilityStatePath)
 $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.selfRootedCrypticDepthGateStatePath)
+$runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkbenchSessionLedgerStatePath)
+$dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.dayDreamCollapseReceiptStatePath)
+$crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.crypticDepthReturnReceiptStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -824,6 +857,9 @@ $bondedParticipationLocalityLedgerState = Read-JsonFileOrNull -Path $bondedParti
 $sanctuaryRuntimeWorkbenchSurfaceState = Read-JsonFileOrNull -Path $sanctuaryRuntimeWorkbenchSurfaceStatePath
 $amenableDayDreamTierAdmissibilityState = Read-JsonFileOrNull -Path $amenableDayDreamTierAdmissibilityStatePath
 $selfRootedCrypticDepthGateState = Read-JsonFileOrNull -Path $selfRootedCrypticDepthGateStatePath
+$runtimeWorkbenchSessionLedgerState = Read-JsonFileOrNull -Path $runtimeWorkbenchSessionLedgerStatePath
+$dayDreamCollapseReceiptState = Read-JsonFileOrNull -Path $dayDreamCollapseReceiptStatePath
+$crypticDepthReturnReceiptState = Read-JsonFileOrNull -Path $crypticDepthReturnReceiptStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1026,6 +1062,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -SanctuaryRuntimeWorkbenchSurfaceState $sanctuaryRuntimeWorkbenchSurfaceState `
                 -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
                 -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
+                -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
+                -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
+                -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1136,6 +1175,9 @@ $taskMapEntries = @(
                     -SanctuaryRuntimeWorkbenchSurfaceState $sanctuaryRuntimeWorkbenchSurfaceState `
                     -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
                     -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
+                    -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
+                    -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
+                    -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1393,6 +1435,34 @@ $statusPayload = [ordered]@{
         selfRootedCrypticDepthGateCrypticBiadRooted = if ($null -ne $selfRootedCrypticDepthGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'crypticBiadRooted') } else { $null }
         selfRootedCrypticDepthGateSharedAmenableOriginDenied = if ($null -ne $selfRootedCrypticDepthGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'sharedAmenableOriginDenied') } else { $null }
         selfRootedCrypticDepthGateDeepAccessGranted = if ($null -ne $selfRootedCrypticDepthGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'deepAccessGranted') } else { $null }
+        runtimeWorkbenchSessionLedgerState = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [string] $runtimeWorkbenchSessionLedgerState.sessionLedgerState } else { $null }
+        runtimeWorkbenchSessionLedgerReason = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [string] $runtimeWorkbenchSessionLedgerState.reasonCode } else { $null }
+        runtimeWorkbenchSessionLedgerNextAction = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [string] $runtimeWorkbenchSessionLedgerState.nextAction } else { $null }
+        runtimeWorkbenchSessionLedgerSessionState = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'sessionState') } else { $null }
+        runtimeWorkbenchSessionLedgerAdmittedLaneCount = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'admittedLaneCount') } else { $null }
+        runtimeWorkbenchSessionLedgerWithheldLaneCount = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'withheldLaneCount') } else { $null }
+        runtimeWorkbenchSessionLedgerSessionEventCount = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'sessionEventCount') } else { $null }
+        runtimeWorkbenchSessionLedgerBoundaryConditionCount = if ($null -ne $runtimeWorkbenchSessionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'boundaryConditionCount') } else { $null }
+        dayDreamCollapseReceiptState = if ($null -ne $dayDreamCollapseReceiptState) { [string] $dayDreamCollapseReceiptState.collapseReceiptState } else { $null }
+        dayDreamCollapseReceiptReason = if ($null -ne $dayDreamCollapseReceiptState) { [string] $dayDreamCollapseReceiptState.reasonCode } else { $null }
+        dayDreamCollapseReceiptNextAction = if ($null -ne $dayDreamCollapseReceiptState) { [string] $dayDreamCollapseReceiptState.nextAction } else { $null }
+        dayDreamCollapseState = if ($null -ne $dayDreamCollapseReceiptState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'collapseState') } else { $null }
+        dayDreamCollapseConsideredPredicateCount = if ($null -ne $dayDreamCollapseReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'consideredPredicateCount') } else { $null }
+        dayDreamCollapseBoundedOutputCount = if ($null -ne $dayDreamCollapseReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'boundedOutputCount') } else { $null }
+        dayDreamCollapseRemainingNonFinalOutputCount = if ($null -ne $dayDreamCollapseReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'remainingNonFinalOutputCount') } else { $null }
+        dayDreamCollapseExploratoryProvenancePreserved = if ($null -ne $dayDreamCollapseReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'exploratoryProvenancePreserved') } else { $null }
+        dayDreamCollapseBoundaryConditionCount = if ($null -ne $dayDreamCollapseReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'boundaryConditionCount') } else { $null }
+        dayDreamCollapseResidueMarkerCount = if ($null -ne $dayDreamCollapseReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'residueMarkerCount') } else { $null }
+        crypticDepthReturnReceiptState = if ($null -ne $crypticDepthReturnReceiptState) { [string] $crypticDepthReturnReceiptState.returnReceiptState } else { $null }
+        crypticDepthReturnReceiptReason = if ($null -ne $crypticDepthReturnReceiptState) { [string] $crypticDepthReturnReceiptState.reasonCode } else { $null }
+        crypticDepthReturnReceiptNextAction = if ($null -ne $crypticDepthReturnReceiptState) { [string] $crypticDepthReturnReceiptState.nextAction } else { $null }
+        crypticDepthReturnState = if ($null -ne $crypticDepthReturnReceiptState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'returnState') } else { $null }
+        crypticDepthReturnContinuityMarkerCount = if ($null -ne $crypticDepthReturnReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'continuityMarkerCount') } else { $null }
+        crypticDepthReturnResidueMarkerCount = if ($null -ne $crypticDepthReturnReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'residueMarkerCount') } else { $null }
+        crypticDepthReturnBoundaryConditionCount = if ($null -ne $crypticDepthReturnReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'boundaryConditionCount') } else { $null }
+        crypticDepthReturnReturnedCleanly = if ($null -ne $crypticDepthReturnReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'returnedCleanly') } else { $null }
+        crypticDepthReturnSharedAmenableLaneClear = if ($null -ne $crypticDepthReturnReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'sharedAmenableLaneClear') } else { $null }
+        crypticDepthReturnIdentityBleedDetected = if ($null -ne $crypticDepthReturnReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'identityBleedDetected') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2123,6 +2193,58 @@ if ($null -ne $selfRootedCrypticDepthGateState) {
     )
 }
 
+if ($null -ne $runtimeWorkbenchSessionLedgerState) {
+    $markdownLines += @(
+        '## Runtime Workbench Session Ledger',
+        '',
+        ('- Session-ledger state: `{0}`' -f [string] $runtimeWorkbenchSessionLedgerState.sessionLedgerState),
+        ('- Reason code: `{0}`' -f [string] $runtimeWorkbenchSessionLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $runtimeWorkbenchSessionLedgerState.nextAction),
+        ('- Session state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'sessionState')),
+        ('- Admitted lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'admittedLaneCount')),
+        ('- Withheld lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'withheldLaneCount')),
+        ('- Session event count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'sessionEventCount')),
+        ('- Boundary-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'boundaryConditionCount')),
+        ''
+    )
+}
+
+if ($null -ne $dayDreamCollapseReceiptState) {
+    $markdownLines += @(
+        '## Day-Dream Collapse Receipt',
+        '',
+        ('- Collapse-receipt state: `{0}`' -f [string] $dayDreamCollapseReceiptState.collapseReceiptState),
+        ('- Reason code: `{0}`' -f [string] $dayDreamCollapseReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $dayDreamCollapseReceiptState.nextAction),
+        ('- Collapse state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'collapseState')),
+        ('- Considered predicate count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'consideredPredicateCount')),
+        ('- Bounded output count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'boundedOutputCount')),
+        ('- Remaining non-final output count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'remainingNonFinalOutputCount')),
+        ('- Exploratory provenance preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'exploratoryProvenancePreserved')),
+        ('- Boundary-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'boundaryConditionCount')),
+        ('- Residue-marker count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $dayDreamCollapseReceiptState -PropertyName 'residueMarkerCount')),
+        ''
+    )
+}
+
+if ($null -ne $crypticDepthReturnReceiptState) {
+    $markdownLines += @(
+        '## Cryptic Depth Return Receipt',
+        '',
+        ('- Return-receipt state: `{0}`' -f [string] $crypticDepthReturnReceiptState.returnReceiptState),
+        ('- Reason code: `{0}`' -f [string] $crypticDepthReturnReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $crypticDepthReturnReceiptState.nextAction),
+        ('- Return state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'returnState')),
+        ('- Continuity-marker count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'continuityMarkerCount')),
+        ('- Residue-marker count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'residueMarkerCount')),
+        ('- Boundary-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'boundaryConditionCount')),
+        ('- Returned cleanly: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'returnedCleanly')),
+        ('- Shared amenable lane clear: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'sharedAmenableLaneClear')),
+        ('- Identity bleed detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $crypticDepthReturnReceiptState -PropertyName 'identityBleedDetected')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2206,6 +2328,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -SanctuaryRuntimeWorkbenchSurfaceState $sanctuaryRuntimeWorkbenchSurfaceState `
             -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
             -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
+            -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
+            -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
+            -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

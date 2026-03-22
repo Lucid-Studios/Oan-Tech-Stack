@@ -59,6 +59,9 @@
   "sanctuaryRuntimeWorkbenchSurfaceOutputRoot": ".audit/runs/sanctuary-runtime-workbench-surface",
   "amenableDayDreamTierAdmissibilityOutputRoot": ".audit/runs/amenable-day-dream-tier-admissibility",
   "selfRootedCrypticDepthGateOutputRoot": ".audit/runs/self-rooted-cryptic-depth-gate",
+  "runtimeWorkbenchSessionLedgerOutputRoot": ".audit/runs/runtime-workbench-session-ledger",
+  "dayDreamCollapseReceiptOutputRoot": ".audit/runs/day-dream-collapse-receipt",
+  "crypticDepthReturnReceiptOutputRoot": ".audit/runs/cryptic-depth-return-receipt",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -116,6 +119,9 @@
   "sanctuaryRuntimeWorkbenchSurfaceStatePath": ".audit/state/local-automation-sanctuary-runtime-workbench-surface-last-run.json",
   "amenableDayDreamTierAdmissibilityStatePath": ".audit/state/local-automation-amenable-day-dream-tier-admissibility-last-run.json",
   "selfRootedCrypticDepthGateStatePath": ".audit/state/local-automation-self-rooted-cryptic-depth-gate-last-run.json",
+  "runtimeWorkbenchSessionLedgerStatePath": ".audit/state/local-automation-runtime-workbench-session-ledger-last-run.json",
+  "dayDreamCollapseReceiptStatePath": ".audit/state/local-automation-day-dream-collapse-receipt-last-run.json",
+  "crypticDepthReturnReceiptStatePath": ".audit/state/local-automation-cryptic-depth-return-receipt-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -202,6 +208,9 @@
     "keepSanctuaryRuntimeWorkbenchSurfaceBundles": 8,
     "keepAmenableDayDreamTierAdmissibilityBundles": 8,
     "keepSelfRootedCrypticDepthGateBundles": 8,
+    "keepRuntimeWorkbenchSessionLedgerBundles": 8,
+    "keepDayDreamCollapseReceiptBundles": 8,
+    "keepCrypticDepthReturnReceiptBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

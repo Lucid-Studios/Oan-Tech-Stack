@@ -45,6 +45,87 @@ public sealed record SelfRootedCrypticDepthGateReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record WorkbenchSessionEvent(
+    string EventHandle,
+    string EventKind,
+    string InquiryStance,
+    string EventState,
+    bool CoherencePreserving,
+    bool HiddenAssumptionDenied,
+    string Description,
+    DateTimeOffset TimestampUtc);
+
+public sealed record BoundaryCondition(
+    string BoundaryHandle,
+    string BoundaryCode,
+    string FailureClass,
+    string TriggerPredicate,
+    string ContinuityRequirement,
+    string PermissionState,
+    string Notes);
+
+public sealed record ResidueMarker(
+    string ResidueHandle,
+    string MarkerCode,
+    string ResidueClass,
+    string CarryDisposition,
+    bool ClearedForAmenableLane,
+    string Notes);
+
+public sealed record ContinuityMarker(
+    string ContinuityHandle,
+    string MarkerCode,
+    string ContinuityClass,
+    string SourceHandle,
+    string CarryDisposition,
+    string Notes);
+
+public sealed record RuntimeWorkbenchSessionLedger(
+    string SessionLedgerHandle,
+    string CMEId,
+    string WorkbenchHandle,
+    string DayDreamTierHandle,
+    string DepthGateHandle,
+    string SessionState,
+    string SessionPosture,
+    string ReturnPosture,
+    IReadOnlyList<string> AdmittedLanes,
+    IReadOnlyList<string> WithheldLanes,
+    IReadOnlyList<WorkbenchSessionEvent> SessionEvents,
+    IReadOnlyList<BoundaryCondition> BoundaryConditions,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record DayDreamCollapseReceipt(
+    string CollapseReceiptHandle,
+    string CMEId,
+    string SessionLedgerHandle,
+    string DayDreamTierHandle,
+    string CollapseState,
+    IReadOnlyList<string> ConsideredPredicates,
+    IReadOnlyList<string> BoundedOutputs,
+    IReadOnlyList<string> RemainingNonFinalOutputs,
+    IReadOnlyList<BoundaryCondition> BoundaryConditions,
+    IReadOnlyList<ResidueMarker> ResidueMarkers,
+    bool ExploratoryProvenancePreserved,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record CrypticDepthReturnReceipt(
+    string ReturnReceiptHandle,
+    string CMEId,
+    string SessionLedgerHandle,
+    string DepthGateHandle,
+    string ReturnState,
+    IReadOnlyList<ContinuityMarker> ContinuityMarkers,
+    IReadOnlyList<ResidueMarker> ResidueMarkers,
+    IReadOnlyList<BoundaryCondition> BoundaryConditions,
+    bool ReturnedCleanly,
+    bool SharedAmenableLaneClear,
+    bool IdentityBleedDetected,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class SanctuaryWorkbenchProjector
 {
     private const string AgentiActualSurfacePrefix = "agenticore-actual-surface://";
@@ -54,6 +135,12 @@ public static class SanctuaryWorkbenchProjector
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
     private const string IdentityInvariantPrefix = "identity-invariant://";
     private const string CrypticBiadRootPrefix = "cryptic-biad-root://";
+    private const string SessionLedgerPrefix = "runtime-workbench-session-ledger://";
+    private const string BoundaryConditionPrefix = "boundary-condition://";
+    private const string ResidueMarkerPrefix = "residue-marker://";
+    private const string ContinuityMarkerPrefix = "continuity-marker://";
+    private const string DayDreamCollapsePrefix = "day-dream-collapse-receipt://";
+    private const string CrypticDepthReturnPrefix = "cryptic-depth-return-receipt://";
 
     public static SanctuaryRuntimeWorkbenchSurfaceReceipt CreateRuntimeWorkbenchSurface(
         AgentiActualUtilitySurfaceReceipt utilitySurface,
@@ -185,6 +272,322 @@ public static class SanctuaryWorkbenchProjector
             SharedAmenableOriginDenied: true,
             DeepAccessGranted: false,
             ReasonCode: "self-rooted-cryptic-depth-gate-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static WorkbenchSessionEvent CreateSessionEvent(
+        string cmeId,
+        string workbenchHandle,
+        string eventKind,
+        string inquiryStance,
+        string eventState,
+        bool coherencePreserving,
+        bool hiddenAssumptionDenied,
+        string description,
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        EnsurePrefix(workbenchHandle, SanctuaryWorkbenchPrefix, nameof(workbenchHandle));
+        ArgumentException.ThrowIfNullOrWhiteSpace(eventKind);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inquiryStance);
+        ArgumentException.ThrowIfNullOrWhiteSpace(eventState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+
+        return new WorkbenchSessionEvent(
+            EventHandle: SanctuaryWorkbenchKeys.CreateWorkbenchSessionEventHandle(
+                cmeId,
+                workbenchHandle,
+                eventKind,
+                inquiryStance,
+                description),
+            EventKind: eventKind.Trim(),
+            InquiryStance: inquiryStance.Trim(),
+            EventState: eventState.Trim(),
+            CoherencePreserving: coherencePreserving,
+            HiddenAssumptionDenied: hiddenAssumptionDenied,
+            Description: description.Trim(),
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BoundaryCondition CreateBoundaryCondition(
+        string cmeId,
+        string workbenchHandle,
+        string boundaryCode,
+        string failureClass,
+        string triggerPredicate,
+        string continuityRequirement,
+        string permissionState,
+        string notes)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        EnsurePrefix(workbenchHandle, SanctuaryWorkbenchPrefix, nameof(workbenchHandle));
+        ArgumentException.ThrowIfNullOrWhiteSpace(boundaryCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(failureClass);
+        ArgumentException.ThrowIfNullOrWhiteSpace(triggerPredicate);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityRequirement);
+        ArgumentException.ThrowIfNullOrWhiteSpace(permissionState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(notes);
+
+        return new BoundaryCondition(
+            BoundaryHandle: SanctuaryWorkbenchKeys.CreateBoundaryConditionHandle(
+                cmeId,
+                workbenchHandle,
+                boundaryCode,
+                triggerPredicate),
+            BoundaryCode: boundaryCode.Trim(),
+            FailureClass: failureClass.Trim(),
+            TriggerPredicate: triggerPredicate.Trim(),
+            ContinuityRequirement: continuityRequirement.Trim(),
+            PermissionState: permissionState.Trim(),
+            Notes: notes.Trim());
+    }
+
+    public static ResidueMarker CreateResidueMarker(
+        string cmeId,
+        string anchorHandle,
+        string markerCode,
+        string residueClass,
+        string carryDisposition,
+        bool clearedForAmenableLane,
+        string notes)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(anchorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(markerCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(residueClass);
+        ArgumentException.ThrowIfNullOrWhiteSpace(carryDisposition);
+        ArgumentException.ThrowIfNullOrWhiteSpace(notes);
+
+        return new ResidueMarker(
+            ResidueHandle: SanctuaryWorkbenchKeys.CreateResidueMarkerHandle(
+                cmeId,
+                anchorHandle,
+                markerCode,
+                residueClass),
+            MarkerCode: markerCode.Trim(),
+            ResidueClass: residueClass.Trim(),
+            CarryDisposition: carryDisposition.Trim(),
+            ClearedForAmenableLane: clearedForAmenableLane,
+            Notes: notes.Trim());
+    }
+
+    public static ContinuityMarker CreateContinuityMarker(
+        string cmeId,
+        string anchorHandle,
+        string markerCode,
+        string continuityClass,
+        string sourceHandle,
+        string carryDisposition,
+        string notes)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(anchorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(markerCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityClass);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(carryDisposition);
+        ArgumentException.ThrowIfNullOrWhiteSpace(notes);
+
+        return new ContinuityMarker(
+            ContinuityHandle: SanctuaryWorkbenchKeys.CreateContinuityMarkerHandle(
+                cmeId,
+                anchorHandle,
+                markerCode,
+                sourceHandle),
+            MarkerCode: markerCode.Trim(),
+            ContinuityClass: continuityClass.Trim(),
+            SourceHandle: sourceHandle.Trim(),
+            CarryDisposition: carryDisposition.Trim(),
+            Notes: notes.Trim());
+    }
+
+    public static RuntimeWorkbenchSessionLedger CreateRuntimeWorkbenchSessionLedger(
+        SanctuaryRuntimeWorkbenchSurfaceReceipt workbench,
+        AmenableDayDreamTierAdmissibilityReceipt dayDreamTier,
+        SelfRootedCrypticDepthGateReceipt depthGate,
+        IReadOnlyList<WorkbenchSessionEvent>? sessionEvents = null,
+        IReadOnlyList<BoundaryCondition>? boundaryConditions = null,
+        string sessionState = "bounded-session-open",
+        string sessionPosture = "bounded-session-open",
+        string returnPosture = "return-through-bounded-workbench",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(workbench);
+        ArgumentNullException.ThrowIfNull(dayDreamTier);
+        ArgumentNullException.ThrowIfNull(depthGate);
+        EnsurePrefix(workbench.WorkbenchHandle, SanctuaryWorkbenchPrefix, nameof(workbench));
+        EnsurePrefix(dayDreamTier.DayDreamTierHandle, AmenableDayDreamPrefix, nameof(dayDreamTier));
+        EnsurePrefix(depthGate.DepthGateHandle, "self-rooted-cryptic-depth-gate://", nameof(depthGate));
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionPosture);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnPosture);
+
+        if (!string.Equals(workbench.CMEId, dayDreamTier.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(workbench.CMEId, depthGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(workbench.WorkbenchHandle, dayDreamTier.WorkbenchHandle, StringComparison.Ordinal) ||
+            !string.Equals(workbench.WorkbenchHandle, depthGate.WorkbenchHandle, StringComparison.Ordinal) ||
+            !string.Equals(dayDreamTier.DayDreamTierHandle, depthGate.DayDreamTierHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Workbench session ledger requires workbench, day-dream tier, and depth gate to remain within one continuity surface.");
+        }
+
+        var admittedLanes = new[]
+        {
+            "bounded-workbench-session",
+            "amenable-day-dream-collapse",
+            "questioning-event-log"
+        };
+        var withheldLanes = new[]
+        {
+            "bonded-operator-actual-release",
+            "ambient-access-grant",
+            "deep-cryptic-export"
+        };
+
+        return new RuntimeWorkbenchSessionLedger(
+            SessionLedgerHandle: SanctuaryWorkbenchKeys.CreateRuntimeWorkbenchSessionLedgerHandle(
+                workbench.CMEId,
+                workbench.WorkbenchHandle,
+                dayDreamTier.DayDreamTierHandle,
+                depthGate.DepthGateHandle),
+            CMEId: workbench.CMEId,
+            WorkbenchHandle: workbench.WorkbenchHandle,
+            DayDreamTierHandle: dayDreamTier.DayDreamTierHandle,
+            DepthGateHandle: depthGate.DepthGateHandle,
+            SessionState: sessionState.Trim(),
+            SessionPosture: sessionPosture.Trim(),
+            ReturnPosture: returnPosture.Trim(),
+            AdmittedLanes: admittedLanes,
+            WithheldLanes: withheldLanes,
+            SessionEvents: (sessionEvents ?? Array.Empty<WorkbenchSessionEvent>())
+                .Where(static item => item is not null)
+                .Distinct()
+                .ToArray(),
+            BoundaryConditions: (boundaryConditions ?? Array.Empty<BoundaryCondition>())
+                .Where(static item => item is not null)
+                .Distinct()
+                .ToArray(),
+            ReasonCode: "runtime-workbench-session-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static DayDreamCollapseReceipt CreateDayDreamCollapseReceipt(
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        AmenableDayDreamTierAdmissibilityReceipt dayDreamTier,
+        IReadOnlyList<string> boundedOutputs,
+        IReadOnlyList<string> remainingNonFinalOutputs,
+        IReadOnlyList<BoundaryCondition>? boundaryConditions = null,
+        IReadOnlyList<ResidueMarker>? residueMarkers = null,
+        string collapseState = "bounded-collapse-recorded",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(dayDreamTier);
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(dayDreamTier.DayDreamTierHandle, AmenableDayDreamPrefix, nameof(dayDreamTier));
+        ArgumentNullException.ThrowIfNull(boundedOutputs);
+        ArgumentNullException.ThrowIfNull(remainingNonFinalOutputs);
+        ArgumentException.ThrowIfNullOrWhiteSpace(collapseState);
+
+        if (!string.Equals(sessionLedger.CMEId, dayDreamTier.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.DayDreamTierHandle, dayDreamTier.DayDreamTierHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Day-dream collapse receipt requires session and day-dream tier to remain inside one continuity surface.");
+        }
+
+        return new DayDreamCollapseReceipt(
+            CollapseReceiptHandle: SanctuaryWorkbenchKeys.CreateDayDreamCollapseReceiptHandle(
+                sessionLedger.CMEId,
+                sessionLedger.SessionLedgerHandle,
+                dayDreamTier.DayDreamTierHandle,
+                collapseState),
+            CMEId: sessionLedger.CMEId,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            DayDreamTierHandle: dayDreamTier.DayDreamTierHandle,
+            CollapseState: collapseState.Trim(),
+            ConsideredPredicates: dayDreamTier.ExploratoryPredicates
+                .Where(static predicate => !string.IsNullOrWhiteSpace(predicate))
+                .Select(static predicate => predicate.Trim())
+                .Distinct(StringComparer.Ordinal)
+                .ToArray(),
+            BoundedOutputs: boundedOutputs
+                .Where(static output => !string.IsNullOrWhiteSpace(output))
+                .Select(static output => output.Trim())
+                .Distinct(StringComparer.Ordinal)
+                .ToArray(),
+            RemainingNonFinalOutputs: remainingNonFinalOutputs
+                .Where(static output => !string.IsNullOrWhiteSpace(output))
+                .Select(static output => output.Trim())
+                .Distinct(StringComparer.Ordinal)
+                .ToArray(),
+            BoundaryConditions: (boundaryConditions ?? Array.Empty<BoundaryCondition>())
+                .Where(static item => item is not null)
+                .Distinct()
+                .ToArray(),
+            ResidueMarkers: (residueMarkers ?? Array.Empty<ResidueMarker>())
+                .Where(static item => item is not null)
+                .Distinct()
+                .ToArray(),
+            ExploratoryProvenancePreserved: true,
+            ReasonCode: "day-dream-collapse-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static CrypticDepthReturnReceipt CreateCrypticDepthReturnReceipt(
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        SelfRootedCrypticDepthGateReceipt depthGate,
+        IReadOnlyList<ContinuityMarker> continuityMarkers,
+        IReadOnlyList<ResidueMarker> residueMarkers,
+        IReadOnlyList<BoundaryCondition>? boundaryConditions = null,
+        string returnState = "clean-return-withheld",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(depthGate);
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(depthGate.DepthGateHandle, "self-rooted-cryptic-depth-gate://", nameof(depthGate));
+        ArgumentNullException.ThrowIfNull(continuityMarkers);
+        ArgumentNullException.ThrowIfNull(residueMarkers);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnState);
+
+        if (!string.Equals(sessionLedger.CMEId, depthGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.DepthGateHandle, depthGate.DepthGateHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Cryptic depth return receipt requires session and depth gate to remain inside one continuity surface.");
+        }
+
+        var normalizedBoundaryConditions = (boundaryConditions ?? Array.Empty<BoundaryCondition>())
+            .Where(static item => item is not null)
+            .Distinct()
+            .ToArray();
+        var normalizedResidueMarkers = residueMarkers
+            .Where(static item => item is not null)
+            .Distinct()
+            .ToArray();
+        var normalizedContinuityMarkers = continuityMarkers
+            .Where(static item => item is not null)
+            .Distinct()
+            .ToArray();
+        var identityBleedDetected = normalizedBoundaryConditions.Any(static condition => string.Equals(condition.FailureClass, "identity-bleed", StringComparison.Ordinal));
+        var sharedAmenableLaneClear = normalizedResidueMarkers.All(static marker => marker.ClearedForAmenableLane);
+
+        return new CrypticDepthReturnReceipt(
+            ReturnReceiptHandle: SanctuaryWorkbenchKeys.CreateCrypticDepthReturnReceiptHandle(
+                sessionLedger.CMEId,
+                sessionLedger.SessionLedgerHandle,
+                depthGate.DepthGateHandle,
+                returnState),
+            CMEId: sessionLedger.CMEId,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            DepthGateHandle: depthGate.DepthGateHandle,
+            ReturnState: returnState.Trim(),
+            ContinuityMarkers: normalizedContinuityMarkers,
+            ResidueMarkers: normalizedResidueMarkers,
+            BoundaryConditions: normalizedBoundaryConditions,
+            ReturnedCleanly: sharedAmenableLaneClear && !identityBleedDetected,
+            SharedAmenableLaneClear: sharedAmenableLaneClear,
+            IdentityBleedDetected: identityBleedDetected,
+            ReasonCode: "cryptic-depth-return-receipt-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

@@ -82,6 +82,212 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.False(depthGate.DeepAccessGranted);
     }
 
+    [Fact]
+    public void CreateRuntimeWorkbenchSessionLedger_BindsSessionEventsAndBoundaries()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var (threadBirth, utilitySurface, _, localityLedger) = CreateReachProjectionBundle();
+        var workbench = workbenchService.CreateRuntimeWorkbenchSurface(
+            utilitySurface,
+            localityLedger,
+            runtimeDeployabilityState: "deployable-candidate-ready",
+            sanctuaryRuntimeReadinessState: "bounded-working-state-ready",
+            runtimeWorkAdmissibilityState: "provisional-runtime-work",
+            sessionPosture: "bounded-workbench-ready",
+            timestampUtc: FixedTimestamp);
+        var dayDreamTier = workbenchService.CreateAmenableDayDreamTier(
+            workbench,
+            exploratoryPredicates:
+            [
+                "open-structure-question",
+                "coherence-probe",
+                "non-collapsing-clarification"
+            ],
+            nonFinalOutputs:
+            [
+                "candidate-knot",
+                "non-final-opal-trace"
+            ],
+            timestampUtc: FixedTimestamp);
+        var depthGate = workbenchService.CreateSelfRootedCrypticDepthGate(
+            threadBirth,
+            workbench,
+            dayDreamTier,
+            timestampUtc: FixedTimestamp);
+        var sessionEvent = SanctuaryWorkbenchProjector.CreateSessionEvent(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            eventKind: "questioning",
+            inquiryStance: "clarify",
+            eventState: "coherence-gain",
+            coherencePreserving: true,
+            hiddenAssumptionDenied: true,
+            description: "what would need to be true for this to hold together?",
+            timestampUtc: FixedTimestamp);
+        var boundaryCondition = SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            boundaryCode: "overcompression-of-distinction",
+            failureClass: "coordination-fracture",
+            triggerPredicate: "question-demands-conclusion-too-early",
+            continuityRequirement: "keep-amenable-and-depth-lanes-distinct",
+            permissionState: "withhold-crossing",
+            notes: "session inquiry must not force deep identity conclusions from exploratory motion.");
+
+        var sessionLedger = workbenchService.CreateRuntimeWorkbenchSessionLedger(
+            workbench,
+            dayDreamTier,
+            depthGate,
+            sessionEvents: [sessionEvent],
+            boundaryConditions: [boundaryCondition],
+            sessionState: "bounded-session-open",
+            sessionPosture: "bounded-session-open",
+            returnPosture: "return-through-bounded-workbench",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("runtime-workbench-session-ledger://", sessionLedger.SessionLedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("runtime-workbench-session-ledger-bound", sessionLedger.ReasonCode);
+        Assert.Equal("bounded-session-open", sessionLedger.SessionState);
+        Assert.Equal("return-through-bounded-workbench", sessionLedger.ReturnPosture);
+        Assert.Contains("questioning-event-log", sessionLedger.AdmittedLanes);
+        Assert.Contains("deep-cryptic-export", sessionLedger.WithheldLanes);
+        Assert.Single(sessionLedger.SessionEvents);
+        Assert.Single(sessionLedger.BoundaryConditions);
+    }
+
+    [Fact]
+    public void CreateDayDreamCollapseAndCrypticDepthReturn_TrackResidueAndContinuity()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var (threadBirth, utilitySurface, _, localityLedger) = CreateReachProjectionBundle();
+        var workbench = workbenchService.CreateRuntimeWorkbenchSurface(
+            utilitySurface,
+            localityLedger,
+            runtimeDeployabilityState: "deployable-candidate-ready",
+            sanctuaryRuntimeReadinessState: "bounded-working-state-ready",
+            runtimeWorkAdmissibilityState: "provisional-runtime-work",
+            sessionPosture: "bounded-workbench-ready",
+            timestampUtc: FixedTimestamp);
+        var dayDreamTier = workbenchService.CreateAmenableDayDreamTier(
+            workbench,
+            exploratoryPredicates:
+            [
+                "candidate-voice-form",
+                "boundary-aware-question",
+                "soft-collapse-probe"
+            ],
+            nonFinalOutputs:
+            [
+                "candidate-voice-fragment",
+                "non-final-boundary-trace"
+            ],
+            timestampUtc: FixedTimestamp);
+        var depthGate = workbenchService.CreateSelfRootedCrypticDepthGate(
+            threadBirth,
+            workbench,
+            dayDreamTier,
+            timestampUtc: FixedTimestamp);
+        var sessionLedger = workbenchService.CreateRuntimeWorkbenchSessionLedger(
+            workbench,
+            dayDreamTier,
+            depthGate,
+            sessionEvents:
+            [
+                SanctuaryWorkbenchProjector.CreateSessionEvent(
+                    workbench.CMEId,
+                    workbench.WorkbenchHandle,
+                    "questioning",
+                    "open",
+                    "field-stabilizing",
+                    coherencePreserving: true,
+                    hiddenAssumptionDenied: true,
+                    description: "what structure is still forming here?",
+                    timestampUtc: FixedTimestamp)
+            ],
+            timestampUtc: FixedTimestamp);
+        var collapseBoundary = SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            boundaryCode: "day-dream-nonfinal-retention",
+            failureClass: "exploratory-boundary",
+            triggerPredicate: "collapse-keeps-one-output-non-final",
+            continuityRequirement: "preserve-exploratory-provenance-on-collapse",
+            permissionState: "collapse-admissible",
+            notes: "bounded collapse may keep a non-final trace without inflating it into deep truth.");
+        var collapseResidue = SanctuaryWorkbenchProjector.CreateResidueMarker(
+            workbench.CMEId,
+            sessionLedger.SessionLedgerHandle,
+            markerCode: "non-final-trace",
+            residueClass: "exploratory-residue",
+            carryDisposition: "carry-forward-observe",
+            clearedForAmenableLane: true,
+            notes: "non-final exploratory residue remains visible but bounded.");
+
+        var collapseReceipt = workbenchService.CreateDayDreamCollapseReceipt(
+            sessionLedger,
+            dayDreamTier,
+            boundedOutputs:
+            [
+                "bounded-voice-fragment",
+                "workbench-question-path"
+            ],
+            remainingNonFinalOutputs:
+            [
+                "non-final-boundary-trace"
+            ],
+            boundaryConditions: [collapseBoundary],
+            residueMarkers: [collapseResidue],
+            timestampUtc: FixedTimestamp);
+        var continuityMarker = SanctuaryWorkbenchProjector.CreateContinuityMarker(
+            workbench.CMEId,
+            sessionLedger.SessionLedgerHandle,
+            markerCode: "self-rooted-return",
+            continuityClass: "depth-return",
+            sourceHandle: depthGate.CrypticBiadRootHandle,
+            carryDisposition: "carry-forward",
+            notes: "self-rooted return preserved CME continuity.");
+        var returnResidue = SanctuaryWorkbenchProjector.CreateResidueMarker(
+            workbench.CMEId,
+            sessionLedger.SessionLedgerHandle,
+            markerCode: "depth-trace-cleared",
+            residueClass: "return-residue",
+            carryDisposition: "cleared-on-return",
+            clearedForAmenableLane: true,
+            notes: "depth residue cleared before re-entry to the amenable lane.");
+        var returnBoundary = SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            boundaryCode: "return-without-bleed",
+            failureClass: "return-constraint",
+            triggerPredicate: "deep-work-reenters-amenable-lane",
+            continuityRequirement: "clear-shared-amenable-lane-before-reentry",
+            permissionState: "return-admissible",
+            notes: "deep return is lawful only when shared amenable lanes are clear.");
+
+        var returnReceipt = workbenchService.CreateCrypticDepthReturnReceipt(
+            sessionLedger,
+            depthGate,
+            continuityMarkers: [continuityMarker],
+            residueMarkers: [returnResidue],
+            boundaryConditions: [returnBoundary],
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("day-dream-collapse-receipt://", collapseReceipt.CollapseReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("day-dream-collapse-receipt-bound", collapseReceipt.ReasonCode);
+        Assert.True(collapseReceipt.ExploratoryProvenancePreserved);
+        Assert.Equal(2, collapseReceipt.BoundedOutputs.Count);
+        Assert.Single(collapseReceipt.RemainingNonFinalOutputs);
+        Assert.Single(collapseReceipt.ResidueMarkers);
+
+        Assert.StartsWith("cryptic-depth-return-receipt://", returnReceipt.ReturnReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("cryptic-depth-return-receipt-bound", returnReceipt.ReasonCode);
+        Assert.True(returnReceipt.ReturnedCleanly);
+        Assert.True(returnReceipt.SharedAmenableLaneClear);
+        Assert.False(returnReceipt.IdentityBleedDetected);
+        Assert.Single(returnReceipt.ContinuityMarkers);
+        Assert.Single(returnReceipt.ResidueMarkers);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
 
     private static (GovernedThreadBirthReceipt ThreadBirth, AgentiActualUtilitySurfaceReceipt UtilitySurface, ReachDuplexRealizationReceipt Realization, BondedParticipationLocalityLedgerReceipt LocalityLedger) CreateReachProjectionBundle()

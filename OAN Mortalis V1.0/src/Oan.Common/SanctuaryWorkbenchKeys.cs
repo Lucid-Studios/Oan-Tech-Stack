@@ -53,6 +53,106 @@ public static class SanctuaryWorkbenchKeys
         return $"self-rooted-cryptic-depth-gate://{ComputeDigest(cmeId, workbenchHandle, crypticBiadRootHandle)}";
     }
 
+    public static string CreateRuntimeWorkbenchSessionLedgerHandle(
+        string cmeId,
+        string workbenchHandle,
+        string dayDreamTierHandle,
+        string depthGateHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(workbenchHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dayDreamTierHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(depthGateHandle);
+
+        return $"runtime-workbench-session-ledger://{ComputeDigest(cmeId, workbenchHandle, dayDreamTierHandle, depthGateHandle)}";
+    }
+
+    public static string CreateWorkbenchSessionEventHandle(
+        string cmeId,
+        string workbenchHandle,
+        string eventKind,
+        string inquiryStance,
+        string description)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(workbenchHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(eventKind);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inquiryStance);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+
+        return $"workbench-session-event://{ComputeDigest(cmeId, workbenchHandle, eventKind, inquiryStance, description)}";
+    }
+
+    public static string CreateBoundaryConditionHandle(
+        string cmeId,
+        string workbenchHandle,
+        string boundaryCode,
+        string triggerPredicate)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(workbenchHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(boundaryCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(triggerPredicate);
+
+        return $"boundary-condition://{ComputeDigest(cmeId, workbenchHandle, boundaryCode, triggerPredicate)}";
+    }
+
+    public static string CreateResidueMarkerHandle(
+        string cmeId,
+        string anchorHandle,
+        string markerCode,
+        string residueClass)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(anchorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(markerCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(residueClass);
+
+        return $"residue-marker://{ComputeDigest(cmeId, anchorHandle, markerCode, residueClass)}";
+    }
+
+    public static string CreateContinuityMarkerHandle(
+        string cmeId,
+        string anchorHandle,
+        string markerCode,
+        string sourceHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(anchorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(markerCode);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceHandle);
+
+        return $"continuity-marker://{ComputeDigest(cmeId, anchorHandle, markerCode, sourceHandle)}";
+    }
+
+    public static string CreateDayDreamCollapseReceiptHandle(
+        string cmeId,
+        string sessionLedgerHandle,
+        string dayDreamTierHandle,
+        string collapseState)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dayDreamTierHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(collapseState);
+
+        return $"day-dream-collapse-receipt://{ComputeDigest(cmeId, sessionLedgerHandle, dayDreamTierHandle, collapseState)}";
+    }
+
+    public static string CreateCrypticDepthReturnReceiptHandle(
+        string cmeId,
+        string sessionLedgerHandle,
+        string depthGateHandle,
+        string returnState)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(depthGateHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnState);
+
+        return $"cryptic-depth-return-receipt://{ComputeDigest(cmeId, sessionLedgerHandle, depthGateHandle, returnState)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

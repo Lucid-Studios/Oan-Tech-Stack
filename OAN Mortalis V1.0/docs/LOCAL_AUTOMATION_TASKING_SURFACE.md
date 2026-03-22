@@ -440,7 +440,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces remain declared runway only until the first bounded Sanctuary workbench exists and can emit session, collapse, and return receipts without continuity inflation
+- runtime workbench session-ledger bundles land under `.audit/runs/runtime-workbench-session-ledger/` and update `.audit/state/local-automation-runtime-workbench-session-ledger-last-run.json`
+- day-dream collapse receipts land under `.audit/runs/day-dream-collapse-receipt/` and update `.audit/state/local-automation-day-dream-collapse-receipt-last-run.json`
+- cryptic depth-return receipts land under `.audit/runs/cryptic-depth-return-receipt/` and update `.audit/state/local-automation-cryptic-depth-return-receipt-last-run.json`
+- these surfaces witness bounded in-runtime session formation, exploratory collapse, and self-rooted depth return without implying bonded co-work release or deep cryptic export
 
 ### Automation Maturation Map 23
 

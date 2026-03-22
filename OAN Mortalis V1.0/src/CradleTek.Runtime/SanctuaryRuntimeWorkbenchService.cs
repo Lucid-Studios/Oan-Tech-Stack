@@ -61,4 +61,81 @@ public sealed class SanctuaryRuntimeWorkbenchService
             gateState,
             timestampUtc);
     }
+
+    public RuntimeWorkbenchSessionLedger CreateRuntimeWorkbenchSessionLedger(
+        SanctuaryRuntimeWorkbenchSurfaceReceipt workbench,
+        AmenableDayDreamTierAdmissibilityReceipt dayDreamTier,
+        SelfRootedCrypticDepthGateReceipt depthGate,
+        IReadOnlyList<WorkbenchSessionEvent>? sessionEvents = null,
+        IReadOnlyList<BoundaryCondition>? boundaryConditions = null,
+        string sessionState = "bounded-session-open",
+        string sessionPosture = "bounded-session-open",
+        string returnPosture = "return-through-bounded-workbench",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(workbench);
+        ArgumentNullException.ThrowIfNull(dayDreamTier);
+        ArgumentNullException.ThrowIfNull(depthGate);
+
+        return SanctuaryWorkbenchProjector.CreateRuntimeWorkbenchSessionLedger(
+            workbench,
+            dayDreamTier,
+            depthGate,
+            sessionEvents,
+            boundaryConditions,
+            sessionState,
+            sessionPosture,
+            returnPosture,
+            timestampUtc);
+    }
+
+    public DayDreamCollapseReceipt CreateDayDreamCollapseReceipt(
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        AmenableDayDreamTierAdmissibilityReceipt dayDreamTier,
+        IReadOnlyList<string> boundedOutputs,
+        IReadOnlyList<string> remainingNonFinalOutputs,
+        IReadOnlyList<BoundaryCondition>? boundaryConditions = null,
+        IReadOnlyList<ResidueMarker>? residueMarkers = null,
+        string collapseState = "bounded-collapse-recorded",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(dayDreamTier);
+        ArgumentNullException.ThrowIfNull(boundedOutputs);
+        ArgumentNullException.ThrowIfNull(remainingNonFinalOutputs);
+
+        return SanctuaryWorkbenchProjector.CreateDayDreamCollapseReceipt(
+            sessionLedger,
+            dayDreamTier,
+            boundedOutputs,
+            remainingNonFinalOutputs,
+            boundaryConditions,
+            residueMarkers,
+            collapseState,
+            timestampUtc);
+    }
+
+    public CrypticDepthReturnReceipt CreateCrypticDepthReturnReceipt(
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        SelfRootedCrypticDepthGateReceipt depthGate,
+        IReadOnlyList<ContinuityMarker> continuityMarkers,
+        IReadOnlyList<ResidueMarker> residueMarkers,
+        IReadOnlyList<BoundaryCondition>? boundaryConditions = null,
+        string returnState = "clean-return-withheld",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(depthGate);
+        ArgumentNullException.ThrowIfNull(continuityMarkers);
+        ArgumentNullException.ThrowIfNull(residueMarkers);
+
+        return SanctuaryWorkbenchProjector.CreateCrypticDepthReturnReceipt(
+            sessionLedger,
+            depthGate,
+            continuityMarkers,
+            residueMarkers,
+            boundaryConditions,
+            returnState,
+            timestampUtc);
+    }
 }
