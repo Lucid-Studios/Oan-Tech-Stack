@@ -54,6 +54,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
     internal LispExecutionResult? LastExecutionResult { get; private set; }
     internal SliExecutionSnapshot? LastExecutionSnapshot { get; private set; }
     internal ICrypticWebNexus? LastCrypticWebNexus { get; private set; }
+    internal ICrypticWebNexusPortal? LastCrypticWebNexusPortal { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -111,6 +112,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
         LastExecutionResult = lispResult;
         LastExecutionSnapshot = lispResult.ExecutionSnapshot;
         LastCrypticWebNexus = lispResult.CrypticWebNexus;
+        LastCrypticWebNexusPortal = lispResult.CrypticWebNexusPortal;
 
         CognitionResult? lowMindResult = null;
         if (_optionalLowMindEngine is not null)

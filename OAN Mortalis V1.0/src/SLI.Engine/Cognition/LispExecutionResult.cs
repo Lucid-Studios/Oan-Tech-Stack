@@ -21,4 +21,5 @@ public sealed class LispExecutionResult
     internal SliLiveEngramRuntimeRun? LiveRuntimeRun { get; init; }
     internal SliExecutionSnapshot? ExecutionSnapshot { get; set; }
     internal ICrypticWebNexus? CrypticWebNexus { get; set; }
+    internal ICrypticWebNexusPortal? CrypticWebNexusPortal { get; set; }
 }

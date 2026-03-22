@@ -152,7 +152,9 @@ public sealed class LispBridge
 
         var snapshot = SliExecutionSnapshotFactory.CreateForCognition(context, result);
         result.ExecutionSnapshot = snapshot;
-        result.CrypticWebNexus = CrypticWebNexusFactory.Create(snapshot);
+        var crypticWebNexus = CrypticWebNexusFactory.Create(snapshot);
+        result.CrypticWebNexus = crypticWebNexus;
+        result.CrypticWebNexusPortal = CrypticWebNexusFactory.CreatePortal(crypticWebNexus);
         return result;
     }
 

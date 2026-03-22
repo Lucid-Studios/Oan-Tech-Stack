@@ -198,6 +198,9 @@ $runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $reso
 $reachAccessTopologyLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.reachAccessTopologyLedgerStatePath)
 $bondedOperatorLocalityReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedOperatorLocalityReadinessStatePath)
 $protectedStateLegibilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.protectedStateLegibilitySurfaceStatePath)
+$nexusSingularPortalFacadeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.nexusSingularPortalFacadeStatePath)
+$duplexPredicateEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.duplexPredicateEnvelopeStatePath)
+$operatorActualWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.operatorActualWorkSessionRehearsalStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -422,6 +425,18 @@ $statePayload.lastSanctuaryRuntimeReadinessBundle = [string] (Get-ObjectProperty
 $statePayload.sanctuaryRuntimeReadinessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sanctuaryRuntimeReadinessStatePath
 $statePayload.lastRuntimeWorkSurfaceAdmissibilityBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRuntimeWorkSurfaceAdmissibilityBundle')
 $statePayload.runtimeWorkSurfaceAdmissibilityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeWorkSurfaceAdmissibilityStatePath
+$statePayload.lastReachAccessTopologyLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReachAccessTopologyLedgerBundle')
+$statePayload.reachAccessTopologyLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachAccessTopologyLedgerStatePath
+$statePayload.lastBondedOperatorLocalityReadinessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBondedOperatorLocalityReadinessBundle')
+$statePayload.bondedOperatorLocalityReadinessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedOperatorLocalityReadinessStatePath
+$statePayload.lastProtectedStateLegibilitySurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastProtectedStateLegibilitySurfaceBundle')
+$statePayload.protectedStateLegibilitySurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedStateLegibilitySurfaceStatePath
+$statePayload.lastNexusSingularPortalFacadeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastNexusSingularPortalFacadeBundle')
+$statePayload.nexusSingularPortalFacadeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $nexusSingularPortalFacadeStatePath
+$statePayload.lastDuplexPredicateEnvelopeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDuplexPredicateEnvelopeBundle')
+$statePayload.duplexPredicateEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $duplexPredicateEnvelopeStatePath
+$statePayload.lastOperatorActualWorkSessionRehearsalBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastOperatorActualWorkSessionRehearsalBundle')
+$statePayload.operatorActualWorkSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operatorActualWorkSessionRehearsalStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -794,6 +809,33 @@ if (-not [string]::IsNullOrWhiteSpace($reachAccessTopologyLedgerBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$protectedStateLegibilitySurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ProtectedState-LegibilitySurface.ps1'
+$protectedStateLegibilitySurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $protectedStateLegibilitySurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Protected-state legibility writer'
+$protectedStateLegibilitySurfaceBundlePath = Get-ScriptOutputTail -Output $protectedStateLegibilitySurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($protectedStateLegibilitySurfaceBundlePath)) {
+    $statePayload.lastProtectedStateLegibilitySurfaceBundle = $protectedStateLegibilitySurfaceBundlePath
+    $statePayload.protectedStateLegibilitySurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedStateLegibilitySurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$nexusSingularPortalFacadeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Nexus-SingularPortalFacade.ps1'
+$nexusSingularPortalFacadeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $nexusSingularPortalFacadeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Nexus singular portal facade writer'
+$nexusSingularPortalFacadeBundlePath = Get-ScriptOutputTail -Output $nexusSingularPortalFacadeOutput
+if (-not [string]::IsNullOrWhiteSpace($nexusSingularPortalFacadeBundlePath)) {
+    $statePayload.lastNexusSingularPortalFacadeBundle = $nexusSingularPortalFacadeBundlePath
+    $statePayload.nexusSingularPortalFacadeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $nexusSingularPortalFacadeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$duplexPredicateEnvelopeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Duplex-PredicateEnvelope.ps1'
+$duplexPredicateEnvelopeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $duplexPredicateEnvelopeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Duplex predicate envelope writer'
+$duplexPredicateEnvelopeBundlePath = Get-ScriptOutputTail -Output $duplexPredicateEnvelopeOutput
+if (-not [string]::IsNullOrWhiteSpace($duplexPredicateEnvelopeBundlePath)) {
+    $statePayload.lastDuplexPredicateEnvelopeBundle = $duplexPredicateEnvelopeBundlePath
+    $statePayload.duplexPredicateEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $duplexPredicateEnvelopeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $bondedOperatorLocalityReadinessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Bonded-OperatorLocalityReadiness.ps1'
 $bondedOperatorLocalityReadinessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $bondedOperatorLocalityReadinessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bonded operator locality readiness writer'
 $bondedOperatorLocalityReadinessBundlePath = Get-ScriptOutputTail -Output $bondedOperatorLocalityReadinessOutput
@@ -803,12 +845,12 @@ if (-not [string]::IsNullOrWhiteSpace($bondedOperatorLocalityReadinessBundlePath
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
-$protectedStateLegibilitySurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ProtectedState-LegibilitySurface.ps1'
-$protectedStateLegibilitySurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $protectedStateLegibilitySurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Protected-state legibility writer'
-$protectedStateLegibilitySurfaceBundlePath = Get-ScriptOutputTail -Output $protectedStateLegibilitySurfaceOutput
-if (-not [string]::IsNullOrWhiteSpace($protectedStateLegibilitySurfaceBundlePath)) {
-    $statePayload.lastProtectedStateLegibilitySurfaceBundle = $protectedStateLegibilitySurfaceBundlePath
-    $statePayload.protectedStateLegibilitySurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedStateLegibilitySurfaceStatePath
+$operatorActualWorkSessionRehearsalScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-OperatorActual-WorkSessionRehearsal.ps1'
+$operatorActualWorkSessionRehearsalOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $operatorActualWorkSessionRehearsalScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Operator.actual work-session rehearsal writer'
+$operatorActualWorkSessionRehearsalBundlePath = Get-ScriptOutputTail -Output $operatorActualWorkSessionRehearsalOutput
+if (-not [string]::IsNullOrWhiteSpace($operatorActualWorkSessionRehearsalBundlePath)) {
+    $statePayload.lastOperatorActualWorkSessionRehearsalBundle = $operatorActualWorkSessionRehearsalBundlePath
+    $statePayload.operatorActualWorkSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operatorActualWorkSessionRehearsalStatePath
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
@@ -900,6 +942,12 @@ $summary = [ordered]@{
     bondedOperatorLocalityReadinessStatePath = $statePayload.bondedOperatorLocalityReadinessStatePath
     lastProtectedStateLegibilitySurfaceBundle = $statePayload.lastProtectedStateLegibilitySurfaceBundle
     protectedStateLegibilitySurfaceStatePath = $statePayload.protectedStateLegibilitySurfaceStatePath
+    lastNexusSingularPortalFacadeBundle = $statePayload.lastNexusSingularPortalFacadeBundle
+    nexusSingularPortalFacadeStatePath = $statePayload.nexusSingularPortalFacadeStatePath
+    lastDuplexPredicateEnvelopeBundle = $statePayload.lastDuplexPredicateEnvelopeBundle
+    duplexPredicateEnvelopeStatePath = $statePayload.duplexPredicateEnvelopeStatePath
+    lastOperatorActualWorkSessionRehearsalBundle = $statePayload.lastOperatorActualWorkSessionRehearsalBundle
+    operatorActualWorkSessionRehearsalStatePath = $statePayload.operatorActualWorkSessionRehearsalStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1079,6 +1127,15 @@ if (-not [string]::IsNullOrWhiteSpace($bondedOperatorLocalityReadinessBundlePath
 }
 if (-not [string]::IsNullOrWhiteSpace($protectedStateLegibilitySurfaceBundlePath)) {
     Write-Host ('[local-automation-cycle] ProtectedStateLegibilitySurface: {0}' -f $protectedStateLegibilitySurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($nexusSingularPortalFacadeBundlePath)) {
+    Write-Host ('[local-automation-cycle] NexusSingularPortalFacade: {0}' -f $nexusSingularPortalFacadeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($duplexPredicateEnvelopeBundlePath)) {
+    Write-Host ('[local-automation-cycle] DuplexPredicateEnvelope: {0}' -f $duplexPredicateEnvelopeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($operatorActualWorkSessionRehearsalBundlePath)) {
+    Write-Host ('[local-automation-cycle] OperatorActualWorkSessionRehearsal: {0}' -f $operatorActualWorkSessionRehearsalBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

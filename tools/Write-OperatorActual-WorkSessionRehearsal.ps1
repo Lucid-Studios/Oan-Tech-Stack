@@ -92,72 +92,83 @@ $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertF
 
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $reachAccessTopologyLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachAccessTopologyLedgerStatePath)
-$sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeReadinessStatePath)
-$runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkSurfaceAdmissibilityStatePath)
+$bondedOperatorLocalityReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessStatePath)
 $nexusSingularPortalFacadeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.nexusSingularPortalFacadeStatePath)
 $duplexPredicateEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.duplexPredicateEnvelopeStatePath)
-$outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessOutputRoot)
-$statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessStatePath)
+$outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorActualWorkSessionRehearsalOutputRoot)
+$statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorActualWorkSessionRehearsalStatePath)
 
 $cycleState = Read-JsonFileOrNull -Path $cycleStatePath
 if ($null -eq $cycleState) {
-    throw 'Local automation cycle state is required before bonded operator locality readiness can run.'
+    throw 'Local automation cycle state is required before the operator.actual work-session rehearsal can run.'
 }
 
 $reachAccessTopologyLedgerState = Read-JsonFileOrNull -Path $reachAccessTopologyLedgerStatePath
-$sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
-$runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSurfaceAdmissibilityStatePath
+$bondedOperatorLocalityReadinessState = Read-JsonFileOrNull -Path $bondedOperatorLocalityReadinessStatePath
 $nexusSingularPortalFacadeState = Read-JsonFileOrNull -Path $nexusSingularPortalFacadeStatePath
 $duplexPredicateEnvelopeState = Read-JsonFileOrNull -Path $duplexPredicateEnvelopeStatePath
 
-$readinessState = 'dormant-before-bond'
-$reasonCode = 'bonded-operator-locality-readiness-dormant-before-bond'
-$nextAction = 'continue-bounded-sanctuary-runtime-work'
+$rehearsalState = 'awaiting-singular-portal'
+$reasonCode = 'operator-actual-work-session-rehearsal-awaiting-singular-portal'
+$nextAction = 'emit-nexus-singular-portal-facade'
 
-$runtimeReadinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'readinessState')
-$runtimeAdmissibilityState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibilityState')
 $reachLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $reachAccessTopologyLedgerState -PropertyName 'ledgerState')
+$bondedReadinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedOperatorLocalityReadinessState -PropertyName 'readinessState')
 $nexusPortalState = [string] (Get-ObjectPropertyValueOrNull -InputObject $nexusSingularPortalFacadeState -PropertyName 'portalState')
 $duplexState = [string] (Get-ObjectPropertyValueOrNull -InputObject $duplexPredicateEnvelopeState -PropertyName 'duplexState')
 
 if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
-    $readinessState = 'blocked'
-    $reasonCode = 'bonded-operator-locality-readiness-automation-blocked'
+    $rehearsalState = 'blocked'
+    $reasonCode = 'operator-actual-work-session-rehearsal-automation-blocked'
     $nextAction = 'investigate-blocked-state'
-} elseif ($null -eq $sanctuaryRuntimeReadinessState -or $runtimeReadinessState -ne 'bounded-working-state-ready') {
-    $readinessState = 'dormant-before-bond'
-    $reasonCode = 'bonded-operator-locality-readiness-runtime-not-ready'
-    $nextAction = if ($null -ne $sanctuaryRuntimeReadinessState) { [string] $sanctuaryRuntimeReadinessState.nextAction } else { 'emit-sanctuary-runtime-readiness' }
-} elseif ($null -eq $reachAccessTopologyLedgerState) {
-    $readinessState = 'awaiting-access-topology'
-    $reasonCode = 'bonded-operator-locality-readiness-access-topology-missing'
+} elseif ($null -eq $nexusSingularPortalFacadeState -or $nexusPortalState -ne 'portal-facade-ready') {
+    $rehearsalState = 'awaiting-singular-portal'
+    $reasonCode = 'operator-actual-work-session-rehearsal-portal-not-ready'
+    $nextAction = if ($null -ne $nexusSingularPortalFacadeState) { [string] $nexusSingularPortalFacadeState.nextAction } else { 'emit-nexus-singular-portal-facade' }
+} elseif ($null -eq $duplexPredicateEnvelopeState -or $duplexState -ne 'duplex-envelope-ready') {
+    $rehearsalState = 'awaiting-duplex-envelope'
+    $reasonCode = 'operator-actual-work-session-rehearsal-duplex-not-ready'
+    $nextAction = if ($null -ne $duplexPredicateEnvelopeState) { [string] $duplexPredicateEnvelopeState.nextAction } else { 'emit-duplex-predicate-envelope' }
+} elseif ($reachLedgerState -ne 'provisional-reach-legibility') {
+    $rehearsalState = 'awaiting-reach-legibility'
+    $reasonCode = 'operator-actual-work-session-rehearsal-reach-not-ready'
     $nextAction = 'emit-reach-access-topology-ledger'
-} elseif ($nexusPortalState -eq 'portal-facade-ready' -and $duplexState -eq 'duplex-envelope-ready') {
-    $readinessState = 'ready-for-bounded-rehearsal'
-    $reasonCode = 'bonded-operator-locality-readiness-bounded-rehearsal-ready'
-    $nextAction = 'emit-operator-actual-work-session-rehearsal'
-} elseif ($reachLedgerState -eq 'provisional-reach-legibility' -and $runtimeAdmissibilityState -in @('bounded-internal-work-only', 'provisional-runtime-work')) {
-    $readinessState = 'withheld-before-bounded-rehearsal'
-    $reasonCode = 'bonded-operator-locality-readiness-reach-not-bound'
-    $nextAction = 'bind-singular-nexus-and-duplex-predicate-envelope'
 } else {
-    $readinessState = 'provisional'
-    $reasonCode = 'bonded-operator-locality-readiness-provisional'
-    $nextAction = 'prepare-bounded-operator-actual-rehearsal'
+    $rehearsalState = 'rehearsal-bundle-ready'
+    $reasonCode = 'operator-actual-work-session-rehearsal-bounded'
+    $nextAction = 'review-hitl-bounded-operator-actual-rehearsal'
 }
 
-$requiredSurfaces = @(
+$coRealizedSurfaces = @(
     [ordered]@{
-        surfaceName = 'Nexus Singular Portal Facade'
-        requirementClass = 'contact-surface'
+        surfaceName = 'Sanctuary.actual Bounded Runtime Work'
+        locality = 'Sanctuary.actual'
+        realizationClass = 'protected-inner-actuality'
     },
     [ordered]@{
-        surfaceName = 'Duplex Predicate Envelope'
-        requirementClass = 'governed-utility'
+        surfaceName = 'AgentiCore.actual Duplex Utility Surface'
+        locality = 'AgentiCore.actual'
+        realizationClass = 'governed-public-utility'
     },
     [ordered]@{
-        surfaceName = 'Operator.actual Work Session Rehearsal'
-        requirementClass = 'bounded-rehearsal'
+        surfaceName = 'Operator.actual Bounded Rehearsal Locality'
+        locality = 'Operator.actual'
+        realizationClass = 'co-realized-participation-locality'
+    }
+)
+
+$withheldSurfaces = @(
+    [ordered]@{
+        surfaceName = 'Ratified Bonded Operator Actual Runtime'
+        withholdingReason = 'bonded-operator-actual-remains-unratified'
+    },
+    [ordered]@{
+        surfaceName = 'Deep Self-Rooted Cryptic Descent'
+        withholdingReason = 'self-rooted-cryptic-depth-gate-not-yet-bound'
+    },
+    [ordered]@{
+        surfaceName = 'Ambient Cross-Locality Grant'
+        withholdingReason = 'ambient-cross-locality-grant-prohibited'
     }
 )
 
@@ -168,48 +179,65 @@ $bundleKey = if (-not [string]::IsNullOrWhiteSpace([string] $cycleState.lastRele
     'no-run'
 }
 $bundlePath = Join-Path $outputRoot ('{0}-{1}' -f $timestamp, $bundleKey)
-$bundleJsonPath = Join-Path $bundlePath 'bonded-operator-locality-readiness.json'
-$bundleMarkdownPath = Join-Path $bundlePath 'bonded-operator-locality-readiness.md'
+$bundleJsonPath = Join-Path $bundlePath 'operator-actual-work-session-rehearsal.json'
+$bundleMarkdownPath = Join-Path $bundlePath 'operator-actual-work-session-rehearsal.md'
 
 $payload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
-    readinessState = $readinessState
+    rehearsalState = $rehearsalState
     reasonCode = $reasonCode
     nextAction = $nextAction
     participationModel = 'co-realized-locality-not-admin-console'
-    runtimeReadinessState = $runtimeReadinessState
-    runtimeAdmissibilityState = $runtimeAdmissibilityState
     reachLedgerState = $reachLedgerState
+    bondedOperatorLocalityReadinessState = $bondedReadinessState
     nexusPortalState = $nexusPortalState
     duplexState = $duplexState
-    requiredSurfaces = $requiredSurfaces
+    returnCondition = 'dissolve-to-bounded-localities'
+    dissolutionPath = 'return-to-sanctuary-actual-plus-operator-locality-separation'
+    coRealizedSurfaces = $coRealizedSurfaces
+    withheldSurfaces = $withheldSurfaces
 }
 
 Write-JsonFile -Path $bundleJsonPath -Value $payload
 
 $markdownLines = @(
-    '# Bonded Operator Locality Readiness',
+    '# Operator.actual Work Session Rehearsal',
     '',
     ('- Generated at (UTC): `{0}`' -f $payload.generatedAtUtc),
-    ('- Readiness state: `{0}`' -f $payload.readinessState),
+    ('- Rehearsal state: `{0}`' -f $payload.rehearsalState),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
     ('- Participation model: `{0}`' -f $payload.participationModel),
-    ('- Runtime readiness state: `{0}`' -f $(if ($payload.runtimeReadinessState) { $payload.runtimeReadinessState } else { 'missing' })),
-    ('- Runtime admissibility state: `{0}`' -f $(if ($payload.runtimeAdmissibilityState) { $payload.runtimeAdmissibilityState } else { 'missing' })),
     ('- Reach ledger state: `{0}`' -f $(if ($payload.reachLedgerState) { $payload.reachLedgerState } else { 'missing' })),
+    ('- Bonded operator locality readiness state: `{0}`' -f $(if ($payload.bondedOperatorLocalityReadinessState) { $payload.bondedOperatorLocalityReadinessState } else { 'missing' })),
     ('- Nexus portal state: `{0}`' -f $(if ($payload.nexusPortalState) { $payload.nexusPortalState } else { 'missing' })),
     ('- Duplex state: `{0}`' -f $(if ($payload.duplexState) { $payload.duplexState } else { 'missing' })),
+    ('- Return condition: `{0}`' -f $payload.returnCondition),
+    ('- Dissolution path: `{0}`' -f $payload.dissolutionPath),
     '',
-    '## Required Surfaces',
+    '## Co-Realized Surfaces',
     ''
 )
 
-foreach ($surface in $requiredSurfaces) {
+foreach ($surface in @($coRealizedSurfaces)) {
     $markdownLines += @(
         ('### {0}' -f [string] $surface.surfaceName),
-        ('- Requirement class: `{0}`' -f [string] $surface.requirementClass),
+        ('- Locality: `{0}`' -f [string] $surface.locality),
+        ('- Realization class: `{0}`' -f [string] $surface.realizationClass),
+        ''
+    )
+}
+
+$markdownLines += @(
+    '## Withheld Surfaces',
+    ''
+)
+
+foreach ($surface in @($withheldSurfaces)) {
+    $markdownLines += @(
+        ('### {0}' -f [string] $surface.surfaceName),
+        ('- Withholding reason: `{0}`' -f [string] $surface.withholdingReason),
         ''
     )
 }
@@ -220,16 +248,17 @@ $statePayload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $payload.generatedAtUtc
     bundlePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bundlePath
-    readinessState = $payload.readinessState
+    rehearsalState = $payload.rehearsalState
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
-    runtimeReadinessState = $payload.runtimeReadinessState
-    runtimeAdmissibilityState = $payload.runtimeAdmissibilityState
     reachLedgerState = $payload.reachLedgerState
+    bondedOperatorLocalityReadinessState = $payload.bondedOperatorLocalityReadinessState
     nexusPortalState = $payload.nexusPortalState
     duplexState = $payload.duplexState
+    coRealizedSurfaceCount = @($coRealizedSurfaces).Count
+    withheldSurfaceCount = @($withheldSurfaces).Count
 }
 
 Write-JsonFile -Path $statePath -Value $statePayload
-Write-Host ('[bonded-operator-locality-readiness] Bundle: {0}' -f $bundlePath)
+Write-Host ('[operator-actual-work-session-rehearsal] Bundle: {0}' -f $bundlePath)
 $bundlePath

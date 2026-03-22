@@ -47,6 +47,9 @@
   "reachAccessTopologyLedgerOutputRoot": ".audit/runs/reach-access-topology-ledger",
   "bondedOperatorLocalityReadinessOutputRoot": ".audit/runs/bonded-operator-locality-readiness",
   "protectedStateLegibilitySurfaceOutputRoot": ".audit/runs/protected-state-legibility-surface",
+  "nexusSingularPortalFacadeOutputRoot": ".audit/runs/nexus-singular-portal-facade",
+  "duplexPredicateEnvelopeOutputRoot": ".audit/runs/duplex-predicate-envelope",
+  "operatorActualWorkSessionRehearsalOutputRoot": ".audit/runs/operator-actual-work-session-rehearsal",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -92,6 +95,9 @@
   "reachAccessTopologyLedgerStatePath": ".audit/state/local-automation-reach-access-topology-ledger-last-run.json",
   "bondedOperatorLocalityReadinessStatePath": ".audit/state/local-automation-bonded-operator-locality-readiness-last-run.json",
   "protectedStateLegibilitySurfaceStatePath": ".audit/state/local-automation-protected-state-legibility-surface-last-run.json",
+  "nexusSingularPortalFacadeStatePath": ".audit/state/local-automation-nexus-singular-portal-facade-last-run.json",
+  "duplexPredicateEnvelopeStatePath": ".audit/state/local-automation-duplex-predicate-envelope-last-run.json",
+  "operatorActualWorkSessionRehearsalStatePath": ".audit/state/local-automation-operator-actual-work-session-rehearsal-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -166,6 +172,9 @@
     "keepReachAccessTopologyLedgerBundles": 8,
     "keepBondedOperatorLocalityReadinessBundles": 8,
     "keepProtectedStateLegibilitySurfaceBundles": 8,
+    "keepNexusSingularPortalFacadeBundles": 8,
+    "keepDuplexPredicateEnvelopeBundles": 8,
+    "keepOperatorActualWorkSessionRehearsalBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

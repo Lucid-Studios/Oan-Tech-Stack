@@ -91,75 +91,56 @@ $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Can
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
 
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
-$reachAccessTopologyLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachAccessTopologyLedgerStatePath)
-$sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeReadinessStatePath)
 $runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkSurfaceAdmissibilityStatePath)
 $nexusSingularPortalFacadeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.nexusSingularPortalFacadeStatePath)
-$duplexPredicateEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.duplexPredicateEnvelopeStatePath)
-$outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessOutputRoot)
-$statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessStatePath)
+$outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.duplexPredicateEnvelopeOutputRoot)
+$statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.duplexPredicateEnvelopeStatePath)
 
 $cycleState = Read-JsonFileOrNull -Path $cycleStatePath
 if ($null -eq $cycleState) {
-    throw 'Local automation cycle state is required before bonded operator locality readiness can run.'
+    throw 'Local automation cycle state is required before the duplex predicate envelope can run.'
 }
 
-$reachAccessTopologyLedgerState = Read-JsonFileOrNull -Path $reachAccessTopologyLedgerStatePath
-$sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
 $runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSurfaceAdmissibilityStatePath
 $nexusSingularPortalFacadeState = Read-JsonFileOrNull -Path $nexusSingularPortalFacadeStatePath
-$duplexPredicateEnvelopeState = Read-JsonFileOrNull -Path $duplexPredicateEnvelopeStatePath
 
-$readinessState = 'dormant-before-bond'
-$reasonCode = 'bonded-operator-locality-readiness-dormant-before-bond'
-$nextAction = 'continue-bounded-sanctuary-runtime-work'
+$duplexSourceFiles = @(
+    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore.Runtime/DuplexPredicateSurfaceContracts.cs')
+    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore.Runtime/AgentiRuntime.cs')
+)
+$missingDuplexSourceFiles = @($duplexSourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
+$agentiRuntimePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore.Runtime/AgentiRuntime.cs'
+$agentiRuntimeSource = if (Test-Path -LiteralPath $agentiRuntimePath -PathType Leaf) { Get-Content -Raw -LiteralPath $agentiRuntimePath } else { '' }
 
-$runtimeReadinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'readinessState')
+$duplexState = 'awaiting-runtime-admissibility'
+$reasonCode = 'duplex-predicate-envelope-awaiting-runtime-admissibility'
+$nextAction = 'emit-runtime-work-surface-admissibility'
+
 $runtimeAdmissibilityState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibilityState')
-$reachLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $reachAccessTopologyLedgerState -PropertyName 'ledgerState')
 $nexusPortalState = [string] (Get-ObjectPropertyValueOrNull -InputObject $nexusSingularPortalFacadeState -PropertyName 'portalState')
-$duplexState = [string] (Get-ObjectPropertyValueOrNull -InputObject $duplexPredicateEnvelopeState -PropertyName 'duplexState')
+$sendDuplexIntentBound = $agentiRuntimeSource.IndexOf('SendDuplexIntentAsync', [System.StringComparison]::Ordinal) -ge 0
 
 if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
-    $readinessState = 'blocked'
-    $reasonCode = 'bonded-operator-locality-readiness-automation-blocked'
+    $duplexState = 'blocked'
+    $reasonCode = 'duplex-predicate-envelope-automation-blocked'
     $nextAction = 'investigate-blocked-state'
-} elseif ($null -eq $sanctuaryRuntimeReadinessState -or $runtimeReadinessState -ne 'bounded-working-state-ready') {
-    $readinessState = 'dormant-before-bond'
-    $reasonCode = 'bonded-operator-locality-readiness-runtime-not-ready'
-    $nextAction = if ($null -ne $sanctuaryRuntimeReadinessState) { [string] $sanctuaryRuntimeReadinessState.nextAction } else { 'emit-sanctuary-runtime-readiness' }
-} elseif ($null -eq $reachAccessTopologyLedgerState) {
-    $readinessState = 'awaiting-access-topology'
-    $reasonCode = 'bonded-operator-locality-readiness-access-topology-missing'
-    $nextAction = 'emit-reach-access-topology-ledger'
-} elseif ($nexusPortalState -eq 'portal-facade-ready' -and $duplexState -eq 'duplex-envelope-ready') {
-    $readinessState = 'ready-for-bounded-rehearsal'
-    $reasonCode = 'bonded-operator-locality-readiness-bounded-rehearsal-ready'
-    $nextAction = 'emit-operator-actual-work-session-rehearsal'
-} elseif ($reachLedgerState -eq 'provisional-reach-legibility' -and $runtimeAdmissibilityState -in @('bounded-internal-work-only', 'provisional-runtime-work')) {
-    $readinessState = 'withheld-before-bounded-rehearsal'
-    $reasonCode = 'bonded-operator-locality-readiness-reach-not-bound'
-    $nextAction = 'bind-singular-nexus-and-duplex-predicate-envelope'
+} elseif ($null -eq $runtimeWorkSurfaceAdmissibilityState -or $runtimeAdmissibilityState -notin @('bounded-internal-work-only', 'provisional-runtime-work')) {
+    $duplexState = 'awaiting-runtime-admissibility'
+    $reasonCode = 'duplex-predicate-envelope-runtime-not-admissible'
+    $nextAction = if ($null -ne $runtimeWorkSurfaceAdmissibilityState) { [string] $runtimeWorkSurfaceAdmissibilityState.nextAction } else { 'emit-runtime-work-surface-admissibility' }
+} elseif ($null -eq $nexusSingularPortalFacadeState -or $nexusPortalState -ne 'portal-facade-ready') {
+    $duplexState = 'awaiting-singular-portal'
+    $reasonCode = 'duplex-predicate-envelope-portal-not-ready'
+    $nextAction = if ($null -ne $nexusSingularPortalFacadeState) { [string] $nexusSingularPortalFacadeState.nextAction } else { 'emit-nexus-singular-portal-facade' }
+} elseif ($missingDuplexSourceFiles.Count -gt 0 -or -not $sendDuplexIntentBound) {
+    $duplexState = 'awaiting-duplex-binding'
+    $reasonCode = 'duplex-predicate-envelope-source-missing'
+    $nextAction = 'bind-agenticore-duplex-envelope'
 } else {
-    $readinessState = 'provisional'
-    $reasonCode = 'bonded-operator-locality-readiness-provisional'
-    $nextAction = 'prepare-bounded-operator-actual-rehearsal'
+    $duplexState = 'duplex-envelope-ready'
+    $reasonCode = 'duplex-predicate-envelope-bound'
+    $nextAction = 'emit-operator-actual-work-session-rehearsal'
 }
-
-$requiredSurfaces = @(
-    [ordered]@{
-        surfaceName = 'Nexus Singular Portal Facade'
-        requirementClass = 'contact-surface'
-    },
-    [ordered]@{
-        surfaceName = 'Duplex Predicate Envelope'
-        requirementClass = 'governed-utility'
-    },
-    [ordered]@{
-        surfaceName = 'Operator.actual Work Session Rehearsal'
-        requirementClass = 'bounded-rehearsal'
-    }
-)
 
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
 $bundleKey = if (-not [string]::IsNullOrWhiteSpace([string] $cycleState.lastReleaseCandidateBundle)) {
@@ -168,48 +149,52 @@ $bundleKey = if (-not [string]::IsNullOrWhiteSpace([string] $cycleState.lastRele
     'no-run'
 }
 $bundlePath = Join-Path $outputRoot ('{0}-{1}' -f $timestamp, $bundleKey)
-$bundleJsonPath = Join-Path $bundlePath 'bonded-operator-locality-readiness.json'
-$bundleMarkdownPath = Join-Path $bundlePath 'bonded-operator-locality-readiness.md'
+$bundleJsonPath = Join-Path $bundlePath 'duplex-predicate-envelope.json'
+$bundleMarkdownPath = Join-Path $bundlePath 'duplex-predicate-envelope.md'
 
 $payload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
-    readinessState = $readinessState
+    duplexState = $duplexState
     reasonCode = $reasonCode
     nextAction = $nextAction
-    participationModel = 'co-realized-locality-not-admin-console'
-    runtimeReadinessState = $runtimeReadinessState
     runtimeAdmissibilityState = $runtimeAdmissibilityState
-    reachLedgerState = $reachLedgerState
     nexusPortalState = $nexusPortalState
-    duplexState = $duplexState
-    requiredSurfaces = $requiredSurfaces
+    workPredicateBound = (Test-Path -LiteralPath $duplexSourceFiles[0] -PathType Leaf)
+    governancePredicateBound = $sendDuplexIntentBound
+    sourceFileCount = @($duplexSourceFiles).Count
+    missingSourceFileCount = @($missingDuplexSourceFiles).Count
+    sourceFiles = @(
+        foreach ($file in $duplexSourceFiles) {
+            [ordered]@{
+                path = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $file
+                present = (Test-Path -LiteralPath $file -PathType Leaf)
+            }
+        }
+    )
 }
 
 Write-JsonFile -Path $bundleJsonPath -Value $payload
 
 $markdownLines = @(
-    '# Bonded Operator Locality Readiness',
+    '# Duplex Predicate Envelope',
     '',
     ('- Generated at (UTC): `{0}`' -f $payload.generatedAtUtc),
-    ('- Readiness state: `{0}`' -f $payload.readinessState),
+    ('- Duplex state: `{0}`' -f $payload.duplexState),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
-    ('- Participation model: `{0}`' -f $payload.participationModel),
-    ('- Runtime readiness state: `{0}`' -f $(if ($payload.runtimeReadinessState) { $payload.runtimeReadinessState } else { 'missing' })),
     ('- Runtime admissibility state: `{0}`' -f $(if ($payload.runtimeAdmissibilityState) { $payload.runtimeAdmissibilityState } else { 'missing' })),
-    ('- Reach ledger state: `{0}`' -f $(if ($payload.reachLedgerState) { $payload.reachLedgerState } else { 'missing' })),
     ('- Nexus portal state: `{0}`' -f $(if ($payload.nexusPortalState) { $payload.nexusPortalState } else { 'missing' })),
-    ('- Duplex state: `{0}`' -f $(if ($payload.duplexState) { $payload.duplexState } else { 'missing' })),
-    '',
-    '## Required Surfaces',
+    ('- Work predicate bound: `{0}`' -f [bool] $payload.workPredicateBound),
+    ('- Governance predicate bound: `{0}`' -f [bool] $payload.governancePredicateBound),
+    ('- Source files present: `{0}/{1}`' -f ($payload.sourceFileCount - $payload.missingSourceFileCount), $payload.sourceFileCount),
     ''
 )
 
-foreach ($surface in $requiredSurfaces) {
+foreach ($file in @($payload.sourceFiles)) {
     $markdownLines += @(
-        ('### {0}' -f [string] $surface.surfaceName),
-        ('- Requirement class: `{0}`' -f [string] $surface.requirementClass),
+        ('## {0}' -f [string] $file.path),
+        ('- Present: `{0}`' -f [bool] $file.present),
         ''
     )
 }
@@ -220,16 +205,15 @@ $statePayload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $payload.generatedAtUtc
     bundlePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bundlePath
-    readinessState = $payload.readinessState
+    duplexState = $payload.duplexState
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
-    runtimeReadinessState = $payload.runtimeReadinessState
     runtimeAdmissibilityState = $payload.runtimeAdmissibilityState
-    reachLedgerState = $payload.reachLedgerState
     nexusPortalState = $payload.nexusPortalState
-    duplexState = $payload.duplexState
+    workPredicateBound = $payload.workPredicateBound
+    governancePredicateBound = $payload.governancePredicateBound
 }
 
 Write-JsonFile -Path $statePath -Value $statePayload
-Write-Host ('[bonded-operator-locality-readiness] Bundle: {0}' -f $bundlePath)
+Write-Host ('[duplex-predicate-envelope] Bundle: {0}' -f $bundlePath)
 $bundlePath

@@ -149,6 +149,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $ReachAccessTopologyLedgerState,
         [object] $BondedOperatorLocalityReadinessState,
         [object] $ProtectedStateLegibilitySurfaceState,
+        [object] $NexusSingularPortalFacadeState,
+        [object] $DuplexPredicateEnvelopeState,
+        [object] $OperatorActualWorkSessionRehearsalState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -545,6 +548,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'nexus-singular-portal-facade' {
+            if ($null -ne $NexusSingularPortalFacadeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'duplex-predicate-envelope' {
+            if ($null -ne $DuplexPredicateEnvelopeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'operator-actual-work-session-rehearsal' {
+            if ($null -ne $OperatorActualWorkSessionRehearsalState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -636,6 +666,9 @@ $runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $reso
 $reachAccessTopologyLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachAccessTopologyLedgerStatePath)
 $bondedOperatorLocalityReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedOperatorLocalityReadinessStatePath)
 $protectedStateLegibilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.protectedStateLegibilitySurfaceStatePath)
+$nexusSingularPortalFacadeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.nexusSingularPortalFacadeStatePath)
+$duplexPredicateEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.duplexPredicateEnvelopeStatePath)
+$operatorActualWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorActualWorkSessionRehearsalStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -680,6 +713,9 @@ $runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSu
 $reachAccessTopologyLedgerState = Read-JsonFileOrNull -Path $reachAccessTopologyLedgerStatePath
 $bondedOperatorLocalityReadinessState = Read-JsonFileOrNull -Path $bondedOperatorLocalityReadinessStatePath
 $protectedStateLegibilitySurfaceState = Read-JsonFileOrNull -Path $protectedStateLegibilitySurfaceStatePath
+$nexusSingularPortalFacadeState = Read-JsonFileOrNull -Path $nexusSingularPortalFacadeStatePath
+$duplexPredicateEnvelopeState = Read-JsonFileOrNull -Path $duplexPredicateEnvelopeStatePath
+$operatorActualWorkSessionRehearsalState = Read-JsonFileOrNull -Path $operatorActualWorkSessionRehearsalStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -870,6 +906,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -ReachAccessTopologyLedgerState $reachAccessTopologyLedgerState `
                 -BondedOperatorLocalityReadinessState $bondedOperatorLocalityReadinessState `
                 -ProtectedStateLegibilitySurfaceState $protectedStateLegibilitySurfaceState `
+                -NexusSingularPortalFacadeState $nexusSingularPortalFacadeState `
+                -DuplexPredicateEnvelopeState $duplexPredicateEnvelopeState `
+                -OperatorActualWorkSessionRehearsalState $operatorActualWorkSessionRehearsalState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -968,6 +1007,9 @@ $taskMapEntries = @(
                     -ReachAccessTopologyLedgerState $reachAccessTopologyLedgerState `
                     -BondedOperatorLocalityReadinessState $bondedOperatorLocalityReadinessState `
                     -ProtectedStateLegibilitySurfaceState $protectedStateLegibilitySurfaceState `
+                    -NexusSingularPortalFacadeState $nexusSingularPortalFacadeState `
+                    -DuplexPredicateEnvelopeState $duplexPredicateEnvelopeState `
+                    -OperatorActualWorkSessionRehearsalState $operatorActualWorkSessionRehearsalState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1168,6 +1210,20 @@ $statusPayload = [ordered]@{
         protectedStateLegibilitySurfaceReason = if ($null -ne $protectedStateLegibilitySurfaceState) { [string] $protectedStateLegibilitySurfaceState.reasonCode } else { $null }
         protectedStateLegibilitySurfaceNextAction = if ($null -ne $protectedStateLegibilitySurfaceState) { [string] $protectedStateLegibilitySurfaceState.nextAction } else { $null }
         protectedStateLegibilityVisibleSignalCount = if ($null -ne $protectedStateLegibilitySurfaceState) { [int] $protectedStateLegibilitySurfaceState.visibleSignalCount } else { $null }
+        nexusSingularPortalFacadeState = if ($null -ne $nexusSingularPortalFacadeState) { [string] $nexusSingularPortalFacadeState.portalState } else { $null }
+        nexusSingularPortalFacadeReason = if ($null -ne $nexusSingularPortalFacadeState) { [string] $nexusSingularPortalFacadeState.reasonCode } else { $null }
+        nexusSingularPortalFacadeNextAction = if ($null -ne $nexusSingularPortalFacadeState) { [string] $nexusSingularPortalFacadeState.nextAction } else { $null }
+        nexusSingularPortalFacadeSourceFileCount = if ($null -ne $nexusSingularPortalFacadeState) { [int] $nexusSingularPortalFacadeState.sourceFileCount } else { $null }
+        duplexPredicateEnvelopeState = if ($null -ne $duplexPredicateEnvelopeState) { [string] $duplexPredicateEnvelopeState.duplexState } else { $null }
+        duplexPredicateEnvelopeReason = if ($null -ne $duplexPredicateEnvelopeState) { [string] $duplexPredicateEnvelopeState.reasonCode } else { $null }
+        duplexPredicateEnvelopeNextAction = if ($null -ne $duplexPredicateEnvelopeState) { [string] $duplexPredicateEnvelopeState.nextAction } else { $null }
+        duplexPredicateEnvelopeWorkPredicateBound = if ($null -ne $duplexPredicateEnvelopeState) { [bool] $duplexPredicateEnvelopeState.workPredicateBound } else { $null }
+        duplexPredicateEnvelopeGovernancePredicateBound = if ($null -ne $duplexPredicateEnvelopeState) { [bool] $duplexPredicateEnvelopeState.governancePredicateBound } else { $null }
+        operatorActualWorkSessionRehearsalState = if ($null -ne $operatorActualWorkSessionRehearsalState) { [string] $operatorActualWorkSessionRehearsalState.rehearsalState } else { $null }
+        operatorActualWorkSessionRehearsalReason = if ($null -ne $operatorActualWorkSessionRehearsalState) { [string] $operatorActualWorkSessionRehearsalState.reasonCode } else { $null }
+        operatorActualWorkSessionRehearsalNextAction = if ($null -ne $operatorActualWorkSessionRehearsalState) { [string] $operatorActualWorkSessionRehearsalState.nextAction } else { $null }
+        operatorActualWorkSessionRehearsalCoRealizedSurfaceCount = if ($null -ne $operatorActualWorkSessionRehearsalState) { [int] $operatorActualWorkSessionRehearsalState.coRealizedSurfaceCount } else { $null }
+        operatorActualWorkSessionRehearsalWithheldSurfaceCount = if ($null -ne $operatorActualWorkSessionRehearsalState) { [int] $operatorActualWorkSessionRehearsalState.withheldSurfaceCount } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -1723,6 +1779,50 @@ if ($null -ne $protectedStateLegibilitySurfaceState) {
     )
 }
 
+if ($null -ne $nexusSingularPortalFacadeState) {
+    $markdownLines += @(
+        '## Nexus Singular Portal Facade',
+        '',
+        ('- Portal state: `{0}`' -f [string] $nexusSingularPortalFacadeState.portalState),
+        ('- Reason code: `{0}`' -f [string] $nexusSingularPortalFacadeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $nexusSingularPortalFacadeState.nextAction),
+        ('- Protected legibility state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $nexusSingularPortalFacadeState -PropertyName 'protectedLegibilityState')),
+        ('- Source files present: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $nexusSingularPortalFacadeState -PropertyName 'sourceFileCount')),
+        ''
+    )
+}
+
+if ($null -ne $duplexPredicateEnvelopeState) {
+    $markdownLines += @(
+        '## Duplex Predicate Envelope',
+        '',
+        ('- Duplex state: `{0}`' -f [string] $duplexPredicateEnvelopeState.duplexState),
+        ('- Reason code: `{0}`' -f [string] $duplexPredicateEnvelopeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $duplexPredicateEnvelopeState.nextAction),
+        ('- Runtime admissibility state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $duplexPredicateEnvelopeState -PropertyName 'runtimeAdmissibilityState')),
+        ('- Nexus portal state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $duplexPredicateEnvelopeState -PropertyName 'nexusPortalState')),
+        ('- Work predicate bound: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $duplexPredicateEnvelopeState -PropertyName 'workPredicateBound')),
+        ('- Governance predicate bound: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $duplexPredicateEnvelopeState -PropertyName 'governancePredicateBound')),
+        ''
+    )
+}
+
+if ($null -ne $operatorActualWorkSessionRehearsalState) {
+    $markdownLines += @(
+        '## Operator.actual Work Session Rehearsal',
+        '',
+        ('- Rehearsal state: `{0}`' -f [string] $operatorActualWorkSessionRehearsalState.rehearsalState),
+        ('- Reason code: `{0}`' -f [string] $operatorActualWorkSessionRehearsalState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $operatorActualWorkSessionRehearsalState.nextAction),
+        ('- Reach ledger state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorActualWorkSessionRehearsalState -PropertyName 'reachLedgerState')),
+        ('- Nexus portal state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorActualWorkSessionRehearsalState -PropertyName 'nexusPortalState')),
+        ('- Duplex state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorActualWorkSessionRehearsalState -PropertyName 'duplexState')),
+        ('- Co-realized surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorActualWorkSessionRehearsalState -PropertyName 'coRealizedSurfaceCount')),
+        ('- Withheld surfaces: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorActualWorkSessionRehearsalState -PropertyName 'withheldSurfaceCount')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -1788,6 +1888,15 @@ if ($null -ne $activeLongFormTaskMap) {
             -SchedulerProofHarvestState $schedulerProofHarvestState `
             -IntervalOriginClarificationState $intervalOriginClarificationState `
             -QueuedTaskMapPromotionState $queuedTaskMapPromotionState `
+            -RuntimeDeployabilityEnvelopeState $runtimeDeployabilityEnvelopeState `
+            -SanctuaryRuntimeReadinessState $sanctuaryRuntimeReadinessState `
+            -RuntimeWorkSurfaceAdmissibilityState $runtimeWorkSurfaceAdmissibilityState `
+            -ReachAccessTopologyLedgerState $reachAccessTopologyLedgerState `
+            -BondedOperatorLocalityReadinessState $bondedOperatorLocalityReadinessState `
+            -ProtectedStateLegibilitySurfaceState $protectedStateLegibilitySurfaceState `
+            -NexusSingularPortalFacadeState $nexusSingularPortalFacadeState `
+            -DuplexPredicateEnvelopeState $duplexPredicateEnvelopeState `
+            -OperatorActualWorkSessionRehearsalState $operatorActualWorkSessionRehearsalState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
