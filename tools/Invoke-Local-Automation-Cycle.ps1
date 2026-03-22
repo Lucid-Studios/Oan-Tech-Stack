@@ -207,6 +207,9 @@ $interWorkerBraidHandoffPacketStatePath = Resolve-PathFromRepo -BasePath $resolv
 $agentiCoreActualUtilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.agentiCoreActualUtilitySurfaceStatePath)
 $reachDuplexRealizationSeamStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.reachDuplexRealizationSeamStatePath)
 $bondedParticipationLocalityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedParticipationLocalityLedgerStatePath)
+$sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sanctuaryRuntimeWorkbenchSurfaceStatePath)
+$amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.amenableDayDreamTierAdmissibilityStatePath)
+$selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.selfRootedCrypticDepthGateStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -455,6 +458,12 @@ $statePayload.lastReachDuplexRealizationSeamBundle = [string] (Get-ObjectPropert
 $statePayload.reachDuplexRealizationSeamStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachDuplexRealizationSeamStatePath
 $statePayload.lastBondedParticipationLocalityLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBondedParticipationLocalityLedgerBundle')
 $statePayload.bondedParticipationLocalityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedParticipationLocalityLedgerStatePath
+$statePayload.lastSanctuaryRuntimeWorkbenchSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSanctuaryRuntimeWorkbenchSurfaceBundle')
+$statePayload.sanctuaryRuntimeWorkbenchSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sanctuaryRuntimeWorkbenchSurfaceStatePath
+$statePayload.lastAmenableDayDreamTierAdmissibilityBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastAmenableDayDreamTierAdmissibilityBundle')
+$statePayload.amenableDayDreamTierAdmissibilityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $amenableDayDreamTierAdmissibilityStatePath
+$statePayload.lastSelfRootedCrypticDepthGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSelfRootedCrypticDepthGateBundle')
+$statePayload.selfRootedCrypticDepthGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $selfRootedCrypticDepthGateStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -926,6 +935,33 @@ if (-not [string]::IsNullOrWhiteSpace($bondedParticipationLocalityLedgerBundlePa
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$sanctuaryRuntimeWorkbenchSurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Sanctuary-RuntimeWorkbenchSurface.ps1'
+$sanctuaryRuntimeWorkbenchSurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $sanctuaryRuntimeWorkbenchSurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Sanctuary runtime-workbench surface writer'
+$sanctuaryRuntimeWorkbenchSurfaceBundlePath = Get-ScriptOutputTail -Output $sanctuaryRuntimeWorkbenchSurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($sanctuaryRuntimeWorkbenchSurfaceBundlePath)) {
+    $statePayload.lastSanctuaryRuntimeWorkbenchSurfaceBundle = $sanctuaryRuntimeWorkbenchSurfaceBundlePath
+    $statePayload.sanctuaryRuntimeWorkbenchSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sanctuaryRuntimeWorkbenchSurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$amenableDayDreamTierAdmissibilityScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Amenable-DayDreamTierAdmissibility.ps1'
+$amenableDayDreamTierAdmissibilityOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $amenableDayDreamTierAdmissibilityScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Amenable day-dream tier admissibility writer'
+$amenableDayDreamTierAdmissibilityBundlePath = Get-ScriptOutputTail -Output $amenableDayDreamTierAdmissibilityOutput
+if (-not [string]::IsNullOrWhiteSpace($amenableDayDreamTierAdmissibilityBundlePath)) {
+    $statePayload.lastAmenableDayDreamTierAdmissibilityBundle = $amenableDayDreamTierAdmissibilityBundlePath
+    $statePayload.amenableDayDreamTierAdmissibilityStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $amenableDayDreamTierAdmissibilityStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$selfRootedCrypticDepthGateScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SelfRooted-CrypticDepthGate.ps1'
+$selfRootedCrypticDepthGateOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $selfRootedCrypticDepthGateScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Self-rooted cryptic-depth gate writer'
+$selfRootedCrypticDepthGateBundlePath = Get-ScriptOutputTail -Output $selfRootedCrypticDepthGateOutput
+if (-not [string]::IsNullOrWhiteSpace($selfRootedCrypticDepthGateBundlePath)) {
+    $statePayload.lastSelfRootedCrypticDepthGateBundle = $selfRootedCrypticDepthGateBundlePath
+    $statePayload.selfRootedCrypticDepthGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $selfRootedCrypticDepthGateStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1032,6 +1068,12 @@ $summary = [ordered]@{
     reachDuplexRealizationSeamStatePath = $statePayload.reachDuplexRealizationSeamStatePath
     lastBondedParticipationLocalityLedgerBundle = $statePayload.lastBondedParticipationLocalityLedgerBundle
     bondedParticipationLocalityLedgerStatePath = $statePayload.bondedParticipationLocalityLedgerStatePath
+    lastSanctuaryRuntimeWorkbenchSurfaceBundle = $statePayload.lastSanctuaryRuntimeWorkbenchSurfaceBundle
+    sanctuaryRuntimeWorkbenchSurfaceStatePath = $statePayload.sanctuaryRuntimeWorkbenchSurfaceStatePath
+    lastAmenableDayDreamTierAdmissibilityBundle = $statePayload.lastAmenableDayDreamTierAdmissibilityBundle
+    amenableDayDreamTierAdmissibilityStatePath = $statePayload.amenableDayDreamTierAdmissibilityStatePath
+    lastSelfRootedCrypticDepthGateBundle = $statePayload.lastSelfRootedCrypticDepthGateBundle
+    selfRootedCrypticDepthGateStatePath = $statePayload.selfRootedCrypticDepthGateStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1238,6 +1280,15 @@ if (-not [string]::IsNullOrWhiteSpace($reachDuplexRealizationSeamBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($bondedParticipationLocalityLedgerBundlePath)) {
     Write-Host ('[local-automation-cycle] BondedParticipationLocalityLedger: {0}' -f $bondedParticipationLocalityLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($sanctuaryRuntimeWorkbenchSurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] SanctuaryRuntimeWorkbenchSurface: {0}' -f $sanctuaryRuntimeWorkbenchSurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($amenableDayDreamTierAdmissibilityBundlePath)) {
+    Write-Host ('[local-automation-cycle] AmenableDayDreamTierAdmissibility: {0}' -f $amenableDayDreamTierAdmissibilityBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($selfRootedCrypticDepthGateBundlePath)) {
+    Write-Host ('[local-automation-cycle] SelfRootedCrypticDepthGate: {0}' -f $selfRootedCrypticDepthGateBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

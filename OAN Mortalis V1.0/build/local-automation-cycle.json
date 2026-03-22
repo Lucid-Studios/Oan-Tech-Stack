@@ -56,6 +56,9 @@
   "agentiCoreActualUtilitySurfaceOutputRoot": ".audit/runs/agenticore-actual-utility-surface",
   "reachDuplexRealizationSeamOutputRoot": ".audit/runs/reach-duplex-realization-seam",
   "bondedParticipationLocalityLedgerOutputRoot": ".audit/runs/bonded-participation-locality-ledger",
+  "sanctuaryRuntimeWorkbenchSurfaceOutputRoot": ".audit/runs/sanctuary-runtime-workbench-surface",
+  "amenableDayDreamTierAdmissibilityOutputRoot": ".audit/runs/amenable-day-dream-tier-admissibility",
+  "selfRootedCrypticDepthGateOutputRoot": ".audit/runs/self-rooted-cryptic-depth-gate",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -110,6 +113,9 @@
   "agentiCoreActualUtilitySurfaceStatePath": ".audit/state/local-automation-agenticore-actual-utility-surface-last-run.json",
   "reachDuplexRealizationSeamStatePath": ".audit/state/local-automation-reach-duplex-realization-seam-last-run.json",
   "bondedParticipationLocalityLedgerStatePath": ".audit/state/local-automation-bonded-participation-locality-ledger-last-run.json",
+  "sanctuaryRuntimeWorkbenchSurfaceStatePath": ".audit/state/local-automation-sanctuary-runtime-workbench-surface-last-run.json",
+  "amenableDayDreamTierAdmissibilityStatePath": ".audit/state/local-automation-amenable-day-dream-tier-admissibility-last-run.json",
+  "selfRootedCrypticDepthGateStatePath": ".audit/state/local-automation-self-rooted-cryptic-depth-gate-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -193,6 +199,9 @@
     "keepAgentiCoreActualUtilitySurfaceBundles": 8,
     "keepReachDuplexRealizationSeamBundles": 8,
     "keepBondedParticipationLocalityLedgerBundles": 8,
+    "keepSanctuaryRuntimeWorkbenchSurfaceBundles": 8,
+    "keepAmenableDayDreamTierAdmissibilityBundles": 8,
+    "keepSelfRootedCrypticDepthGateBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

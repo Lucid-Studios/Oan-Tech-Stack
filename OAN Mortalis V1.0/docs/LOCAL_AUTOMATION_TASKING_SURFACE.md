@@ -424,7 +424,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces are declared runway only until `AgentiCore.actual`, `reach`, and bounded runtime-work maps collapse lawfully into a first deployable in-runtime workbench
+- Sanctuary runtime workbench-surface bundles land under `.audit/runs/sanctuary-runtime-workbench-surface/` and update `.audit/state/local-automation-sanctuary-runtime-workbench-surface-last-run.json`
+- amenable day-dream tier admissibility bundles land under `.audit/runs/amenable-day-dream-tier-admissibility/` and update `.audit/state/local-automation-amenable-day-dream-tier-admissibility-last-run.json`
+- self-rooted cryptic-depth gate bundles land under `.audit/runs/self-rooted-cryptic-depth-gate/` and update `.audit/state/local-automation-self-rooted-cryptic-depth-gate-last-run.json`
+- these surfaces witness bounded in-runtime Sanctuary work, exploratory day-dream admissibility, and self-rooted depth withholding without implying bonded `Operator.actual` release or deep cryptic grant
 
 ### Automation Maturation Map 22
 

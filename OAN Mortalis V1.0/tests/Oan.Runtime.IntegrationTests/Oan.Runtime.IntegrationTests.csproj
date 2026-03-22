@@ -37,6 +37,7 @@
     <ProjectReference Include="..\..\src\CradleTek.Cryptic\CradleTek.Cryptic.csproj" />
     <ProjectReference Include="..\..\src\CradleTek.Mantle\CradleTek.Mantle.csproj" />
     <ProjectReference Include="..\..\src\CradleTek.Public\CradleTek.Public.csproj" />
+    <ProjectReference Include="..\..\src\CradleTek.Runtime\CradleTek.Runtime.csproj" />
     <ProjectReference Include="..\..\src\EngramGovernance\EngramGovernance.csproj" />
     <ProjectReference Include="..\..\src\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\..\src\Oan.Cradle\Oan.Cradle.csproj" />

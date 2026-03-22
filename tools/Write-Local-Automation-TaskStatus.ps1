@@ -158,6 +158,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $AgentiCoreActualUtilitySurfaceState,
         [object] $ReachDuplexRealizationSeamState,
         [object] $BondedParticipationLocalityLedgerState,
+        [object] $SanctuaryRuntimeWorkbenchSurfaceState,
+        [object] $AmenableDayDreamTierAdmissibilityState,
+        [object] $SelfRootedCrypticDepthGateState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -635,6 +638,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'sanctuary-runtime-workbench-surface' {
+            if ($null -ne $SanctuaryRuntimeWorkbenchSurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'amenable-day-dream-tier-admissibility' {
+            if ($null -ne $AmenableDayDreamTierAdmissibilityState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'self-rooted-cryptic-depth-gate' {
+            if ($null -ne $SelfRootedCrypticDepthGateState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -735,6 +765,9 @@ $interWorkerBraidHandoffPacketStatePath = Resolve-PathFromRepo -BasePath $resolv
 $agentiCoreActualUtilitySurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.agentiCoreActualUtilitySurfaceStatePath)
 $reachDuplexRealizationSeamStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachDuplexRealizationSeamStatePath)
 $bondedParticipationLocalityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedParticipationLocalityLedgerStatePath)
+$sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeWorkbenchSurfaceStatePath)
+$amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.amenableDayDreamTierAdmissibilityStatePath)
+$selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.selfRootedCrypticDepthGateStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -788,6 +821,9 @@ $interWorkerBraidHandoffPacketState = Read-JsonFileOrNull -Path $interWorkerBrai
 $agentiCoreActualUtilitySurfaceState = Read-JsonFileOrNull -Path $agentiCoreActualUtilitySurfaceStatePath
 $reachDuplexRealizationSeamState = Read-JsonFileOrNull -Path $reachDuplexRealizationSeamStatePath
 $bondedParticipationLocalityLedgerState = Read-JsonFileOrNull -Path $bondedParticipationLocalityLedgerStatePath
+$sanctuaryRuntimeWorkbenchSurfaceState = Read-JsonFileOrNull -Path $sanctuaryRuntimeWorkbenchSurfaceStatePath
+$amenableDayDreamTierAdmissibilityState = Read-JsonFileOrNull -Path $amenableDayDreamTierAdmissibilityStatePath
+$selfRootedCrypticDepthGateState = Read-JsonFileOrNull -Path $selfRootedCrypticDepthGateStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -987,6 +1023,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -AgentiCoreActualUtilitySurfaceState $agentiCoreActualUtilitySurfaceState `
                 -ReachDuplexRealizationSeamState $reachDuplexRealizationSeamState `
                 -BondedParticipationLocalityLedgerState $bondedParticipationLocalityLedgerState `
+                -SanctuaryRuntimeWorkbenchSurfaceState $sanctuaryRuntimeWorkbenchSurfaceState `
+                -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
+                -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1094,6 +1133,9 @@ $taskMapEntries = @(
                     -AgentiCoreActualUtilitySurfaceState $agentiCoreActualUtilitySurfaceState `
                     -ReachDuplexRealizationSeamState $reachDuplexRealizationSeamState `
                     -BondedParticipationLocalityLedgerState $bondedParticipationLocalityLedgerState `
+                    -SanctuaryRuntimeWorkbenchSurfaceState $sanctuaryRuntimeWorkbenchSurfaceState `
+                    -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
+                    -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1333,6 +1375,24 @@ $statusPayload = [ordered]@{
         bondedParticipationLocalityLedgerNextAction = if ($null -ne $bondedParticipationLocalityLedgerState) { [string] $bondedParticipationLocalityLedgerState.nextAction } else { $null }
         bondedParticipationLocalityLedgerCoRealizedSurfaceCount = if ($null -ne $bondedParticipationLocalityLedgerState) { [int] $bondedParticipationLocalityLedgerState.coRealizedSurfaceCount } else { $null }
         bondedParticipationLocalityLedgerWithheldSurfaceCount = if ($null -ne $bondedParticipationLocalityLedgerState) { [int] $bondedParticipationLocalityLedgerState.withheldSurfaceCount } else { $null }
+        sanctuaryRuntimeWorkbenchSurfaceState = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] $sanctuaryRuntimeWorkbenchSurfaceState.workbenchState } else { $null }
+        sanctuaryRuntimeWorkbenchSurfaceReason = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] $sanctuaryRuntimeWorkbenchSurfaceState.reasonCode } else { $null }
+        sanctuaryRuntimeWorkbenchSurfaceNextAction = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] $sanctuaryRuntimeWorkbenchSurfaceState.nextAction } else { $null }
+        sanctuaryRuntimeWorkbenchSessionPosture = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'sessionPosture') } else { $null }
+        sanctuaryRuntimeWorkbenchBoundedWorkClass = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'boundedWorkClass') } else { $null }
+        amenableDayDreamTierAdmissibilityState = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [string] $amenableDayDreamTierAdmissibilityState.admissibilityState } else { $null }
+        amenableDayDreamTierAdmissibilityReason = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [string] $amenableDayDreamTierAdmissibilityState.reasonCode } else { $null }
+        amenableDayDreamTierAdmissibilityNextAction = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [string] $amenableDayDreamTierAdmissibilityState.nextAction } else { $null }
+        amenableDayDreamTierExploratoryOnly = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'exploratoryOnly') } else { $null }
+        amenableDayDreamTierIdentityBearingDescentDenied = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'identityBearingDescentDenied') } else { $null }
+        amenableDayDreamTierContinuityInflationDenied = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'continuityInflationDenied') } else { $null }
+        selfRootedCrypticDepthGateState = if ($null -ne $selfRootedCrypticDepthGateState) { [string] $selfRootedCrypticDepthGateState.gateState } else { $null }
+        selfRootedCrypticDepthGateReason = if ($null -ne $selfRootedCrypticDepthGateState) { [string] $selfRootedCrypticDepthGateState.reasonCode } else { $null }
+        selfRootedCrypticDepthGateNextAction = if ($null -ne $selfRootedCrypticDepthGateState) { [string] $selfRootedCrypticDepthGateState.nextAction } else { $null }
+        selfRootedCrypticDepthGateMode = if ($null -ne $selfRootedCrypticDepthGateState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'gateMode') } else { $null }
+        selfRootedCrypticDepthGateCrypticBiadRooted = if ($null -ne $selfRootedCrypticDepthGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'crypticBiadRooted') } else { $null }
+        selfRootedCrypticDepthGateSharedAmenableOriginDenied = if ($null -ne $selfRootedCrypticDepthGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'sharedAmenableOriginDenied') } else { $null }
+        selfRootedCrypticDepthGateDeepAccessGranted = if ($null -ne $selfRootedCrypticDepthGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'deepAccessGranted') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2019,6 +2079,50 @@ if ($null -ne $bondedParticipationLocalityLedgerState) {
     )
 }
 
+if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) {
+    $markdownLines += @(
+        '## Sanctuary Runtime Workbench Surface',
+        '',
+        ('- Session state: `{0}`' -f [string] $sanctuaryRuntimeWorkbenchSurfaceState.workbenchState),
+        ('- Reason code: `{0}`' -f [string] $sanctuaryRuntimeWorkbenchSurfaceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $sanctuaryRuntimeWorkbenchSurfaceState.nextAction),
+        ('- Session posture: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'sessionPosture')),
+        ('- Bounded work class: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'boundedWorkClass')),
+        ('- Bonded operator lane withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'bondedOperatorLaneWithheld')),
+        ('- MoS-bearing release denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'mosBearingReleaseDenied')),
+        ''
+    )
+}
+
+if ($null -ne $amenableDayDreamTierAdmissibilityState) {
+    $markdownLines += @(
+        '## Amenable Day-Dream Tier Admissibility',
+        '',
+        ('- Admissibility state: `{0}`' -f [string] $amenableDayDreamTierAdmissibilityState.admissibilityState),
+        ('- Reason code: `{0}`' -f [string] $amenableDayDreamTierAdmissibilityState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $amenableDayDreamTierAdmissibilityState.nextAction),
+        ('- Exploratory only: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'exploratoryOnly')),
+        ('- Identity-bearing descent denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'identityBearingDescentDenied')),
+        ('- Continuity inflation denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'continuityInflationDenied')),
+        ''
+    )
+}
+
+if ($null -ne $selfRootedCrypticDepthGateState) {
+    $markdownLines += @(
+        '## Self-Rooted Cryptic Depth Gate',
+        '',
+        ('- Gate state: `{0}`' -f [string] $selfRootedCrypticDepthGateState.gateState),
+        ('- Reason code: `{0}`' -f [string] $selfRootedCrypticDepthGateState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $selfRootedCrypticDepthGateState.nextAction),
+        ('- Gate mode: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'gateMode')),
+        ('- Cryptic biad rooted: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'crypticBiadRooted')),
+        ('- Shared amenable origin denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'sharedAmenableOriginDenied')),
+        ('- Deep access granted: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'deepAccessGranted')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2099,6 +2203,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -AgentiCoreActualUtilitySurfaceState $agentiCoreActualUtilitySurfaceState `
             -ReachDuplexRealizationSeamState $reachDuplexRealizationSeamState `
             -BondedParticipationLocalityLedgerState $bondedParticipationLocalityLedgerState `
+            -SanctuaryRuntimeWorkbenchSurfaceState $sanctuaryRuntimeWorkbenchSurfaceState `
+            -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
+            -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
