@@ -210,6 +210,54 @@ public sealed record MutualIntelligibilityWitnessReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record InquiryPatternContinuityLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string OperatorInquiryEnvelopeHandle,
+    string ContinuityLedgerHandle,
+    string MutualIntelligibilityWitnessHandle,
+    string SharedBoundaryMemoryLedgerHandle,
+    string LedgerState,
+    IReadOnlyList<string> ReusableInquiryPatterns,
+    IReadOnlyList<string> TriggerConditions,
+    IReadOnlyList<string> PreservedConstraints,
+    int BoundaryPairCount,
+    bool IdentityBleedDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record QuestioningBoundaryPairLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string OperatorInquiryEnvelopeHandle,
+    string ContinuityLedgerHandle,
+    string DeformationReceiptHandle,
+    string SharedBoundaryMemoryLedgerHandle,
+    string LedgerState,
+    IReadOnlyList<string> InquiryPatterns,
+    IReadOnlyList<string> SupportingBoundaries,
+    IReadOnlyList<string> BoundaryConstraints,
+    IReadOnlyList<string> OverreachWarnings,
+    bool ConstraintMemoryPreserved,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record CarryForwardInquirySelectionSurfaceReceipt(
+    string SurfaceHandle,
+    string CMEId,
+    string InquiryPatternLedgerHandle,
+    string BoundaryPairLedgerHandle,
+    string OperatorInquiryEnvelopeHandle,
+    string LocalityWitnessHandle,
+    string SurfaceState,
+    IReadOnlyList<string> AvailableCarryForwardPatterns,
+    IReadOnlyList<string> AdmittedReuseConditions,
+    IReadOnlyList<string> WithheldReuseWarnings,
+    bool LocalitySafeReview,
+    bool AmbientHabitDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -230,6 +278,9 @@ public static class AgentiActualizationProjector
     private const string ContinuityUnderPressureLedgerPrefix = "continuity-under-pressure-ledger://";
     private const string ExpressiveDeformationReceiptPrefix = "expressive-deformation-receipt://";
     private const string MutualIntelligibilityWitnessPrefix = "mutual-intelligibility-witness://";
+    private const string InquiryPatternContinuityLedgerPrefix = "inquiry-pattern-continuity-ledger://";
+    private const string QuestioningBoundaryPairLedgerPrefix = "questioning-boundary-pair-ledger://";
+    private const string CarryForwardInquirySelectionSurfacePrefix = "carry-forward-inquiry-selection-surface://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -880,6 +931,197 @@ public static class AgentiActualizationProjector
             SamenessCollapseDenied: !localityWitness.LocalityCollapseDetected,
             OpaqueDivergenceDetected: false,
             ReasonCode: "mutual-intelligibility-witness-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static InquiryPatternContinuityLedgerReceipt CreateInquiryPatternContinuityLedger(
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        string ledgerState = "inquiry-pattern-continuity-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+        EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
+        EnsurePrefix(continuityLedger.LedgerHandle, ContinuityUnderPressureLedgerPrefix, nameof(continuityLedger));
+        EnsurePrefix(mutualIntelligibilityWitness.WitnessHandle, MutualIntelligibilityWitnessPrefix, nameof(mutualIntelligibilityWitness));
+        EnsurePrefix(sharedBoundaryMemory.LedgerHandle, SharedBoundaryMemoryLedgerPrefix, nameof(sharedBoundaryMemory));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(operatorInquiryEnvelope.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(operatorInquiryEnvelope.CMEId, mutualIntelligibilityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(operatorInquiryEnvelope.CMEId, sharedBoundaryMemory.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Inquiry pattern continuity requires inquiry envelope, pressure continuity, mutual intelligibility, and shared boundary memory to remain inside one bonded CME surface.");
+        }
+
+        var reusableInquiryPatterns = operatorInquiryEnvelope.AvailableInquiryStances
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var triggerConditions = sharedBoundaryMemory.SharedContinuityRequirements
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var preservedConstraints = operatorInquiryEnvelope.LawfulUseConditions
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new InquiryPatternContinuityLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateInquiryPatternContinuityLedgerHandle(
+                operatorInquiryEnvelope.CMEId,
+                operatorInquiryEnvelope.EnvelopeHandle,
+                continuityLedger.LedgerHandle,
+                mutualIntelligibilityWitness.WitnessHandle),
+            CMEId: operatorInquiryEnvelope.CMEId,
+            OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
+            ContinuityLedgerHandle: continuityLedger.LedgerHandle,
+            MutualIntelligibilityWitnessHandle: mutualIntelligibilityWitness.WitnessHandle,
+            SharedBoundaryMemoryLedgerHandle: sharedBoundaryMemory.LedgerHandle,
+            LedgerState: ledgerState.Trim(),
+            ReusableInquiryPatterns: reusableInquiryPatterns,
+            TriggerConditions: triggerConditions,
+            PreservedConstraints: preservedConstraints,
+            BoundaryPairCount: sharedBoundaryMemory.SharedBoundaryCodes.Count,
+            IdentityBleedDenied: !sharedBoundaryMemory.IdentityBleedDetected,
+            ReasonCode: "inquiry-pattern-continuity-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static QuestioningBoundaryPairLedgerReceipt CreateQuestioningBoundaryPairLedger(
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        ExpressiveDeformationReceipt deformationReceipt,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        string ledgerState = "questioning-boundary-pair-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(deformationReceipt);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+        EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
+        EnsurePrefix(continuityLedger.LedgerHandle, ContinuityUnderPressureLedgerPrefix, nameof(continuityLedger));
+        EnsurePrefix(deformationReceipt.ReceiptHandle, ExpressiveDeformationReceiptPrefix, nameof(deformationReceipt));
+        EnsurePrefix(sharedBoundaryMemory.LedgerHandle, SharedBoundaryMemoryLedgerPrefix, nameof(sharedBoundaryMemory));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(operatorInquiryEnvelope.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(operatorInquiryEnvelope.CMEId, deformationReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(operatorInquiryEnvelope.CMEId, sharedBoundaryMemory.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Questioning boundary pairing requires inquiry envelope, pressure continuity, expressive deformation, and shared boundary memory to remain inside one bonded CME surface.");
+        }
+
+        var inquiryPatterns = operatorInquiryEnvelope.AvailableInquiryStances
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var supportingBoundaries = sharedBoundaryMemory.SharedBoundaryCodes
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var boundaryConstraints = sharedBoundaryMemory.SharedContinuityRequirements
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var overreachWarnings = operatorInquiryEnvelope.KnownBoundaryWarnings
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new QuestioningBoundaryPairLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateQuestioningBoundaryPairLedgerHandle(
+                operatorInquiryEnvelope.CMEId,
+                operatorInquiryEnvelope.EnvelopeHandle,
+                continuityLedger.LedgerHandle,
+                deformationReceipt.ReceiptHandle),
+            CMEId: operatorInquiryEnvelope.CMEId,
+            OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
+            ContinuityLedgerHandle: continuityLedger.LedgerHandle,
+            DeformationReceiptHandle: deformationReceipt.ReceiptHandle,
+            SharedBoundaryMemoryLedgerHandle: sharedBoundaryMemory.LedgerHandle,
+            LedgerState: ledgerState.Trim(),
+            InquiryPatterns: inquiryPatterns,
+            SupportingBoundaries: supportingBoundaries,
+            BoundaryConstraints: boundaryConstraints,
+            OverreachWarnings: overreachWarnings,
+            ConstraintMemoryPreserved: true,
+            ReasonCode: "questioning-boundary-pair-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static CarryForwardInquirySelectionSurfaceReceipt CreateCarryForwardInquirySelectionSurface(
+        InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
+        QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string surfaceState = "carry-forward-inquiry-selection-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(inquiryPatternLedger);
+        ArgumentNullException.ThrowIfNull(boundaryPairLedger);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        EnsurePrefix(inquiryPatternLedger.LedgerHandle, InquiryPatternContinuityLedgerPrefix, nameof(inquiryPatternLedger));
+        EnsurePrefix(boundaryPairLedger.LedgerHandle, QuestioningBoundaryPairLedgerPrefix, nameof(boundaryPairLedger));
+        EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
+        EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(surfaceState);
+
+        if (!string.Equals(inquiryPatternLedger.CMEId, boundaryPairLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(inquiryPatternLedger.CMEId, operatorInquiryEnvelope.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(inquiryPatternLedger.CMEId, localityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Carry-forward inquiry selection requires inquiry-pattern, boundary-pair, operator inquiry, and locality witness receipts to remain inside one bonded CME surface.");
+        }
+
+        var availableCarryForwardPatterns = inquiryPatternLedger.ReusableInquiryPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var admittedReuseConditions = inquiryPatternLedger.PreservedConstraints
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var withheldReuseWarnings = boundaryPairLedger.OverreachWarnings
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new CarryForwardInquirySelectionSurfaceReceipt(
+            SurfaceHandle: AgentiActualizationKeys.CreateCarryForwardInquirySelectionSurfaceHandle(
+                inquiryPatternLedger.CMEId,
+                inquiryPatternLedger.LedgerHandle,
+                boundaryPairLedger.LedgerHandle,
+                localityWitness.WitnessLedgerHandle),
+            CMEId: inquiryPatternLedger.CMEId,
+            InquiryPatternLedgerHandle: inquiryPatternLedger.LedgerHandle,
+            BoundaryPairLedgerHandle: boundaryPairLedger.LedgerHandle,
+            OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
+            LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            SurfaceState: surfaceState.Trim(),
+            AvailableCarryForwardPatterns: availableCarryForwardPatterns,
+            AdmittedReuseConditions: admittedReuseConditions,
+            WithheldReuseWarnings: withheldReuseWarnings,
+            LocalitySafeReview: !localityWitness.LocalityCollapseDetected,
+            AmbientHabitDenied: true,
+            ReasonCode: "carry-forward-inquiry-selection-surface-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

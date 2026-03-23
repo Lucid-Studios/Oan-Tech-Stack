@@ -183,6 +183,48 @@ public static class AgentiActualizationKeys
         return $"mutual-intelligibility-witness://{ComputeDigest(cmeId, crucibleRehearsalHandle, continuityLedgerHandle, deformationReceiptHandle)}";
     }
 
+    public static string CreateInquiryPatternContinuityLedgerHandle(
+        string cmeId,
+        string operatorInquiryEnvelopeHandle,
+        string continuityLedgerHandle,
+        string mutualWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operatorInquiryEnvelopeHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mutualWitnessHandle);
+
+        return $"inquiry-pattern-continuity-ledger://{ComputeDigest(cmeId, operatorInquiryEnvelopeHandle, continuityLedgerHandle, mutualWitnessHandle)}";
+    }
+
+    public static string CreateQuestioningBoundaryPairLedgerHandle(
+        string cmeId,
+        string operatorInquiryEnvelopeHandle,
+        string continuityLedgerHandle,
+        string deformationReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operatorInquiryEnvelopeHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(deformationReceiptHandle);
+
+        return $"questioning-boundary-pair-ledger://{ComputeDigest(cmeId, operatorInquiryEnvelopeHandle, continuityLedgerHandle, deformationReceiptHandle)}";
+    }
+
+    public static string CreateCarryForwardInquirySelectionSurfaceHandle(
+        string cmeId,
+        string inquiryPatternLedgerHandle,
+        string boundaryPairLedgerHandle,
+        string localityWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inquiryPatternLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(boundaryPairLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(localityWitnessHandle);
+
+        return $"carry-forward-inquiry-selection-surface://{ComputeDigest(cmeId, inquiryPatternLedgerHandle, boundaryPairLedgerHandle, localityWitnessHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

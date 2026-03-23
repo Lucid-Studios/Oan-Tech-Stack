@@ -182,6 +182,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $ContinuityUnderPressureLedgerState,
         [object] $ExpressiveDeformationReceiptState,
         [object] $MutualIntelligibilityWitnessState,
+        [object] $InquiryPatternContinuityLedgerState,
+        [object] $QuestioningBoundaryPairLedgerState,
+        [object] $CarryForwardInquirySelectionSurfaceState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -875,6 +878,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'inquiry-pattern-continuity-ledger' {
+            if ($null -ne $InquiryPatternContinuityLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'questioning-boundary-pair-ledger' {
+            if ($null -ne $QuestioningBoundaryPairLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'carry-forward-inquiry-selection-surface' {
+            if ($null -ne $CarryForwardInquirySelectionSurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -999,6 +1029,9 @@ $sharedBoundaryMemoryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedR
 $continuityUnderPressureLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.continuityUnderPressureLedgerStatePath)
 $expressiveDeformationReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.expressiveDeformationReceiptStatePath)
 $mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.mutualIntelligibilityWitnessStatePath)
+$inquiryPatternContinuityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.inquiryPatternContinuityLedgerStatePath)
+$questioningBoundaryPairLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningBoundaryPairLedgerStatePath)
+$carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.carryForwardInquirySelectionSurfaceStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1076,6 +1109,9 @@ $sharedBoundaryMemoryLedgerState = Read-JsonFileOrNull -Path $sharedBoundaryMemo
 $continuityUnderPressureLedgerState = Read-JsonFileOrNull -Path $continuityUnderPressureLedgerStatePath
 $expressiveDeformationReceiptState = Read-JsonFileOrNull -Path $expressiveDeformationReceiptStatePath
 $mutualIntelligibilityWitnessState = Read-JsonFileOrNull -Path $mutualIntelligibilityWitnessStatePath
+$inquiryPatternContinuityLedgerState = Read-JsonFileOrNull -Path $inquiryPatternContinuityLedgerStatePath
+$questioningBoundaryPairLedgerState = Read-JsonFileOrNull -Path $questioningBoundaryPairLedgerStatePath
+$carryForwardInquirySelectionSurfaceState = Read-JsonFileOrNull -Path $carryForwardInquirySelectionSurfaceStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1299,6 +1335,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -ContinuityUnderPressureLedgerState $continuityUnderPressureLedgerState `
                 -ExpressiveDeformationReceiptState $expressiveDeformationReceiptState `
                 -MutualIntelligibilityWitnessState $mutualIntelligibilityWitnessState `
+                -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
+                -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
+                -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1430,6 +1469,9 @@ $taskMapEntries = @(
                     -ContinuityUnderPressureLedgerState $continuityUnderPressureLedgerState `
                     -ExpressiveDeformationReceiptState $expressiveDeformationReceiptState `
                     -MutualIntelligibilityWitnessState $mutualIntelligibilityWitnessState `
+                    -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
+                    -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
+                    -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1881,6 +1923,33 @@ $statusPayload = [ordered]@{
         mutualIntelligibilityBrokenCount = if ($null -ne $mutualIntelligibilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'brokenIntelligibilityCount') } else { $null }
         mutualIntelligibilitySamenessCollapseDenied = if ($null -ne $mutualIntelligibilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'samenessCollapseDenied') } else { $null }
         mutualIntelligibilityOpaqueDivergenceDetected = if ($null -ne $mutualIntelligibilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'opaqueDivergenceDetected') } else { $null }
+        inquiryPatternContinuityLedgerState = if ($null -ne $inquiryPatternContinuityLedgerState) { [string] $inquiryPatternContinuityLedgerState.inquiryPatternContinuityLedgerState } else { $null }
+        inquiryPatternContinuityLedgerReason = if ($null -ne $inquiryPatternContinuityLedgerState) { [string] $inquiryPatternContinuityLedgerState.reasonCode } else { $null }
+        inquiryPatternContinuityLedgerNextAction = if ($null -ne $inquiryPatternContinuityLedgerState) { [string] $inquiryPatternContinuityLedgerState.nextAction } else { $null }
+        inquiryPatternContinuityState = if ($null -ne $inquiryPatternContinuityLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'carryForwardState') } else { $null }
+        inquiryPatternReusableCount = if ($null -ne $inquiryPatternContinuityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'reusableInquiryPatternCount') } else { $null }
+        inquiryPatternTriggerConditionCount = if ($null -ne $inquiryPatternContinuityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'triggerConditionCount') } else { $null }
+        inquiryPatternPreservedConstraintCount = if ($null -ne $inquiryPatternContinuityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'preservedConstraintCount') } else { $null }
+        inquiryPatternBoundaryPairCount = if ($null -ne $inquiryPatternContinuityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'boundaryPairCount') } else { $null }
+        inquiryPatternIdentityBleedDenied = if ($null -ne $inquiryPatternContinuityLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'identityBleedDenied') } else { $null }
+        questioningBoundaryPairLedgerState = if ($null -ne $questioningBoundaryPairLedgerState) { [string] $questioningBoundaryPairLedgerState.questioningBoundaryPairLedgerState } else { $null }
+        questioningBoundaryPairLedgerReason = if ($null -ne $questioningBoundaryPairLedgerState) { [string] $questioningBoundaryPairLedgerState.reasonCode } else { $null }
+        questioningBoundaryPairLedgerNextAction = if ($null -ne $questioningBoundaryPairLedgerState) { [string] $questioningBoundaryPairLedgerState.nextAction } else { $null }
+        questioningBoundaryPairState = if ($null -ne $questioningBoundaryPairLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'pairingState') } else { $null }
+        questioningBoundaryPairInquiryPatternCount = if ($null -ne $questioningBoundaryPairLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'inquiryPatternCount') } else { $null }
+        questioningBoundaryPairSupportingBoundaryCount = if ($null -ne $questioningBoundaryPairLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'supportingBoundaryCount') } else { $null }
+        questioningBoundaryPairBoundaryConstraintCount = if ($null -ne $questioningBoundaryPairLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'boundaryConstraintCount') } else { $null }
+        questioningBoundaryPairOverreachWarningCount = if ($null -ne $questioningBoundaryPairLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'overreachWarningCount') } else { $null }
+        questioningBoundaryPairConstraintMemoryPreserved = if ($null -ne $questioningBoundaryPairLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'constraintMemoryPreserved') } else { $null }
+        carryForwardInquirySelectionSurfaceState = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [string] $carryForwardInquirySelectionSurfaceState.carryForwardInquirySelectionSurfaceState } else { $null }
+        carryForwardInquirySelectionSurfaceReason = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [string] $carryForwardInquirySelectionSurfaceState.reasonCode } else { $null }
+        carryForwardInquirySelectionSurfaceNextAction = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [string] $carryForwardInquirySelectionSurfaceState.nextAction } else { $null }
+        carryForwardInquirySelectionState = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'carryForwardInquirySelectionState') } else { $null }
+        carryForwardAvailablePatternCount = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'availableCarryForwardPatternCount') } else { $null }
+        carryForwardAdmittedReuseConditionCount = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'admittedReuseConditionCount') } else { $null }
+        carryForwardWithheldReuseWarningCount = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'withheldReuseWarningCount') } else { $null }
+        carryForwardLocalitySafeReview = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'localitySafeReview') } else { $null }
+        carryForwardAmbientHabitDenied = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'ambientHabitDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2976,6 +3045,57 @@ if ($null -ne $mutualIntelligibilityWitnessState) {
     )
 }
 
+if ($null -ne $inquiryPatternContinuityLedgerState) {
+    $markdownLines += @(
+        '## Inquiry Pattern Continuity Ledger',
+        '',
+        ('- Inquiry-pattern continuity state: `{0}`' -f [string] $inquiryPatternContinuityLedgerState.inquiryPatternContinuityLedgerState),
+        ('- Reason code: `{0}`' -f [string] $inquiryPatternContinuityLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $inquiryPatternContinuityLedgerState.nextAction),
+        ('- Carry-forward state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'carryForwardState')),
+        ('- Reusable inquiry-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'reusableInquiryPatternCount')),
+        ('- Trigger-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'triggerConditionCount')),
+        ('- Preserved constraint count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'preservedConstraintCount')),
+        ('- Boundary-pair count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'boundaryPairCount')),
+        ('- Identity bleed denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $inquiryPatternContinuityLedgerState -PropertyName 'identityBleedDenied')),
+        ''
+    )
+}
+
+if ($null -ne $questioningBoundaryPairLedgerState) {
+    $markdownLines += @(
+        '## Questioning Boundary Pair Ledger',
+        '',
+        ('- Questioning boundary-pair state: `{0}`' -f [string] $questioningBoundaryPairLedgerState.questioningBoundaryPairLedgerState),
+        ('- Reason code: `{0}`' -f [string] $questioningBoundaryPairLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $questioningBoundaryPairLedgerState.nextAction),
+        ('- Pairing state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'pairingState')),
+        ('- Inquiry-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'inquiryPatternCount')),
+        ('- Supporting boundary count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'supportingBoundaryCount')),
+        ('- Boundary constraint count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'boundaryConstraintCount')),
+        ('- Overreach warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'overreachWarningCount')),
+        ('- Constraint memory preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningBoundaryPairLedgerState -PropertyName 'constraintMemoryPreserved')),
+        ''
+    )
+}
+
+if ($null -ne $carryForwardInquirySelectionSurfaceState) {
+    $markdownLines += @(
+        '## Carry-Forward Inquiry Selection Surface',
+        '',
+        ('- Carry-forward inquiry-selection surface state: `{0}`' -f [string] $carryForwardInquirySelectionSurfaceState.carryForwardInquirySelectionSurfaceState),
+        ('- Reason code: `{0}`' -f [string] $carryForwardInquirySelectionSurfaceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $carryForwardInquirySelectionSurfaceState.nextAction),
+        ('- Carry-forward inquiry-selection state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'carryForwardInquirySelectionState')),
+        ('- Available carry-forward pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'availableCarryForwardPatternCount')),
+        ('- Admitted reuse-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'admittedReuseConditionCount')),
+        ('- Withheld reuse-warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'withheldReuseWarningCount')),
+        ('- Locality-safe review: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'localitySafeReview')),
+        ('- Ambient habit denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'ambientHabitDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3080,6 +3200,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -ContinuityUnderPressureLedgerState $continuityUnderPressureLedgerState `
             -ExpressiveDeformationReceiptState $expressiveDeformationReceiptState `
             -MutualIntelligibilityWitnessState $mutualIntelligibilityWitnessState `
+            -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
+            -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
+            -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

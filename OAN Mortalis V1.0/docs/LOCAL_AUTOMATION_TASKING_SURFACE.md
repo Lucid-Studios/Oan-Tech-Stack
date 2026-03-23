@@ -556,9 +556,14 @@ These surfaces witness what held under pressure, how expression deformed without
 
 Current live output surfaces for this map:
 
-- inquiry pattern continuity remains bounded to future pressure, deformation, and coherence witness surfaces until its dedicated carry-forward ledger root is declared
-- questioning boundary pairs remain bounded to current boundary-memory and future crucible pressure receipts until their dedicated pair-ledger bundle exists
-- carry-forward inquiry selection remains bounded to operator inquiry selection, locality distinction, and future pattern-memory surfaces until its dedicated selection surface is declared
+- `.audit/runs/inquiry-pattern-continuity-ledger/`
+- `.audit/state/local-automation-inquiry-pattern-continuity-ledger-last-run.json`
+- `.audit/runs/questioning-boundary-pair-ledger/`
+- `.audit/state/local-automation-questioning-boundary-pair-ledger-last-run.json`
+- `.audit/runs/carry-forward-inquiry-selection-surface/`
+- `.audit/state/local-automation-carry-forward-inquiry-selection-surface-last-run.json`
+
+These surfaces retain reusable inquiry approaches, pair them with the boundaries that limit them, and expose a bounded reuse surface without turning remembered questioning into ambient habit or identity bleed.
 
 ### Automation Maturation Map 30
 

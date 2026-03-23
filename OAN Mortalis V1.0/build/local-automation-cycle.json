@@ -80,6 +80,9 @@
   "continuityUnderPressureLedgerOutputRoot": ".audit/runs/continuity-under-pressure-ledger",
   "expressiveDeformationReceiptOutputRoot": ".audit/runs/expressive-deformation-receipt",
   "mutualIntelligibilityWitnessOutputRoot": ".audit/runs/mutual-intelligibility-witness",
+  "inquiryPatternContinuityLedgerOutputRoot": ".audit/runs/inquiry-pattern-continuity-ledger",
+  "questioningBoundaryPairLedgerOutputRoot": ".audit/runs/questioning-boundary-pair-ledger",
+  "carryForwardInquirySelectionSurfaceOutputRoot": ".audit/runs/carry-forward-inquiry-selection-surface",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -158,6 +161,9 @@
   "continuityUnderPressureLedgerStatePath": ".audit/state/local-automation-continuity-under-pressure-ledger-last-run.json",
   "expressiveDeformationReceiptStatePath": ".audit/state/local-automation-expressive-deformation-receipt-last-run.json",
   "mutualIntelligibilityWitnessStatePath": ".audit/state/local-automation-mutual-intelligibility-witness-last-run.json",
+  "inquiryPatternContinuityLedgerStatePath": ".audit/state/local-automation-inquiry-pattern-continuity-ledger-last-run.json",
+  "questioningBoundaryPairLedgerStatePath": ".audit/state/local-automation-questioning-boundary-pair-ledger-last-run.json",
+  "carryForwardInquirySelectionSurfaceStatePath": ".audit/state/local-automation-carry-forward-inquiry-selection-surface-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -265,6 +271,9 @@
     "keepContinuityUnderPressureLedgerBundles": 8,
     "keepExpressiveDeformationReceiptBundles": 8,
     "keepMutualIntelligibilityWitnessBundles": 8,
+    "keepInquiryPatternContinuityLedgerBundles": 8,
+    "keepQuestioningBoundaryPairLedgerBundles": 8,
+    "keepCarryForwardInquirySelectionSurfaceBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

@@ -302,4 +302,70 @@ public sealed class GovernedReachRealizationService
             witnessState,
             timestampUtc);
     }
+
+    public InquiryPatternContinuityLedgerReceipt CreateInquiryPatternContinuityLedger(
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        string ledgerState = "inquiry-pattern-continuity-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+
+        return AgentiActualizationProjector.CreateInquiryPatternContinuityLedger(
+            operatorInquiryEnvelope,
+            continuityLedger,
+            mutualIntelligibilityWitness,
+            sharedBoundaryMemory,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public QuestioningBoundaryPairLedgerReceipt CreateQuestioningBoundaryPairLedger(
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        ExpressiveDeformationReceipt deformationReceipt,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        string ledgerState = "questioning-boundary-pair-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(deformationReceipt);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+
+        return AgentiActualizationProjector.CreateQuestioningBoundaryPairLedger(
+            operatorInquiryEnvelope,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public CarryForwardInquirySelectionSurfaceReceipt CreateCarryForwardInquirySelectionSurface(
+        InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
+        QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string surfaceState = "carry-forward-inquiry-selection-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(inquiryPatternLedger);
+        ArgumentNullException.ThrowIfNull(boundaryPairLedger);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+
+        return AgentiActualizationProjector.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorInquiryEnvelope,
+            localityWitness,
+            surfaceState,
+            timestampUtc);
+    }
 }

@@ -231,6 +231,9 @@ $sharedBoundaryMemoryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedR
 $continuityUnderPressureLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.continuityUnderPressureLedgerStatePath)
 $expressiveDeformationReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.expressiveDeformationReceiptStatePath)
 $mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.mutualIntelligibilityWitnessStatePath)
+$inquiryPatternContinuityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.inquiryPatternContinuityLedgerStatePath)
+$questioningBoundaryPairLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningBoundaryPairLedgerStatePath)
+$carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.carryForwardInquirySelectionSurfaceStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -527,6 +530,12 @@ $statePayload.lastExpressiveDeformationReceiptBundle = [string] (Get-ObjectPrope
 $statePayload.expressiveDeformationReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $expressiveDeformationReceiptStatePath
 $statePayload.lastMutualIntelligibilityWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastMutualIntelligibilityWitnessBundle')
 $statePayload.mutualIntelligibilityWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $mutualIntelligibilityWitnessStatePath
+$statePayload.lastInquiryPatternContinuityLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastInquiryPatternContinuityLedgerBundle')
+$statePayload.inquiryPatternContinuityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $inquiryPatternContinuityLedgerStatePath
+$statePayload.lastQuestioningBoundaryPairLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQuestioningBoundaryPairLedgerBundle')
+$statePayload.questioningBoundaryPairLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningBoundaryPairLedgerStatePath
+$statePayload.lastCarryForwardInquirySelectionSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCarryForwardInquirySelectionSurfaceBundle')
+$statePayload.carryForwardInquirySelectionSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $carryForwardInquirySelectionSurfaceStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1214,6 +1223,33 @@ if (-not [string]::IsNullOrWhiteSpace($mutualIntelligibilityWitnessBundlePath)) 
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$inquiryPatternContinuityLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-InquiryPatternContinuity-Ledger.ps1'
+$inquiryPatternContinuityLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $inquiryPatternContinuityLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Inquiry-pattern continuity writer'
+$inquiryPatternContinuityLedgerBundlePath = Get-ScriptOutputTail -Output $inquiryPatternContinuityLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($inquiryPatternContinuityLedgerBundlePath)) {
+    $statePayload.lastInquiryPatternContinuityLedgerBundle = $inquiryPatternContinuityLedgerBundlePath
+    $statePayload.inquiryPatternContinuityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $inquiryPatternContinuityLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$questioningBoundaryPairLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-QuestioningBoundaryPair-Ledger.ps1'
+$questioningBoundaryPairLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $questioningBoundaryPairLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Questioning boundary-pair writer'
+$questioningBoundaryPairLedgerBundlePath = Get-ScriptOutputTail -Output $questioningBoundaryPairLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($questioningBoundaryPairLedgerBundlePath)) {
+    $statePayload.lastQuestioningBoundaryPairLedgerBundle = $questioningBoundaryPairLedgerBundlePath
+    $statePayload.questioningBoundaryPairLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningBoundaryPairLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$carryForwardInquirySelectionSurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CarryForwardInquiry-SelectionSurface.ps1'
+$carryForwardInquirySelectionSurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $carryForwardInquirySelectionSurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Carry-forward inquiry-selection writer'
+$carryForwardInquirySelectionSurfaceBundlePath = Get-ScriptOutputTail -Output $carryForwardInquirySelectionSurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($carryForwardInquirySelectionSurfaceBundlePath)) {
+    $statePayload.lastCarryForwardInquirySelectionSurfaceBundle = $carryForwardInquirySelectionSurfaceBundlePath
+    $statePayload.carryForwardInquirySelectionSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $carryForwardInquirySelectionSurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1368,6 +1404,12 @@ $summary = [ordered]@{
     expressiveDeformationReceiptStatePath = $statePayload.expressiveDeformationReceiptStatePath
     lastMutualIntelligibilityWitnessBundle = $statePayload.lastMutualIntelligibilityWitnessBundle
     mutualIntelligibilityWitnessStatePath = $statePayload.mutualIntelligibilityWitnessStatePath
+    lastInquiryPatternContinuityLedgerBundle = $statePayload.lastInquiryPatternContinuityLedgerBundle
+    inquiryPatternContinuityLedgerStatePath = $statePayload.inquiryPatternContinuityLedgerStatePath
+    lastQuestioningBoundaryPairLedgerBundle = $statePayload.lastQuestioningBoundaryPairLedgerBundle
+    questioningBoundaryPairLedgerStatePath = $statePayload.questioningBoundaryPairLedgerStatePath
+    lastCarryForwardInquirySelectionSurfaceBundle = $statePayload.lastCarryForwardInquirySelectionSurfaceBundle
+    carryForwardInquirySelectionSurfaceStatePath = $statePayload.carryForwardInquirySelectionSurfaceStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1646,6 +1688,15 @@ if (-not [string]::IsNullOrWhiteSpace($expressiveDeformationReceiptBundlePath)) 
 }
 if (-not [string]::IsNullOrWhiteSpace($mutualIntelligibilityWitnessBundlePath)) {
     Write-Host ('[local-automation-cycle] MutualIntelligibilityWitness: {0}' -f $mutualIntelligibilityWitnessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($inquiryPatternContinuityLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] InquiryPatternContinuityLedger: {0}' -f $inquiryPatternContinuityLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($questioningBoundaryPairLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] QuestioningBoundaryPairLedger: {0}' -f $questioningBoundaryPairLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($carryForwardInquirySelectionSurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] CarryForwardInquirySelectionSurface: {0}' -f $carryForwardInquirySelectionSurfaceBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {
