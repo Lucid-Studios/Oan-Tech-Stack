@@ -234,6 +234,9 @@ $mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolve
 $inquiryPatternContinuityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.inquiryPatternContinuityLedgerStatePath)
 $questioningBoundaryPairLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningBoundaryPairLedgerStatePath)
 $carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.carryForwardInquirySelectionSurfaceStatePath)
+$questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningOperatorCandidateLedgerStatePath)
+$questioningGelPromotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningGelPromotionGateStatePath)
+$protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.protectedQuestioningPatternSurfaceStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -536,6 +539,12 @@ $statePayload.lastQuestioningBoundaryPairLedgerBundle = [string] (Get-ObjectProp
 $statePayload.questioningBoundaryPairLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningBoundaryPairLedgerStatePath
 $statePayload.lastCarryForwardInquirySelectionSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCarryForwardInquirySelectionSurfaceBundle')
 $statePayload.carryForwardInquirySelectionSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $carryForwardInquirySelectionSurfaceStatePath
+$statePayload.lastQuestioningOperatorCandidateLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQuestioningOperatorCandidateLedgerBundle')
+$statePayload.questioningOperatorCandidateLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningOperatorCandidateLedgerStatePath
+$statePayload.lastQuestioningGelPromotionGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQuestioningGelPromotionGateBundle')
+$statePayload.questioningGelPromotionGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningGelPromotionGateStatePath
+$statePayload.lastProtectedQuestioningPatternSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastProtectedQuestioningPatternSurfaceBundle')
+$statePayload.protectedQuestioningPatternSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedQuestioningPatternSurfaceStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1250,6 +1259,33 @@ if (-not [string]::IsNullOrWhiteSpace($carryForwardInquirySelectionSurfaceBundle
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$questioningOperatorCandidateLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-QuestioningOperator-CandidateLedger.ps1'
+$questioningOperatorCandidateLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $questioningOperatorCandidateLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Questioning-operator candidate writer'
+$questioningOperatorCandidateLedgerBundlePath = Get-ScriptOutputTail -Output $questioningOperatorCandidateLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($questioningOperatorCandidateLedgerBundlePath)) {
+    $statePayload.lastQuestioningOperatorCandidateLedgerBundle = $questioningOperatorCandidateLedgerBundlePath
+    $statePayload.questioningOperatorCandidateLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningOperatorCandidateLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$questioningGelPromotionGateScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-QuestioningGEL-PromotionGate.ps1'
+$questioningGelPromotionGateOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $questioningGelPromotionGateScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Questioning GEL promotion-gate writer'
+$questioningGelPromotionGateBundlePath = Get-ScriptOutputTail -Output $questioningGelPromotionGateOutput
+if (-not [string]::IsNullOrWhiteSpace($questioningGelPromotionGateBundlePath)) {
+    $statePayload.lastQuestioningGelPromotionGateBundle = $questioningGelPromotionGateBundlePath
+    $statePayload.questioningGelPromotionGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningGelPromotionGateStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$protectedQuestioningPatternSurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ProtectedQuestioningPatternSurface.ps1'
+$protectedQuestioningPatternSurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $protectedQuestioningPatternSurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Protected questioning-pattern writer'
+$protectedQuestioningPatternSurfaceBundlePath = Get-ScriptOutputTail -Output $protectedQuestioningPatternSurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($protectedQuestioningPatternSurfaceBundlePath)) {
+    $statePayload.lastProtectedQuestioningPatternSurfaceBundle = $protectedQuestioningPatternSurfaceBundlePath
+    $statePayload.protectedQuestioningPatternSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedQuestioningPatternSurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1410,6 +1446,12 @@ $summary = [ordered]@{
     questioningBoundaryPairLedgerStatePath = $statePayload.questioningBoundaryPairLedgerStatePath
     lastCarryForwardInquirySelectionSurfaceBundle = $statePayload.lastCarryForwardInquirySelectionSurfaceBundle
     carryForwardInquirySelectionSurfaceStatePath = $statePayload.carryForwardInquirySelectionSurfaceStatePath
+    lastQuestioningOperatorCandidateLedgerBundle = $statePayload.lastQuestioningOperatorCandidateLedgerBundle
+    questioningOperatorCandidateLedgerStatePath = $statePayload.questioningOperatorCandidateLedgerStatePath
+    lastQuestioningGelPromotionGateBundle = $statePayload.lastQuestioningGelPromotionGateBundle
+    questioningGelPromotionGateStatePath = $statePayload.questioningGelPromotionGateStatePath
+    lastProtectedQuestioningPatternSurfaceBundle = $statePayload.lastProtectedQuestioningPatternSurfaceBundle
+    protectedQuestioningPatternSurfaceStatePath = $statePayload.protectedQuestioningPatternSurfaceStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1697,6 +1739,15 @@ if (-not [string]::IsNullOrWhiteSpace($questioningBoundaryPairLedgerBundlePath))
 }
 if (-not [string]::IsNullOrWhiteSpace($carryForwardInquirySelectionSurfaceBundlePath)) {
     Write-Host ('[local-automation-cycle] CarryForwardInquirySelectionSurface: {0}' -f $carryForwardInquirySelectionSurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($questioningOperatorCandidateLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] QuestioningOperatorCandidateLedger: {0}' -f $questioningOperatorCandidateLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($questioningGelPromotionGateBundlePath)) {
+    Write-Host ('[local-automation-cycle] QuestioningGelPromotionGate: {0}' -f $questioningGelPromotionGateBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($protectedQuestioningPatternSurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] ProtectedQuestioningPatternSurface: {0}' -f $protectedQuestioningPatternSurfaceBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

@@ -576,9 +576,12 @@ These surfaces retain reusable inquiry approaches, pair them with the boundaries
 
 Current live output surfaces for this map:
 
-- questioning operator candidacy remains bounded to future inquiry-pattern continuity, boundary-pair, and crucible evidence surfaces until its dedicated candidate ledger root is declared
-- questioning GEL promotion remains bounded to current promotion law and future inquiry-candidate evidence until its dedicated gate surface is declared
-- protected questioning pattern legibility remains bounded to future candidate and locality-safe review surfaces until its dedicated protected pattern bundle exists
+- `Questioning Operator Candidate Ledger`
+  Bundle root: `.audit/runs/questioning-operator-candidate-ledger/`
+- `Questioning GEL Promotion Gate`
+  Bundle root: `.audit/runs/questioning-gel-promotion-gate/`
+- `Protected Questioning Pattern Surface`
+  Bundle root: `.audit/runs/protected-questioning-pattern-surface/`
 
 ## Status Interpretation
 

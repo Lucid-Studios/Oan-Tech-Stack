@@ -185,6 +185,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $InquiryPatternContinuityLedgerState,
         [object] $QuestioningBoundaryPairLedgerState,
         [object] $CarryForwardInquirySelectionSurfaceState,
+        [object] $QuestioningOperatorCandidateLedgerState,
+        [object] $QuestioningGelPromotionGateState,
+        [object] $ProtectedQuestioningPatternSurfaceState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -905,6 +908,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'questioning-operator-candidate-ledger' {
+            if ($null -ne $QuestioningOperatorCandidateLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'questioning-gel-promotion-gate' {
+            if ($null -ne $QuestioningGelPromotionGateState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'protected-questioning-pattern-surface' {
+            if ($null -ne $ProtectedQuestioningPatternSurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1032,6 +1062,9 @@ $mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolve
 $inquiryPatternContinuityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.inquiryPatternContinuityLedgerStatePath)
 $questioningBoundaryPairLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningBoundaryPairLedgerStatePath)
 $carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.carryForwardInquirySelectionSurfaceStatePath)
+$questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningOperatorCandidateLedgerStatePath)
+$questioningGelPromotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningGelPromotionGateStatePath)
+$protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.protectedQuestioningPatternSurfaceStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1112,6 +1145,9 @@ $mutualIntelligibilityWitnessState = Read-JsonFileOrNull -Path $mutualIntelligib
 $inquiryPatternContinuityLedgerState = Read-JsonFileOrNull -Path $inquiryPatternContinuityLedgerStatePath
 $questioningBoundaryPairLedgerState = Read-JsonFileOrNull -Path $questioningBoundaryPairLedgerStatePath
 $carryForwardInquirySelectionSurfaceState = Read-JsonFileOrNull -Path $carryForwardInquirySelectionSurfaceStatePath
+$questioningOperatorCandidateLedgerState = Read-JsonFileOrNull -Path $questioningOperatorCandidateLedgerStatePath
+$questioningGelPromotionGateState = Read-JsonFileOrNull -Path $questioningGelPromotionGateStatePath
+$protectedQuestioningPatternSurfaceState = Read-JsonFileOrNull -Path $protectedQuestioningPatternSurfaceStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1338,6 +1374,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
                 -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
                 -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
+                -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
+                -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
+                -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1472,6 +1511,9 @@ $taskMapEntries = @(
                     -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
                     -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
                     -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
+                    -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
+                    -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
+                    -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1950,6 +1992,40 @@ $statusPayload = [ordered]@{
         carryForwardWithheldReuseWarningCount = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'withheldReuseWarningCount') } else { $null }
         carryForwardLocalitySafeReview = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'localitySafeReview') } else { $null }
         carryForwardAmbientHabitDenied = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'ambientHabitDenied') } else { $null }
+        questioningOperatorCandidateLedgerState = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] $questioningOperatorCandidateLedgerState.questioningOperatorCandidateLedgerState } else { $null }
+        questioningOperatorCandidateLedgerReason = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] $questioningOperatorCandidateLedgerState.reasonCode } else { $null }
+        questioningOperatorCandidateLedgerNextAction = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] $questioningOperatorCandidateLedgerState.nextAction } else { $null }
+        questioningOperatorCandidateClassificationState = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'candidateClassificationState') } else { $null }
+        questioningOperatorEventBoundFormCount = if ($null -ne $questioningOperatorCandidateLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'eventBoundInquiryFormCount') } else { $null }
+        questioningOperatorCandidatePatternCount = if ($null -ne $questioningOperatorCandidateLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'candidateInquiryPatternCount') } else { $null }
+        questioningOperatorPromotionEvidenceCount = if ($null -ne $questioningOperatorCandidateLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'promotionEvidenceCount') } else { $null }
+        questioningOperatorRequiredReentryConditionCount = if ($null -ne $questioningOperatorCandidateLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'requiredReentryConditionCount') } else { $null }
+        questioningOperatorFailureSignatureExpectationCount = if ($null -ne $questioningOperatorCandidateLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'failureSignatureExpectationCount') } else { $null }
+        questioningOperatorHiddenAuthorityPatternsDenied = if ($null -ne $questioningOperatorCandidateLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'hiddenAuthorityPatternsDenied') } else { $null }
+        questioningOperatorIdentityBoundPatternsWithheld = if ($null -ne $questioningOperatorCandidateLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'identityBoundPatternsWithheld') } else { $null }
+        questioningGelPromotionGateState = if ($null -ne $questioningGelPromotionGateState) { [string] $questioningGelPromotionGateState.questioningGelPromotionGateState } else { $null }
+        questioningGelPromotionGateReason = if ($null -ne $questioningGelPromotionGateState) { [string] $questioningGelPromotionGateState.reasonCode } else { $null }
+        questioningGelPromotionGateNextAction = if ($null -ne $questioningGelPromotionGateState) { [string] $questioningGelPromotionGateState.nextAction } else { $null }
+        questioningGelPromotionGateReviewState = if ($null -ne $questioningGelPromotionGateState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'promotionGateState') } else { $null }
+        questioningGelCandidatePatternCount = if ($null -ne $questioningGelPromotionGateState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'candidateInquiryPatternCount') } else { $null }
+        questioningGelSatisfiedPromotionConditionCount = if ($null -ne $questioningGelPromotionGateState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'satisfiedPromotionConditionCount') } else { $null }
+        questioningGelUnmetPromotionConditionCount = if ($null -ne $questioningGelPromotionGateState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'unmetPromotionConditionCount') } else { $null }
+        questioningGelPromotionWarningCount = if ($null -ne $questioningGelPromotionGateState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'promotionWarningCount') } else { $null }
+        questioningGelLocalitySeparationPreserved = if ($null -ne $questioningGelPromotionGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'localitySeparationPreserved') } else { $null }
+        questioningGelAuthoritySeparationPreserved = if ($null -ne $questioningGelPromotionGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'authoritySeparationPreserved') } else { $null }
+        questioningGelTruthSeekingInvariantPreserved = if ($null -ne $questioningGelPromotionGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'truthSeekingInvariantPreserved') } else { $null }
+        questioningGelOutcomeSeekingDenied = if ($null -ne $questioningGelPromotionGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'outcomeSeekingDenied') } else { $null }
+        questioningGelPromotionReviewAdmitted = if ($null -ne $questioningGelPromotionGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'promotionReviewAdmitted') } else { $null }
+        protectedQuestioningPatternSurfaceState = if ($null -ne $protectedQuestioningPatternSurfaceState) { [string] $protectedQuestioningPatternSurfaceState.protectedQuestioningPatternSurfaceState } else { $null }
+        protectedQuestioningPatternSurfaceReason = if ($null -ne $protectedQuestioningPatternSurfaceState) { [string] $protectedQuestioningPatternSurfaceState.reasonCode } else { $null }
+        protectedQuestioningPatternSurfaceNextAction = if ($null -ne $protectedQuestioningPatternSurfaceState) { [string] $protectedQuestioningPatternSurfaceState.nextAction } else { $null }
+        protectedQuestioningReviewState = if ($null -ne $protectedQuestioningPatternSurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'protectedReviewState') } else { $null }
+        protectedQuestioningReviewableCandidatePatternCount = if ($null -ne $protectedQuestioningPatternSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'reviewableCandidatePatternCount') } else { $null }
+        protectedQuestioningLawfulReviewEnvelopeCount = if ($null -ne $protectedQuestioningPatternSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'lawfulReviewEnvelopeCount') } else { $null }
+        protectedQuestioningWithheldInteriorityWarningCount = if ($null -ne $protectedQuestioningPatternSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'withheldInteriorityWarningCount') } else { $null }
+        protectedQuestioningLocalitySafeLegibility = if ($null -ne $protectedQuestioningPatternSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'localitySafeLegibility') } else { $null }
+        protectedQuestioningRawInteriorityDenied = if ($null -ne $protectedQuestioningPatternSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'rawInteriorityDenied') } else { $null }
+        protectedQuestioningAutomaticGrantDenied = if ($null -ne $protectedQuestioningPatternSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'automaticGrantDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3096,6 +3172,64 @@ if ($null -ne $carryForwardInquirySelectionSurfaceState) {
     )
 }
 
+if ($null -ne $questioningOperatorCandidateLedgerState) {
+    $markdownLines += @(
+        '## Questioning Operator Candidate Ledger',
+        '',
+        ('- Questioning operator candidate-ledger state: `{0}`' -f [string] $questioningOperatorCandidateLedgerState.questioningOperatorCandidateLedgerState),
+        ('- Reason code: `{0}`' -f [string] $questioningOperatorCandidateLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $questioningOperatorCandidateLedgerState.nextAction),
+        ('- Candidate classification state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'candidateClassificationState')),
+        ('- Event-bound inquiry-form count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'eventBoundInquiryFormCount')),
+        ('- Candidate inquiry-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'candidateInquiryPatternCount')),
+        ('- Promotion-evidence count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'promotionEvidenceCount')),
+        ('- Required re-entry condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'requiredReentryConditionCount')),
+        ('- Failure-signature expectation count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'failureSignatureExpectationCount')),
+        ('- Hidden authority patterns denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'hiddenAuthorityPatternsDenied')),
+        ('- Identity-bound patterns withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'identityBoundPatternsWithheld')),
+        ''
+    )
+}
+
+if ($null -ne $questioningGelPromotionGateState) {
+    $markdownLines += @(
+        '## Questioning GEL Promotion Gate',
+        '',
+        ('- Questioning GEL promotion-gate state: `{0}`' -f [string] $questioningGelPromotionGateState.questioningGelPromotionGateState),
+        ('- Reason code: `{0}`' -f [string] $questioningGelPromotionGateState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $questioningGelPromotionGateState.nextAction),
+        ('- Promotion gate state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'promotionGateState')),
+        ('- Candidate inquiry-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'candidateInquiryPatternCount')),
+        ('- Satisfied promotion-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'satisfiedPromotionConditionCount')),
+        ('- Unmet promotion-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'unmetPromotionConditionCount')),
+        ('- Promotion warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'promotionWarningCount')),
+        ('- Locality separation preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'localitySeparationPreserved')),
+        ('- Authority separation preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'authoritySeparationPreserved')),
+        ('- Truth-seeking invariant preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'truthSeekingInvariantPreserved')),
+        ('- Outcome-seeking denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'outcomeSeekingDenied')),
+        ('- Promotion review admitted: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningGelPromotionGateState -PropertyName 'promotionReviewAdmitted')),
+        ''
+    )
+}
+
+if ($null -ne $protectedQuestioningPatternSurfaceState) {
+    $markdownLines += @(
+        '## Protected Questioning Pattern Surface',
+        '',
+        ('- Protected questioning-pattern surface state: `{0}`' -f [string] $protectedQuestioningPatternSurfaceState.protectedQuestioningPatternSurfaceState),
+        ('- Reason code: `{0}`' -f [string] $protectedQuestioningPatternSurfaceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $protectedQuestioningPatternSurfaceState.nextAction),
+        ('- Protected review state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'protectedReviewState')),
+        ('- Reviewable candidate-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'reviewableCandidatePatternCount')),
+        ('- Lawful review-envelope count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'lawfulReviewEnvelopeCount')),
+        ('- Withheld interiority-warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'withheldInteriorityWarningCount')),
+        ('- Locality-safe legibility: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'localitySafeLegibility')),
+        ('- Raw interiority denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'rawInteriorityDenied')),
+        ('- Automatic grant denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'automaticGrantDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3203,6 +3337,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
             -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
             -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
+            -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
+            -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
+            -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

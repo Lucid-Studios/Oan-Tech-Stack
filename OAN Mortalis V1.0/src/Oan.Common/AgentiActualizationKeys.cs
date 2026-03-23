@@ -225,6 +225,48 @@ public static class AgentiActualizationKeys
         return $"carry-forward-inquiry-selection-surface://{ComputeDigest(cmeId, inquiryPatternLedgerHandle, boundaryPairLedgerHandle, localityWitnessHandle)}";
     }
 
+    public static string CreateQuestioningOperatorCandidateLedgerHandle(
+        string cmeId,
+        string carryForwardInquirySelectionSurfaceHandle,
+        string continuityLedgerHandle,
+        string mutualWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(carryForwardInquirySelectionSurfaceHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mutualWitnessHandle);
+
+        return $"questioning-operator-candidate-ledger://{ComputeDigest(cmeId, carryForwardInquirySelectionSurfaceHandle, continuityLedgerHandle, mutualWitnessHandle)}";
+    }
+
+    public static string CreateQuestioningGelPromotionGateHandle(
+        string cmeId,
+        string candidateLedgerHandle,
+        string operatorInquiryEnvelopeHandle,
+        string localityWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(candidateLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operatorInquiryEnvelopeHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(localityWitnessHandle);
+
+        return $"questioning-gel-promotion-gate://{ComputeDigest(cmeId, candidateLedgerHandle, operatorInquiryEnvelopeHandle, localityWitnessHandle)}";
+    }
+
+    public static string CreateProtectedQuestioningPatternSurfaceHandle(
+        string cmeId,
+        string candidateLedgerHandle,
+        string promotionGateHandle,
+        string localityWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(candidateLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(promotionGateHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(localityWitnessHandle);
+
+        return $"protected-questioning-pattern-surface://{ComputeDigest(cmeId, candidateLedgerHandle, promotionGateHandle, localityWitnessHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

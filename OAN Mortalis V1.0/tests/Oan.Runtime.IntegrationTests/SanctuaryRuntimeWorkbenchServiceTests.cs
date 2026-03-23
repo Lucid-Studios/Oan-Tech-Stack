@@ -710,6 +710,129 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(carryForwardSurface.AmbientHabitDenied);
     }
 
+    [Fact]
+    public void CreateQuestioningOperatorCandidateLedgerAndPromotionGate_GuardReuseBeforeInheritance()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
+        var (_, _, _, _, _, _, _, operatorSelection, _, _, _) = CreateCrucibleBundle();
+        var inquiryPatternLedger = reachService.CreateInquiryPatternContinuityLedger(
+            operatorSelection,
+            continuityLedger,
+            mutualWitness,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var boundaryPairLedger = reachService.CreateQuestioningBoundaryPairLedger(
+            operatorSelection,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var carryForwardSurface = reachService.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+
+        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            ledgerState: "questioning-operator-candidate-ledger-ready",
+            timestampUtc: FixedTimestamp);
+        var promotionGate = reachService.CreateQuestioningGelPromotionGate(
+            candidateLedger,
+            carryForwardSurface,
+            operatorSelection,
+            localityWitness,
+            gateState: "questioning-gel-promotion-gate-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("questioning-operator-candidate-ledger://", candidateLedger.LedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("questioning-operator-candidate-ledger-bound", candidateLedger.ReasonCode);
+        Assert.Equal("questioning-operator-candidate-ledger-ready", candidateLedger.LedgerState);
+        Assert.Equal(3, candidateLedger.EventBoundInquiryForms.Count);
+        Assert.Equal(3, candidateLedger.CandidateInquiryPatterns.Count);
+        Assert.Equal(3, candidateLedger.PromotionEvidence.Count);
+        Assert.Equal(3, candidateLedger.RequiredReentryConditions.Count);
+        Assert.Equal(3, candidateLedger.FailureSignatureExpectations.Count);
+        Assert.True(candidateLedger.HiddenAuthorityPatternsDenied);
+        Assert.True(candidateLedger.IdentityBoundPatternsWithheld);
+
+        Assert.StartsWith("questioning-gel-promotion-gate://", promotionGate.GateHandle, StringComparison.Ordinal);
+        Assert.Equal("questioning-gel-promotion-gate-bound", promotionGate.ReasonCode);
+        Assert.Equal("questioning-gel-promotion-gate-ready", promotionGate.GateState);
+        Assert.Equal(3, promotionGate.CandidateInquiryPatterns.Count);
+        Assert.Equal(3, promotionGate.SatisfiedPromotionConditions.Count);
+        Assert.Equal(3, promotionGate.UnmetPromotionConditions.Count);
+        Assert.Equal(3, promotionGate.PromotionWarnings.Count);
+        Assert.True(promotionGate.LocalitySeparationPreserved);
+        Assert.True(promotionGate.AuthoritySeparationPreserved);
+        Assert.True(promotionGate.TruthSeekingInvariantPreserved);
+        Assert.True(promotionGate.OutcomeSeekingDenied);
+        Assert.True(promotionGate.PromotionReviewAdmitted);
+    }
+
+    [Fact]
+    public void CreateProtectedQuestioningPatternSurface_PreservesLegibilityWithoutGrant()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
+        var (_, _, _, _, _, _, _, operatorSelection, _, _, _) = CreateCrucibleBundle();
+        var inquiryPatternLedger = reachService.CreateInquiryPatternContinuityLedger(
+            operatorSelection,
+            continuityLedger,
+            mutualWitness,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var boundaryPairLedger = reachService.CreateQuestioningBoundaryPairLedger(
+            operatorSelection,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var carryForwardSurface = reachService.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            timestampUtc: FixedTimestamp);
+        var promotionGate = reachService.CreateQuestioningGelPromotionGate(
+            candidateLedger,
+            carryForwardSurface,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+
+        var protectedSurface = reachService.CreateProtectedQuestioningPatternSurface(
+            candidateLedger,
+            promotionGate,
+            carryForwardSurface,
+            localityWitness,
+            surfaceState: "protected-questioning-pattern-surface-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("protected-questioning-pattern-surface://", protectedSurface.SurfaceHandle, StringComparison.Ordinal);
+        Assert.Equal("protected-questioning-pattern-surface-bound", protectedSurface.ReasonCode);
+        Assert.Equal("protected-questioning-pattern-surface-ready", protectedSurface.SurfaceState);
+        Assert.Equal(3, protectedSurface.ReviewableCandidatePatterns.Count);
+        Assert.Equal(3, protectedSurface.LawfulReviewEnvelopes.Count);
+        Assert.Equal(3, protectedSurface.WithheldInteriorityWarnings.Count);
+        Assert.True(protectedSurface.LocalitySafeLegibility);
+        Assert.True(protectedSurface.RawInteriorityDenied);
+        Assert.True(protectedSurface.AutomaticGrantDenied);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
 
     private static (RuntimeHabitationReadinessLedgerReceipt ReadinessLedger, RuntimeWorkbenchSessionLedger SessionLedger, DayDreamCollapseReceipt CollapseReceipt, CrypticDepthReturnReceipt CrypticReturnReceipt, BondedCoWorkSessionRehearsalReceipt BondedCoWorkRehearsal, ReachReturnDissolutionReceipt ReachReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateInquiryBundle()

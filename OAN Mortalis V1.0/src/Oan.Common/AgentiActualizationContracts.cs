@@ -258,6 +258,62 @@ public sealed record CarryForwardInquirySelectionSurfaceReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record QuestioningOperatorCandidateLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string CarryForwardInquirySelectionSurfaceHandle,
+    string InquiryPatternLedgerHandle,
+    string BoundaryPairLedgerHandle,
+    string ContinuityLedgerHandle,
+    string MutualIntelligibilityWitnessHandle,
+    string LedgerState,
+    IReadOnlyList<string> EventBoundInquiryForms,
+    IReadOnlyList<string> CandidateInquiryPatterns,
+    IReadOnlyList<string> PromotionEvidence,
+    IReadOnlyList<string> RequiredReentryConditions,
+    IReadOnlyList<string> FailureSignatureExpectations,
+    bool HiddenAuthorityPatternsDenied,
+    bool IdentityBoundPatternsWithheld,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record QuestioningGelPromotionGateReceipt(
+    string GateHandle,
+    string CMEId,
+    string CandidateLedgerHandle,
+    string CarryForwardInquirySelectionSurfaceHandle,
+    string OperatorInquiryEnvelopeHandle,
+    string LocalityWitnessHandle,
+    string GateState,
+    IReadOnlyList<string> CandidateInquiryPatterns,
+    IReadOnlyList<string> SatisfiedPromotionConditions,
+    IReadOnlyList<string> UnmetPromotionConditions,
+    IReadOnlyList<string> PromotionWarnings,
+    bool LocalitySeparationPreserved,
+    bool AuthoritySeparationPreserved,
+    bool TruthSeekingInvariantPreserved,
+    bool OutcomeSeekingDenied,
+    bool PromotionReviewAdmitted,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record ProtectedQuestioningPatternSurfaceReceipt(
+    string SurfaceHandle,
+    string CMEId,
+    string CandidateLedgerHandle,
+    string PromotionGateHandle,
+    string CarryForwardInquirySelectionSurfaceHandle,
+    string LocalityWitnessHandle,
+    string SurfaceState,
+    IReadOnlyList<string> ReviewableCandidatePatterns,
+    IReadOnlyList<string> LawfulReviewEnvelopes,
+    IReadOnlyList<string> WithheldInteriorityWarnings,
+    bool LocalitySafeLegibility,
+    bool RawInteriorityDenied,
+    bool AutomaticGrantDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -281,6 +337,9 @@ public static class AgentiActualizationProjector
     private const string InquiryPatternContinuityLedgerPrefix = "inquiry-pattern-continuity-ledger://";
     private const string QuestioningBoundaryPairLedgerPrefix = "questioning-boundary-pair-ledger://";
     private const string CarryForwardInquirySelectionSurfacePrefix = "carry-forward-inquiry-selection-surface://";
+    private const string QuestioningOperatorCandidateLedgerPrefix = "questioning-operator-candidate-ledger://";
+    private const string QuestioningGelPromotionGatePrefix = "questioning-gel-promotion-gate://";
+    private const string ProtectedQuestioningPatternSurfacePrefix = "protected-questioning-pattern-surface://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -1122,6 +1181,234 @@ public static class AgentiActualizationProjector
             LocalitySafeReview: !localityWitness.LocalityCollapseDetected,
             AmbientHabitDenied: true,
             ReasonCode: "carry-forward-inquiry-selection-surface-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static QuestioningOperatorCandidateLedgerReceipt CreateQuestioningOperatorCandidateLedger(
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
+        QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
+        string ledgerState = "questioning-operator-candidate-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(inquiryPatternLedger);
+        ArgumentNullException.ThrowIfNull(boundaryPairLedger);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
+        EnsurePrefix(carryForwardInquirySelectionSurface.SurfaceHandle, CarryForwardInquirySelectionSurfacePrefix, nameof(carryForwardInquirySelectionSurface));
+        EnsurePrefix(inquiryPatternLedger.LedgerHandle, InquiryPatternContinuityLedgerPrefix, nameof(inquiryPatternLedger));
+        EnsurePrefix(boundaryPairLedger.LedgerHandle, QuestioningBoundaryPairLedgerPrefix, nameof(boundaryPairLedger));
+        EnsurePrefix(continuityLedger.LedgerHandle, ContinuityUnderPressureLedgerPrefix, nameof(continuityLedger));
+        EnsurePrefix(mutualIntelligibilityWitness.WitnessHandle, MutualIntelligibilityWitnessPrefix, nameof(mutualIntelligibilityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(carryForwardInquirySelectionSurface.CMEId, inquiryPatternLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, boundaryPairLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, mutualIntelligibilityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Questioning operator candidacy requires carry-forward selection, inquiry continuity, boundary pairing, pressure continuity, and mutual intelligibility to remain inside one bonded CME surface.");
+        }
+
+        var eventBoundInquiryForms = carryForwardInquirySelectionSurface.WithheldReuseWarnings
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var candidateInquiryPatterns = carryForwardInquirySelectionSurface.AvailableCarryForwardPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var promotionEvidence = continuityLedger.HeldContinuities
+            .Concat(new[] { mutualIntelligibilityWitness.SharedUnderstandingState })
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var requiredReentryConditions = inquiryPatternLedger.PreservedConstraints
+            .Concat(inquiryPatternLedger.TriggerConditions)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var failureSignatureExpectations = boundaryPairLedger.OverreachWarnings
+            .Concat(boundaryPairLedger.BoundaryConstraints)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new QuestioningOperatorCandidateLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateQuestioningOperatorCandidateLedgerHandle(
+                carryForwardInquirySelectionSurface.CMEId,
+                carryForwardInquirySelectionSurface.SurfaceHandle,
+                continuityLedger.LedgerHandle,
+                mutualIntelligibilityWitness.WitnessHandle),
+            CMEId: carryForwardInquirySelectionSurface.CMEId,
+            CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
+            InquiryPatternLedgerHandle: inquiryPatternLedger.LedgerHandle,
+            BoundaryPairLedgerHandle: boundaryPairLedger.LedgerHandle,
+            ContinuityLedgerHandle: continuityLedger.LedgerHandle,
+            MutualIntelligibilityWitnessHandle: mutualIntelligibilityWitness.WitnessHandle,
+            LedgerState: ledgerState.Trim(),
+            EventBoundInquiryForms: eventBoundInquiryForms,
+            CandidateInquiryPatterns: candidateInquiryPatterns,
+            PromotionEvidence: promotionEvidence,
+            RequiredReentryConditions: requiredReentryConditions,
+            FailureSignatureExpectations: failureSignatureExpectations,
+            HiddenAuthorityPatternsDenied: carryForwardInquirySelectionSurface.AmbientHabitDenied,
+            IdentityBoundPatternsWithheld: inquiryPatternLedger.IdentityBleedDenied,
+            ReasonCode: "questioning-operator-candidate-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static QuestioningGelPromotionGateReceipt CreateQuestioningGelPromotionGate(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string gateState = "questioning-gel-promotion-gate-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(carryForwardInquirySelectionSurface.SurfaceHandle, CarryForwardInquirySelectionSurfacePrefix, nameof(carryForwardInquirySelectionSurface));
+        EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
+        EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(gateState);
+
+        if (!string.Equals(candidateLedger.CMEId, carryForwardInquirySelectionSurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, operatorInquiryEnvelope.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, localityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Questioning GEL promotion requires candidate, carry-forward, operator inquiry, and locality witness receipts to remain inside one bonded CME surface.");
+        }
+
+        var candidateInquiryPatterns = candidateLedger.CandidateInquiryPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var satisfiedPromotionConditions = carryForwardInquirySelectionSurface.AdmittedReuseConditions
+            .Concat(operatorInquiryEnvelope.LawfulUseConditions)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var unmetPromotionConditions = candidateLedger.RequiredReentryConditions
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var promotionWarnings = candidateLedger.FailureSignatureExpectations
+            .Concat(carryForwardInquirySelectionSurface.WithheldReuseWarnings)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        var localitySeparationPreserved = !localityWitness.LocalityCollapseDetected;
+        var authoritySeparationPreserved = operatorInquiryEnvelope.RawGrantDenied && candidateLedger.HiddenAuthorityPatternsDenied;
+        var truthSeekingInvariantPreserved = authoritySeparationPreserved && candidateLedger.IdentityBoundPatternsWithheld;
+        var outcomeSeekingDenied = true;
+        var promotionReviewAdmitted = localitySeparationPreserved &&
+            authoritySeparationPreserved &&
+            truthSeekingInvariantPreserved &&
+            candidateInquiryPatterns.Length > 0;
+
+        return new QuestioningGelPromotionGateReceipt(
+            GateHandle: AgentiActualizationKeys.CreateQuestioningGelPromotionGateHandle(
+                candidateLedger.CMEId,
+                candidateLedger.LedgerHandle,
+                operatorInquiryEnvelope.EnvelopeHandle,
+                localityWitness.WitnessLedgerHandle),
+            CMEId: candidateLedger.CMEId,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
+            OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
+            LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            GateState: gateState.Trim(),
+            CandidateInquiryPatterns: candidateInquiryPatterns,
+            SatisfiedPromotionConditions: satisfiedPromotionConditions,
+            UnmetPromotionConditions: unmetPromotionConditions,
+            PromotionWarnings: promotionWarnings,
+            LocalitySeparationPreserved: localitySeparationPreserved,
+            AuthoritySeparationPreserved: authoritySeparationPreserved,
+            TruthSeekingInvariantPreserved: truthSeekingInvariantPreserved,
+            OutcomeSeekingDenied: outcomeSeekingDenied,
+            PromotionReviewAdmitted: promotionReviewAdmitted,
+            ReasonCode: "questioning-gel-promotion-gate-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static ProtectedQuestioningPatternSurfaceReceipt CreateProtectedQuestioningPatternSurface(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string surfaceState = "protected-questioning-pattern-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(promotionGate.GateHandle, QuestioningGelPromotionGatePrefix, nameof(promotionGate));
+        EnsurePrefix(carryForwardInquirySelectionSurface.SurfaceHandle, CarryForwardInquirySelectionSurfacePrefix, nameof(carryForwardInquirySelectionSurface));
+        EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(surfaceState);
+
+        if (!string.Equals(candidateLedger.CMEId, promotionGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, carryForwardInquirySelectionSurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, localityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Protected questioning patterns require candidate, promotion gate, carry-forward inquiry, and locality witness receipts to remain inside one bonded CME surface.");
+        }
+
+        var reviewableCandidatePatterns = promotionGate.CandidateInquiryPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var lawfulReviewEnvelopes = promotionGate.SatisfiedPromotionConditions
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var withheldInteriorityWarnings = candidateLedger.FailureSignatureExpectations
+            .Concat(carryForwardInquirySelectionSurface.WithheldReuseWarnings)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new ProtectedQuestioningPatternSurfaceReceipt(
+            SurfaceHandle: AgentiActualizationKeys.CreateProtectedQuestioningPatternSurfaceHandle(
+                candidateLedger.CMEId,
+                candidateLedger.LedgerHandle,
+                promotionGate.GateHandle,
+                localityWitness.WitnessLedgerHandle),
+            CMEId: candidateLedger.CMEId,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            PromotionGateHandle: promotionGate.GateHandle,
+            CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
+            LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            SurfaceState: surfaceState.Trim(),
+            ReviewableCandidatePatterns: reviewableCandidatePatterns,
+            LawfulReviewEnvelopes: lawfulReviewEnvelopes,
+            WithheldInteriorityWarnings: withheldInteriorityWarnings,
+            LocalitySafeLegibility: promotionGate.LocalitySeparationPreserved && !localityWitness.LocalityCollapseDetected,
+            RawInteriorityDenied: true,
+            AutomaticGrantDenied: true,
+            ReasonCode: "protected-questioning-pattern-surface-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

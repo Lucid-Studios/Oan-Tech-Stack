@@ -368,4 +368,73 @@ public sealed class GovernedReachRealizationService
             surfaceState,
             timestampUtc);
     }
+
+    public QuestioningOperatorCandidateLedgerReceipt CreateQuestioningOperatorCandidateLedger(
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
+        QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
+        string ledgerState = "questioning-operator-candidate-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(inquiryPatternLedger);
+        ArgumentNullException.ThrowIfNull(boundaryPairLedger);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
+
+        return AgentiActualizationProjector.CreateQuestioningOperatorCandidateLedger(
+            carryForwardInquirySelectionSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualIntelligibilityWitness,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public QuestioningGelPromotionGateReceipt CreateQuestioningGelPromotionGate(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string gateState = "questioning-gel-promotion-gate-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+
+        return AgentiActualizationProjector.CreateQuestioningGelPromotionGate(
+            candidateLedger,
+            carryForwardInquirySelectionSurface,
+            operatorInquiryEnvelope,
+            localityWitness,
+            gateState,
+            timestampUtc);
+    }
+
+    public ProtectedQuestioningPatternSurfaceReceipt CreateProtectedQuestioningPatternSurface(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string surfaceState = "protected-questioning-pattern-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+
+        return AgentiActualizationProjector.CreateProtectedQuestioningPatternSurface(
+            candidateLedger,
+            promotionGate,
+            carryForwardInquirySelectionSurface,
+            localityWitness,
+            surfaceState,
+            timestampUtc);
+    }
 }
