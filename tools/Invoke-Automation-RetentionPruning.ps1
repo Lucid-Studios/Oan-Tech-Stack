@@ -165,6 +165,9 @@ function Get-ProtectedDirectorySet {
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastPostHabitationHorizonLatticeBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastBoundedHorizonResearchBriefBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastNextEraBatchSelectorBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastInquirySessionDisciplineSurfaceBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastBoundaryConditionLedgerBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastCoherenceGainWitnessReceiptBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $BlockedEscalationState -PropertyName 'bundlePath')
     )) {
         if (-not [string]::IsNullOrWhiteSpace($candidate)) {
@@ -505,6 +508,18 @@ $roots = @(
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.nextEraBatchSelectorOutputRoot)
         keep = [int] $retentionPolicy.keepNextEraBatchSelectorBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.inquirySessionDisciplineSurfaceOutputRoot)
+        keep = [int] $retentionPolicy.keepInquirySessionDisciplineSurfaceBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.boundaryConditionLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepBoundaryConditionLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coherenceGainWitnessReceiptOutputRoot)
+        keep = [int] $retentionPolicy.keepCoherenceGainWitnessReceiptBundles
     },
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)

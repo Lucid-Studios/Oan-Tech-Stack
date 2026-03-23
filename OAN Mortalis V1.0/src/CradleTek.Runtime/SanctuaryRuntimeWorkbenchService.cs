@@ -198,4 +198,75 @@ public sealed class SanctuaryRuntimeWorkbenchService
             launchState,
             timestampUtc);
     }
+
+    public InquirySessionDisciplineSurfaceReceipt CreateInquirySessionDisciplineSurface(
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        DayDreamCollapseReceipt collapseReceipt,
+        CrypticDepthReturnReceipt returnReceipt,
+        string inquiryState = "inquiry-session-discipline-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(collapseReceipt);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+
+        return SanctuaryWorkbenchProjector.CreateInquirySessionDisciplineSurface(
+            readinessLedger,
+            sessionLedger,
+            collapseReceipt,
+            returnReceipt,
+            inquiryState,
+            timestampUtc);
+    }
+
+    public BoundaryConditionLedgerReceipt CreateBoundaryConditionLedger(
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        InquirySessionDisciplineSurfaceReceipt inquirySurface,
+        DayDreamCollapseReceipt collapseReceipt,
+        CrypticDepthReturnReceipt returnReceipt,
+        string ledgerState = "boundary-condition-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(inquirySurface);
+        ArgumentNullException.ThrowIfNull(collapseReceipt);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+
+        return SanctuaryWorkbenchProjector.CreateBoundaryConditionLedger(
+            readinessLedger,
+            sessionLedger,
+            inquirySurface,
+            collapseReceipt,
+            returnReceipt,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public CoherenceGainWitnessReceipt CreateCoherenceGainWitnessReceipt(
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        InquirySessionDisciplineSurfaceReceipt inquirySurface,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        string witnessState = "coherence-gain-witness-receipt-ready",
+        string coherenceState = "coherence-gain-witnessed",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(inquirySurface);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+
+        return SanctuaryWorkbenchProjector.CreateCoherenceGainWitnessReceipt(
+            readinessLedger,
+            sessionLedger,
+            inquirySurface,
+            boundaryLedger,
+            witnessState,
+            coherenceState,
+            timestampUtc);
+    }
 }

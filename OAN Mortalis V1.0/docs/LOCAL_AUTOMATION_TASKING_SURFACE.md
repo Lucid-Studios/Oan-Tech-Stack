@@ -504,9 +504,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- inquiry session discipline remains bounded to the workbench session, day-dream collapse, cryptic return, and horizon-research surfaces until its dedicated output root is declared
-- boundary condition memory remains bounded to current session, collapse, return, and locality receipts until its dedicated ledger root is declared
-- coherence gain witness remains bounded to future inquiry-session events and horizon-selection surfaces until its dedicated witness bundle exists
+- inquiry session-discipline surfaces land under `.audit/runs/inquiry-session-discipline-surface/` and update `.audit/state/local-automation-inquiry-session-discipline-surface-last-run.json`
+- boundary condition ledgers land under `.audit/runs/boundary-condition-ledger/` and update `.audit/state/local-automation-boundary-condition-ledger-last-run.json`
+- coherence gain-witness receipts land under `.audit/runs/coherence-gain-witness-receipt/` and update `.audit/state/local-automation-coherence-gain-witness-receipt-last-run.json`
+- these surfaces witness chamber-native inquiry discipline, retained boundary memory, and coherence-preserving questioning without prematurely promoting questioning patterns into standalone GEL types
 
 ### Automation Maturation Map 27
 

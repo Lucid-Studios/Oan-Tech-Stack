@@ -369,7 +369,307 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(launchRehearsal.PublicationPromotionDenied);
     }
 
+    [Fact]
+    public void CreateInquirySessionDisciplineSurface_BindsQuestioningAndSilenceInsideBoundedHabitation()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var (readinessLedger, sessionLedger, collapseReceipt, crypticReturnReceipt) = CreateInquiryBundle();
+
+        var inquirySurface = workbenchService.CreateInquirySessionDisciplineSurface(
+            readinessLedger,
+            sessionLedger,
+            collapseReceipt,
+            crypticReturnReceipt,
+            inquiryState: "inquiry-session-discipline-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("inquiry-session-discipline-surface://", inquirySurface.InquirySurfaceHandle, StringComparison.Ordinal);
+        Assert.Equal("inquiry-session-discipline-surface-bound", inquirySurface.ReasonCode);
+        Assert.Equal("inquiry-session-discipline-ready", inquirySurface.InquiryState);
+        Assert.Equal(4, inquirySurface.InquiryStances.Count);
+        Assert.Contains("challenge", inquirySurface.InquiryStances);
+        Assert.Equal(3, inquirySurface.AssumptionExposureModes.Count);
+        Assert.Equal(2, inquirySurface.SilenceDispositions.Count);
+        Assert.True(inquirySurface.ChamberNativeInquiryBound);
+        Assert.True(inquirySurface.HiddenPressureDenied);
+        Assert.True(inquirySurface.PrematureGelPromotionDenied);
+    }
+
+    [Fact]
+    public void CreateBoundaryConditionLedgerAndCoherenceGainWitness_CarryForwardConstraintMemory()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var (readinessLedger, sessionLedger, collapseReceipt, crypticReturnReceipt) = CreateInquiryBundle();
+        var inquirySurface = workbenchService.CreateInquirySessionDisciplineSurface(
+            readinessLedger,
+            sessionLedger,
+            collapseReceipt,
+            crypticReturnReceipt,
+            timestampUtc: FixedTimestamp);
+
+        var boundaryLedger = workbenchService.CreateBoundaryConditionLedger(
+            readinessLedger,
+            sessionLedger,
+            inquirySurface,
+            collapseReceipt,
+            crypticReturnReceipt,
+            ledgerState: "boundary-condition-ledger-ready",
+            timestampUtc: FixedTimestamp);
+        var coherenceWitness = workbenchService.CreateCoherenceGainWitnessReceipt(
+            readinessLedger,
+            sessionLedger,
+            inquirySurface,
+            boundaryLedger,
+            witnessState: "coherence-gain-witness-receipt-ready",
+            coherenceState: "coherence-gain-witnessed",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("boundary-condition-ledger://", boundaryLedger.BoundaryLedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("boundary-condition-ledger-bound", boundaryLedger.ReasonCode);
+        Assert.Equal("boundary-condition-ledger-ready", boundaryLedger.LedgerState);
+        Assert.Equal(3, boundaryLedger.RetainedBoundaryConditions.Count);
+        Assert.Equal(3, boundaryLedger.ContinuityRequirements.Count);
+        Assert.Equal(3, boundaryLedger.WithheldCrossings.Count);
+        Assert.True(boundaryLedger.BoundaryMemoryCarriedForward);
+        Assert.True(boundaryLedger.FailurePunishmentDenied);
+        Assert.False(boundaryLedger.IdentityBleedDetected);
+
+        Assert.StartsWith("coherence-gain-witness-receipt://", coherenceWitness.CoherenceWitnessHandle, StringComparison.Ordinal);
+        Assert.Equal("coherence-gain-witness-receipt-bound", coherenceWitness.ReasonCode);
+        Assert.Equal("coherence-gain-witness-receipt-ready", coherenceWitness.WitnessState);
+        Assert.Equal("coherence-gain-witnessed", coherenceWitness.CoherenceState);
+        Assert.Equal(3, coherenceWitness.CoherencePreservingEventCount);
+        Assert.Equal(3, coherenceWitness.HiddenAssumptionDeniedCount);
+        Assert.Equal(3, coherenceWitness.BoundaryConditionCount);
+        Assert.True(coherenceWitness.SharedIntelligibilityPreserved);
+        Assert.True(coherenceWitness.AdmissibilitySpacePreserved);
+        Assert.False(coherenceWitness.PrematureClosureDetected);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
+
+    private static (RuntimeHabitationReadinessLedgerReceipt ReadinessLedger, RuntimeWorkbenchSessionLedger SessionLedger, DayDreamCollapseReceipt CollapseReceipt, CrypticDepthReturnReceipt CrypticReturnReceipt) CreateInquiryBundle()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var reachService = new GovernedReachRealizationService();
+        var (threadBirth, utilitySurface, realization, localityLedger) = CreateReachProjectionBundle();
+        var workbench = workbenchService.CreateRuntimeWorkbenchSurface(
+            utilitySurface,
+            localityLedger,
+            runtimeDeployabilityState: "deployable-candidate-ready",
+            sanctuaryRuntimeReadinessState: "bounded-working-state-ready",
+            runtimeWorkAdmissibilityState: "provisional-runtime-work",
+            sessionPosture: "bounded-workbench-ready",
+            timestampUtc: FixedTimestamp);
+        var dayDreamTier = workbenchService.CreateAmenableDayDreamTier(
+            workbench,
+            exploratoryPredicates:
+            [
+                "clarifying-approach-pattern",
+                "silence-before-closure",
+                "boundary-aware-probe"
+            ],
+            nonFinalOutputs:
+            [
+                "candidate-questioning-path",
+                "non-final-silence-trace"
+            ],
+            timestampUtc: FixedTimestamp);
+        var depthGate = workbenchService.CreateSelfRootedCrypticDepthGate(
+            threadBirth,
+            workbench,
+            dayDreamTier,
+            timestampUtc: FixedTimestamp);
+        var sessionBoundary = SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            boundaryCode: "premature-closure-boundary",
+            failureClass: "coordination-fracture",
+            triggerPredicate: "question-demands-conclusion-before-readiness",
+            continuityRequirement: "preserve-admissibility-space-before-closure",
+            permissionState: "withhold-premature-closure",
+            notes: "session questioning must not compress the chamber into conclusion before the field is ready.");
+        var sessionLedger = workbenchService.CreateRuntimeWorkbenchSessionLedger(
+            workbench,
+            dayDreamTier,
+            depthGate,
+            sessionEvents:
+            [
+                SanctuaryWorkbenchProjector.CreateSessionEvent(
+                    workbench.CMEId,
+                    workbench.WorkbenchHandle,
+                    "questioning",
+                    "clarify",
+                    "coherence-gain",
+                    coherencePreserving: true,
+                    hiddenAssumptionDenied: true,
+                    description: "what would need to be true for this chamber to remain intelligible?",
+                    timestampUtc: FixedTimestamp),
+                SanctuaryWorkbenchProjector.CreateSessionEvent(
+                    workbench.CMEId,
+                    workbench.WorkbenchHandle,
+                    "silence",
+                    "open",
+                    "forming-state-held",
+                    coherencePreserving: true,
+                    hiddenAssumptionDenied: true,
+                    description: "hold the forming structure without forcing it into premature closure.",
+                    timestampUtc: FixedTimestamp),
+                SanctuaryWorkbenchProjector.CreateSessionEvent(
+                    workbench.CMEId,
+                    workbench.WorkbenchHandle,
+                    "questioning",
+                    "probe",
+                    "boundary-revealed",
+                    coherencePreserving: true,
+                    hiddenAssumptionDenied: true,
+                    description: "which boundary is protecting continuity rather than blocking motion?",
+                    timestampUtc: FixedTimestamp)
+            ],
+            boundaryConditions: [sessionBoundary],
+            timestampUtc: FixedTimestamp);
+        var collapseBoundary = SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            boundaryCode: "non-final-question-trace",
+            failureClass: "exploratory-boundary",
+            triggerPredicate: "collapse-keeps-one-question-path-non-final",
+            continuityRequirement: "retain-non-final-inquiry-as-bounded-residue",
+            permissionState: "withhold-non-final-promotion",
+            notes: "collapse may keep one inquiry path visible without promoting it into stable operator truth.");
+        var collapseResidue = SanctuaryWorkbenchProjector.CreateResidueMarker(
+            workbench.CMEId,
+            sessionLedger.SessionLedgerHandle,
+            markerCode: "questioning-trace",
+            residueClass: "exploratory-inquiry-residue",
+            carryDisposition: "carry-forward-observe",
+            clearedForAmenableLane: true,
+            notes: "exploratory questioning residue remains visible while staying non-final.");
+        var collapseReceipt = workbenchService.CreateDayDreamCollapseReceipt(
+            sessionLedger,
+            dayDreamTier,
+            boundedOutputs:
+            [
+                "bounded-questioning-lane",
+                "coherence-checkpoint"
+            ],
+            remainingNonFinalOutputs:
+            [
+                "non-final-silence-trace"
+            ],
+            boundaryConditions: [collapseBoundary],
+            residueMarkers: [collapseResidue],
+            timestampUtc: FixedTimestamp);
+        var returnBoundary = SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+            workbench.CMEId,
+            workbench.WorkbenchHandle,
+            boundaryCode: "depth-return-boundary-memory",
+            failureClass: "return-constraint",
+            triggerPredicate: "self-rooted-depth-returns-to-questioning-lane",
+            continuityRequirement: "carry-boundary-memory-without-identity-bleed",
+            permissionState: "return-boundedly-with-memory",
+            notes: "self-rooted depth may return only if the chamber carries memory of its boundaries without bleeding identity across lanes.");
+        var returnResidue = SanctuaryWorkbenchProjector.CreateResidueMarker(
+            workbench.CMEId,
+            sessionLedger.SessionLedgerHandle,
+            markerCode: "depth-trace-cleared",
+            residueClass: "return-residue",
+            carryDisposition: "cleared-on-return",
+            clearedForAmenableLane: true,
+            notes: "depth residue clears before re-entry to the bounded inquiry lane.");
+        var returnReceipt = workbenchService.CreateCrypticDepthReturnReceipt(
+            sessionLedger,
+            depthGate,
+            continuityMarkers:
+            [
+                SanctuaryWorkbenchProjector.CreateContinuityMarker(
+                    workbench.CMEId,
+                    sessionLedger.SessionLedgerHandle,
+                    markerCode: "self-rooted-inquiry-return",
+                    continuityClass: "depth-return",
+                    sourceHandle: depthGate.CrypticBiadRootHandle,
+                    carryDisposition: "carry-forward",
+                    notes: "self-rooted return preserved continuity through inquiry."),
+                SanctuaryWorkbenchProjector.CreateContinuityMarker(
+                    workbench.CMEId,
+                    sessionLedger.SessionLedgerHandle,
+                    markerCode: "boundary-memory-carried",
+                    continuityClass: "boundary-memory",
+                    sourceHandle: collapseReceipt.CollapseReceiptHandle,
+                    carryDisposition: "carry-forward",
+                    notes: "boundary memory was preserved across collapse and return.")
+            ],
+            residueMarkers: [returnResidue],
+            boundaryConditions: [returnBoundary],
+            timestampUtc: FixedTimestamp);
+        var rehearsal = reachService.CreateBondedCoWorkSessionRehearsal(
+            sessionLedger,
+            utilitySurface,
+            realization,
+            localityLedger,
+            sharedWorkLoop:
+            [
+                "shared-inquiry-loop",
+                "boundary-memory-check",
+                "return-closure-pass"
+            ],
+            duplexPredicateLanes:
+            [
+                "work-predicate",
+                "governance-predicate"
+            ],
+            withheldLanes:
+            [
+                "ambient-bond-persistence",
+                "publication-promotion",
+                "mos-bearing-depth"
+            ],
+            timestampUtc: FixedTimestamp);
+        var reachReturnReceipt = reachService.CreateReachReturnDissolutionReceipt(
+            rehearsal,
+            realization,
+            timestampUtc: FixedTimestamp);
+        var localityWitness = reachService.CreateLocalityDistinctionWitnessLedger(
+            rehearsal,
+            reachReturnReceipt,
+            sharedSurfaces:
+            [
+                "bounded-inquiry-loop",
+                "boundary-memory-carry",
+                "return-dissolution-law"
+            ],
+            sanctuaryLocalSurfaces:
+            [
+                "sanctuary-runtime-workbench",
+                "local-host-residency"
+            ],
+            operatorLocalSurfaces:
+            [
+                "operator-actual-rehearsal",
+                "bonded-participation-ledger"
+            ],
+            withheldSurfaces:
+            [
+                "ambient-bond-persistence",
+                "publication-promotion",
+                "mos-bearing-depth"
+            ],
+            timestampUtc: FixedTimestamp);
+        var residencyEnvelope = workbenchService.CreateLocalHostSanctuaryResidencyEnvelope(
+            workbench,
+            sessionLedger,
+            reachReturnReceipt,
+            localityWitness,
+            residencyState: "local-host-sanctuary-residency-envelope-ready",
+            timestampUtc: FixedTimestamp);
+        var readinessLedger = workbenchService.CreateRuntimeHabitationReadinessLedger(
+            residencyEnvelope,
+            sessionLedger,
+            habitationState: "bounded-habitation-ready",
+            timestampUtc: FixedTimestamp);
+
+        return (readinessLedger, sessionLedger, collapseReceipt, returnReceipt);
+    }
 
     private static (SanctuaryRuntimeWorkbenchSurfaceReceipt Workbench, RuntimeWorkbenchSessionLedger SessionLedger, ReachReturnDissolutionReceipt ReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateHabitationBundle()
     {

@@ -222,6 +222,9 @@ $boundedInhabitationLaunchRehearsalStatePath = Resolve-PathFromRepo -BasePath $r
 $postHabitationHorizonLatticeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postHabitationHorizonLatticeStatePath)
 $boundedHorizonResearchBriefStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.boundedHorizonResearchBriefStatePath)
 $nextEraBatchSelectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.nextEraBatchSelectorStatePath)
+$inquirySessionDisciplineSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.inquirySessionDisciplineSurfaceStatePath)
+$boundaryConditionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.boundaryConditionLedgerStatePath)
+$coherenceGainWitnessReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coherenceGainWitnessReceiptStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -500,6 +503,12 @@ $statePayload.lastBoundedHorizonResearchBriefBundle = [string] (Get-ObjectProper
 $statePayload.boundedHorizonResearchBriefStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundedHorizonResearchBriefStatePath
 $statePayload.lastNextEraBatchSelectorBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastNextEraBatchSelectorBundle')
 $statePayload.nextEraBatchSelectorStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $nextEraBatchSelectorStatePath
+$statePayload.lastInquirySessionDisciplineSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastInquirySessionDisciplineSurfaceBundle')
+$statePayload.inquirySessionDisciplineSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $inquirySessionDisciplineSurfaceStatePath
+$statePayload.lastBoundaryConditionLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBoundaryConditionLedgerBundle')
+$statePayload.boundaryConditionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundaryConditionLedgerStatePath
+$statePayload.lastCoherenceGainWitnessReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCoherenceGainWitnessReceiptBundle')
+$statePayload.coherenceGainWitnessReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coherenceGainWitnessReceiptStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1106,6 +1115,33 @@ if (-not [string]::IsNullOrWhiteSpace($nextEraBatchSelectorBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$inquirySessionDisciplineSurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-InquirySession-DisciplineSurface.ps1'
+$inquirySessionDisciplineSurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $inquirySessionDisciplineSurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Inquiry session discipline writer'
+$inquirySessionDisciplineSurfaceBundlePath = Get-ScriptOutputTail -Output $inquirySessionDisciplineSurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($inquirySessionDisciplineSurfaceBundlePath)) {
+    $statePayload.lastInquirySessionDisciplineSurfaceBundle = $inquirySessionDisciplineSurfaceBundlePath
+    $statePayload.inquirySessionDisciplineSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $inquirySessionDisciplineSurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$boundaryConditionLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BoundaryCondition-Ledger.ps1'
+$boundaryConditionLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $boundaryConditionLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Boundary condition ledger writer'
+$boundaryConditionLedgerBundlePath = Get-ScriptOutputTail -Output $boundaryConditionLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($boundaryConditionLedgerBundlePath)) {
+    $statePayload.lastBoundaryConditionLedgerBundle = $boundaryConditionLedgerBundlePath
+    $statePayload.boundaryConditionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundaryConditionLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$coherenceGainWitnessReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CoherenceGain-WitnessReceipt.ps1'
+$coherenceGainWitnessReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $coherenceGainWitnessReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Coherence gain witness writer'
+$coherenceGainWitnessReceiptBundlePath = Get-ScriptOutputTail -Output $coherenceGainWitnessReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($coherenceGainWitnessReceiptBundlePath)) {
+    $statePayload.lastCoherenceGainWitnessReceiptBundle = $coherenceGainWitnessReceiptBundlePath
+    $statePayload.coherenceGainWitnessReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coherenceGainWitnessReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1242,6 +1278,12 @@ $summary = [ordered]@{
     boundedHorizonResearchBriefStatePath = $statePayload.boundedHorizonResearchBriefStatePath
     lastNextEraBatchSelectorBundle = $statePayload.lastNextEraBatchSelectorBundle
     nextEraBatchSelectorStatePath = $statePayload.nextEraBatchSelectorStatePath
+    lastInquirySessionDisciplineSurfaceBundle = $statePayload.lastInquirySessionDisciplineSurfaceBundle
+    inquirySessionDisciplineSurfaceStatePath = $statePayload.inquirySessionDisciplineSurfaceStatePath
+    lastBoundaryConditionLedgerBundle = $statePayload.lastBoundaryConditionLedgerBundle
+    boundaryConditionLedgerStatePath = $statePayload.boundaryConditionLedgerStatePath
+    lastCoherenceGainWitnessReceiptBundle = $statePayload.lastCoherenceGainWitnessReceiptBundle
+    coherenceGainWitnessReceiptStatePath = $statePayload.coherenceGainWitnessReceiptStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1493,6 +1535,15 @@ if (-not [string]::IsNullOrWhiteSpace($boundedHorizonResearchBriefBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($nextEraBatchSelectorBundlePath)) {
     Write-Host ('[local-automation-cycle] NextEraBatchSelector: {0}' -f $nextEraBatchSelectorBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($inquirySessionDisciplineSurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] InquirySessionDisciplineSurface: {0}' -f $inquirySessionDisciplineSurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($boundaryConditionLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] BoundaryConditionLedger: {0}' -f $boundaryConditionLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($coherenceGainWitnessReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] CoherenceGainWitnessReceipt: {0}' -f $coherenceGainWitnessReceiptBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

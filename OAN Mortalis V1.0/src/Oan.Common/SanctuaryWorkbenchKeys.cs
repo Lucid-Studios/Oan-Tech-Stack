@@ -193,6 +193,50 @@ public static class SanctuaryWorkbenchKeys
         return $"bounded-inhabitation-launch-rehearsal://{ComputeDigest(cmeId, residencyEnvelopeHandle, readinessLedgerHandle, sessionLedgerHandle)}";
     }
 
+    public static string CreateInquirySessionDisciplineSurfaceHandle(
+        string cmeId,
+        string readinessLedgerHandle,
+        string sessionLedgerHandle,
+        string collapseReceiptHandle,
+        string returnReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(readinessLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(collapseReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnReceiptHandle);
+
+        return $"inquiry-session-discipline-surface://{ComputeDigest(cmeId, readinessLedgerHandle, sessionLedgerHandle, collapseReceiptHandle, returnReceiptHandle)}";
+    }
+
+    public static string CreateBoundaryConditionLedgerHandle(
+        string cmeId,
+        string readinessLedgerHandle,
+        string sessionLedgerHandle,
+        string inquirySurfaceHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(readinessLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inquirySurfaceHandle);
+
+        return $"boundary-condition-ledger://{ComputeDigest(cmeId, readinessLedgerHandle, sessionLedgerHandle, inquirySurfaceHandle)}";
+    }
+
+    public static string CreateCoherenceGainWitnessReceiptHandle(
+        string cmeId,
+        string readinessLedgerHandle,
+        string sessionLedgerHandle,
+        string boundaryLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(readinessLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(boundaryLedgerHandle);
+
+        return $"coherence-gain-witness-receipt://{ComputeDigest(cmeId, readinessLedgerHandle, sessionLedgerHandle, boundaryLedgerHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

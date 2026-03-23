@@ -71,6 +71,9 @@
   "postHabitationHorizonLatticeOutputRoot": ".audit/runs/post-habitation-horizon-lattice",
   "boundedHorizonResearchBriefOutputRoot": ".audit/runs/bounded-horizon-research-brief",
   "nextEraBatchSelectorOutputRoot": ".audit/runs/next-era-batch-selector",
+  "inquirySessionDisciplineSurfaceOutputRoot": ".audit/runs/inquiry-session-discipline-surface",
+  "boundaryConditionLedgerOutputRoot": ".audit/runs/boundary-condition-ledger",
+  "coherenceGainWitnessReceiptOutputRoot": ".audit/runs/coherence-gain-witness-receipt",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -140,6 +143,9 @@
   "postHabitationHorizonLatticeStatePath": ".audit/state/local-automation-post-habitation-horizon-lattice-last-run.json",
   "boundedHorizonResearchBriefStatePath": ".audit/state/local-automation-bounded-horizon-research-brief-last-run.json",
   "nextEraBatchSelectorStatePath": ".audit/state/local-automation-next-era-batch-selector-last-run.json",
+  "inquirySessionDisciplineSurfaceStatePath": ".audit/state/local-automation-inquiry-session-discipline-surface-last-run.json",
+  "boundaryConditionLedgerStatePath": ".audit/state/local-automation-boundary-condition-ledger-last-run.json",
+  "coherenceGainWitnessReceiptStatePath": ".audit/state/local-automation-coherence-gain-witness-receipt-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -238,6 +244,9 @@
     "keepPostHabitationHorizonLatticeBundles": 8,
     "keepBoundedHorizonResearchBriefBundles": 8,
     "keepNextEraBatchSelectorBundles": 8,
+    "keepInquirySessionDisciplineSurfaceBundles": 8,
+    "keepBoundaryConditionLedgerBundles": 8,
+    "keepCoherenceGainWitnessReceiptBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

@@ -179,6 +179,59 @@ public sealed record BoundedInhabitationLaunchRehearsalReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record InquirySessionDisciplineSurfaceReceipt(
+    string InquirySurfaceHandle,
+    string CMEId,
+    string ReadinessLedgerHandle,
+    string SessionLedgerHandle,
+    string CollapseReceiptHandle,
+    string ReturnReceiptHandle,
+    string InquiryState,
+    IReadOnlyList<string> InquiryStances,
+    IReadOnlyList<string> AssumptionExposureModes,
+    IReadOnlyList<string> SilenceDispositions,
+    bool ChamberNativeInquiryBound,
+    bool HiddenPressureDenied,
+    bool PrematureGelPromotionDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record BoundaryConditionLedgerReceipt(
+    string BoundaryLedgerHandle,
+    string CMEId,
+    string ReadinessLedgerHandle,
+    string SessionLedgerHandle,
+    string InquirySurfaceHandle,
+    string CollapseReceiptHandle,
+    string ReturnReceiptHandle,
+    string LedgerState,
+    IReadOnlyList<BoundaryCondition> RetainedBoundaryConditions,
+    IReadOnlyList<string> ContinuityRequirements,
+    IReadOnlyList<string> WithheldCrossings,
+    bool BoundaryMemoryCarriedForward,
+    bool FailurePunishmentDenied,
+    bool IdentityBleedDetected,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record CoherenceGainWitnessReceipt(
+    string CoherenceWitnessHandle,
+    string CMEId,
+    string ReadinessLedgerHandle,
+    string SessionLedgerHandle,
+    string InquirySurfaceHandle,
+    string BoundaryLedgerHandle,
+    string WitnessState,
+    string CoherenceState,
+    int CoherencePreservingEventCount,
+    int HiddenAssumptionDeniedCount,
+    int BoundaryConditionCount,
+    bool SharedIntelligibilityPreserved,
+    bool AdmissibilitySpacePreserved,
+    bool PrematureClosureDetected,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class SanctuaryWorkbenchProjector
 {
     private const string AgentiActualSurfacePrefix = "agenticore-actual-surface://";
@@ -198,6 +251,9 @@ public static class SanctuaryWorkbenchProjector
     private const string LocalityDistinctionWitnessPrefix = "locality-distinction-witness-ledger://";
     private const string LocalHostResidencyEnvelopePrefix = "local-host-sanctuary-residency-envelope://";
     private const string RuntimeHabitationReadinessLedgerPrefix = "runtime-habitation-readiness-ledger://";
+    private const string InquirySessionDisciplinePrefix = "inquiry-session-discipline-surface://";
+    private const string BoundaryConditionLedgerPrefix = "boundary-condition-ledger://";
+    private const string CoherenceGainWitnessPrefix = "coherence-gain-witness-receipt://";
 
     public static SanctuaryRuntimeWorkbenchSurfaceReceipt CreateRuntimeWorkbenchSurface(
         AgentiActualUtilitySurfaceReceipt utilitySurface,
@@ -833,6 +889,211 @@ public static class SanctuaryWorkbenchProjector
             AmbientBondDenied: true,
             PublicationPromotionDenied: true,
             ReasonCode: "bounded-inhabitation-launch-rehearsal-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static InquirySessionDisciplineSurfaceReceipt CreateInquirySessionDisciplineSurface(
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        DayDreamCollapseReceipt collapseReceipt,
+        CrypticDepthReturnReceipt returnReceipt,
+        string inquiryState = "inquiry-session-discipline-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(collapseReceipt);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        EnsurePrefix(readinessLedger.ReadinessLedgerHandle, RuntimeHabitationReadinessLedgerPrefix, nameof(readinessLedger));
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(collapseReceipt.CollapseReceiptHandle, DayDreamCollapsePrefix, nameof(collapseReceipt));
+        EnsurePrefix(returnReceipt.ReturnReceiptHandle, CrypticDepthReturnPrefix, nameof(returnReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(inquiryState);
+
+        if (!string.Equals(readinessLedger.CMEId, sessionLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, collapseReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, returnReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.SessionLedgerHandle, sessionLedger.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, collapseReceipt.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, returnReceipt.SessionLedgerHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Inquiry session discipline requires readiness, session, collapse, and return receipts to remain inside one bounded habitation chamber.");
+        }
+
+        var inquiryStances = new[]
+        {
+            "clarify",
+            "open",
+            "probe",
+            "challenge"
+        };
+        var assumptionExposureModes = new[]
+        {
+            "surface-hidden-assumption",
+            "declare-constraint",
+            "test-readiness-without-forcing-closure"
+        };
+        var silenceDispositions = new[]
+        {
+            "hold-forming-state",
+            "withhold-premature-question"
+        };
+
+        return new InquirySessionDisciplineSurfaceReceipt(
+            InquirySurfaceHandle: SanctuaryWorkbenchKeys.CreateInquirySessionDisciplineSurfaceHandle(
+                readinessLedger.CMEId,
+                readinessLedger.ReadinessLedgerHandle,
+                sessionLedger.SessionLedgerHandle,
+                collapseReceipt.CollapseReceiptHandle,
+                returnReceipt.ReturnReceiptHandle),
+            CMEId: readinessLedger.CMEId,
+            ReadinessLedgerHandle: readinessLedger.ReadinessLedgerHandle,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            CollapseReceiptHandle: collapseReceipt.CollapseReceiptHandle,
+            ReturnReceiptHandle: returnReceipt.ReturnReceiptHandle,
+            InquiryState: inquiryState.Trim(),
+            InquiryStances: inquiryStances,
+            AssumptionExposureModes: assumptionExposureModes,
+            SilenceDispositions: silenceDispositions,
+            ChamberNativeInquiryBound: true,
+            HiddenPressureDenied: true,
+            PrematureGelPromotionDenied: true,
+            ReasonCode: "inquiry-session-discipline-surface-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BoundaryConditionLedgerReceipt CreateBoundaryConditionLedger(
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        InquirySessionDisciplineSurfaceReceipt inquirySurface,
+        DayDreamCollapseReceipt collapseReceipt,
+        CrypticDepthReturnReceipt returnReceipt,
+        string ledgerState = "boundary-condition-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(inquirySurface);
+        ArgumentNullException.ThrowIfNull(collapseReceipt);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        EnsurePrefix(readinessLedger.ReadinessLedgerHandle, RuntimeHabitationReadinessLedgerPrefix, nameof(readinessLedger));
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(inquirySurface.InquirySurfaceHandle, InquirySessionDisciplinePrefix, nameof(inquirySurface));
+        EnsurePrefix(collapseReceipt.CollapseReceiptHandle, DayDreamCollapsePrefix, nameof(collapseReceipt));
+        EnsurePrefix(returnReceipt.ReturnReceiptHandle, CrypticDepthReturnPrefix, nameof(returnReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(readinessLedger.CMEId, sessionLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, inquirySurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, collapseReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, returnReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.SessionLedgerHandle, sessionLedger.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, inquirySurface.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, collapseReceipt.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, returnReceipt.SessionLedgerHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Boundary condition ledger requires readiness, session, inquiry, collapse, and return receipts to remain inside one bounded habitation chamber.");
+        }
+
+        var retainedBoundaryConditions = sessionLedger.BoundaryConditions
+            .Concat(collapseReceipt.BoundaryConditions)
+            .Concat(returnReceipt.BoundaryConditions)
+            .Distinct()
+            .ToArray();
+        var continuityRequirements = retainedBoundaryConditions
+            .Select(static condition => condition.ContinuityRequirement)
+            .Where(static value => !string.IsNullOrWhiteSpace(value))
+            .Select(static value => value.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var withheldCrossings = retainedBoundaryConditions
+            .Select(static condition => condition.TriggerPredicate)
+            .Where(static value => !string.IsNullOrWhiteSpace(value))
+            .Select(static value => value.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        return new BoundaryConditionLedgerReceipt(
+            BoundaryLedgerHandle: SanctuaryWorkbenchKeys.CreateBoundaryConditionLedgerHandle(
+                readinessLedger.CMEId,
+                readinessLedger.ReadinessLedgerHandle,
+                sessionLedger.SessionLedgerHandle,
+                inquirySurface.InquirySurfaceHandle),
+            CMEId: readinessLedger.CMEId,
+            ReadinessLedgerHandle: readinessLedger.ReadinessLedgerHandle,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            InquirySurfaceHandle: inquirySurface.InquirySurfaceHandle,
+            CollapseReceiptHandle: collapseReceipt.CollapseReceiptHandle,
+            ReturnReceiptHandle: returnReceipt.ReturnReceiptHandle,
+            LedgerState: ledgerState.Trim(),
+            RetainedBoundaryConditions: retainedBoundaryConditions,
+            ContinuityRequirements: continuityRequirements,
+            WithheldCrossings: withheldCrossings,
+            BoundaryMemoryCarriedForward: retainedBoundaryConditions.Length > 0,
+            FailurePunishmentDenied: true,
+            IdentityBleedDetected: returnReceipt.IdentityBleedDetected,
+            ReasonCode: "boundary-condition-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static CoherenceGainWitnessReceipt CreateCoherenceGainWitnessReceipt(
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        InquirySessionDisciplineSurfaceReceipt inquirySurface,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        string witnessState = "coherence-gain-witness-receipt-ready",
+        string coherenceState = "coherence-gain-witnessed",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(inquirySurface);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        EnsurePrefix(readinessLedger.ReadinessLedgerHandle, RuntimeHabitationReadinessLedgerPrefix, nameof(readinessLedger));
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(inquirySurface.InquirySurfaceHandle, InquirySessionDisciplinePrefix, nameof(inquirySurface));
+        EnsurePrefix(boundaryLedger.BoundaryLedgerHandle, BoundaryConditionLedgerPrefix, nameof(boundaryLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(witnessState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coherenceState);
+
+        if (!string.Equals(readinessLedger.CMEId, sessionLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, inquirySurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.CMEId, boundaryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(readinessLedger.SessionLedgerHandle, sessionLedger.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, inquirySurface.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(sessionLedger.SessionLedgerHandle, boundaryLedger.SessionLedgerHandle, StringComparison.Ordinal) ||
+            !string.Equals(inquirySurface.InquirySurfaceHandle, boundaryLedger.InquirySurfaceHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Coherence gain witness requires readiness, session, inquiry, and boundary ledgers to remain inside one bounded habitation chamber.");
+        }
+
+        var coherencePreservingEventCount = sessionLedger.SessionEvents.Count(static item => item.CoherencePreserving);
+        var hiddenAssumptionDeniedCount = sessionLedger.SessionEvents.Count(static item => item.HiddenAssumptionDenied);
+        var boundaryConditionCount = boundaryLedger.RetainedBoundaryConditions.Count;
+        var prematureClosureDetected = sessionLedger.SessionEvents.Any(static item =>
+            string.Equals(item.EventKind, "closure", StringComparison.Ordinal) &&
+            !item.CoherencePreserving);
+
+        return new CoherenceGainWitnessReceipt(
+            CoherenceWitnessHandle: SanctuaryWorkbenchKeys.CreateCoherenceGainWitnessReceiptHandle(
+                readinessLedger.CMEId,
+                readinessLedger.ReadinessLedgerHandle,
+                sessionLedger.SessionLedgerHandle,
+                boundaryLedger.BoundaryLedgerHandle),
+            CMEId: readinessLedger.CMEId,
+            ReadinessLedgerHandle: readinessLedger.ReadinessLedgerHandle,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            InquirySurfaceHandle: inquirySurface.InquirySurfaceHandle,
+            BoundaryLedgerHandle: boundaryLedger.BoundaryLedgerHandle,
+            WitnessState: witnessState.Trim(),
+            CoherenceState: coherenceState.Trim(),
+            CoherencePreservingEventCount: coherencePreservingEventCount,
+            HiddenAssumptionDeniedCount: hiddenAssumptionDeniedCount,
+            BoundaryConditionCount: boundaryConditionCount,
+            SharedIntelligibilityPreserved: coherencePreservingEventCount > 0 && !boundaryLedger.IdentityBleedDetected,
+            AdmissibilitySpacePreserved: inquirySurface.HiddenPressureDenied && inquirySurface.PrematureGelPromotionDenied,
+            PrematureClosureDetected: prematureClosureDetected,
+            ReasonCode: "coherence-gain-witness-receipt-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 
