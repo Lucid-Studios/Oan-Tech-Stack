@@ -524,6 +524,51 @@ Current live output surfaces for this map:
 - bonded crucible rehearsal remains bounded to future inquiry-discipline and shared-unknown surfaces until its dedicated rehearsal bundle exists
 - shared boundary memory remains bounded to current locality witness, return law, and future inquiry boundary receipts until its dedicated ledger root is declared
 
+### Automation Maturation Map 28
+
+- Goal: retain what the crucible actually teaches by making continuity under pressure, expressive deformation, and mutual intelligibility first-class bounded receipts before any inquiry pattern is reused
+- Expected review windows: `2`
+- Selected tasks:
+  - `Continuity Under Pressure Ledger`
+  - `Expressive Deformation Receipt`
+  - `Mutual Intelligibility Witness`
+
+Current live output surfaces for this map:
+
+- continuity under-pressure evidence remains bounded to future bonded crucible, shared boundary-memory, and chamber-native inquiry surfaces until its dedicated ledger root is declared
+- expressive deformation remains bounded to future crucible session and inquiry-discipline receipts until its dedicated deformation bundle exists
+- mutual intelligibility remains bounded to locality distinction, bonded co-work, and future crucible witness surfaces until its dedicated witness root is declared
+
+### Automation Maturation Map 29
+
+- Goal: convert crucible evidence into bounded carry-forward inquiry memory so future approaches can be selected from what held and what broke without turning boundary memory into identity bleed
+- Expected review windows: `2`
+- Selected tasks:
+  - `Inquiry Pattern Continuity Ledger`
+  - `Questioning Boundary Pair Ledger`
+  - `Carry-Forward Inquiry Selection Surface`
+
+Current live output surfaces for this map:
+
+- inquiry pattern continuity remains bounded to future pressure, deformation, and coherence witness surfaces until its dedicated carry-forward ledger root is declared
+- questioning boundary pairs remain bounded to current boundary-memory and future crucible pressure receipts until their dedicated pair-ledger bundle exists
+- carry-forward inquiry selection remains bounded to operator inquiry selection, locality distinction, and future pattern-memory surfaces until its dedicated selection surface is declared
+
+### Automation Maturation Map 30
+
+- Goal: open a guarded promotion lane for questioning operators as GEL candidates only when continuity and boundary evidence justify reuse, while keeping locality, authority, and promotion law intact
+- Expected review windows: `2`
+- Selected tasks:
+  - `Questioning Operator Candidate Ledger`
+  - `Questioning GEL Promotion Gate`
+  - `Protected Questioning Pattern Surface`
+
+Current live output surfaces for this map:
+
+- questioning operator candidacy remains bounded to future inquiry-pattern continuity, boundary-pair, and crucible evidence surfaces until its dedicated candidate ledger root is declared
+- questioning GEL promotion remains bounded to current promotion law and future inquiry-candidate evidence until its dedicated gate surface is declared
+- protected questioning pattern legibility remains bounded to future candidate and locality-safe review surfaces until its dedicated protected pattern bundle exists
+
 ## Status Interpretation
 
 The task board must distinguish between:

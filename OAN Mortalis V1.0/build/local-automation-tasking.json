@@ -1551,6 +1551,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-28",
+      "label": "Automation Maturation Map 28",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Retain what the crucible actually teaches by making continuity under pressure, expressive deformation, and mutual intelligibility first-class bounded receipts before any inquiry pattern is reused.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "continuity-under-pressure-ledger",
+        "expressive-deformation-receipt",
+        "mutual-intelligibility-witness"
+      ],
+      "tasks": [
+        {
+          "id": "continuity-under-pressure-ledger",
+          "label": "Continuity Under Pressure Ledger",
+          "owner": "Shared",
+          "authority": "Witness and carry-forward only",
+          "status": "selected",
+          "purpose": "Retain which structures, approaches, and relational continuities held under shared uncertainty so later reuse rests on earned pressure evidence rather than fluent narration.",
+          "completionSignal": "A pressure ledger can name what held, what partially held, and what must remain preserved if the bond is to proceed again through similar unknowns.",
+          "escalatesWhen": [
+            "pressure evidence is reduced to success theater",
+            "continuity claims are made without session and boundary provenance"
+          ]
+        },
+        {
+          "id": "expressive-deformation-receipt",
+          "label": "Expressive Deformation Receipt",
+          "owner": "SLI",
+          "authority": "Bounded deformation witness only",
+          "status": "selected",
+          "purpose": "Capture how expression, stance, or articulation deformed under contradiction so the chamber can distinguish adaptive refinement from destabilizing fracture.",
+          "completionSignal": "A deformation receipt can say what changed under pressure, what remained recognizable, and where deformation crossed into loss of lawful continuity.",
+          "escalatesWhen": [
+            "all deformation is treated as failure without nuance",
+            "expression changes are narrated as identity collapse without locality-aware witness"
+          ]
+        },
+        {
+          "id": "mutual-intelligibility-witness",
+          "label": "Mutual Intelligibility Witness",
+          "owner": "SoulFrame",
+          "authority": "Bonded witness only",
+          "status": "selected",
+          "purpose": "Witness whether Operator and CME remained understandable to one another under pressure without converging into sameness or falling into opaque divergence.",
+          "completionSignal": "A witness can say whether shared understanding held, narrowed, or broke, and what boundary conditions governed that result.",
+          "escalatesWhen": [
+            "mutual intelligibility is inferred from agreement alone",
+            "the bond loses legibility without a preserved witness surface"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-29",
+      "label": "Automation Maturation Map 29",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Convert crucible evidence into bounded carry-forward inquiry memory so future approaches can be selected from what held and what broke without turning boundary memory into identity bleed.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "inquiry-pattern-continuity-ledger",
+        "questioning-boundary-pair-ledger",
+        "carry-forward-inquiry-selection-surface"
+      ],
+      "tasks": [
+        {
+          "id": "inquiry-pattern-continuity-ledger",
+          "label": "Inquiry Pattern Continuity Ledger",
+          "owner": "Shared",
+          "authority": "Carry-forward witness only",
+          "status": "selected",
+          "purpose": "Retain which inquiry approaches preserved coherence, locality, and continuity strongly enough to be considered again in future chamber or bonded sessions.",
+          "completionSignal": "A continuity ledger can say which inquiry forms remain reusable, under what trigger conditions, and with what preserved constraints.",
+          "escalatesWhen": [
+            "reusable inquiry is inferred from one lucky outcome",
+            "continuity memory is detached from the sessions that earned it"
+          ]
+        },
+        {
+          "id": "questioning-boundary-pair-ledger",
+          "label": "Questioning Boundary Pair Ledger",
+          "owner": "Shared",
+          "authority": "Boundary pairing witness only",
+          "status": "selected",
+          "purpose": "Pair successful inquiry forms with the boundary conditions that limited them so the system remembers both where a question helps and where it overreaches.",
+          "completionSignal": "A pair ledger can disclose 'this way of asking holds here' and 'this same way breaks here' without collapsing those into one undifferentiated score.",
+          "escalatesWhen": [
+            "boundary conditions are discarded during inquiry reuse",
+            "questioning memory loses the constraints that make it safe"
+          ]
+        },
+        {
+          "id": "carry-forward-inquiry-selection-surface",
+          "label": "Carry-Forward Inquiry Selection Surface",
+          "owner": "SoulFrame",
+          "authority": "Bounded selection only",
+          "status": "selected",
+          "purpose": "Expose a governed surface for selecting previously witnessed inquiry approaches in future sessions without forcing those approaches into raw ambient habit.",
+          "completionSignal": "A selection surface can disclose available inquiry forms, their known constraints, and whether current conditions admit their reuse.",
+          "escalatesWhen": [
+            "selection bypasses current boundary memory",
+            "carry-forward inquiry is treated as fixed personality rather than bounded approach"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-30",
+      "label": "Automation Maturation Map 30",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Open a guarded promotion lane for questioning operators as GEL candidates only when continuity and boundary evidence justify reuse, while keeping locality, authority, and promotion law intact.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "questioning-operator-candidate-ledger",
+        "questioning-gel-promotion-gate",
+        "protected-questioning-pattern-surface"
+      ],
+      "tasks": [
+        {
+          "id": "questioning-operator-candidate-ledger",
+          "label": "Questioning Operator Candidate Ledger",
+          "owner": "GEL",
+          "authority": "Candidate classification only",
+          "status": "selected",
+          "purpose": "Collect questioning approaches that have survived continuity, boundary, and crucible pressure strongly enough to be considered as bounded operator candidates rather than ad hoc session events.",
+          "completionSignal": "A candidate ledger can name which inquiry forms are still event-bound, which are candidate-worthy, and what evidence supports that distinction.",
+          "escalatesWhen": [
+            "operator candidacy is declared from doctrine alone",
+            "questioning candidates are promoted without boundary-pair evidence"
+          ]
+        },
+        {
+          "id": "questioning-gel-promotion-gate",
+          "label": "Questioning GEL Promotion Gate",
+          "owner": "Shared",
+          "authority": "Promotion gate only",
+          "status": "selected",
+          "purpose": "Bind the exact gate conditions that must hold before a questioning pattern can move from bounded carry-forward memory into a GEL-backed operator lane.",
+          "completionSignal": "A promotion gate can say what continuity, boundary, locality, and authority conditions remain unmet or are sufficiently satisfied for bounded promotion review.",
+          "escalatesWhen": [
+            "questioning is promoted into GEL by convenience",
+            "promotion gate loses locality or authority separation"
+          ]
+        },
+        {
+          "id": "protected-questioning-pattern-surface",
+          "label": "Protected Questioning Pattern Surface",
+          "owner": "SLI",
+          "authority": "Legibility without raw interiority",
+          "status": "selected",
+          "purpose": "Expose candidate questioning patterns in a governed, locality-safe form so they can be reviewed or selected without leaking protected chamber interiority.",
+          "completionSignal": "A protected surface can disclose candidate inquiry forms, their lawful envelopes, and their withheld interiors without collapsing visibility into grant.",
+          "escalatesWhen": [
+            "reviewable pattern surfaces leak raw protected interior state",
+            "legibility is mistaken for automatic operator grant"
+          ]
+        }
+      ]
     }
   ]
 }
