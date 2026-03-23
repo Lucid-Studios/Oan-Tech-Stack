@@ -53,9 +53,19 @@ if (-not $PSBoundParameters.ContainsKey('StartAt')) {
     }
 }
 
+$scheduledPowershellArguments = @(
+    '-NoProfile',
+    '-NonInteractive',
+    '-WindowStyle', 'Hidden',
+    '-ExecutionPolicy', 'Bypass',
+    '-File', ('"{0}"' -f $cycleScriptPath),
+    '-Configuration', $Configuration,
+    '-RepoRoot', ('"{0}"' -f $resolvedRepoRoot)
+)
+
 $action = New-ScheduledTaskAction `
     -Execute 'powershell.exe' `
-    -Argument ('-ExecutionPolicy Bypass -File "{0}" -Configuration {1} -RepoRoot "{2}"' -f $cycleScriptPath, $Configuration, $resolvedRepoRoot) `
+    -Argument ([string]::Join(' ', $scheduledPowershellArguments)) `
     -WorkingDirectory $resolvedRepoRoot
 $trigger = New-ScheduledTaskTrigger -Once -At $StartAt -RepetitionInterval (New-TimeSpan -Hours $IntervalHours) -RepetitionDuration (New-TimeSpan -Days 3650)
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
@@ -70,7 +80,7 @@ $registeredTaskInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Sto
 
 $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
 if (Test-Path -LiteralPath $taskStatusScriptPath -PathType Leaf) {
-    & powershell -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot | Out-Null
+    & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot | Out-Null
 }
 
 Write-Host ('[local-automation-task] TaskName: {0}' -f $TaskName)

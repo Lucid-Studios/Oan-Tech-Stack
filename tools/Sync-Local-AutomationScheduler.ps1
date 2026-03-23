@@ -116,7 +116,7 @@ $driftMinutes = if ($null -ne $previousNextRunUtc) {
 
 if (-not $registeredBefore -or $driftMinutes -gt $toleranceMinutes) {
     $installScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationCycleTask.ps1'
-    & powershell -ExecutionPolicy Bypass -File $installScriptPath `
+    & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $installScriptPath `
         -RepoRoot $resolvedRepoRoot `
         -TaskName $taskName `
         -Configuration $Configuration `

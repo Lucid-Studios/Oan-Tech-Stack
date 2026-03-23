@@ -119,7 +119,7 @@ function Invoke-ChildPowershellScript {
         [string] $FailureContext
     )
 
-    $output = & powershell @ArgumentList
+    $output = & powershell -NoProfile -NonInteractive -WindowStyle Hidden @ArgumentList
     if ($LASTEXITCODE -ne 0) {
         throw '{0} failed with exit code {1}.' -f $FailureContext, $LASTEXITCODE
     }

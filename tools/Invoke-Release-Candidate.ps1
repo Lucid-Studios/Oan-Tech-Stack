@@ -97,7 +97,7 @@ function Invoke-ChildPowershellScript {
         [string] $FailureContext
     )
 
-    $output = & powershell @ArgumentList 2>&1
+    $output = & powershell -NoProfile -NonInteractive -WindowStyle Hidden @ArgumentList 2>&1
     if ($LASTEXITCODE -ne 0) {
         $tail = Get-ScriptOutputTail -Output $output
         if ($tail.Count -gt 0) {
