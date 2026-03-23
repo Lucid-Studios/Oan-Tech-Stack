@@ -231,6 +231,7 @@ This clarification does not activate:
 - post-Dream promotion logic
 - final encrypted `OE` or `cOE` append spline formation
 - full `MoS` pointerization rules
+- full `MoS.Actual` first-vessel, lawful fracture, or shared gold-repair law
 - broader `cGEL` or community externalization
 
 For this phase, the corrected mental model stops at:
@@ -239,6 +240,10 @@ For this phase, the corrected mental model stops at:
 - first protected contextual peel to `cGoA`
 - protected autobiographical and continuity-adjacent holding in `cMoS`
 - later non-personification enrichment payloads that may also route to `cGoA` before Dream
+
+Later `MoS.Actual` first-vessel and repair law is defined separately in:
+
+- `docs/MOS_ACTUAL_FIRST_VESSEL_AND_REPAIR_LAW.md`
 
 ## Implication For Current Runtime Vocabulary
 
