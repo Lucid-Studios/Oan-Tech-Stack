@@ -176,6 +176,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $InquirySessionDisciplineSurfaceState,
         [object] $BoundaryConditionLedgerState,
         [object] $CoherenceGainWitnessReceiptState,
+        [object] $OperatorInquirySelectionEnvelopeState,
+        [object] $BondedCrucibleSessionRehearsalState,
+        [object] $SharedBoundaryMemoryLedgerState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -815,6 +818,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'operator-inquiry-selection-envelope' {
+            if ($null -ne $OperatorInquirySelectionEnvelopeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'bonded-crucible-session-rehearsal' {
+            if ($null -ne $BondedCrucibleSessionRehearsalState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'shared-boundary-memory-ledger' {
+            if ($null -ne $SharedBoundaryMemoryLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -933,6 +963,9 @@ $nextEraBatchSelectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoo
 $inquirySessionDisciplineSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.inquirySessionDisciplineSurfaceStatePath)
 $boundaryConditionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.boundaryConditionLedgerStatePath)
 $coherenceGainWitnessReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coherenceGainWitnessReceiptStatePath)
+$operatorInquirySelectionEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorInquirySelectionEnvelopeStatePath)
+$bondedCrucibleSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedCrucibleSessionRehearsalStatePath)
+$sharedBoundaryMemoryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sharedBoundaryMemoryLedgerStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1004,6 +1037,9 @@ $nextEraBatchSelectorState = Read-JsonFileOrNull -Path $nextEraBatchSelectorStat
 $inquirySessionDisciplineSurfaceState = Read-JsonFileOrNull -Path $inquirySessionDisciplineSurfaceStatePath
 $boundaryConditionLedgerState = Read-JsonFileOrNull -Path $boundaryConditionLedgerStatePath
 $coherenceGainWitnessReceiptState = Read-JsonFileOrNull -Path $coherenceGainWitnessReceiptStatePath
+$operatorInquirySelectionEnvelopeState = Read-JsonFileOrNull -Path $operatorInquirySelectionEnvelopeStatePath
+$bondedCrucibleSessionRehearsalState = Read-JsonFileOrNull -Path $bondedCrucibleSessionRehearsalStatePath
+$sharedBoundaryMemoryLedgerState = Read-JsonFileOrNull -Path $sharedBoundaryMemoryLedgerStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1221,6 +1257,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -InquirySessionDisciplineSurfaceState $inquirySessionDisciplineSurfaceState `
                 -BoundaryConditionLedgerState $boundaryConditionLedgerState `
                 -CoherenceGainWitnessReceiptState $coherenceGainWitnessReceiptState `
+                -OperatorInquirySelectionEnvelopeState $operatorInquirySelectionEnvelopeState `
+                -BondedCrucibleSessionRehearsalState $bondedCrucibleSessionRehearsalState `
+                -SharedBoundaryMemoryLedgerState $sharedBoundaryMemoryLedgerState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1346,6 +1385,9 @@ $taskMapEntries = @(
                     -InquirySessionDisciplineSurfaceState $inquirySessionDisciplineSurfaceState `
                     -BoundaryConditionLedgerState $boundaryConditionLedgerState `
                     -CoherenceGainWitnessReceiptState $coherenceGainWitnessReceiptState `
+                    -OperatorInquirySelectionEnvelopeState $operatorInquirySelectionEnvelopeState `
+                    -BondedCrucibleSessionRehearsalState $bondedCrucibleSessionRehearsalState `
+                    -SharedBoundaryMemoryLedgerState $sharedBoundaryMemoryLedgerState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1740,6 +1782,36 @@ $statusPayload = [ordered]@{
         coherenceGainWitnessSharedIntelligibilityPreserved = if ($null -ne $coherenceGainWitnessReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coherenceGainWitnessReceiptState -PropertyName 'sharedIntelligibilityPreserved') } else { $null }
         coherenceGainWitnessAdmissibilitySpacePreserved = if ($null -ne $coherenceGainWitnessReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coherenceGainWitnessReceiptState -PropertyName 'admissibilitySpacePreserved') } else { $null }
         coherenceGainWitnessPrematureClosureDetected = if ($null -ne $coherenceGainWitnessReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coherenceGainWitnessReceiptState -PropertyName 'prematureClosureDetected') } else { $null }
+        operatorInquirySelectionEnvelopeState = if ($null -ne $operatorInquirySelectionEnvelopeState) { [string] $operatorInquirySelectionEnvelopeState.operatorInquirySelectionEnvelopeState } else { $null }
+        operatorInquirySelectionEnvelopeReason = if ($null -ne $operatorInquirySelectionEnvelopeState) { [string] $operatorInquirySelectionEnvelopeState.reasonCode } else { $null }
+        operatorInquirySelectionEnvelopeNextAction = if ($null -ne $operatorInquirySelectionEnvelopeState) { [string] $operatorInquirySelectionEnvelopeState.nextAction } else { $null }
+        operatorInquirySelectionState = if ($null -ne $operatorInquirySelectionEnvelopeState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'operatorInquirySelectionState') } else { $null }
+        operatorInquirySelectionAvailableInquiryStanceCount = if ($null -ne $operatorInquirySelectionEnvelopeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'availableInquiryStanceCount') } else { $null }
+        operatorInquirySelectionKnownBoundaryWarningCount = if ($null -ne $operatorInquirySelectionEnvelopeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'knownBoundaryWarningCount') } else { $null }
+        operatorInquirySelectionLawfulUseConditionCount = if ($null -ne $operatorInquirySelectionEnvelopeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'lawfulUseConditionCount') } else { $null }
+        operatorInquirySelectionProtectedInteriorityDenied = if ($null -ne $operatorInquirySelectionEnvelopeState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'protectedInteriorityDenied') } else { $null }
+        operatorInquirySelectionLocalityBypassDenied = if ($null -ne $operatorInquirySelectionEnvelopeState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'localityBypassDenied') } else { $null }
+        operatorInquirySelectionRawGrantDenied = if ($null -ne $operatorInquirySelectionEnvelopeState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'rawGrantDenied') } else { $null }
+        bondedCrucibleSessionRehearsalState = if ($null -ne $bondedCrucibleSessionRehearsalState) { [string] $bondedCrucibleSessionRehearsalState.bondedCrucibleSessionRehearsalState } else { $null }
+        bondedCrucibleSessionRehearsalReason = if ($null -ne $bondedCrucibleSessionRehearsalState) { [string] $bondedCrucibleSessionRehearsalState.reasonCode } else { $null }
+        bondedCrucibleSessionRehearsalNextAction = if ($null -ne $bondedCrucibleSessionRehearsalState) { [string] $bondedCrucibleSessionRehearsalState.nextAction } else { $null }
+        bondedCrucibleState = if ($null -ne $bondedCrucibleSessionRehearsalState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'crucibleState') } else { $null }
+        bondedCrucibleSelectedInquiryStanceCount = if ($null -ne $bondedCrucibleSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'selectedInquiryStanceCount') } else { $null }
+        bondedCrucibleSharedUnknownFacetCount = if ($null -ne $bondedCrucibleSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'sharedUnknownFacetCount') } else { $null }
+        bondedCrucibleCoordinationHoldCount = if ($null -ne $bondedCrucibleSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'coordinationHoldCount') } else { $null }
+        bondedCrucibleExposedBoundaryCount = if ($null -ne $bondedCrucibleSessionRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'exposedBoundaryCount') } else { $null }
+        bondedCruciblePreScriptedAnswerDenied = if ($null -ne $bondedCrucibleSessionRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'preScriptedAnswerDenied') } else { $null }
+        bondedCrucibleRemoteDominanceDenied = if ($null -ne $bondedCrucibleSessionRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'remoteDominanceDenied') } else { $null }
+        sharedBoundaryMemoryLedgerState = if ($null -ne $sharedBoundaryMemoryLedgerState) { [string] $sharedBoundaryMemoryLedgerState.sharedBoundaryMemoryLedgerState } else { $null }
+        sharedBoundaryMemoryLedgerReason = if ($null -ne $sharedBoundaryMemoryLedgerState) { [string] $sharedBoundaryMemoryLedgerState.reasonCode } else { $null }
+        sharedBoundaryMemoryLedgerNextAction = if ($null -ne $sharedBoundaryMemoryLedgerState) { [string] $sharedBoundaryMemoryLedgerState.nextAction } else { $null }
+        sharedBoundaryMemoryState = if ($null -ne $sharedBoundaryMemoryLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'sharedBoundaryMemoryState') } else { $null }
+        sharedBoundaryMemorySharedBoundaryConditionCount = if ($null -ne $sharedBoundaryMemoryLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'sharedBoundaryConditionCount') } else { $null }
+        sharedBoundaryMemorySharedContinuityRequirementCount = if ($null -ne $sharedBoundaryMemoryLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'sharedContinuityRequirementCount') } else { $null }
+        sharedBoundaryMemoryWithheldCommonPropertyClaimCount = if ($null -ne $sharedBoundaryMemoryLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'withheldCommonPropertyClaimCount') } else { $null }
+        sharedBoundaryMemoryLocalityProvenancePreserved = if ($null -ne $sharedBoundaryMemoryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'localityProvenancePreserved') } else { $null }
+        sharedBoundaryMemoryIdentityBleedDetected = if ($null -ne $sharedBoundaryMemoryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'identityBleedDetected') } else { $null }
+        sharedBoundaryMemoryAmbientCommonPropertyDenied = if ($null -ne $sharedBoundaryMemoryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'ambientCommonPropertyDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2730,6 +2802,60 @@ if ($null -ne $coherenceGainWitnessReceiptState) {
     )
 }
 
+if ($null -ne $operatorInquirySelectionEnvelopeState) {
+    $markdownLines += @(
+        '## Operator Inquiry Selection Envelope',
+        '',
+        ('- Selection-envelope state: `{0}`' -f [string] $operatorInquirySelectionEnvelopeState.operatorInquirySelectionEnvelopeState),
+        ('- Reason code: `{0}`' -f [string] $operatorInquirySelectionEnvelopeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $operatorInquirySelectionEnvelopeState.nextAction),
+        ('- Operator inquiry-selection state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'operatorInquirySelectionState')),
+        ('- Available inquiry stance count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'availableInquiryStanceCount')),
+        ('- Known boundary warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'knownBoundaryWarningCount')),
+        ('- Lawful use-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'lawfulUseConditionCount')),
+        ('- Protected interiority denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'protectedInteriorityDenied')),
+        ('- Locality bypass denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'localityBypassDenied')),
+        ('- Raw grant denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'rawGrantDenied')),
+        ''
+    )
+}
+
+if ($null -ne $bondedCrucibleSessionRehearsalState) {
+    $markdownLines += @(
+        '## Bonded Crucible Session Rehearsal',
+        '',
+        ('- Crucible-rehearsal state: `{0}`' -f [string] $bondedCrucibleSessionRehearsalState.bondedCrucibleSessionRehearsalState),
+        ('- Reason code: `{0}`' -f [string] $bondedCrucibleSessionRehearsalState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $bondedCrucibleSessionRehearsalState.nextAction),
+        ('- Crucible state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'crucibleState')),
+        ('- Selected inquiry-stance count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'selectedInquiryStanceCount')),
+        ('- Shared unknown-facet count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'sharedUnknownFacetCount')),
+        ('- Coordination-hold count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'coordinationHoldCount')),
+        ('- Exposed boundary count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'exposedBoundaryCount')),
+        ('- Pre-scripted answer denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'preScriptedAnswerDenied')),
+        ('- Remote dominance denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedCrucibleSessionRehearsalState -PropertyName 'remoteDominanceDenied')),
+        ''
+    )
+}
+
+if ($null -ne $sharedBoundaryMemoryLedgerState) {
+    $markdownLines += @(
+        '## Shared Boundary Memory Ledger',
+        '',
+        ('- Shared-boundary-memory state: `{0}`' -f [string] $sharedBoundaryMemoryLedgerState.sharedBoundaryMemoryLedgerState),
+        ('- Reason code: `{0}`' -f [string] $sharedBoundaryMemoryLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $sharedBoundaryMemoryLedgerState.nextAction),
+        ('- Shared boundary-memory class: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'sharedBoundaryMemoryState')),
+        ('- Shared boundary-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'sharedBoundaryConditionCount')),
+        ('- Shared continuity-requirement count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'sharedContinuityRequirementCount')),
+        ('- Withheld common-property claim count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'withheldCommonPropertyClaimCount')),
+        ('- Locality provenance preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'localityProvenancePreserved')),
+        ('- Identity bleed detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'identityBleedDetected')),
+        ('- Ambient common property denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'ambientCommonPropertyDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2828,6 +2954,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -InquirySessionDisciplineSurfaceState $inquirySessionDisciplineSurfaceState `
             -BoundaryConditionLedgerState $boundaryConditionLedgerState `
             -CoherenceGainWitnessReceiptState $coherenceGainWitnessReceiptState `
+            -OperatorInquirySelectionEnvelopeState $operatorInquirySelectionEnvelopeState `
+            -BondedCrucibleSessionRehearsalState $bondedCrucibleSessionRehearsalState `
+            -SharedBoundaryMemoryLedgerState $sharedBoundaryMemoryLedgerState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

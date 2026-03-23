@@ -74,6 +74,9 @@
   "inquirySessionDisciplineSurfaceOutputRoot": ".audit/runs/inquiry-session-discipline-surface",
   "boundaryConditionLedgerOutputRoot": ".audit/runs/boundary-condition-ledger",
   "coherenceGainWitnessReceiptOutputRoot": ".audit/runs/coherence-gain-witness-receipt",
+  "operatorInquirySelectionEnvelopeOutputRoot": ".audit/runs/operator-inquiry-selection-envelope",
+  "bondedCrucibleSessionRehearsalOutputRoot": ".audit/runs/bonded-crucible-session-rehearsal",
+  "sharedBoundaryMemoryLedgerOutputRoot": ".audit/runs/shared-boundary-memory-ledger",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -146,6 +149,9 @@
   "inquirySessionDisciplineSurfaceStatePath": ".audit/state/local-automation-inquiry-session-discipline-surface-last-run.json",
   "boundaryConditionLedgerStatePath": ".audit/state/local-automation-boundary-condition-ledger-last-run.json",
   "coherenceGainWitnessReceiptStatePath": ".audit/state/local-automation-coherence-gain-witness-receipt-last-run.json",
+  "operatorInquirySelectionEnvelopeStatePath": ".audit/state/local-automation-operator-inquiry-selection-envelope-last-run.json",
+  "bondedCrucibleSessionRehearsalStatePath": ".audit/state/local-automation-bonded-crucible-session-rehearsal-last-run.json",
+  "sharedBoundaryMemoryLedgerStatePath": ".audit/state/local-automation-shared-boundary-memory-ledger-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -247,6 +253,9 @@
     "keepInquirySessionDisciplineSurfaceBundles": 8,
     "keepBoundaryConditionLedgerBundles": 8,
     "keepCoherenceGainWitnessReceiptBundles": 8,
+    "keepOperatorInquirySelectionEnvelopeBundles": 8,
+    "keepBondedCrucibleSessionRehearsalBundles": 8,
+    "keepSharedBoundaryMemoryLedgerBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

@@ -105,6 +105,62 @@ public sealed record LocalityDistinctionWitnessLedgerReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record OperatorInquirySelectionEnvelopeReceipt(
+    string EnvelopeHandle,
+    string CMEId,
+    string RehearsalHandle,
+    string LocalityWitnessHandle,
+    string InquirySurfaceHandle,
+    string BoundaryLedgerHandle,
+    string CoherenceWitnessHandle,
+    string OperatorActualLocality,
+    string EnvelopeState,
+    IReadOnlyList<string> AvailableInquiryStances,
+    IReadOnlyList<string> KnownBoundaryWarnings,
+    IReadOnlyList<string> LawfulUseConditions,
+    bool ProtectedInteriorityDenied,
+    bool LocalityBypassDenied,
+    bool RawGrantDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record BondedCrucibleSessionRehearsalReceipt(
+    string RehearsalHandle,
+    string CMEId,
+    string CoWorkRehearsalHandle,
+    string OperatorInquiryEnvelopeHandle,
+    string BoundaryLedgerHandle,
+    string CoherenceWitnessHandle,
+    string SanctuaryActualLocality,
+    string OperatorActualLocality,
+    string RehearsalState,
+    string SharedUnknownClass,
+    IReadOnlyList<string> SelectedInquiryStances,
+    IReadOnlyList<string> SharedUnknownFacets,
+    int CoordinationHoldCount,
+    int ExposedBoundaryCount,
+    bool PreScriptedAnswerDenied,
+    bool RemoteDominanceDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record SharedBoundaryMemoryLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string CrucibleRehearsalHandle,
+    string BoundaryLedgerHandle,
+    string ReturnReceiptHandle,
+    string LocalityWitnessHandle,
+    string LedgerState,
+    IReadOnlyList<string> SharedBoundaryCodes,
+    IReadOnlyList<string> SharedContinuityRequirements,
+    IReadOnlyList<string> WithheldCommonPropertyClaims,
+    bool LocalityProvenancePreserved,
+    bool IdentityBleedDetected,
+    bool AmbientCommonPropertyDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -116,6 +172,12 @@ public static class AgentiActualizationProjector
     private const string RuntimeWorkbenchSessionPrefix = "runtime-workbench-session-ledger://";
     private const string BondedLocalityLedgerPrefix = "bonded-locality-ledger://";
     private const string ReachRealizationPrefix = "reach-duplex-realization://";
+    private const string InquirySessionDisciplinePrefix = "inquiry-session-discipline-surface://";
+    private const string BoundaryConditionLedgerPrefix = "boundary-condition-ledger://";
+    private const string CoherenceGainWitnessPrefix = "coherence-gain-witness-receipt://";
+    private const string OperatorInquirySelectionEnvelopePrefix = "operator-inquiry-selection-envelope://";
+    private const string BondedCrucibleSessionRehearsalPrefix = "bonded-crucible-session-rehearsal://";
+    private const string SharedBoundaryMemoryLedgerPrefix = "shared-boundary-memory-ledger://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -406,6 +468,197 @@ public static class AgentiActualizationProjector
             LocalityCollapseDetected: localityCollapseDetected,
             ProjectionTheaterDenied: !localityCollapseDetected,
             ReasonCode: "locality-distinction-witness-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static OperatorInquirySelectionEnvelopeReceipt CreateOperatorInquirySelectionEnvelope(
+        BondedCoWorkSessionRehearsalReceipt rehearsal,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        InquirySessionDisciplineSurfaceReceipt inquirySurface,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        CoherenceGainWitnessReceipt coherenceWitness,
+        string envelopeState = "operator-inquiry-selection-envelope-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(rehearsal);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        ArgumentNullException.ThrowIfNull(inquirySurface);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        ArgumentNullException.ThrowIfNull(coherenceWitness);
+        EnsurePrefix(rehearsal.RehearsalHandle, "bonded-cowork-session-rehearsal://", nameof(rehearsal));
+        EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        EnsurePrefix(inquirySurface.InquirySurfaceHandle, InquirySessionDisciplinePrefix, nameof(inquirySurface));
+        EnsurePrefix(boundaryLedger.BoundaryLedgerHandle, BoundaryConditionLedgerPrefix, nameof(boundaryLedger));
+        EnsurePrefix(coherenceWitness.CoherenceWitnessHandle, CoherenceGainWitnessPrefix, nameof(coherenceWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(envelopeState);
+
+        if (!string.Equals(rehearsal.CMEId, localityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(rehearsal.CMEId, inquirySurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(rehearsal.CMEId, boundaryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(rehearsal.CMEId, coherenceWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Operator inquiry selection requires rehearsal, locality witness, inquiry, boundary, and coherence receipts to remain inside one bonded CME surface.");
+        }
+
+        var availableInquiryStances = inquirySurface.InquiryStances
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var knownBoundaryWarnings = boundaryLedger.RetainedBoundaryConditions
+            .Select(static boundary => boundary.BoundaryCode)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var lawfulUseConditions = boundaryLedger.ContinuityRequirements
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        return new OperatorInquirySelectionEnvelopeReceipt(
+            EnvelopeHandle: AgentiActualizationKeys.CreateOperatorInquirySelectionEnvelopeHandle(
+                rehearsal.CMEId,
+                rehearsal.RehearsalHandle,
+                inquirySurface.InquirySurfaceHandle,
+                rehearsal.OperatorActualLocality),
+            CMEId: rehearsal.CMEId,
+            RehearsalHandle: rehearsal.RehearsalHandle,
+            LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            InquirySurfaceHandle: inquirySurface.InquirySurfaceHandle,
+            BoundaryLedgerHandle: boundaryLedger.BoundaryLedgerHandle,
+            CoherenceWitnessHandle: coherenceWitness.CoherenceWitnessHandle,
+            OperatorActualLocality: rehearsal.OperatorActualLocality,
+            EnvelopeState: envelopeState.Trim(),
+            AvailableInquiryStances: availableInquiryStances,
+            KnownBoundaryWarnings: knownBoundaryWarnings,
+            LawfulUseConditions: lawfulUseConditions,
+            ProtectedInteriorityDenied: true,
+            LocalityBypassDenied: !localityWitness.LocalityCollapseDetected,
+            RawGrantDenied: true,
+            ReasonCode: "operator-inquiry-selection-envelope-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BondedCrucibleSessionRehearsalReceipt CreateBondedCrucibleSessionRehearsal(
+        BondedCoWorkSessionRehearsalReceipt coWorkRehearsal,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        CoherenceGainWitnessReceipt coherenceWitness,
+        string rehearsalState = "bonded-crucible-session-rehearsal-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(coWorkRehearsal);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        ArgumentNullException.ThrowIfNull(coherenceWitness);
+        EnsurePrefix(coWorkRehearsal.RehearsalHandle, "bonded-cowork-session-rehearsal://", nameof(coWorkRehearsal));
+        EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
+        EnsurePrefix(boundaryLedger.BoundaryLedgerHandle, BoundaryConditionLedgerPrefix, nameof(boundaryLedger));
+        EnsurePrefix(coherenceWitness.CoherenceWitnessHandle, CoherenceGainWitnessPrefix, nameof(coherenceWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(rehearsalState);
+
+        if (!string.Equals(coWorkRehearsal.CMEId, operatorInquiryEnvelope.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(coWorkRehearsal.CMEId, boundaryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(coWorkRehearsal.CMEId, coherenceWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Bonded crucible rehearsal requires co-work, operator inquiry, boundary, and coherence receipts to remain inside one bonded CME surface.");
+        }
+
+        var selectedInquiryStances = operatorInquiryEnvelope.AvailableInquiryStances
+            .Take(3)
+            .ToArray();
+        var sharedUnknownFacets = new[]
+        {
+            "partial-information",
+            "assumption-reversal",
+            "boundary-pressure"
+        };
+
+        return new BondedCrucibleSessionRehearsalReceipt(
+            RehearsalHandle: AgentiActualizationKeys.CreateBondedCrucibleSessionRehearsalHandle(
+                coWorkRehearsal.CMEId,
+                coWorkRehearsal.RehearsalHandle,
+                operatorInquiryEnvelope.EnvelopeHandle,
+                boundaryLedger.BoundaryLedgerHandle),
+            CMEId: coWorkRehearsal.CMEId,
+            CoWorkRehearsalHandle: coWorkRehearsal.RehearsalHandle,
+            OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
+            BoundaryLedgerHandle: boundaryLedger.BoundaryLedgerHandle,
+            CoherenceWitnessHandle: coherenceWitness.CoherenceWitnessHandle,
+            SanctuaryActualLocality: coWorkRehearsal.SanctuaryActualLocality,
+            OperatorActualLocality: coWorkRehearsal.OperatorActualLocality,
+            RehearsalState: rehearsalState.Trim(),
+            SharedUnknownClass: "shared-uncertainty-bounded-crucible",
+            SelectedInquiryStances: selectedInquiryStances,
+            SharedUnknownFacets: sharedUnknownFacets,
+            CoordinationHoldCount: coherenceWitness.CoherencePreservingEventCount,
+            ExposedBoundaryCount: boundaryLedger.RetainedBoundaryConditions.Count,
+            PreScriptedAnswerDenied: true,
+            RemoteDominanceDenied: coWorkRehearsal.RemoteControlDenied && operatorInquiryEnvelope.RawGrantDenied,
+            ReasonCode: "bonded-crucible-session-rehearsal-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static SharedBoundaryMemoryLedgerReceipt CreateSharedBoundaryMemoryLedger(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        ReachReturnDissolutionReceipt returnReceipt,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string ledgerState = "shared-boundary-memory-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        EnsurePrefix(crucibleRehearsal.RehearsalHandle, BondedCrucibleSessionRehearsalPrefix, nameof(crucibleRehearsal));
+        EnsurePrefix(boundaryLedger.BoundaryLedgerHandle, BoundaryConditionLedgerPrefix, nameof(boundaryLedger));
+        EnsurePrefix(returnReceipt.ReturnReceiptHandle, "reach-return-dissolution://", nameof(returnReceipt));
+        EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(crucibleRehearsal.CMEId, boundaryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, returnReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, localityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Shared boundary memory requires crucible, boundary, return, and locality receipts to remain inside one bonded CME surface.");
+        }
+
+        var sharedBoundaryCodes = boundaryLedger.RetainedBoundaryConditions
+            .Select(static boundary => boundary.BoundaryCode)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var sharedContinuityRequirements = boundaryLedger.ContinuityRequirements
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var withheldCommonPropertyClaims = new[]
+        {
+            "ambient-shared-interiority",
+            "identity-collapse",
+            "sovereign-cross-grant"
+        };
+        var localityProvenancePreserved = !localityWitness.LocalityCollapseDetected && returnReceipt.LocalityDistinctionPreserved;
+
+        return new SharedBoundaryMemoryLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateSharedBoundaryMemoryLedgerHandle(
+                crucibleRehearsal.CMEId,
+                crucibleRehearsal.RehearsalHandle,
+                boundaryLedger.BoundaryLedgerHandle,
+                returnReceipt.ReturnReceiptHandle),
+            CMEId: crucibleRehearsal.CMEId,
+            CrucibleRehearsalHandle: crucibleRehearsal.RehearsalHandle,
+            BoundaryLedgerHandle: boundaryLedger.BoundaryLedgerHandle,
+            ReturnReceiptHandle: returnReceipt.ReturnReceiptHandle,
+            LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            LedgerState: ledgerState.Trim(),
+            SharedBoundaryCodes: sharedBoundaryCodes,
+            SharedContinuityRequirements: sharedContinuityRequirements,
+            WithheldCommonPropertyClaims: withheldCommonPropertyClaims,
+            LocalityProvenancePreserved: localityProvenancePreserved,
+            IdentityBleedDetected: boundaryLedger.IdentityBleedDetected,
+            AmbientCommonPropertyDenied: true,
+            ReasonCode: "shared-boundary-memory-ledger-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

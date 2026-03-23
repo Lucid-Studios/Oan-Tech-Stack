@@ -170,4 +170,73 @@ public sealed class GovernedReachRealizationService
             withheldSurfaces,
             timestampUtc);
     }
+
+    public OperatorInquirySelectionEnvelopeReceipt CreateOperatorInquirySelectionEnvelope(
+        BondedCoWorkSessionRehearsalReceipt rehearsal,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        InquirySessionDisciplineSurfaceReceipt inquirySurface,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        CoherenceGainWitnessReceipt coherenceWitness,
+        string envelopeState = "operator-inquiry-selection-envelope-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(rehearsal);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        ArgumentNullException.ThrowIfNull(inquirySurface);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        ArgumentNullException.ThrowIfNull(coherenceWitness);
+
+        return AgentiActualizationProjector.CreateOperatorInquirySelectionEnvelope(
+            rehearsal,
+            localityWitness,
+            inquirySurface,
+            boundaryLedger,
+            coherenceWitness,
+            envelopeState,
+            timestampUtc);
+    }
+
+    public BondedCrucibleSessionRehearsalReceipt CreateBondedCrucibleSessionRehearsal(
+        BondedCoWorkSessionRehearsalReceipt coWorkRehearsal,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        CoherenceGainWitnessReceipt coherenceWitness,
+        string rehearsalState = "bonded-crucible-session-rehearsal-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(coWorkRehearsal);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        ArgumentNullException.ThrowIfNull(coherenceWitness);
+
+        return AgentiActualizationProjector.CreateBondedCrucibleSessionRehearsal(
+            coWorkRehearsal,
+            operatorInquiryEnvelope,
+            boundaryLedger,
+            coherenceWitness,
+            rehearsalState,
+            timestampUtc);
+    }
+
+    public SharedBoundaryMemoryLedgerReceipt CreateSharedBoundaryMemoryLedger(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        BoundaryConditionLedgerReceipt boundaryLedger,
+        ReachReturnDissolutionReceipt returnReceipt,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string ledgerState = "shared-boundary-memory-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(boundaryLedger);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+
+        return AgentiActualizationProjector.CreateSharedBoundaryMemoryLedger(
+            crucibleRehearsal,
+            boundaryLedger,
+            returnReceipt,
+            localityWitness,
+            ledgerState,
+            timestampUtc);
+    }
 }

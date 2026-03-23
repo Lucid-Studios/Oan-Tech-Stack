@@ -520,9 +520,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- operator inquiry selection remains bounded to bonded co-work, locality distinction, and horizon-selection surfaces until its dedicated envelope root is declared
-- bonded crucible rehearsal remains bounded to future inquiry-discipline and shared-unknown surfaces until its dedicated rehearsal bundle exists
-- shared boundary memory remains bounded to current locality witness, return law, and future inquiry boundary receipts until its dedicated ledger root is declared
+- operator inquiry selection envelopes land under `.audit/runs/operator-inquiry-selection-envelope/` and update `.audit/state/local-automation-operator-inquiry-selection-envelope-last-run.json`
+- bonded crucible session rehearsals land under `.audit/runs/bonded-crucible-session-rehearsal/` and update `.audit/state/local-automation-bonded-crucible-session-rehearsal-last-run.json`
+- shared boundary-memory ledgers land under `.audit/runs/shared-boundary-memory-ledger/` and update `.audit/state/local-automation-shared-boundary-memory-ledger-last-run.json`
+- these surfaces witness operator inquiry selection, shared-uncertainty crucible rehearsal, and carry-forward boundary memory without leaking protected interiority or collapsing locality
 
 ### Automation Maturation Map 28
 

@@ -225,6 +225,9 @@ $nextEraBatchSelectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoo
 $inquirySessionDisciplineSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.inquirySessionDisciplineSurfaceStatePath)
 $boundaryConditionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.boundaryConditionLedgerStatePath)
 $coherenceGainWitnessReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coherenceGainWitnessReceiptStatePath)
+$operatorInquirySelectionEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.operatorInquirySelectionEnvelopeStatePath)
+$bondedCrucibleSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedCrucibleSessionRehearsalStatePath)
+$sharedBoundaryMemoryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sharedBoundaryMemoryLedgerStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -509,6 +512,12 @@ $statePayload.lastBoundaryConditionLedgerBundle = [string] (Get-ObjectPropertyVa
 $statePayload.boundaryConditionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundaryConditionLedgerStatePath
 $statePayload.lastCoherenceGainWitnessReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCoherenceGainWitnessReceiptBundle')
 $statePayload.coherenceGainWitnessReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coherenceGainWitnessReceiptStatePath
+$statePayload.lastOperatorInquirySelectionEnvelopeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastOperatorInquirySelectionEnvelopeBundle')
+$statePayload.operatorInquirySelectionEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operatorInquirySelectionEnvelopeStatePath
+$statePayload.lastBondedCrucibleSessionRehearsalBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBondedCrucibleSessionRehearsalBundle')
+$statePayload.bondedCrucibleSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedCrucibleSessionRehearsalStatePath
+$statePayload.lastSharedBoundaryMemoryLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSharedBoundaryMemoryLedgerBundle')
+$statePayload.sharedBoundaryMemoryLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sharedBoundaryMemoryLedgerStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1142,6 +1151,33 @@ if (-not [string]::IsNullOrWhiteSpace($coherenceGainWitnessReceiptBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$operatorInquirySelectionEnvelopeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-OperatorInquiry-SelectionEnvelope.ps1'
+$operatorInquirySelectionEnvelopeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $operatorInquirySelectionEnvelopeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Operator inquiry selection writer'
+$operatorInquirySelectionEnvelopeBundlePath = Get-ScriptOutputTail -Output $operatorInquirySelectionEnvelopeOutput
+if (-not [string]::IsNullOrWhiteSpace($operatorInquirySelectionEnvelopeBundlePath)) {
+    $statePayload.lastOperatorInquirySelectionEnvelopeBundle = $operatorInquirySelectionEnvelopeBundlePath
+    $statePayload.operatorInquirySelectionEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $operatorInquirySelectionEnvelopeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$bondedCrucibleSessionRehearsalScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BondedCrucible-SessionRehearsal.ps1'
+$bondedCrucibleSessionRehearsalOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $bondedCrucibleSessionRehearsalScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bonded crucible rehearsal writer'
+$bondedCrucibleSessionRehearsalBundlePath = Get-ScriptOutputTail -Output $bondedCrucibleSessionRehearsalOutput
+if (-not [string]::IsNullOrWhiteSpace($bondedCrucibleSessionRehearsalBundlePath)) {
+    $statePayload.lastBondedCrucibleSessionRehearsalBundle = $bondedCrucibleSessionRehearsalBundlePath
+    $statePayload.bondedCrucibleSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedCrucibleSessionRehearsalStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$sharedBoundaryMemoryLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SharedBoundaryMemory-Ledger.ps1'
+$sharedBoundaryMemoryLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $sharedBoundaryMemoryLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Shared boundary memory writer'
+$sharedBoundaryMemoryLedgerBundlePath = Get-ScriptOutputTail -Output $sharedBoundaryMemoryLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($sharedBoundaryMemoryLedgerBundlePath)) {
+    $statePayload.lastSharedBoundaryMemoryLedgerBundle = $sharedBoundaryMemoryLedgerBundlePath
+    $statePayload.sharedBoundaryMemoryLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sharedBoundaryMemoryLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1284,6 +1320,12 @@ $summary = [ordered]@{
     boundaryConditionLedgerStatePath = $statePayload.boundaryConditionLedgerStatePath
     lastCoherenceGainWitnessReceiptBundle = $statePayload.lastCoherenceGainWitnessReceiptBundle
     coherenceGainWitnessReceiptStatePath = $statePayload.coherenceGainWitnessReceiptStatePath
+    lastOperatorInquirySelectionEnvelopeBundle = $statePayload.lastOperatorInquirySelectionEnvelopeBundle
+    operatorInquirySelectionEnvelopeStatePath = $statePayload.operatorInquirySelectionEnvelopeStatePath
+    lastBondedCrucibleSessionRehearsalBundle = $statePayload.lastBondedCrucibleSessionRehearsalBundle
+    bondedCrucibleSessionRehearsalStatePath = $statePayload.bondedCrucibleSessionRehearsalStatePath
+    lastSharedBoundaryMemoryLedgerBundle = $statePayload.lastSharedBoundaryMemoryLedgerBundle
+    sharedBoundaryMemoryLedgerStatePath = $statePayload.sharedBoundaryMemoryLedgerStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1544,6 +1586,15 @@ if (-not [string]::IsNullOrWhiteSpace($boundaryConditionLedgerBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($coherenceGainWitnessReceiptBundlePath)) {
     Write-Host ('[local-automation-cycle] CoherenceGainWitnessReceipt: {0}' -f $coherenceGainWitnessReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($operatorInquirySelectionEnvelopeBundlePath)) {
+    Write-Host ('[local-automation-cycle] OperatorInquirySelectionEnvelope: {0}' -f $operatorInquirySelectionEnvelopeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($bondedCrucibleSessionRehearsalBundlePath)) {
+    Write-Host ('[local-automation-cycle] BondedCrucibleSessionRehearsal: {0}' -f $bondedCrucibleSessionRehearsalBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($sharedBoundaryMemoryLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] SharedBoundaryMemoryLedger: {0}' -f $sharedBoundaryMemoryLedgerBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {
