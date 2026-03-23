@@ -161,6 +161,55 @@ public sealed record SharedBoundaryMemoryLedgerReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record ContinuityUnderPressureLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string CrucibleRehearsalHandle,
+    string SharedBoundaryMemoryLedgerHandle,
+    string CoherenceWitnessHandle,
+    string LedgerState,
+    IReadOnlyList<string> HeldContinuities,
+    IReadOnlyList<string> PartialContinuities,
+    IReadOnlyList<string> RequiredPreservations,
+    int BoundaryPressureCount,
+    bool FluentSuccessDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record ExpressiveDeformationReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string CrucibleRehearsalHandle,
+    string OperatorInquiryEnvelopeHandle,
+    string ContinuityLedgerHandle,
+    string SharedBoundaryMemoryLedgerHandle,
+    string ReceiptState,
+    string DeformationClass,
+    IReadOnlyList<string> ChangedExpressions,
+    IReadOnlyList<string> RecognizableContinuities,
+    IReadOnlyList<string> FractureBoundaries,
+    bool AdaptiveRefinementPreserved,
+    bool IdentityCollapseDetected,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record MutualIntelligibilityWitnessReceipt(
+    string WitnessHandle,
+    string CMEId,
+    string CrucibleRehearsalHandle,
+    string ContinuityLedgerHandle,
+    string DeformationReceiptHandle,
+    string LocalityWitnessHandle,
+    string WitnessState,
+    string SharedUnderstandingState,
+    int HeldIntelligibilityCount,
+    int NarrowedIntelligibilityCount,
+    int BrokenIntelligibilityCount,
+    bool SamenessCollapseDenied,
+    bool OpaqueDivergenceDetected,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -178,6 +227,9 @@ public static class AgentiActualizationProjector
     private const string OperatorInquirySelectionEnvelopePrefix = "operator-inquiry-selection-envelope://";
     private const string BondedCrucibleSessionRehearsalPrefix = "bonded-crucible-session-rehearsal://";
     private const string SharedBoundaryMemoryLedgerPrefix = "shared-boundary-memory-ledger://";
+    private const string ContinuityUnderPressureLedgerPrefix = "continuity-under-pressure-ledger://";
+    private const string ExpressiveDeformationReceiptPrefix = "expressive-deformation-receipt://";
+    private const string MutualIntelligibilityWitnessPrefix = "mutual-intelligibility-witness://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -659,6 +711,175 @@ public static class AgentiActualizationProjector
             IdentityBleedDetected: boundaryLedger.IdentityBleedDetected,
             AmbientCommonPropertyDenied: true,
             ReasonCode: "shared-boundary-memory-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static ContinuityUnderPressureLedgerReceipt CreateContinuityUnderPressureLedger(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        CoherenceGainWitnessReceipt coherenceWitness,
+        string ledgerState = "continuity-under-pressure-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+        ArgumentNullException.ThrowIfNull(coherenceWitness);
+        EnsurePrefix(crucibleRehearsal.RehearsalHandle, BondedCrucibleSessionRehearsalPrefix, nameof(crucibleRehearsal));
+        EnsurePrefix(sharedBoundaryMemory.LedgerHandle, SharedBoundaryMemoryLedgerPrefix, nameof(sharedBoundaryMemory));
+        EnsurePrefix(coherenceWitness.CoherenceWitnessHandle, CoherenceGainWitnessPrefix, nameof(coherenceWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(crucibleRehearsal.CMEId, sharedBoundaryMemory.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, coherenceWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Continuity under pressure requires crucible, shared-boundary-memory, and coherence receipts to remain inside one bonded CME surface.");
+        }
+
+        var heldContinuities = sharedBoundaryMemory.SharedContinuityRequirements
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var partialContinuities = crucibleRehearsal.SelectedInquiryStances
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Select(static item => $"{item}-under-pressure")
+            .Take(3)
+            .ToArray();
+        var requiredPreservations = sharedBoundaryMemory.SharedContinuityRequirements
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new ContinuityUnderPressureLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateContinuityUnderPressureLedgerHandle(
+                crucibleRehearsal.CMEId,
+                crucibleRehearsal.RehearsalHandle,
+                sharedBoundaryMemory.LedgerHandle,
+                coherenceWitness.CoherenceWitnessHandle),
+            CMEId: crucibleRehearsal.CMEId,
+            CrucibleRehearsalHandle: crucibleRehearsal.RehearsalHandle,
+            SharedBoundaryMemoryLedgerHandle: sharedBoundaryMemory.LedgerHandle,
+            CoherenceWitnessHandle: coherenceWitness.CoherenceWitnessHandle,
+            LedgerState: ledgerState.Trim(),
+            HeldContinuities: heldContinuities,
+            PartialContinuities: partialContinuities,
+            RequiredPreservations: requiredPreservations,
+            BoundaryPressureCount: crucibleRehearsal.ExposedBoundaryCount,
+            FluentSuccessDenied: true,
+            ReasonCode: "continuity-under-pressure-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static ExpressiveDeformationReceipt CreateExpressiveDeformationReceipt(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        string receiptState = "expressive-deformation-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+        EnsurePrefix(crucibleRehearsal.RehearsalHandle, BondedCrucibleSessionRehearsalPrefix, nameof(crucibleRehearsal));
+        EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
+        EnsurePrefix(continuityLedger.LedgerHandle, ContinuityUnderPressureLedgerPrefix, nameof(continuityLedger));
+        EnsurePrefix(sharedBoundaryMemory.LedgerHandle, SharedBoundaryMemoryLedgerPrefix, nameof(sharedBoundaryMemory));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(crucibleRehearsal.CMEId, operatorInquiryEnvelope.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, sharedBoundaryMemory.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Expressive deformation requires crucible, operator inquiry, continuity, and shared-boundary-memory receipts to remain inside one bonded CME surface.");
+        }
+
+        var changedExpressions = operatorInquiryEnvelope.AvailableInquiryStances
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Select(static item => $"{item}-under-pressure")
+            .Take(3)
+            .ToArray();
+        var recognizableContinuities = continuityLedger.HeldContinuities
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var fractureBoundaries = sharedBoundaryMemory.SharedBoundaryCodes
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+
+        return new ExpressiveDeformationReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateExpressiveDeformationReceiptHandle(
+                crucibleRehearsal.CMEId,
+                crucibleRehearsal.RehearsalHandle,
+                operatorInquiryEnvelope.EnvelopeHandle,
+                continuityLedger.LedgerHandle),
+            CMEId: crucibleRehearsal.CMEId,
+            CrucibleRehearsalHandle: crucibleRehearsal.RehearsalHandle,
+            OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
+            ContinuityLedgerHandle: continuityLedger.LedgerHandle,
+            SharedBoundaryMemoryLedgerHandle: sharedBoundaryMemory.LedgerHandle,
+            ReceiptState: receiptState.Trim(),
+            DeformationClass: "adaptive-refinement-with-bounded-strain",
+            ChangedExpressions: changedExpressions,
+            RecognizableContinuities: recognizableContinuities,
+            FractureBoundaries: fractureBoundaries,
+            AdaptiveRefinementPreserved: true,
+            IdentityCollapseDetected: sharedBoundaryMemory.IdentityBleedDetected,
+            ReasonCode: "expressive-deformation-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static MutualIntelligibilityWitnessReceipt CreateMutualIntelligibilityWitness(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        ExpressiveDeformationReceipt deformationReceipt,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string witnessState = "mutual-intelligibility-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(deformationReceipt);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+        EnsurePrefix(crucibleRehearsal.RehearsalHandle, BondedCrucibleSessionRehearsalPrefix, nameof(crucibleRehearsal));
+        EnsurePrefix(continuityLedger.LedgerHandle, ContinuityUnderPressureLedgerPrefix, nameof(continuityLedger));
+        EnsurePrefix(deformationReceipt.ReceiptHandle, ExpressiveDeformationReceiptPrefix, nameof(deformationReceipt));
+        EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(witnessState);
+
+        if (!string.Equals(crucibleRehearsal.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, deformationReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(crucibleRehearsal.CMEId, localityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Mutual intelligibility witness requires crucible, continuity, deformation, and locality receipts to remain inside one bonded CME surface.");
+        }
+
+        return new MutualIntelligibilityWitnessReceipt(
+            WitnessHandle: AgentiActualizationKeys.CreateMutualIntelligibilityWitnessHandle(
+                crucibleRehearsal.CMEId,
+                crucibleRehearsal.RehearsalHandle,
+                continuityLedger.LedgerHandle,
+                deformationReceipt.ReceiptHandle),
+            CMEId: crucibleRehearsal.CMEId,
+            CrucibleRehearsalHandle: crucibleRehearsal.RehearsalHandle,
+            ContinuityLedgerHandle: continuityLedger.LedgerHandle,
+            DeformationReceiptHandle: deformationReceipt.ReceiptHandle,
+            LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            WitnessState: witnessState.Trim(),
+            SharedUnderstandingState: "mutual-intelligibility-preserved",
+            HeldIntelligibilityCount: continuityLedger.HeldContinuities.Count,
+            NarrowedIntelligibilityCount: deformationReceipt.RecognizableContinuities.Count,
+            BrokenIntelligibilityCount: deformationReceipt.FractureBoundaries.Count,
+            SamenessCollapseDenied: !localityWitness.LocalityCollapseDetected,
+            OpaqueDivergenceDetected: false,
+            ReasonCode: "mutual-intelligibility-witness-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

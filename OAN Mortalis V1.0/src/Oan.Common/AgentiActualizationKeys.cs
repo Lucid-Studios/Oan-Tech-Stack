@@ -141,6 +141,48 @@ public static class AgentiActualizationKeys
         return $"shared-boundary-memory-ledger://{ComputeDigest(cmeId, crucibleRehearsalHandle, boundaryLedgerHandle, returnReceiptHandle)}";
     }
 
+    public static string CreateContinuityUnderPressureLedgerHandle(
+        string cmeId,
+        string crucibleRehearsalHandle,
+        string sharedBoundaryMemoryLedgerHandle,
+        string coherenceWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(crucibleRehearsalHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sharedBoundaryMemoryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coherenceWitnessHandle);
+
+        return $"continuity-under-pressure-ledger://{ComputeDigest(cmeId, crucibleRehearsalHandle, sharedBoundaryMemoryLedgerHandle, coherenceWitnessHandle)}";
+    }
+
+    public static string CreateExpressiveDeformationReceiptHandle(
+        string cmeId,
+        string crucibleRehearsalHandle,
+        string operatorInquiryEnvelopeHandle,
+        string continuityLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(crucibleRehearsalHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operatorInquiryEnvelopeHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
+
+        return $"expressive-deformation-receipt://{ComputeDigest(cmeId, crucibleRehearsalHandle, operatorInquiryEnvelopeHandle, continuityLedgerHandle)}";
+    }
+
+    public static string CreateMutualIntelligibilityWitnessHandle(
+        string cmeId,
+        string crucibleRehearsalHandle,
+        string continuityLedgerHandle,
+        string deformationReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(crucibleRehearsalHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(deformationReceiptHandle);
+
+        return $"mutual-intelligibility-witness://{ComputeDigest(cmeId, crucibleRehearsalHandle, continuityLedgerHandle, deformationReceiptHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

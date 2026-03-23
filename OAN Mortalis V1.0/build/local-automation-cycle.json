@@ -77,6 +77,9 @@
   "operatorInquirySelectionEnvelopeOutputRoot": ".audit/runs/operator-inquiry-selection-envelope",
   "bondedCrucibleSessionRehearsalOutputRoot": ".audit/runs/bonded-crucible-session-rehearsal",
   "sharedBoundaryMemoryLedgerOutputRoot": ".audit/runs/shared-boundary-memory-ledger",
+  "continuityUnderPressureLedgerOutputRoot": ".audit/runs/continuity-under-pressure-ledger",
+  "expressiveDeformationReceiptOutputRoot": ".audit/runs/expressive-deformation-receipt",
+  "mutualIntelligibilityWitnessOutputRoot": ".audit/runs/mutual-intelligibility-witness",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -152,6 +155,9 @@
   "operatorInquirySelectionEnvelopeStatePath": ".audit/state/local-automation-operator-inquiry-selection-envelope-last-run.json",
   "bondedCrucibleSessionRehearsalStatePath": ".audit/state/local-automation-bonded-crucible-session-rehearsal-last-run.json",
   "sharedBoundaryMemoryLedgerStatePath": ".audit/state/local-automation-shared-boundary-memory-ledger-last-run.json",
+  "continuityUnderPressureLedgerStatePath": ".audit/state/local-automation-continuity-under-pressure-ledger-last-run.json",
+  "expressiveDeformationReceiptStatePath": ".audit/state/local-automation-expressive-deformation-receipt-last-run.json",
+  "mutualIntelligibilityWitnessStatePath": ".audit/state/local-automation-mutual-intelligibility-witness-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -256,6 +262,9 @@
     "keepOperatorInquirySelectionEnvelopeBundles": 8,
     "keepBondedCrucibleSessionRehearsalBundles": 8,
     "keepSharedBoundaryMemoryLedgerBundles": 8,
+    "keepContinuityUnderPressureLedgerBundles": 8,
+    "keepExpressiveDeformationReceiptBundles": 8,
+    "keepMutualIntelligibilityWitnessBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

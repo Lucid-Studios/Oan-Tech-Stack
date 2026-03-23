@@ -110,6 +110,10 @@ $currentCoherenceWitnessState = [string] (Get-ObjectPropertyValueOrNull -InputOb
 $currentNextEraSelectorState = [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectorState')
 $selectedNextMapId = [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectedNextMapId')
 $currentActiveTaskMapId = [string] (Get-ObjectPropertyValueOrNull -InputObject $activeTaskMapRunState -PropertyName 'mapId')
+$currentActiveTaskMapOrdinal = 0
+if ($currentActiveTaskMapId -match 'automation-maturation-map-(\d+)$') {
+    $currentActiveTaskMapOrdinal = [int] $Matches[1]
+}
 
 $sourceFiles = @(
     (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/Oan.Common/AgentiActualizationContracts.cs'),
@@ -159,7 +163,7 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $reasonCode = 'operator-inquiry-selection-envelope-coherence-witness-not-ready'
     $nextAction = if ($null -ne $coherenceGainWitnessReceiptState) { [string] $coherenceGainWitnessReceiptState.nextAction } else { 'emit-coherence-gain-witness-receipt' }
 } elseif (($currentNextEraSelectorState -ne 'next-era-batch-selector-ready' -or $selectedNextMapId -ne 'automation-maturation-map-27') -and
-    $currentActiveTaskMapId -ne 'automation-maturation-map-27') {
+    $currentActiveTaskMapOrdinal -lt 27) {
     $operatorInquirySelectionEnvelopeState = 'awaiting-map-27-selection'
     $reasonCode = 'operator-inquiry-selection-envelope-next-era-not-selected'
     $nextAction = if ($null -ne $nextEraBatchSelectorState) { [string] $nextEraBatchSelectorState.nextAction } else { 'emit-next-era-batch-selector' }

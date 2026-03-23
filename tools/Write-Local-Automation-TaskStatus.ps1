@@ -179,6 +179,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $OperatorInquirySelectionEnvelopeState,
         [object] $BondedCrucibleSessionRehearsalState,
         [object] $SharedBoundaryMemoryLedgerState,
+        [object] $ContinuityUnderPressureLedgerState,
+        [object] $ExpressiveDeformationReceiptState,
+        [object] $MutualIntelligibilityWitnessState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -845,6 +848,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'continuity-under-pressure-ledger' {
+            if ($null -ne $ContinuityUnderPressureLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'expressive-deformation-receipt' {
+            if ($null -ne $ExpressiveDeformationReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'mutual-intelligibility-witness' {
+            if ($null -ne $MutualIntelligibilityWitnessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -966,6 +996,9 @@ $coherenceGainWitnessReceiptStatePath = Resolve-PathFromRepo -BasePath $resolved
 $operatorInquirySelectionEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorInquirySelectionEnvelopeStatePath)
 $bondedCrucibleSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedCrucibleSessionRehearsalStatePath)
 $sharedBoundaryMemoryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sharedBoundaryMemoryLedgerStatePath)
+$continuityUnderPressureLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.continuityUnderPressureLedgerStatePath)
+$expressiveDeformationReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.expressiveDeformationReceiptStatePath)
+$mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.mutualIntelligibilityWitnessStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1040,6 +1073,9 @@ $coherenceGainWitnessReceiptState = Read-JsonFileOrNull -Path $coherenceGainWitn
 $operatorInquirySelectionEnvelopeState = Read-JsonFileOrNull -Path $operatorInquirySelectionEnvelopeStatePath
 $bondedCrucibleSessionRehearsalState = Read-JsonFileOrNull -Path $bondedCrucibleSessionRehearsalStatePath
 $sharedBoundaryMemoryLedgerState = Read-JsonFileOrNull -Path $sharedBoundaryMemoryLedgerStatePath
+$continuityUnderPressureLedgerState = Read-JsonFileOrNull -Path $continuityUnderPressureLedgerStatePath
+$expressiveDeformationReceiptState = Read-JsonFileOrNull -Path $expressiveDeformationReceiptStatePath
+$mutualIntelligibilityWitnessState = Read-JsonFileOrNull -Path $mutualIntelligibilityWitnessStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1260,6 +1296,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -OperatorInquirySelectionEnvelopeState $operatorInquirySelectionEnvelopeState `
                 -BondedCrucibleSessionRehearsalState $bondedCrucibleSessionRehearsalState `
                 -SharedBoundaryMemoryLedgerState $sharedBoundaryMemoryLedgerState `
+                -ContinuityUnderPressureLedgerState $continuityUnderPressureLedgerState `
+                -ExpressiveDeformationReceiptState $expressiveDeformationReceiptState `
+                -MutualIntelligibilityWitnessState $mutualIntelligibilityWitnessState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1388,6 +1427,9 @@ $taskMapEntries = @(
                     -OperatorInquirySelectionEnvelopeState $operatorInquirySelectionEnvelopeState `
                     -BondedCrucibleSessionRehearsalState $bondedCrucibleSessionRehearsalState `
                     -SharedBoundaryMemoryLedgerState $sharedBoundaryMemoryLedgerState `
+                    -ContinuityUnderPressureLedgerState $continuityUnderPressureLedgerState `
+                    -ExpressiveDeformationReceiptState $expressiveDeformationReceiptState `
+                    -MutualIntelligibilityWitnessState $mutualIntelligibilityWitnessState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1812,6 +1854,33 @@ $statusPayload = [ordered]@{
         sharedBoundaryMemoryLocalityProvenancePreserved = if ($null -ne $sharedBoundaryMemoryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'localityProvenancePreserved') } else { $null }
         sharedBoundaryMemoryIdentityBleedDetected = if ($null -ne $sharedBoundaryMemoryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'identityBleedDetected') } else { $null }
         sharedBoundaryMemoryAmbientCommonPropertyDenied = if ($null -ne $sharedBoundaryMemoryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $sharedBoundaryMemoryLedgerState -PropertyName 'ambientCommonPropertyDenied') } else { $null }
+        continuityUnderPressureLedgerState = if ($null -ne $continuityUnderPressureLedgerState) { [string] $continuityUnderPressureLedgerState.continuityUnderPressureLedgerState } else { $null }
+        continuityUnderPressureLedgerReason = if ($null -ne $continuityUnderPressureLedgerState) { [string] $continuityUnderPressureLedgerState.reasonCode } else { $null }
+        continuityUnderPressureLedgerNextAction = if ($null -ne $continuityUnderPressureLedgerState) { [string] $continuityUnderPressureLedgerState.nextAction } else { $null }
+        continuityUnderPressureState = if ($null -ne $continuityUnderPressureLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'pressureState') } else { $null }
+        continuityUnderPressureHeldContinuityCount = if ($null -ne $continuityUnderPressureLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'heldContinuityCount') } else { $null }
+        continuityUnderPressurePartialContinuityCount = if ($null -ne $continuityUnderPressureLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'partialContinuityCount') } else { $null }
+        continuityUnderPressureRequiredPreservationCount = if ($null -ne $continuityUnderPressureLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'requiredPreservationCount') } else { $null }
+        continuityUnderPressureBoundaryPressureCount = if ($null -ne $continuityUnderPressureLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'boundaryPressureCount') } else { $null }
+        continuityUnderPressureFluentSuccessDenied = if ($null -ne $continuityUnderPressureLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'fluentSuccessDenied') } else { $null }
+        expressiveDeformationReceiptState = if ($null -ne $expressiveDeformationReceiptState) { [string] $expressiveDeformationReceiptState.expressiveDeformationReceiptState } else { $null }
+        expressiveDeformationReceiptReason = if ($null -ne $expressiveDeformationReceiptState) { [string] $expressiveDeformationReceiptState.reasonCode } else { $null }
+        expressiveDeformationReceiptNextAction = if ($null -ne $expressiveDeformationReceiptState) { [string] $expressiveDeformationReceiptState.nextAction } else { $null }
+        expressiveDeformationState = if ($null -ne $expressiveDeformationReceiptState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'deformationState') } else { $null }
+        expressiveDeformationChangedExpressionCount = if ($null -ne $expressiveDeformationReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'changedExpressionCount') } else { $null }
+        expressiveDeformationRecognizableContinuityCount = if ($null -ne $expressiveDeformationReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'recognizableContinuityCount') } else { $null }
+        expressiveDeformationFractureBoundaryCount = if ($null -ne $expressiveDeformationReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'fractureBoundaryCount') } else { $null }
+        expressiveDeformationAdaptiveRefinementPreserved = if ($null -ne $expressiveDeformationReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'adaptiveRefinementPreserved') } else { $null }
+        expressiveDeformationIdentityCollapseDetected = if ($null -ne $expressiveDeformationReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'identityCollapseDetected') } else { $null }
+        mutualIntelligibilityWitnessState = if ($null -ne $mutualIntelligibilityWitnessState) { [string] $mutualIntelligibilityWitnessState.mutualIntelligibilityWitnessState } else { $null }
+        mutualIntelligibilityWitnessReason = if ($null -ne $mutualIntelligibilityWitnessState) { [string] $mutualIntelligibilityWitnessState.reasonCode } else { $null }
+        mutualIntelligibilityWitnessNextAction = if ($null -ne $mutualIntelligibilityWitnessState) { [string] $mutualIntelligibilityWitnessState.nextAction } else { $null }
+        mutualIntelligibilitySharedUnderstandingState = if ($null -ne $mutualIntelligibilityWitnessState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'sharedUnderstandingState') } else { $null }
+        mutualIntelligibilityHeldCount = if ($null -ne $mutualIntelligibilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'heldIntelligibilityCount') } else { $null }
+        mutualIntelligibilityNarrowedCount = if ($null -ne $mutualIntelligibilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'narrowedIntelligibilityCount') } else { $null }
+        mutualIntelligibilityBrokenCount = if ($null -ne $mutualIntelligibilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'brokenIntelligibilityCount') } else { $null }
+        mutualIntelligibilitySamenessCollapseDenied = if ($null -ne $mutualIntelligibilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'samenessCollapseDenied') } else { $null }
+        mutualIntelligibilityOpaqueDivergenceDetected = if ($null -ne $mutualIntelligibilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'opaqueDivergenceDetected') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2856,6 +2925,57 @@ if ($null -ne $sharedBoundaryMemoryLedgerState) {
     )
 }
 
+if ($null -ne $continuityUnderPressureLedgerState) {
+    $markdownLines += @(
+        '## Continuity Under Pressure Ledger',
+        '',
+        ('- Continuity-under-pressure state: `{0}`' -f [string] $continuityUnderPressureLedgerState.continuityUnderPressureLedgerState),
+        ('- Reason code: `{0}`' -f [string] $continuityUnderPressureLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $continuityUnderPressureLedgerState.nextAction),
+        ('- Pressure state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'pressureState')),
+        ('- Held continuity count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'heldContinuityCount')),
+        ('- Partial continuity count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'partialContinuityCount')),
+        ('- Required preservation count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'requiredPreservationCount')),
+        ('- Boundary pressure count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'boundaryPressureCount')),
+        ('- Fluent success denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $continuityUnderPressureLedgerState -PropertyName 'fluentSuccessDenied')),
+        ''
+    )
+}
+
+if ($null -ne $expressiveDeformationReceiptState) {
+    $markdownLines += @(
+        '## Expressive Deformation Receipt',
+        '',
+        ('- Expressive-deformation state: `{0}`' -f [string] $expressiveDeformationReceiptState.expressiveDeformationReceiptState),
+        ('- Reason code: `{0}`' -f [string] $expressiveDeformationReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $expressiveDeformationReceiptState.nextAction),
+        ('- Deformation state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'deformationState')),
+        ('- Changed expression count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'changedExpressionCount')),
+        ('- Recognizable continuity count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'recognizableContinuityCount')),
+        ('- Fracture boundary count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'fractureBoundaryCount')),
+        ('- Adaptive refinement preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'adaptiveRefinementPreserved')),
+        ('- Identity collapse detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $expressiveDeformationReceiptState -PropertyName 'identityCollapseDetected')),
+        ''
+    )
+}
+
+if ($null -ne $mutualIntelligibilityWitnessState) {
+    $markdownLines += @(
+        '## Mutual Intelligibility Witness',
+        '',
+        ('- Mutual-intelligibility state: `{0}`' -f [string] $mutualIntelligibilityWitnessState.mutualIntelligibilityWitnessState),
+        ('- Reason code: `{0}`' -f [string] $mutualIntelligibilityWitnessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $mutualIntelligibilityWitnessState.nextAction),
+        ('- Shared understanding state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'sharedUnderstandingState')),
+        ('- Held intelligibility count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'heldIntelligibilityCount')),
+        ('- Narrowed intelligibility count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'narrowedIntelligibilityCount')),
+        ('- Broken intelligibility count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'brokenIntelligibilityCount')),
+        ('- Sameness collapse denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'samenessCollapseDenied')),
+        ('- Opaque divergence detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $mutualIntelligibilityWitnessState -PropertyName 'opaqueDivergenceDetected')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2957,6 +3077,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -OperatorInquirySelectionEnvelopeState $operatorInquirySelectionEnvelopeState `
             -BondedCrucibleSessionRehearsalState $bondedCrucibleSessionRehearsalState `
             -SharedBoundaryMemoryLedgerState $sharedBoundaryMemoryLedgerState `
+            -ContinuityUnderPressureLedgerState $continuityUnderPressureLedgerState `
+            -ExpressiveDeformationReceiptState $expressiveDeformationReceiptState `
+            -MutualIntelligibilityWitnessState $mutualIntelligibilityWitnessState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

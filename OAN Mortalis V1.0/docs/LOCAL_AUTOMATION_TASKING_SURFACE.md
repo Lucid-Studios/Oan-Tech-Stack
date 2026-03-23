@@ -536,9 +536,14 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- continuity under-pressure evidence remains bounded to future bonded crucible, shared boundary-memory, and chamber-native inquiry surfaces until its dedicated ledger root is declared
-- expressive deformation remains bounded to future crucible session and inquiry-discipline receipts until its dedicated deformation bundle exists
-- mutual intelligibility remains bounded to locality distinction, bonded co-work, and future crucible witness surfaces until its dedicated witness root is declared
+- `.audit/runs/continuity-under-pressure-ledger/`
+- `.audit/state/local-automation-continuity-under-pressure-ledger-last-run.json`
+- `.audit/runs/expressive-deformation-receipt/`
+- `.audit/state/local-automation-expressive-deformation-receipt-last-run.json`
+- `.audit/runs/mutual-intelligibility-witness/`
+- `.audit/state/local-automation-mutual-intelligibility-witness-last-run.json`
+
+These surfaces witness what held under pressure, how expression deformed without collapse, and whether mutual intelligibility stayed bonded without converging into sameness.
 
 ### Automation Maturation Map 29
 

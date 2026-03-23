@@ -228,6 +228,9 @@ $coherenceGainWitnessReceiptStatePath = Resolve-PathFromRepo -BasePath $resolved
 $operatorInquirySelectionEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.operatorInquirySelectionEnvelopeStatePath)
 $bondedCrucibleSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedCrucibleSessionRehearsalStatePath)
 $sharedBoundaryMemoryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sharedBoundaryMemoryLedgerStatePath)
+$continuityUnderPressureLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.continuityUnderPressureLedgerStatePath)
+$expressiveDeformationReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.expressiveDeformationReceiptStatePath)
+$mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.mutualIntelligibilityWitnessStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -518,6 +521,12 @@ $statePayload.lastBondedCrucibleSessionRehearsalBundle = [string] (Get-ObjectPro
 $statePayload.bondedCrucibleSessionRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bondedCrucibleSessionRehearsalStatePath
 $statePayload.lastSharedBoundaryMemoryLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastSharedBoundaryMemoryLedgerBundle')
 $statePayload.sharedBoundaryMemoryLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sharedBoundaryMemoryLedgerStatePath
+$statePayload.lastContinuityUnderPressureLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastContinuityUnderPressureLedgerBundle')
+$statePayload.continuityUnderPressureLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $continuityUnderPressureLedgerStatePath
+$statePayload.lastExpressiveDeformationReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastExpressiveDeformationReceiptBundle')
+$statePayload.expressiveDeformationReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $expressiveDeformationReceiptStatePath
+$statePayload.lastMutualIntelligibilityWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastMutualIntelligibilityWitnessBundle')
+$statePayload.mutualIntelligibilityWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $mutualIntelligibilityWitnessStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1178,6 +1187,33 @@ if (-not [string]::IsNullOrWhiteSpace($sharedBoundaryMemoryLedgerBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$continuityUnderPressureLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ContinuityUnderPressure-Ledger.ps1'
+$continuityUnderPressureLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $continuityUnderPressureLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Continuity under pressure writer'
+$continuityUnderPressureLedgerBundlePath = Get-ScriptOutputTail -Output $continuityUnderPressureLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($continuityUnderPressureLedgerBundlePath)) {
+    $statePayload.lastContinuityUnderPressureLedgerBundle = $continuityUnderPressureLedgerBundlePath
+    $statePayload.continuityUnderPressureLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $continuityUnderPressureLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$expressiveDeformationReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ExpressiveDeformation-Receipt.ps1'
+$expressiveDeformationReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $expressiveDeformationReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Expressive deformation writer'
+$expressiveDeformationReceiptBundlePath = Get-ScriptOutputTail -Output $expressiveDeformationReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($expressiveDeformationReceiptBundlePath)) {
+    $statePayload.lastExpressiveDeformationReceiptBundle = $expressiveDeformationReceiptBundlePath
+    $statePayload.expressiveDeformationReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $expressiveDeformationReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$mutualIntelligibilityWitnessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-MutualIntelligibility-Witness.ps1'
+$mutualIntelligibilityWitnessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $mutualIntelligibilityWitnessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Mutual intelligibility writer'
+$mutualIntelligibilityWitnessBundlePath = Get-ScriptOutputTail -Output $mutualIntelligibilityWitnessOutput
+if (-not [string]::IsNullOrWhiteSpace($mutualIntelligibilityWitnessBundlePath)) {
+    $statePayload.lastMutualIntelligibilityWitnessBundle = $mutualIntelligibilityWitnessBundlePath
+    $statePayload.mutualIntelligibilityWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $mutualIntelligibilityWitnessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1326,6 +1362,12 @@ $summary = [ordered]@{
     bondedCrucibleSessionRehearsalStatePath = $statePayload.bondedCrucibleSessionRehearsalStatePath
     lastSharedBoundaryMemoryLedgerBundle = $statePayload.lastSharedBoundaryMemoryLedgerBundle
     sharedBoundaryMemoryLedgerStatePath = $statePayload.sharedBoundaryMemoryLedgerStatePath
+    lastContinuityUnderPressureLedgerBundle = $statePayload.lastContinuityUnderPressureLedgerBundle
+    continuityUnderPressureLedgerStatePath = $statePayload.continuityUnderPressureLedgerStatePath
+    lastExpressiveDeformationReceiptBundle = $statePayload.lastExpressiveDeformationReceiptBundle
+    expressiveDeformationReceiptStatePath = $statePayload.expressiveDeformationReceiptStatePath
+    lastMutualIntelligibilityWitnessBundle = $statePayload.lastMutualIntelligibilityWitnessBundle
+    mutualIntelligibilityWitnessStatePath = $statePayload.mutualIntelligibilityWitnessStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1595,6 +1637,15 @@ if (-not [string]::IsNullOrWhiteSpace($bondedCrucibleSessionRehearsalBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($sharedBoundaryMemoryLedgerBundlePath)) {
     Write-Host ('[local-automation-cycle] SharedBoundaryMemoryLedger: {0}' -f $sharedBoundaryMemoryLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($continuityUnderPressureLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] ContinuityUnderPressureLedger: {0}' -f $continuityUnderPressureLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($expressiveDeformationReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] ExpressiveDeformationReceipt: {0}' -f $expressiveDeformationReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($mutualIntelligibilityWitnessBundlePath)) {
+    Write-Host ('[local-automation-cycle] MutualIntelligibilityWitness: {0}' -f $mutualIntelligibilityWitnessBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

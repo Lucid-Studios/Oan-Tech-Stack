@@ -239,4 +239,67 @@ public sealed class GovernedReachRealizationService
             ledgerState,
             timestampUtc);
     }
+
+    public ContinuityUnderPressureLedgerReceipt CreateContinuityUnderPressureLedger(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        CoherenceGainWitnessReceipt coherenceWitness,
+        string ledgerState = "continuity-under-pressure-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+        ArgumentNullException.ThrowIfNull(coherenceWitness);
+
+        return AgentiActualizationProjector.CreateContinuityUnderPressureLedger(
+            crucibleRehearsal,
+            sharedBoundaryMemory,
+            coherenceWitness,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public ExpressiveDeformationReceipt CreateExpressiveDeformationReceipt(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        SharedBoundaryMemoryLedgerReceipt sharedBoundaryMemory,
+        string receiptState = "expressive-deformation-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(sharedBoundaryMemory);
+
+        return AgentiActualizationProjector.CreateExpressiveDeformationReceipt(
+            crucibleRehearsal,
+            operatorInquiryEnvelope,
+            continuityLedger,
+            sharedBoundaryMemory,
+            receiptState,
+            timestampUtc);
+    }
+
+    public MutualIntelligibilityWitnessReceipt CreateMutualIntelligibilityWitness(
+        BondedCrucibleSessionRehearsalReceipt crucibleRehearsal,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        ExpressiveDeformationReceipt deformationReceipt,
+        LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        string witnessState = "mutual-intelligibility-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(crucibleRehearsal);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(deformationReceipt);
+        ArgumentNullException.ThrowIfNull(localityWitness);
+
+        return AgentiActualizationProjector.CreateMutualIntelligibilityWitness(
+            crucibleRehearsal,
+            continuityLedger,
+            deformationReceipt,
+            localityWitness,
+            witnessState,
+            timestampUtc);
+    }
 }

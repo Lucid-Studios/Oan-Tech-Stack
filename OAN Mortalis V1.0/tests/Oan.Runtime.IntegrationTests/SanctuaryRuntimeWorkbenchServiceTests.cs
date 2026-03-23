@@ -562,6 +562,76 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(sharedBoundaryMemory.AmbientCommonPropertyDenied);
     }
 
+    [Fact]
+    public void CreateContinuityUnderPressureLedger_RetainsWhatHeldUnderSharedUncertainty()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, coherenceWitness, _, crucibleRehearsal, sharedBoundaryMemory, _) = CreateCrucibleBundle();
+
+        var continuityLedger = reachService.CreateContinuityUnderPressureLedger(
+            crucibleRehearsal,
+            sharedBoundaryMemory,
+            coherenceWitness,
+            ledgerState: "continuity-under-pressure-ledger-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("continuity-under-pressure-ledger://", continuityLedger.LedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("continuity-under-pressure-ledger-bound", continuityLedger.ReasonCode);
+        Assert.Equal("continuity-under-pressure-ledger-ready", continuityLedger.LedgerState);
+        Assert.Equal(3, continuityLedger.HeldContinuities.Count);
+        Assert.Equal(3, continuityLedger.PartialContinuities.Count);
+        Assert.Equal(3, continuityLedger.RequiredPreservations.Count);
+        Assert.Equal(3, continuityLedger.BoundaryPressureCount);
+        Assert.True(continuityLedger.FluentSuccessDenied);
+    }
+
+    [Fact]
+    public void CreateExpressiveDeformationAndMutualIntelligibilityWitness_PreserveRecognizableDifference()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, coherenceWitness, operatorSelection, crucibleRehearsal, sharedBoundaryMemory, localityWitness) = CreateCrucibleBundle();
+        var continuityLedger = reachService.CreateContinuityUnderPressureLedger(
+            crucibleRehearsal,
+            sharedBoundaryMemory,
+            coherenceWitness,
+            timestampUtc: FixedTimestamp);
+
+        var deformationReceipt = reachService.CreateExpressiveDeformationReceipt(
+            crucibleRehearsal,
+            operatorSelection,
+            continuityLedger,
+            sharedBoundaryMemory,
+            receiptState: "expressive-deformation-receipt-ready",
+            timestampUtc: FixedTimestamp);
+        var mutualWitness = reachService.CreateMutualIntelligibilityWitness(
+            crucibleRehearsal,
+            continuityLedger,
+            deformationReceipt,
+            localityWitness,
+            witnessState: "mutual-intelligibility-witness-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("expressive-deformation-receipt://", deformationReceipt.ReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("expressive-deformation-receipt-bound", deformationReceipt.ReasonCode);
+        Assert.Equal("expressive-deformation-receipt-ready", deformationReceipt.ReceiptState);
+        Assert.Equal("adaptive-refinement-with-bounded-strain", deformationReceipt.DeformationClass);
+        Assert.Equal(3, deformationReceipt.ChangedExpressions.Count);
+        Assert.Equal(3, deformationReceipt.RecognizableContinuities.Count);
+        Assert.Equal(3, deformationReceipt.FractureBoundaries.Count);
+        Assert.True(deformationReceipt.AdaptiveRefinementPreserved);
+        Assert.False(deformationReceipt.IdentityCollapseDetected);
+
+        Assert.StartsWith("mutual-intelligibility-witness://", mutualWitness.WitnessHandle, StringComparison.Ordinal);
+        Assert.Equal("mutual-intelligibility-witness-bound", mutualWitness.ReasonCode);
+        Assert.Equal("mutual-intelligibility-witness-ready", mutualWitness.WitnessState);
+        Assert.Equal("mutual-intelligibility-preserved", mutualWitness.SharedUnderstandingState);
+        Assert.Equal(3, mutualWitness.HeldIntelligibilityCount);
+        Assert.Equal(3, mutualWitness.NarrowedIntelligibilityCount);
+        Assert.Equal(3, mutualWitness.BrokenIntelligibilityCount);
+        Assert.True(mutualWitness.SamenessCollapseDenied);
+        Assert.False(mutualWitness.OpaqueDivergenceDetected);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
 
     private static (RuntimeHabitationReadinessLedgerReceipt ReadinessLedger, RuntimeWorkbenchSessionLedger SessionLedger, DayDreamCollapseReceipt CollapseReceipt, CrypticDepthReturnReceipt CrypticReturnReceipt, BondedCoWorkSessionRehearsalReceipt BondedCoWorkRehearsal, ReachReturnDissolutionReceipt ReachReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateInquiryBundle()
@@ -785,6 +855,75 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
             timestampUtc: FixedTimestamp);
 
         return (readinessLedger, sessionLedger, collapseReceipt, returnReceipt, rehearsal, reachReturnReceipt, localityWitness);
+    }
+
+    private static (
+        RuntimeHabitationReadinessLedgerReceipt ReadinessLedger,
+        RuntimeWorkbenchSessionLedger SessionLedger,
+        DayDreamCollapseReceipt CollapseReceipt,
+        CrypticDepthReturnReceipt ReturnReceipt,
+        InquirySessionDisciplineSurfaceReceipt InquirySurface,
+        BoundaryConditionLedgerReceipt BoundaryLedger,
+        CoherenceGainWitnessReceipt CoherenceWitness,
+        OperatorInquirySelectionEnvelopeReceipt OperatorSelection,
+        BondedCrucibleSessionRehearsalReceipt CrucibleRehearsal,
+        SharedBoundaryMemoryLedgerReceipt SharedBoundaryMemory,
+        LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateCrucibleBundle()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var reachService = new GovernedReachRealizationService();
+        var (readinessLedger, sessionLedger, collapseReceipt, returnReceipt, rehearsal, reachReturnReceipt, localityWitness) = CreateInquiryBundle();
+        var inquirySurface = workbenchService.CreateInquirySessionDisciplineSurface(
+            readinessLedger,
+            sessionLedger,
+            collapseReceipt,
+            returnReceipt,
+            timestampUtc: FixedTimestamp);
+        var boundaryLedger = workbenchService.CreateBoundaryConditionLedger(
+            readinessLedger,
+            sessionLedger,
+            inquirySurface,
+            collapseReceipt,
+            returnReceipt,
+            timestampUtc: FixedTimestamp);
+        var coherenceWitness = workbenchService.CreateCoherenceGainWitnessReceipt(
+            readinessLedger,
+            sessionLedger,
+            inquirySurface,
+            boundaryLedger,
+            timestampUtc: FixedTimestamp);
+        var operatorSelection = reachService.CreateOperatorInquirySelectionEnvelope(
+            rehearsal,
+            localityWitness,
+            inquirySurface,
+            boundaryLedger,
+            coherenceWitness,
+            timestampUtc: FixedTimestamp);
+        var crucibleRehearsal = reachService.CreateBondedCrucibleSessionRehearsal(
+            rehearsal,
+            operatorSelection,
+            boundaryLedger,
+            coherenceWitness,
+            timestampUtc: FixedTimestamp);
+        var sharedBoundaryMemory = reachService.CreateSharedBoundaryMemoryLedger(
+            crucibleRehearsal,
+            boundaryLedger,
+            reachReturnReceipt,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+
+        return (
+            readinessLedger,
+            sessionLedger,
+            collapseReceipt,
+            returnReceipt,
+            inquirySurface,
+            boundaryLedger,
+            coherenceWitness,
+            operatorSelection,
+            crucibleRehearsal,
+            sharedBoundaryMemory,
+            localityWitness);
     }
 
     private static (SanctuaryRuntimeWorkbenchSurfaceReceipt Workbench, RuntimeWorkbenchSessionLedger SessionLedger, ReachReturnDissolutionReceipt ReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateHabitationBundle()
