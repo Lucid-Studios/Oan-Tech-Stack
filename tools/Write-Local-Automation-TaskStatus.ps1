@@ -170,6 +170,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $LocalHostSanctuaryResidencyEnvelopeState,
         [object] $RuntimeHabitationReadinessLedgerState,
         [object] $BoundedInhabitationLaunchRehearsalState,
+        [object] $PostHabitationHorizonLatticeState,
+        [object] $BoundedHorizonResearchBriefState,
+        [object] $NextEraBatchSelectorState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -755,6 +758,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'post-habitation-horizon-lattice' {
+            if ($null -ne $PostHabitationHorizonLatticeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'bounded-horizon-research-brief' {
+            if ($null -ne $BoundedHorizonResearchBriefState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'next-era-batch-selector' {
+            if ($null -ne $NextEraBatchSelectorState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -867,6 +897,9 @@ $localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $res
 $localHostSanctuaryResidencyEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.localHostSanctuaryResidencyEnvelopeStatePath)
 $runtimeHabitationReadinessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeHabitationReadinessLedgerStatePath)
 $boundedInhabitationLaunchRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.boundedInhabitationLaunchRehearsalStatePath)
+$postHabitationHorizonLatticeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.postHabitationHorizonLatticeStatePath)
+$boundedHorizonResearchBriefStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.boundedHorizonResearchBriefStatePath)
+$nextEraBatchSelectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.nextEraBatchSelectorStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -932,6 +965,9 @@ $localityDistinctionWitnessLedgerState = Read-JsonFileOrNull -Path $localityDist
 $localHostSanctuaryResidencyEnvelopeState = Read-JsonFileOrNull -Path $localHostSanctuaryResidencyEnvelopeStatePath
 $runtimeHabitationReadinessLedgerState = Read-JsonFileOrNull -Path $runtimeHabitationReadinessLedgerStatePath
 $boundedInhabitationLaunchRehearsalState = Read-JsonFileOrNull -Path $boundedInhabitationLaunchRehearsalStatePath
+$postHabitationHorizonLatticeState = Read-JsonFileOrNull -Path $postHabitationHorizonLatticeStatePath
+$boundedHorizonResearchBriefState = Read-JsonFileOrNull -Path $boundedHorizonResearchBriefStatePath
+$nextEraBatchSelectorState = Read-JsonFileOrNull -Path $nextEraBatchSelectorStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1143,6 +1179,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -LocalHostSanctuaryResidencyEnvelopeState $localHostSanctuaryResidencyEnvelopeState `
                 -RuntimeHabitationReadinessLedgerState $runtimeHabitationReadinessLedgerState `
                 -BoundedInhabitationLaunchRehearsalState $boundedInhabitationLaunchRehearsalState `
+                -PostHabitationHorizonLatticeState $postHabitationHorizonLatticeState `
+                -BoundedHorizonResearchBriefState $boundedHorizonResearchBriefState `
+                -NextEraBatchSelectorState $nextEraBatchSelectorState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1262,6 +1301,9 @@ $taskMapEntries = @(
                     -LocalHostSanctuaryResidencyEnvelopeState $localHostSanctuaryResidencyEnvelopeState `
                     -RuntimeHabitationReadinessLedgerState $runtimeHabitationReadinessLedgerState `
                     -BoundedInhabitationLaunchRehearsalState $boundedInhabitationLaunchRehearsalState `
+                    -PostHabitationHorizonLatticeState $postHabitationHorizonLatticeState `
+                    -BoundedHorizonResearchBriefState $boundedHorizonResearchBriefState `
+                    -NextEraBatchSelectorState $nextEraBatchSelectorState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1608,6 +1650,25 @@ $statusPayload = [ordered]@{
         boundedInhabitationReturnClosureWitnessed = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'returnClosureWitnessed') } else { $null }
         boundedInhabitationAmbientBondDenied = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'ambientBondDenied') } else { $null }
         boundedInhabitationPublicationPromotionDenied = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'publicationPromotionDenied') } else { $null }
+        postHabitationHorizonLatticeState = if ($null -ne $postHabitationHorizonLatticeState) { [string] $postHabitationHorizonLatticeState.latticeState } else { $null }
+        postHabitationHorizonLatticeReason = if ($null -ne $postHabitationHorizonLatticeState) { [string] $postHabitationHorizonLatticeState.reasonCode } else { $null }
+        postHabitationHorizonLatticeNextAction = if ($null -ne $postHabitationHorizonLatticeState) { [string] $postHabitationHorizonLatticeState.nextAction } else { $null }
+        postHabitationHorizonAnchorReceiptCount = if ($null -ne $postHabitationHorizonLatticeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'anchorReceiptCount') } else { $null }
+        postHabitationCandidateHorizonCount = if ($null -ne $postHabitationHorizonLatticeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'candidateHorizonCount') } else { $null }
+        postHabitationWithheldExpansionCount = if ($null -ne $postHabitationHorizonLatticeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'withheldExpansionCount') } else { $null }
+        boundedHorizonResearchBriefState = if ($null -ne $boundedHorizonResearchBriefState) { [string] $boundedHorizonResearchBriefState.researchBriefState } else { $null }
+        boundedHorizonResearchBriefReason = if ($null -ne $boundedHorizonResearchBriefState) { [string] $boundedHorizonResearchBriefState.reasonCode } else { $null }
+        boundedHorizonResearchBriefNextAction = if ($null -ne $boundedHorizonResearchBriefState) { [string] $boundedHorizonResearchBriefState.nextAction } else { $null }
+        boundedHorizonPrimaryPressurePoint = if ($null -ne $boundedHorizonResearchBriefState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'primaryPressurePoint') } else { $null }
+        boundedHorizonQueuedHorizonCount = if ($null -ne $boundedHorizonResearchBriefState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'queuedHorizonCount') } else { $null }
+        boundedHorizonWithheldExpansionCount = if ($null -ne $boundedHorizonResearchBriefState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'withheldExpansionCount') } else { $null }
+        nextEraBatchSelectorState = if ($null -ne $nextEraBatchSelectorState) { [string] $nextEraBatchSelectorState.selectorState } else { $null }
+        nextEraBatchSelectorReason = if ($null -ne $nextEraBatchSelectorState) { [string] $nextEraBatchSelectorState.reasonCode } else { $null }
+        nextEraBatchSelectorNextAction = if ($null -ne $nextEraBatchSelectorState) { [string] $nextEraBatchSelectorState.nextAction } else { $null }
+        nextEraBatchSelectedMapId = if ($null -ne $nextEraBatchSelectorState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectedNextMapId') } else { $null }
+        nextEraBatchSelectedCluster = if ($null -ne $nextEraBatchSelectorState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectedCluster') } else { $null }
+        nextEraBatchQueuedMapCount = if ($null -ne $nextEraBatchSelectorState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'queuedMapCount') } else { $null }
+        nextEraBatchSelectionBoundedToDeclaredMaps = if ($null -ne $nextEraBatchSelectorState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectionBoundedToDeclaredMaps') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2498,6 +2559,53 @@ if ($null -ne $boundedInhabitationLaunchRehearsalState) {
     )
 }
 
+if ($null -ne $postHabitationHorizonLatticeState) {
+    $markdownLines += @(
+        '## Post-Habitation Horizon Lattice',
+        '',
+        ('- Lattice state: `{0}`' -f [string] $postHabitationHorizonLatticeState.latticeState),
+        ('- Reason code: `{0}`' -f [string] $postHabitationHorizonLatticeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $postHabitationHorizonLatticeState.nextAction),
+        ('- Anchor-receipt count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'anchorReceiptCount')),
+        ('- Candidate-horizon count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'candidateHorizonCount')),
+        ('- Withheld-expansion count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'withheldExpansionCount')),
+        ('- Research cycle bounded: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $postHabitationHorizonLatticeState -PropertyName 'researchCycleBounded')),
+        ''
+    )
+}
+
+if ($null -ne $boundedHorizonResearchBriefState) {
+    $markdownLines += @(
+        '## Bounded Horizon Research Brief',
+        '',
+        ('- Research-brief state: `{0}`' -f [string] $boundedHorizonResearchBriefState.researchBriefState),
+        ('- Reason code: `{0}`' -f [string] $boundedHorizonResearchBriefState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $boundedHorizonResearchBriefState.nextAction),
+        ('- Primary pressure point: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'primaryPressurePoint')),
+        ('- Queued horizon count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'queuedHorizonCount')),
+        ('- Withheld-expansion count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'withheldExpansionCount')),
+        ('- Bonded release still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'bondedReleaseStillWithheld')),
+        ('- Publication maturity still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'publicationMaturityStillWithheld')),
+        ('- MoS-bearing depth still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedHorizonResearchBriefState -PropertyName 'mosBearingDepthStillWithheld')),
+        ''
+    )
+}
+
+if ($null -ne $nextEraBatchSelectorState) {
+    $markdownLines += @(
+        '## Next Era Batch Selector',
+        '',
+        ('- Selector state: `{0}`' -f [string] $nextEraBatchSelectorState.selectorState),
+        ('- Reason code: `{0}`' -f [string] $nextEraBatchSelectorState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $nextEraBatchSelectorState.nextAction),
+        ('- Selected next map: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectedNextMapId')),
+        ('- Selected cluster: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectedCluster')),
+        ('- Queued map count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'queuedMapCount')),
+        ('- Selection bounded to declared maps: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $nextEraBatchSelectorState -PropertyName 'selectionBoundedToDeclaredMaps')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2590,6 +2698,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -LocalHostSanctuaryResidencyEnvelopeState $localHostSanctuaryResidencyEnvelopeState `
             -RuntimeHabitationReadinessLedgerState $runtimeHabitationReadinessLedgerState `
             -BoundedInhabitationLaunchRehearsalState $boundedInhabitationLaunchRehearsalState `
+            -PostHabitationHorizonLatticeState $postHabitationHorizonLatticeState `
+            -BoundedHorizonResearchBriefState $boundedHorizonResearchBriefState `
+            -NextEraBatchSelectorState $nextEraBatchSelectorState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

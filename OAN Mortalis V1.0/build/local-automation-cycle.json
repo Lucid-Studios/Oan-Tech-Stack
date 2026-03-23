@@ -68,6 +68,9 @@
   "localHostSanctuaryResidencyEnvelopeOutputRoot": ".audit/runs/local-host-sanctuary-residency-envelope",
   "runtimeHabitationReadinessLedgerOutputRoot": ".audit/runs/runtime-habitation-readiness-ledger",
   "boundedInhabitationLaunchRehearsalOutputRoot": ".audit/runs/bounded-inhabitation-launch-rehearsal",
+  "postHabitationHorizonLatticeOutputRoot": ".audit/runs/post-habitation-horizon-lattice",
+  "boundedHorizonResearchBriefOutputRoot": ".audit/runs/bounded-horizon-research-brief",
+  "nextEraBatchSelectorOutputRoot": ".audit/runs/next-era-batch-selector",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -134,6 +137,9 @@
   "localHostSanctuaryResidencyEnvelopeStatePath": ".audit/state/local-automation-local-host-sanctuary-residency-envelope-last-run.json",
   "runtimeHabitationReadinessLedgerStatePath": ".audit/state/local-automation-runtime-habitation-readiness-ledger-last-run.json",
   "boundedInhabitationLaunchRehearsalStatePath": ".audit/state/local-automation-bounded-inhabitation-launch-rehearsal-last-run.json",
+  "postHabitationHorizonLatticeStatePath": ".audit/state/local-automation-post-habitation-horizon-lattice-last-run.json",
+  "boundedHorizonResearchBriefStatePath": ".audit/state/local-automation-bounded-horizon-research-brief-last-run.json",
+  "nextEraBatchSelectorStatePath": ".audit/state/local-automation-next-era-batch-selector-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -229,6 +235,9 @@
     "keepLocalHostSanctuaryResidencyEnvelopeBundles": 8,
     "keepRuntimeHabitationReadinessLedgerBundles": 8,
     "keepBoundedInhabitationLaunchRehearsalBundles": 8,
+    "keepPostHabitationHorizonLatticeBundles": 8,
+    "keepBoundedHorizonResearchBriefBundles": 8,
+    "keepNextEraBatchSelectorBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

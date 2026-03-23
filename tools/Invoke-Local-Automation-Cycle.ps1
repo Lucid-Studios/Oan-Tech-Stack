@@ -219,6 +219,9 @@ $localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $res
 $localHostSanctuaryResidencyEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.localHostSanctuaryResidencyEnvelopeStatePath)
 $runtimeHabitationReadinessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeHabitationReadinessLedgerStatePath)
 $boundedInhabitationLaunchRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.boundedInhabitationLaunchRehearsalStatePath)
+$postHabitationHorizonLatticeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.postHabitationHorizonLatticeStatePath)
+$boundedHorizonResearchBriefStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.boundedHorizonResearchBriefStatePath)
+$nextEraBatchSelectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.nextEraBatchSelectorStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -491,6 +494,12 @@ $statePayload.lastRuntimeHabitationReadinessLedgerBundle = [string] (Get-ObjectP
 $statePayload.runtimeHabitationReadinessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeHabitationReadinessLedgerStatePath
 $statePayload.lastBoundedInhabitationLaunchRehearsalBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBoundedInhabitationLaunchRehearsalBundle')
 $statePayload.boundedInhabitationLaunchRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundedInhabitationLaunchRehearsalStatePath
+$statePayload.lastPostHabitationHorizonLatticeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPostHabitationHorizonLatticeBundle')
+$statePayload.postHabitationHorizonLatticeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postHabitationHorizonLatticeStatePath
+$statePayload.lastBoundedHorizonResearchBriefBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBoundedHorizonResearchBriefBundle')
+$statePayload.boundedHorizonResearchBriefStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundedHorizonResearchBriefStatePath
+$statePayload.lastNextEraBatchSelectorBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastNextEraBatchSelectorBundle')
+$statePayload.nextEraBatchSelectorStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $nextEraBatchSelectorStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1070,6 +1079,33 @@ if (-not [string]::IsNullOrWhiteSpace($boundedInhabitationLaunchRehearsalBundleP
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$postHabitationHorizonLatticeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-PostHabitation-HorizonLattice.ps1'
+$postHabitationHorizonLatticeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $postHabitationHorizonLatticeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Post-habitation horizon lattice writer'
+$postHabitationHorizonLatticeBundlePath = Get-ScriptOutputTail -Output $postHabitationHorizonLatticeOutput
+if (-not [string]::IsNullOrWhiteSpace($postHabitationHorizonLatticeBundlePath)) {
+    $statePayload.lastPostHabitationHorizonLatticeBundle = $postHabitationHorizonLatticeBundlePath
+    $statePayload.postHabitationHorizonLatticeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $postHabitationHorizonLatticeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$boundedHorizonResearchBriefScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BoundedHorizon-ResearchBrief.ps1'
+$boundedHorizonResearchBriefOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $boundedHorizonResearchBriefScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bounded horizon research brief writer'
+$boundedHorizonResearchBriefBundlePath = Get-ScriptOutputTail -Output $boundedHorizonResearchBriefOutput
+if (-not [string]::IsNullOrWhiteSpace($boundedHorizonResearchBriefBundlePath)) {
+    $statePayload.lastBoundedHorizonResearchBriefBundle = $boundedHorizonResearchBriefBundlePath
+    $statePayload.boundedHorizonResearchBriefStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundedHorizonResearchBriefStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$nextEraBatchSelectorScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-NextEra-BatchSelector.ps1'
+$nextEraBatchSelectorOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $nextEraBatchSelectorScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Next era batch selector writer'
+$nextEraBatchSelectorBundlePath = Get-ScriptOutputTail -Output $nextEraBatchSelectorOutput
+if (-not [string]::IsNullOrWhiteSpace($nextEraBatchSelectorBundlePath)) {
+    $statePayload.lastNextEraBatchSelectorBundle = $nextEraBatchSelectorBundlePath
+    $statePayload.nextEraBatchSelectorStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $nextEraBatchSelectorStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1200,6 +1236,12 @@ $summary = [ordered]@{
     runtimeHabitationReadinessLedgerStatePath = $statePayload.runtimeHabitationReadinessLedgerStatePath
     lastBoundedInhabitationLaunchRehearsalBundle = $statePayload.lastBoundedInhabitationLaunchRehearsalBundle
     boundedInhabitationLaunchRehearsalStatePath = $statePayload.boundedInhabitationLaunchRehearsalStatePath
+    lastPostHabitationHorizonLatticeBundle = $statePayload.lastPostHabitationHorizonLatticeBundle
+    postHabitationHorizonLatticeStatePath = $statePayload.postHabitationHorizonLatticeStatePath
+    lastBoundedHorizonResearchBriefBundle = $statePayload.lastBoundedHorizonResearchBriefBundle
+    boundedHorizonResearchBriefStatePath = $statePayload.boundedHorizonResearchBriefStatePath
+    lastNextEraBatchSelectorBundle = $statePayload.lastNextEraBatchSelectorBundle
+    nextEraBatchSelectorStatePath = $statePayload.nextEraBatchSelectorStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1442,6 +1484,15 @@ if (-not [string]::IsNullOrWhiteSpace($runtimeHabitationReadinessLedgerBundlePat
 }
 if (-not [string]::IsNullOrWhiteSpace($boundedInhabitationLaunchRehearsalBundlePath)) {
     Write-Host ('[local-automation-cycle] BoundedInhabitationLaunchRehearsal: {0}' -f $boundedInhabitationLaunchRehearsalBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($postHabitationHorizonLatticeBundlePath)) {
+    Write-Host ('[local-automation-cycle] PostHabitationHorizonLattice: {0}' -f $postHabitationHorizonLatticeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($boundedHorizonResearchBriefBundlePath)) {
+    Write-Host ('[local-automation-cycle] BoundedHorizonResearchBrief: {0}' -f $boundedHorizonResearchBriefBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($nextEraBatchSelectorBundlePath)) {
+    Write-Host ('[local-automation-cycle] NextEraBatchSelector: {0}' -f $nextEraBatchSelectorBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

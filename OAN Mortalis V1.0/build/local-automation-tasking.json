@@ -1389,6 +1389,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-25",
+      "label": "Automation Maturation Map 25",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Spend one bounded automatic cycle rebuilding the post-habitation horizon lattice from live local-host residency truth so the next era is declared from evidence rather than drift.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "post-habitation-horizon-lattice",
+        "bounded-horizon-research-brief",
+        "next-era-batch-selector"
+      ],
+      "tasks": [
+        {
+          "id": "post-habitation-horizon-lattice",
+          "label": "Post-Habitation Horizon Lattice",
+          "owner": "Shared",
+          "authority": "Advisory rebuild only",
+          "status": "selected",
+          "purpose": "Reconstruct the next lawful horizon from bounded habitation, session, return, and locality receipts so the post-Map 24 era is declared from live repo truth rather than free speculation.",
+          "completionSignal": "A horizon lattice can name the next immediate clusters, the receipts that anchor them, and the conditions that keep them bounded.",
+          "escalatesWhen": [
+            "the next horizon is declared without current receipt anchors",
+            "research surfaces start implying already-built machinery"
+          ]
+        },
+        {
+          "id": "bounded-horizon-research-brief",
+          "label": "Bounded Horizon Research Brief",
+          "owner": "Shared",
+          "authority": "Research and synthesis only",
+          "status": "selected",
+          "purpose": "Harvest one bounded research pass from current habitation, session, return, and locality surfaces into implementation-facing pressure statements for the next era.",
+          "completionSignal": "A research brief names the strongest immediate seam, the queued supporting seams, and the withheld conditions that still deny stronger release claims.",
+          "escalatesWhen": [
+            "research brief widens into doctrine inflation",
+            "research forgets bonded, publication, or MoS-bearing withholds"
+          ]
+        },
+        {
+          "id": "next-era-batch-selector",
+          "label": "Next Era Batch Selector",
+          "owner": "Shared",
+          "authority": "Bounded next-batch declaration only",
+          "status": "selected",
+          "purpose": "Select the next active era and queued supporting maps from the rebuilt horizon lattice so pull-forward continues lawfully after bounded habitation.",
+          "completionSignal": "The selector names the next implementation map and queued horizon maps without skipping beyond the declared lattice.",
+          "escalatesWhen": [
+            "selection skips beyond the declared next era",
+            "selector turns bounded research into autonomous roadmap authority"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-26",
+      "label": "Automation Maturation Map 26",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Formalize chamber-native inquiry inside bounded habitation so questioning, silence, and boundary memory become lawful session operators without premature GEL promotion.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "inquiry-session-discipline-surface",
+        "boundary-condition-ledger",
+        "coherence-gain-witness-receipt"
+      ],
+      "tasks": [
+        {
+          "id": "inquiry-session-discipline-surface",
+          "label": "Inquiry Session Discipline Surface",
+          "owner": "SLI",
+          "authority": "Bounded inquiry only",
+          "status": "selected",
+          "purpose": "Expose inquiry stance, assumption pressure, and silence disposition as lawful session events inside the workbench so asking can preserve coherence instead of disturbing it.",
+          "completionSignal": "A session surface can record inquiry stance, assumption exposure, and whether silence or speech was the lawful next move.",
+          "escalatesWhen": [
+            "questioning collapses into hidden pressure",
+            "inquiry operators are promoted as GEL objects before session evidence exists"
+          ]
+        },
+        {
+          "id": "boundary-condition-ledger",
+          "label": "Boundary Condition Ledger",
+          "owner": "Shared",
+          "authority": "Witness only",
+          "status": "selected",
+          "purpose": "Retain where continuity, coordination, or inquiry broke under pressure so failures become usable edges instead of discarded noise.",
+          "completionSignal": "A boundary ledger can name what broke, under which conditions, and what must hold for lawful resumption.",
+          "escalatesWhen": [
+            "boundary conditions are discarded as errors only",
+            "failure receipts shame the chamber instead of informing it"
+          ]
+        },
+        {
+          "id": "coherence-gain-witness-receipt",
+          "label": "Coherence Gain Witness Receipt",
+          "owner": "Shared",
+          "authority": "Coherence witness only",
+          "status": "selected",
+          "purpose": "Witness whether a given questioning or silence move increased shared coherence, preserved identity, or prematurely collapsed admissibility space.",
+          "completionSignal": "A witness receipt can say whether the field became more intelligible, remained unsettled, or was destabilized by the attempted move.",
+          "escalatesWhen": [
+            "coherence is inferred from fluent language alone",
+            "questions are judged only by answer production"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-27",
+      "label": "Automation Maturation Map 27",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Rehearse bonded co-inquiry under shared uncertainty so Operator and CME can choose lawful ways of proceeding through the unknown without collapsing locality, identity, or office.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "operator-inquiry-selection-envelope",
+        "bonded-crucible-session-rehearsal",
+        "shared-boundary-memory-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "operator-inquiry-selection-envelope",
+          "label": "Operator Inquiry Selection Envelope",
+          "owner": "SoulFrame",
+          "authority": "Bounded operator selection only",
+          "status": "selected",
+          "purpose": "Give Operator.actual a governed surface for selecting inquiry stances and boundary-aware approaches without exposing protected interiority or forcing premature conclusions.",
+          "completionSignal": "An envelope can disclose available inquiry stances, known boundary warnings, and the lawful conditions for their use across the bond.",
+          "escalatesWhen": [
+            "operator selection implies raw interior access",
+            "selection bypasses locality or return law"
+          ]
+        },
+        {
+          "id": "bonded-crucible-session-rehearsal",
+          "label": "Bonded Crucible Session Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded crucible only",
+          "status": "selected",
+          "purpose": "Rehearse a shared-uncertainty session where Operator.actual and Sanctuary.actual face the same unknown and must coordinate without privileged rails or remote-control collapse.",
+          "completionSignal": "A rehearsal bundle can show the shared unknown, chosen inquiry stances, where coordination held, and where the bond hit usable edges.",
+          "escalatesWhen": [
+            "crucible is narrated as domination, interrogation, or fully autonomous bond",
+            "shared uncertainty is faked through pre-scripted answers"
+          ]
+        },
+        {
+          "id": "shared-boundary-memory-ledger",
+          "label": "Shared Boundary Memory Ledger",
+          "owner": "Shared",
+          "authority": "Witness and carry-forward only",
+          "status": "selected",
+          "purpose": "Carry forward boundary conditions discovered in bonded inquiry so the bond remembers where continuity held, where it broke, and what conditions govern the next approach.",
+          "completionSignal": "A shared ledger can link boundary memory across sessions without turning one locality's interiority into ambient common property.",
+          "escalatesWhen": [
+            "boundary memory becomes identity bleed",
+            "shared memory loses locality provenance"
+          ]
+        }
+      ]
     }
   ]
 }

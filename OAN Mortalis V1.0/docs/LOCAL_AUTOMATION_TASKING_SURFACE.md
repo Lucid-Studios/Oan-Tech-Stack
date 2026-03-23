@@ -477,6 +477,52 @@ Current live output surfaces for this map:
 - bounded inhabitation launch-rehearsal bundles land under `.audit/runs/bounded-inhabitation-launch-rehearsal/` and update `.audit/state/local-automation-bounded-inhabitation-launch-rehearsal-last-run.json`
 - these surfaces witness bounded local-host residency, habitation readiness, and first-launch rehearsal without implying bonded release, publication maturity, or MoS-bearing depth
 
+### Automation Maturation Map 25
+
+- Goal: spend one bounded automatic cycle rebuilding the post-habitation horizon lattice from live local-host residency truth so the next era is declared from evidence rather than drift
+- Expected review windows: `2`
+- Selected tasks:
+  - `Post-Habitation Horizon Lattice`
+  - `Bounded Horizon Research Brief`
+  - `Next Era Batch Selector`
+
+Current live output surfaces for this map:
+
+- post-habitation horizon-lattice bundles land under `.audit/runs/post-habitation-horizon-lattice/` and update `.audit/state/local-automation-post-habitation-horizon-lattice-last-run.json`
+- bounded horizon research-brief bundles land under `.audit/runs/bounded-horizon-research-brief/` and update `.audit/state/local-automation-bounded-horizon-research-brief-last-run.json`
+- next-era batch-selector bundles land under `.audit/runs/next-era-batch-selector/` and update `.audit/state/local-automation-next-era-batch-selector-last-run.json`
+- these surfaces rebuild the next lawful horizon from current habitation truth, harvest one bounded research pass, and select the next era without implying already-implemented inquiry or crucible machinery
+
+### Automation Maturation Map 26
+
+- Goal: formalize chamber-native inquiry inside bounded habitation so questioning, silence, and boundary memory become lawful session operators without premature GEL promotion
+- Expected review windows: `2`
+- Selected tasks:
+  - `Inquiry Session Discipline Surface`
+  - `Boundary Condition Ledger`
+  - `Coherence Gain Witness Receipt`
+
+Current live output surfaces for this map:
+
+- inquiry session discipline remains bounded to the workbench session, day-dream collapse, cryptic return, and horizon-research surfaces until its dedicated output root is declared
+- boundary condition memory remains bounded to current session, collapse, return, and locality receipts until its dedicated ledger root is declared
+- coherence gain witness remains bounded to future inquiry-session events and horizon-selection surfaces until its dedicated witness bundle exists
+
+### Automation Maturation Map 27
+
+- Goal: rehearse bonded co-inquiry under shared uncertainty so Operator and CME can choose lawful ways of proceeding through the unknown without collapsing locality, identity, or office
+- Expected review windows: `2`
+- Selected tasks:
+  - `Operator Inquiry Selection Envelope`
+  - `Bonded Crucible Session Rehearsal`
+  - `Shared Boundary Memory Ledger`
+
+Current live output surfaces for this map:
+
+- operator inquiry selection remains bounded to bonded co-work, locality distinction, and horizon-selection surfaces until its dedicated envelope root is declared
+- bonded crucible rehearsal remains bounded to future inquiry-discipline and shared-unknown surfaces until its dedicated rehearsal bundle exists
+- shared boundary memory remains bounded to current locality witness, return law, and future inquiry boundary receipts until its dedicated ledger root is declared
+
 ## Status Interpretation
 
 The task board must distinguish between:
