@@ -472,7 +472,10 @@ Current live output surfaces for this map:
 
 Current live output surfaces for this map:
 
-- these surfaces remain declared runway only until bounded habitation can be rehearsed on the local host with explicit entry, readiness, and return truth
+- local-host Sanctuary residency-envelope bundles land under `.audit/runs/local-host-sanctuary-residency-envelope/` and update `.audit/state/local-automation-local-host-sanctuary-residency-envelope-last-run.json`
+- runtime habitation readiness-ledger bundles land under `.audit/runs/runtime-habitation-readiness-ledger/` and update `.audit/state/local-automation-runtime-habitation-readiness-ledger-last-run.json`
+- bounded inhabitation launch-rehearsal bundles land under `.audit/runs/bounded-inhabitation-launch-rehearsal/` and update `.audit/state/local-automation-bounded-inhabitation-launch-rehearsal-last-run.json`
+- these surfaces witness bounded local-host residency, habitation readiness, and first-launch rehearsal without implying bonded release, publication maturity, or MoS-bearing depth
 
 ## Status Interpretation
 

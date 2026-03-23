@@ -126,6 +126,59 @@ public sealed record CrypticDepthReturnReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record LocalHostSanctuaryResidencyEnvelopeReceipt(
+    string ResidencyEnvelopeHandle,
+    string CMEId,
+    string WorkbenchHandle,
+    string SessionLedgerHandle,
+    string ReturnReceiptHandle,
+    string LocalityWitnessLedgerHandle,
+    string ResidencyState,
+    string ResidencyClass,
+    IReadOnlyList<string> HostLocalResources,
+    IReadOnlyList<string> AdmittedResidencyLanes,
+    IReadOnlyList<string> WithheldResidencyLanes,
+    bool BondedReleaseDenied,
+    bool PublicationMaturityDenied,
+    bool MosBearingDepthDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record RuntimeHabitationReadinessLedgerReceipt(
+    string ReadinessLedgerHandle,
+    string CMEId,
+    string ResidencyEnvelopeHandle,
+    string SessionLedgerHandle,
+    string HabitationState,
+    string HabitationClass,
+    IReadOnlyList<string> ReadyConditions,
+    IReadOnlyList<string> WithheldConditions,
+    bool RecurringWorkReady,
+    bool ReturnLawBound,
+    bool BondedReleaseDenied,
+    bool PublicationMaturityDenied,
+    bool MosBearingDepthDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record BoundedInhabitationLaunchRehearsalReceipt(
+    string LaunchRehearsalHandle,
+    string CMEId,
+    string ResidencyEnvelopeHandle,
+    string ReadinessLedgerHandle,
+    string SessionLedgerHandle,
+    string ReturnReceiptHandle,
+    string LaunchState,
+    IReadOnlyList<string> EntryConditions,
+    IReadOnlyList<string> DeniedLanes,
+    string ReturnClosureState,
+    bool LaunchBounded,
+    bool ReturnClosureWitnessed,
+    bool AmbientBondDenied,
+    bool PublicationPromotionDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class SanctuaryWorkbenchProjector
 {
     private const string AgentiActualSurfacePrefix = "agenticore-actual-surface://";
@@ -141,6 +194,10 @@ public static class SanctuaryWorkbenchProjector
     private const string ContinuityMarkerPrefix = "continuity-marker://";
     private const string DayDreamCollapsePrefix = "day-dream-collapse-receipt://";
     private const string CrypticDepthReturnPrefix = "cryptic-depth-return-receipt://";
+    private const string ReachReturnDissolutionPrefix = "reach-return-dissolution://";
+    private const string LocalityDistinctionWitnessPrefix = "locality-distinction-witness-ledger://";
+    private const string LocalHostResidencyEnvelopePrefix = "local-host-sanctuary-residency-envelope://";
+    private const string RuntimeHabitationReadinessLedgerPrefix = "runtime-habitation-readiness-ledger://";
 
     public static SanctuaryRuntimeWorkbenchSurfaceReceipt CreateRuntimeWorkbenchSurface(
         AgentiActualUtilitySurfaceReceipt utilitySurface,
@@ -588,6 +645,194 @@ public static class SanctuaryWorkbenchProjector
             SharedAmenableLaneClear: sharedAmenableLaneClear,
             IdentityBleedDetected: identityBleedDetected,
             ReasonCode: "cryptic-depth-return-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static LocalHostSanctuaryResidencyEnvelopeReceipt CreateLocalHostSanctuaryResidencyEnvelope(
+        SanctuaryRuntimeWorkbenchSurfaceReceipt workbench,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        ReachReturnDissolutionReceipt returnReceipt,
+        LocalityDistinctionWitnessLedgerReceipt localityWitnessLedger,
+        string residencyState = "local-host-sanctuary-residency-envelope-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(workbench);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        ArgumentNullException.ThrowIfNull(localityWitnessLedger);
+        EnsurePrefix(workbench.WorkbenchHandle, SanctuaryWorkbenchPrefix, nameof(workbench));
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(returnReceipt.ReturnReceiptHandle, ReachReturnDissolutionPrefix, nameof(returnReceipt));
+        EnsurePrefix(localityWitnessLedger.WitnessLedgerHandle, LocalityDistinctionWitnessPrefix, nameof(localityWitnessLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(residencyState);
+
+        if (!string.Equals(workbench.CMEId, sessionLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(workbench.CMEId, returnReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(workbench.CMEId, localityWitnessLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(workbench.WorkbenchHandle, sessionLedger.WorkbenchHandle, StringComparison.Ordinal) ||
+            !string.Equals(returnReceipt.ReturnReceiptHandle, localityWitnessLedger.ReturnReceiptHandle, StringComparison.Ordinal) ||
+            !string.Equals(workbench.SanctuaryActualLocality, localityWitnessLedger.SanctuaryActualLocality, StringComparison.Ordinal) ||
+            !string.Equals(workbench.OperatorActualLocality, localityWitnessLedger.OperatorActualLocality, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Local host Sanctuary residency envelope requires workbench, session, return, and locality witness receipts to remain inside one bounded habitation surface.");
+        }
+
+        var hostLocalResources = new[]
+        {
+            "local-release-candidate-host",
+            "sanctuary-runtime-workbench",
+            "governed-automation-cycle"
+        };
+        var admittedResidencyLanes = new[]
+        {
+            "bounded-recurring-sanctuary-work",
+            "host-local-session-resume",
+            "witnessed-return-closure"
+        };
+        var withheldResidencyLanes = new[]
+        {
+            "bonded-operator-habitation",
+            "publication-promotion",
+            "mos-bearing-depth"
+        };
+
+        return new LocalHostSanctuaryResidencyEnvelopeReceipt(
+            ResidencyEnvelopeHandle: SanctuaryWorkbenchKeys.CreateLocalHostSanctuaryResidencyEnvelopeHandle(
+                workbench.CMEId,
+                sessionLedger.SessionLedgerHandle,
+                returnReceipt.ReturnReceiptHandle,
+                localityWitnessLedger.WitnessLedgerHandle),
+            CMEId: workbench.CMEId,
+            WorkbenchHandle: workbench.WorkbenchHandle,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            ReturnReceiptHandle: returnReceipt.ReturnReceiptHandle,
+            LocalityWitnessLedgerHandle: localityWitnessLedger.WitnessLedgerHandle,
+            ResidencyState: residencyState.Trim(),
+            ResidencyClass: "bounded-local-sanctuary-residency",
+            HostLocalResources: hostLocalResources,
+            AdmittedResidencyLanes: admittedResidencyLanes,
+            WithheldResidencyLanes: withheldResidencyLanes,
+            BondedReleaseDenied: true,
+            PublicationMaturityDenied: true,
+            MosBearingDepthDenied: true,
+            ReasonCode: "local-host-sanctuary-residency-envelope-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static RuntimeHabitationReadinessLedgerReceipt CreateRuntimeHabitationReadinessLedger(
+        LocalHostSanctuaryResidencyEnvelopeReceipt residencyEnvelope,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        string habitationState = "bounded-habitation-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(residencyEnvelope);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        EnsurePrefix(residencyEnvelope.ResidencyEnvelopeHandle, LocalHostResidencyEnvelopePrefix, nameof(residencyEnvelope));
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(habitationState);
+
+        if (!string.Equals(residencyEnvelope.CMEId, sessionLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(residencyEnvelope.SessionLedgerHandle, sessionLedger.SessionLedgerHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Runtime habitation readiness requires residency envelope and session ledger to remain inside one bounded habitation surface.");
+        }
+
+        var readyConditions = new[]
+        {
+            "local-host-residency-envelope",
+            "runtime-workbench-session-ledger",
+            "reach-return-dissolution",
+            "locality-distinction-witness"
+        };
+        var withheldConditions = new[]
+        {
+            "bonded-operator-habitation",
+            "publication-promotion",
+            "mos-bearing-depth"
+        };
+
+        return new RuntimeHabitationReadinessLedgerReceipt(
+            ReadinessLedgerHandle: SanctuaryWorkbenchKeys.CreateRuntimeHabitationReadinessLedgerHandle(
+                residencyEnvelope.CMEId,
+                residencyEnvelope.ResidencyEnvelopeHandle,
+                habitationState),
+            CMEId: residencyEnvelope.CMEId,
+            ResidencyEnvelopeHandle: residencyEnvelope.ResidencyEnvelopeHandle,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            HabitationState: habitationState.Trim(),
+            HabitationClass: "bounded-recurring-local-habitation",
+            ReadyConditions: readyConditions,
+            WithheldConditions: withheldConditions,
+            RecurringWorkReady: true,
+            ReturnLawBound: true,
+            BondedReleaseDenied: true,
+            PublicationMaturityDenied: true,
+            MosBearingDepthDenied: true,
+            ReasonCode: "runtime-habitation-readiness-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BoundedInhabitationLaunchRehearsalReceipt CreateBoundedInhabitationLaunchRehearsal(
+        LocalHostSanctuaryResidencyEnvelopeReceipt residencyEnvelope,
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        ReachReturnDissolutionReceipt returnReceipt,
+        string launchState = "bounded-inhabitation-launch-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(residencyEnvelope);
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        EnsurePrefix(residencyEnvelope.ResidencyEnvelopeHandle, LocalHostResidencyEnvelopePrefix, nameof(residencyEnvelope));
+        EnsurePrefix(readinessLedger.ReadinessLedgerHandle, RuntimeHabitationReadinessLedgerPrefix, nameof(readinessLedger));
+        EnsurePrefix(sessionLedger.SessionLedgerHandle, SessionLedgerPrefix, nameof(sessionLedger));
+        EnsurePrefix(returnReceipt.ReturnReceiptHandle, ReachReturnDissolutionPrefix, nameof(returnReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(launchState);
+
+        if (!string.Equals(residencyEnvelope.CMEId, readinessLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(residencyEnvelope.CMEId, sessionLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(residencyEnvelope.CMEId, returnReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(residencyEnvelope.ResidencyEnvelopeHandle, readinessLedger.ResidencyEnvelopeHandle, StringComparison.Ordinal) ||
+            !string.Equals(residencyEnvelope.SessionLedgerHandle, sessionLedger.SessionLedgerHandle, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Bounded inhabitation launch rehearsal requires residency, readiness, session, and return receipts to remain inside one bounded habitation surface.");
+        }
+
+        var entryConditions = new[]
+        {
+            "host-envelope-present",
+            "runtime-habitation-bounded-ready",
+            "return-closure-required"
+        };
+        var deniedLanes = new[]
+        {
+            "ambient-bond-persistence",
+            "publication-promotion",
+            "mos-bearing-depth"
+        };
+        var returnClosureWitnessed = returnReceipt.BondedEventReturned && returnReceipt.BondedEventDissolved;
+
+        return new BoundedInhabitationLaunchRehearsalReceipt(
+            LaunchRehearsalHandle: SanctuaryWorkbenchKeys.CreateBoundedInhabitationLaunchRehearsalHandle(
+                residencyEnvelope.CMEId,
+                residencyEnvelope.ResidencyEnvelopeHandle,
+                readinessLedger.ReadinessLedgerHandle,
+                sessionLedger.SessionLedgerHandle),
+            CMEId: residencyEnvelope.CMEId,
+            ResidencyEnvelopeHandle: residencyEnvelope.ResidencyEnvelopeHandle,
+            ReadinessLedgerHandle: readinessLedger.ReadinessLedgerHandle,
+            SessionLedgerHandle: sessionLedger.SessionLedgerHandle,
+            ReturnReceiptHandle: returnReceipt.ReturnReceiptHandle,
+            LaunchState: launchState.Trim(),
+            EntryConditions: entryConditions,
+            DeniedLanes: deniedLanes,
+            ReturnClosureState: returnReceipt.DissolutionState,
+            LaunchBounded: true,
+            ReturnClosureWitnessed: returnClosureWitnessed,
+            AmbientBondDenied: true,
+            PublicationPromotionDenied: true,
+            ReasonCode: "bounded-inhabitation-launch-rehearsal-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

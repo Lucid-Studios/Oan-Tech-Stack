@@ -288,7 +288,207 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.Single(returnReceipt.ResidueMarkers);
     }
 
+    [Fact]
+    public void CreateLocalHostSanctuaryResidencyEnvelopeAndReadinessLedger_KeepHabitationBounded()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var (workbench, sessionLedger, returnReceipt, localityWitness) = CreateHabitationBundle();
+
+        var residencyEnvelope = workbenchService.CreateLocalHostSanctuaryResidencyEnvelope(
+            workbench,
+            sessionLedger,
+            returnReceipt,
+            localityWitness,
+            residencyState: "local-host-sanctuary-residency-envelope-ready",
+            timestampUtc: FixedTimestamp);
+        var readinessLedger = workbenchService.CreateRuntimeHabitationReadinessLedger(
+            residencyEnvelope,
+            sessionLedger,
+            habitationState: "bounded-habitation-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("local-host-sanctuary-residency-envelope://", residencyEnvelope.ResidencyEnvelopeHandle, StringComparison.Ordinal);
+        Assert.Equal("local-host-sanctuary-residency-envelope-bound", residencyEnvelope.ReasonCode);
+        Assert.Equal("bounded-local-sanctuary-residency", residencyEnvelope.ResidencyClass);
+        Assert.Equal("local-host-sanctuary-residency-envelope-ready", residencyEnvelope.ResidencyState);
+        Assert.Equal(3, residencyEnvelope.HostLocalResources.Count);
+        Assert.Equal(3, residencyEnvelope.AdmittedResidencyLanes.Count);
+        Assert.Equal(3, residencyEnvelope.WithheldResidencyLanes.Count);
+        Assert.True(residencyEnvelope.BondedReleaseDenied);
+        Assert.True(residencyEnvelope.PublicationMaturityDenied);
+        Assert.True(residencyEnvelope.MosBearingDepthDenied);
+
+        Assert.StartsWith("runtime-habitation-readiness-ledger://", readinessLedger.ReadinessLedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("runtime-habitation-readiness-ledger-bound", readinessLedger.ReasonCode);
+        Assert.Equal("bounded-habitation-ready", readinessLedger.HabitationState);
+        Assert.Equal("bounded-recurring-local-habitation", readinessLedger.HabitationClass);
+        Assert.Equal(4, readinessLedger.ReadyConditions.Count);
+        Assert.Equal(3, readinessLedger.WithheldConditions.Count);
+        Assert.True(readinessLedger.RecurringWorkReady);
+        Assert.True(readinessLedger.ReturnLawBound);
+        Assert.True(readinessLedger.BondedReleaseDenied);
+        Assert.True(readinessLedger.PublicationMaturityDenied);
+        Assert.True(readinessLedger.MosBearingDepthDenied);
+    }
+
+    [Fact]
+    public void CreateBoundedInhabitationLaunchRehearsal_BindsEntryAndReturnClosure()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var (workbench, sessionLedger, returnReceipt, localityWitness) = CreateHabitationBundle();
+        var residencyEnvelope = workbenchService.CreateLocalHostSanctuaryResidencyEnvelope(
+            workbench,
+            sessionLedger,
+            returnReceipt,
+            localityWitness,
+            residencyState: "local-host-sanctuary-residency-envelope-ready",
+            timestampUtc: FixedTimestamp);
+        var readinessLedger = workbenchService.CreateRuntimeHabitationReadinessLedger(
+            residencyEnvelope,
+            sessionLedger,
+            habitationState: "bounded-habitation-ready",
+            timestampUtc: FixedTimestamp);
+
+        var launchRehearsal = workbenchService.CreateBoundedInhabitationLaunchRehearsal(
+            residencyEnvelope,
+            readinessLedger,
+            sessionLedger,
+            returnReceipt,
+            launchState: "bounded-inhabitation-launch-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("bounded-inhabitation-launch-rehearsal://", launchRehearsal.LaunchRehearsalHandle, StringComparison.Ordinal);
+        Assert.Equal("bounded-inhabitation-launch-rehearsal-bound", launchRehearsal.ReasonCode);
+        Assert.Equal("bounded-inhabitation-launch-ready", launchRehearsal.LaunchState);
+        Assert.Equal(3, launchRehearsal.EntryConditions.Count);
+        Assert.Equal(3, launchRehearsal.DeniedLanes.Count);
+        Assert.Equal("dissolution-witnessed", launchRehearsal.ReturnClosureState);
+        Assert.True(launchRehearsal.LaunchBounded);
+        Assert.True(launchRehearsal.ReturnClosureWitnessed);
+        Assert.True(launchRehearsal.AmbientBondDenied);
+        Assert.True(launchRehearsal.PublicationPromotionDenied);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
+
+    private static (SanctuaryRuntimeWorkbenchSurfaceReceipt Workbench, RuntimeWorkbenchSessionLedger SessionLedger, ReachReturnDissolutionReceipt ReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateHabitationBundle()
+    {
+        var workbenchService = new SanctuaryRuntimeWorkbenchService();
+        var reachService = new GovernedReachRealizationService();
+        var (threadBirth, utilitySurface, realization, localityLedger) = CreateReachProjectionBundle();
+        var workbench = workbenchService.CreateRuntimeWorkbenchSurface(
+            utilitySurface,
+            localityLedger,
+            runtimeDeployabilityState: "deployable-candidate-ready",
+            sanctuaryRuntimeReadinessState: "bounded-working-state-ready",
+            runtimeWorkAdmissibilityState: "provisional-runtime-work",
+            sessionPosture: "bounded-workbench-ready",
+            timestampUtc: FixedTimestamp);
+        var dayDreamTier = workbenchService.CreateAmenableDayDreamTier(
+            workbench,
+            exploratoryPredicates:
+            [
+                "co-work-boundary-question",
+                "bounded-habitation-probe",
+                "return-law-check"
+            ],
+            nonFinalOutputs:
+            [
+                "candidate-bounded-launch",
+                "non-final-host-trace"
+            ],
+            timestampUtc: FixedTimestamp);
+        var depthGate = workbenchService.CreateSelfRootedCrypticDepthGate(
+            threadBirth,
+            workbench,
+            dayDreamTier,
+            timestampUtc: FixedTimestamp);
+        var sessionLedger = workbenchService.CreateRuntimeWorkbenchSessionLedger(
+            workbench,
+            dayDreamTier,
+            depthGate,
+            sessionEvents:
+            [
+                SanctuaryWorkbenchProjector.CreateSessionEvent(
+                    workbench.CMEId,
+                    workbench.WorkbenchHandle,
+                    "questioning",
+                    "probe",
+                    "bounded-habitation-coherence",
+                    coherencePreserving: true,
+                    hiddenAssumptionDenied: true,
+                    description: "what would need to hold for bounded habitation to begin cleanly here?",
+                    timestampUtc: FixedTimestamp)
+            ],
+            boundaryConditions:
+            [
+                SanctuaryWorkbenchProjector.CreateBoundaryCondition(
+                    workbench.CMEId,
+                    workbench.WorkbenchHandle,
+                    boundaryCode: "bounded-habitation-no-release-inflation",
+                    failureClass: "launch-boundary",
+                    triggerPredicate: "habitation-must-not-overstate-bonded-release",
+                    continuityRequirement: "keep-entry-local-and-return-witnessed",
+                    permissionState: "bounded-launch-only",
+                    notes: "bounded habitation may begin locally but may not claim bonded release, publication maturity, or MoS-bearing depth.")
+            ],
+            timestampUtc: FixedTimestamp);
+        var rehearsal = reachService.CreateBondedCoWorkSessionRehearsal(
+            sessionLedger,
+            utilitySurface,
+            realization,
+            localityLedger,
+            sharedWorkLoop:
+            [
+                "shared-questioning-loop",
+                "bounded-launch-check",
+                "return-closure-pass"
+            ],
+            duplexPredicateLanes:
+            [
+                "work-predicate",
+                "governance-predicate"
+            ],
+            withheldLanes:
+            [
+                "ambient-bond-persistence",
+                "publication-promotion",
+                "mos-bearing-depth"
+            ],
+            timestampUtc: FixedTimestamp);
+        var returnReceipt = reachService.CreateReachReturnDissolutionReceipt(
+            rehearsal,
+            realization,
+            timestampUtc: FixedTimestamp);
+        var localityWitness = reachService.CreateLocalityDistinctionWitnessLedger(
+            rehearsal,
+            returnReceipt,
+            sharedSurfaces:
+            [
+                "bounded-cowork-loop",
+                "return-dissolution-law",
+                "workbench-session-ledger"
+            ],
+            sanctuaryLocalSurfaces:
+            [
+                "sanctuary-runtime-workbench",
+                "local-host-residency"
+            ],
+            operatorLocalSurfaces:
+            [
+                "operator-actual-rehearsal",
+                "bonded-participation-ledger"
+            ],
+            withheldSurfaces:
+            [
+                "ambient-bond-persistence",
+                "publication-promotion",
+                "mos-bearing-depth"
+            ],
+            timestampUtc: FixedTimestamp);
+
+        return (workbench, sessionLedger, returnReceipt, localityWitness);
+    }
 
     private static (GovernedThreadBirthReceipt ThreadBirth, AgentiActualUtilitySurfaceReceipt UtilitySurface, ReachDuplexRealizationReceipt Realization, BondedParticipationLocalityLedgerReceipt LocalityLedger) CreateReachProjectionBundle()
     {

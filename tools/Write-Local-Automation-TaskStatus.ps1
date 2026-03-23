@@ -167,6 +167,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $BondedCoWorkSessionRehearsalState,
         [object] $ReachReturnDissolutionReceiptState,
         [object] $LocalityDistinctionWitnessLedgerState,
+        [object] $LocalHostSanctuaryResidencyEnvelopeState,
+        [object] $RuntimeHabitationReadinessLedgerState,
+        [object] $BoundedInhabitationLaunchRehearsalState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -725,6 +728,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'local-host-sanctuary-residency-envelope' {
+            if ($null -ne $LocalHostSanctuaryResidencyEnvelopeState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'runtime-habitation-readiness-ledger' {
+            if ($null -ne $RuntimeHabitationReadinessLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'bounded-inhabitation-launch-rehearsal' {
+            if ($null -ne $BoundedInhabitationLaunchRehearsalState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -834,6 +864,9 @@ $crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRe
 $bondedCoWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedCoWorkSessionRehearsalStatePath)
 $reachReturnDissolutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.reachReturnDissolutionReceiptStatePath)
 $localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.localityDistinctionWitnessLedgerStatePath)
+$localHostSanctuaryResidencyEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.localHostSanctuaryResidencyEnvelopeStatePath)
+$runtimeHabitationReadinessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeHabitationReadinessLedgerStatePath)
+$boundedInhabitationLaunchRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.boundedInhabitationLaunchRehearsalStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -896,6 +929,9 @@ $crypticDepthReturnReceiptState = Read-JsonFileOrNull -Path $crypticDepthReturnR
 $bondedCoWorkSessionRehearsalState = Read-JsonFileOrNull -Path $bondedCoWorkSessionRehearsalStatePath
 $reachReturnDissolutionReceiptState = Read-JsonFileOrNull -Path $reachReturnDissolutionReceiptStatePath
 $localityDistinctionWitnessLedgerState = Read-JsonFileOrNull -Path $localityDistinctionWitnessLedgerStatePath
+$localHostSanctuaryResidencyEnvelopeState = Read-JsonFileOrNull -Path $localHostSanctuaryResidencyEnvelopeStatePath
+$runtimeHabitationReadinessLedgerState = Read-JsonFileOrNull -Path $runtimeHabitationReadinessLedgerStatePath
+$boundedInhabitationLaunchRehearsalState = Read-JsonFileOrNull -Path $boundedInhabitationLaunchRehearsalStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1104,6 +1140,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
                 -ReachReturnDissolutionReceiptState $reachReturnDissolutionReceiptState `
                 -LocalityDistinctionWitnessLedgerState $localityDistinctionWitnessLedgerState `
+                -LocalHostSanctuaryResidencyEnvelopeState $localHostSanctuaryResidencyEnvelopeState `
+                -RuntimeHabitationReadinessLedgerState $runtimeHabitationReadinessLedgerState `
+                -BoundedInhabitationLaunchRehearsalState $boundedInhabitationLaunchRehearsalState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1220,6 +1259,9 @@ $taskMapEntries = @(
                     -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
                     -ReachReturnDissolutionReceiptState $reachReturnDissolutionReceiptState `
                     -LocalityDistinctionWitnessLedgerState $localityDistinctionWitnessLedgerState `
+                    -LocalHostSanctuaryResidencyEnvelopeState $localHostSanctuaryResidencyEnvelopeState `
+                    -RuntimeHabitationReadinessLedgerState $runtimeHabitationReadinessLedgerState `
+                    -BoundedInhabitationLaunchRehearsalState $boundedInhabitationLaunchRehearsalState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -1532,6 +1574,40 @@ $statusPayload = [ordered]@{
         localityDistinctionWitnessLedgerWithheldSurfaceCount = if ($null -ne $localityDistinctionWitnessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'withheldSurfaceCount') } else { $null }
         localityDistinctionWitnessLedgerLocalityCollapseDetected = if ($null -ne $localityDistinctionWitnessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'localityCollapseDetected') } else { $null }
         localityDistinctionWitnessLedgerProjectionTheaterDenied = if ($null -ne $localityDistinctionWitnessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'projectionTheaterDenied') } else { $null }
+        localHostSanctuaryResidencyEnvelopeState = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [string] $localHostSanctuaryResidencyEnvelopeState.envelopeState } else { $null }
+        localHostSanctuaryResidencyEnvelopeReason = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [string] $localHostSanctuaryResidencyEnvelopeState.reasonCode } else { $null }
+        localHostSanctuaryResidencyEnvelopeNextAction = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [string] $localHostSanctuaryResidencyEnvelopeState.nextAction } else { $null }
+        localHostSanctuaryResidencyState = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'residencyState') } else { $null }
+        localHostSanctuaryResidencyClass = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'residencyClass') } else { $null }
+        localHostSanctuaryHostLocalResourceCount = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'hostLocalResourceCount') } else { $null }
+        localHostSanctuaryAdmittedResidencyLaneCount = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'admittedResidencyLaneCount') } else { $null }
+        localHostSanctuaryWithheldResidencyLaneCount = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'withheldResidencyLaneCount') } else { $null }
+        localHostSanctuaryBondedReleaseDenied = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'bondedReleaseDenied') } else { $null }
+        localHostSanctuaryPublicationMaturityDenied = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'publicationMaturityDenied') } else { $null }
+        localHostSanctuaryMosBearingDepthDenied = if ($null -ne $localHostSanctuaryResidencyEnvelopeState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'mosBearingDepthDenied') } else { $null }
+        runtimeHabitationReadinessLedgerState = if ($null -ne $runtimeHabitationReadinessLedgerState) { [string] $runtimeHabitationReadinessLedgerState.readinessLedgerState } else { $null }
+        runtimeHabitationReadinessLedgerReason = if ($null -ne $runtimeHabitationReadinessLedgerState) { [string] $runtimeHabitationReadinessLedgerState.reasonCode } else { $null }
+        runtimeHabitationReadinessLedgerNextAction = if ($null -ne $runtimeHabitationReadinessLedgerState) { [string] $runtimeHabitationReadinessLedgerState.nextAction } else { $null }
+        runtimeHabitationState = if ($null -ne $runtimeHabitationReadinessLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'habitationState') } else { $null }
+        runtimeHabitationClass = if ($null -ne $runtimeHabitationReadinessLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'habitationClass') } else { $null }
+        runtimeHabitationReadyConditionCount = if ($null -ne $runtimeHabitationReadinessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'readyConditionCount') } else { $null }
+        runtimeHabitationWithheldConditionCount = if ($null -ne $runtimeHabitationReadinessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'withheldConditionCount') } else { $null }
+        runtimeHabitationRecurringWorkReady = if ($null -ne $runtimeHabitationReadinessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'recurringWorkReady') } else { $null }
+        runtimeHabitationReturnLawBound = if ($null -ne $runtimeHabitationReadinessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'returnLawBound') } else { $null }
+        runtimeHabitationBondedReleaseDenied = if ($null -ne $runtimeHabitationReadinessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'bondedReleaseDenied') } else { $null }
+        runtimeHabitationPublicationMaturityDenied = if ($null -ne $runtimeHabitationReadinessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'publicationMaturityDenied') } else { $null }
+        runtimeHabitationMosBearingDepthDenied = if ($null -ne $runtimeHabitationReadinessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'mosBearingDepthDenied') } else { $null }
+        boundedInhabitationLaunchRehearsalState = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [string] $boundedInhabitationLaunchRehearsalState.launchRehearsalState } else { $null }
+        boundedInhabitationLaunchRehearsalReason = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [string] $boundedInhabitationLaunchRehearsalState.reasonCode } else { $null }
+        boundedInhabitationLaunchRehearsalNextAction = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [string] $boundedInhabitationLaunchRehearsalState.nextAction } else { $null }
+        boundedInhabitationLaunchState = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'launchState') } else { $null }
+        boundedInhabitationEntryConditionCount = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'entryConditionCount') } else { $null }
+        boundedInhabitationDeniedLaneCount = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'deniedLaneCount') } else { $null }
+        boundedInhabitationReturnClosureState = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'returnClosureState') } else { $null }
+        boundedInhabitationLaunchBounded = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'launchBounded') } else { $null }
+        boundedInhabitationReturnClosureWitnessed = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'returnClosureWitnessed') } else { $null }
+        boundedInhabitationAmbientBondDenied = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'ambientBondDenied') } else { $null }
+        boundedInhabitationPublicationPromotionDenied = if ($null -ne $boundedInhabitationLaunchRehearsalState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'publicationPromotionDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -2364,6 +2440,64 @@ if ($null -ne $localityDistinctionWitnessLedgerState) {
     )
 }
 
+if ($null -ne $localHostSanctuaryResidencyEnvelopeState) {
+    $markdownLines += @(
+        '## Local Host Sanctuary Residency Envelope',
+        '',
+        ('- Envelope state: `{0}`' -f [string] $localHostSanctuaryResidencyEnvelopeState.envelopeState),
+        ('- Reason code: `{0}`' -f [string] $localHostSanctuaryResidencyEnvelopeState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $localHostSanctuaryResidencyEnvelopeState.nextAction),
+        ('- Residency state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'residencyState')),
+        ('- Residency class: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'residencyClass')),
+        ('- Host-local resource count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'hostLocalResourceCount')),
+        ('- Admitted residency-lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'admittedResidencyLaneCount')),
+        ('- Withheld residency-lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'withheldResidencyLaneCount')),
+        ('- Bonded release denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'bondedReleaseDenied')),
+        ('- Publication maturity denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'publicationMaturityDenied')),
+        ('- MoS-bearing depth denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $localHostSanctuaryResidencyEnvelopeState -PropertyName 'mosBearingDepthDenied')),
+        ''
+    )
+}
+
+if ($null -ne $runtimeHabitationReadinessLedgerState) {
+    $markdownLines += @(
+        '## Runtime Habitation Readiness Ledger',
+        '',
+        ('- Readiness-ledger state: `{0}`' -f [string] $runtimeHabitationReadinessLedgerState.readinessLedgerState),
+        ('- Reason code: `{0}`' -f [string] $runtimeHabitationReadinessLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $runtimeHabitationReadinessLedgerState.nextAction),
+        ('- Habitation state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'habitationState')),
+        ('- Habitation class: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'habitationClass')),
+        ('- Ready-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'readyConditionCount')),
+        ('- Withheld-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'withheldConditionCount')),
+        ('- Recurring work ready: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'recurringWorkReady')),
+        ('- Return law bound: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'returnLawBound')),
+        ('- Bonded release denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'bondedReleaseDenied')),
+        ('- Publication maturity denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'publicationMaturityDenied')),
+        ('- MoS-bearing depth denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeHabitationReadinessLedgerState -PropertyName 'mosBearingDepthDenied')),
+        ''
+    )
+}
+
+if ($null -ne $boundedInhabitationLaunchRehearsalState) {
+    $markdownLines += @(
+        '## Bounded Inhabitation Launch Rehearsal',
+        '',
+        ('- Launch-rehearsal state: `{0}`' -f [string] $boundedInhabitationLaunchRehearsalState.launchRehearsalState),
+        ('- Reason code: `{0}`' -f [string] $boundedInhabitationLaunchRehearsalState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $boundedInhabitationLaunchRehearsalState.nextAction),
+        ('- Launch state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'launchState')),
+        ('- Entry-condition count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'entryConditionCount')),
+        ('- Denied-lane count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'deniedLaneCount')),
+        ('- Return-closure state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'returnClosureState')),
+        ('- Launch bounded: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'launchBounded')),
+        ('- Return closure witnessed: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'returnClosureWitnessed')),
+        ('- Ambient bond denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'ambientBondDenied')),
+        ('- Publication promotion denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $boundedInhabitationLaunchRehearsalState -PropertyName 'publicationPromotionDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -2453,6 +2587,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
             -ReachReturnDissolutionReceiptState $reachReturnDissolutionReceiptState `
             -LocalityDistinctionWitnessLedgerState $localityDistinctionWitnessLedgerState `
+            -LocalHostSanctuaryResidencyEnvelopeState $localHostSanctuaryResidencyEnvelopeState `
+            -RuntimeHabitationReadinessLedgerState $runtimeHabitationReadinessLedgerState `
+            -BoundedInhabitationLaunchRehearsalState $boundedInhabitationLaunchRehearsalState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

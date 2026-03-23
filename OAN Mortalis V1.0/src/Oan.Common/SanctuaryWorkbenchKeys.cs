@@ -153,6 +153,46 @@ public static class SanctuaryWorkbenchKeys
         return $"cryptic-depth-return-receipt://{ComputeDigest(cmeId, sessionLedgerHandle, depthGateHandle, returnState)}";
     }
 
+    public static string CreateLocalHostSanctuaryResidencyEnvelopeHandle(
+        string cmeId,
+        string sessionLedgerHandle,
+        string returnReceiptHandle,
+        string localityWitnessLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(returnReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(localityWitnessLedgerHandle);
+
+        return $"local-host-sanctuary-residency-envelope://{ComputeDigest(cmeId, sessionLedgerHandle, returnReceiptHandle, localityWitnessLedgerHandle)}";
+    }
+
+    public static string CreateRuntimeHabitationReadinessLedgerHandle(
+        string cmeId,
+        string residencyEnvelopeHandle,
+        string habitationState)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(residencyEnvelopeHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(habitationState);
+
+        return $"runtime-habitation-readiness-ledger://{ComputeDigest(cmeId, residencyEnvelopeHandle, habitationState)}";
+    }
+
+    public static string CreateBoundedInhabitationLaunchRehearsalHandle(
+        string cmeId,
+        string residencyEnvelopeHandle,
+        string readinessLedgerHandle,
+        string sessionLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(residencyEnvelopeHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(readinessLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionLedgerHandle);
+
+        return $"bounded-inhabitation-launch-rehearsal://{ComputeDigest(cmeId, residencyEnvelopeHandle, readinessLedgerHandle, sessionLedgerHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

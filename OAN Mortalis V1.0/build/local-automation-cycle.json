@@ -65,6 +65,9 @@
   "bondedCoWorkSessionRehearsalOutputRoot": ".audit/runs/bonded-cowork-session-rehearsal",
   "reachReturnDissolutionReceiptOutputRoot": ".audit/runs/reach-return-dissolution-receipt",
   "localityDistinctionWitnessLedgerOutputRoot": ".audit/runs/locality-distinction-witness-ledger",
+  "localHostSanctuaryResidencyEnvelopeOutputRoot": ".audit/runs/local-host-sanctuary-residency-envelope",
+  "runtimeHabitationReadinessLedgerOutputRoot": ".audit/runs/runtime-habitation-readiness-ledger",
+  "boundedInhabitationLaunchRehearsalOutputRoot": ".audit/runs/bounded-inhabitation-launch-rehearsal",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -128,6 +131,9 @@
   "bondedCoWorkSessionRehearsalStatePath": ".audit/state/local-automation-bonded-cowork-session-rehearsal-last-run.json",
   "reachReturnDissolutionReceiptStatePath": ".audit/state/local-automation-reach-return-dissolution-receipt-last-run.json",
   "localityDistinctionWitnessLedgerStatePath": ".audit/state/local-automation-locality-distinction-witness-ledger-last-run.json",
+  "localHostSanctuaryResidencyEnvelopeStatePath": ".audit/state/local-automation-local-host-sanctuary-residency-envelope-last-run.json",
+  "runtimeHabitationReadinessLedgerStatePath": ".audit/state/local-automation-runtime-habitation-readiness-ledger-last-run.json",
+  "boundedInhabitationLaunchRehearsalStatePath": ".audit/state/local-automation-bounded-inhabitation-launch-rehearsal-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -220,6 +226,9 @@
     "keepBondedCoWorkSessionRehearsalBundles": 8,
     "keepReachReturnDissolutionReceiptBundles": 8,
     "keepLocalityDistinctionWitnessLedgerBundles": 8,
+    "keepLocalHostSanctuaryResidencyEnvelopeBundles": 8,
+    "keepRuntimeHabitationReadinessLedgerBundles": 8,
+    "keepBoundedInhabitationLaunchRehearsalBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

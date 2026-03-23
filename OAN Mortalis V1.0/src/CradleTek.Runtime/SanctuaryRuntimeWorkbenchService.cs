@@ -138,4 +138,64 @@ public sealed class SanctuaryRuntimeWorkbenchService
             returnState,
             timestampUtc);
     }
+
+    public LocalHostSanctuaryResidencyEnvelopeReceipt CreateLocalHostSanctuaryResidencyEnvelope(
+        SanctuaryRuntimeWorkbenchSurfaceReceipt workbench,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        ReachReturnDissolutionReceipt returnReceipt,
+        LocalityDistinctionWitnessLedgerReceipt localityWitnessLedger,
+        string residencyState = "local-host-sanctuary-residency-envelope-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(workbench);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+        ArgumentNullException.ThrowIfNull(localityWitnessLedger);
+
+        return SanctuaryWorkbenchProjector.CreateLocalHostSanctuaryResidencyEnvelope(
+            workbench,
+            sessionLedger,
+            returnReceipt,
+            localityWitnessLedger,
+            residencyState,
+            timestampUtc);
+    }
+
+    public RuntimeHabitationReadinessLedgerReceipt CreateRuntimeHabitationReadinessLedger(
+        LocalHostSanctuaryResidencyEnvelopeReceipt residencyEnvelope,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        string habitationState = "bounded-habitation-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(residencyEnvelope);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+
+        return SanctuaryWorkbenchProjector.CreateRuntimeHabitationReadinessLedger(
+            residencyEnvelope,
+            sessionLedger,
+            habitationState,
+            timestampUtc);
+    }
+
+    public BoundedInhabitationLaunchRehearsalReceipt CreateBoundedInhabitationLaunchRehearsal(
+        LocalHostSanctuaryResidencyEnvelopeReceipt residencyEnvelope,
+        RuntimeHabitationReadinessLedgerReceipt readinessLedger,
+        RuntimeWorkbenchSessionLedger sessionLedger,
+        ReachReturnDissolutionReceipt returnReceipt,
+        string launchState = "bounded-inhabitation-launch-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(residencyEnvelope);
+        ArgumentNullException.ThrowIfNull(readinessLedger);
+        ArgumentNullException.ThrowIfNull(sessionLedger);
+        ArgumentNullException.ThrowIfNull(returnReceipt);
+
+        return SanctuaryWorkbenchProjector.CreateBoundedInhabitationLaunchRehearsal(
+            residencyEnvelope,
+            readinessLedger,
+            sessionLedger,
+            returnReceipt,
+            launchState,
+            timestampUtc);
+    }
 }

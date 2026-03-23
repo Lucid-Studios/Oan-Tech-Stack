@@ -216,6 +216,9 @@ $crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRe
 $bondedCoWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedCoWorkSessionRehearsalStatePath)
 $reachReturnDissolutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.reachReturnDissolutionReceiptStatePath)
 $localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.localityDistinctionWitnessLedgerStatePath)
+$localHostSanctuaryResidencyEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.localHostSanctuaryResidencyEnvelopeStatePath)
+$runtimeHabitationReadinessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeHabitationReadinessLedgerStatePath)
+$boundedInhabitationLaunchRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.boundedInhabitationLaunchRehearsalStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -482,6 +485,12 @@ $statePayload.lastReachReturnDissolutionReceiptBundle = [string] (Get-ObjectProp
 $statePayload.reachReturnDissolutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $reachReturnDissolutionReceiptStatePath
 $statePayload.lastLocalityDistinctionWitnessLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastLocalityDistinctionWitnessLedgerBundle')
 $statePayload.localityDistinctionWitnessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $localityDistinctionWitnessLedgerStatePath
+$statePayload.lastLocalHostSanctuaryResidencyEnvelopeBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastLocalHostSanctuaryResidencyEnvelopeBundle')
+$statePayload.localHostSanctuaryResidencyEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $localHostSanctuaryResidencyEnvelopeStatePath
+$statePayload.lastRuntimeHabitationReadinessLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRuntimeHabitationReadinessLedgerBundle')
+$statePayload.runtimeHabitationReadinessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeHabitationReadinessLedgerStatePath
+$statePayload.lastBoundedInhabitationLaunchRehearsalBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBoundedInhabitationLaunchRehearsalBundle')
+$statePayload.boundedInhabitationLaunchRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundedInhabitationLaunchRehearsalStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1034,6 +1043,33 @@ if (-not [string]::IsNullOrWhiteSpace($localityDistinctionWitnessLedgerBundlePat
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$localHostSanctuaryResidencyEnvelopeScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-LocalHost-SanctuaryResidencyEnvelope.ps1'
+$localHostSanctuaryResidencyEnvelopeOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $localHostSanctuaryResidencyEnvelopeScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Local host Sanctuary residency envelope writer'
+$localHostSanctuaryResidencyEnvelopeBundlePath = Get-ScriptOutputTail -Output $localHostSanctuaryResidencyEnvelopeOutput
+if (-not [string]::IsNullOrWhiteSpace($localHostSanctuaryResidencyEnvelopeBundlePath)) {
+    $statePayload.lastLocalHostSanctuaryResidencyEnvelopeBundle = $localHostSanctuaryResidencyEnvelopeBundlePath
+    $statePayload.localHostSanctuaryResidencyEnvelopeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $localHostSanctuaryResidencyEnvelopeStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$runtimeHabitationReadinessLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-RuntimeHabitation-ReadinessLedger.ps1'
+$runtimeHabitationReadinessLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $runtimeHabitationReadinessLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Runtime habitation readiness ledger writer'
+$runtimeHabitationReadinessLedgerBundlePath = Get-ScriptOutputTail -Output $runtimeHabitationReadinessLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($runtimeHabitationReadinessLedgerBundlePath)) {
+    $statePayload.lastRuntimeHabitationReadinessLedgerBundle = $runtimeHabitationReadinessLedgerBundlePath
+    $statePayload.runtimeHabitationReadinessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeHabitationReadinessLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$boundedInhabitationLaunchRehearsalScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BoundedInhabitation-LaunchRehearsal.ps1'
+$boundedInhabitationLaunchRehearsalOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $boundedInhabitationLaunchRehearsalScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Bounded inhabitation launch rehearsal writer'
+$boundedInhabitationLaunchRehearsalBundlePath = Get-ScriptOutputTail -Output $boundedInhabitationLaunchRehearsalOutput
+if (-not [string]::IsNullOrWhiteSpace($boundedInhabitationLaunchRehearsalBundlePath)) {
+    $statePayload.lastBoundedInhabitationLaunchRehearsalBundle = $boundedInhabitationLaunchRehearsalBundlePath
+    $statePayload.boundedInhabitationLaunchRehearsalStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $boundedInhabitationLaunchRehearsalStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1158,6 +1194,12 @@ $summary = [ordered]@{
     reachReturnDissolutionReceiptStatePath = $statePayload.reachReturnDissolutionReceiptStatePath
     lastLocalityDistinctionWitnessLedgerBundle = $statePayload.lastLocalityDistinctionWitnessLedgerBundle
     localityDistinctionWitnessLedgerStatePath = $statePayload.localityDistinctionWitnessLedgerStatePath
+    lastLocalHostSanctuaryResidencyEnvelopeBundle = $statePayload.lastLocalHostSanctuaryResidencyEnvelopeBundle
+    localHostSanctuaryResidencyEnvelopeStatePath = $statePayload.localHostSanctuaryResidencyEnvelopeStatePath
+    lastRuntimeHabitationReadinessLedgerBundle = $statePayload.lastRuntimeHabitationReadinessLedgerBundle
+    runtimeHabitationReadinessLedgerStatePath = $statePayload.runtimeHabitationReadinessLedgerStatePath
+    lastBoundedInhabitationLaunchRehearsalBundle = $statePayload.lastBoundedInhabitationLaunchRehearsalBundle
+    boundedInhabitationLaunchRehearsalStatePath = $statePayload.boundedInhabitationLaunchRehearsalStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1391,6 +1433,15 @@ if (-not [string]::IsNullOrWhiteSpace($reachReturnDissolutionReceiptBundlePath))
 }
 if (-not [string]::IsNullOrWhiteSpace($localityDistinctionWitnessLedgerBundlePath)) {
     Write-Host ('[local-automation-cycle] LocalityDistinctionWitnessLedger: {0}' -f $localityDistinctionWitnessLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($localHostSanctuaryResidencyEnvelopeBundlePath)) {
+    Write-Host ('[local-automation-cycle] LocalHostSanctuaryResidencyEnvelope: {0}' -f $localHostSanctuaryResidencyEnvelopeBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($runtimeHabitationReadinessLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] RuntimeHabitationReadinessLedger: {0}' -f $runtimeHabitationReadinessLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($boundedInhabitationLaunchRehearsalBundlePath)) {
+    Write-Host ('[local-automation-cycle] BoundedInhabitationLaunchRehearsal: {0}' -f $boundedInhabitationLaunchRehearsalBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {
