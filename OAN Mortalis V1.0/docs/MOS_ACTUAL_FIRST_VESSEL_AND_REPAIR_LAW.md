@@ -26,6 +26,7 @@ Companion documents:
 - `docs/CME_CRYPTIC_FIRST_COLLAPSE_CLARIFICATION.md`
 - `docs/CME_COLLAPSE_QUALIFICATION_CRITERIA.md`
 - `docs/FIRST_BOOT_CLASSIFICATION_AND_EXPANSION_POLICY.md`
+- `docs/MOS_ACTUAL_CIVIL_CONTINUITY_AND_ANTI_DRIFT_LAW.md`
 
 ## Core Sentence
 
@@ -189,6 +190,10 @@ Current runtime truth remains:
 - later `MoS` promotion is not yet implemented
 
 This document therefore governs how later `MoS.Actual` maturation should be interpreted when that lane becomes build truth.
+
+The later civilizational continuity layer that follows this birth law is defined separately in:
+
+- `docs/MOS_ACTUAL_CIVIL_CONTINUITY_AND_ANTI_DRIFT_LAW.md`
 
 ## Success Condition
 
