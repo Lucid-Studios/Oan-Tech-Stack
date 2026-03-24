@@ -252,6 +252,9 @@ $durabilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -
 $warmClockDispositionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.warmClockDispositionStatePath)
 $ripeningStalenessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.ripeningStalenessLedgerStatePath)
 $coolingPressureWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coolingPressureWitnessStatePath)
+$hotReactivationTriggerReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.hotReactivationTriggerReceiptStatePath)
+$coldAdmissionEligibilityGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coldAdmissionEligibilityGateStatePath)
+$archiveDispositionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.archiveDispositionLedgerStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -590,6 +593,12 @@ $statePayload.lastRipeningStalenessLedgerBundle = [string] (Get-ObjectPropertyVa
 $statePayload.ripeningStalenessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $ripeningStalenessLedgerStatePath
 $statePayload.lastCoolingPressureWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCoolingPressureWitnessBundle')
 $statePayload.coolingPressureWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coolingPressureWitnessStatePath
+$statePayload.lastHotReactivationTriggerReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastHotReactivationTriggerReceiptBundle')
+$statePayload.hotReactivationTriggerReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $hotReactivationTriggerReceiptStatePath
+$statePayload.lastColdAdmissionEligibilityGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastColdAdmissionEligibilityGateBundle')
+$statePayload.coldAdmissionEligibilityGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coldAdmissionEligibilityGateStatePath
+$statePayload.lastArchiveDispositionLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastArchiveDispositionLedgerBundle')
+$statePayload.archiveDispositionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $archiveDispositionLedgerStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1466,6 +1475,33 @@ if (-not [string]::IsNullOrWhiteSpace($coolingPressureWitnessBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$hotReactivationTriggerReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-HotReactivation-TriggerReceipt.ps1'
+$hotReactivationTriggerReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $hotReactivationTriggerReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Hot reactivation trigger receipt writer'
+$hotReactivationTriggerReceiptBundlePath = Get-ScriptOutputTail -Output $hotReactivationTriggerReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($hotReactivationTriggerReceiptBundlePath)) {
+    $statePayload.lastHotReactivationTriggerReceiptBundle = $hotReactivationTriggerReceiptBundlePath
+    $statePayload.hotReactivationTriggerReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $hotReactivationTriggerReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$coldAdmissionEligibilityGateScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-ColdAdmission-EligibilityGate.ps1'
+$coldAdmissionEligibilityGateOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $coldAdmissionEligibilityGateScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Cold admission eligibility gate writer'
+$coldAdmissionEligibilityGateBundlePath = Get-ScriptOutputTail -Output $coldAdmissionEligibilityGateOutput
+if (-not [string]::IsNullOrWhiteSpace($coldAdmissionEligibilityGateBundlePath)) {
+    $statePayload.lastColdAdmissionEligibilityGateBundle = $coldAdmissionEligibilityGateBundlePath
+    $statePayload.coldAdmissionEligibilityGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coldAdmissionEligibilityGateStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$archiveDispositionLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Archive-DispositionLedger.ps1'
+$archiveDispositionLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $archiveDispositionLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Archive disposition ledger writer'
+$archiveDispositionLedgerBundlePath = Get-ScriptOutputTail -Output $archiveDispositionLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($archiveDispositionLedgerBundlePath)) {
+    $statePayload.lastArchiveDispositionLedgerBundle = $archiveDispositionLedgerBundlePath
+    $statePayload.archiveDispositionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $archiveDispositionLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1662,6 +1698,12 @@ $summary = [ordered]@{
     ripeningStalenessLedgerStatePath = $statePayload.ripeningStalenessLedgerStatePath
     lastCoolingPressureWitnessBundle = $statePayload.lastCoolingPressureWitnessBundle
     coolingPressureWitnessStatePath = $statePayload.coolingPressureWitnessStatePath
+    lastHotReactivationTriggerReceiptBundle = $statePayload.lastHotReactivationTriggerReceiptBundle
+    hotReactivationTriggerReceiptStatePath = $statePayload.hotReactivationTriggerReceiptStatePath
+    lastColdAdmissionEligibilityGateBundle = $statePayload.lastColdAdmissionEligibilityGateBundle
+    coldAdmissionEligibilityGateStatePath = $statePayload.coldAdmissionEligibilityGateStatePath
+    lastArchiveDispositionLedgerBundle = $statePayload.lastArchiveDispositionLedgerBundle
+    archiveDispositionLedgerStatePath = $statePayload.archiveDispositionLedgerStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -2003,6 +2045,15 @@ if (-not [string]::IsNullOrWhiteSpace($ripeningStalenessLedgerBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($coolingPressureWitnessBundlePath)) {
     Write-Host ('[local-automation-cycle] CoolingPressureWitness: {0}' -f $coolingPressureWitnessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($hotReactivationTriggerReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] HotReactivationTriggerReceipt: {0}' -f $hotReactivationTriggerReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($coldAdmissionEligibilityGateBundlePath)) {
+    Write-Host ('[local-automation-cycle] ColdAdmissionEligibilityGate: {0}' -f $coldAdmissionEligibilityGateBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($archiveDispositionLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] ArchiveDispositionLedger: {0}' -f $archiveDispositionLedgerBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

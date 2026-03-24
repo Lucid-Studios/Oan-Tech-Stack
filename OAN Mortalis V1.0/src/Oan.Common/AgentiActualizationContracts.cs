@@ -629,6 +629,58 @@ public sealed record CoolingPressureWitnessReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record HotReactivationTriggerReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string WarmClockDispositionReceiptHandle,
+    string CoolingPressureWitnessReceiptHandle,
+    string BrittlenessWitnessHandle,
+    string ReceiptState,
+    IReadOnlyList<string> ReactivationTriggers,
+    IReadOnlyList<string> FailedInvariants,
+    string ReactivationDisposition,
+    bool HotReturnLawful,
+    bool WarmHoldingInsufficient,
+    bool ReentryAsFormationPreserved,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record ColdAdmissionEligibilityGateReceipt(
+    string GateHandle,
+    string CMEId,
+    string CoolingPressureWitnessReceiptHandle,
+    string WarmClockDispositionReceiptHandle,
+    string RipeningStalenessLedgerHandle,
+    string DurabilityWitnessHandle,
+    string IntentConstraintAlignmentReceiptHandle,
+    string GateState,
+    IReadOnlyList<string> EligibilitySignals,
+    IReadOnlyList<string> RemainingBarriers,
+    string EligibilityDisposition,
+    bool ColdApproachLawful,
+    bool PreFreezeOnly,
+    bool FinalInheritanceStillWithheld,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record ArchiveDispositionLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string HotReactivationTriggerReceiptHandle,
+    string ColdAdmissionEligibilityGateHandle,
+    string WarmClockDispositionReceiptHandle,
+    string RipeningStalenessLedgerHandle,
+    string LedgerState,
+    IReadOnlyList<string> ArchiveRoutes,
+    IReadOnlyList<string> PreservedProvenanceMarks,
+    IReadOnlyList<string> DeniedRewriteRisks,
+    string ArchiveDisposition,
+    bool ProvenancePreserved,
+    bool PseudoLineageDenied,
+    bool WarmIndefiniteHoldingDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -670,6 +722,9 @@ public static class AgentiActualizationProjector
     private const string WarmClockDispositionPrefix = "warm-clock-disposition://";
     private const string RipeningStalenessLedgerPrefix = "ripening-staleness-ledger://";
     private const string CoolingPressureWitnessPrefix = "cooling-pressure-witness://";
+    private const string HotReactivationTriggerReceiptPrefix = "hot-reactivation-trigger-receipt://";
+    private const string ColdAdmissionEligibilityGatePrefix = "cold-admission-eligibility-gate://";
+    private const string ArchiveDispositionLedgerPrefix = "archive-disposition-ledger://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -2798,6 +2853,267 @@ public static class AgentiActualizationProjector
             ColdApproachLawful: coolingForces.Count > 0 && coolingBarriers.Count == 0 && formationPhaseVector.CoolingEligible,
             ReheatingOrArchivePressureStillStronger: coolingBarriers.Count >= coolingForces.Count,
             ReasonCode: "cooling-pressure-witness-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static HotReactivationTriggerReceipt CreateHotReactivationTriggerReceipt(
+        WarmClockDispositionReceipt warmClockDisposition,
+        CoolingPressureWitnessReceipt coolingPressureWitness,
+        BrittlenessWitnessReceipt brittlenessWitness,
+        string receiptState = "hot-reactivation-trigger-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(coolingPressureWitness);
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        EnsurePrefix(warmClockDisposition.ReceiptHandle, WarmClockDispositionPrefix, nameof(warmClockDisposition));
+        EnsurePrefix(coolingPressureWitness.ReceiptHandle, CoolingPressureWitnessPrefix, nameof(coolingPressureWitness));
+        EnsurePrefix(brittlenessWitness.ReceiptHandle, BrittlenessWitnessPrefix, nameof(brittlenessWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(warmClockDisposition.CMEId, coolingPressureWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(warmClockDisposition.CMEId, brittlenessWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Hot reactivation trigger requires warm clock, cooling pressure, and brittleness receipts to remain inside one CME continuity lane.");
+        }
+
+        var reactivationTriggers = new List<string>();
+        if (warmClockDisposition.FailureSignatureFreshnessRequired)
+        {
+            reactivationTriggers.Add("failure-signature-fired");
+        }
+
+        if (warmClockDisposition.DistanceBurdenStillActive)
+        {
+            reactivationTriggers.Add("distance-burden-unclosed");
+        }
+
+        if (brittlenessWitness.SceneBoundBrittlenessDetected)
+        {
+            reactivationTriggers.Add("scene-bound-fracture");
+        }
+
+        if (coolingPressureWitness.ReheatingOrArchivePressureStillStronger)
+        {
+            reactivationTriggers.Add("cooling-pressure-reversal");
+        }
+
+        var failedInvariants = new List<string>();
+        if (warmClockDisposition.FailureSignatureFreshnessRequired)
+        {
+            failedInvariants.Add("failure-closure-invariant");
+        }
+
+        if (warmClockDisposition.DistanceBurdenStillActive)
+        {
+            failedInvariants.Add("root-distance-closure-invariant");
+        }
+
+        if (brittlenessWitness.PrematureCoolingDenied)
+        {
+            failedInvariants.Add("cooling-readiness-invariant");
+        }
+
+        if (brittlenessWitness.MisalignmentPressureDetected)
+        {
+            failedInvariants.Add("intent-constraint-stability-invariant");
+        }
+
+        var hotReturnLawful = reactivationTriggers.Count > 0;
+
+        return new HotReactivationTriggerReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateHotReactivationTriggerReceiptHandle(
+                warmClockDisposition.CMEId,
+                warmClockDisposition.ReceiptHandle,
+                coolingPressureWitness.ReceiptHandle,
+                brittlenessWitness.ReceiptHandle),
+            CMEId: warmClockDisposition.CMEId,
+            WarmClockDispositionReceiptHandle: warmClockDisposition.ReceiptHandle,
+            CoolingPressureWitnessReceiptHandle: coolingPressureWitness.ReceiptHandle,
+            BrittlenessWitnessHandle: brittlenessWitness.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            ReactivationTriggers: reactivationTriggers,
+            FailedInvariants: failedInvariants,
+            ReactivationDisposition: hotReturnLawful ? "return-to-hot-required" : "warm-hold-sufficient",
+            HotReturnLawful: hotReturnLawful,
+            WarmHoldingInsufficient: hotReturnLawful,
+            ReentryAsFormationPreserved: hotReturnLawful && coolingPressureWitness.ReheatingOrArchivePressureStillStronger,
+            ReasonCode: "hot-reactivation-trigger-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static ColdAdmissionEligibilityGateReceipt CreateColdAdmissionEligibilityGateReceipt(
+        CoolingPressureWitnessReceipt coolingPressureWitness,
+        WarmClockDispositionReceipt warmClockDisposition,
+        RipeningStalenessLedgerReceipt ripeningStalenessLedger,
+        DurabilityWitnessReceipt durabilityWitness,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        string gateState = "cold-admission-eligibility-gate-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(coolingPressureWitness);
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(ripeningStalenessLedger);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        EnsurePrefix(coolingPressureWitness.ReceiptHandle, CoolingPressureWitnessPrefix, nameof(coolingPressureWitness));
+        EnsurePrefix(warmClockDisposition.ReceiptHandle, WarmClockDispositionPrefix, nameof(warmClockDisposition));
+        EnsurePrefix(ripeningStalenessLedger.LedgerHandle, RipeningStalenessLedgerPrefix, nameof(ripeningStalenessLedger));
+        EnsurePrefix(durabilityWitness.ReceiptHandle, DurabilityWitnessPrefix, nameof(durabilityWitness));
+        EnsurePrefix(intentConstraintAlignmentReceipt.ReceiptHandle, IntentConstraintAlignmentReceiptPrefix, nameof(intentConstraintAlignmentReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(gateState);
+
+        if (!string.Equals(coolingPressureWitness.CMEId, warmClockDisposition.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(coolingPressureWitness.CMEId, ripeningStalenessLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(coolingPressureWitness.CMEId, durabilityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(coolingPressureWitness.CMEId, intentConstraintAlignmentReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Cold admission eligibility gate requires cooling pressure, warm clock, ripening, durability, and alignment receipts to remain inside one CME continuity lane.");
+        }
+
+        var eligibilitySignals = new List<string>();
+        if (durabilityWitness.DurableUnderVariation)
+        {
+            eligibilitySignals.Add("durable-under-variation");
+        }
+
+        if (ripeningStalenessLedger.HonestWarmRipeningPreserved)
+        {
+            eligibilitySignals.Add("honest-temporal-ripening");
+        }
+
+        if (intentConstraintAlignmentReceipt.StructureConstraintAlignmentSatisfied)
+        {
+            eligibilitySignals.Add("structure-constraint-aligned");
+        }
+
+        if (intentConstraintAlignmentReceipt.ProvenanceAlignedWithIntent)
+        {
+            eligibilitySignals.Add("provenance-intent-aligned");
+        }
+
+        if (coolingPressureWitness.CoolingPressureEmergent)
+        {
+            eligibilitySignals.Add("cooling-pressure-emergent");
+        }
+
+        var remainingBarriers = new List<string>();
+        if (warmClockDisposition.DistanceBurdenStillActive)
+        {
+            remainingBarriers.Add("distance-burden-still-active");
+        }
+
+        if (warmClockDisposition.ReentryClockActive)
+        {
+            remainingBarriers.Add("reentry-clock-still-active");
+        }
+
+        if (durabilityWitness.ColdPromotionStillWithheld)
+        {
+            remainingBarriers.Add("cold-promotion-withheld");
+        }
+
+        if (!coolingPressureWitness.ColdApproachLawful)
+        {
+            remainingBarriers.Add("cold-approach-not-yet-lawful");
+        }
+
+        return new ColdAdmissionEligibilityGateReceipt(
+            GateHandle: AgentiActualizationKeys.CreateColdAdmissionEligibilityGateHandle(
+                coolingPressureWitness.CMEId,
+                coolingPressureWitness.ReceiptHandle,
+                ripeningStalenessLedger.LedgerHandle,
+                durabilityWitness.ReceiptHandle),
+            CMEId: coolingPressureWitness.CMEId,
+            CoolingPressureWitnessReceiptHandle: coolingPressureWitness.ReceiptHandle,
+            WarmClockDispositionReceiptHandle: warmClockDisposition.ReceiptHandle,
+            RipeningStalenessLedgerHandle: ripeningStalenessLedger.LedgerHandle,
+            DurabilityWitnessHandle: durabilityWitness.ReceiptHandle,
+            IntentConstraintAlignmentReceiptHandle: intentConstraintAlignmentReceipt.ReceiptHandle,
+            GateState: gateState.Trim(),
+            EligibilitySignals: eligibilitySignals,
+            RemainingBarriers: remainingBarriers,
+            EligibilityDisposition: coolingPressureWitness.ColdApproachLawful && remainingBarriers.Count == 0
+                ? "cold-candidacy-lawful"
+                : "cold-candidacy-withheld",
+            ColdApproachLawful: coolingPressureWitness.ColdApproachLawful,
+            PreFreezeOnly: true,
+            FinalInheritanceStillWithheld: true,
+            ReasonCode: "cold-admission-eligibility-gate-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static ArchiveDispositionLedgerReceipt CreateArchiveDispositionLedgerReceipt(
+        HotReactivationTriggerReceipt hotReactivationTrigger,
+        ColdAdmissionEligibilityGateReceipt coldAdmissionEligibilityGate,
+        WarmClockDispositionReceipt warmClockDisposition,
+        RipeningStalenessLedgerReceipt ripeningStalenessLedger,
+        string ledgerState = "archive-disposition-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(hotReactivationTrigger);
+        ArgumentNullException.ThrowIfNull(coldAdmissionEligibilityGate);
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(ripeningStalenessLedger);
+        EnsurePrefix(hotReactivationTrigger.ReceiptHandle, HotReactivationTriggerReceiptPrefix, nameof(hotReactivationTrigger));
+        EnsurePrefix(coldAdmissionEligibilityGate.GateHandle, ColdAdmissionEligibilityGatePrefix, nameof(coldAdmissionEligibilityGate));
+        EnsurePrefix(warmClockDisposition.ReceiptHandle, WarmClockDispositionPrefix, nameof(warmClockDisposition));
+        EnsurePrefix(ripeningStalenessLedger.LedgerHandle, RipeningStalenessLedgerPrefix, nameof(ripeningStalenessLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(hotReactivationTrigger.CMEId, coldAdmissionEligibilityGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(hotReactivationTrigger.CMEId, warmClockDisposition.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(hotReactivationTrigger.CMEId, ripeningStalenessLedger.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Archive disposition ledger requires hot reactivation, cold eligibility, warm clock, and ripening receipts to remain inside one CME continuity lane.");
+        }
+
+        var archiveRoutes = new[]
+        {
+            "narrative",
+            "hypothesis",
+            "residue",
+            "bounded-artifact"
+        };
+        var preservedProvenanceMarks = new[]
+        {
+            "origin-provenance-retained",
+            "distance-class-retained",
+            "intent-context-retained"
+        };
+        var deniedRewriteRisks = new[]
+        {
+            "pseudo-lineage",
+            "provenance-erasure",
+            "category-rewrite"
+        };
+
+        var archiveDisposition = hotReactivationTrigger.HotReturnLawful
+            ? "archive-available-but-hot-preferred"
+            : coldAdmissionEligibilityGate.ColdApproachLawful
+                ? "archive-withheld-due-to-cold-approach"
+                : "archive-route-lawful";
+
+        return new ArchiveDispositionLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateArchiveDispositionLedgerHandle(
+                hotReactivationTrigger.CMEId,
+                hotReactivationTrigger.ReceiptHandle,
+                coldAdmissionEligibilityGate.GateHandle,
+                warmClockDisposition.ReceiptHandle),
+            CMEId: hotReactivationTrigger.CMEId,
+            HotReactivationTriggerReceiptHandle: hotReactivationTrigger.ReceiptHandle,
+            ColdAdmissionEligibilityGateHandle: coldAdmissionEligibilityGate.GateHandle,
+            WarmClockDispositionReceiptHandle: warmClockDisposition.ReceiptHandle,
+            RipeningStalenessLedgerHandle: ripeningStalenessLedger.LedgerHandle,
+            LedgerState: ledgerState.Trim(),
+            ArchiveRoutes: archiveRoutes,
+            PreservedProvenanceMarks: preservedProvenanceMarks,
+            DeniedRewriteRisks: deniedRewriteRisks,
+            ArchiveDisposition: archiveDisposition,
+            ProvenancePreserved: true,
+            PseudoLineageDenied: true,
+            WarmIndefiniteHoldingDenied: warmClockDisposition.StalenessRiskPresent || ripeningStalenessLedger.FreshConstraintContactStillRequired,
+            ReasonCode: "archive-disposition-ledger-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

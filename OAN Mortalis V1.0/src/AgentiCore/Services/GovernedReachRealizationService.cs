@@ -770,4 +770,70 @@ public sealed class GovernedReachRealizationService
             receiptState,
             timestampUtc);
     }
+
+    public HotReactivationTriggerReceipt CreateHotReactivationTriggerReceipt(
+        WarmClockDispositionReceipt warmClockDisposition,
+        CoolingPressureWitnessReceipt coolingPressureWitness,
+        BrittlenessWitnessReceipt brittlenessWitness,
+        string receiptState = "hot-reactivation-trigger-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(coolingPressureWitness);
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+
+        return AgentiActualizationProjector.CreateHotReactivationTriggerReceipt(
+            warmClockDisposition,
+            coolingPressureWitness,
+            brittlenessWitness,
+            receiptState,
+            timestampUtc);
+    }
+
+    public ColdAdmissionEligibilityGateReceipt CreateColdAdmissionEligibilityGateReceipt(
+        CoolingPressureWitnessReceipt coolingPressureWitness,
+        WarmClockDispositionReceipt warmClockDisposition,
+        RipeningStalenessLedgerReceipt ripeningStalenessLedger,
+        DurabilityWitnessReceipt durabilityWitness,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        string gateState = "cold-admission-eligibility-gate-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(coolingPressureWitness);
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(ripeningStalenessLedger);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+
+        return AgentiActualizationProjector.CreateColdAdmissionEligibilityGateReceipt(
+            coolingPressureWitness,
+            warmClockDisposition,
+            ripeningStalenessLedger,
+            durabilityWitness,
+            intentConstraintAlignmentReceipt,
+            gateState,
+            timestampUtc);
+    }
+
+    public ArchiveDispositionLedgerReceipt CreateArchiveDispositionLedgerReceipt(
+        HotReactivationTriggerReceipt hotReactivationTrigger,
+        ColdAdmissionEligibilityGateReceipt coldAdmissionEligibilityGate,
+        WarmClockDispositionReceipt warmClockDisposition,
+        RipeningStalenessLedgerReceipt ripeningStalenessLedger,
+        string ledgerState = "archive-disposition-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(hotReactivationTrigger);
+        ArgumentNullException.ThrowIfNull(coldAdmissionEligibilityGate);
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(ripeningStalenessLedger);
+
+        return AgentiActualizationProjector.CreateArchiveDispositionLedgerReceipt(
+            hotReactivationTrigger,
+            coldAdmissionEligibilityGate,
+            warmClockDisposition,
+            ripeningStalenessLedger,
+            ledgerState,
+            timestampUtc);
+    }
 }

@@ -475,6 +475,48 @@ public static class AgentiActualizationKeys
         return $"cooling-pressure-witness://{ComputeDigest(cmeId, warmClockDispositionReceiptHandle, ripeningStalenessLedgerHandle, durabilityWitnessHandle)}";
     }
 
+    public static string CreateHotReactivationTriggerReceiptHandle(
+        string cmeId,
+        string warmClockDispositionReceiptHandle,
+        string coolingPressureWitnessReceiptHandle,
+        string brittlenessWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warmClockDispositionReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coolingPressureWitnessReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(brittlenessWitnessHandle);
+
+        return $"hot-reactivation-trigger-receipt://{ComputeDigest(cmeId, warmClockDispositionReceiptHandle, coolingPressureWitnessReceiptHandle, brittlenessWitnessHandle)}";
+    }
+
+    public static string CreateColdAdmissionEligibilityGateHandle(
+        string cmeId,
+        string coolingPressureWitnessReceiptHandle,
+        string ripeningStalenessLedgerHandle,
+        string durabilityWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coolingPressureWitnessReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(ripeningStalenessLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(durabilityWitnessHandle);
+
+        return $"cold-admission-eligibility-gate://{ComputeDigest(cmeId, coolingPressureWitnessReceiptHandle, ripeningStalenessLedgerHandle, durabilityWitnessHandle)}";
+    }
+
+    public static string CreateArchiveDispositionLedgerHandle(
+        string cmeId,
+        string hotReactivationTriggerReceiptHandle,
+        string coldAdmissionEligibilityGateHandle,
+        string warmClockDispositionReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(hotReactivationTriggerReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coldAdmissionEligibilityGateHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warmClockDispositionReceiptHandle);
+
+        return $"archive-disposition-ledger://{ComputeDigest(cmeId, hotReactivationTriggerReceiptHandle, coldAdmissionEligibilityGateHandle, warmClockDispositionReceiptHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

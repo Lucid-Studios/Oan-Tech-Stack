@@ -639,6 +639,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepCoolingPressureWitnessBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.hotReactivationTriggerReceiptOutputRoot)
+        keep = [int] $retentionPolicy.keepHotReactivationTriggerReceiptBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coldAdmissionEligibilityGateOutputRoot)
+        keep = [int] $retentionPolicy.keepColdAdmissionEligibilityGateBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.archiveDispositionLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepArchiveDispositionLedgerBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)
         keep = [int] $retentionPolicy.keepBlockedEscalationBundles
     }

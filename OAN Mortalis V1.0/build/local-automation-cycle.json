@@ -101,6 +101,9 @@
   "warmClockDispositionOutputRoot": ".audit/runs/warm-clock-disposition",
   "ripeningStalenessLedgerOutputRoot": ".audit/runs/ripening-staleness-ledger",
   "coolingPressureWitnessOutputRoot": ".audit/runs/cooling-pressure-witness",
+  "hotReactivationTriggerReceiptOutputRoot": ".audit/runs/hot-reactivation-trigger-receipt",
+  "coldAdmissionEligibilityGateOutputRoot": ".audit/runs/cold-admission-eligibility-gate",
+  "archiveDispositionLedgerOutputRoot": ".audit/runs/archive-disposition-ledger",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -200,6 +203,9 @@
   "warmClockDispositionStatePath": ".audit/state/local-automation-warm-clock-disposition-last-run.json",
   "ripeningStalenessLedgerStatePath": ".audit/state/local-automation-ripening-staleness-ledger-last-run.json",
   "coolingPressureWitnessStatePath": ".audit/state/local-automation-cooling-pressure-witness-last-run.json",
+  "hotReactivationTriggerReceiptStatePath": ".audit/state/local-automation-hot-reactivation-trigger-receipt-last-run.json",
+  "coldAdmissionEligibilityGateStatePath": ".audit/state/local-automation-cold-admission-eligibility-gate-last-run.json",
+  "archiveDispositionLedgerStatePath": ".audit/state/local-automation-archive-disposition-ledger-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -328,6 +334,9 @@
     "keepWarmClockDispositionBundles": 8,
     "keepRipeningStalenessLedgerBundles": 8,
     "keepCoolingPressureWitnessBundles": 8,
+    "keepHotReactivationTriggerReceiptBundles": 8,
+    "keepColdAdmissionEligibilityGateBundles": 8,
+    "keepArchiveDispositionLedgerBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

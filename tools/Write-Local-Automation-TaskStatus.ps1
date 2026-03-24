@@ -203,6 +203,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $WarmClockDispositionState,
         [object] $RipeningStalenessLedgerState,
         [object] $CoolingPressureWitnessState,
+        [object] $HotReactivationTriggerReceiptState,
+        [object] $ColdAdmissionEligibilityGateState,
+        [object] $ArchiveDispositionLedgerState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -1085,6 +1088,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'hot-reactivation-trigger-receipt' {
+            if ($null -ne $HotReactivationTriggerReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'cold-admission-eligibility-gate' {
+            if ($null -ne $ColdAdmissionEligibilityGateState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'archive-disposition-ledger' {
+            if ($null -ne $ArchiveDispositionLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1230,6 +1260,9 @@ $durabilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -
 $warmClockDispositionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.warmClockDispositionStatePath)
 $ripeningStalenessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.ripeningStalenessLedgerStatePath)
 $coolingPressureWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coolingPressureWitnessStatePath)
+$hotReactivationTriggerReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.hotReactivationTriggerReceiptStatePath)
+$coldAdmissionEligibilityGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coldAdmissionEligibilityGateStatePath)
+$archiveDispositionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.archiveDispositionLedgerStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1328,6 +1361,9 @@ $durabilityWitnessState = Read-JsonFileOrNull -Path $durabilityWitnessStatePath
 $warmClockDispositionState = Read-JsonFileOrNull -Path $warmClockDispositionStatePath
 $ripeningStalenessLedgerState = Read-JsonFileOrNull -Path $ripeningStalenessLedgerStatePath
 $coolingPressureWitnessState = Read-JsonFileOrNull -Path $coolingPressureWitnessStatePath
+$hotReactivationTriggerReceiptState = Read-JsonFileOrNull -Path $hotReactivationTriggerReceiptStatePath
+$coldAdmissionEligibilityGateState = Read-JsonFileOrNull -Path $coldAdmissionEligibilityGateStatePath
+$archiveDispositionLedgerState = Read-JsonFileOrNull -Path $archiveDispositionLedgerStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1572,6 +1608,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -WarmClockDispositionState $warmClockDispositionState `
                 -RipeningStalenessLedgerState $ripeningStalenessLedgerState `
                 -CoolingPressureWitnessState $coolingPressureWitnessState `
+                -HotReactivationTriggerReceiptState $hotReactivationTriggerReceiptState `
+                -ColdAdmissionEligibilityGateState $coldAdmissionEligibilityGateState `
+                -ArchiveDispositionLedgerState $archiveDispositionLedgerState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1724,6 +1763,9 @@ $taskMapEntries = @(
                     -WarmClockDispositionState $warmClockDispositionState `
                     -RipeningStalenessLedgerState $ripeningStalenessLedgerState `
                     -CoolingPressureWitnessState $coolingPressureWitnessState `
+                    -HotReactivationTriggerReceiptState $hotReactivationTriggerReceiptState `
+                    -ColdAdmissionEligibilityGateState $coldAdmissionEligibilityGateState `
+                    -ArchiveDispositionLedgerState $archiveDispositionLedgerState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -2356,6 +2398,34 @@ $statusPayload = [ordered]@{
         coolingPressureEmergent = if ($null -ne $coolingPressureWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingPressureEmergent') } else { $null }
         coolingPressureColdApproachLawful = if ($null -ne $coolingPressureWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coldApproachLawful') } else { $null }
         reheatingOrArchivePressureStillStronger = if ($null -ne $coolingPressureWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'reheatingOrArchivePressureStillStronger') } else { $null }
+        hotReactivationTriggerReceiptState = if ($null -ne $hotReactivationTriggerReceiptState) { [string] $hotReactivationTriggerReceiptState.hotReactivationTriggerReceiptState } else { $null }
+        hotReactivationTriggerReason = if ($null -ne $hotReactivationTriggerReceiptState) { [string] $hotReactivationTriggerReceiptState.reasonCode } else { $null }
+        hotReactivationTriggerNextAction = if ($null -ne $hotReactivationTriggerReceiptState) { [string] $hotReactivationTriggerReceiptState.nextAction } else { $null }
+        hotReactivationTriggerCount = if ($null -ne $hotReactivationTriggerReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'reactivationTriggerCount') } else { $null }
+        hotReactivationFailedInvariantCount = if ($null -ne $hotReactivationTriggerReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'failedInvariantCount') } else { $null }
+        hotReactivationDisposition = if ($null -ne $hotReactivationTriggerReceiptState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'reactivationDisposition') } else { $null }
+        hotReturnLawful = if ($null -ne $hotReactivationTriggerReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'hotReturnLawful') } else { $null }
+        warmHoldingInsufficient = if ($null -ne $hotReactivationTriggerReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'warmHoldingInsufficient') } else { $null }
+        reentryAsFormationPreserved = if ($null -ne $hotReactivationTriggerReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'reentryAsFormationPreserved') } else { $null }
+        coldAdmissionEligibilityGateState = if ($null -ne $coldAdmissionEligibilityGateState) { [string] $coldAdmissionEligibilityGateState.coldAdmissionEligibilityGateState } else { $null }
+        coldAdmissionEligibilityGateReason = if ($null -ne $coldAdmissionEligibilityGateState) { [string] $coldAdmissionEligibilityGateState.reasonCode } else { $null }
+        coldAdmissionEligibilityGateNextAction = if ($null -ne $coldAdmissionEligibilityGateState) { [string] $coldAdmissionEligibilityGateState.nextAction } else { $null }
+        coldEligibilitySignalCount = if ($null -ne $coldAdmissionEligibilityGateState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'eligibilitySignalCount') } else { $null }
+        coldEligibilityRemainingBarrierCount = if ($null -ne $coldAdmissionEligibilityGateState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'remainingBarrierCount') } else { $null }
+        coldEligibilityDisposition = if ($null -ne $coldAdmissionEligibilityGateState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'eligibilityDisposition') } else { $null }
+        coldEligibilityColdApproachLawful = if ($null -ne $coldAdmissionEligibilityGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'coldApproachLawful') } else { $null }
+        coldEligibilityPreFreezeOnly = if ($null -ne $coldAdmissionEligibilityGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'preFreezeOnly') } else { $null }
+        coldEligibilityFinalInheritanceStillWithheld = if ($null -ne $coldAdmissionEligibilityGateState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'finalInheritanceStillWithheld') } else { $null }
+        archiveDispositionLedgerState = if ($null -ne $archiveDispositionLedgerState) { [string] $archiveDispositionLedgerState.archiveDispositionLedgerState } else { $null }
+        archiveDispositionLedgerReason = if ($null -ne $archiveDispositionLedgerState) { [string] $archiveDispositionLedgerState.reasonCode } else { $null }
+        archiveDispositionLedgerNextAction = if ($null -ne $archiveDispositionLedgerState) { [string] $archiveDispositionLedgerState.nextAction } else { $null }
+        archiveRouteCount = if ($null -ne $archiveDispositionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'archiveRouteCount') } else { $null }
+        preservedProvenanceMarkCount = if ($null -ne $archiveDispositionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'preservedProvenanceMarkCount') } else { $null }
+        deniedRewriteRiskCount = if ($null -ne $archiveDispositionLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'deniedRewriteRiskCount') } else { $null }
+        archiveDisposition = if ($null -ne $archiveDispositionLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'archiveDisposition') } else { $null }
+        archiveProvenancePreserved = if ($null -ne $archiveDispositionLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'provenancePreserved') } else { $null }
+        archivePseudoLineageDenied = if ($null -ne $archiveDispositionLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'pseudoLineageDenied') } else { $null }
+        archiveWarmIndefiniteHoldingDenied = if ($null -ne $archiveDispositionLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'warmIndefiniteHoldingDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3775,6 +3845,58 @@ if ($null -ne $coolingPressureWitnessState) {
     )
 }
 
+if ($null -ne $hotReactivationTriggerReceiptState) {
+    $markdownLines += @(
+        '## Hot Reactivation Trigger Receipt',
+        '',
+        ('- Hot reactivation-trigger receipt state: `{0}`' -f [string] $hotReactivationTriggerReceiptState.hotReactivationTriggerReceiptState),
+        ('- Reason code: `{0}`' -f [string] $hotReactivationTriggerReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $hotReactivationTriggerReceiptState.nextAction),
+        ('- Reactivation-trigger count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'reactivationTriggerCount')),
+        ('- Failed-invariant count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'failedInvariantCount')),
+        ('- Reactivation disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'reactivationDisposition')),
+        ('- Hot return lawful: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'hotReturnLawful')),
+        ('- Warm holding insufficient: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'warmHoldingInsufficient')),
+        ('- Re-entry as formation preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $hotReactivationTriggerReceiptState -PropertyName 'reentryAsFormationPreserved')),
+        ''
+    )
+}
+
+if ($null -ne $coldAdmissionEligibilityGateState) {
+    $markdownLines += @(
+        '## Cold Admission Eligibility Gate',
+        '',
+        ('- Cold admission-eligibility gate state: `{0}`' -f [string] $coldAdmissionEligibilityGateState.coldAdmissionEligibilityGateState),
+        ('- Reason code: `{0}`' -f [string] $coldAdmissionEligibilityGateState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $coldAdmissionEligibilityGateState.nextAction),
+        ('- Eligibility-signal count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'eligibilitySignalCount')),
+        ('- Remaining-barrier count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'remainingBarrierCount')),
+        ('- Eligibility disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'eligibilityDisposition')),
+        ('- Cold approach lawful: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'coldApproachLawful')),
+        ('- Pre-freeze only: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'preFreezeOnly')),
+        ('- Final inheritance still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coldAdmissionEligibilityGateState -PropertyName 'finalInheritanceStillWithheld')),
+        ''
+    )
+}
+
+if ($null -ne $archiveDispositionLedgerState) {
+    $markdownLines += @(
+        '## Archive Disposition Ledger',
+        '',
+        ('- Archive disposition-ledger state: `{0}`' -f [string] $archiveDispositionLedgerState.archiveDispositionLedgerState),
+        ('- Reason code: `{0}`' -f [string] $archiveDispositionLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $archiveDispositionLedgerState.nextAction),
+        ('- Archive-route count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'archiveRouteCount')),
+        ('- Preserved provenance-mark count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'preservedProvenanceMarkCount')),
+        ('- Denied rewrite-risk count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'deniedRewriteRiskCount')),
+        ('- Archive disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'archiveDisposition')),
+        ('- Provenance preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'provenancePreserved')),
+        ('- Pseudo-lineage denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'pseudoLineageDenied')),
+        ('- Warm indefinite holding denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'warmIndefiniteHoldingDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3900,6 +4022,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -WarmClockDispositionState $warmClockDispositionState `
             -RipeningStalenessLedgerState $ripeningStalenessLedgerState `
             -CoolingPressureWitnessState $coolingPressureWitnessState `
+            -HotReactivationTriggerReceiptState $hotReactivationTriggerReceiptState `
+            -ColdAdmissionEligibilityGateState $coldAdmissionEligibilityGateState `
+            -ArchiveDispositionLedgerState $archiveDispositionLedgerState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
