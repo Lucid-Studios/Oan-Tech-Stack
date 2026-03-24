@@ -92,6 +92,9 @@
   "variationTestedReentryLedgerOutputRoot": ".audit/runs/variation-tested-reentry-ledger",
   "questioningAdmissionRefusalReceiptOutputRoot": ".audit/runs/questioning-admission-refusal-receipt",
   "promotionSeductionWatchOutputRoot": ".audit/runs/promotion-seduction-watch",
+  "engramIntentFieldLedgerOutputRoot": ".audit/runs/engram-intent-field-ledger",
+  "intentConstraintAlignmentReceiptOutputRoot": ".audit/runs/intent-constraint-alignment-receipt",
+  "warmReactivationDispositionReceiptOutputRoot": ".audit/runs/warm-reactivation-disposition-receipt",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -182,6 +185,9 @@
   "variationTestedReentryLedgerStatePath": ".audit/state/local-automation-variation-tested-reentry-ledger-last-run.json",
   "questioningAdmissionRefusalReceiptStatePath": ".audit/state/local-automation-questioning-admission-refusal-receipt-last-run.json",
   "promotionSeductionWatchStatePath": ".audit/state/local-automation-promotion-seduction-watch-last-run.json",
+  "engramIntentFieldLedgerStatePath": ".audit/state/local-automation-engram-intent-field-ledger-last-run.json",
+  "intentConstraintAlignmentReceiptStatePath": ".audit/state/local-automation-intent-constraint-alignment-receipt-last-run.json",
+  "warmReactivationDispositionReceiptStatePath": ".audit/state/local-automation-warm-reactivation-disposition-receipt-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -301,6 +307,9 @@
     "keepVariationTestedReentryLedgerBundles": 8,
     "keepQuestioningAdmissionRefusalReceiptBundles": 8,
     "keepPromotionSeductionWatchBundles": 8,
+    "keepEngramIntentFieldLedgerBundles": 8,
+    "keepIntentConstraintAlignmentReceiptBundles": 8,
+    "keepWarmReactivationDispositionReceiptBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

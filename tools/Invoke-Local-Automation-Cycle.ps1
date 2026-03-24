@@ -243,6 +243,9 @@ $protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $r
 $variationTestedReentryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.variationTestedReentryLedgerStatePath)
 $questioningAdmissionRefusalReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningAdmissionRefusalReceiptStatePath)
 $promotionSeductionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.promotionSeductionWatchStatePath)
+$engramIntentFieldLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.engramIntentFieldLedgerStatePath)
+$intentConstraintAlignmentReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.intentConstraintAlignmentReceiptStatePath)
+$warmReactivationDispositionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.warmReactivationDispositionReceiptStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -563,6 +566,12 @@ $statePayload.lastQuestioningAdmissionRefusalReceiptBundle = [string] (Get-Objec
 $statePayload.questioningAdmissionRefusalReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningAdmissionRefusalReceiptStatePath
 $statePayload.lastPromotionSeductionWatchBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPromotionSeductionWatchBundle')
 $statePayload.promotionSeductionWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $promotionSeductionWatchStatePath
+$statePayload.lastEngramIntentFieldLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastEngramIntentFieldLedgerBundle')
+$statePayload.engramIntentFieldLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $engramIntentFieldLedgerStatePath
+$statePayload.lastIntentConstraintAlignmentReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastIntentConstraintAlignmentReceiptBundle')
+$statePayload.intentConstraintAlignmentReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $intentConstraintAlignmentReceiptStatePath
+$statePayload.lastWarmReactivationDispositionReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastWarmReactivationDispositionReceiptBundle')
+$statePayload.warmReactivationDispositionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $warmReactivationDispositionReceiptStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1358,6 +1367,33 @@ if (-not [string]::IsNullOrWhiteSpace($promotionSeductionWatchBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$engramIntentFieldLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-EngramIntentField-Ledger.ps1'
+$engramIntentFieldLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $engramIntentFieldLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Engram intent-field ledger writer'
+$engramIntentFieldLedgerBundlePath = Get-ScriptOutputTail -Output $engramIntentFieldLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($engramIntentFieldLedgerBundlePath)) {
+    $statePayload.lastEngramIntentFieldLedgerBundle = $engramIntentFieldLedgerBundlePath
+    $statePayload.engramIntentFieldLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $engramIntentFieldLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$intentConstraintAlignmentReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-IntentConstraint-AlignmentReceipt.ps1'
+$intentConstraintAlignmentReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $intentConstraintAlignmentReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Intent-constraint alignment writer'
+$intentConstraintAlignmentReceiptBundlePath = Get-ScriptOutputTail -Output $intentConstraintAlignmentReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($intentConstraintAlignmentReceiptBundlePath)) {
+    $statePayload.lastIntentConstraintAlignmentReceiptBundle = $intentConstraintAlignmentReceiptBundlePath
+    $statePayload.intentConstraintAlignmentReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $intentConstraintAlignmentReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$warmReactivationDispositionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-WarmReactivation-DispositionReceipt.ps1'
+$warmReactivationDispositionReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $warmReactivationDispositionReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Warm reactivation disposition writer'
+$warmReactivationDispositionReceiptBundlePath = Get-ScriptOutputTail -Output $warmReactivationDispositionReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($warmReactivationDispositionReceiptBundlePath)) {
+    $statePayload.lastWarmReactivationDispositionReceiptBundle = $warmReactivationDispositionReceiptBundlePath
+    $statePayload.warmReactivationDispositionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $warmReactivationDispositionReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1536,6 +1572,12 @@ $summary = [ordered]@{
     questioningAdmissionRefusalReceiptStatePath = $statePayload.questioningAdmissionRefusalReceiptStatePath
     lastPromotionSeductionWatchBundle = $statePayload.lastPromotionSeductionWatchBundle
     promotionSeductionWatchStatePath = $statePayload.promotionSeductionWatchStatePath
+    lastEngramIntentFieldLedgerBundle = $statePayload.lastEngramIntentFieldLedgerBundle
+    engramIntentFieldLedgerStatePath = $statePayload.engramIntentFieldLedgerStatePath
+    lastIntentConstraintAlignmentReceiptBundle = $statePayload.lastIntentConstraintAlignmentReceiptBundle
+    intentConstraintAlignmentReceiptStatePath = $statePayload.intentConstraintAlignmentReceiptStatePath
+    lastWarmReactivationDispositionReceiptBundle = $statePayload.lastWarmReactivationDispositionReceiptBundle
+    warmReactivationDispositionReceiptStatePath = $statePayload.warmReactivationDispositionReceiptStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1850,6 +1892,15 @@ if (-not [string]::IsNullOrWhiteSpace($questioningAdmissionRefusalReceiptBundleP
 }
 if (-not [string]::IsNullOrWhiteSpace($promotionSeductionWatchBundlePath)) {
     Write-Host ('[local-automation-cycle] PromotionSeductionWatch: {0}' -f $promotionSeductionWatchBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($engramIntentFieldLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] EngramIntentFieldLedger: {0}' -f $engramIntentFieldLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($intentConstraintAlignmentReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] IntentConstraintAlignmentReceipt: {0}' -f $intentConstraintAlignmentReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($warmReactivationDispositionReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] WarmReactivationDispositionReceipt: {0}' -f $warmReactivationDispositionReceiptBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

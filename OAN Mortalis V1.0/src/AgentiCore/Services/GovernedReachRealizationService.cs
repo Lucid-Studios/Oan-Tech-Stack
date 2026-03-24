@@ -566,4 +566,76 @@ public sealed class GovernedReachRealizationService
             watchState,
             timestampUtc);
     }
+
+    public EngramIntentFieldLedgerReceipt CreateEngramIntentFieldLedger(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        PromotionSeductionWatchReceipt promotionSeductionWatch,
+        string ledgerState = "engram-intent-field-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        ArgumentNullException.ThrowIfNull(promotionSeductionWatch);
+
+        return AgentiActualizationProjector.CreateEngramIntentFieldLedger(
+            candidateLedger,
+            variationTestedReentryLedger,
+            admissionRefusalReceipt,
+            promotionSeductionWatch,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public IntentConstraintAlignmentReceipt CreateIntentConstraintAlignmentReceipt(
+        EngramIntentFieldLedgerReceipt intentFieldLedger,
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        string receiptState = "intent-constraint-alignment-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(intentFieldLedger);
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+
+        return AgentiActualizationProjector.CreateIntentConstraintAlignmentReceipt(
+            intentFieldLedger,
+            candidateLedger,
+            variationTestedReentryLedger,
+            promotionGate,
+            admissionRefusalReceipt,
+            receiptState,
+            timestampUtc);
+    }
+
+    public WarmReactivationDispositionReceipt CreateWarmReactivationDispositionReceipt(
+        EngramIntentFieldLedgerReceipt intentFieldLedger,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        PromotionSeductionWatchReceipt promotionSeductionWatch,
+        string receiptState = "warm-reactivation-disposition-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(intentFieldLedger);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        ArgumentNullException.ThrowIfNull(promotionSeductionWatch);
+
+        return AgentiActualizationProjector.CreateWarmReactivationDispositionReceipt(
+            intentFieldLedger,
+            intentConstraintAlignmentReceipt,
+            variationTestedReentryLedger,
+            admissionRefusalReceipt,
+            promotionSeductionWatch,
+            receiptState,
+            timestampUtc);
+    }
 }

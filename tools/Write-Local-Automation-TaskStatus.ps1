@@ -194,6 +194,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $VariationTestedReentryLedgerState,
         [object] $QuestioningAdmissionRefusalReceiptState,
         [object] $PromotionSeductionWatchState,
+        [object] $EngramIntentFieldLedgerState,
+        [object] $IntentConstraintAlignmentReceiptState,
+        [object] $WarmReactivationDispositionReceiptState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -995,6 +998,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'engram-intent-field-ledger' {
+            if ($null -ne $EngramIntentFieldLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'intent-constraint-alignment-receipt' {
+            if ($null -ne $IntentConstraintAlignmentReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'warm-reactivation-disposition-receipt' {
+            if ($null -ne $WarmReactivationDispositionReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1131,6 +1161,9 @@ $protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $r
 $variationTestedReentryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.variationTestedReentryLedgerStatePath)
 $questioningAdmissionRefusalReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningAdmissionRefusalReceiptStatePath)
 $promotionSeductionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.promotionSeductionWatchStatePath)
+$engramIntentFieldLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramIntentFieldLedgerStatePath)
+$intentConstraintAlignmentReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intentConstraintAlignmentReceiptStatePath)
+$warmReactivationDispositionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.warmReactivationDispositionReceiptStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1220,6 +1253,9 @@ $protectedQuestioningPatternSurfaceState = Read-JsonFileOrNull -Path $protectedQ
 $variationTestedReentryLedgerState = Read-JsonFileOrNull -Path $variationTestedReentryLedgerStatePath
 $questioningAdmissionRefusalReceiptState = Read-JsonFileOrNull -Path $questioningAdmissionRefusalReceiptStatePath
 $promotionSeductionWatchState = Read-JsonFileOrNull -Path $promotionSeductionWatchStatePath
+$engramIntentFieldLedgerState = Read-JsonFileOrNull -Path $engramIntentFieldLedgerStatePath
+$intentConstraintAlignmentReceiptState = Read-JsonFileOrNull -Path $intentConstraintAlignmentReceiptStatePath
+$warmReactivationDispositionReceiptState = Read-JsonFileOrNull -Path $warmReactivationDispositionReceiptStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1455,6 +1491,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -VariationTestedReentryLedgerState $variationTestedReentryLedgerState `
                 -QuestioningAdmissionRefusalReceiptState $questioningAdmissionRefusalReceiptState `
                 -PromotionSeductionWatchState $promotionSeductionWatchState `
+                -EngramIntentFieldLedgerState $engramIntentFieldLedgerState `
+                -IntentConstraintAlignmentReceiptState $intentConstraintAlignmentReceiptState `
+                -WarmReactivationDispositionReceiptState $warmReactivationDispositionReceiptState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1598,6 +1637,9 @@ $taskMapEntries = @(
                     -VariationTestedReentryLedgerState $variationTestedReentryLedgerState `
                     -QuestioningAdmissionRefusalReceiptState $questioningAdmissionRefusalReceiptState `
                     -PromotionSeductionWatchState $promotionSeductionWatchState `
+                    -EngramIntentFieldLedgerState $engramIntentFieldLedgerState `
+                    -IntentConstraintAlignmentReceiptState $intentConstraintAlignmentReceiptState `
+                    -WarmReactivationDispositionReceiptState $warmReactivationDispositionReceiptState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -2147,6 +2189,30 @@ $statusPayload = [ordered]@{
         promotionSeductionBlockedVectorCount = if ($null -ne $promotionSeductionWatchState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'blockedPromotionVectorCount') } else { $null }
         promotionSeductionDriftWarningCount = if ($null -ne $promotionSeductionWatchState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'driftWarningCount') } else { $null }
         promotionSeductionPrestigeInflationDenied = if ($null -ne $promotionSeductionWatchState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'prestigeInflationDenied') } else { $null }
+        engramIntentFieldLedgerState = if ($null -ne $engramIntentFieldLedgerState) { [string] $engramIntentFieldLedgerState.engramIntentFieldLedgerState } else { $null }
+        engramIntentFieldReason = if ($null -ne $engramIntentFieldLedgerState) { [string] $engramIntentFieldLedgerState.reasonCode } else { $null }
+        engramIntentFieldNextAction = if ($null -ne $engramIntentFieldLedgerState) { [string] $engramIntentFieldLedgerState.nextAction } else { $null }
+        engramIntentBearingPatternCount = if ($null -ne $engramIntentFieldLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'intentBearingPatternCount') } else { $null }
+        engramIntentSceneBoundPatternCount = if ($null -ne $engramIntentFieldLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'sceneBoundPatternCount') } else { $null }
+        engramIntentCandidateCarriesInternalIntent = if ($null -ne $engramIntentFieldLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'candidateCarriesInternalIntent') } else { $null }
+        engramIntentBorrowedJustificationDenied = if ($null -ne $engramIntentFieldLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'borrowedJustificationDenied') } else { $null }
+        intentConstraintAlignmentReceiptState = if ($null -ne $intentConstraintAlignmentReceiptState) { [string] $intentConstraintAlignmentReceiptState.intentConstraintAlignmentReceiptState } else { $null }
+        intentConstraintAlignmentReason = if ($null -ne $intentConstraintAlignmentReceiptState) { [string] $intentConstraintAlignmentReceiptState.reasonCode } else { $null }
+        intentConstraintAlignmentNextAction = if ($null -ne $intentConstraintAlignmentReceiptState) { [string] $intentConstraintAlignmentReceiptState.nextAction } else { $null }
+        intentConstraintAlignedPatternCount = if ($null -ne $intentConstraintAlignmentReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'alignedPatternCount') } else { $null }
+        intentConstraintMisalignedPatternCount = if ($null -ne $intentConstraintAlignmentReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'misalignedPatternCount') } else { $null }
+        intentConstraintAlignmentSatisfied = if ($null -ne $intentConstraintAlignmentReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'structureConstraintAlignmentSatisfied') } else { $null }
+        intentConstraintProvenanceAlignedWithIntent = if ($null -ne $intentConstraintAlignmentReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'provenanceAlignedWithIntent') } else { $null }
+        intentConstraintSceneBoundIntentDetected = if ($null -ne $intentConstraintAlignmentReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'sceneBoundIntentDetected') } else { $null }
+        warmReactivationDispositionReceiptState = if ($null -ne $warmReactivationDispositionReceiptState) { [string] $warmReactivationDispositionReceiptState.warmReactivationDispositionReceiptState } else { $null }
+        warmReactivationDispositionReason = if ($null -ne $warmReactivationDispositionReceiptState) { [string] $warmReactivationDispositionReceiptState.reasonCode } else { $null }
+        warmReactivationDispositionNextAction = if ($null -ne $warmReactivationDispositionReceiptState) { [string] $warmReactivationDispositionReceiptState.nextAction } else { $null }
+        warmHeldPatternCount = if ($null -ne $warmReactivationDispositionReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'warmHeldPatternCount') } else { $null }
+        warmReactivatedHotPatternCount = if ($null -ne $warmReactivationDispositionReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'reactivatedHotPatternCount') } else { $null }
+        warmArchivedPatternCount = if ($null -ne $warmReactivationDispositionReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'archivedPatternCount') } else { $null }
+        warmHoldingPreserved = if ($null -ne $warmReactivationDispositionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'warmHoldingPreserved') } else { $null }
+        warmHotReentryRequired = if ($null -ne $warmReactivationDispositionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'hotReentryRequired') } else { $null }
+        warmColdAdmissionWithheld = if ($null -ne $warmReactivationDispositionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'coldAdmissionWithheld') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3406,6 +3472,58 @@ if ($null -ne $promotionSeductionWatchState) {
     )
 }
 
+if ($null -ne $engramIntentFieldLedgerState) {
+    $markdownLines += @(
+        '## Engram Intent Field Ledger',
+        '',
+        ('- Engram intent-field ledger state: `{0}`' -f [string] $engramIntentFieldLedgerState.engramIntentFieldLedgerState),
+        ('- Reason code: `{0}`' -f [string] $engramIntentFieldLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $engramIntentFieldLedgerState.nextAction),
+        ('- Intent-bearing pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'intentBearingPatternCount')),
+        ('- Scene-bound pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'sceneBoundPatternCount')),
+        ('- Resolution-orientation count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'resolutionOrientationCount')),
+        ('- Truth-posture count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'truthPostureCount')),
+        ('- Candidate carries internal intent: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'candidateCarriesInternalIntent')),
+        ('- Borrowed justification denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $engramIntentFieldLedgerState -PropertyName 'borrowedJustificationDenied')),
+        ''
+    )
+}
+
+if ($null -ne $intentConstraintAlignmentReceiptState) {
+    $markdownLines += @(
+        '## Intent Constraint Alignment Receipt',
+        '',
+        ('- Intent-constraint alignment receipt state: `{0}`' -f [string] $intentConstraintAlignmentReceiptState.intentConstraintAlignmentReceiptState),
+        ('- Reason code: `{0}`' -f [string] $intentConstraintAlignmentReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $intentConstraintAlignmentReceiptState.nextAction),
+        ('- Aligned pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'alignedPatternCount')),
+        ('- Misaligned pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'misalignedPatternCount')),
+        ('- Structure-constraint alignment count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'structureConstraintAlignmentCount')),
+        ('- Intent-constraint alignment count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'intentConstraintAlignmentCount')),
+        ('- Provenance aligned with intent: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'provenanceAlignedWithIntent')),
+        ('- Scene-bound intent detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $intentConstraintAlignmentReceiptState -PropertyName 'sceneBoundIntentDetected')),
+        ''
+    )
+}
+
+if ($null -ne $warmReactivationDispositionReceiptState) {
+    $markdownLines += @(
+        '## Warm Reactivation Disposition Receipt',
+        '',
+        ('- Warm reactivation-disposition receipt state: `{0}`' -f [string] $warmReactivationDispositionReceiptState.warmReactivationDispositionReceiptState),
+        ('- Reason code: `{0}`' -f [string] $warmReactivationDispositionReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $warmReactivationDispositionReceiptState.nextAction),
+        ('- Warm-held pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'warmHeldPatternCount')),
+        ('- Reactivated-hot pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'reactivatedHotPatternCount')),
+        ('- Archived pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'archivedPatternCount')),
+        ('- Reactivation disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'reactivationDisposition')),
+        ('- Warm holding preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'warmHoldingPreserved')),
+        ('- Hot re-entry required: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'hotReentryRequired')),
+        ('- Cold admission withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'coldAdmissionWithheld')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3522,6 +3640,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -VariationTestedReentryLedgerState $variationTestedReentryLedgerState `
             -QuestioningAdmissionRefusalReceiptState $questioningAdmissionRefusalReceiptState `
             -PromotionSeductionWatchState $promotionSeductionWatchState `
+            -EngramIntentFieldLedgerState $engramIntentFieldLedgerState `
+            -IntentConstraintAlignmentReceiptState $intentConstraintAlignmentReceiptState `
+            -WarmReactivationDispositionReceiptState $warmReactivationDispositionReceiptState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

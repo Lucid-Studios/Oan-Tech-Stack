@@ -1064,6 +1064,149 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(seductionWatch.EmotionalCompulsionDenied);
     }
 
+    [Fact]
+    public void CreateWarmIntentAlignmentAndReactivation_RequireCandidatesToCarryTheirOwnWhyBeforeCooling()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
+        var (_, _, _, _, _, _, _, operatorSelection, _, _, _) = CreateCrucibleBundle();
+        var inquiryPatternLedger = reachService.CreateInquiryPatternContinuityLedger(
+            operatorSelection,
+            continuityLedger,
+            mutualWitness,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var boundaryPairLedger = reachService.CreateQuestioningBoundaryPairLedger(
+            operatorSelection,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var carryForwardSurface = reachService.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var classificationLedger = reachService.CreateEngramDistanceClassificationLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            timestampUtc: FixedTimestamp);
+        var requirementsMatrix = reachService.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            timestampUtc: FixedTimestamp);
+        var distanceWeightedSurface = reachService.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            requirementsMatrix,
+            carryForwardSurface,
+            timestampUtc: FixedTimestamp);
+        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
+        var promotionGate = reachService.CreateQuestioningGelPromotionGate(
+            candidateLedger,
+            carryForwardSurface,
+            operatorSelection,
+            localityWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
+        var protectedSurface = reachService.CreateProtectedQuestioningPatternSurface(
+            candidateLedger,
+            promotionGate,
+            carryForwardSurface,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var variationLedger = reachService.CreateVariationTestedReentryLedger(
+            distanceWeightedSurface,
+            candidateLedger,
+            promotionGate,
+            protectedSurface,
+            timestampUtc: FixedTimestamp);
+        var refusalReceipt = reachService.CreateQuestioningAdmissionRefusalReceipt(
+            variationLedger,
+            candidateLedger,
+            promotionGate,
+            protectedSurface,
+            timestampUtc: FixedTimestamp);
+        var seductionWatch = reachService.CreatePromotionSeductionWatch(
+            candidateLedger,
+            promotionGate,
+            variationLedger,
+            refusalReceipt,
+            timestampUtc: FixedTimestamp);
+
+        var intentFieldLedger = reachService.CreateEngramIntentFieldLedger(
+            candidateLedger,
+            variationLedger,
+            refusalReceipt,
+            seductionWatch,
+            ledgerState: "engram-intent-field-ledger-ready",
+            timestampUtc: FixedTimestamp);
+        var intentConstraintAlignment = reachService.CreateIntentConstraintAlignmentReceipt(
+            intentFieldLedger,
+            candidateLedger,
+            variationLedger,
+            promotionGate,
+            refusalReceipt,
+            receiptState: "intent-constraint-alignment-receipt-ready",
+            timestampUtc: FixedTimestamp);
+        var warmReactivationDisposition = reachService.CreateWarmReactivationDispositionReceipt(
+            intentFieldLedger,
+            intentConstraintAlignment,
+            variationLedger,
+            refusalReceipt,
+            seductionWatch,
+            receiptState: "warm-reactivation-disposition-receipt-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("engram-intent-field-ledger://", intentFieldLedger.LedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("engram-intent-field-ledger-bound", intentFieldLedger.ReasonCode);
+        Assert.Equal("engram-intent-field-ledger-ready", intentFieldLedger.LedgerState);
+        Assert.Equal(candidateLedger.DominantDistanceClass, intentFieldLedger.DominantDistanceClass);
+        Assert.Equal(candidateLedger.PromotionCeiling, intentFieldLedger.PromotionCeiling);
+        Assert.Equal(2, intentFieldLedger.IntentBearingPatterns.Count);
+        Assert.Single(intentFieldLedger.SceneBoundPatterns);
+        Assert.Equal(3, intentFieldLedger.ResolutionOrientations.Count);
+        Assert.Equal(3, intentFieldLedger.TruthPostures.Count);
+        Assert.Equal(2, intentFieldLedger.ScopeClasses.Count);
+        Assert.Equal(2, intentFieldLedger.TemporalPostures.Count);
+        Assert.Equal(3, intentFieldLedger.DependencyRelations.Count);
+        Assert.True(intentFieldLedger.CandidateCarriesInternalIntent);
+        Assert.True(intentFieldLedger.BorrowedJustificationDenied);
+
+        Assert.StartsWith("intent-constraint-alignment-receipt://", intentConstraintAlignment.ReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("intent-constraint-alignment-receipt-bound", intentConstraintAlignment.ReasonCode);
+        Assert.Equal("intent-constraint-alignment-receipt-ready", intentConstraintAlignment.ReceiptState);
+        Assert.Equal(2, intentConstraintAlignment.StructureConstraintAlignments.Count);
+        Assert.Equal(2, intentConstraintAlignment.IntentConstraintAlignments.Count);
+        Assert.Equal(3, intentConstraintAlignment.ProvenanceAlignmentChecks.Count);
+        Assert.Equal(2, intentConstraintAlignment.AlignedPatternCount);
+        Assert.Equal(1, intentConstraintAlignment.MisalignedPatternCount);
+        Assert.True(intentConstraintAlignment.StructureConstraintAlignmentSatisfied);
+        Assert.True(intentConstraintAlignment.ProvenanceAlignedWithIntent);
+        Assert.True(intentConstraintAlignment.SceneBoundIntentDetected);
+
+        Assert.StartsWith("warm-reactivation-disposition-receipt://", warmReactivationDisposition.ReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("warm-reactivation-disposition-receipt-bound", warmReactivationDisposition.ReasonCode);
+        Assert.Equal("warm-reactivation-disposition-receipt-ready", warmReactivationDisposition.ReceiptState);
+        Assert.Equal(2, warmReactivationDisposition.WarmHeldPatterns.Count);
+        Assert.Single(warmReactivationDisposition.ReactivatedHotPatterns);
+        Assert.Empty(warmReactivationDisposition.ArchivedPatterns);
+        Assert.Equal("mixed-hold-and-reactivate", warmReactivationDisposition.ReactivationDisposition);
+        Assert.True(warmReactivationDisposition.WarmHoldingPreserved);
+        Assert.True(warmReactivationDisposition.HotReentryRequired);
+        Assert.True(warmReactivationDisposition.ColdAdmissionWithheld);
+        Assert.True(warmReactivationDisposition.ArchiveDispositionAllowed);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
 
     private static (RuntimeHabitationReadinessLedgerReceipt ReadinessLedger, RuntimeWorkbenchSessionLedger SessionLedger, DayDreamCollapseReceipt CollapseReceipt, CrypticDepthReturnReceipt CrypticReturnReceipt, BondedCoWorkSessionRehearsalReceipt BondedCoWorkRehearsal, ReachReturnDissolutionReceipt ReachReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateInquiryBundle()

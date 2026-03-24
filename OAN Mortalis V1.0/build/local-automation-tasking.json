@@ -1821,6 +1821,60 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-33",
+      "label": "Automation Maturation Map 33",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Distill internal engram intent inside the warm lane so candidates can carry their own reason-for-being, align that intent with structure and constraint, and lawfully re-enter hot formation when the internal why does not hold.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "engram-intent-field-ledger",
+        "intent-constraint-alignment-receipt",
+        "warm-reactivation-disposition-receipt"
+      ],
+      "tasks": [
+        {
+          "id": "engram-intent-field-ledger",
+          "label": "Engram Intent Field Ledger",
+          "owner": "GEL",
+          "authority": "Warm-lane intent classification only",
+          "status": "selected",
+          "purpose": "Distill live objective and envelope intent into an internal candidate-carried intent field so the chamber can test whether a questioning candidate knows what class of resolution it exists to serve.",
+          "completionSignal": "An intent-field ledger can say which patterns carry internal intent, which remain scene-bound, and whether borrowed justification has been denied inside the warm lane.",
+          "escalatesWhen": [
+            "runtime objective is copied directly into candidate persistence without distillation",
+            "candidates continue to exist only because the originating scene is still narrating them"
+          ]
+        },
+        {
+          "id": "intent-constraint-alignment-receipt",
+          "label": "Intent Constraint Alignment Receipt",
+          "owner": "Shared",
+          "authority": "Warm alignment witness only",
+          "status": "selected",
+          "purpose": "Witness whether structure, constraint, provenance, and the candidate’s internal intent field actually align strongly enough for lawful continued holding or future cooling.",
+          "completionSignal": "An alignment receipt can distinguish aligned from misaligned patterns, disclose whether provenance still agrees with intent, and detect when scene-bound intent remains load-bearing.",
+          "escalatesWhen": [
+            "structure stabilizes while the candidate still cannot carry its own why",
+            "distance burden is satisfied but intent remains contradictory or overfit"
+          ]
+        },
+        {
+          "id": "warm-reactivation-disposition-receipt",
+          "label": "Warm Reactivation Disposition Receipt",
+          "owner": "SoulFrame",
+          "authority": "Warm hold and reheating only",
+          "status": "selected",
+          "purpose": "Decide which warm-held candidates remain disciplined non-finality, which must lawfully re-enter hot formation, and which may be archived without becoming inheritance.",
+          "completionSignal": "A reactivation receipt can name warm-held patterns, hot-reactivated patterns, and whether cold admission remains withheld while the candidate’s internal why is still under discipline.",
+          "escalatesWhen": [
+            "warm candidates are frozen without resolving internal intent coherence",
+            "scene-bound patterns are kept warm indefinitely without lawful reheating or archive disposition"
+          ]
+        }
+      ]
     }
   ]
 }

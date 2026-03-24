@@ -457,6 +457,68 @@ public sealed record PromotionSeductionWatchReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record EngramIntentFieldLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string CandidateLedgerHandle,
+    string VariationTestedReentryLedgerHandle,
+    string AdmissionRefusalReceiptHandle,
+    string PromotionSeductionWatchHandle,
+    string LedgerState,
+    EngramDistanceClass DominantDistanceClass,
+    EngramPromotionCeiling PromotionCeiling,
+    IReadOnlyList<string> IntentBearingPatterns,
+    IReadOnlyList<string> SceneBoundPatterns,
+    IReadOnlyList<string> ResolutionOrientations,
+    IReadOnlyList<string> TruthPostures,
+    IReadOnlyList<string> ScopeClasses,
+    IReadOnlyList<string> TemporalPostures,
+    IReadOnlyList<string> DependencyRelations,
+    bool CandidateCarriesInternalIntent,
+    bool BorrowedJustificationDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record IntentConstraintAlignmentReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string IntentFieldLedgerHandle,
+    string CandidateLedgerHandle,
+    string VariationTestedReentryLedgerHandle,
+    string PromotionGateHandle,
+    string AdmissionRefusalReceiptHandle,
+    string ReceiptState,
+    IReadOnlyList<string> StructureConstraintAlignments,
+    IReadOnlyList<string> IntentConstraintAlignments,
+    IReadOnlyList<string> ProvenanceAlignmentChecks,
+    int AlignedPatternCount,
+    int MisalignedPatternCount,
+    bool StructureConstraintAlignmentSatisfied,
+    bool ProvenanceAlignedWithIntent,
+    bool SceneBoundIntentDetected,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record WarmReactivationDispositionReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string IntentFieldLedgerHandle,
+    string IntentConstraintAlignmentReceiptHandle,
+    string VariationTestedReentryLedgerHandle,
+    string AdmissionRefusalReceiptHandle,
+    string PromotionSeductionWatchHandle,
+    string ReceiptState,
+    IReadOnlyList<string> WarmHeldPatterns,
+    IReadOnlyList<string> ReactivatedHotPatterns,
+    IReadOnlyList<string> ArchivedPatterns,
+    string ReactivationDisposition,
+    bool WarmHoldingPreserved,
+    bool HotReentryRequired,
+    bool ColdAdmissionWithheld,
+    bool ArchiveDispositionAllowed,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -489,6 +551,9 @@ public static class AgentiActualizationProjector
     private const string VariationTestedReentryLedgerPrefix = "variation-tested-reentry-ledger://";
     private const string QuestioningAdmissionRefusalReceiptPrefix = "questioning-admission-refusal-receipt://";
     private const string PromotionSeductionWatchPrefix = "promotion-seduction-watch://";
+    private const string EngramIntentFieldLedgerPrefix = "engram-intent-field-ledger://";
+    private const string IntentConstraintAlignmentReceiptPrefix = "intent-constraint-alignment-receipt://";
+    private const string WarmReactivationDispositionReceiptPrefix = "warm-reactivation-disposition-receipt://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -1979,6 +2044,231 @@ public static class AgentiActualizationProjector
             EleganceBiasDenied: true,
             EmotionalCompulsionDenied: true,
             ReasonCode: "promotion-seduction-watch-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static EngramIntentFieldLedgerReceipt CreateEngramIntentFieldLedger(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        PromotionSeductionWatchReceipt promotionSeductionWatch,
+        string ledgerState = "engram-intent-field-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        ArgumentNullException.ThrowIfNull(promotionSeductionWatch);
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(admissionRefusalReceipt.ReceiptHandle, QuestioningAdmissionRefusalReceiptPrefix, nameof(admissionRefusalReceipt));
+        EnsurePrefix(promotionSeductionWatch.WatchHandle, PromotionSeductionWatchPrefix, nameof(promotionSeductionWatch));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(candidateLedger.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, admissionRefusalReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, promotionSeductionWatch.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Engram intent-field ledger requires candidate, reentry, refusal, and seduction receipts to remain inside one CME continuity lane.");
+        }
+
+        var intentBearingPatterns = variationTestedReentryLedger.SurvivingPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var sceneBoundPatterns = admissionRefusalReceipt.RefusedPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var resolutionOrientations = new[]
+        {
+            "clarify",
+            "stabilize",
+            "explore"
+        };
+        var truthPostures = new[]
+        {
+            "bounded-truth-seeking",
+            "candidate-only",
+            "non-final"
+        };
+        var scopeClasses = new[]
+        {
+            "portable-candidate",
+            "scene-bound-warning"
+        };
+        var temporalPostures = new[]
+        {
+            "warm-held-review",
+            "long-chain-maturation"
+        };
+        var dependencyRelations = new[]
+        {
+            "constraint-envelope",
+            "distance-burden",
+            "warm-review-law"
+        };
+
+        return new EngramIntentFieldLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateEngramIntentFieldLedgerHandle(
+                candidateLedger.CMEId,
+                candidateLedger.LedgerHandle,
+                variationTestedReentryLedger.LedgerHandle,
+                admissionRefusalReceipt.ReceiptHandle),
+            CMEId: candidateLedger.CMEId,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            AdmissionRefusalReceiptHandle: admissionRefusalReceipt.ReceiptHandle,
+            PromotionSeductionWatchHandle: promotionSeductionWatch.WatchHandle,
+            LedgerState: ledgerState.Trim(),
+            DominantDistanceClass: candidateLedger.DominantDistanceClass,
+            PromotionCeiling: candidateLedger.PromotionCeiling,
+            IntentBearingPatterns: intentBearingPatterns,
+            SceneBoundPatterns: sceneBoundPatterns,
+            ResolutionOrientations: resolutionOrientations,
+            TruthPostures: truthPostures,
+            ScopeClasses: scopeClasses,
+            TemporalPostures: temporalPostures,
+            DependencyRelations: dependencyRelations,
+            CandidateCarriesInternalIntent: intentBearingPatterns.Length > 0,
+            BorrowedJustificationDenied: true,
+            ReasonCode: "engram-intent-field-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static IntentConstraintAlignmentReceipt CreateIntentConstraintAlignmentReceipt(
+        EngramIntentFieldLedgerReceipt intentFieldLedger,
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        string receiptState = "intent-constraint-alignment-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(intentFieldLedger);
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        EnsurePrefix(intentFieldLedger.LedgerHandle, EngramIntentFieldLedgerPrefix, nameof(intentFieldLedger));
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(promotionGate.GateHandle, QuestioningGelPromotionGatePrefix, nameof(promotionGate));
+        EnsurePrefix(admissionRefusalReceipt.ReceiptHandle, QuestioningAdmissionRefusalReceiptPrefix, nameof(admissionRefusalReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(intentFieldLedger.CMEId, candidateLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, promotionGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, admissionRefusalReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Intent-constraint alignment requires intent, candidate, reentry, promotion, and refusal receipts to remain inside one CME continuity lane.");
+        }
+
+        var structureConstraintAlignments = variationTestedReentryLedger.SurvivingPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Select(static item => $"{item}:structure-holds-under-variation")
+            .ToArray();
+        var intentConstraintAlignments = intentFieldLedger.IntentBearingPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Select(static item => $"{item}:intent-matches-constraint-envelope")
+            .ToArray();
+        var provenanceAlignmentChecks = new[]
+        {
+            $"distance-class:{candidateLedger.DominantDistanceClass}",
+            $"promotion-ceiling:{candidateLedger.PromotionCeiling}",
+            $"re-rooting-required:{promotionGate.ReRootingRequired}"
+        };
+        var alignedPatternCount = Math.Min(structureConstraintAlignments.Length, intentConstraintAlignments.Length);
+        var misalignedPatternCount = intentFieldLedger.SceneBoundPatterns.Count;
+
+        return new IntentConstraintAlignmentReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateIntentConstraintAlignmentReceiptHandle(
+                intentFieldLedger.CMEId,
+                intentFieldLedger.LedgerHandle,
+                variationTestedReentryLedger.LedgerHandle,
+                promotionGate.GateHandle),
+            CMEId: intentFieldLedger.CMEId,
+            IntentFieldLedgerHandle: intentFieldLedger.LedgerHandle,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            PromotionGateHandle: promotionGate.GateHandle,
+            AdmissionRefusalReceiptHandle: admissionRefusalReceipt.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            StructureConstraintAlignments: structureConstraintAlignments,
+            IntentConstraintAlignments: intentConstraintAlignments,
+            ProvenanceAlignmentChecks: provenanceAlignmentChecks,
+            AlignedPatternCount: alignedPatternCount,
+            MisalignedPatternCount: misalignedPatternCount,
+            StructureConstraintAlignmentSatisfied: variationTestedReentryLedger.VariationBurdenSatisfied && alignedPatternCount > 0,
+            ProvenanceAlignedWithIntent: !promotionGate.ReRootingRequired && candidateLedger.DominantDistanceClass != EngramDistanceClass.FarOther,
+            SceneBoundIntentDetected: misalignedPatternCount > 0,
+            ReasonCode: "intent-constraint-alignment-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static WarmReactivationDispositionReceipt CreateWarmReactivationDispositionReceipt(
+        EngramIntentFieldLedgerReceipt intentFieldLedger,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        PromotionSeductionWatchReceipt promotionSeductionWatch,
+        string receiptState = "warm-reactivation-disposition-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(intentFieldLedger);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        ArgumentNullException.ThrowIfNull(promotionSeductionWatch);
+        EnsurePrefix(intentFieldLedger.LedgerHandle, EngramIntentFieldLedgerPrefix, nameof(intentFieldLedger));
+        EnsurePrefix(intentConstraintAlignmentReceipt.ReceiptHandle, IntentConstraintAlignmentReceiptPrefix, nameof(intentConstraintAlignmentReceipt));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(admissionRefusalReceipt.ReceiptHandle, QuestioningAdmissionRefusalReceiptPrefix, nameof(admissionRefusalReceipt));
+        EnsurePrefix(promotionSeductionWatch.WatchHandle, PromotionSeductionWatchPrefix, nameof(promotionSeductionWatch));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(intentFieldLedger.CMEId, intentConstraintAlignmentReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, admissionRefusalReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, promotionSeductionWatch.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Warm reactivation disposition requires intent, alignment, reentry, refusal, and seduction receipts to remain inside one CME continuity lane.");
+        }
+
+        var warmHeldPatterns = intentFieldLedger.IntentBearingPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var reactivatedHotPatterns = admissionRefusalReceipt.RefusedPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var archivedPatterns = Array.Empty<string>();
+        var reactivationDisposition = reactivatedHotPatterns.Length > 0 ? "mixed-hold-and-reactivate" : "warm-hold-stable";
+
+        return new WarmReactivationDispositionReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateWarmReactivationDispositionReceiptHandle(
+                intentFieldLedger.CMEId,
+                intentFieldLedger.LedgerHandle,
+                intentConstraintAlignmentReceipt.ReceiptHandle,
+                admissionRefusalReceipt.ReceiptHandle),
+            CMEId: intentFieldLedger.CMEId,
+            IntentFieldLedgerHandle: intentFieldLedger.LedgerHandle,
+            IntentConstraintAlignmentReceiptHandle: intentConstraintAlignmentReceipt.ReceiptHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            AdmissionRefusalReceiptHandle: admissionRefusalReceipt.ReceiptHandle,
+            PromotionSeductionWatchHandle: promotionSeductionWatch.WatchHandle,
+            ReceiptState: receiptState.Trim(),
+            WarmHeldPatterns: warmHeldPatterns,
+            ReactivatedHotPatterns: reactivatedHotPatterns,
+            ArchivedPatterns: archivedPatterns,
+            ReactivationDisposition: reactivationDisposition,
+            WarmHoldingPreserved: warmHeldPatterns.Length > 0,
+            HotReentryRequired: reactivatedHotPatterns.Length > 0,
+            ColdAdmissionWithheld: true,
+            ArchiveDispositionAllowed: true,
+            ReasonCode: "warm-reactivation-disposition-receipt-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

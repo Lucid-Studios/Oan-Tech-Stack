@@ -349,6 +349,48 @@ public static class AgentiActualizationKeys
         return $"promotion-seduction-watch://{ComputeDigest(cmeId, candidateLedgerHandle, variationTestedReentryLedgerHandle, admissionRefusalReceiptHandle)}";
     }
 
+    public static string CreateEngramIntentFieldLedgerHandle(
+        string cmeId,
+        string candidateLedgerHandle,
+        string variationTestedReentryLedgerHandle,
+        string admissionRefusalReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(candidateLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(admissionRefusalReceiptHandle);
+
+        return $"engram-intent-field-ledger://{ComputeDigest(cmeId, candidateLedgerHandle, variationTestedReentryLedgerHandle, admissionRefusalReceiptHandle)}";
+    }
+
+    public static string CreateIntentConstraintAlignmentReceiptHandle(
+        string cmeId,
+        string intentFieldLedgerHandle,
+        string variationTestedReentryLedgerHandle,
+        string promotionGateHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intentFieldLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(promotionGateHandle);
+
+        return $"intent-constraint-alignment-receipt://{ComputeDigest(cmeId, intentFieldLedgerHandle, variationTestedReentryLedgerHandle, promotionGateHandle)}";
+    }
+
+    public static string CreateWarmReactivationDispositionReceiptHandle(
+        string cmeId,
+        string intentFieldLedgerHandle,
+        string intentConstraintAlignmentReceiptHandle,
+        string admissionRefusalReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intentFieldLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intentConstraintAlignmentReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(admissionRefusalReceiptHandle);
+
+        return $"warm-reactivation-disposition-receipt://{ComputeDigest(cmeId, intentFieldLedgerHandle, intentConstraintAlignmentReceiptHandle, admissionRefusalReceiptHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

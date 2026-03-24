@@ -603,6 +603,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepPromotionSeductionWatchBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramIntentFieldLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepEngramIntentFieldLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intentConstraintAlignmentReceiptOutputRoot)
+        keep = [int] $retentionPolicy.keepIntentConstraintAlignmentReceiptBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.warmReactivationDispositionReceiptOutputRoot)
+        keep = [int] $retentionPolicy.keepWarmReactivationDispositionReceiptBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)
         keep = [int] $retentionPolicy.keepBlockedEscalationBundles
     }

@@ -619,6 +619,24 @@ Current live output surfaces for this map:
 - `Promotion Seduction Watch`
   Bundle root: `.audit/runs/promotion-seduction-watch/`
 
+### Automation Maturation Map 33
+
+- Goal: distill internal engram intent inside the warm lane so candidates can carry their own reason-for-being, align that intent with structure and constraint, and lawfully re-enter hot formation when the internal why does not hold
+- Expected review windows: `2`
+- Selected tasks:
+  - `Engram Intent Field Ledger`
+  - `Intent Constraint Alignment Receipt`
+  - `Warm Reactivation Disposition Receipt`
+
+Current live output surfaces for this map:
+
+- `Engram Intent Field Ledger`
+  Bundle root: `.audit/runs/engram-intent-field-ledger/`
+- `Intent Constraint Alignment Receipt`
+  Bundle root: `.audit/runs/intent-constraint-alignment-receipt/`
+- `Warm Reactivation Disposition Receipt`
+  Bundle root: `.audit/runs/warm-reactivation-disposition-receipt/`
+
 ## Status Interpretation
 
 The task board must distinguish between:
