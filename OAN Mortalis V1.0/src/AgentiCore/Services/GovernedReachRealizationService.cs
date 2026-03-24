@@ -369,13 +369,13 @@ public sealed class GovernedReachRealizationService
             timestampUtc);
     }
 
-    public QuestioningOperatorCandidateLedgerReceipt CreateQuestioningOperatorCandidateLedger(
+    public EngramDistanceClassificationLedgerReceipt CreateEngramDistanceClassificationLedger(
         CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
         InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
         QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
         ContinuityUnderPressureLedgerReceipt continuityLedger,
         MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
-        string ledgerState = "questioning-operator-candidate-ledger-ready",
+        string ledgerState = "engram-distance-classification-ledger-ready",
         DateTimeOffset? timestampUtc = null)
     {
         ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
@@ -384,7 +384,7 @@ public sealed class GovernedReachRealizationService
         ArgumentNullException.ThrowIfNull(continuityLedger);
         ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
 
-        return AgentiActualizationProjector.CreateQuestioningOperatorCandidateLedger(
+        return AgentiActualizationProjector.CreateEngramDistanceClassificationLedger(
             carryForwardInquirySelectionSurface,
             inquiryPatternLedger,
             boundaryPairLedger,
@@ -394,11 +394,72 @@ public sealed class GovernedReachRealizationService
             timestampUtc);
     }
 
+    public EngramPromotionRequirementsMatrixReceipt CreateEngramPromotionRequirementsMatrix(
+        EngramDistanceClassificationLedgerReceipt classificationLedger,
+        string matrixState = "engram-promotion-requirements-matrix-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(classificationLedger);
+
+        return AgentiActualizationProjector.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            matrixState,
+            timestampUtc);
+    }
+
+    public DistanceWeightedQuestioningAdmissionSurfaceReceipt CreateDistanceWeightedQuestioningAdmissionSurface(
+        EngramDistanceClassificationLedgerReceipt classificationLedger,
+        EngramPromotionRequirementsMatrixReceipt promotionRequirementsMatrix,
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        string surfaceState = "distance-weighted-questioning-admission-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(classificationLedger);
+        ArgumentNullException.ThrowIfNull(promotionRequirementsMatrix);
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+
+        return AgentiActualizationProjector.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            promotionRequirementsMatrix,
+            carryForwardInquirySelectionSurface,
+            surfaceState,
+            timestampUtc);
+    }
+
+    public QuestioningOperatorCandidateLedgerReceipt CreateQuestioningOperatorCandidateLedger(
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
+        QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
+        DistanceWeightedQuestioningAdmissionSurfaceReceipt distanceWeightedAdmissionSurface,
+        string ledgerState = "questioning-operator-candidate-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(inquiryPatternLedger);
+        ArgumentNullException.ThrowIfNull(boundaryPairLedger);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
+        ArgumentNullException.ThrowIfNull(distanceWeightedAdmissionSurface);
+
+        return AgentiActualizationProjector.CreateQuestioningOperatorCandidateLedger(
+            carryForwardInquirySelectionSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualIntelligibilityWitness,
+            distanceWeightedAdmissionSurface,
+            ledgerState,
+            timestampUtc);
+    }
+
     public QuestioningGelPromotionGateReceipt CreateQuestioningGelPromotionGate(
         QuestioningOperatorCandidateLedgerReceipt candidateLedger,
         CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
         OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
         LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        DistanceWeightedQuestioningAdmissionSurfaceReceipt distanceWeightedAdmissionSurface,
         string gateState = "questioning-gel-promotion-gate-ready",
         DateTimeOffset? timestampUtc = null)
     {
@@ -406,12 +467,14 @@ public sealed class GovernedReachRealizationService
         ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
         ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
         ArgumentNullException.ThrowIfNull(localityWitness);
+        ArgumentNullException.ThrowIfNull(distanceWeightedAdmissionSurface);
 
         return AgentiActualizationProjector.CreateQuestioningGelPromotionGate(
             candidateLedger,
             carryForwardInquirySelectionSurface,
             operatorInquiryEnvelope,
             localityWitness,
+            distanceWeightedAdmissionSurface,
             gateState,
             timestampUtc);
     }

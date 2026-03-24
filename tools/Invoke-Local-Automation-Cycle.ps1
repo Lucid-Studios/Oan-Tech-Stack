@@ -234,6 +234,9 @@ $mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolve
 $inquiryPatternContinuityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.inquiryPatternContinuityLedgerStatePath)
 $questioningBoundaryPairLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningBoundaryPairLedgerStatePath)
 $carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.carryForwardInquirySelectionSurfaceStatePath)
+$engramDistanceClassificationLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.engramDistanceClassificationLedgerStatePath)
+$engramPromotionRequirementsMatrixStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.engramPromotionRequirementsMatrixStatePath)
+$distanceWeightedQuestioningAdmissionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.distanceWeightedQuestioningAdmissionSurfaceStatePath)
 $questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningOperatorCandidateLedgerStatePath)
 $questioningGelPromotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningGelPromotionGateStatePath)
 $protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.protectedQuestioningPatternSurfaceStatePath)
@@ -539,6 +542,12 @@ $statePayload.lastQuestioningBoundaryPairLedgerBundle = [string] (Get-ObjectProp
 $statePayload.questioningBoundaryPairLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningBoundaryPairLedgerStatePath
 $statePayload.lastCarryForwardInquirySelectionSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCarryForwardInquirySelectionSurfaceBundle')
 $statePayload.carryForwardInquirySelectionSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $carryForwardInquirySelectionSurfaceStatePath
+$statePayload.lastEngramDistanceClassificationLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastEngramDistanceClassificationLedgerBundle')
+$statePayload.engramDistanceClassificationLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $engramDistanceClassificationLedgerStatePath
+$statePayload.lastEngramPromotionRequirementsMatrixBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastEngramPromotionRequirementsMatrixBundle')
+$statePayload.engramPromotionRequirementsMatrixStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $engramPromotionRequirementsMatrixStatePath
+$statePayload.lastDistanceWeightedQuestioningAdmissionSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDistanceWeightedQuestioningAdmissionSurfaceBundle')
+$statePayload.distanceWeightedQuestioningAdmissionSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $distanceWeightedQuestioningAdmissionSurfaceStatePath
 $statePayload.lastQuestioningOperatorCandidateLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQuestioningOperatorCandidateLedgerBundle')
 $statePayload.questioningOperatorCandidateLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningOperatorCandidateLedgerStatePath
 $statePayload.lastQuestioningGelPromotionGateBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQuestioningGelPromotionGateBundle')
@@ -1259,6 +1268,33 @@ if (-not [string]::IsNullOrWhiteSpace($carryForwardInquirySelectionSurfaceBundle
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$engramDistanceClassificationLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-EngramDistance-ClassificationLedger.ps1'
+$engramDistanceClassificationLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $engramDistanceClassificationLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Engram-distance classification writer'
+$engramDistanceClassificationLedgerBundlePath = Get-ScriptOutputTail -Output $engramDistanceClassificationLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($engramDistanceClassificationLedgerBundlePath)) {
+    $statePayload.lastEngramDistanceClassificationLedgerBundle = $engramDistanceClassificationLedgerBundlePath
+    $statePayload.engramDistanceClassificationLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $engramDistanceClassificationLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$engramPromotionRequirementsMatrixScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-EngramPromotionRequirements-Matrix.ps1'
+$engramPromotionRequirementsMatrixOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $engramPromotionRequirementsMatrixScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Engram-promotion requirements writer'
+$engramPromotionRequirementsMatrixBundlePath = Get-ScriptOutputTail -Output $engramPromotionRequirementsMatrixOutput
+if (-not [string]::IsNullOrWhiteSpace($engramPromotionRequirementsMatrixBundlePath)) {
+    $statePayload.lastEngramPromotionRequirementsMatrixBundle = $engramPromotionRequirementsMatrixBundlePath
+    $statePayload.engramPromotionRequirementsMatrixStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $engramPromotionRequirementsMatrixStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$distanceWeightedQuestioningAdmissionSurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-DistanceWeighted-QuestioningAdmissionSurface.ps1'
+$distanceWeightedQuestioningAdmissionSurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $distanceWeightedQuestioningAdmissionSurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Distance-weighted questioning-admission writer'
+$distanceWeightedQuestioningAdmissionSurfaceBundlePath = Get-ScriptOutputTail -Output $distanceWeightedQuestioningAdmissionSurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($distanceWeightedQuestioningAdmissionSurfaceBundlePath)) {
+    $statePayload.lastDistanceWeightedQuestioningAdmissionSurfaceBundle = $distanceWeightedQuestioningAdmissionSurfaceBundlePath
+    $statePayload.distanceWeightedQuestioningAdmissionSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $distanceWeightedQuestioningAdmissionSurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $questioningOperatorCandidateLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-QuestioningOperator-CandidateLedger.ps1'
 $questioningOperatorCandidateLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $questioningOperatorCandidateLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Questioning-operator candidate writer'
 $questioningOperatorCandidateLedgerBundlePath = Get-ScriptOutputTail -Output $questioningOperatorCandidateLedgerOutput
@@ -1446,6 +1482,12 @@ $summary = [ordered]@{
     questioningBoundaryPairLedgerStatePath = $statePayload.questioningBoundaryPairLedgerStatePath
     lastCarryForwardInquirySelectionSurfaceBundle = $statePayload.lastCarryForwardInquirySelectionSurfaceBundle
     carryForwardInquirySelectionSurfaceStatePath = $statePayload.carryForwardInquirySelectionSurfaceStatePath
+    lastEngramDistanceClassificationLedgerBundle = $statePayload.lastEngramDistanceClassificationLedgerBundle
+    engramDistanceClassificationLedgerStatePath = $statePayload.engramDistanceClassificationLedgerStatePath
+    lastEngramPromotionRequirementsMatrixBundle = $statePayload.lastEngramPromotionRequirementsMatrixBundle
+    engramPromotionRequirementsMatrixStatePath = $statePayload.engramPromotionRequirementsMatrixStatePath
+    lastDistanceWeightedQuestioningAdmissionSurfaceBundle = $statePayload.lastDistanceWeightedQuestioningAdmissionSurfaceBundle
+    distanceWeightedQuestioningAdmissionSurfaceStatePath = $statePayload.distanceWeightedQuestioningAdmissionSurfaceStatePath
     lastQuestioningOperatorCandidateLedgerBundle = $statePayload.lastQuestioningOperatorCandidateLedgerBundle
     questioningOperatorCandidateLedgerStatePath = $statePayload.questioningOperatorCandidateLedgerStatePath
     lastQuestioningGelPromotionGateBundle = $statePayload.lastQuestioningGelPromotionGateBundle
@@ -1739,6 +1781,15 @@ if (-not [string]::IsNullOrWhiteSpace($questioningBoundaryPairLedgerBundlePath))
 }
 if (-not [string]::IsNullOrWhiteSpace($carryForwardInquirySelectionSurfaceBundlePath)) {
     Write-Host ('[local-automation-cycle] CarryForwardInquirySelectionSurface: {0}' -f $carryForwardInquirySelectionSurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($engramDistanceClassificationLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] EngramDistanceClassificationLedger: {0}' -f $engramDistanceClassificationLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($engramPromotionRequirementsMatrixBundlePath)) {
+    Write-Host ('[local-automation-cycle] EngramPromotionRequirementsMatrix: {0}' -f $engramPromotionRequirementsMatrixBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($distanceWeightedQuestioningAdmissionSurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] DistanceWeightedQuestioningAdmissionSurface: {0}' -f $distanceWeightedQuestioningAdmissionSurfaceBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($questioningOperatorCandidateLedgerBundlePath)) {
     Write-Host ('[local-automation-cycle] QuestioningOperatorCandidateLedger: {0}' -f $questioningOperatorCandidateLedgerBundlePath)

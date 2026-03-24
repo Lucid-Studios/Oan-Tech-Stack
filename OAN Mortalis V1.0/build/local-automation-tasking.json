@@ -1713,6 +1713,60 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-31",
+      "label": "Automation Maturation Map 31",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Scale questioning promotion burden by epistemic distance from Root so farther patterns face stronger re-entry, tighter unknown tolerance, and lawful promotion ceilings before they can approach inheritance.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "engram-distance-classification-ledger",
+        "engram-promotion-requirements-matrix",
+        "distance-weighted-questioning-admission-surface"
+      ],
+      "tasks": [
+        {
+          "id": "engram-distance-classification-ledger",
+          "label": "Engram Distance Classification Ledger",
+          "owner": "GEL",
+          "authority": "Distance classification only",
+          "status": "selected",
+          "purpose": "Classify questioning patterns by epistemic distance from Root so review burden begins from constraint proximity instead of surface elegance.",
+          "completionSignal": "A classification ledger can distinguish adjacent-root, first-order-other, and far-other material without treating all remembered patterns as equally admissible.",
+          "escalatesWhen": [
+            "distance classes are assigned from rhetoric alone",
+            "far-other material is treated as inheritance without re-rooting"
+          ]
+        },
+        {
+          "id": "engram-promotion-requirements-matrix",
+          "label": "Engram Promotion Requirements Matrix",
+          "owner": "Shared",
+          "authority": "Admission weighting only",
+          "status": "selected",
+          "purpose": "Bind the evidence counts, unknown tolerance, re-entry depth, and promotion ceilings that each distance class must satisfy before questioning can approach inheritance.",
+          "completionSignal": "A requirements matrix can scale burden proportionately with Root distance and name when refusal or candidate-only retention is mandatory.",
+          "escalatesWhen": [
+            "promotion burden stays flat across distance classes",
+            "distance classes gain inheritance without explicit ceilings"
+          ]
+        },
+        {
+          "id": "distance-weighted-questioning-admission-surface",
+          "label": "Distance-Weighted Questioning Admission Surface",
+          "owner": "SoulFrame",
+          "authority": "Admission filtering only",
+          "status": "selected",
+          "purpose": "Expose which questioning patterns remain reviewable after distance weighting, which stay withheld, and what re-entry burdens still govern them.",
+          "completionSignal": "A distance-weighted surface can admit bounded candidate patterns, withhold far or weakly rooted ones, and disclose the lawful burden still owed before promotion review.",
+          "escalatesWhen": [
+            "distance weighting becomes decorative metadata",
+            "reviewable questioning is admitted without burden scaling"
+          ]
+        }
+      ]
     }
   ]
 }

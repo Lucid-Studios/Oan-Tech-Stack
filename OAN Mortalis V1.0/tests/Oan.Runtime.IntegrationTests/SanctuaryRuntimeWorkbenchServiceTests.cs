@@ -711,7 +711,7 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
     }
 
     [Fact]
-    public void CreateQuestioningOperatorCandidateLedgerAndPromotionGate_GuardReuseBeforeInheritance()
+    public void CreateEngramDistanceAdmissionSurface_ScalesPromotionBurdenByRootDistance()
     {
         var reachService = new GovernedReachRealizationService();
         var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
@@ -735,12 +735,100 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
             localityWitness,
             timestampUtc: FixedTimestamp);
 
+        var classificationLedger = reachService.CreateEngramDistanceClassificationLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            ledgerState: "engram-distance-classification-ledger-ready",
+            timestampUtc: FixedTimestamp);
+        var requirementsMatrix = reachService.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            matrixState: "engram-promotion-requirements-matrix-ready",
+            timestampUtc: FixedTimestamp);
+        var distanceWeightedSurface = reachService.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            requirementsMatrix,
+            carryForwardSurface,
+            surfaceState: "distance-weighted-questioning-admission-surface-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("engram-distance-classification-ledger://", classificationLedger.LedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("engram-distance-classification-ledger-bound", classificationLedger.ReasonCode);
+        Assert.Equal("engram-distance-classification-ledger-ready", classificationLedger.LedgerState);
+        Assert.Equal(EngramDistanceClass.AdjacentRoot, classificationLedger.DominantDistanceClass);
+        Assert.Equal(3, classificationLedger.AdjacentRootPatternCount);
+        Assert.Equal(0, classificationLedger.CoRootPatternCount);
+        Assert.True(classificationLedger.PromotionFromFarOtherDenied);
+
+        Assert.StartsWith("engram-promotion-requirements-matrix://", requirementsMatrix.MatrixHandle, StringComparison.Ordinal);
+        Assert.Equal("engram-promotion-requirements-matrix-bound", requirementsMatrix.ReasonCode);
+        Assert.Equal("engram-promotion-requirements-matrix-ready", requirementsMatrix.MatrixState);
+        Assert.Equal(4, requirementsMatrix.RequirementEntries.Count);
+        Assert.True(requirementsMatrix.BurdenScalingPreserved);
+        Assert.True(requirementsMatrix.PortableInheritanceRequiresVariation);
+
+        Assert.StartsWith("distance-weighted-questioning-admission-surface://", distanceWeightedSurface.SurfaceHandle, StringComparison.Ordinal);
+        Assert.Equal("distance-weighted-questioning-admission-surface-bound", distanceWeightedSurface.ReasonCode);
+        Assert.Equal("distance-weighted-questioning-admission-surface-ready", distanceWeightedSurface.SurfaceState);
+        Assert.Equal(EngramDistanceClass.AdjacentRoot, distanceWeightedSurface.DominantDistanceClass);
+        Assert.Equal(EngramPromotionCeiling.GuardedCandidateReview, distanceWeightedSurface.PromotionCeiling);
+        Assert.Equal(3, distanceWeightedSurface.AdmittedCandidatePatterns.Count);
+        Assert.Equal(3, distanceWeightedSurface.WithheldCandidatePatterns.Count);
+        Assert.Equal(3, distanceWeightedSurface.RequiredReentryBurdens.Count);
+        Assert.Equal(1, distanceWeightedSurface.UnknownTolerance);
+        Assert.True(distanceWeightedSurface.DistanceScalingPreserved);
+        Assert.True(distanceWeightedSurface.FarOtherPromotionDenied);
+    }
+
+    [Fact]
+    public void CreateQuestioningOperatorCandidateLedgerAndPromotionGate_GuardReuseBeforeInheritance()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
+        var (_, _, _, _, _, _, _, operatorSelection, _, _, _) = CreateCrucibleBundle();
+        var inquiryPatternLedger = reachService.CreateInquiryPatternContinuityLedger(
+            operatorSelection,
+            continuityLedger,
+            mutualWitness,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var boundaryPairLedger = reachService.CreateQuestioningBoundaryPairLedger(
+            operatorSelection,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var carryForwardSurface = reachService.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var classificationLedger = reachService.CreateEngramDistanceClassificationLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            timestampUtc: FixedTimestamp);
+        var requirementsMatrix = reachService.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            timestampUtc: FixedTimestamp);
+        var distanceWeightedSurface = reachService.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            requirementsMatrix,
+            carryForwardSurface,
+            timestampUtc: FixedTimestamp);
+
         var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
             carryForwardSurface,
             inquiryPatternLedger,
             boundaryPairLedger,
             continuityLedger,
             mutualWitness,
+            distanceWeightedSurface,
             ledgerState: "questioning-operator-candidate-ledger-ready",
             timestampUtc: FixedTimestamp);
         var promotionGate = reachService.CreateQuestioningGelPromotionGate(
@@ -748,12 +836,16 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
             carryForwardSurface,
             operatorSelection,
             localityWitness,
+            distanceWeightedSurface,
             gateState: "questioning-gel-promotion-gate-ready",
             timestampUtc: FixedTimestamp);
 
         Assert.StartsWith("questioning-operator-candidate-ledger://", candidateLedger.LedgerHandle, StringComparison.Ordinal);
         Assert.Equal("questioning-operator-candidate-ledger-bound", candidateLedger.ReasonCode);
         Assert.Equal("questioning-operator-candidate-ledger-ready", candidateLedger.LedgerState);
+        Assert.Equal(distanceWeightedSurface.SurfaceHandle, candidateLedger.DistanceWeightedAdmissionSurfaceHandle);
+        Assert.Equal(EngramDistanceClass.AdjacentRoot, candidateLedger.DominantDistanceClass);
+        Assert.Equal(EngramPromotionCeiling.GuardedCandidateReview, candidateLedger.PromotionCeiling);
         Assert.Equal(3, candidateLedger.EventBoundInquiryForms.Count);
         Assert.Equal(3, candidateLedger.CandidateInquiryPatterns.Count);
         Assert.Equal(3, candidateLedger.PromotionEvidence.Count);
@@ -761,10 +853,15 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.Equal(3, candidateLedger.FailureSignatureExpectations.Count);
         Assert.True(candidateLedger.HiddenAuthorityPatternsDenied);
         Assert.True(candidateLedger.IdentityBoundPatternsWithheld);
+        Assert.True(candidateLedger.DistanceScalingPreserved);
+        Assert.True(candidateLedger.FarOtherPromotionDenied);
 
         Assert.StartsWith("questioning-gel-promotion-gate://", promotionGate.GateHandle, StringComparison.Ordinal);
         Assert.Equal("questioning-gel-promotion-gate-bound", promotionGate.ReasonCode);
         Assert.Equal("questioning-gel-promotion-gate-ready", promotionGate.GateState);
+        Assert.Equal(distanceWeightedSurface.SurfaceHandle, promotionGate.DistanceWeightedAdmissionSurfaceHandle);
+        Assert.Equal(EngramDistanceClass.AdjacentRoot, promotionGate.DominantDistanceClass);
+        Assert.Equal(EngramPromotionCeiling.GuardedCandidateReview, promotionGate.PromotionCeiling);
         Assert.Equal(3, promotionGate.CandidateInquiryPatterns.Count);
         Assert.Equal(3, promotionGate.SatisfiedPromotionConditions.Count);
         Assert.Equal(3, promotionGate.UnmetPromotionConditions.Count);
@@ -773,6 +870,8 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(promotionGate.AuthoritySeparationPreserved);
         Assert.True(promotionGate.TruthSeekingInvariantPreserved);
         Assert.True(promotionGate.OutcomeSeekingDenied);
+        Assert.True(promotionGate.DistanceScalingPreserved);
+        Assert.False(promotionGate.ReRootingRequired);
         Assert.True(promotionGate.PromotionReviewAdmitted);
     }
 
@@ -800,18 +899,35 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
             operatorSelection,
             localityWitness,
             timestampUtc: FixedTimestamp);
-        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+        var classificationLedger = reachService.CreateEngramDistanceClassificationLedger(
             carryForwardSurface,
             inquiryPatternLedger,
             boundaryPairLedger,
             continuityLedger,
             mutualWitness,
             timestampUtc: FixedTimestamp);
+        var requirementsMatrix = reachService.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            timestampUtc: FixedTimestamp);
+        var distanceWeightedSurface = reachService.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            requirementsMatrix,
+            carryForwardSurface,
+            timestampUtc: FixedTimestamp);
+        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
         var promotionGate = reachService.CreateQuestioningGelPromotionGate(
             candidateLedger,
             carryForwardSurface,
             operatorSelection,
             localityWitness,
+            distanceWeightedSurface,
             timestampUtc: FixedTimestamp);
 
         var protectedSurface = reachService.CreateProtectedQuestioningPatternSurface(

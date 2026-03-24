@@ -258,7 +258,38 @@ public sealed record CarryForwardInquirySelectionSurfaceReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
-public sealed record QuestioningOperatorCandidateLedgerReceipt(
+public enum EngramDistanceClass
+{
+    CoRoot,
+    AdjacentRoot,
+    FirstOrderOther,
+    FarOther
+}
+
+public enum EngramPromotionCeiling
+{
+    FastTrackCandidateReview,
+    GuardedCandidateReview,
+    CandidateOnlyMemory,
+    NarrativeArchiveOnly
+}
+
+public sealed record EngramDistanceClassificationEntry(
+    string PatternCode,
+    EngramDistanceClass DistanceClass,
+    string SourceMode,
+    string PromotionDisposition);
+
+public sealed record EngramDistanceRequirementEntry(
+    EngramDistanceClass DistanceClass,
+    int RequiredEvidenceCount,
+    int MaximumUnknownLoad,
+    int RequiredReentryDepth,
+    EngramPromotionCeiling PromotionCeiling,
+    bool FreshConstraintContactRequired,
+    IReadOnlyList<string> RefusalConditions);
+
+public sealed record EngramDistanceClassificationLedgerReceipt(
     string LedgerHandle,
     string CMEId,
     string CarryForwardInquirySelectionSurfaceHandle,
@@ -267,6 +298,59 @@ public sealed record QuestioningOperatorCandidateLedgerReceipt(
     string ContinuityLedgerHandle,
     string MutualIntelligibilityWitnessHandle,
     string LedgerState,
+    EngramDistanceClass DominantDistanceClass,
+    IReadOnlyList<EngramDistanceClassificationEntry> ClassifiedPatterns,
+    int CoRootPatternCount,
+    int AdjacentRootPatternCount,
+    int FirstOrderOtherPatternCount,
+    int FarOtherArtifactCount,
+    bool PromotionFromFarOtherDenied,
+    bool ReRootingRequiredForFarOther,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record EngramPromotionRequirementsMatrixReceipt(
+    string MatrixHandle,
+    string CMEId,
+    string ClassificationLedgerHandle,
+    string MatrixState,
+    IReadOnlyList<EngramDistanceRequirementEntry> RequirementEntries,
+    bool BurdenScalingPreserved,
+    bool PortableInheritanceRequiresVariation,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record DistanceWeightedQuestioningAdmissionSurfaceReceipt(
+    string SurfaceHandle,
+    string CMEId,
+    string ClassificationLedgerHandle,
+    string PromotionRequirementsMatrixHandle,
+    string CarryForwardInquirySelectionSurfaceHandle,
+    string SurfaceState,
+    EngramDistanceClass DominantDistanceClass,
+    EngramPromotionCeiling PromotionCeiling,
+    IReadOnlyList<string> AdmittedCandidatePatterns,
+    IReadOnlyList<string> WithheldCandidatePatterns,
+    IReadOnlyList<string> RequiredReentryBurdens,
+    int UnknownTolerance,
+    bool DistanceScalingPreserved,
+    bool FarOtherPromotionDenied,
+    bool ReRootingRequired,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record QuestioningOperatorCandidateLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string CarryForwardInquirySelectionSurfaceHandle,
+    string InquiryPatternLedgerHandle,
+    string BoundaryPairLedgerHandle,
+    string ContinuityLedgerHandle,
+    string MutualIntelligibilityWitnessHandle,
+    string DistanceWeightedAdmissionSurfaceHandle,
+    string LedgerState,
+    EngramDistanceClass DominantDistanceClass,
+    EngramPromotionCeiling PromotionCeiling,
     IReadOnlyList<string> EventBoundInquiryForms,
     IReadOnlyList<string> CandidateInquiryPatterns,
     IReadOnlyList<string> PromotionEvidence,
@@ -274,6 +358,8 @@ public sealed record QuestioningOperatorCandidateLedgerReceipt(
     IReadOnlyList<string> FailureSignatureExpectations,
     bool HiddenAuthorityPatternsDenied,
     bool IdentityBoundPatternsWithheld,
+    bool DistanceScalingPreserved,
+    bool FarOtherPromotionDenied,
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
@@ -284,7 +370,10 @@ public sealed record QuestioningGelPromotionGateReceipt(
     string CarryForwardInquirySelectionSurfaceHandle,
     string OperatorInquiryEnvelopeHandle,
     string LocalityWitnessHandle,
+    string DistanceWeightedAdmissionSurfaceHandle,
     string GateState,
+    EngramDistanceClass DominantDistanceClass,
+    EngramPromotionCeiling PromotionCeiling,
     IReadOnlyList<string> CandidateInquiryPatterns,
     IReadOnlyList<string> SatisfiedPromotionConditions,
     IReadOnlyList<string> UnmetPromotionConditions,
@@ -293,6 +382,8 @@ public sealed record QuestioningGelPromotionGateReceipt(
     bool AuthoritySeparationPreserved,
     bool TruthSeekingInvariantPreserved,
     bool OutcomeSeekingDenied,
+    bool DistanceScalingPreserved,
+    bool ReRootingRequired,
     bool PromotionReviewAdmitted,
     string ReasonCode,
     DateTimeOffset TimestampUtc);
@@ -337,6 +428,9 @@ public static class AgentiActualizationProjector
     private const string InquiryPatternContinuityLedgerPrefix = "inquiry-pattern-continuity-ledger://";
     private const string QuestioningBoundaryPairLedgerPrefix = "questioning-boundary-pair-ledger://";
     private const string CarryForwardInquirySelectionSurfacePrefix = "carry-forward-inquiry-selection-surface://";
+    private const string EngramDistanceClassificationLedgerPrefix = "engram-distance-classification-ledger://";
+    private const string EngramPromotionRequirementsMatrixPrefix = "engram-promotion-requirements-matrix://";
+    private const string DistanceWeightedQuestioningAdmissionSurfacePrefix = "distance-weighted-questioning-admission-surface://";
     private const string QuestioningOperatorCandidateLedgerPrefix = "questioning-operator-candidate-ledger://";
     private const string QuestioningGelPromotionGatePrefix = "questioning-gel-promotion-gate://";
     private const string ProtectedQuestioningPatternSurfacePrefix = "protected-questioning-pattern-surface://";
@@ -1184,13 +1278,13 @@ public static class AgentiActualizationProjector
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 
-    public static QuestioningOperatorCandidateLedgerReceipt CreateQuestioningOperatorCandidateLedger(
+    public static EngramDistanceClassificationLedgerReceipt CreateEngramDistanceClassificationLedger(
         CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
         InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
         QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
         ContinuityUnderPressureLedgerReceipt continuityLedger,
         MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
-        string ledgerState = "questioning-operator-candidate-ledger-ready",
+        string ledgerState = "engram-distance-classification-ledger-ready",
         DateTimeOffset? timestampUtc = null)
     {
         ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
@@ -1210,26 +1304,233 @@ public static class AgentiActualizationProjector
             !string.Equals(carryForwardInquirySelectionSurface.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
             !string.Equals(carryForwardInquirySelectionSurface.CMEId, mutualIntelligibilityWitness.CMEId, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Questioning operator candidacy requires carry-forward selection, inquiry continuity, boundary pairing, pressure continuity, and mutual intelligibility to remain inside one bonded CME surface.");
+            throw new InvalidOperationException("Engram distance classification requires carry-forward inquiry, inquiry continuity, boundary pairing, pressure continuity, and mutual intelligibility to remain inside one bonded CME surface.");
         }
 
-        var eventBoundInquiryForms = carryForwardInquirySelectionSurface.WithheldReuseWarnings
+        var adjacentRootPatterns = carryForwardInquirySelectionSurface.AvailableCarryForwardPatterns
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
             .ToArray();
-        var candidateInquiryPatterns = carryForwardInquirySelectionSurface.AvailableCarryForwardPatterns
+        var firstOrderOtherPatterns = boundaryPairLedger.InquiryPatterns
+            .Except(adjacentRootPatterns, StringComparer.Ordinal)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var farOtherArtifacts = Array.Empty<string>();
+        var classifiedPatterns = adjacentRootPatterns
+            .Select(static pattern => new EngramDistanceClassificationEntry(
+                PatternCode: pattern,
+                DistanceClass: EngramDistanceClass.AdjacentRoot,
+                SourceMode: "adjacent-constraint-observation",
+                PromotionDisposition: "guarded-candidate-review"))
+            .Concat(firstOrderOtherPatterns.Select(static pattern => new EngramDistanceClassificationEntry(
+                PatternCode: pattern,
+                DistanceClass: EngramDistanceClass.FirstOrderOther,
+                SourceMode: "reported-or-reconstructed-constraint",
+                PromotionDisposition: "candidate-only-retention")))
+            .Concat(farOtherArtifacts.Select(static artifact => new EngramDistanceClassificationEntry(
+                PatternCode: artifact,
+                DistanceClass: EngramDistanceClass.FarOther,
+                SourceMode: "far-other-artifact",
+                PromotionDisposition: "narrative-archive-only")))
+            .ToArray();
+        var coRootPatternCount = 0;
+        var adjacentRootPatternCount = adjacentRootPatterns.Length;
+        var firstOrderOtherPatternCount = firstOrderOtherPatterns.Length;
+        var farOtherArtifactCount = farOtherArtifacts.Length;
+        var dominantDistanceClass = DetermineDominantDistanceClass(
+            coRootPatternCount,
+            adjacentRootPatternCount,
+            firstOrderOtherPatternCount,
+            farOtherArtifactCount);
+
+        return new EngramDistanceClassificationLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateEngramDistanceClassificationLedgerHandle(
+                carryForwardInquirySelectionSurface.CMEId,
+                carryForwardInquirySelectionSurface.SurfaceHandle,
+                inquiryPatternLedger.LedgerHandle,
+                continuityLedger.LedgerHandle),
+            CMEId: carryForwardInquirySelectionSurface.CMEId,
+            CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
+            InquiryPatternLedgerHandle: inquiryPatternLedger.LedgerHandle,
+            BoundaryPairLedgerHandle: boundaryPairLedger.LedgerHandle,
+            ContinuityLedgerHandle: continuityLedger.LedgerHandle,
+            MutualIntelligibilityWitnessHandle: mutualIntelligibilityWitness.WitnessHandle,
+            LedgerState: ledgerState.Trim(),
+            DominantDistanceClass: dominantDistanceClass,
+            ClassifiedPatterns: classifiedPatterns,
+            CoRootPatternCount: coRootPatternCount,
+            AdjacentRootPatternCount: adjacentRootPatternCount,
+            FirstOrderOtherPatternCount: firstOrderOtherPatternCount,
+            FarOtherArtifactCount: farOtherArtifactCount,
+            PromotionFromFarOtherDenied: true,
+            ReRootingRequiredForFarOther: farOtherArtifactCount > 0,
+            ReasonCode: "engram-distance-classification-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static EngramPromotionRequirementsMatrixReceipt CreateEngramPromotionRequirementsMatrix(
+        EngramDistanceClassificationLedgerReceipt classificationLedger,
+        string matrixState = "engram-promotion-requirements-matrix-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(classificationLedger);
+        EnsurePrefix(classificationLedger.LedgerHandle, EngramDistanceClassificationLedgerPrefix, nameof(classificationLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(matrixState);
+
+        var requirementEntries = CreateDefaultEngramDistanceRequirementEntries();
+
+        return new EngramPromotionRequirementsMatrixReceipt(
+            MatrixHandle: AgentiActualizationKeys.CreateEngramPromotionRequirementsMatrixHandle(
+                classificationLedger.CMEId,
+                classificationLedger.LedgerHandle),
+            CMEId: classificationLedger.CMEId,
+            ClassificationLedgerHandle: classificationLedger.LedgerHandle,
+            MatrixState: matrixState.Trim(),
+            RequirementEntries: requirementEntries,
+            BurdenScalingPreserved: true,
+            PortableInheritanceRequiresVariation: true,
+            ReasonCode: "engram-promotion-requirements-matrix-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static DistanceWeightedQuestioningAdmissionSurfaceReceipt CreateDistanceWeightedQuestioningAdmissionSurface(
+        EngramDistanceClassificationLedgerReceipt classificationLedger,
+        EngramPromotionRequirementsMatrixReceipt promotionRequirementsMatrix,
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        string surfaceState = "distance-weighted-questioning-admission-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(classificationLedger);
+        ArgumentNullException.ThrowIfNull(promotionRequirementsMatrix);
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        EnsurePrefix(classificationLedger.LedgerHandle, EngramDistanceClassificationLedgerPrefix, nameof(classificationLedger));
+        EnsurePrefix(promotionRequirementsMatrix.MatrixHandle, EngramPromotionRequirementsMatrixPrefix, nameof(promotionRequirementsMatrix));
+        EnsurePrefix(carryForwardInquirySelectionSurface.SurfaceHandle, CarryForwardInquirySelectionSurfacePrefix, nameof(carryForwardInquirySelectionSurface));
+        ArgumentException.ThrowIfNullOrWhiteSpace(surfaceState);
+
+        if (!string.Equals(classificationLedger.CMEId, promotionRequirementsMatrix.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(classificationLedger.CMEId, carryForwardInquirySelectionSurface.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Distance-weighted questioning admission requires distance classification, promotion requirements, and carry-forward inquiry to remain inside one bonded CME surface.");
+        }
+
+        var dominantRequirement = GetRequirementEntry(
+            promotionRequirementsMatrix.RequirementEntries,
+            classificationLedger.DominantDistanceClass);
+        var admittedCandidatePatterns = classificationLedger.ClassifiedPatterns
+            .Where(static entry => entry.DistanceClass is EngramDistanceClass.CoRoot or EngramDistanceClass.AdjacentRoot)
+            .Select(static entry => entry.PatternCode)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var withheldCandidatePatterns = classificationLedger.ClassifiedPatterns
+            .Where(static entry => entry.DistanceClass is EngramDistanceClass.FirstOrderOther or EngramDistanceClass.FarOther)
+            .Select(static entry => entry.PatternCode)
+            .Concat(carryForwardInquirySelectionSurface.WithheldReuseWarnings)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var requiredReentryBurdens = new[]
+            {
+                $"required-evidence-count:{dominantRequirement.RequiredEvidenceCount}",
+                $"maximum-unknown-load:{dominantRequirement.MaximumUnknownLoad}",
+                $"required-reentry-depth:{dominantRequirement.RequiredReentryDepth}",
+                dominantRequirement.FreshConstraintContactRequired ? "fresh-constraint-contact-required" : "fresh-constraint-contact-not-required"
+            }
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var promotionCeiling = dominantRequirement.PromotionCeiling;
+        var distanceScalingPreserved = promotionRequirementsMatrix.BurdenScalingPreserved &&
+            classificationLedger.PromotionFromFarOtherDenied;
+        var farOtherPromotionDenied = classificationLedger.PromotionFromFarOtherDenied;
+        var reRootingRequired = classificationLedger.ReRootingRequiredForFarOther ||
+            dominantRequirement.FreshConstraintContactRequired;
+
+        return new DistanceWeightedQuestioningAdmissionSurfaceReceipt(
+            SurfaceHandle: AgentiActualizationKeys.CreateDistanceWeightedQuestioningAdmissionSurfaceHandle(
+                classificationLedger.CMEId,
+                classificationLedger.LedgerHandle,
+                promotionRequirementsMatrix.MatrixHandle,
+                carryForwardInquirySelectionSurface.SurfaceHandle),
+            CMEId: classificationLedger.CMEId,
+            ClassificationLedgerHandle: classificationLedger.LedgerHandle,
+            PromotionRequirementsMatrixHandle: promotionRequirementsMatrix.MatrixHandle,
+            CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
+            SurfaceState: surfaceState.Trim(),
+            DominantDistanceClass: classificationLedger.DominantDistanceClass,
+            PromotionCeiling: promotionCeiling,
+            AdmittedCandidatePatterns: AllowsCandidateReview(promotionCeiling) ? admittedCandidatePatterns : Array.Empty<string>(),
+            WithheldCandidatePatterns: withheldCandidatePatterns,
+            RequiredReentryBurdens: requiredReentryBurdens,
+            UnknownTolerance: dominantRequirement.MaximumUnknownLoad,
+            DistanceScalingPreserved: distanceScalingPreserved,
+            FarOtherPromotionDenied: farOtherPromotionDenied,
+            ReRootingRequired: reRootingRequired,
+            ReasonCode: "distance-weighted-questioning-admission-surface-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static QuestioningOperatorCandidateLedgerReceipt CreateQuestioningOperatorCandidateLedger(
+        CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
+        InquiryPatternContinuityLedgerReceipt inquiryPatternLedger,
+        QuestioningBoundaryPairLedgerReceipt boundaryPairLedger,
+        ContinuityUnderPressureLedgerReceipt continuityLedger,
+        MutualIntelligibilityWitnessReceipt mutualIntelligibilityWitness,
+        DistanceWeightedQuestioningAdmissionSurfaceReceipt distanceWeightedAdmissionSurface,
+        string ledgerState = "questioning-operator-candidate-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
+        ArgumentNullException.ThrowIfNull(inquiryPatternLedger);
+        ArgumentNullException.ThrowIfNull(boundaryPairLedger);
+        ArgumentNullException.ThrowIfNull(continuityLedger);
+        ArgumentNullException.ThrowIfNull(mutualIntelligibilityWitness);
+        ArgumentNullException.ThrowIfNull(distanceWeightedAdmissionSurface);
+        EnsurePrefix(carryForwardInquirySelectionSurface.SurfaceHandle, CarryForwardInquirySelectionSurfacePrefix, nameof(carryForwardInquirySelectionSurface));
+        EnsurePrefix(inquiryPatternLedger.LedgerHandle, InquiryPatternContinuityLedgerPrefix, nameof(inquiryPatternLedger));
+        EnsurePrefix(boundaryPairLedger.LedgerHandle, QuestioningBoundaryPairLedgerPrefix, nameof(boundaryPairLedger));
+        EnsurePrefix(continuityLedger.LedgerHandle, ContinuityUnderPressureLedgerPrefix, nameof(continuityLedger));
+        EnsurePrefix(mutualIntelligibilityWitness.WitnessHandle, MutualIntelligibilityWitnessPrefix, nameof(mutualIntelligibilityWitness));
+        EnsurePrefix(distanceWeightedAdmissionSurface.SurfaceHandle, DistanceWeightedQuestioningAdmissionSurfacePrefix, nameof(distanceWeightedAdmissionSurface));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(carryForwardInquirySelectionSurface.CMEId, inquiryPatternLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, boundaryPairLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, continuityLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, mutualIntelligibilityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(carryForwardInquirySelectionSurface.CMEId, distanceWeightedAdmissionSurface.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Questioning operator candidacy requires carry-forward selection, inquiry continuity, boundary pairing, pressure continuity, mutual intelligibility, and distance-weighted admission to remain inside one bonded CME surface.");
+        }
+
+        var eventBoundInquiryForms = distanceWeightedAdmissionSurface.WithheldCandidatePatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        var candidateInquiryPatterns = distanceWeightedAdmissionSurface.AdmittedCandidatePatterns
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
             .ToArray();
         var promotionEvidence = continuityLedger.HeldContinuities
-            .Concat(new[] { mutualIntelligibilityWitness.SharedUnderstandingState })
+            .Concat(new[]
+            {
+                mutualIntelligibilityWitness.SharedUnderstandingState,
+                $"engram-distance:{distanceWeightedAdmissionSurface.DominantDistanceClass}"
+            })
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
             .ToArray();
-        var requiredReentryConditions = inquiryPatternLedger.PreservedConstraints
+        var requiredReentryConditions = distanceWeightedAdmissionSurface.RequiredReentryBurdens
+            .Concat(inquiryPatternLedger.PreservedConstraints)
             .Concat(inquiryPatternLedger.TriggerConditions)
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
@@ -1237,6 +1538,7 @@ public static class AgentiActualizationProjector
             .ToArray();
         var failureSignatureExpectations = boundaryPairLedger.OverreachWarnings
             .Concat(boundaryPairLedger.BoundaryConstraints)
+            .Concat(distanceWeightedAdmissionSurface.WithheldCandidatePatterns)
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
@@ -1247,14 +1549,18 @@ public static class AgentiActualizationProjector
                 carryForwardInquirySelectionSurface.CMEId,
                 carryForwardInquirySelectionSurface.SurfaceHandle,
                 continuityLedger.LedgerHandle,
-                mutualIntelligibilityWitness.WitnessHandle),
+                mutualIntelligibilityWitness.WitnessHandle,
+                distanceWeightedAdmissionSurface.SurfaceHandle),
             CMEId: carryForwardInquirySelectionSurface.CMEId,
             CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
             InquiryPatternLedgerHandle: inquiryPatternLedger.LedgerHandle,
             BoundaryPairLedgerHandle: boundaryPairLedger.LedgerHandle,
             ContinuityLedgerHandle: continuityLedger.LedgerHandle,
             MutualIntelligibilityWitnessHandle: mutualIntelligibilityWitness.WitnessHandle,
+            DistanceWeightedAdmissionSurfaceHandle: distanceWeightedAdmissionSurface.SurfaceHandle,
             LedgerState: ledgerState.Trim(),
+            DominantDistanceClass: distanceWeightedAdmissionSurface.DominantDistanceClass,
+            PromotionCeiling: distanceWeightedAdmissionSurface.PromotionCeiling,
             EventBoundInquiryForms: eventBoundInquiryForms,
             CandidateInquiryPatterns: candidateInquiryPatterns,
             PromotionEvidence: promotionEvidence,
@@ -1262,6 +1568,8 @@ public static class AgentiActualizationProjector
             FailureSignatureExpectations: failureSignatureExpectations,
             HiddenAuthorityPatternsDenied: carryForwardInquirySelectionSurface.AmbientHabitDenied,
             IdentityBoundPatternsWithheld: inquiryPatternLedger.IdentityBleedDenied,
+            DistanceScalingPreserved: distanceWeightedAdmissionSurface.DistanceScalingPreserved,
+            FarOtherPromotionDenied: distanceWeightedAdmissionSurface.FarOtherPromotionDenied,
             ReasonCode: "questioning-operator-candidate-ledger-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
@@ -1271,6 +1579,7 @@ public static class AgentiActualizationProjector
         CarryForwardInquirySelectionSurfaceReceipt carryForwardInquirySelectionSurface,
         OperatorInquirySelectionEnvelopeReceipt operatorInquiryEnvelope,
         LocalityDistinctionWitnessLedgerReceipt localityWitness,
+        DistanceWeightedQuestioningAdmissionSurfaceReceipt distanceWeightedAdmissionSurface,
         string gateState = "questioning-gel-promotion-gate-ready",
         DateTimeOffset? timestampUtc = null)
     {
@@ -1278,17 +1587,20 @@ public static class AgentiActualizationProjector
         ArgumentNullException.ThrowIfNull(carryForwardInquirySelectionSurface);
         ArgumentNullException.ThrowIfNull(operatorInquiryEnvelope);
         ArgumentNullException.ThrowIfNull(localityWitness);
+        ArgumentNullException.ThrowIfNull(distanceWeightedAdmissionSurface);
         EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
         EnsurePrefix(carryForwardInquirySelectionSurface.SurfaceHandle, CarryForwardInquirySelectionSurfacePrefix, nameof(carryForwardInquirySelectionSurface));
         EnsurePrefix(operatorInquiryEnvelope.EnvelopeHandle, OperatorInquirySelectionEnvelopePrefix, nameof(operatorInquiryEnvelope));
         EnsurePrefix(localityWitness.WitnessLedgerHandle, "locality-distinction-witness-ledger://", nameof(localityWitness));
+        EnsurePrefix(distanceWeightedAdmissionSurface.SurfaceHandle, DistanceWeightedQuestioningAdmissionSurfacePrefix, nameof(distanceWeightedAdmissionSurface));
         ArgumentException.ThrowIfNullOrWhiteSpace(gateState);
 
         if (!string.Equals(candidateLedger.CMEId, carryForwardInquirySelectionSurface.CMEId, StringComparison.Ordinal) ||
             !string.Equals(candidateLedger.CMEId, operatorInquiryEnvelope.CMEId, StringComparison.Ordinal) ||
-            !string.Equals(candidateLedger.CMEId, localityWitness.CMEId, StringComparison.Ordinal))
+            !string.Equals(candidateLedger.CMEId, localityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, distanceWeightedAdmissionSurface.CMEId, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException("Questioning GEL promotion requires candidate, carry-forward, operator inquiry, and locality witness receipts to remain inside one bonded CME surface.");
+            throw new InvalidOperationException("Questioning GEL promotion requires candidate, carry-forward, operator inquiry, locality witness, and distance-weighted admission receipts to remain inside one bonded CME surface.");
         }
 
         var candidateInquiryPatterns = candidateLedger.CandidateInquiryPatterns
@@ -1298,17 +1610,19 @@ public static class AgentiActualizationProjector
             .ToArray();
         var satisfiedPromotionConditions = carryForwardInquirySelectionSurface.AdmittedReuseConditions
             .Concat(operatorInquiryEnvelope.LawfulUseConditions)
+            .Concat(new[] { $"promotion-ceiling:{distanceWeightedAdmissionSurface.PromotionCeiling}" })
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
             .ToArray();
         var unmetPromotionConditions = candidateLedger.RequiredReentryConditions
+            .Concat(distanceWeightedAdmissionSurface.ReRootingRequired ? new[] { "fresh-root-reentry-required" } : Array.Empty<string>())
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
             .ToArray();
         var promotionWarnings = candidateLedger.FailureSignatureExpectations
-            .Concat(carryForwardInquirySelectionSurface.WithheldReuseWarnings)
+            .Concat(distanceWeightedAdmissionSurface.WithheldCandidatePatterns)
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Distinct(StringComparer.Ordinal)
             .Take(3)
@@ -1316,11 +1630,15 @@ public static class AgentiActualizationProjector
 
         var localitySeparationPreserved = !localityWitness.LocalityCollapseDetected;
         var authoritySeparationPreserved = operatorInquiryEnvelope.RawGrantDenied && candidateLedger.HiddenAuthorityPatternsDenied;
-        var truthSeekingInvariantPreserved = authoritySeparationPreserved && candidateLedger.IdentityBoundPatternsWithheld;
+        var truthSeekingInvariantPreserved = authoritySeparationPreserved &&
+            candidateLedger.IdentityBoundPatternsWithheld &&
+            distanceWeightedAdmissionSurface.DistanceScalingPreserved;
         var outcomeSeekingDenied = true;
         var promotionReviewAdmitted = localitySeparationPreserved &&
             authoritySeparationPreserved &&
             truthSeekingInvariantPreserved &&
+            distanceWeightedAdmissionSurface.FarOtherPromotionDenied &&
+            AllowsCandidateReview(distanceWeightedAdmissionSurface.PromotionCeiling) &&
             candidateInquiryPatterns.Length > 0;
 
         return new QuestioningGelPromotionGateReceipt(
@@ -1328,13 +1646,17 @@ public static class AgentiActualizationProjector
                 candidateLedger.CMEId,
                 candidateLedger.LedgerHandle,
                 operatorInquiryEnvelope.EnvelopeHandle,
-                localityWitness.WitnessLedgerHandle),
+                localityWitness.WitnessLedgerHandle,
+                distanceWeightedAdmissionSurface.SurfaceHandle),
             CMEId: candidateLedger.CMEId,
             CandidateLedgerHandle: candidateLedger.LedgerHandle,
             CarryForwardInquirySelectionSurfaceHandle: carryForwardInquirySelectionSurface.SurfaceHandle,
             OperatorInquiryEnvelopeHandle: operatorInquiryEnvelope.EnvelopeHandle,
             LocalityWitnessHandle: localityWitness.WitnessLedgerHandle,
+            DistanceWeightedAdmissionSurfaceHandle: distanceWeightedAdmissionSurface.SurfaceHandle,
             GateState: gateState.Trim(),
+            DominantDistanceClass: distanceWeightedAdmissionSurface.DominantDistanceClass,
+            PromotionCeiling: distanceWeightedAdmissionSurface.PromotionCeiling,
             CandidateInquiryPatterns: candidateInquiryPatterns,
             SatisfiedPromotionConditions: satisfiedPromotionConditions,
             UnmetPromotionConditions: unmetPromotionConditions,
@@ -1343,6 +1665,8 @@ public static class AgentiActualizationProjector
             AuthoritySeparationPreserved: authoritySeparationPreserved,
             TruthSeekingInvariantPreserved: truthSeekingInvariantPreserved,
             OutcomeSeekingDenied: outcomeSeekingDenied,
+            DistanceScalingPreserved: distanceWeightedAdmissionSurface.DistanceScalingPreserved,
+            ReRootingRequired: distanceWeightedAdmissionSurface.ReRootingRequired,
             PromotionReviewAdmitted: promotionReviewAdmitted,
             ReasonCode: "questioning-gel-promotion-gate-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
@@ -1410,6 +1734,102 @@ public static class AgentiActualizationProjector
             AutomaticGrantDenied: true,
             ReasonCode: "protected-questioning-pattern-surface-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    private static EngramDistanceRequirementEntry[] CreateDefaultEngramDistanceRequirementEntries()
+    {
+        return
+        [
+            new EngramDistanceRequirementEntry(
+                DistanceClass: EngramDistanceClass.CoRoot,
+                RequiredEvidenceCount: 1,
+                MaximumUnknownLoad: 0,
+                RequiredReentryDepth: 1,
+                PromotionCeiling: EngramPromotionCeiling.FastTrackCandidateReview,
+                FreshConstraintContactRequired: false,
+                RefusalConditions:
+                [
+                    "direct-constraint-witness-missing",
+                    "identity-claim-detached-from-act"
+                ]),
+            new EngramDistanceRequirementEntry(
+                DistanceClass: EngramDistanceClass.AdjacentRoot,
+                RequiredEvidenceCount: 2,
+                MaximumUnknownLoad: 1,
+                RequiredReentryDepth: 1,
+                PromotionCeiling: EngramPromotionCeiling.GuardedCandidateReview,
+                FreshConstraintContactRequired: false,
+                RefusalConditions:
+                [
+                    "candidate-invariant-unresolved",
+                    "failure-signature-not-articulated"
+                ]),
+            new EngramDistanceRequirementEntry(
+                DistanceClass: EngramDistanceClass.FirstOrderOther,
+                RequiredEvidenceCount: 3,
+                MaximumUnknownLoad: 0,
+                RequiredReentryDepth: 2,
+                PromotionCeiling: EngramPromotionCeiling.CandidateOnlyMemory,
+                FreshConstraintContactRequired: true,
+                RefusalConditions:
+                [
+                    "reported-pattern-lacks-reentry",
+                    "portability-claimed-without-variation"
+                ]),
+            new EngramDistanceRequirementEntry(
+                DistanceClass: EngramDistanceClass.FarOther,
+                RequiredEvidenceCount: 3,
+                MaximumUnknownLoad: 0,
+                RequiredReentryDepth: 3,
+                PromotionCeiling: EngramPromotionCeiling.NarrativeArchiveOnly,
+                FreshConstraintContactRequired: true,
+                RefusalConditions:
+                [
+                    "far-other-material-cannot-inherit",
+                    "re-rooting-required-before-promotion"
+                ])
+        ];
+    }
+
+    private static EngramDistanceRequirementEntry GetRequirementEntry(
+        IReadOnlyList<EngramDistanceRequirementEntry> requirementEntries,
+        EngramDistanceClass distanceClass)
+    {
+        ArgumentNullException.ThrowIfNull(requirementEntries);
+
+        var entry = requirementEntries.FirstOrDefault(candidate => candidate.DistanceClass == distanceClass);
+        return entry ?? throw new InvalidOperationException($"Missing promotion requirement entry for distance class `{distanceClass}`.");
+    }
+
+    private static EngramDistanceClass DetermineDominantDistanceClass(
+        int coRootPatternCount,
+        int adjacentRootPatternCount,
+        int firstOrderOtherPatternCount,
+        int farOtherArtifactCount)
+    {
+        if (coRootPatternCount > 0)
+        {
+            return EngramDistanceClass.CoRoot;
+        }
+
+        if (adjacentRootPatternCount > 0)
+        {
+            return EngramDistanceClass.AdjacentRoot;
+        }
+
+        if (firstOrderOtherPatternCount > 0)
+        {
+            return EngramDistanceClass.FirstOrderOther;
+        }
+
+        return farOtherArtifactCount > 0
+            ? EngramDistanceClass.FarOther
+            : EngramDistanceClass.FirstOrderOther;
+    }
+
+    private static bool AllowsCandidateReview(EngramPromotionCeiling promotionCeiling)
+    {
+        return promotionCeiling is EngramPromotionCeiling.FastTrackCandidateReview or EngramPromotionCeiling.GuardedCandidateReview;
     }
 
     private static void RequireActualLocality(string value, string parameterName)

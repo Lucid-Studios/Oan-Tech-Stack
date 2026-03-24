@@ -583,6 +583,24 @@ Current live output surfaces for this map:
 - `Protected Questioning Pattern Surface`
   Bundle root: `.audit/runs/protected-questioning-pattern-surface/`
 
+### Automation Maturation Map 31
+
+- Goal: scale questioning promotion burden by epistemic distance from Root so farther patterns face stronger re-entry, tighter unknown tolerance, and lawful promotion ceilings before they can approach inheritance
+- Expected review windows: `2`
+- Selected tasks:
+  - `Engram Distance Classification Ledger`
+  - `Engram Promotion Requirements Matrix`
+  - `Distance-Weighted Questioning Admission Surface`
+
+Current live output surfaces for this map:
+
+- `Engram Distance Classification Ledger`
+  Bundle root: `.audit/runs/engram-distance-classification-ledger/`
+- `Engram Promotion Requirements Matrix`
+  Bundle root: `.audit/runs/engram-promotion-requirements-matrix/`
+- `Distance-Weighted Questioning Admission Surface`
+  Bundle root: `.audit/runs/distance-weighted-questioning-admission-surface/`
+
 ## Status Interpretation
 
 The task board must distinguish between:

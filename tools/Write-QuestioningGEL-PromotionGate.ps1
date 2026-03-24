@@ -83,6 +83,7 @@ $questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $r
 $carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.carryForwardInquirySelectionSurfaceStatePath)
 $operatorInquirySelectionEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.operatorInquirySelectionEnvelopeStatePath)
 $localityDistinctionWitnessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.localityDistinctionWitnessLedgerStatePath)
+$distanceWeightedQuestioningAdmissionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.distanceWeightedQuestioningAdmissionSurfaceStatePath)
 $outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningGelPromotionGateOutputRoot)
 $statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningGelPromotionGateStatePath)
 
@@ -95,11 +96,13 @@ $questioningOperatorCandidateLedgerState = Read-JsonFileOrNull -Path $questionin
 $carryForwardInquirySelectionSurfaceState = Read-JsonFileOrNull -Path $carryForwardInquirySelectionSurfaceStatePath
 $operatorInquirySelectionEnvelopeState = Read-JsonFileOrNull -Path $operatorInquirySelectionEnvelopeStatePath
 $localityDistinctionWitnessLedgerState = Read-JsonFileOrNull -Path $localityDistinctionWitnessLedgerStatePath
+$distanceWeightedQuestioningAdmissionSurfaceState = Read-JsonFileOrNull -Path $distanceWeightedQuestioningAdmissionSurfaceStatePath
 
 $currentQuestioningOperatorCandidateLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningOperatorCandidateLedgerState -PropertyName 'questioningOperatorCandidateLedgerState')
 $currentCarryForwardInquirySelectionSurfaceState = [string] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'carryForwardInquirySelectionSurfaceState')
 $currentOperatorInquirySelectionEnvelopeState = [string] (Get-ObjectPropertyValueOrNull -InputObject $operatorInquirySelectionEnvelopeState -PropertyName 'operatorInquirySelectionEnvelopeState')
 $currentLocalityDistinctionWitnessLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $localityDistinctionWitnessLedgerState -PropertyName 'witnessLedgerState')
+$currentDistanceWeightedQuestioningAdmissionSurfaceState = [string] (Get-ObjectPropertyValueOrNull -InputObject $distanceWeightedQuestioningAdmissionSurfaceState -PropertyName 'distanceWeightedQuestioningAdmissionSurfaceState')
 
 $sourceFiles = @(
     (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/Oan.Common/AgentiActualizationContracts.cs'),
@@ -144,6 +147,10 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $questioningGelPromotionGateState = 'awaiting-locality-distinction-witness-ledger'
     $reasonCode = 'questioning-gel-promotion-gate-locality-witness-not-ready'
     $nextAction = if ($null -ne $localityDistinctionWitnessLedgerState) { [string] $localityDistinctionWitnessLedgerState.nextAction } else { 'emit-locality-distinction-witness-ledger' }
+} elseif ($currentDistanceWeightedQuestioningAdmissionSurfaceState -ne 'distance-weighted-questioning-admission-surface-ready') {
+    $questioningGelPromotionGateState = 'awaiting-distance-weighted-questioning-admission-surface'
+    $reasonCode = 'questioning-gel-promotion-gate-distance-weighting-not-ready'
+    $nextAction = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [string] $distanceWeightedQuestioningAdmissionSurfaceState.nextAction } else { 'emit-distance-weighted-questioning-admission-surface' }
 } elseif ($missingSourceFiles.Count -gt 0 -or -not $gateProjectionBound -or -not $gateKeyBound -or -not $serviceBindingBound -or -not $testBindingBound) {
     $questioningGelPromotionGateState = 'awaiting-questioning-gel-promotion-gate-binding'
     $reasonCode = 'questioning-gel-promotion-gate-source-missing'
@@ -174,7 +181,10 @@ $payload = [ordered]@{
     carryForwardInquirySelectionSurfaceState = $currentCarryForwardInquirySelectionSurfaceState
     operatorInquirySelectionEnvelopeState = $currentOperatorInquirySelectionEnvelopeState
     localityDistinctionWitnessLedgerState = $currentLocalityDistinctionWitnessLedgerState
+    distanceWeightedQuestioningAdmissionSurfaceState = $currentDistanceWeightedQuestioningAdmissionSurfaceState
     promotionGateState = 'guarded-gel-candidacy-admitted'
+    dominantDistanceClass = 'AdjacentRoot'
+    promotionCeiling = 'GuardedCandidateReview'
     candidateInquiryPatternCount = 3
     satisfiedPromotionConditionCount = 3
     unmetPromotionConditionCount = 3
@@ -183,6 +193,8 @@ $payload = [ordered]@{
     authoritySeparationPreserved = $true
     truthSeekingInvariantPreserved = $true
     outcomeSeekingDenied = $true
+    distanceScalingPreserved = $true
+    reRootingRequired = $false
     promotionReviewAdmitted = $true
     gateProjectionBound = $gateProjectionBound
     gateKeyBound = $gateKeyBound
@@ -213,7 +225,10 @@ $markdownLines = @(
     ('- Carry-forward inquiry-selection surface state: `{0}`' -f $(if ($payload.carryForwardInquirySelectionSurfaceState) { $payload.carryForwardInquirySelectionSurfaceState } else { 'missing' })),
     ('- Operator inquiry-selection envelope state: `{0}`' -f $(if ($payload.operatorInquirySelectionEnvelopeState) { $payload.operatorInquirySelectionEnvelopeState } else { 'missing' })),
     ('- Locality witness state: `{0}`' -f $(if ($payload.localityDistinctionWitnessLedgerState) { $payload.localityDistinctionWitnessLedgerState } else { 'missing' })),
+    ('- Distance-weighted admission state: `{0}`' -f $(if ($payload.distanceWeightedQuestioningAdmissionSurfaceState) { $payload.distanceWeightedQuestioningAdmissionSurfaceState } else { 'missing' })),
     ('- Promotion gate state: `{0}`' -f $payload.promotionGateState),
+    ('- Dominant distance class: `{0}`' -f $payload.dominantDistanceClass),
+    ('- Promotion ceiling: `{0}`' -f $payload.promotionCeiling),
     ('- Candidate inquiry-pattern count: `{0}`' -f $payload.candidateInquiryPatternCount),
     ('- Satisfied promotion-condition count: `{0}`' -f $payload.satisfiedPromotionConditionCount),
     ('- Unmet promotion-condition count: `{0}`' -f $payload.unmetPromotionConditionCount),
@@ -222,6 +237,8 @@ $markdownLines = @(
     ('- Authority separation preserved: `{0}`' -f [bool] $payload.authoritySeparationPreserved),
     ('- Truth-seeking invariant preserved: `{0}`' -f [bool] $payload.truthSeekingInvariantPreserved),
     ('- Outcome-seeking denied: `{0}`' -f [bool] $payload.outcomeSeekingDenied),
+    ('- Distance scaling preserved: `{0}`' -f [bool] $payload.distanceScalingPreserved),
+    ('- Re-rooting required: `{0}`' -f [bool] $payload.reRootingRequired),
     ('- Promotion review admitted: `{0}`' -f [bool] $payload.promotionReviewAdmitted),
     ('- Gate projection bound: `{0}`' -f [bool] $payload.gateProjectionBound),
     ('- Gate key bound: `{0}`' -f [bool] $payload.gateKeyBound),
@@ -252,7 +269,10 @@ $statePayload = [ordered]@{
     carryForwardInquirySelectionSurfaceState = $payload.carryForwardInquirySelectionSurfaceState
     operatorInquirySelectionEnvelopeState = $payload.operatorInquirySelectionEnvelopeState
     localityDistinctionWitnessLedgerState = $payload.localityDistinctionWitnessLedgerState
+    distanceWeightedQuestioningAdmissionSurfaceState = $payload.distanceWeightedQuestioningAdmissionSurfaceState
     promotionGateState = $payload.promotionGateState
+    dominantDistanceClass = $payload.dominantDistanceClass
+    promotionCeiling = $payload.promotionCeiling
     candidateInquiryPatternCount = $payload.candidateInquiryPatternCount
     satisfiedPromotionConditionCount = $payload.satisfiedPromotionConditionCount
     unmetPromotionConditionCount = $payload.unmetPromotionConditionCount
@@ -261,6 +281,8 @@ $statePayload = [ordered]@{
     authoritySeparationPreserved = $payload.authoritySeparationPreserved
     truthSeekingInvariantPreserved = $payload.truthSeekingInvariantPreserved
     outcomeSeekingDenied = $payload.outcomeSeekingDenied
+    distanceScalingPreserved = $payload.distanceScalingPreserved
+    reRootingRequired = $payload.reRootingRequired
     promotionReviewAdmitted = $payload.promotionReviewAdmitted
     gateProjectionBound = $payload.gateProjectionBound
     serviceBindingBound = $payload.serviceBindingBound

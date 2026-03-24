@@ -567,6 +567,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepCarryForwardInquirySelectionSurfaceBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramDistanceClassificationLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepEngramDistanceClassificationLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramPromotionRequirementsMatrixOutputRoot)
+        keep = [int] $retentionPolicy.keepEngramPromotionRequirementsMatrixBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.distanceWeightedQuestioningAdmissionSurfaceOutputRoot)
+        keep = [int] $retentionPolicy.keepDistanceWeightedQuestioningAdmissionSurfaceBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningOperatorCandidateLedgerOutputRoot)
         keep = [int] $retentionPolicy.keepQuestioningOperatorCandidateLedgerBundles
     },

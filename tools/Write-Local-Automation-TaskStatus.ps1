@@ -185,6 +185,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $InquiryPatternContinuityLedgerState,
         [object] $QuestioningBoundaryPairLedgerState,
         [object] $CarryForwardInquirySelectionSurfaceState,
+        [object] $EngramDistanceClassificationLedgerState,
+        [object] $EngramPromotionRequirementsMatrixState,
+        [object] $DistanceWeightedQuestioningAdmissionSurfaceState,
         [object] $QuestioningOperatorCandidateLedgerState,
         [object] $QuestioningGelPromotionGateState,
         [object] $ProtectedQuestioningPatternSurfaceState,
@@ -908,6 +911,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'engram-distance-classification-ledger' {
+            if ($null -ne $EngramDistanceClassificationLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'engram-promotion-requirements-matrix' {
+            if ($null -ne $EngramPromotionRequirementsMatrixState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'distance-weighted-questioning-admission-surface' {
+            if ($null -ne $DistanceWeightedQuestioningAdmissionSurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
         'questioning-operator-candidate-ledger' {
             if ($null -ne $QuestioningOperatorCandidateLedgerState) {
                 return 'completed'
@@ -1062,6 +1092,9 @@ $mutualIntelligibilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolve
 $inquiryPatternContinuityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.inquiryPatternContinuityLedgerStatePath)
 $questioningBoundaryPairLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningBoundaryPairLedgerStatePath)
 $carryForwardInquirySelectionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.carryForwardInquirySelectionSurfaceStatePath)
+$engramDistanceClassificationLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramDistanceClassificationLedgerStatePath)
+$engramPromotionRequirementsMatrixStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramPromotionRequirementsMatrixStatePath)
+$distanceWeightedQuestioningAdmissionSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.distanceWeightedQuestioningAdmissionSurfaceStatePath)
 $questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningOperatorCandidateLedgerStatePath)
 $questioningGelPromotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningGelPromotionGateStatePath)
 $protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.protectedQuestioningPatternSurfaceStatePath)
@@ -1145,6 +1178,9 @@ $mutualIntelligibilityWitnessState = Read-JsonFileOrNull -Path $mutualIntelligib
 $inquiryPatternContinuityLedgerState = Read-JsonFileOrNull -Path $inquiryPatternContinuityLedgerStatePath
 $questioningBoundaryPairLedgerState = Read-JsonFileOrNull -Path $questioningBoundaryPairLedgerStatePath
 $carryForwardInquirySelectionSurfaceState = Read-JsonFileOrNull -Path $carryForwardInquirySelectionSurfaceStatePath
+$engramDistanceClassificationLedgerState = Read-JsonFileOrNull -Path $engramDistanceClassificationLedgerStatePath
+$engramPromotionRequirementsMatrixState = Read-JsonFileOrNull -Path $engramPromotionRequirementsMatrixStatePath
+$distanceWeightedQuestioningAdmissionSurfaceState = Read-JsonFileOrNull -Path $distanceWeightedQuestioningAdmissionSurfaceStatePath
 $questioningOperatorCandidateLedgerState = Read-JsonFileOrNull -Path $questioningOperatorCandidateLedgerStatePath
 $questioningGelPromotionGateState = Read-JsonFileOrNull -Path $questioningGelPromotionGateStatePath
 $protectedQuestioningPatternSurfaceState = Read-JsonFileOrNull -Path $protectedQuestioningPatternSurfaceStatePath
@@ -1374,6 +1410,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
                 -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
                 -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
+                -EngramDistanceClassificationLedgerState $engramDistanceClassificationLedgerState `
+                -EngramPromotionRequirementsMatrixState $engramPromotionRequirementsMatrixState `
+                -DistanceWeightedQuestioningAdmissionSurfaceState $distanceWeightedQuestioningAdmissionSurfaceState `
                 -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
                 -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
                 -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
@@ -1511,6 +1550,9 @@ $taskMapEntries = @(
                     -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
                     -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
                     -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
+                    -EngramDistanceClassificationLedgerState $engramDistanceClassificationLedgerState `
+                    -EngramPromotionRequirementsMatrixState $engramPromotionRequirementsMatrixState `
+                    -DistanceWeightedQuestioningAdmissionSurfaceState $distanceWeightedQuestioningAdmissionSurfaceState `
                     -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
                     -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
                     -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
@@ -1992,6 +2034,23 @@ $statusPayload = [ordered]@{
         carryForwardWithheldReuseWarningCount = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'withheldReuseWarningCount') } else { $null }
         carryForwardLocalitySafeReview = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'localitySafeReview') } else { $null }
         carryForwardAmbientHabitDenied = if ($null -ne $carryForwardInquirySelectionSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $carryForwardInquirySelectionSurfaceState -PropertyName 'ambientHabitDenied') } else { $null }
+        engramDistanceClassificationLedgerState = if ($null -ne $engramDistanceClassificationLedgerState) { [string] $engramDistanceClassificationLedgerState.engramDistanceClassificationLedgerState } else { $null }
+        engramDistanceClassificationReason = if ($null -ne $engramDistanceClassificationLedgerState) { [string] $engramDistanceClassificationLedgerState.reasonCode } else { $null }
+        engramDistanceClassificationNextAction = if ($null -ne $engramDistanceClassificationLedgerState) { [string] $engramDistanceClassificationLedgerState.nextAction } else { $null }
+        engramDistanceDominantClass = if ($null -ne $engramDistanceClassificationLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $engramDistanceClassificationLedgerState -PropertyName 'dominantDistanceClass') } else { $null }
+        engramDistanceAdjacentRootPatternCount = if ($null -ne $engramDistanceClassificationLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $engramDistanceClassificationLedgerState -PropertyName 'adjacentRootPatternCount') } else { $null }
+        engramDistanceFarOtherPromotionDenied = if ($null -ne $engramDistanceClassificationLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $engramDistanceClassificationLedgerState -PropertyName 'promotionFromFarOtherDenied') } else { $null }
+        engramPromotionRequirementsMatrixState = if ($null -ne $engramPromotionRequirementsMatrixState) { [string] $engramPromotionRequirementsMatrixState.engramPromotionRequirementsMatrixState } else { $null }
+        engramPromotionRequirementsReason = if ($null -ne $engramPromotionRequirementsMatrixState) { [string] $engramPromotionRequirementsMatrixState.reasonCode } else { $null }
+        engramPromotionRequirementsNextAction = if ($null -ne $engramPromotionRequirementsMatrixState) { [string] $engramPromotionRequirementsMatrixState.nextAction } else { $null }
+        engramPromotionRequirementEntryCount = if ($null -ne $engramPromotionRequirementsMatrixState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $engramPromotionRequirementsMatrixState -PropertyName 'requirementEntryCount') } else { $null }
+        engramPromotionBurdenScalingPreserved = if ($null -ne $engramPromotionRequirementsMatrixState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $engramPromotionRequirementsMatrixState -PropertyName 'burdenScalingPreserved') } else { $null }
+        distanceWeightedQuestioningAdmissionSurfaceState = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [string] $distanceWeightedQuestioningAdmissionSurfaceState.distanceWeightedQuestioningAdmissionSurfaceState } else { $null }
+        distanceWeightedQuestioningAdmissionReason = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [string] $distanceWeightedQuestioningAdmissionSurfaceState.reasonCode } else { $null }
+        distanceWeightedQuestioningAdmissionNextAction = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [string] $distanceWeightedQuestioningAdmissionSurfaceState.nextAction } else { $null }
+        distanceWeightedQuestioningPromotionCeiling = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $distanceWeightedQuestioningAdmissionSurfaceState -PropertyName 'promotionCeiling') } else { $null }
+        distanceWeightedQuestioningAdmittedPatternCount = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $distanceWeightedQuestioningAdmissionSurfaceState -PropertyName 'admittedCandidatePatternCount') } else { $null }
+        distanceWeightedQuestioningWithheldPatternCount = if ($null -ne $distanceWeightedQuestioningAdmissionSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $distanceWeightedQuestioningAdmissionSurfaceState -PropertyName 'withheldCandidatePatternCount') } else { $null }
         questioningOperatorCandidateLedgerState = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] $questioningOperatorCandidateLedgerState.questioningOperatorCandidateLedgerState } else { $null }
         questioningOperatorCandidateLedgerReason = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] $questioningOperatorCandidateLedgerState.reasonCode } else { $null }
         questioningOperatorCandidateLedgerNextAction = if ($null -ne $questioningOperatorCandidateLedgerState) { [string] $questioningOperatorCandidateLedgerState.nextAction } else { $null }
@@ -3337,6 +3396,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -InquiryPatternContinuityLedgerState $inquiryPatternContinuityLedgerState `
             -QuestioningBoundaryPairLedgerState $questioningBoundaryPairLedgerState `
             -CarryForwardInquirySelectionSurfaceState $carryForwardInquirySelectionSurfaceState `
+            -EngramDistanceClassificationLedgerState $engramDistanceClassificationLedgerState `
+            -EngramPromotionRequirementsMatrixState $engramPromotionRequirementsMatrixState `
+            -DistanceWeightedQuestioningAdmissionSurfaceState $distanceWeightedQuestioningAdmissionSurfaceState `
             -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
             -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
             -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `

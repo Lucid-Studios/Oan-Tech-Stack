@@ -225,32 +225,74 @@ public static class AgentiActualizationKeys
         return $"carry-forward-inquiry-selection-surface://{ComputeDigest(cmeId, inquiryPatternLedgerHandle, boundaryPairLedgerHandle, localityWitnessHandle)}";
     }
 
+    public static string CreateEngramDistanceClassificationLedgerHandle(
+        string cmeId,
+        string carryForwardInquirySelectionSurfaceHandle,
+        string inquiryPatternLedgerHandle,
+        string continuityLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(carryForwardInquirySelectionSurfaceHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inquiryPatternLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
+
+        return $"engram-distance-classification-ledger://{ComputeDigest(cmeId, carryForwardInquirySelectionSurfaceHandle, inquiryPatternLedgerHandle, continuityLedgerHandle)}";
+    }
+
+    public static string CreateEngramPromotionRequirementsMatrixHandle(
+        string cmeId,
+        string classificationLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(classificationLedgerHandle);
+
+        return $"engram-promotion-requirements-matrix://{ComputeDigest(cmeId, classificationLedgerHandle)}";
+    }
+
+    public static string CreateDistanceWeightedQuestioningAdmissionSurfaceHandle(
+        string cmeId,
+        string classificationLedgerHandle,
+        string promotionRequirementsMatrixHandle,
+        string carryForwardInquirySelectionSurfaceHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(classificationLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(promotionRequirementsMatrixHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(carryForwardInquirySelectionSurfaceHandle);
+
+        return $"distance-weighted-questioning-admission-surface://{ComputeDigest(cmeId, classificationLedgerHandle, promotionRequirementsMatrixHandle, carryForwardInquirySelectionSurfaceHandle)}";
+    }
+
     public static string CreateQuestioningOperatorCandidateLedgerHandle(
         string cmeId,
         string carryForwardInquirySelectionSurfaceHandle,
         string continuityLedgerHandle,
-        string mutualWitnessHandle)
+        string mutualWitnessHandle,
+        string distanceWeightedAdmissionSurfaceHandle)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
         ArgumentException.ThrowIfNullOrWhiteSpace(carryForwardInquirySelectionSurfaceHandle);
         ArgumentException.ThrowIfNullOrWhiteSpace(continuityLedgerHandle);
         ArgumentException.ThrowIfNullOrWhiteSpace(mutualWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(distanceWeightedAdmissionSurfaceHandle);
 
-        return $"questioning-operator-candidate-ledger://{ComputeDigest(cmeId, carryForwardInquirySelectionSurfaceHandle, continuityLedgerHandle, mutualWitnessHandle)}";
+        return $"questioning-operator-candidate-ledger://{ComputeDigest(cmeId, carryForwardInquirySelectionSurfaceHandle, continuityLedgerHandle, mutualWitnessHandle, distanceWeightedAdmissionSurfaceHandle)}";
     }
 
     public static string CreateQuestioningGelPromotionGateHandle(
         string cmeId,
         string candidateLedgerHandle,
         string operatorInquiryEnvelopeHandle,
-        string localityWitnessHandle)
+        string localityWitnessHandle,
+        string distanceWeightedAdmissionSurfaceHandle)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
         ArgumentException.ThrowIfNullOrWhiteSpace(candidateLedgerHandle);
         ArgumentException.ThrowIfNullOrWhiteSpace(operatorInquiryEnvelopeHandle);
         ArgumentException.ThrowIfNullOrWhiteSpace(localityWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(distanceWeightedAdmissionSurfaceHandle);
 
-        return $"questioning-gel-promotion-gate://{ComputeDigest(cmeId, candidateLedgerHandle, operatorInquiryEnvelopeHandle, localityWitnessHandle)}";
+        return $"questioning-gel-promotion-gate://{ComputeDigest(cmeId, candidateLedgerHandle, operatorInquiryEnvelopeHandle, localityWitnessHandle, distanceWeightedAdmissionSurfaceHandle)}";
     }
 
     public static string CreateProtectedQuestioningPatternSurfaceHandle(
