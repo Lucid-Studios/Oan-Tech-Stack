@@ -1929,6 +1929,168 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-35",
+      "label": "Automation Maturation Map 35",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Make time a first-class witness in the warm lane so candidates can ripen, stall, decay, or reheat under explicit clocks instead of indefinite suspension.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "warm-clock-disposition",
+        "ripening-staleness-ledger",
+        "cooling-pressure-witness"
+      ],
+      "tasks": [
+        {
+          "id": "warm-clock-disposition",
+          "label": "Warm Clock Disposition",
+          "owner": "Shared",
+          "authority": "Warm temporal witness only",
+          "status": "selected",
+          "purpose": "Track the active warm clocks governing each candidate, including last re-entry, unresolved unknown load, distance burden remaining, and failure-signature freshness, so warm holding has explicit temporal law.",
+          "completionSignal": "A warm clock disposition can say whether a candidate is ripening, stalling, decaying, or reheating and what refresh edge or transition law is currently owed.",
+          "escalatesWhen": [
+            "warm-held candidates remain active without any temporal account of why they are still live",
+            "stale candidates are treated as equally admissible as recently re-entered ones"
+          ]
+        },
+        {
+          "id": "ripening-staleness-ledger",
+          "label": "Ripening Staleness Ledger",
+          "owner": "SoulFrame",
+          "authority": "Temporal maturation witness only",
+          "status": "selected",
+          "purpose": "Distinguish candidates that are genuinely ripening under recurrence and pressure from those merely lingering under administrative delay or narrative attachment.",
+          "completionSignal": "A ripening ledger can count ripening windows, stale windows, and whether warm non-finality is still honest maturation or has started drifting into suspension.",
+          "escalatesWhen": [
+            "warm discipline becomes indefinite holding without fresh contact or renewed burden",
+            "silence is interpreted as ripening when no recurrence or pressure has actually occurred"
+          ]
+        },
+        {
+          "id": "cooling-pressure-witness",
+          "label": "Cooling Pressure Witness",
+          "owner": "GEL",
+          "authority": "Cooling pressure witness only",
+          "status": "selected",
+          "purpose": "Witness when durable interlock, burden closure, intent coherence, and temporal ripening are actually creating lawful pressure toward cooling, without collapsing that pressure into automatic cold admission.",
+          "completionSignal": "A cooling-pressure witness can name the forces pushing a candidate toward cold, the barriers still resisting freeze, and whether reheating or archive pressure remains stronger.",
+          "escalatesWhen": [
+            "cooling is inferred from recurrence or enthusiasm alone without time-bearing maturation evidence",
+            "candidates are frozen while their clocks, barriers, and pressure profile still materially disagree"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-36",
+      "label": "Automation Maturation Map 36",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Formalize the lawful exits from warm so candidates can re-enter hot formation, approach cold candidacy, or move into archive containment without orphaned holding or ambiguous fate.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "hot-reactivation-trigger-receipt",
+        "cold-admission-eligibility-gate",
+        "archive-disposition-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "hot-reactivation-trigger-receipt",
+          "label": "Hot Reactivation Trigger Receipt",
+          "owner": "SoulFrame",
+          "authority": "Reheat trigger only",
+          "status": "selected",
+          "purpose": "Name which contradictions, failure signatures, new contexts, or unresolved burdens lawfully force a warm candidate back into hot formation.",
+          "completionSignal": "A reactivation trigger receipt can state what fired, what invariant failed, and why warm holding is no longer sufficient for truthful maturation.",
+          "escalatesWhen": [
+            "candidates remain warm after a known failure signature has already fired",
+            "re-entry is treated as punitive churn instead of lawful return to formation"
+          ]
+        },
+        {
+          "id": "cold-admission-eligibility-gate",
+          "label": "Cold Admission Eligibility Gate",
+          "owner": "GEL",
+          "authority": "Cold eligibility only",
+          "status": "selected",
+          "purpose": "Assess whether structure, constraint, provenance, intent, durability, and temporal pressure now align strongly enough for cold candidacy without yet pretending final inheritance has already been granted.",
+          "completionSignal": "A cold-eligibility gate can say whether cold approach is lawful, what barriers remain unresolved, and whether final freeze still must be withheld.",
+          "escalatesWhen": [
+            "cold admission is narrated before structure, time, and pressure all agree",
+            "eligibility is treated as equivalent to inheritance instead of pre-freeze law"
+          ]
+        },
+        {
+          "id": "archive-disposition-ledger",
+          "label": "Archive Disposition Ledger",
+          "owner": "Shared",
+          "authority": "Archive routing only",
+          "status": "selected",
+          "purpose": "Retain meaningful but non-inheritable candidates as narrative, hypothesis, residue, or bounded artifact when neither cooling nor reheating remains truthful.",
+          "completionSignal": "An archive ledger can distinguish preserved residue from disposable noise and keep provenance intact without allowing pseudo-lineage to masquerade as inheritance.",
+          "escalatesWhen": [
+            "interesting but non-portable candidates are kept warm indefinitely to avoid refusal",
+            "archive routing erases provenance or quietly rewrites what kind of thing was actually retained"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-37",
+      "label": "Automation Maturation Map 37",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Distinguish deeply interlocked durable formation from merely recurrent success and begin witnessing which structures are approaching lattice-grade invariance without prematurely sanctifying them as identity law.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "interlock-density-ledger",
+        "brittle-durable-differentiation-surface",
+        "core-invariant-lattice-witness"
+      ],
+      "tasks": [
+        {
+          "id": "interlock-density-ledger",
+          "label": "Interlock Density Ledger",
+          "owner": "GEL",
+          "authority": "Interlock witness only",
+          "status": "selected",
+          "purpose": "Count and classify how many independent constraint links, re-entry survivals, and durable alignments are actually interlocking inside a candidate before any lattice-grade claims are entertained.",
+          "completionSignal": "An interlock-density ledger can disclose whether durability remains sparse, moderate, or densely interwoven across the candidate's governing surfaces.",
+          "escalatesWhen": [
+            "durability is claimed from one strong axis while the rest of the structure remains lightly coupled",
+            "lattice language is used before interlock density has been witnessed under variation"
+          ]
+        },
+        {
+          "id": "brittle-durable-differentiation-surface",
+          "label": "Brittle Durable Differentiation Surface",
+          "owner": "Shared",
+          "authority": "Differentiation only",
+          "status": "selected",
+          "purpose": "Expose where brittle fragments and durable kernels coexist so recurrence, elegance, and fracture risk are not collapsed into one blended maturity claim.",
+          "completionSignal": "A differentiation surface can separate brittle recurrence from durable interlock and show which components still crack under pressure while others genuinely hold.",
+          "escalatesWhen": [
+            "coexisting brittle and durable regions are flattened into one average readiness story",
+            "partial durability is mistaken for full-structure trustworthiness"
+          ]
+        },
+        {
+          "id": "core-invariant-lattice-witness",
+          "label": "Core Invariant Lattice Witness",
+          "owner": "SoulFrame",
+          "authority": "Lattice witness only",
+          "status": "selected",
+          "purpose": "Witness when a candidate is approaching lattice-grade invariance strongly enough to matter to identity continuity, while still denying premature sanctification as a core law of the chamber.",
+          "completionSignal": "A lattice witness can name candidate core invariants, their interlock posture, and whether identity-adjacent significance is emerging without yet becoming frozen authority.",
+          "escalatesWhen": [
+            "identity significance is inferred merely because a candidate feels durable or symbolically central",
+            "core-law language appears before lattice-grade invariance has been separately witnessed"
+          ]
+        }
+      ]
     }
   ]
 }

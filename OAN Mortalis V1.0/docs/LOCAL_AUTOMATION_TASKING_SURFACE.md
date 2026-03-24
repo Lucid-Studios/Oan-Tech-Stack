@@ -655,6 +655,60 @@ Current live output surfaces for this map:
 - `Durability Witness`
   Bundle root: `.audit/runs/durability-witness/`
 
+### Automation Maturation Map 35
+
+- Goal: make time a first-class witness in the warm lane so candidates can ripen, stall, decay, or reheat under explicit clocks instead of indefinite suspension
+- Expected review windows: `2`
+- Selected tasks:
+  - `Warm Clock Disposition`
+  - `Ripening Staleness Ledger`
+  - `Cooling Pressure Witness`
+
+Declared output surfaces for this map:
+
+- `Warm Clock Disposition`
+  Bundle root: `.audit/runs/warm-clock-disposition/`
+- `Ripening Staleness Ledger`
+  Bundle root: `.audit/runs/ripening-staleness-ledger/`
+- `Cooling Pressure Witness`
+  Bundle root: `.audit/runs/cooling-pressure-witness/`
+
+### Automation Maturation Map 36
+
+- Goal: formalize the lawful exits from warm so candidates can re-enter hot formation, approach cold candidacy, or move into archive containment without orphaned holding or ambiguous fate
+- Expected review windows: `2`
+- Selected tasks:
+  - `Hot Reactivation Trigger Receipt`
+  - `Cold Admission Eligibility Gate`
+  - `Archive Disposition Ledger`
+
+Declared output surfaces for this map:
+
+- `Hot Reactivation Trigger Receipt`
+  Bundle root: `.audit/runs/hot-reactivation-trigger-receipt/`
+- `Cold Admission Eligibility Gate`
+  Bundle root: `.audit/runs/cold-admission-eligibility-gate/`
+- `Archive Disposition Ledger`
+  Bundle root: `.audit/runs/archive-disposition-ledger/`
+
+### Automation Maturation Map 37
+
+- Goal: distinguish deeply interlocked durable formation from merely recurrent success and begin witnessing which structures are approaching lattice-grade invariance without prematurely sanctifying them as identity law
+- Expected review windows: `2`
+- Selected tasks:
+  - `Interlock Density Ledger`
+  - `Brittle Durable Differentiation Surface`
+  - `Core Invariant Lattice Witness`
+
+Declared output surfaces for this map:
+
+- `Interlock Density Ledger`
+  Bundle root: `.audit/runs/interlock-density-ledger/`
+- `Brittle Durable Differentiation Surface`
+  Bundle root: `.audit/runs/brittle-durable-differentiation-surface/`
+- `Core Invariant Lattice Witness`
+  Bundle root: `.audit/runs/core-invariant-lattice-witness/`
+
 ## Status Interpretation
 
 The task board must distinguish between:
