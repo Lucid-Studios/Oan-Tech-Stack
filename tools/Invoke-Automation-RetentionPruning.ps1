@@ -615,6 +615,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepWarmReactivationDispositionReceiptBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.formationPhaseVectorOutputRoot)
+        keep = [int] $retentionPolicy.keepFormationPhaseVectorBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.brittlenessWitnessOutputRoot)
+        keep = [int] $retentionPolicy.keepBrittlenessWitnessBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.durabilityWitnessOutputRoot)
+        keep = [int] $retentionPolicy.keepDurabilityWitnessBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)
         keep = [int] $retentionPolicy.keepBlockedEscalationBundles
     }

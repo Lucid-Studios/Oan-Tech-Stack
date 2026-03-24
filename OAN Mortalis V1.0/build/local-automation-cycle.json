@@ -95,6 +95,9 @@
   "engramIntentFieldLedgerOutputRoot": ".audit/runs/engram-intent-field-ledger",
   "intentConstraintAlignmentReceiptOutputRoot": ".audit/runs/intent-constraint-alignment-receipt",
   "warmReactivationDispositionReceiptOutputRoot": ".audit/runs/warm-reactivation-disposition-receipt",
+  "formationPhaseVectorOutputRoot": ".audit/runs/formation-phase-vector",
+  "brittlenessWitnessOutputRoot": ".audit/runs/brittleness-witness",
+  "durabilityWitnessOutputRoot": ".audit/runs/durability-witness",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -188,6 +191,9 @@
   "engramIntentFieldLedgerStatePath": ".audit/state/local-automation-engram-intent-field-ledger-last-run.json",
   "intentConstraintAlignmentReceiptStatePath": ".audit/state/local-automation-intent-constraint-alignment-receipt-last-run.json",
   "warmReactivationDispositionReceiptStatePath": ".audit/state/local-automation-warm-reactivation-disposition-receipt-last-run.json",
+  "formationPhaseVectorStatePath": ".audit/state/local-automation-formation-phase-vector-last-run.json",
+  "brittlenessWitnessStatePath": ".audit/state/local-automation-brittleness-witness-last-run.json",
+  "durabilityWitnessStatePath": ".audit/state/local-automation-durability-witness-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -310,6 +316,9 @@
     "keepEngramIntentFieldLedgerBundles": 8,
     "keepIntentConstraintAlignmentReceiptBundles": 8,
     "keepWarmReactivationDispositionReceiptBundles": 8,
+    "keepFormationPhaseVectorBundles": 8,
+    "keepBrittlenessWitnessBundles": 8,
+    "keepDurabilityWitnessBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

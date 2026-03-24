@@ -391,6 +391,48 @@ public static class AgentiActualizationKeys
         return $"warm-reactivation-disposition-receipt://{ComputeDigest(cmeId, intentFieldLedgerHandle, intentConstraintAlignmentReceiptHandle, admissionRefusalReceiptHandle)}";
     }
 
+    public static string CreateFormationPhaseVectorReceiptHandle(
+        string cmeId,
+        string intentFieldLedgerHandle,
+        string intentConstraintAlignmentReceiptHandle,
+        string warmReactivationDispositionReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intentFieldLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intentConstraintAlignmentReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warmReactivationDispositionReceiptHandle);
+
+        return $"formation-phase-vector://{ComputeDigest(cmeId, intentFieldLedgerHandle, intentConstraintAlignmentReceiptHandle, warmReactivationDispositionReceiptHandle)}";
+    }
+
+    public static string CreateBrittlenessWitnessReceiptHandle(
+        string cmeId,
+        string formationPhaseVectorHandle,
+        string intentConstraintAlignmentReceiptHandle,
+        string admissionRefusalReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(formationPhaseVectorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(intentConstraintAlignmentReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(admissionRefusalReceiptHandle);
+
+        return $"brittleness-witness://{ComputeDigest(cmeId, formationPhaseVectorHandle, intentConstraintAlignmentReceiptHandle, admissionRefusalReceiptHandle)}";
+    }
+
+    public static string CreateDurabilityWitnessReceiptHandle(
+        string cmeId,
+        string formationPhaseVectorHandle,
+        string brittlenessWitnessHandle,
+        string variationTestedReentryLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(formationPhaseVectorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(brittlenessWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+
+        return $"durability-witness://{ComputeDigest(cmeId, formationPhaseVectorHandle, brittlenessWitnessHandle, variationTestedReentryLedgerHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

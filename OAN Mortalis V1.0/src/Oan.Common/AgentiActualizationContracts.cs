@@ -519,6 +519,59 @@ public sealed record WarmReactivationDispositionReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record FormationPhaseVectorReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string IntentFieldLedgerHandle,
+    string IntentConstraintAlignmentReceiptHandle,
+    string WarmReactivationDispositionReceiptHandle,
+    string ReceiptState,
+    EngramDistanceClass DominantDistanceClass,
+    EngramPromotionCeiling PromotionCeiling,
+    IReadOnlyList<string> PhaseAxes,
+    IReadOnlyList<string> StabilityAxes,
+    IReadOnlyList<string> ThermalRegions,
+    string FormationRegion,
+    bool WarmGovernanceDominant,
+    bool CoolingEligible,
+    bool ReheatingSensitive,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record BrittlenessWitnessReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string FormationPhaseVectorHandle,
+    string IntentConstraintAlignmentReceiptHandle,
+    string WarmReactivationDispositionReceiptHandle,
+    string AdmissionRefusalReceiptHandle,
+    string ReceiptState,
+    IReadOnlyList<string> BrittlePatterns,
+    IReadOnlyList<string> FractureAxes,
+    IReadOnlyList<string> OverfitWarnings,
+    bool SceneBoundBrittlenessDetected,
+    bool MisalignmentPressureDetected,
+    bool PrematureCoolingDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record DurabilityWitnessReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string FormationPhaseVectorHandle,
+    string BrittlenessWitnessHandle,
+    string VariationTestedReentryLedgerHandle,
+    string IntentConstraintAlignmentReceiptHandle,
+    string ReceiptState,
+    IReadOnlyList<string> DurablePatterns,
+    IReadOnlyList<string> InterlockSignals,
+    IReadOnlyList<string> CoolingBarriers,
+    bool DurableUnderVariation,
+    bool InterlockDensityEmergent,
+    bool ColdPromotionStillWithheld,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -554,6 +607,9 @@ public static class AgentiActualizationProjector
     private const string EngramIntentFieldLedgerPrefix = "engram-intent-field-ledger://";
     private const string IntentConstraintAlignmentReceiptPrefix = "intent-constraint-alignment-receipt://";
     private const string WarmReactivationDispositionReceiptPrefix = "warm-reactivation-disposition-receipt://";
+    private const string FormationPhaseVectorPrefix = "formation-phase-vector://";
+    private const string BrittlenessWitnessPrefix = "brittleness-witness://";
+    private const string DurabilityWitnessPrefix = "durability-witness://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -2269,6 +2325,201 @@ public static class AgentiActualizationProjector
             ColdAdmissionWithheld: true,
             ArchiveDispositionAllowed: true,
             ReasonCode: "warm-reactivation-disposition-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static FormationPhaseVectorReceipt CreateFormationPhaseVectorReceipt(
+        EngramIntentFieldLedgerReceipt intentFieldLedger,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        WarmReactivationDispositionReceipt warmReactivationDispositionReceipt,
+        string receiptState = "formation-phase-vector-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(intentFieldLedger);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        ArgumentNullException.ThrowIfNull(warmReactivationDispositionReceipt);
+        EnsurePrefix(intentFieldLedger.LedgerHandle, EngramIntentFieldLedgerPrefix, nameof(intentFieldLedger));
+        EnsurePrefix(intentConstraintAlignmentReceipt.ReceiptHandle, IntentConstraintAlignmentReceiptPrefix, nameof(intentConstraintAlignmentReceipt));
+        EnsurePrefix(warmReactivationDispositionReceipt.ReceiptHandle, WarmReactivationDispositionReceiptPrefix, nameof(warmReactivationDispositionReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(intentFieldLedger.CMEId, intentConstraintAlignmentReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(intentFieldLedger.CMEId, warmReactivationDispositionReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Formation phase vector requires intent, alignment, and warm reactivation receipts to remain inside one CME continuity lane.");
+        }
+
+        var phaseAxes = new[]
+        {
+            "distance-from-root",
+            "variation-stability",
+            "intent-coherence",
+            "constraint-alignment",
+            "seduction-risk",
+            "cooling-eligibility"
+        };
+        var stabilityAxes = new[]
+        {
+            "warm-held-stable",
+            "brittle-fracture-risk",
+            "durable-interlock-potential"
+        };
+        var thermalRegions = new[]
+        {
+            "warm-governance",
+            "candidate-cooling-boundary",
+            "hot-reactivation-edge"
+        };
+
+        return new FormationPhaseVectorReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateFormationPhaseVectorReceiptHandle(
+                intentFieldLedger.CMEId,
+                intentFieldLedger.LedgerHandle,
+                intentConstraintAlignmentReceipt.ReceiptHandle,
+                warmReactivationDispositionReceipt.ReceiptHandle),
+            CMEId: intentFieldLedger.CMEId,
+            IntentFieldLedgerHandle: intentFieldLedger.LedgerHandle,
+            IntentConstraintAlignmentReceiptHandle: intentConstraintAlignmentReceipt.ReceiptHandle,
+            WarmReactivationDispositionReceiptHandle: warmReactivationDispositionReceipt.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            DominantDistanceClass: intentFieldLedger.DominantDistanceClass,
+            PromotionCeiling: intentFieldLedger.PromotionCeiling,
+            PhaseAxes: phaseAxes,
+            StabilityAxes: stabilityAxes,
+            ThermalRegions: thermalRegions,
+            FormationRegion: "warm-governed-phase-space",
+            WarmGovernanceDominant: true,
+            CoolingEligible: !warmReactivationDispositionReceipt.HotReentryRequired && intentConstraintAlignmentReceipt.StructureConstraintAlignmentSatisfied,
+            ReheatingSensitive: warmReactivationDispositionReceipt.HotReentryRequired,
+            ReasonCode: "formation-phase-vector-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BrittlenessWitnessReceipt CreateBrittlenessWitnessReceipt(
+        FormationPhaseVectorReceipt formationPhaseVector,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        WarmReactivationDispositionReceipt warmReactivationDispositionReceipt,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        string receiptState = "brittleness-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        ArgumentNullException.ThrowIfNull(warmReactivationDispositionReceipt);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        EnsurePrefix(formationPhaseVector.ReceiptHandle, FormationPhaseVectorPrefix, nameof(formationPhaseVector));
+        EnsurePrefix(intentConstraintAlignmentReceipt.ReceiptHandle, IntentConstraintAlignmentReceiptPrefix, nameof(intentConstraintAlignmentReceipt));
+        EnsurePrefix(warmReactivationDispositionReceipt.ReceiptHandle, WarmReactivationDispositionReceiptPrefix, nameof(warmReactivationDispositionReceipt));
+        EnsurePrefix(admissionRefusalReceipt.ReceiptHandle, QuestioningAdmissionRefusalReceiptPrefix, nameof(admissionRefusalReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(formationPhaseVector.CMEId, intentConstraintAlignmentReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(formationPhaseVector.CMEId, warmReactivationDispositionReceipt.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(formationPhaseVector.CMEId, admissionRefusalReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Brittleness witness requires phase, alignment, warm reactivation, and refusal receipts to remain inside one CME continuity lane.");
+        }
+
+        var brittlePatterns = admissionRefusalReceipt.RefusedPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var fractureAxes = new[]
+        {
+            "scene-bound-overfit",
+            "misalignment-pressure",
+            "premature-cooling-risk"
+        };
+        var overfitWarnings = new[]
+        {
+            "single-scene-coherence",
+            "borrowed-justification-pressure",
+            "variation-sensitive-fracture"
+        };
+
+        return new BrittlenessWitnessReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateBrittlenessWitnessReceiptHandle(
+                formationPhaseVector.CMEId,
+                formationPhaseVector.ReceiptHandle,
+                intentConstraintAlignmentReceipt.ReceiptHandle,
+                admissionRefusalReceipt.ReceiptHandle),
+            CMEId: formationPhaseVector.CMEId,
+            FormationPhaseVectorHandle: formationPhaseVector.ReceiptHandle,
+            IntentConstraintAlignmentReceiptHandle: intentConstraintAlignmentReceipt.ReceiptHandle,
+            WarmReactivationDispositionReceiptHandle: warmReactivationDispositionReceipt.ReceiptHandle,
+            AdmissionRefusalReceiptHandle: admissionRefusalReceipt.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            BrittlePatterns: brittlePatterns,
+            FractureAxes: fractureAxes,
+            OverfitWarnings: overfitWarnings,
+            SceneBoundBrittlenessDetected: brittlePatterns.Length > 0,
+            MisalignmentPressureDetected: intentConstraintAlignmentReceipt.SceneBoundIntentDetected,
+            PrematureCoolingDenied: !formationPhaseVector.CoolingEligible,
+            ReasonCode: "brittleness-witness-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static DurabilityWitnessReceipt CreateDurabilityWitnessReceipt(
+        FormationPhaseVectorReceipt formationPhaseVector,
+        BrittlenessWitnessReceipt brittlenessWitness,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        string receiptState = "durability-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        EnsurePrefix(formationPhaseVector.ReceiptHandle, FormationPhaseVectorPrefix, nameof(formationPhaseVector));
+        EnsurePrefix(brittlenessWitness.ReceiptHandle, BrittlenessWitnessPrefix, nameof(brittlenessWitness));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(intentConstraintAlignmentReceipt.ReceiptHandle, IntentConstraintAlignmentReceiptPrefix, nameof(intentConstraintAlignmentReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(formationPhaseVector.CMEId, brittlenessWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(formationPhaseVector.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(formationPhaseVector.CMEId, intentConstraintAlignmentReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Durability witness requires phase, brittleness, reentry, and alignment receipts to remain inside one CME continuity lane.");
+        }
+
+        var durablePatterns = variationTestedReentryLedger.SurvivingPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var interlockSignals = new[]
+        {
+            "variation-survival",
+            "intent-constraint-coherence",
+            "portable-pattern-kernel"
+        };
+        var coolingBarriers = new[]
+        {
+            "scene-bound-remainder",
+            "hot-reentry-required",
+            "cold-admission-withheld"
+        };
+
+        return new DurabilityWitnessReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateDurabilityWitnessReceiptHandle(
+                formationPhaseVector.CMEId,
+                formationPhaseVector.ReceiptHandle,
+                brittlenessWitness.ReceiptHandle,
+                variationTestedReentryLedger.LedgerHandle),
+            CMEId: formationPhaseVector.CMEId,
+            FormationPhaseVectorHandle: formationPhaseVector.ReceiptHandle,
+            BrittlenessWitnessHandle: brittlenessWitness.ReceiptHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            IntentConstraintAlignmentReceiptHandle: intentConstraintAlignmentReceipt.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            DurablePatterns: durablePatterns,
+            InterlockSignals: interlockSignals,
+            CoolingBarriers: coolingBarriers,
+            DurableUnderVariation: variationTestedReentryLedger.PortablePatternsWithstoodVariation,
+            InterlockDensityEmergent: durablePatterns.Length > 0 && intentConstraintAlignmentReceipt.StructureConstraintAlignmentSatisfied,
+            ColdPromotionStillWithheld: true,
+            ReasonCode: "durability-witness-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

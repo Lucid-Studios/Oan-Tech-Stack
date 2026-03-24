@@ -638,4 +638,67 @@ public sealed class GovernedReachRealizationService
             receiptState,
             timestampUtc);
     }
+
+    public FormationPhaseVectorReceipt CreateFormationPhaseVectorReceipt(
+        EngramIntentFieldLedgerReceipt intentFieldLedger,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        WarmReactivationDispositionReceipt warmReactivationDispositionReceipt,
+        string receiptState = "formation-phase-vector-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(intentFieldLedger);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        ArgumentNullException.ThrowIfNull(warmReactivationDispositionReceipt);
+
+        return AgentiActualizationProjector.CreateFormationPhaseVectorReceipt(
+            intentFieldLedger,
+            intentConstraintAlignmentReceipt,
+            warmReactivationDispositionReceipt,
+            receiptState,
+            timestampUtc);
+    }
+
+    public BrittlenessWitnessReceipt CreateBrittlenessWitnessReceipt(
+        FormationPhaseVectorReceipt formationPhaseVector,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        WarmReactivationDispositionReceipt warmReactivationDispositionReceipt,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        string receiptState = "brittleness-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        ArgumentNullException.ThrowIfNull(warmReactivationDispositionReceipt);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+
+        return AgentiActualizationProjector.CreateBrittlenessWitnessReceipt(
+            formationPhaseVector,
+            intentConstraintAlignmentReceipt,
+            warmReactivationDispositionReceipt,
+            admissionRefusalReceipt,
+            receiptState,
+            timestampUtc);
+    }
+
+    public DurabilityWitnessReceipt CreateDurabilityWitnessReceipt(
+        FormationPhaseVectorReceipt formationPhaseVector,
+        BrittlenessWitnessReceipt brittlenessWitness,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        string receiptState = "durability-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+
+        return AgentiActualizationProjector.CreateDurabilityWitnessReceipt(
+            formationPhaseVector,
+            brittlenessWitness,
+            variationTestedReentryLedger,
+            intentConstraintAlignmentReceipt,
+            receiptState,
+            timestampUtc);
+    }
 }

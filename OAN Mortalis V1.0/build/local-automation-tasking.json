@@ -1875,6 +1875,60 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-34",
+      "label": "Automation Maturation Map 34",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Make the warm lane phase-aware by witnessing candidate position in the formation field, detecting brittle overfit before it masquerades as durability, and naming which interlocked structures are actually durable enough to keep maturing under constraint.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "formation-phase-vector",
+        "brittleness-witness",
+        "durability-witness"
+      ],
+      "tasks": [
+        {
+          "id": "formation-phase-vector",
+          "label": "Formation Phase Vector",
+          "owner": "Shared",
+          "authority": "Phase-space witness only",
+          "status": "selected",
+          "purpose": "Place warm-lane candidates inside a governed formation field so their position can be witnessed by distance, stability, intent coherence, constraint alignment, seduction risk, and cooling eligibility instead of simple ready/not-ready judgment.",
+          "completionSignal": "A phase vector can name the candidate's field region, phase axes, stability axes, and whether warm governance or reheating currently dominates its becoming.",
+          "escalatesWhen": [
+            "candidates are reviewed only as flat gate states after warm discipline has already made them multi-axial",
+            "field position is inferred from one metric while other active pressures remain hidden"
+          ]
+        },
+        {
+          "id": "brittleness-witness",
+          "label": "Brittleness Witness",
+          "owner": "SoulFrame",
+          "authority": "Fracture risk witness only",
+          "status": "selected",
+          "purpose": "Witness where apparent coherence remains brittle, overfit, or scene-bound so fracture risk is made legible before the chamber mistakes narrow success for durable becoming.",
+          "completionSignal": "A brittleness witness can name brittle patterns, fracture axes, and overfit warnings while denying premature cooling for structures that still crack under modest pressure shifts.",
+          "escalatesWhen": [
+            "scene-bound patterns masquerade as durable simply because they are elegant or repeated",
+            "premature cooling is allowed before brittle fracture signatures are made legible"
+          ]
+        },
+        {
+          "id": "durability-witness",
+          "label": "Durability Witness",
+          "owner": "GEL",
+          "authority": "Durability attestation only",
+          "status": "selected",
+          "purpose": "Name which candidate structures are actually interlocking under variation strongly enough to count as durable formation, while still withholding cold promotion until the remaining barriers are resolved.",
+          "completionSignal": "A durability witness can disclose durable patterns, interlock signals, and cooling barriers without collapsing durable emergence into automatic inheritance.",
+          "escalatesWhen": [
+            "durability is inferred from recurrence alone without interlock evidence",
+            "cold promotion is assumed merely because brittle fragments and durable kernels coexist"
+          ]
+        }
+      ]
     }
   ]
 }

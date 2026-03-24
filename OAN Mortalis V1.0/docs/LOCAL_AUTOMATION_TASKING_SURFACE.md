@@ -637,6 +637,24 @@ Current live output surfaces for this map:
 - `Warm Reactivation Disposition Receipt`
   Bundle root: `.audit/runs/warm-reactivation-disposition-receipt/`
 
+### Automation Maturation Map 34
+
+- Goal: make the warm lane phase-aware by witnessing candidate position in the formation field, detecting brittle overfit before it masquerades as durability, and naming which interlocked structures are actually durable enough to keep maturing under constraint
+- Expected review windows: `2`
+- Selected tasks:
+  - `Formation Phase Vector`
+  - `Brittleness Witness`
+  - `Durability Witness`
+
+Current live output surfaces for this map:
+
+- `Formation Phase Vector`
+  Bundle root: `.audit/runs/formation-phase-vector/`
+- `Brittleness Witness`
+  Bundle root: `.audit/runs/brittleness-witness/`
+- `Durability Witness`
+  Bundle root: `.audit/runs/durability-witness/`
+
 ## Status Interpretation
 
 The task board must distinguish between:

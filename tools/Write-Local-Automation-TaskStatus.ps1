@@ -197,6 +197,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $EngramIntentFieldLedgerState,
         [object] $IntentConstraintAlignmentReceiptState,
         [object] $WarmReactivationDispositionReceiptState,
+        [object] $FormationPhaseVectorState,
+        [object] $BrittlenessWitnessState,
+        [object] $DurabilityWitnessState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -1025,6 +1028,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'formation-phase-vector' {
+            if ($null -ne $FormationPhaseVectorState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'brittleness-witness' {
+            if ($null -ne $BrittlenessWitnessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'durability-witness' {
+            if ($null -ne $DurabilityWitnessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1164,6 +1194,9 @@ $promotionSeductionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepo
 $engramIntentFieldLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.engramIntentFieldLedgerStatePath)
 $intentConstraintAlignmentReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intentConstraintAlignmentReceiptStatePath)
 $warmReactivationDispositionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.warmReactivationDispositionReceiptStatePath)
+$formationPhaseVectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.formationPhaseVectorStatePath)
+$brittlenessWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.brittlenessWitnessStatePath)
+$durabilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.durabilityWitnessStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1256,6 +1289,9 @@ $promotionSeductionWatchState = Read-JsonFileOrNull -Path $promotionSeductionWat
 $engramIntentFieldLedgerState = Read-JsonFileOrNull -Path $engramIntentFieldLedgerStatePath
 $intentConstraintAlignmentReceiptState = Read-JsonFileOrNull -Path $intentConstraintAlignmentReceiptStatePath
 $warmReactivationDispositionReceiptState = Read-JsonFileOrNull -Path $warmReactivationDispositionReceiptStatePath
+$formationPhaseVectorState = Read-JsonFileOrNull -Path $formationPhaseVectorStatePath
+$brittlenessWitnessState = Read-JsonFileOrNull -Path $brittlenessWitnessStatePath
+$durabilityWitnessState = Read-JsonFileOrNull -Path $durabilityWitnessStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1494,6 +1530,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -EngramIntentFieldLedgerState $engramIntentFieldLedgerState `
                 -IntentConstraintAlignmentReceiptState $intentConstraintAlignmentReceiptState `
                 -WarmReactivationDispositionReceiptState $warmReactivationDispositionReceiptState `
+                -FormationPhaseVectorState $formationPhaseVectorState `
+                -BrittlenessWitnessState $brittlenessWitnessState `
+                -DurabilityWitnessState $durabilityWitnessState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1640,6 +1679,9 @@ $taskMapEntries = @(
                     -EngramIntentFieldLedgerState $engramIntentFieldLedgerState `
                     -IntentConstraintAlignmentReceiptState $intentConstraintAlignmentReceiptState `
                     -WarmReactivationDispositionReceiptState $warmReactivationDispositionReceiptState `
+                    -FormationPhaseVectorState $formationPhaseVectorState `
+                    -BrittlenessWitnessState $brittlenessWitnessState `
+                    -DurabilityWitnessState $durabilityWitnessState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -2213,6 +2255,33 @@ $statusPayload = [ordered]@{
         warmHoldingPreserved = if ($null -ne $warmReactivationDispositionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'warmHoldingPreserved') } else { $null }
         warmHotReentryRequired = if ($null -ne $warmReactivationDispositionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'hotReentryRequired') } else { $null }
         warmColdAdmissionWithheld = if ($null -ne $warmReactivationDispositionReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmReactivationDispositionReceiptState -PropertyName 'coldAdmissionWithheld') } else { $null }
+        formationPhaseVectorState = if ($null -ne $formationPhaseVectorState) { [string] $formationPhaseVectorState.formationPhaseVectorState } else { $null }
+        formationPhaseVectorReason = if ($null -ne $formationPhaseVectorState) { [string] $formationPhaseVectorState.reasonCode } else { $null }
+        formationPhaseVectorNextAction = if ($null -ne $formationPhaseVectorState) { [string] $formationPhaseVectorState.nextAction } else { $null }
+        formationPhaseAxisCount = if ($null -ne $formationPhaseVectorState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'phaseAxisCount') } else { $null }
+        formationStabilityAxisCount = if ($null -ne $formationPhaseVectorState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'stabilityAxisCount') } else { $null }
+        formationThermalRegionCount = if ($null -ne $formationPhaseVectorState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'thermalRegionCount') } else { $null }
+        formationWarmGovernanceDominant = if ($null -ne $formationPhaseVectorState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'warmGovernanceDominant') } else { $null }
+        formationCoolingEligible = if ($null -ne $formationPhaseVectorState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'coolingEligible') } else { $null }
+        formationReheatingSensitive = if ($null -ne $formationPhaseVectorState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'reheatingSensitive') } else { $null }
+        brittlenessWitnessState = if ($null -ne $brittlenessWitnessState) { [string] $brittlenessWitnessState.brittlenessWitnessState } else { $null }
+        brittlenessWitnessReason = if ($null -ne $brittlenessWitnessState) { [string] $brittlenessWitnessState.reasonCode } else { $null }
+        brittlenessWitnessNextAction = if ($null -ne $brittlenessWitnessState) { [string] $brittlenessWitnessState.nextAction } else { $null }
+        brittlePatternCount = if ($null -ne $brittlenessWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'brittlePatternCount') } else { $null }
+        brittlenessFractureAxisCount = if ($null -ne $brittlenessWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'fractureAxisCount') } else { $null }
+        brittlenessOverfitWarningCount = if ($null -ne $brittlenessWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'overfitWarningCount') } else { $null }
+        sceneBoundBrittlenessDetected = if ($null -ne $brittlenessWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'sceneBoundBrittlenessDetected') } else { $null }
+        misalignmentPressureDetected = if ($null -ne $brittlenessWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'misalignmentPressureDetected') } else { $null }
+        prematureCoolingDenied = if ($null -ne $brittlenessWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'prematureCoolingDenied') } else { $null }
+        durabilityWitnessState = if ($null -ne $durabilityWitnessState) { [string] $durabilityWitnessState.durabilityWitnessState } else { $null }
+        durabilityWitnessReason = if ($null -ne $durabilityWitnessState) { [string] $durabilityWitnessState.reasonCode } else { $null }
+        durabilityWitnessNextAction = if ($null -ne $durabilityWitnessState) { [string] $durabilityWitnessState.nextAction } else { $null }
+        durablePatternCount = if ($null -ne $durabilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'durablePatternCount') } else { $null }
+        durabilityInterlockSignalCount = if ($null -ne $durabilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'interlockSignalCount') } else { $null }
+        durabilityCoolingBarrierCount = if ($null -ne $durabilityWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'coolingBarrierCount') } else { $null }
+        durableUnderVariation = if ($null -ne $durabilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'durableUnderVariation') } else { $null }
+        interlockDensityEmergent = if ($null -ne $durabilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'interlockDensityEmergent') } else { $null }
+        coldPromotionStillWithheld = if ($null -ne $durabilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'coldPromotionStillWithheld') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3524,6 +3593,58 @@ if ($null -ne $warmReactivationDispositionReceiptState) {
     )
 }
 
+if ($null -ne $formationPhaseVectorState) {
+    $markdownLines += @(
+        '## Formation Phase Vector',
+        '',
+        ('- Formation phase-vector state: `{0}`' -f [string] $formationPhaseVectorState.formationPhaseVectorState),
+        ('- Reason code: `{0}`' -f [string] $formationPhaseVectorState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $formationPhaseVectorState.nextAction),
+        ('- Phase-axis count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'phaseAxisCount')),
+        ('- Stability-axis count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'stabilityAxisCount')),
+        ('- Thermal-region count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'thermalRegionCount')),
+        ('- Formation region: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'formationRegion')),
+        ('- Warm governance dominant: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'warmGovernanceDominant')),
+        ('- Cooling eligible: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'coolingEligible')),
+        ('- Reheating sensitive: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $formationPhaseVectorState -PropertyName 'reheatingSensitive')),
+        ''
+    )
+}
+
+if ($null -ne $brittlenessWitnessState) {
+    $markdownLines += @(
+        '## Brittleness Witness',
+        '',
+        ('- Brittleness-witness state: `{0}`' -f [string] $brittlenessWitnessState.brittlenessWitnessState),
+        ('- Reason code: `{0}`' -f [string] $brittlenessWitnessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $brittlenessWitnessState.nextAction),
+        ('- Brittle-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'brittlePatternCount')),
+        ('- Fracture-axis count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'fractureAxisCount')),
+        ('- Overfit-warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'overfitWarningCount')),
+        ('- Scene-bound brittleness detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'sceneBoundBrittlenessDetected')),
+        ('- Misalignment pressure detected: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'misalignmentPressureDetected')),
+        ('- Premature cooling denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittlenessWitnessState -PropertyName 'prematureCoolingDenied')),
+        ''
+    )
+}
+
+if ($null -ne $durabilityWitnessState) {
+    $markdownLines += @(
+        '## Durability Witness',
+        '',
+        ('- Durability-witness state: `{0}`' -f [string] $durabilityWitnessState.durabilityWitnessState),
+        ('- Reason code: `{0}`' -f [string] $durabilityWitnessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $durabilityWitnessState.nextAction),
+        ('- Durable-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'durablePatternCount')),
+        ('- Interlock-signal count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'interlockSignalCount')),
+        ('- Cooling-barrier count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'coolingBarrierCount')),
+        ('- Durable under variation: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'durableUnderVariation')),
+        ('- Interlock density emergent: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'interlockDensityEmergent')),
+        ('- Cold promotion still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'coldPromotionStillWithheld')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3643,6 +3764,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -EngramIntentFieldLedgerState $engramIntentFieldLedgerState `
             -IntentConstraintAlignmentReceiptState $intentConstraintAlignmentReceiptState `
             -WarmReactivationDispositionReceiptState $warmReactivationDispositionReceiptState `
+            -FormationPhaseVectorState $formationPhaseVectorState `
+            -BrittlenessWitnessState $brittlenessWitnessState `
+            -DurabilityWitnessState $durabilityWitnessState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

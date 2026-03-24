@@ -246,6 +246,9 @@ $promotionSeductionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepo
 $engramIntentFieldLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.engramIntentFieldLedgerStatePath)
 $intentConstraintAlignmentReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.intentConstraintAlignmentReceiptStatePath)
 $warmReactivationDispositionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.warmReactivationDispositionReceiptStatePath)
+$formationPhaseVectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.formationPhaseVectorStatePath)
+$brittlenessWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.brittlenessWitnessStatePath)
+$durabilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.durabilityWitnessStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -572,6 +575,12 @@ $statePayload.lastIntentConstraintAlignmentReceiptBundle = [string] (Get-ObjectP
 $statePayload.intentConstraintAlignmentReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $intentConstraintAlignmentReceiptStatePath
 $statePayload.lastWarmReactivationDispositionReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastWarmReactivationDispositionReceiptBundle')
 $statePayload.warmReactivationDispositionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $warmReactivationDispositionReceiptStatePath
+$statePayload.lastFormationPhaseVectorBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastFormationPhaseVectorBundle')
+$statePayload.formationPhaseVectorStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $formationPhaseVectorStatePath
+$statePayload.lastBrittlenessWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBrittlenessWitnessBundle')
+$statePayload.brittlenessWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $brittlenessWitnessStatePath
+$statePayload.lastDurabilityWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDurabilityWitnessBundle')
+$statePayload.durabilityWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $durabilityWitnessStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1394,6 +1403,33 @@ if (-not [string]::IsNullOrWhiteSpace($warmReactivationDispositionReceiptBundleP
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$formationPhaseVectorScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-FormationPhase-Vector.ps1'
+$formationPhaseVectorOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $formationPhaseVectorScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Formation phase-vector writer'
+$formationPhaseVectorBundlePath = Get-ScriptOutputTail -Output $formationPhaseVectorOutput
+if (-not [string]::IsNullOrWhiteSpace($formationPhaseVectorBundlePath)) {
+    $statePayload.lastFormationPhaseVectorBundle = $formationPhaseVectorBundlePath
+    $statePayload.formationPhaseVectorStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $formationPhaseVectorStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$brittlenessWitnessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Brittleness-Witness.ps1'
+$brittlenessWitnessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $brittlenessWitnessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Brittleness witness writer'
+$brittlenessWitnessBundlePath = Get-ScriptOutputTail -Output $brittlenessWitnessOutput
+if (-not [string]::IsNullOrWhiteSpace($brittlenessWitnessBundlePath)) {
+    $statePayload.lastBrittlenessWitnessBundle = $brittlenessWitnessBundlePath
+    $statePayload.brittlenessWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $brittlenessWitnessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$durabilityWitnessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Durability-Witness.ps1'
+$durabilityWitnessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $durabilityWitnessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Durability witness writer'
+$durabilityWitnessBundlePath = Get-ScriptOutputTail -Output $durabilityWitnessOutput
+if (-not [string]::IsNullOrWhiteSpace($durabilityWitnessBundlePath)) {
+    $statePayload.lastDurabilityWitnessBundle = $durabilityWitnessBundlePath
+    $statePayload.durabilityWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $durabilityWitnessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1578,6 +1614,12 @@ $summary = [ordered]@{
     intentConstraintAlignmentReceiptStatePath = $statePayload.intentConstraintAlignmentReceiptStatePath
     lastWarmReactivationDispositionReceiptBundle = $statePayload.lastWarmReactivationDispositionReceiptBundle
     warmReactivationDispositionReceiptStatePath = $statePayload.warmReactivationDispositionReceiptStatePath
+    lastFormationPhaseVectorBundle = $statePayload.lastFormationPhaseVectorBundle
+    formationPhaseVectorStatePath = $statePayload.formationPhaseVectorStatePath
+    lastBrittlenessWitnessBundle = $statePayload.lastBrittlenessWitnessBundle
+    brittlenessWitnessStatePath = $statePayload.brittlenessWitnessStatePath
+    lastDurabilityWitnessBundle = $statePayload.lastDurabilityWitnessBundle
+    durabilityWitnessStatePath = $statePayload.durabilityWitnessStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1901,6 +1943,15 @@ if (-not [string]::IsNullOrWhiteSpace($intentConstraintAlignmentReceiptBundlePat
 }
 if (-not [string]::IsNullOrWhiteSpace($warmReactivationDispositionReceiptBundlePath)) {
     Write-Host ('[local-automation-cycle] WarmReactivationDispositionReceipt: {0}' -f $warmReactivationDispositionReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($formationPhaseVectorBundlePath)) {
+    Write-Host ('[local-automation-cycle] FormationPhaseVector: {0}' -f $formationPhaseVectorBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($brittlenessWitnessBundlePath)) {
+    Write-Host ('[local-automation-cycle] BrittlenessWitness: {0}' -f $brittlenessWitnessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($durabilityWitnessBundlePath)) {
+    Write-Host ('[local-automation-cycle] DurabilityWitness: {0}' -f $durabilityWitnessBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {
