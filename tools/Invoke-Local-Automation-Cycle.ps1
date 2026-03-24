@@ -249,6 +249,9 @@ $warmReactivationDispositionReceiptStatePath = Resolve-PathFromRepo -BasePath $r
 $formationPhaseVectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.formationPhaseVectorStatePath)
 $brittlenessWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.brittlenessWitnessStatePath)
 $durabilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.durabilityWitnessStatePath)
+$warmClockDispositionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.warmClockDispositionStatePath)
+$ripeningStalenessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.ripeningStalenessLedgerStatePath)
+$coolingPressureWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coolingPressureWitnessStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -581,6 +584,12 @@ $statePayload.lastBrittlenessWitnessBundle = [string] (Get-ObjectPropertyValueOr
 $statePayload.brittlenessWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $brittlenessWitnessStatePath
 $statePayload.lastDurabilityWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDurabilityWitnessBundle')
 $statePayload.durabilityWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $durabilityWitnessStatePath
+$statePayload.lastWarmClockDispositionBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastWarmClockDispositionBundle')
+$statePayload.warmClockDispositionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $warmClockDispositionStatePath
+$statePayload.lastRipeningStalenessLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRipeningStalenessLedgerBundle')
+$statePayload.ripeningStalenessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $ripeningStalenessLedgerStatePath
+$statePayload.lastCoolingPressureWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCoolingPressureWitnessBundle')
+$statePayload.coolingPressureWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coolingPressureWitnessStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1430,6 +1439,33 @@ if (-not [string]::IsNullOrWhiteSpace($durabilityWitnessBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$warmClockDispositionScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-WarmClock-Disposition.ps1'
+$warmClockDispositionOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $warmClockDispositionScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Warm clock disposition writer'
+$warmClockDispositionBundlePath = Get-ScriptOutputTail -Output $warmClockDispositionOutput
+if (-not [string]::IsNullOrWhiteSpace($warmClockDispositionBundlePath)) {
+    $statePayload.lastWarmClockDispositionBundle = $warmClockDispositionBundlePath
+    $statePayload.warmClockDispositionStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $warmClockDispositionStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$ripeningStalenessLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Ripening-Staleness-Ledger.ps1'
+$ripeningStalenessLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $ripeningStalenessLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Ripening staleness ledger writer'
+$ripeningStalenessLedgerBundlePath = Get-ScriptOutputTail -Output $ripeningStalenessLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($ripeningStalenessLedgerBundlePath)) {
+    $statePayload.lastRipeningStalenessLedgerBundle = $ripeningStalenessLedgerBundlePath
+    $statePayload.ripeningStalenessLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $ripeningStalenessLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$coolingPressureWitnessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CoolingPressure-Witness.ps1'
+$coolingPressureWitnessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $coolingPressureWitnessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Cooling pressure witness writer'
+$coolingPressureWitnessBundlePath = Get-ScriptOutputTail -Output $coolingPressureWitnessOutput
+if (-not [string]::IsNullOrWhiteSpace($coolingPressureWitnessBundlePath)) {
+    $statePayload.lastCoolingPressureWitnessBundle = $coolingPressureWitnessBundlePath
+    $statePayload.coolingPressureWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coolingPressureWitnessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1620,6 +1656,12 @@ $summary = [ordered]@{
     brittlenessWitnessStatePath = $statePayload.brittlenessWitnessStatePath
     lastDurabilityWitnessBundle = $statePayload.lastDurabilityWitnessBundle
     durabilityWitnessStatePath = $statePayload.durabilityWitnessStatePath
+    lastWarmClockDispositionBundle = $statePayload.lastWarmClockDispositionBundle
+    warmClockDispositionStatePath = $statePayload.warmClockDispositionStatePath
+    lastRipeningStalenessLedgerBundle = $statePayload.lastRipeningStalenessLedgerBundle
+    ripeningStalenessLedgerStatePath = $statePayload.ripeningStalenessLedgerStatePath
+    lastCoolingPressureWitnessBundle = $statePayload.lastCoolingPressureWitnessBundle
+    coolingPressureWitnessStatePath = $statePayload.coolingPressureWitnessStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1952,6 +1994,15 @@ if (-not [string]::IsNullOrWhiteSpace($brittlenessWitnessBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($durabilityWitnessBundlePath)) {
     Write-Host ('[local-automation-cycle] DurabilityWitness: {0}' -f $durabilityWitnessBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($warmClockDispositionBundlePath)) {
+    Write-Host ('[local-automation-cycle] WarmClockDisposition: {0}' -f $warmClockDispositionBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($ripeningStalenessLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] RipeningStalenessLedger: {0}' -f $ripeningStalenessLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($coolingPressureWitnessBundlePath)) {
+    Write-Host ('[local-automation-cycle] CoolingPressureWitness: {0}' -f $coolingPressureWitnessBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

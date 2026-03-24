@@ -433,6 +433,48 @@ public static class AgentiActualizationKeys
         return $"durability-witness://{ComputeDigest(cmeId, formationPhaseVectorHandle, brittlenessWitnessHandle, variationTestedReentryLedgerHandle)}";
     }
 
+    public static string CreateWarmClockDispositionReceiptHandle(
+        string cmeId,
+        string formationPhaseVectorHandle,
+        string variationTestedReentryLedgerHandle,
+        string engramDistanceClassificationLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(formationPhaseVectorHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(engramDistanceClassificationLedgerHandle);
+
+        return $"warm-clock-disposition://{ComputeDigest(cmeId, formationPhaseVectorHandle, variationTestedReentryLedgerHandle, engramDistanceClassificationLedgerHandle)}";
+    }
+
+    public static string CreateRipeningStalenessLedgerReceiptHandle(
+        string cmeId,
+        string warmClockDispositionReceiptHandle,
+        string brittlenessWitnessHandle,
+        string durabilityWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warmClockDispositionReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(brittlenessWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(durabilityWitnessHandle);
+
+        return $"ripening-staleness-ledger://{ComputeDigest(cmeId, warmClockDispositionReceiptHandle, brittlenessWitnessHandle, durabilityWitnessHandle)}";
+    }
+
+    public static string CreateCoolingPressureWitnessReceiptHandle(
+        string cmeId,
+        string warmClockDispositionReceiptHandle,
+        string ripeningStalenessLedgerHandle,
+        string durabilityWitnessHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warmClockDispositionReceiptHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(ripeningStalenessLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(durabilityWitnessHandle);
+
+        return $"cooling-pressure-witness://{ComputeDigest(cmeId, warmClockDispositionReceiptHandle, ripeningStalenessLedgerHandle, durabilityWitnessHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

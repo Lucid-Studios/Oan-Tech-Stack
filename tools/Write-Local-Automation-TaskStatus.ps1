@@ -200,6 +200,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $FormationPhaseVectorState,
         [object] $BrittlenessWitnessState,
         [object] $DurabilityWitnessState,
+        [object] $WarmClockDispositionState,
+        [object] $RipeningStalenessLedgerState,
+        [object] $CoolingPressureWitnessState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -1055,6 +1058,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'warm-clock-disposition' {
+            if ($null -ne $WarmClockDispositionState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'ripening-staleness-ledger' {
+            if ($null -ne $RipeningStalenessLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'cooling-pressure-witness' {
+            if ($null -ne $CoolingPressureWitnessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1197,6 +1227,9 @@ $warmReactivationDispositionReceiptStatePath = Resolve-PathFromRepo -BasePath $r
 $formationPhaseVectorStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.formationPhaseVectorStatePath)
 $brittlenessWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.brittlenessWitnessStatePath)
 $durabilityWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.durabilityWitnessStatePath)
+$warmClockDispositionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.warmClockDispositionStatePath)
+$ripeningStalenessLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.ripeningStalenessLedgerStatePath)
+$coolingPressureWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coolingPressureWitnessStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1292,6 +1325,9 @@ $warmReactivationDispositionReceiptState = Read-JsonFileOrNull -Path $warmReacti
 $formationPhaseVectorState = Read-JsonFileOrNull -Path $formationPhaseVectorStatePath
 $brittlenessWitnessState = Read-JsonFileOrNull -Path $brittlenessWitnessStatePath
 $durabilityWitnessState = Read-JsonFileOrNull -Path $durabilityWitnessStatePath
+$warmClockDispositionState = Read-JsonFileOrNull -Path $warmClockDispositionStatePath
+$ripeningStalenessLedgerState = Read-JsonFileOrNull -Path $ripeningStalenessLedgerStatePath
+$coolingPressureWitnessState = Read-JsonFileOrNull -Path $coolingPressureWitnessStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1533,6 +1569,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -FormationPhaseVectorState $formationPhaseVectorState `
                 -BrittlenessWitnessState $brittlenessWitnessState `
                 -DurabilityWitnessState $durabilityWitnessState `
+                -WarmClockDispositionState $warmClockDispositionState `
+                -RipeningStalenessLedgerState $ripeningStalenessLedgerState `
+                -CoolingPressureWitnessState $coolingPressureWitnessState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1682,6 +1721,9 @@ $taskMapEntries = @(
                     -FormationPhaseVectorState $formationPhaseVectorState `
                     -BrittlenessWitnessState $brittlenessWitnessState `
                     -DurabilityWitnessState $durabilityWitnessState `
+                    -WarmClockDispositionState $warmClockDispositionState `
+                    -RipeningStalenessLedgerState $ripeningStalenessLedgerState `
+                    -CoolingPressureWitnessState $coolingPressureWitnessState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -2282,6 +2324,38 @@ $statusPayload = [ordered]@{
         durableUnderVariation = if ($null -ne $durabilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'durableUnderVariation') } else { $null }
         interlockDensityEmergent = if ($null -ne $durabilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'interlockDensityEmergent') } else { $null }
         coldPromotionStillWithheld = if ($null -ne $durabilityWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $durabilityWitnessState -PropertyName 'coldPromotionStillWithheld') } else { $null }
+        warmClockDispositionState = if ($null -ne $warmClockDispositionState) { [string] $warmClockDispositionState.warmClockDispositionState } else { $null }
+        warmClockDispositionReason = if ($null -ne $warmClockDispositionState) { [string] $warmClockDispositionState.reasonCode } else { $null }
+        warmClockDispositionNextAction = if ($null -ne $warmClockDispositionState) { [string] $warmClockDispositionState.nextAction } else { $null }
+        warmClockCount = if ($null -ne $warmClockDispositionState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'warmClockCount') } else { $null }
+        warmClockUnresolvedUnknownLoad = if ($null -ne $warmClockDispositionState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'unresolvedUnknownLoad') } else { $null }
+        warmClockRipeningDisposition = if ($null -ne $warmClockDispositionState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'ripeningDisposition') } else { $null }
+        warmClockStalenessDisposition = if ($null -ne $warmClockDispositionState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'stalenessDisposition') } else { $null }
+        warmClockReentryClockActive = if ($null -ne $warmClockDispositionState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'reentryClockActive') } else { $null }
+        warmClockDistanceBurdenStillActive = if ($null -ne $warmClockDispositionState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'distanceBurdenStillActive') } else { $null }
+        warmClockFailureSignatureFreshnessRequired = if ($null -ne $warmClockDispositionState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'failureSignatureFreshnessRequired') } else { $null }
+        warmClockRipeningUnderway = if ($null -ne $warmClockDispositionState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'warmRipeningUnderway') } else { $null }
+        warmClockStalenessRiskPresent = if ($null -ne $warmClockDispositionState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'stalenessRiskPresent') } else { $null }
+        ripeningStalenessLedgerState = if ($null -ne $ripeningStalenessLedgerState) { [string] $ripeningStalenessLedgerState.ripeningStalenessLedgerState } else { $null }
+        ripeningStalenessLedgerReason = if ($null -ne $ripeningStalenessLedgerState) { [string] $ripeningStalenessLedgerState.reasonCode } else { $null }
+        ripeningStalenessLedgerNextAction = if ($null -ne $ripeningStalenessLedgerState) { [string] $ripeningStalenessLedgerState.nextAction } else { $null }
+        ripeningPatternCount = if ($null -ne $ripeningStalenessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'ripeningPatternCount') } else { $null }
+        stalePatternCount = if ($null -ne $ripeningStalenessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'stalePatternCount') } else { $null }
+        ripeningWindowCount = if ($null -ne $ripeningStalenessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'ripeningWindowCount') } else { $null }
+        staleWindowCount = if ($null -ne $ripeningStalenessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'staleWindowCount') } else { $null }
+        ripeningRefreshRequiredCount = if ($null -ne $ripeningStalenessLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'refreshRequiredCount') } else { $null }
+        honestWarmRipeningPreserved = if ($null -ne $ripeningStalenessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'honestWarmRipeningPreserved') } else { $null }
+        administrativeSuspensionDenied = if ($null -ne $ripeningStalenessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'administrativeSuspensionDenied') } else { $null }
+        freshConstraintContactStillRequired = if ($null -ne $ripeningStalenessLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'freshConstraintContactStillRequired') } else { $null }
+        coolingPressureWitnessState = if ($null -ne $coolingPressureWitnessState) { [string] $coolingPressureWitnessState.coolingPressureWitnessState } else { $null }
+        coolingPressureWitnessReason = if ($null -ne $coolingPressureWitnessState) { [string] $coolingPressureWitnessState.reasonCode } else { $null }
+        coolingPressureWitnessNextAction = if ($null -ne $coolingPressureWitnessState) { [string] $coolingPressureWitnessState.nextAction } else { $null }
+        coolingPressureForceCount = if ($null -ne $coolingPressureWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingForceCount') } else { $null }
+        coolingPressureBarrierCount = if ($null -ne $coolingPressureWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingBarrierCount') } else { $null }
+        coolingPressureDisposition = if ($null -ne $coolingPressureWitnessState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'pressureDisposition') } else { $null }
+        coolingPressureEmergent = if ($null -ne $coolingPressureWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingPressureEmergent') } else { $null }
+        coolingPressureColdApproachLawful = if ($null -ne $coolingPressureWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coldApproachLawful') } else { $null }
+        reheatingOrArchivePressureStillStronger = if ($null -ne $coolingPressureWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'reheatingOrArchivePressureStillStronger') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3645,6 +3719,62 @@ if ($null -ne $durabilityWitnessState) {
     )
 }
 
+if ($null -ne $warmClockDispositionState) {
+    $markdownLines += @(
+        '## Warm Clock Disposition',
+        '',
+        ('- Warm-clock disposition state: `{0}`' -f [string] $warmClockDispositionState.warmClockDispositionState),
+        ('- Reason code: `{0}`' -f [string] $warmClockDispositionState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $warmClockDispositionState.nextAction),
+        ('- Warm-clock count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'warmClockCount')),
+        ('- Unresolved unknown load: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'unresolvedUnknownLoad')),
+        ('- Ripening disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'ripeningDisposition')),
+        ('- Staleness disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'stalenessDisposition')),
+        ('- Re-entry clock active: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'reentryClockActive')),
+        ('- Distance burden still active: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'distanceBurdenStillActive')),
+        ('- Failure-signature freshness required: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'failureSignatureFreshnessRequired')),
+        ('- Warm ripening underway: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'warmRipeningUnderway')),
+        ('- Staleness risk present: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $warmClockDispositionState -PropertyName 'stalenessRiskPresent')),
+        ''
+    )
+}
+
+if ($null -ne $ripeningStalenessLedgerState) {
+    $markdownLines += @(
+        '## Ripening Staleness Ledger',
+        '',
+        ('- Ripening-staleness ledger state: `{0}`' -f [string] $ripeningStalenessLedgerState.ripeningStalenessLedgerState),
+        ('- Reason code: `{0}`' -f [string] $ripeningStalenessLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $ripeningStalenessLedgerState.nextAction),
+        ('- Ripening-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'ripeningPatternCount')),
+        ('- Stale-pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'stalePatternCount')),
+        ('- Ripening-window count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'ripeningWindowCount')),
+        ('- Stale-window count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'staleWindowCount')),
+        ('- Refresh-required count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'refreshRequiredCount')),
+        ('- Honest warm ripening preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'honestWarmRipeningPreserved')),
+        ('- Administrative suspension denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'administrativeSuspensionDenied')),
+        ('- Fresh constraint contact still required: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $ripeningStalenessLedgerState -PropertyName 'freshConstraintContactStillRequired')),
+        ''
+    )
+}
+
+if ($null -ne $coolingPressureWitnessState) {
+    $markdownLines += @(
+        '## Cooling Pressure Witness',
+        '',
+        ('- Cooling-pressure witness state: `{0}`' -f [string] $coolingPressureWitnessState.coolingPressureWitnessState),
+        ('- Reason code: `{0}`' -f [string] $coolingPressureWitnessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $coolingPressureWitnessState.nextAction),
+        ('- Cooling-force count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingForceCount')),
+        ('- Cooling-barrier count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingBarrierCount')),
+        ('- Pressure disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'pressureDisposition')),
+        ('- Cooling pressure emergent: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coolingPressureEmergent')),
+        ('- Cold approach lawful: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'coldApproachLawful')),
+        ('- Reheating or archive pressure still stronger: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coolingPressureWitnessState -PropertyName 'reheatingOrArchivePressureStillStronger')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3767,6 +3897,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -FormationPhaseVectorState $formationPhaseVectorState `
             -BrittlenessWitnessState $brittlenessWitnessState `
             -DurabilityWitnessState $durabilityWitnessState `
+            -WarmClockDispositionState $warmClockDispositionState `
+            -RipeningStalenessLedgerState $ripeningStalenessLedgerState `
+            -CoolingPressureWitnessState $coolingPressureWitnessState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

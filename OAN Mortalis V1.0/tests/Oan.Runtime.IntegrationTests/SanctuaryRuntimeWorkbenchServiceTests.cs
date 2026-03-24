@@ -1361,6 +1361,181 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(durabilityWitness.ColdPromotionStillWithheld);
     }
 
+    [Fact]
+    public void CreateWarmClockRipeningAndCoolingPressure_WitnessTemporalLawInsideWarmLane()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
+        var (_, _, _, _, _, _, _, operatorSelection, _, _, _) = CreateCrucibleBundle();
+        var inquiryPatternLedger = reachService.CreateInquiryPatternContinuityLedger(
+            operatorSelection,
+            continuityLedger,
+            mutualWitness,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var boundaryPairLedger = reachService.CreateQuestioningBoundaryPairLedger(
+            operatorSelection,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var carryForwardSurface = reachService.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var classificationLedger = reachService.CreateEngramDistanceClassificationLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            timestampUtc: FixedTimestamp);
+        var requirementsMatrix = reachService.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            timestampUtc: FixedTimestamp);
+        var distanceWeightedSurface = reachService.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            requirementsMatrix,
+            carryForwardSurface,
+            timestampUtc: FixedTimestamp);
+        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
+        var promotionGate = reachService.CreateQuestioningGelPromotionGate(
+            candidateLedger,
+            carryForwardSurface,
+            operatorSelection,
+            localityWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
+        var protectedSurface = reachService.CreateProtectedQuestioningPatternSurface(
+            candidateLedger,
+            promotionGate,
+            carryForwardSurface,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var variationLedger = reachService.CreateVariationTestedReentryLedger(
+            distanceWeightedSurface,
+            candidateLedger,
+            promotionGate,
+            protectedSurface,
+            timestampUtc: FixedTimestamp);
+        var refusalReceipt = reachService.CreateQuestioningAdmissionRefusalReceipt(
+            variationLedger,
+            candidateLedger,
+            promotionGate,
+            protectedSurface,
+            timestampUtc: FixedTimestamp);
+        var seductionWatch = reachService.CreatePromotionSeductionWatch(
+            candidateLedger,
+            promotionGate,
+            variationLedger,
+            refusalReceipt,
+            timestampUtc: FixedTimestamp);
+        var intentFieldLedger = reachService.CreateEngramIntentFieldLedger(
+            candidateLedger,
+            variationLedger,
+            refusalReceipt,
+            seductionWatch,
+            timestampUtc: FixedTimestamp);
+        var intentConstraintAlignment = reachService.CreateIntentConstraintAlignmentReceipt(
+            intentFieldLedger,
+            candidateLedger,
+            variationLedger,
+            promotionGate,
+            refusalReceipt,
+            timestampUtc: FixedTimestamp);
+        var warmReactivationDisposition = reachService.CreateWarmReactivationDispositionReceipt(
+            intentFieldLedger,
+            intentConstraintAlignment,
+            variationLedger,
+            refusalReceipt,
+            seductionWatch,
+            timestampUtc: FixedTimestamp);
+        var formationPhaseVector = reachService.CreateFormationPhaseVectorReceipt(
+            intentFieldLedger,
+            intentConstraintAlignment,
+            warmReactivationDisposition,
+            timestampUtc: FixedTimestamp);
+        var brittlenessWitness = reachService.CreateBrittlenessWitnessReceipt(
+            formationPhaseVector,
+            intentConstraintAlignment,
+            warmReactivationDisposition,
+            refusalReceipt,
+            timestampUtc: FixedTimestamp);
+        var durabilityWitness = reachService.CreateDurabilityWitnessReceipt(
+            formationPhaseVector,
+            brittlenessWitness,
+            variationLedger,
+            intentConstraintAlignment,
+            timestampUtc: FixedTimestamp);
+
+        var warmClockDisposition = reachService.CreateWarmClockDispositionReceipt(
+            formationPhaseVector,
+            variationLedger,
+            classificationLedger,
+            warmReactivationDisposition,
+            receiptState: "warm-clock-disposition-ready",
+            timestampUtc: FixedTimestamp);
+        var ripeningStalenessLedger = reachService.CreateRipeningStalenessLedgerReceipt(
+            warmClockDisposition,
+            formationPhaseVector,
+            brittlenessWitness,
+            durabilityWitness,
+            ledgerState: "ripening-staleness-ledger-ready",
+            timestampUtc: FixedTimestamp);
+        var coolingPressureWitness = reachService.CreateCoolingPressureWitnessReceipt(
+            warmClockDisposition,
+            ripeningStalenessLedger,
+            durabilityWitness,
+            formationPhaseVector,
+            intentConstraintAlignment,
+            receiptState: "cooling-pressure-witness-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("warm-clock-disposition://", warmClockDisposition.ReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("warm-clock-disposition-bound", warmClockDisposition.ReasonCode);
+        Assert.Equal("warm-clock-disposition-ready", warmClockDisposition.ReceiptState);
+        Assert.Equal(4, warmClockDisposition.WarmClocks.Count);
+        Assert.Equal("ripening-active", warmClockDisposition.RipeningDisposition);
+        Assert.Equal("staleness-risk-present", warmClockDisposition.StalenessDisposition);
+        Assert.Equal(1, warmClockDisposition.UnresolvedUnknownLoad);
+        Assert.True(warmClockDisposition.ReentryClockActive);
+        Assert.True(warmClockDisposition.DistanceBurdenStillActive);
+        Assert.True(warmClockDisposition.FailureSignatureFreshnessRequired);
+        Assert.True(warmClockDisposition.WarmRipeningUnderway);
+        Assert.True(warmClockDisposition.StalenessRiskPresent);
+
+        Assert.StartsWith("ripening-staleness-ledger://", ripeningStalenessLedger.LedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("ripening-staleness-ledger-bound", ripeningStalenessLedger.ReasonCode);
+        Assert.Equal("ripening-staleness-ledger-ready", ripeningStalenessLedger.LedgerState);
+        Assert.Equal(2, ripeningStalenessLedger.RipeningPatterns.Count);
+        Assert.Single(ripeningStalenessLedger.StalePatterns);
+        Assert.Equal(2, ripeningStalenessLedger.RipeningWindowCount);
+        Assert.Equal(1, ripeningStalenessLedger.StaleWindowCount);
+        Assert.Equal(1, ripeningStalenessLedger.RefreshRequiredCount);
+        Assert.True(ripeningStalenessLedger.HonestWarmRipeningPreserved);
+        Assert.True(ripeningStalenessLedger.AdministrativeSuspensionDenied);
+        Assert.True(ripeningStalenessLedger.FreshConstraintContactStillRequired);
+
+        Assert.StartsWith("cooling-pressure-witness://", coolingPressureWitness.ReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("cooling-pressure-witness-bound", coolingPressureWitness.ReasonCode);
+        Assert.Equal("cooling-pressure-witness-ready", coolingPressureWitness.ReceiptState);
+        Assert.Equal(3, coolingPressureWitness.CoolingForces.Count);
+        Assert.Equal(3, coolingPressureWitness.CoolingBarriers.Count);
+        Assert.Equal("pressure-emergent-but-withheld", coolingPressureWitness.PressureDisposition);
+        Assert.True(coolingPressureWitness.CoolingPressureEmergent);
+        Assert.False(coolingPressureWitness.ColdApproachLawful);
+        Assert.True(coolingPressureWitness.ReheatingOrArchivePressureStillStronger);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
 
     private static (RuntimeHabitationReadinessLedgerReceipt ReadinessLedger, RuntimeWorkbenchSessionLedger SessionLedger, DayDreamCollapseReceipt CollapseReceipt, CrypticDepthReturnReceipt CrypticReturnReceipt, BondedCoWorkSessionRehearsalReceipt BondedCoWorkRehearsal, ReachReturnDissolutionReceipt ReachReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateInquiryBundle()

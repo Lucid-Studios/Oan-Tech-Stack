@@ -572,6 +572,63 @@ public sealed record DurabilityWitnessReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record WarmClockDispositionReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string FormationPhaseVectorHandle,
+    string VariationTestedReentryLedgerHandle,
+    string EngramDistanceClassificationLedgerHandle,
+    string WarmReactivationDispositionReceiptHandle,
+    string ReceiptState,
+    IReadOnlyList<string> WarmClocks,
+    string RipeningDisposition,
+    string StalenessDisposition,
+    int UnresolvedUnknownLoad,
+    bool ReentryClockActive,
+    bool DistanceBurdenStillActive,
+    bool FailureSignatureFreshnessRequired,
+    bool WarmRipeningUnderway,
+    bool StalenessRiskPresent,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record RipeningStalenessLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string WarmClockDispositionReceiptHandle,
+    string FormationPhaseVectorHandle,
+    string BrittlenessWitnessHandle,
+    string DurabilityWitnessHandle,
+    string LedgerState,
+    IReadOnlyList<string> RipeningPatterns,
+    IReadOnlyList<string> StalePatterns,
+    int RipeningWindowCount,
+    int StaleWindowCount,
+    int RefreshRequiredCount,
+    bool HonestWarmRipeningPreserved,
+    bool AdministrativeSuspensionDenied,
+    bool FreshConstraintContactStillRequired,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record CoolingPressureWitnessReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string WarmClockDispositionReceiptHandle,
+    string RipeningStalenessLedgerHandle,
+    string DurabilityWitnessHandle,
+    string FormationPhaseVectorHandle,
+    string IntentConstraintAlignmentReceiptHandle,
+    string ReceiptState,
+    IReadOnlyList<string> CoolingForces,
+    IReadOnlyList<string> CoolingBarriers,
+    string PressureDisposition,
+    bool CoolingPressureEmergent,
+    bool ColdApproachLawful,
+    bool ReheatingOrArchivePressureStillStronger,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -610,6 +667,9 @@ public static class AgentiActualizationProjector
     private const string FormationPhaseVectorPrefix = "formation-phase-vector://";
     private const string BrittlenessWitnessPrefix = "brittleness-witness://";
     private const string DurabilityWitnessPrefix = "durability-witness://";
+    private const string WarmClockDispositionPrefix = "warm-clock-disposition://";
+    private const string RipeningStalenessLedgerPrefix = "ripening-staleness-ledger://";
+    private const string CoolingPressureWitnessPrefix = "cooling-pressure-witness://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -2520,6 +2580,224 @@ public static class AgentiActualizationProjector
             InterlockDensityEmergent: durablePatterns.Length > 0 && intentConstraintAlignmentReceipt.StructureConstraintAlignmentSatisfied,
             ColdPromotionStillWithheld: true,
             ReasonCode: "durability-witness-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static WarmClockDispositionReceipt CreateWarmClockDispositionReceipt(
+        FormationPhaseVectorReceipt formationPhaseVector,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        EngramDistanceClassificationLedgerReceipt classificationLedger,
+        WarmReactivationDispositionReceipt warmReactivationDispositionReceipt,
+        string receiptState = "warm-clock-disposition-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(classificationLedger);
+        ArgumentNullException.ThrowIfNull(warmReactivationDispositionReceipt);
+        EnsurePrefix(formationPhaseVector.ReceiptHandle, FormationPhaseVectorPrefix, nameof(formationPhaseVector));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(classificationLedger.LedgerHandle, EngramDistanceClassificationLedgerPrefix, nameof(classificationLedger));
+        EnsurePrefix(warmReactivationDispositionReceipt.ReceiptHandle, WarmReactivationDispositionReceiptPrefix, nameof(warmReactivationDispositionReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(formationPhaseVector.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(formationPhaseVector.CMEId, classificationLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(formationPhaseVector.CMEId, warmReactivationDispositionReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Warm clock disposition requires phase, reentry, classification, and warm reactivation receipts to remain inside one CME continuity lane.");
+        }
+
+        var warmClocks = new[]
+        {
+            "last-reentry",
+            "unknown-load",
+            "distance-burden",
+            "failure-signature-freshness"
+        };
+        var unresolvedUnknownLoad = variationTestedReentryLedger.RequiredRetestPatterns.Count;
+        var reentryClockActive = warmReactivationDispositionReceipt.HotReentryRequired;
+        var distanceBurdenStillActive = classificationLedger.DominantDistanceClass != EngramDistanceClass.CoRoot;
+        var failureSignatureFreshnessRequired = variationTestedReentryLedger.RequiredRetestPatterns.Count > 0 ||
+            variationTestedReentryLedger.FailedPatterns.Count > 0;
+        var warmRipeningUnderway = warmReactivationDispositionReceipt.WarmHoldingPreserved && formationPhaseVector.WarmGovernanceDominant;
+        var stalenessRiskPresent = unresolvedUnknownLoad > 0;
+
+        return new WarmClockDispositionReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateWarmClockDispositionReceiptHandle(
+                formationPhaseVector.CMEId,
+                formationPhaseVector.ReceiptHandle,
+                variationTestedReentryLedger.LedgerHandle,
+                classificationLedger.LedgerHandle),
+            CMEId: formationPhaseVector.CMEId,
+            FormationPhaseVectorHandle: formationPhaseVector.ReceiptHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            EngramDistanceClassificationLedgerHandle: classificationLedger.LedgerHandle,
+            WarmReactivationDispositionReceiptHandle: warmReactivationDispositionReceipt.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            WarmClocks: warmClocks,
+            RipeningDisposition: warmRipeningUnderway ? "ripening-active" : "ripening-blocked",
+            StalenessDisposition: stalenessRiskPresent ? "staleness-risk-present" : "staleness-risk-low",
+            UnresolvedUnknownLoad: unresolvedUnknownLoad,
+            ReentryClockActive: reentryClockActive,
+            DistanceBurdenStillActive: distanceBurdenStillActive,
+            FailureSignatureFreshnessRequired: failureSignatureFreshnessRequired,
+            WarmRipeningUnderway: warmRipeningUnderway,
+            StalenessRiskPresent: stalenessRiskPresent,
+            ReasonCode: "warm-clock-disposition-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static RipeningStalenessLedgerReceipt CreateRipeningStalenessLedgerReceipt(
+        WarmClockDispositionReceipt warmClockDisposition,
+        FormationPhaseVectorReceipt formationPhaseVector,
+        BrittlenessWitnessReceipt brittlenessWitness,
+        DurabilityWitnessReceipt durabilityWitness,
+        string ledgerState = "ripening-staleness-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        EnsurePrefix(warmClockDisposition.ReceiptHandle, WarmClockDispositionPrefix, nameof(warmClockDisposition));
+        EnsurePrefix(formationPhaseVector.ReceiptHandle, FormationPhaseVectorPrefix, nameof(formationPhaseVector));
+        EnsurePrefix(brittlenessWitness.ReceiptHandle, BrittlenessWitnessPrefix, nameof(brittlenessWitness));
+        EnsurePrefix(durabilityWitness.ReceiptHandle, DurabilityWitnessPrefix, nameof(durabilityWitness));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(warmClockDisposition.CMEId, formationPhaseVector.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(warmClockDisposition.CMEId, brittlenessWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(warmClockDisposition.CMEId, durabilityWitness.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Ripening staleness ledger requires warm-clock, phase, brittleness, and durability receipts to remain inside one CME continuity lane.");
+        }
+
+        var ripeningPatterns = durabilityWitness.DurablePatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var stalePatterns = brittlenessWitness.BrittlePatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        return new RipeningStalenessLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateRipeningStalenessLedgerReceiptHandle(
+                warmClockDisposition.CMEId,
+                warmClockDisposition.ReceiptHandle,
+                brittlenessWitness.ReceiptHandle,
+                durabilityWitness.ReceiptHandle),
+            CMEId: warmClockDisposition.CMEId,
+            WarmClockDispositionReceiptHandle: warmClockDisposition.ReceiptHandle,
+            FormationPhaseVectorHandle: formationPhaseVector.ReceiptHandle,
+            BrittlenessWitnessHandle: brittlenessWitness.ReceiptHandle,
+            DurabilityWitnessHandle: durabilityWitness.ReceiptHandle,
+            LedgerState: ledgerState.Trim(),
+            RipeningPatterns: ripeningPatterns,
+            StalePatterns: stalePatterns,
+            RipeningWindowCount: ripeningPatterns.Length,
+            StaleWindowCount: stalePatterns.Length,
+            RefreshRequiredCount: warmClockDisposition.UnresolvedUnknownLoad,
+            HonestWarmRipeningPreserved: ripeningPatterns.Length > 0 && warmClockDisposition.WarmRipeningUnderway,
+            AdministrativeSuspensionDenied: true,
+            FreshConstraintContactStillRequired: warmClockDisposition.ReentryClockActive || warmClockDisposition.FailureSignatureFreshnessRequired,
+            ReasonCode: "ripening-staleness-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static CoolingPressureWitnessReceipt CreateCoolingPressureWitnessReceipt(
+        WarmClockDispositionReceipt warmClockDisposition,
+        RipeningStalenessLedgerReceipt ripeningStalenessLedger,
+        DurabilityWitnessReceipt durabilityWitness,
+        FormationPhaseVectorReceipt formationPhaseVector,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        string receiptState = "cooling-pressure-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(ripeningStalenessLedger);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+        EnsurePrefix(warmClockDisposition.ReceiptHandle, WarmClockDispositionPrefix, nameof(warmClockDisposition));
+        EnsurePrefix(ripeningStalenessLedger.LedgerHandle, RipeningStalenessLedgerPrefix, nameof(ripeningStalenessLedger));
+        EnsurePrefix(durabilityWitness.ReceiptHandle, DurabilityWitnessPrefix, nameof(durabilityWitness));
+        EnsurePrefix(formationPhaseVector.ReceiptHandle, FormationPhaseVectorPrefix, nameof(formationPhaseVector));
+        EnsurePrefix(intentConstraintAlignmentReceipt.ReceiptHandle, IntentConstraintAlignmentReceiptPrefix, nameof(intentConstraintAlignmentReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(warmClockDisposition.CMEId, ripeningStalenessLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(warmClockDisposition.CMEId, durabilityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(warmClockDisposition.CMEId, formationPhaseVector.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(warmClockDisposition.CMEId, intentConstraintAlignmentReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Cooling pressure witness requires warm-clock, ripening, durability, phase, and alignment receipts to remain inside one CME continuity lane.");
+        }
+
+        var coolingForces = new List<string>();
+        if (durabilityWitness.DurableUnderVariation)
+        {
+            coolingForces.Add("durable-interlock");
+        }
+
+        if (intentConstraintAlignmentReceipt.StructureConstraintAlignmentSatisfied)
+        {
+            coolingForces.Add("intent-constraint-coherence");
+        }
+
+        if (ripeningStalenessLedger.HonestWarmRipeningPreserved)
+        {
+            coolingForces.Add("temporal-ripening");
+        }
+
+        if (!warmClockDisposition.DistanceBurdenStillActive)
+        {
+            coolingForces.Add("distance-burden-closure");
+        }
+
+        var coolingBarriers = new List<string>();
+        if (warmClockDisposition.DistanceBurdenStillActive)
+        {
+            coolingBarriers.Add("distance-burden-still-active");
+        }
+
+        if (formationPhaseVector.ReheatingSensitive)
+        {
+            coolingBarriers.Add("hot-reentry-required");
+        }
+
+        if (durabilityWitness.ColdPromotionStillWithheld)
+        {
+            coolingBarriers.Add("cold-admission-withheld");
+        }
+
+        var pressureDisposition = coolingForces.Count == 0
+            ? "cooling-pressure-absent"
+            : coolingBarriers.Count > 0
+                ? "pressure-emergent-but-withheld"
+                : "pressure-ready-for-cold-approach";
+
+        return new CoolingPressureWitnessReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateCoolingPressureWitnessReceiptHandle(
+                warmClockDisposition.CMEId,
+                warmClockDisposition.ReceiptHandle,
+                ripeningStalenessLedger.LedgerHandle,
+                durabilityWitness.ReceiptHandle),
+            CMEId: warmClockDisposition.CMEId,
+            WarmClockDispositionReceiptHandle: warmClockDisposition.ReceiptHandle,
+            RipeningStalenessLedgerHandle: ripeningStalenessLedger.LedgerHandle,
+            DurabilityWitnessHandle: durabilityWitness.ReceiptHandle,
+            FormationPhaseVectorHandle: formationPhaseVector.ReceiptHandle,
+            IntentConstraintAlignmentReceiptHandle: intentConstraintAlignmentReceipt.ReceiptHandle,
+            ReceiptState: receiptState.Trim(),
+            CoolingForces: coolingForces,
+            CoolingBarriers: coolingBarriers,
+            PressureDisposition: pressureDisposition,
+            CoolingPressureEmergent: coolingForces.Count > 0,
+            ColdApproachLawful: coolingForces.Count > 0 && coolingBarriers.Count == 0 && formationPhaseVector.CoolingEligible,
+            ReheatingOrArchivePressureStillStronger: coolingBarriers.Count >= coolingForces.Count,
+            ReasonCode: "cooling-pressure-witness-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

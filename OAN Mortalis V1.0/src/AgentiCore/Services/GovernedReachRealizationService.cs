@@ -701,4 +701,73 @@ public sealed class GovernedReachRealizationService
             receiptState,
             timestampUtc);
     }
+
+    public WarmClockDispositionReceipt CreateWarmClockDispositionReceipt(
+        FormationPhaseVectorReceipt formationPhaseVector,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        EngramDistanceClassificationLedgerReceipt classificationLedger,
+        WarmReactivationDispositionReceipt warmReactivationDispositionReceipt,
+        string receiptState = "warm-clock-disposition-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(classificationLedger);
+        ArgumentNullException.ThrowIfNull(warmReactivationDispositionReceipt);
+
+        return AgentiActualizationProjector.CreateWarmClockDispositionReceipt(
+            formationPhaseVector,
+            variationTestedReentryLedger,
+            classificationLedger,
+            warmReactivationDispositionReceipt,
+            receiptState,
+            timestampUtc);
+    }
+
+    public RipeningStalenessLedgerReceipt CreateRipeningStalenessLedgerReceipt(
+        WarmClockDispositionReceipt warmClockDisposition,
+        FormationPhaseVectorReceipt formationPhaseVector,
+        BrittlenessWitnessReceipt brittlenessWitness,
+        DurabilityWitnessReceipt durabilityWitness,
+        string ledgerState = "ripening-staleness-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+
+        return AgentiActualizationProjector.CreateRipeningStalenessLedgerReceipt(
+            warmClockDisposition,
+            formationPhaseVector,
+            brittlenessWitness,
+            durabilityWitness,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public CoolingPressureWitnessReceipt CreateCoolingPressureWitnessReceipt(
+        WarmClockDispositionReceipt warmClockDisposition,
+        RipeningStalenessLedgerReceipt ripeningStalenessLedger,
+        DurabilityWitnessReceipt durabilityWitness,
+        FormationPhaseVectorReceipt formationPhaseVector,
+        IntentConstraintAlignmentReceipt intentConstraintAlignmentReceipt,
+        string receiptState = "cooling-pressure-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(warmClockDisposition);
+        ArgumentNullException.ThrowIfNull(ripeningStalenessLedger);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(formationPhaseVector);
+        ArgumentNullException.ThrowIfNull(intentConstraintAlignmentReceipt);
+
+        return AgentiActualizationProjector.CreateCoolingPressureWitnessReceipt(
+            warmClockDisposition,
+            ripeningStalenessLedger,
+            durabilityWitness,
+            formationPhaseVector,
+            intentConstraintAlignmentReceipt,
+            receiptState,
+            timestampUtc);
+    }
 }
