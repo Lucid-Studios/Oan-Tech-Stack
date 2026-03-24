@@ -89,6 +89,9 @@
   "questioningOperatorCandidateLedgerOutputRoot": ".audit/runs/questioning-operator-candidate-ledger",
   "questioningGelPromotionGateOutputRoot": ".audit/runs/questioning-gel-promotion-gate",
   "protectedQuestioningPatternSurfaceOutputRoot": ".audit/runs/protected-questioning-pattern-surface",
+  "variationTestedReentryLedgerOutputRoot": ".audit/runs/variation-tested-reentry-ledger",
+  "questioningAdmissionRefusalReceiptOutputRoot": ".audit/runs/questioning-admission-refusal-receipt",
+  "promotionSeductionWatchOutputRoot": ".audit/runs/promotion-seduction-watch",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -176,6 +179,9 @@
   "questioningOperatorCandidateLedgerStatePath": ".audit/state/local-automation-questioning-operator-candidate-ledger-last-run.json",
   "questioningGelPromotionGateStatePath": ".audit/state/local-automation-questioning-gel-promotion-gate-last-run.json",
   "protectedQuestioningPatternSurfaceStatePath": ".audit/state/local-automation-protected-questioning-pattern-surface-last-run.json",
+  "variationTestedReentryLedgerStatePath": ".audit/state/local-automation-variation-tested-reentry-ledger-last-run.json",
+  "questioningAdmissionRefusalReceiptStatePath": ".audit/state/local-automation-questioning-admission-refusal-receipt-last-run.json",
+  "promotionSeductionWatchStatePath": ".audit/state/local-automation-promotion-seduction-watch-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -292,6 +298,9 @@
     "keepQuestioningOperatorCandidateLedgerBundles": 8,
     "keepQuestioningGelPromotionGateBundles": 8,
     "keepProtectedQuestioningPatternSurfaceBundles": 8,
+    "keepVariationTestedReentryLedgerBundles": 8,
+    "keepQuestioningAdmissionRefusalReceiptBundles": 8,
+    "keepPromotionSeductionWatchBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

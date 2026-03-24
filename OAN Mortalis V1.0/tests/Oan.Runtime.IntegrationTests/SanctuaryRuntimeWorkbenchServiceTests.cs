@@ -949,6 +949,121 @@ public sealed class SanctuaryRuntimeWorkbenchServiceTests
         Assert.True(protectedSurface.AutomaticGrantDenied);
     }
 
+    [Fact]
+    public void CreateVariationReentryRefusalAndSeductionWatch_HardenPromotionLaneAgainstAlmostGoodEnoughCandidates()
+    {
+        var reachService = new GovernedReachRealizationService();
+        var (_, _, _, _, _, _, localityWitness, sharedBoundaryMemory, continuityLedger, deformationReceipt, mutualWitness) = CreatePressureBundle();
+        var (_, _, _, _, _, _, _, operatorSelection, _, _, _) = CreateCrucibleBundle();
+        var inquiryPatternLedger = reachService.CreateInquiryPatternContinuityLedger(
+            operatorSelection,
+            continuityLedger,
+            mutualWitness,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var boundaryPairLedger = reachService.CreateQuestioningBoundaryPairLedger(
+            operatorSelection,
+            continuityLedger,
+            deformationReceipt,
+            sharedBoundaryMemory,
+            timestampUtc: FixedTimestamp);
+        var carryForwardSurface = reachService.CreateCarryForwardInquirySelectionSurface(
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            operatorSelection,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+        var classificationLedger = reachService.CreateEngramDistanceClassificationLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            timestampUtc: FixedTimestamp);
+        var requirementsMatrix = reachService.CreateEngramPromotionRequirementsMatrix(
+            classificationLedger,
+            timestampUtc: FixedTimestamp);
+        var distanceWeightedSurface = reachService.CreateDistanceWeightedQuestioningAdmissionSurface(
+            classificationLedger,
+            requirementsMatrix,
+            carryForwardSurface,
+            timestampUtc: FixedTimestamp);
+        var candidateLedger = reachService.CreateQuestioningOperatorCandidateLedger(
+            carryForwardSurface,
+            inquiryPatternLedger,
+            boundaryPairLedger,
+            continuityLedger,
+            mutualWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
+        var promotionGate = reachService.CreateQuestioningGelPromotionGate(
+            candidateLedger,
+            carryForwardSurface,
+            operatorSelection,
+            localityWitness,
+            distanceWeightedSurface,
+            timestampUtc: FixedTimestamp);
+        var protectedSurface = reachService.CreateProtectedQuestioningPatternSurface(
+            candidateLedger,
+            promotionGate,
+            carryForwardSurface,
+            localityWitness,
+            timestampUtc: FixedTimestamp);
+
+        var variationLedger = reachService.CreateVariationTestedReentryLedger(
+            distanceWeightedSurface,
+            candidateLedger,
+            promotionGate,
+            protectedSurface,
+            ledgerState: "variation-tested-reentry-ledger-ready",
+            timestampUtc: FixedTimestamp);
+        var refusalReceipt = reachService.CreateQuestioningAdmissionRefusalReceipt(
+            variationLedger,
+            candidateLedger,
+            promotionGate,
+            protectedSurface,
+            receiptState: "questioning-admission-refusal-receipt-ready",
+            timestampUtc: FixedTimestamp);
+        var seductionWatch = reachService.CreatePromotionSeductionWatch(
+            candidateLedger,
+            promotionGate,
+            variationLedger,
+            refusalReceipt,
+            watchState: "promotion-seduction-watch-ready",
+            timestampUtc: FixedTimestamp);
+
+        Assert.StartsWith("variation-tested-reentry-ledger://", variationLedger.LedgerHandle, StringComparison.Ordinal);
+        Assert.Equal("variation-tested-reentry-ledger-bound", variationLedger.ReasonCode);
+        Assert.Equal("variation-tested-reentry-ledger-ready", variationLedger.LedgerState);
+        Assert.Equal(3, variationLedger.VariationContexts.Count);
+        Assert.Equal(2, variationLedger.SurvivingPatterns.Count);
+        Assert.Single(variationLedger.FailedPatterns);
+        Assert.Single(variationLedger.RequiredRetestPatterns);
+        Assert.Equal(2, variationLedger.RequiredReentryPassCount);
+        Assert.True(variationLedger.VariationBurdenSatisfied);
+        Assert.True(variationLedger.PortablePatternsWithstoodVariation);
+
+        Assert.StartsWith("questioning-admission-refusal-receipt://", refusalReceipt.ReceiptHandle, StringComparison.Ordinal);
+        Assert.Equal("questioning-admission-refusal-receipt-bound", refusalReceipt.ReasonCode);
+        Assert.Equal("questioning-admission-refusal-receipt-ready", refusalReceipt.ReceiptState);
+        Assert.Single(refusalReceipt.RefusedPatterns);
+        Assert.Empty(refusalReceipt.DeferredPatterns);
+        Assert.Equal(3, refusalReceipt.RefusalReasons.Count);
+        Assert.True(refusalReceipt.AttractiveButUnderEvidencedDenied);
+        Assert.True(refusalReceipt.ArchiveProtectionPreserved);
+        Assert.True(refusalReceipt.DelayWithoutDisposalAllowed);
+
+        Assert.StartsWith("promotion-seduction-watch://", seductionWatch.WatchHandle, StringComparison.Ordinal);
+        Assert.Equal("promotion-seduction-watch-bound", seductionWatch.ReasonCode);
+        Assert.Equal("promotion-seduction-watch-ready", seductionWatch.WatchState);
+        Assert.Equal(3, seductionWatch.SeductionSignals.Count);
+        Assert.Equal(3, seductionWatch.BlockedPromotionVectors.Count);
+        Assert.Equal(3, seductionWatch.DriftWarnings.Count);
+        Assert.True(seductionWatch.PrestigeInflationDenied);
+        Assert.True(seductionWatch.EleganceBiasDenied);
+        Assert.True(seductionWatch.EmotionalCompulsionDenied);
+    }
+
     private static readonly DateTimeOffset FixedTimestamp = new(2026, 3, 22, 12, 0, 0, TimeSpan.Zero);
 
     private static (RuntimeHabitationReadinessLedgerReceipt ReadinessLedger, RuntimeWorkbenchSessionLedger SessionLedger, DayDreamCollapseReceipt CollapseReceipt, CrypticDepthReturnReceipt CrypticReturnReceipt, BondedCoWorkSessionRehearsalReceipt BondedCoWorkRehearsal, ReachReturnDissolutionReceipt ReachReturnReceipt, LocalityDistinctionWitnessLedgerReceipt LocalityWitness) CreateInquiryBundle()

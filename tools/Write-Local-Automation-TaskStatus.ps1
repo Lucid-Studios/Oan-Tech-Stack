@@ -191,6 +191,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $QuestioningOperatorCandidateLedgerState,
         [object] $QuestioningGelPromotionGateState,
         [object] $ProtectedQuestioningPatternSurfaceState,
+        [object] $VariationTestedReentryLedgerState,
+        [object] $QuestioningAdmissionRefusalReceiptState,
+        [object] $PromotionSeductionWatchState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -965,6 +968,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'variation-tested-reentry-ledger' {
+            if ($null -ne $VariationTestedReentryLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'questioning-admission-refusal-receipt' {
+            if ($null -ne $QuestioningAdmissionRefusalReceiptState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'promotion-seduction-watch' {
+            if ($null -ne $PromotionSeductionWatchState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1098,6 +1128,9 @@ $distanceWeightedQuestioningAdmissionSurfaceStatePath = Resolve-PathFromRepo -Ba
 $questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningOperatorCandidateLedgerStatePath)
 $questioningGelPromotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningGelPromotionGateStatePath)
 $protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.protectedQuestioningPatternSurfaceStatePath)
+$variationTestedReentryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.variationTestedReentryLedgerStatePath)
+$questioningAdmissionRefusalReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningAdmissionRefusalReceiptStatePath)
+$promotionSeductionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.promotionSeductionWatchStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1184,6 +1217,9 @@ $distanceWeightedQuestioningAdmissionSurfaceState = Read-JsonFileOrNull -Path $d
 $questioningOperatorCandidateLedgerState = Read-JsonFileOrNull -Path $questioningOperatorCandidateLedgerStatePath
 $questioningGelPromotionGateState = Read-JsonFileOrNull -Path $questioningGelPromotionGateStatePath
 $protectedQuestioningPatternSurfaceState = Read-JsonFileOrNull -Path $protectedQuestioningPatternSurfaceStatePath
+$variationTestedReentryLedgerState = Read-JsonFileOrNull -Path $variationTestedReentryLedgerStatePath
+$questioningAdmissionRefusalReceiptState = Read-JsonFileOrNull -Path $questioningAdmissionRefusalReceiptStatePath
+$promotionSeductionWatchState = Read-JsonFileOrNull -Path $promotionSeductionWatchStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1416,6 +1452,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
                 -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
                 -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
+                -VariationTestedReentryLedgerState $variationTestedReentryLedgerState `
+                -QuestioningAdmissionRefusalReceiptState $questioningAdmissionRefusalReceiptState `
+                -PromotionSeductionWatchState $promotionSeductionWatchState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1556,6 +1595,9 @@ $taskMapEntries = @(
                     -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
                     -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
                     -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
+                    -VariationTestedReentryLedgerState $variationTestedReentryLedgerState `
+                    -QuestioningAdmissionRefusalReceiptState $questioningAdmissionRefusalReceiptState `
+                    -PromotionSeductionWatchState $promotionSeductionWatchState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -2085,6 +2127,26 @@ $statusPayload = [ordered]@{
         protectedQuestioningLocalitySafeLegibility = if ($null -ne $protectedQuestioningPatternSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'localitySafeLegibility') } else { $null }
         protectedQuestioningRawInteriorityDenied = if ($null -ne $protectedQuestioningPatternSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'rawInteriorityDenied') } else { $null }
         protectedQuestioningAutomaticGrantDenied = if ($null -ne $protectedQuestioningPatternSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $protectedQuestioningPatternSurfaceState -PropertyName 'automaticGrantDenied') } else { $null }
+        variationTestedReentryLedgerState = if ($null -ne $variationTestedReentryLedgerState) { [string] $variationTestedReentryLedgerState.variationTestedReentryLedgerState } else { $null }
+        variationTestedReentryReason = if ($null -ne $variationTestedReentryLedgerState) { [string] $variationTestedReentryLedgerState.reasonCode } else { $null }
+        variationTestedReentryNextAction = if ($null -ne $variationTestedReentryLedgerState) { [string] $variationTestedReentryLedgerState.nextAction } else { $null }
+        variationTestedReentrySurvivingPatternCount = if ($null -ne $variationTestedReentryLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'survivingPatternCount') } else { $null }
+        variationTestedReentryFailedPatternCount = if ($null -ne $variationTestedReentryLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'failedPatternCount') } else { $null }
+        variationTestedReentryRequiredRetestPatternCount = if ($null -ne $variationTestedReentryLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'requiredRetestPatternCount') } else { $null }
+        variationTestedReentryVariationBurdenSatisfied = if ($null -ne $variationTestedReentryLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'variationBurdenSatisfied') } else { $null }
+        questioningAdmissionRefusalReceiptState = if ($null -ne $questioningAdmissionRefusalReceiptState) { [string] $questioningAdmissionRefusalReceiptState.questioningAdmissionRefusalReceiptState } else { $null }
+        questioningAdmissionRefusalReason = if ($null -ne $questioningAdmissionRefusalReceiptState) { [string] $questioningAdmissionRefusalReceiptState.reasonCode } else { $null }
+        questioningAdmissionRefusalNextAction = if ($null -ne $questioningAdmissionRefusalReceiptState) { [string] $questioningAdmissionRefusalReceiptState.nextAction } else { $null }
+        questioningAdmissionRefusalRefusedPatternCount = if ($null -ne $questioningAdmissionRefusalReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'refusedPatternCount') } else { $null }
+        questioningAdmissionRefusalRefusalReasonCount = if ($null -ne $questioningAdmissionRefusalReceiptState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'refusalReasonCount') } else { $null }
+        questioningAdmissionRefusalArchiveProtectionPreserved = if ($null -ne $questioningAdmissionRefusalReceiptState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'archiveProtectionPreserved') } else { $null }
+        promotionSeductionWatchState = if ($null -ne $promotionSeductionWatchState) { [string] $promotionSeductionWatchState.promotionSeductionWatchState } else { $null }
+        promotionSeductionWatchReason = if ($null -ne $promotionSeductionWatchState) { [string] $promotionSeductionWatchState.reasonCode } else { $null }
+        promotionSeductionWatchNextAction = if ($null -ne $promotionSeductionWatchState) { [string] $promotionSeductionWatchState.nextAction } else { $null }
+        promotionSeductionSignalCount = if ($null -ne $promotionSeductionWatchState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'seductionSignalCount') } else { $null }
+        promotionSeductionBlockedVectorCount = if ($null -ne $promotionSeductionWatchState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'blockedPromotionVectorCount') } else { $null }
+        promotionSeductionDriftWarningCount = if ($null -ne $promotionSeductionWatchState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'driftWarningCount') } else { $null }
+        promotionSeductionPrestigeInflationDenied = if ($null -ne $promotionSeductionWatchState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'prestigeInflationDenied') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3289,6 +3351,61 @@ if ($null -ne $protectedQuestioningPatternSurfaceState) {
     )
 }
 
+if ($null -ne $variationTestedReentryLedgerState) {
+    $markdownLines += @(
+        '## Variation-Tested Reentry Ledger',
+        '',
+        ('- Variation-tested reentry-ledger state: `{0}`' -f [string] $variationTestedReentryLedgerState.variationTestedReentryLedgerState),
+        ('- Reason code: `{0}`' -f [string] $variationTestedReentryLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $variationTestedReentryLedgerState.nextAction),
+        ('- Variation burden state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'variationBurdenState')),
+        ('- Variation context count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'variationContextCount')),
+        ('- Surviving pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'survivingPatternCount')),
+        ('- Failed pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'failedPatternCount')),
+        ('- Required retest pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'requiredRetestPatternCount')),
+        ('- Required re-entry pass count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'requiredReentryPassCount')),
+        ('- Variation burden satisfied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'variationBurdenSatisfied')),
+        ('- Portable patterns withstood variation: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $variationTestedReentryLedgerState -PropertyName 'portablePatternsWithstoodVariation')),
+        ''
+    )
+}
+
+if ($null -ne $questioningAdmissionRefusalReceiptState) {
+    $markdownLines += @(
+        '## Questioning Admission Refusal Receipt',
+        '',
+        ('- Questioning admission-refusal receipt state: `{0}`' -f [string] $questioningAdmissionRefusalReceiptState.questioningAdmissionRefusalReceiptState),
+        ('- Reason code: `{0}`' -f [string] $questioningAdmissionRefusalReceiptState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $questioningAdmissionRefusalReceiptState.nextAction),
+        ('- Refusal posture state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'refusalPostureState')),
+        ('- Refused pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'refusedPatternCount')),
+        ('- Deferred pattern count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'deferredPatternCount')),
+        ('- Refusal reason count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'refusalReasonCount')),
+        ('- Attractive but under-evidenced denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'attractiveButUnderEvidencedDenied')),
+        ('- Archive protection preserved: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'archiveProtectionPreserved')),
+        ('- Delay without disposal allowed: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $questioningAdmissionRefusalReceiptState -PropertyName 'delayWithoutDisposalAllowed')),
+        ''
+    )
+}
+
+if ($null -ne $promotionSeductionWatchState) {
+    $markdownLines += @(
+        '## Promotion Seduction Watch',
+        '',
+        ('- Promotion seduction-watch state: `{0}`' -f [string] $promotionSeductionWatchState.promotionSeductionWatchState),
+        ('- Reason code: `{0}`' -f [string] $promotionSeductionWatchState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $promotionSeductionWatchState.nextAction),
+        ('- Seduction watch state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'seductionWatchState')),
+        ('- Seduction signal count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'seductionSignalCount')),
+        ('- Blocked promotion-vector count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'blockedPromotionVectorCount')),
+        ('- Drift warning count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'driftWarningCount')),
+        ('- Prestige inflation denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'prestigeInflationDenied')),
+        ('- Elegance bias denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'eleganceBiasDenied')),
+        ('- Emotional compulsion denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $promotionSeductionWatchState -PropertyName 'emotionalCompulsionDenied')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -3402,6 +3519,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -QuestioningOperatorCandidateLedgerState $questioningOperatorCandidateLedgerState `
             -QuestioningGelPromotionGateState $questioningGelPromotionGateState `
             -ProtectedQuestioningPatternSurfaceState $protectedQuestioningPatternSurfaceState `
+            -VariationTestedReentryLedgerState $variationTestedReentryLedgerState `
+            -QuestioningAdmissionRefusalReceiptState $questioningAdmissionRefusalReceiptState `
+            -PromotionSeductionWatchState $promotionSeductionWatchState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

@@ -309,6 +309,46 @@ public static class AgentiActualizationKeys
         return $"protected-questioning-pattern-surface://{ComputeDigest(cmeId, candidateLedgerHandle, promotionGateHandle, localityWitnessHandle)}";
     }
 
+    public static string CreateVariationTestedReentryLedgerHandle(
+        string cmeId,
+        string distanceWeightedAdmissionSurfaceHandle,
+        string promotionGateHandle,
+        string protectedPatternSurfaceHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(distanceWeightedAdmissionSurfaceHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(promotionGateHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(protectedPatternSurfaceHandle);
+
+        return $"variation-tested-reentry-ledger://{ComputeDigest(cmeId, distanceWeightedAdmissionSurfaceHandle, promotionGateHandle, protectedPatternSurfaceHandle)}";
+    }
+
+    public static string CreateQuestioningAdmissionRefusalReceiptHandle(
+        string cmeId,
+        string variationTestedReentryLedgerHandle,
+        string promotionGateHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(promotionGateHandle);
+
+        return $"questioning-admission-refusal-receipt://{ComputeDigest(cmeId, variationTestedReentryLedgerHandle, promotionGateHandle)}";
+    }
+
+    public static string CreatePromotionSeductionWatchHandle(
+        string cmeId,
+        string candidateLedgerHandle,
+        string variationTestedReentryLedgerHandle,
+        string admissionRefusalReceiptHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(candidateLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(admissionRefusalReceiptHandle);
+
+        return $"promotion-seduction-watch://{ComputeDigest(cmeId, candidateLedgerHandle, variationTestedReentryLedgerHandle, admissionRefusalReceiptHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

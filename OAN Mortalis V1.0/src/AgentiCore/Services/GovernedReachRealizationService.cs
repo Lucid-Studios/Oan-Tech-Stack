@@ -500,4 +500,70 @@ public sealed class GovernedReachRealizationService
             surfaceState,
             timestampUtc);
     }
+
+    public VariationTestedReentryLedgerReceipt CreateVariationTestedReentryLedger(
+        DistanceWeightedQuestioningAdmissionSurfaceReceipt distanceWeightedAdmissionSurface,
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        ProtectedQuestioningPatternSurfaceReceipt protectedPatternSurface,
+        string ledgerState = "variation-tested-reentry-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(distanceWeightedAdmissionSurface);
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(protectedPatternSurface);
+
+        return AgentiActualizationProjector.CreateVariationTestedReentryLedger(
+            distanceWeightedAdmissionSurface,
+            candidateLedger,
+            promotionGate,
+            protectedPatternSurface,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public QuestioningAdmissionRefusalReceipt CreateQuestioningAdmissionRefusalReceipt(
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        ProtectedQuestioningPatternSurfaceReceipt protectedPatternSurface,
+        string receiptState = "questioning-admission-refusal-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(protectedPatternSurface);
+
+        return AgentiActualizationProjector.CreateQuestioningAdmissionRefusalReceipt(
+            variationTestedReentryLedger,
+            candidateLedger,
+            promotionGate,
+            protectedPatternSurface,
+            receiptState,
+            timestampUtc);
+    }
+
+    public PromotionSeductionWatchReceipt CreatePromotionSeductionWatch(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        string watchState = "promotion-seduction-watch-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+
+        return AgentiActualizationProjector.CreatePromotionSeductionWatch(
+            candidateLedger,
+            promotionGate,
+            variationTestedReentryLedger,
+            admissionRefusalReceipt,
+            watchState,
+            timestampUtc);
+    }
 }

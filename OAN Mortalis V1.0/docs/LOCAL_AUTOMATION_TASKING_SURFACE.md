@@ -601,6 +601,24 @@ Current live output surfaces for this map:
 - `Distance-Weighted Questioning Admission Surface`
   Bundle root: `.audit/runs/distance-weighted-questioning-admission-surface/`
 
+### Automation Maturation Map 32
+
+- Goal: harden the questioning promotion lane through variation-tested re-entry, lawful refusal, and seduction watch so almost-good-enough candidates can be denied without collapsing into sterility
+- Expected review windows: `2`
+- Selected tasks:
+  - `Variation-Tested Reentry Ledger`
+  - `Questioning Admission Refusal Receipt`
+  - `Promotion Seduction Watch`
+
+Current live output surfaces for this map:
+
+- `Variation-Tested Reentry Ledger`
+  Bundle root: `.audit/runs/variation-tested-reentry-ledger/`
+- `Questioning Admission Refusal Receipt`
+  Bundle root: `.audit/runs/questioning-admission-refusal-receipt/`
+- `Promotion Seduction Watch`
+  Bundle root: `.audit/runs/promotion-seduction-watch/`
+
 ## Status Interpretation
 
 The task board must distinguish between:

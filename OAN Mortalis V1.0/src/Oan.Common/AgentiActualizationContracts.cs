@@ -405,6 +405,58 @@ public sealed record ProtectedQuestioningPatternSurfaceReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record VariationTestedReentryLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string DistanceWeightedAdmissionSurfaceHandle,
+    string CandidateLedgerHandle,
+    string PromotionGateHandle,
+    string ProtectedPatternSurfaceHandle,
+    string LedgerState,
+    IReadOnlyList<string> VariationContexts,
+    IReadOnlyList<string> SurvivingPatterns,
+    IReadOnlyList<string> FailedPatterns,
+    IReadOnlyList<string> RequiredRetestPatterns,
+    int RequiredReentryPassCount,
+    bool VariationBurdenSatisfied,
+    bool PortablePatternsWithstoodVariation,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record QuestioningAdmissionRefusalReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string VariationTestedReentryLedgerHandle,
+    string CandidateLedgerHandle,
+    string PromotionGateHandle,
+    string ProtectedPatternSurfaceHandle,
+    string ReceiptState,
+    IReadOnlyList<string> RefusedPatterns,
+    IReadOnlyList<string> DeferredPatterns,
+    IReadOnlyList<string> RefusalReasons,
+    bool AttractiveButUnderEvidencedDenied,
+    bool ArchiveProtectionPreserved,
+    bool DelayWithoutDisposalAllowed,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record PromotionSeductionWatchReceipt(
+    string WatchHandle,
+    string CMEId,
+    string CandidateLedgerHandle,
+    string PromotionGateHandle,
+    string VariationTestedReentryLedgerHandle,
+    string AdmissionRefusalReceiptHandle,
+    string WatchState,
+    IReadOnlyList<string> SeductionSignals,
+    IReadOnlyList<string> BlockedPromotionVectors,
+    IReadOnlyList<string> DriftWarnings,
+    bool PrestigeInflationDenied,
+    bool EleganceBiasDenied,
+    bool EmotionalCompulsionDenied,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -434,6 +486,9 @@ public static class AgentiActualizationProjector
     private const string QuestioningOperatorCandidateLedgerPrefix = "questioning-operator-candidate-ledger://";
     private const string QuestioningGelPromotionGatePrefix = "questioning-gel-promotion-gate://";
     private const string ProtectedQuestioningPatternSurfacePrefix = "protected-questioning-pattern-surface://";
+    private const string VariationTestedReentryLedgerPrefix = "variation-tested-reentry-ledger://";
+    private const string QuestioningAdmissionRefusalReceiptPrefix = "questioning-admission-refusal-receipt://";
+    private const string PromotionSeductionWatchPrefix = "promotion-seduction-watch://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -1733,6 +1788,197 @@ public static class AgentiActualizationProjector
             RawInteriorityDenied: true,
             AutomaticGrantDenied: true,
             ReasonCode: "protected-questioning-pattern-surface-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static VariationTestedReentryLedgerReceipt CreateVariationTestedReentryLedger(
+        DistanceWeightedQuestioningAdmissionSurfaceReceipt distanceWeightedAdmissionSurface,
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        ProtectedQuestioningPatternSurfaceReceipt protectedPatternSurface,
+        string ledgerState = "variation-tested-reentry-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(distanceWeightedAdmissionSurface);
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(protectedPatternSurface);
+        EnsurePrefix(distanceWeightedAdmissionSurface.SurfaceHandle, DistanceWeightedQuestioningAdmissionSurfacePrefix, nameof(distanceWeightedAdmissionSurface));
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(promotionGate.GateHandle, QuestioningGelPromotionGatePrefix, nameof(promotionGate));
+        EnsurePrefix(protectedPatternSurface.SurfaceHandle, ProtectedQuestioningPatternSurfacePrefix, nameof(protectedPatternSurface));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(distanceWeightedAdmissionSurface.CMEId, candidateLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, promotionGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(promotionGate.CMEId, protectedPatternSurface.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Variation-tested reentry requires weighted admission, candidate, promotion, and protected surfaces to remain inside one CME continuity lane.");
+        }
+
+        var survivingPatterns = candidateLedger.CandidateInquiryPatterns
+            .Take(2)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var failedPatterns = candidateLedger.CandidateInquiryPatterns
+            .Skip(survivingPatterns.Length)
+            .Take(1)
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var requiredRetestPatterns = failedPatterns;
+        var variationContexts = new[]
+        {
+            "operator-shift",
+            "pressure-shift",
+            "stance-shift"
+        };
+        var requiredReentryPassCount = survivingPatterns.Length;
+        var variationBurdenSatisfied = distanceWeightedAdmissionSurface.RequiredReentryBurdens.Count >= requiredReentryPassCount &&
+            candidateLedger.RequiredReentryConditions.Count >= requiredReentryPassCount;
+
+        return new VariationTestedReentryLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateVariationTestedReentryLedgerHandle(
+                candidateLedger.CMEId,
+                distanceWeightedAdmissionSurface.SurfaceHandle,
+                promotionGate.GateHandle,
+                protectedPatternSurface.SurfaceHandle),
+            CMEId: candidateLedger.CMEId,
+            DistanceWeightedAdmissionSurfaceHandle: distanceWeightedAdmissionSurface.SurfaceHandle,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            PromotionGateHandle: promotionGate.GateHandle,
+            ProtectedPatternSurfaceHandle: protectedPatternSurface.SurfaceHandle,
+            LedgerState: ledgerState.Trim(),
+            VariationContexts: variationContexts,
+            SurvivingPatterns: survivingPatterns,
+            FailedPatterns: failedPatterns,
+            RequiredRetestPatterns: requiredRetestPatterns,
+            RequiredReentryPassCount: requiredReentryPassCount,
+            VariationBurdenSatisfied: variationBurdenSatisfied,
+            PortablePatternsWithstoodVariation: survivingPatterns.Length > 0 && !promotionGate.ReRootingRequired,
+            ReasonCode: "variation-tested-reentry-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static QuestioningAdmissionRefusalReceipt CreateQuestioningAdmissionRefusalReceipt(
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        ProtectedQuestioningPatternSurfaceReceipt protectedPatternSurface,
+        string receiptState = "questioning-admission-refusal-receipt-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(protectedPatternSurface);
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(promotionGate.GateHandle, QuestioningGelPromotionGatePrefix, nameof(promotionGate));
+        EnsurePrefix(protectedPatternSurface.SurfaceHandle, ProtectedQuestioningPatternSurfacePrefix, nameof(protectedPatternSurface));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(variationTestedReentryLedger.CMEId, candidateLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, promotionGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(promotionGate.CMEId, protectedPatternSurface.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Questioning admission refusal requires reentry, candidate, promotion, and protected surfaces to remain inside one CME continuity lane.");
+        }
+
+        var refusedPatterns = variationTestedReentryLedger.RequiredRetestPatterns
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var refusalReasons = new[]
+        {
+            "weak-failure-signature-clarity",
+            "single-context-variation-insufficient",
+            "attractive-but-under-evidenced"
+        };
+
+        return new QuestioningAdmissionRefusalReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateQuestioningAdmissionRefusalReceiptHandle(
+                candidateLedger.CMEId,
+                variationTestedReentryLedger.LedgerHandle,
+                promotionGate.GateHandle),
+            CMEId: candidateLedger.CMEId,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            PromotionGateHandle: promotionGate.GateHandle,
+            ProtectedPatternSurfaceHandle: protectedPatternSurface.SurfaceHandle,
+            ReceiptState: receiptState.Trim(),
+            RefusedPatterns: refusedPatterns,
+            DeferredPatterns: Array.Empty<string>(),
+            RefusalReasons: refusalReasons,
+            AttractiveButUnderEvidencedDenied: refusedPatterns.Length > 0,
+            ArchiveProtectionPreserved: true,
+            DelayWithoutDisposalAllowed: true,
+            ReasonCode: "questioning-admission-refusal-receipt-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static PromotionSeductionWatchReceipt CreatePromotionSeductionWatch(
+        QuestioningOperatorCandidateLedgerReceipt candidateLedger,
+        QuestioningGelPromotionGateReceipt promotionGate,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        QuestioningAdmissionRefusalReceipt admissionRefusalReceipt,
+        string watchState = "promotion-seduction-watch-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(candidateLedger);
+        ArgumentNullException.ThrowIfNull(promotionGate);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(admissionRefusalReceipt);
+        EnsurePrefix(candidateLedger.LedgerHandle, QuestioningOperatorCandidateLedgerPrefix, nameof(candidateLedger));
+        EnsurePrefix(promotionGate.GateHandle, QuestioningGelPromotionGatePrefix, nameof(promotionGate));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(admissionRefusalReceipt.ReceiptHandle, QuestioningAdmissionRefusalReceiptPrefix, nameof(admissionRefusalReceipt));
+        ArgumentException.ThrowIfNullOrWhiteSpace(watchState);
+
+        if (!string.Equals(candidateLedger.CMEId, promotionGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(candidateLedger.CMEId, admissionRefusalReceipt.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Promotion seduction watch requires candidate, promotion, reentry, and refusal receipts to remain inside one CME continuity lane.");
+        }
+
+        var seductionSignals = new[]
+        {
+            "elegance-without-variation",
+            "repeat-success-single-context",
+            "social-prestige-pressure"
+        };
+        var blockedPromotionVectors = new[]
+        {
+            "prestige-promotion",
+            "emotional-certification",
+            "almost-good-enough-canonization"
+        };
+        var driftWarnings = admissionRefusalReceipt.RefusalReasons
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        return new PromotionSeductionWatchReceipt(
+            WatchHandle: AgentiActualizationKeys.CreatePromotionSeductionWatchHandle(
+                candidateLedger.CMEId,
+                candidateLedger.LedgerHandle,
+                variationTestedReentryLedger.LedgerHandle,
+                admissionRefusalReceipt.ReceiptHandle),
+            CMEId: candidateLedger.CMEId,
+            CandidateLedgerHandle: candidateLedger.LedgerHandle,
+            PromotionGateHandle: promotionGate.GateHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            AdmissionRefusalReceiptHandle: admissionRefusalReceipt.ReceiptHandle,
+            WatchState: watchState.Trim(),
+            SeductionSignals: seductionSignals,
+            BlockedPromotionVectors: blockedPromotionVectors,
+            DriftWarnings: driftWarnings,
+            PrestigeInflationDenied: true,
+            EleganceBiasDenied: true,
+            EmotionalCompulsionDenied: true,
+            ReasonCode: "promotion-seduction-watch-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 

@@ -591,6 +591,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepProtectedQuestioningPatternSurfaceBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.variationTestedReentryLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepVariationTestedReentryLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.questioningAdmissionRefusalReceiptOutputRoot)
+        keep = [int] $retentionPolicy.keepQuestioningAdmissionRefusalReceiptBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.promotionSeductionWatchOutputRoot)
+        keep = [int] $retentionPolicy.keepPromotionSeductionWatchBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)
         keep = [int] $retentionPolicy.keepBlockedEscalationBundles
     }

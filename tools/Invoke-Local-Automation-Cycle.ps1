@@ -240,6 +240,9 @@ $distanceWeightedQuestioningAdmissionSurfaceStatePath = Resolve-PathFromRepo -Ba
 $questioningOperatorCandidateLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningOperatorCandidateLedgerStatePath)
 $questioningGelPromotionGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningGelPromotionGateStatePath)
 $protectedQuestioningPatternSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.protectedQuestioningPatternSurfaceStatePath)
+$variationTestedReentryLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.variationTestedReentryLedgerStatePath)
+$questioningAdmissionRefusalReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.questioningAdmissionRefusalReceiptStatePath)
+$promotionSeductionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.promotionSeductionWatchStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -554,6 +557,12 @@ $statePayload.lastQuestioningGelPromotionGateBundle = [string] (Get-ObjectProper
 $statePayload.questioningGelPromotionGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningGelPromotionGateStatePath
 $statePayload.lastProtectedQuestioningPatternSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastProtectedQuestioningPatternSurfaceBundle')
 $statePayload.protectedQuestioningPatternSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $protectedQuestioningPatternSurfaceStatePath
+$statePayload.lastVariationTestedReentryLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastVariationTestedReentryLedgerBundle')
+$statePayload.variationTestedReentryLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $variationTestedReentryLedgerStatePath
+$statePayload.lastQuestioningAdmissionRefusalReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastQuestioningAdmissionRefusalReceiptBundle')
+$statePayload.questioningAdmissionRefusalReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningAdmissionRefusalReceiptStatePath
+$statePayload.lastPromotionSeductionWatchBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastPromotionSeductionWatchBundle')
+$statePayload.promotionSeductionWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $promotionSeductionWatchStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1322,6 +1331,33 @@ if (-not [string]::IsNullOrWhiteSpace($protectedQuestioningPatternSurfaceBundleP
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$variationTestedReentryLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-VariationTested-ReentryLedger.ps1'
+$variationTestedReentryLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $variationTestedReentryLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Variation-tested reentry writer'
+$variationTestedReentryLedgerBundlePath = Get-ScriptOutputTail -Output $variationTestedReentryLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($variationTestedReentryLedgerBundlePath)) {
+    $statePayload.lastVariationTestedReentryLedgerBundle = $variationTestedReentryLedgerBundlePath
+    $statePayload.variationTestedReentryLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $variationTestedReentryLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$questioningAdmissionRefusalReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-QuestioningAdmission-RefusalReceipt.ps1'
+$questioningAdmissionRefusalReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $questioningAdmissionRefusalReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Questioning admission-refusal writer'
+$questioningAdmissionRefusalReceiptBundlePath = Get-ScriptOutputTail -Output $questioningAdmissionRefusalReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($questioningAdmissionRefusalReceiptBundlePath)) {
+    $statePayload.lastQuestioningAdmissionRefusalReceiptBundle = $questioningAdmissionRefusalReceiptBundlePath
+    $statePayload.questioningAdmissionRefusalReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $questioningAdmissionRefusalReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$promotionSeductionWatchScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-PromotionSeduction-Watch.ps1'
+$promotionSeductionWatchOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $promotionSeductionWatchScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Promotion-seduction watch writer'
+$promotionSeductionWatchBundlePath = Get-ScriptOutputTail -Output $promotionSeductionWatchOutput
+if (-not [string]::IsNullOrWhiteSpace($promotionSeductionWatchBundlePath)) {
+    $statePayload.lastPromotionSeductionWatchBundle = $promotionSeductionWatchBundlePath
+    $statePayload.promotionSeductionWatchStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $promotionSeductionWatchStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1494,6 +1530,12 @@ $summary = [ordered]@{
     questioningGelPromotionGateStatePath = $statePayload.questioningGelPromotionGateStatePath
     lastProtectedQuestioningPatternSurfaceBundle = $statePayload.lastProtectedQuestioningPatternSurfaceBundle
     protectedQuestioningPatternSurfaceStatePath = $statePayload.protectedQuestioningPatternSurfaceStatePath
+    lastVariationTestedReentryLedgerBundle = $statePayload.lastVariationTestedReentryLedgerBundle
+    variationTestedReentryLedgerStatePath = $statePayload.variationTestedReentryLedgerStatePath
+    lastQuestioningAdmissionRefusalReceiptBundle = $statePayload.lastQuestioningAdmissionRefusalReceiptBundle
+    questioningAdmissionRefusalReceiptStatePath = $statePayload.questioningAdmissionRefusalReceiptStatePath
+    lastPromotionSeductionWatchBundle = $statePayload.lastPromotionSeductionWatchBundle
+    promotionSeductionWatchStatePath = $statePayload.promotionSeductionWatchStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -1799,6 +1841,15 @@ if (-not [string]::IsNullOrWhiteSpace($questioningGelPromotionGateBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($protectedQuestioningPatternSurfaceBundlePath)) {
     Write-Host ('[local-automation-cycle] ProtectedQuestioningPatternSurface: {0}' -f $protectedQuestioningPatternSurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($variationTestedReentryLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] VariationTestedReentryLedger: {0}' -f $variationTestedReentryLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($questioningAdmissionRefusalReceiptBundlePath)) {
+    Write-Host ('[local-automation-cycle] QuestioningAdmissionRefusalReceipt: {0}' -f $questioningAdmissionRefusalReceiptBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($promotionSeductionWatchBundlePath)) {
+    Write-Host ('[local-automation-cycle] PromotionSeductionWatch: {0}' -f $promotionSeductionWatchBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

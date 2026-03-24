@@ -1767,6 +1767,60 @@
           ]
         }
       ]
+    },
+    {
+      "id": "automation-maturation-map-32",
+      "label": "Automation Maturation Map 32",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Harden the questioning promotion lane through variation-tested re-entry, lawful refusal, and seduction watch so almost-good-enough candidates can be denied without collapsing into sterility.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "variation-tested-reentry-ledger",
+        "questioning-admission-refusal-receipt",
+        "promotion-seduction-watch"
+      ],
+      "tasks": [
+        {
+          "id": "variation-tested-reentry-ledger",
+          "label": "Variation-Tested Reentry Ledger",
+          "owner": "Shared",
+          "authority": "Reentry witness only",
+          "status": "selected",
+          "purpose": "Retain which candidate questioning patterns survive variation across operator, pressure, and stance shifts so portability is proven by re-entry rather than narrative confidence.",
+          "completionSignal": "A reentry ledger can distinguish surviving patterns, failed patterns, and required retest patterns under named variation contexts.",
+          "escalatesWhen": [
+            "variation is inferred without actual reentry burden",
+            "single-context success is treated as portable inheritance"
+          ]
+        },
+        {
+          "id": "questioning-admission-refusal-receipt",
+          "label": "Questioning Admission Refusal Receipt",
+          "owner": "GEL",
+          "authority": "Refusal and delay only",
+          "status": "selected",
+          "purpose": "Emit a lawful refusal when an attractive questioning candidate remains under-evidenced so the archive is protected from premature inheritance without discarding promising work.",
+          "completionSignal": "A refusal receipt can name which patterns were denied, why they were denied, and whether delay without disposal remains lawful.",
+          "escalatesWhen": [
+            "refusal becomes silent disappearance instead of witnessed delay or denial",
+            "almost-good-enough candidates are promoted because they are elegant or repeated"
+          ]
+        },
+        {
+          "id": "promotion-seduction-watch",
+          "label": "Promotion Seduction Watch",
+          "owner": "SoulFrame",
+          "authority": "Watch and warning only",
+          "status": "selected",
+          "purpose": "Watch for prestige, elegance, emotional satisfaction, or social pressure trying to masquerade as inheritance readiness inside the questioning promotion lane.",
+          "completionSignal": "A seduction watch can name blocked promotion vectors and drift warnings without turning caution into sterile refusal.",
+          "escalatesWhen": [
+            "prestige signals are mistaken for portability evidence",
+            "seduction watch collapses into blanket anti-promotion pessimism"
+          ]
+        }
+      ]
     }
   ]
 }
