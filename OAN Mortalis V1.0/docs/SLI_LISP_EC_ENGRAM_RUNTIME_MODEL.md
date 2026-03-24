@@ -27,6 +27,10 @@ This note does define:
 - trace and residue duties
 - return and collapse eligibility at the runtime boundary
 
+The stored structure versus admitted use versus live expression distinction is defined separately in:
+
+- `docs/SKILL_ABILITY_TALENT_ENGRAM_ADMISSION_LAW.md`
+
 ## Root Principle
 
 An engram in the SLI/Lisp EC runtime is a lawful symbolic-operational unit, not merely remembered content.
