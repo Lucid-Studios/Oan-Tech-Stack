@@ -651,6 +651,18 @@ $roots = @(
         keep = [int] $retentionPolicy.keepArchiveDispositionLedgerBundles
     },
     [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.interlockDensityLedgerOutputRoot)
+        keep = [int] $retentionPolicy.keepInterlockDensityLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.brittleDurableDifferentiationSurfaceOutputRoot)
+        keep = [int] $retentionPolicy.keepBrittleDurableDifferentiationSurfaceBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coreInvariantLatticeWitnessOutputRoot)
+        keep = [int] $retentionPolicy.keepCoreInvariantLatticeWitnessBundles
+    },
+    [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationOutputRoot)
         keep = [int] $retentionPolicy.keepBlockedEscalationBundles
     }

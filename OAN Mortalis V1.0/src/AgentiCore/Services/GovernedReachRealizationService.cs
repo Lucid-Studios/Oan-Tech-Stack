@@ -836,4 +836,64 @@ public sealed class GovernedReachRealizationService
             ledgerState,
             timestampUtc);
     }
+
+    public InterlockDensityLedgerReceipt CreateInterlockDensityLedgerReceipt(
+        DurabilityWitnessReceipt durabilityWitness,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        ColdAdmissionEligibilityGateReceipt coldAdmissionEligibilityGate,
+        string ledgerState = "interlock-density-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(coldAdmissionEligibilityGate);
+
+        return AgentiActualizationProjector.CreateInterlockDensityLedgerReceipt(
+            durabilityWitness,
+            variationTestedReentryLedger,
+            coldAdmissionEligibilityGate,
+            ledgerState,
+            timestampUtc);
+    }
+
+    public BrittleDurableDifferentiationSurfaceReceipt CreateBrittleDurableDifferentiationSurfaceReceipt(
+        BrittlenessWitnessReceipt brittlenessWitness,
+        DurabilityWitnessReceipt durabilityWitness,
+        InterlockDensityLedgerReceipt interlockDensityLedger,
+        string surfaceState = "brittle-durable-differentiation-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(interlockDensityLedger);
+
+        return AgentiActualizationProjector.CreateBrittleDurableDifferentiationSurfaceReceipt(
+            brittlenessWitness,
+            durabilityWitness,
+            interlockDensityLedger,
+            surfaceState,
+            timestampUtc);
+    }
+
+    public CoreInvariantLatticeWitnessReceipt CreateCoreInvariantLatticeWitnessReceipt(
+        InterlockDensityLedgerReceipt interlockDensityLedger,
+        BrittleDurableDifferentiationSurfaceReceipt brittleDurableDifferentiationSurface,
+        ColdAdmissionEligibilityGateReceipt coldAdmissionEligibilityGate,
+        ArchiveDispositionLedgerReceipt archiveDispositionLedger,
+        string receiptState = "core-invariant-lattice-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(interlockDensityLedger);
+        ArgumentNullException.ThrowIfNull(brittleDurableDifferentiationSurface);
+        ArgumentNullException.ThrowIfNull(coldAdmissionEligibilityGate);
+        ArgumentNullException.ThrowIfNull(archiveDispositionLedger);
+
+        return AgentiActualizationProjector.CreateCoreInvariantLatticeWitnessReceipt(
+            interlockDensityLedger,
+            brittleDurableDifferentiationSurface,
+            coldAdmissionEligibilityGate,
+            archiveDispositionLedger,
+            receiptState,
+            timestampUtc);
+    }
 }

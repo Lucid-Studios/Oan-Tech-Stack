@@ -517,6 +517,50 @@ public static class AgentiActualizationKeys
         return $"archive-disposition-ledger://{ComputeDigest(cmeId, hotReactivationTriggerReceiptHandle, coldAdmissionEligibilityGateHandle, warmClockDispositionReceiptHandle)}";
     }
 
+    public static string CreateInterlockDensityLedgerHandle(
+        string cmeId,
+        string durabilityWitnessHandle,
+        string variationTestedReentryLedgerHandle,
+        string coldAdmissionEligibilityGateHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(durabilityWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(variationTestedReentryLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coldAdmissionEligibilityGateHandle);
+
+        return $"interlock-density-ledger://{ComputeDigest(cmeId, durabilityWitnessHandle, variationTestedReentryLedgerHandle, coldAdmissionEligibilityGateHandle)}";
+    }
+
+    public static string CreateBrittleDurableDifferentiationSurfaceHandle(
+        string cmeId,
+        string brittlenessWitnessHandle,
+        string durabilityWitnessHandle,
+        string interlockDensityLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(brittlenessWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(durabilityWitnessHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(interlockDensityLedgerHandle);
+
+        return $"brittle-durable-differentiation-surface://{ComputeDigest(cmeId, brittlenessWitnessHandle, durabilityWitnessHandle, interlockDensityLedgerHandle)}";
+    }
+
+    public static string CreateCoreInvariantLatticeWitnessHandle(
+        string cmeId,
+        string interlockDensityLedgerHandle,
+        string brittleDurableDifferentiationSurfaceHandle,
+        string coldAdmissionEligibilityGateHandle,
+        string archiveDispositionLedgerHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(interlockDensityLedgerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(brittleDurableDifferentiationSurfaceHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(coldAdmissionEligibilityGateHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(archiveDispositionLedgerHandle);
+
+        return $"core-invariant-lattice-witness://{ComputeDigest(cmeId, interlockDensityLedgerHandle, brittleDurableDifferentiationSurfaceHandle, coldAdmissionEligibilityGateHandle, archiveDispositionLedgerHandle)}";
+    }
+
     private static string ComputeDigest(params string[] parts)
     {
         var material = string.Join("|", parts.Select(part => part.Trim()));

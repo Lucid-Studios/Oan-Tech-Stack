@@ -206,6 +206,9 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $HotReactivationTriggerReceiptState,
         [object] $ColdAdmissionEligibilityGateState,
         [object] $ArchiveDispositionLedgerState,
+        [object] $InterlockDensityLedgerState,
+        [object] $BrittleDurableDifferentiationSurfaceState,
+        [object] $CoreInvariantLatticeWitnessState,
         [string] $LastKnownStatus,
         [string] $BlockedStatus
     )
@@ -1115,6 +1118,33 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'interlock-density-ledger' {
+            if ($null -ne $InterlockDensityLedgerState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'brittle-durable-differentiation-surface' {
+            if ($null -ne $BrittleDurableDifferentiationSurfaceState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'core-invariant-lattice-witness' {
+            if ($null -ne $CoreInvariantLatticeWitnessState) {
+                return 'completed'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
     }
 
     return $PolicyStatus
@@ -1263,6 +1293,9 @@ $coolingPressureWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoR
 $hotReactivationTriggerReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.hotReactivationTriggerReceiptStatePath)
 $coldAdmissionEligibilityGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coldAdmissionEligibilityGateStatePath)
 $archiveDispositionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.archiveDispositionLedgerStatePath)
+$interlockDensityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.interlockDensityLedgerStatePath)
+$brittleDurableDifferentiationSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.brittleDurableDifferentiationSurfaceStatePath)
+$coreInvariantLatticeWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.coreInvariantLatticeWitnessStatePath)
 $retentionState = Read-JsonFileOrNull -Path $retentionStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
 $notificationState = Read-JsonFileOrNull -Path $notificationStatePath
@@ -1364,6 +1397,9 @@ $coolingPressureWitnessState = Read-JsonFileOrNull -Path $coolingPressureWitness
 $hotReactivationTriggerReceiptState = Read-JsonFileOrNull -Path $hotReactivationTriggerReceiptStatePath
 $coldAdmissionEligibilityGateState = Read-JsonFileOrNull -Path $coldAdmissionEligibilityGateStatePath
 $archiveDispositionLedgerState = Read-JsonFileOrNull -Path $archiveDispositionLedgerStatePath
+$interlockDensityLedgerState = Read-JsonFileOrNull -Path $interlockDensityLedgerStatePath
+$brittleDurableDifferentiationSurfaceState = Read-JsonFileOrNull -Path $brittleDurableDifferentiationSurfaceStatePath
+$coreInvariantLatticeWitnessState = Read-JsonFileOrNull -Path $coreInvariantLatticeWitnessStatePath
 
 $digestJson = $null
 if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
@@ -1611,6 +1647,9 @@ if ($null -ne $activeLongFormTaskMap) {
                 -HotReactivationTriggerReceiptState $hotReactivationTriggerReceiptState `
                 -ColdAdmissionEligibilityGateState $coldAdmissionEligibilityGateState `
                 -ArchiveDispositionLedgerState $archiveDispositionLedgerState `
+                -InterlockDensityLedgerState $interlockDensityLedgerState `
+                -BrittleDurableDifferentiationSurfaceState $brittleDurableDifferentiationSurfaceState `
+                -CoreInvariantLatticeWitnessState $coreInvariantLatticeWitnessState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         }
@@ -1766,6 +1805,9 @@ $taskMapEntries = @(
                     -HotReactivationTriggerReceiptState $hotReactivationTriggerReceiptState `
                     -ColdAdmissionEligibilityGateState $coldAdmissionEligibilityGateState `
                     -ArchiveDispositionLedgerState $archiveDispositionLedgerState `
+                    -InterlockDensityLedgerState $interlockDensityLedgerState `
+                    -BrittleDurableDifferentiationSurfaceState $brittleDurableDifferentiationSurfaceState `
+                    -CoreInvariantLatticeWitnessState $coreInvariantLatticeWitnessState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
 
@@ -2426,6 +2468,34 @@ $statusPayload = [ordered]@{
         archiveProvenancePreserved = if ($null -ne $archiveDispositionLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'provenancePreserved') } else { $null }
         archivePseudoLineageDenied = if ($null -ne $archiveDispositionLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'pseudoLineageDenied') } else { $null }
         archiveWarmIndefiniteHoldingDenied = if ($null -ne $archiveDispositionLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $archiveDispositionLedgerState -PropertyName 'warmIndefiniteHoldingDenied') } else { $null }
+        interlockDensityLedgerState = if ($null -ne $interlockDensityLedgerState) { [string] $interlockDensityLedgerState.interlockDensityLedgerState } else { $null }
+        interlockDensityLedgerReason = if ($null -ne $interlockDensityLedgerState) { [string] $interlockDensityLedgerState.reasonCode } else { $null }
+        interlockDensityLedgerNextAction = if ($null -ne $interlockDensityLedgerState) { [string] $interlockDensityLedgerState.nextAction } else { $null }
+        interlockDensityIndependentConstraintLinkCount = if ($null -ne $interlockDensityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'independentConstraintLinkCount') } else { $null }
+        interlockDensityReentrySurvivalCount = if ($null -ne $interlockDensityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'reentrySurvivalCount') } else { $null }
+        interlockDensityDurableAlignmentCount = if ($null -ne $interlockDensityLedgerState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'durableAlignmentCount') } else { $null }
+        interlockDensityDisposition = if ($null -ne $interlockDensityLedgerState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'interlockDensityDisposition') } else { $null }
+        interlockDensityDenseInterweaveEmergent = if ($null -ne $interlockDensityLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'denseInterweaveEmergent') } else { $null }
+        interlockDensityLatticeClaimStillWithheld = if ($null -ne $interlockDensityLedgerState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'latticeClaimStillWithheld') } else { $null }
+        brittleDurableDifferentiationSurfaceState = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [string] $brittleDurableDifferentiationSurfaceState.brittleDurableDifferentiationSurfaceState } else { $null }
+        brittleDurableDifferentiationSurfaceReason = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [string] $brittleDurableDifferentiationSurfaceState.reasonCode } else { $null }
+        brittleDurableDifferentiationSurfaceNextAction = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [string] $brittleDurableDifferentiationSurfaceState.nextAction } else { $null }
+        brittleFragmentCount = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'brittleFragmentCount') } else { $null }
+        durableKernelCount = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'durableKernelCount') } else { $null }
+        coexistingRegionCount = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'coexistingRegionCount') } else { $null }
+        brittleDurableSurfaceDisposition = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'surfaceDisposition') } else { $null }
+        brittleDurableCoexistenceExposed = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'brittleDurableCoexistenceExposed') } else { $null }
+        averageReadinessDenied = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'averageReadinessDenied') } else { $null }
+        fullTrustStillWithheld = if ($null -ne $brittleDurableDifferentiationSurfaceState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'fullTrustStillWithheld') } else { $null }
+        coreInvariantLatticeWitnessState = if ($null -ne $coreInvariantLatticeWitnessState) { [string] $coreInvariantLatticeWitnessState.coreInvariantLatticeWitnessState } else { $null }
+        coreInvariantLatticeWitnessReason = if ($null -ne $coreInvariantLatticeWitnessState) { [string] $coreInvariantLatticeWitnessState.reasonCode } else { $null }
+        coreInvariantLatticeWitnessNextAction = if ($null -ne $coreInvariantLatticeWitnessState) { [string] $coreInvariantLatticeWitnessState.nextAction } else { $null }
+        candidateCoreInvariantCount = if ($null -ne $coreInvariantLatticeWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'candidateCoreInvariantCount') } else { $null }
+        identityAdjacencySignalCount = if ($null -ne $coreInvariantLatticeWitnessState) { [int] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'identityAdjacencySignalCount') } else { $null }
+        coreInvariantInterlockPosture = if ($null -ne $coreInvariantLatticeWitnessState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'interlockPosture') } else { $null }
+        identityAdjacentSignificanceEmergent = if ($null -ne $coreInvariantLatticeWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'identityAdjacentSignificanceEmergent') } else { $null }
+        coreLawSanctificationDenied = if ($null -ne $coreInvariantLatticeWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'coreLawSanctificationDenied') } else { $null }
+        latticeGradeInvarianceWitnessed = if ($null -ne $coreInvariantLatticeWitnessState) { [bool] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'latticeGradeInvarianceWitnessed') } else { $null }
         nextReleaseCandidateRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
         nextMandatoryHitlReviewUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
     }
@@ -3897,6 +3967,58 @@ if ($null -ne $archiveDispositionLedgerState) {
     )
 }
 
+if ($null -ne $interlockDensityLedgerState) {
+    $markdownLines += @(
+        '## Interlock Density Ledger',
+        '',
+        ('- Interlock density-ledger state: `{0}`' -f [string] $interlockDensityLedgerState.interlockDensityLedgerState),
+        ('- Reason code: `{0}`' -f [string] $interlockDensityLedgerState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $interlockDensityLedgerState.nextAction),
+        ('- Independent constraint-link count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'independentConstraintLinkCount')),
+        ('- Reentry-survival count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'reentrySurvivalCount')),
+        ('- Durable-alignment count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'durableAlignmentCount')),
+        ('- Interlock density disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'interlockDensityDisposition')),
+        ('- Dense interweave emergent: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'denseInterweaveEmergent')),
+        ('- Lattice claim still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $interlockDensityLedgerState -PropertyName 'latticeClaimStillWithheld')),
+        ''
+    )
+}
+
+if ($null -ne $brittleDurableDifferentiationSurfaceState) {
+    $markdownLines += @(
+        '## Brittle Durable Differentiation Surface',
+        '',
+        ('- Brittle durable differentiation-surface state: `{0}`' -f [string] $brittleDurableDifferentiationSurfaceState.brittleDurableDifferentiationSurfaceState),
+        ('- Reason code: `{0}`' -f [string] $brittleDurableDifferentiationSurfaceState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $brittleDurableDifferentiationSurfaceState.nextAction),
+        ('- Brittle fragment count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'brittleFragmentCount')),
+        ('- Durable kernel count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'durableKernelCount')),
+        ('- Coexisting region count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'coexistingRegionCount')),
+        ('- Surface disposition: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'surfaceDisposition')),
+        ('- Brittle durable coexistence exposed: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'brittleDurableCoexistenceExposed')),
+        ('- Average readiness denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'averageReadinessDenied')),
+        ('- Full trust still withheld: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $brittleDurableDifferentiationSurfaceState -PropertyName 'fullTrustStillWithheld')),
+        ''
+    )
+}
+
+if ($null -ne $coreInvariantLatticeWitnessState) {
+    $markdownLines += @(
+        '## Core Invariant Lattice Witness',
+        '',
+        ('- Core invariant lattice-witness state: `{0}`' -f [string] $coreInvariantLatticeWitnessState.coreInvariantLatticeWitnessState),
+        ('- Reason code: `{0}`' -f [string] $coreInvariantLatticeWitnessState.reasonCode),
+        ('- Next action: `{0}`' -f [string] $coreInvariantLatticeWitnessState.nextAction),
+        ('- Candidate core-invariant count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'candidateCoreInvariantCount')),
+        ('- Identity adjacency-signal count: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'identityAdjacencySignalCount')),
+        ('- Interlock posture: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'interlockPosture')),
+        ('- Identity-adjacent significance emergent: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'identityAdjacentSignificanceEmergent')),
+        ('- Core law sanctification denied: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'coreLawSanctificationDenied')),
+        ('- Lattice-grade invariance witnessed: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject $coreInvariantLatticeWitnessState -PropertyName 'latticeGradeInvarianceWitnessed')),
+        ''
+    )
+}
+
 if ($null -ne $activeLongFormTaskMap) {
     $markdownLines += @(
         '## Long-Form Task Map',
@@ -4025,6 +4147,9 @@ if ($null -ne $activeLongFormTaskMap) {
             -HotReactivationTriggerReceiptState $hotReactivationTriggerReceiptState `
             -ColdAdmissionEligibilityGateState $coldAdmissionEligibilityGateState `
             -ArchiveDispositionLedgerState $archiveDispositionLedgerState `
+            -InterlockDensityLedgerState $interlockDensityLedgerState `
+            -BrittleDurableDifferentiationSurfaceState $brittleDurableDifferentiationSurfaceState `
+            -CoreInvariantLatticeWitnessState $coreInvariantLatticeWitnessState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)

@@ -104,6 +104,9 @@
   "hotReactivationTriggerReceiptOutputRoot": ".audit/runs/hot-reactivation-trigger-receipt",
   "coldAdmissionEligibilityGateOutputRoot": ".audit/runs/cold-admission-eligibility-gate",
   "archiveDispositionLedgerOutputRoot": ".audit/runs/archive-disposition-ledger",
+  "interlockDensityLedgerOutputRoot": ".audit/runs/interlock-density-ledger",
+  "brittleDurableDifferentiationSurfaceOutputRoot": ".audit/runs/brittle-durable-differentiation-surface",
+  "coreInvariantLatticeWitnessOutputRoot": ".audit/runs/core-invariant-lattice-witness",
   "statePath": ".audit/state/local-automation-cycle.json",
   "retentionStatePath": ".audit/state/local-automation-retention-last-run.json",
   "blockedEscalationStatePath": ".audit/state/local-automation-blocked-escalation-last-run.json",
@@ -206,6 +209,9 @@
   "hotReactivationTriggerReceiptStatePath": ".audit/state/local-automation-hot-reactivation-trigger-receipt-last-run.json",
   "coldAdmissionEligibilityGateStatePath": ".audit/state/local-automation-cold-admission-eligibility-gate-last-run.json",
   "archiveDispositionLedgerStatePath": ".audit/state/local-automation-archive-disposition-ledger-last-run.json",
+  "interlockDensityLedgerStatePath": ".audit/state/local-automation-interlock-density-ledger-last-run.json",
+  "brittleDurableDifferentiationSurfaceStatePath": ".audit/state/local-automation-brittle-durable-differentiation-surface-last-run.json",
+  "coreInvariantLatticeWitnessStatePath": ".audit/state/local-automation-core-invariant-lattice-witness-last-run.json",
   "notificationPolicy": {
     "enabled": true,
     "notifyOnStatuses": [
@@ -337,6 +343,9 @@
     "keepHotReactivationTriggerReceiptBundles": 8,
     "keepColdAdmissionEligibilityGateBundles": 8,
     "keepArchiveDispositionLedgerBundles": 8,
+    "keepInterlockDensityLedgerBundles": 8,
+    "keepBrittleDurableDifferentiationSurfaceBundles": 8,
+    "keepCoreInvariantLatticeWitnessBundles": 8,
     "preserveReferencedBundles": true
   },
   "mechanicalContinuationStatuses": [

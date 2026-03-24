@@ -255,6 +255,9 @@ $coolingPressureWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoR
 $hotReactivationTriggerReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.hotReactivationTriggerReceiptStatePath)
 $coldAdmissionEligibilityGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coldAdmissionEligibilityGateStatePath)
 $archiveDispositionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.archiveDispositionLedgerStatePath)
+$interlockDensityLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.interlockDensityLedgerStatePath)
+$brittleDurableDifferentiationSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.brittleDurableDifferentiationSurfaceStatePath)
+$coreInvariantLatticeWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coreInvariantLatticeWitnessStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
@@ -599,6 +602,12 @@ $statePayload.lastColdAdmissionEligibilityGateBundle = [string] (Get-ObjectPrope
 $statePayload.coldAdmissionEligibilityGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coldAdmissionEligibilityGateStatePath
 $statePayload.lastArchiveDispositionLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastArchiveDispositionLedgerBundle')
 $statePayload.archiveDispositionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $archiveDispositionLedgerStatePath
+$statePayload.lastInterlockDensityLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastInterlockDensityLedgerBundle')
+$statePayload.interlockDensityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $interlockDensityLedgerStatePath
+$statePayload.lastBrittleDurableDifferentiationSurfaceBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBrittleDurableDifferentiationSurfaceBundle')
+$statePayload.brittleDurableDifferentiationSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $brittleDurableDifferentiationSurfaceStatePath
+$statePayload.lastCoreInvariantLatticeWitnessBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCoreInvariantLatticeWitnessBundle')
+$statePayload.coreInvariantLatticeWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coreInvariantLatticeWitnessStatePath
 Write-JsonFile -Path $statePath -Value $statePayload
 
 $blockedEscalationBundlePath = $null
@@ -1502,6 +1511,33 @@ if (-not [string]::IsNullOrWhiteSpace($archiveDispositionLedgerBundlePath)) {
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$interlockDensityLedgerScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-InterlockDensity-Ledger.ps1'
+$interlockDensityLedgerOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $interlockDensityLedgerScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Interlock density ledger writer'
+$interlockDensityLedgerBundlePath = Get-ScriptOutputTail -Output $interlockDensityLedgerOutput
+if (-not [string]::IsNullOrWhiteSpace($interlockDensityLedgerBundlePath)) {
+    $statePayload.lastInterlockDensityLedgerBundle = $interlockDensityLedgerBundlePath
+    $statePayload.interlockDensityLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $interlockDensityLedgerStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$brittleDurableDifferentiationSurfaceScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-BrittleDurable-DifferentiationSurface.ps1'
+$brittleDurableDifferentiationSurfaceOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $brittleDurableDifferentiationSurfaceScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Brittle durable differentiation surface writer'
+$brittleDurableDifferentiationSurfaceBundlePath = Get-ScriptOutputTail -Output $brittleDurableDifferentiationSurfaceOutput
+if (-not [string]::IsNullOrWhiteSpace($brittleDurableDifferentiationSurfaceBundlePath)) {
+    $statePayload.lastBrittleDurableDifferentiationSurfaceBundle = $brittleDurableDifferentiationSurfaceBundlePath
+    $statePayload.brittleDurableDifferentiationSurfaceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $brittleDurableDifferentiationSurfaceStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$coreInvariantLatticeWitnessScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CoreInvariant-LatticeWitness.ps1'
+$coreInvariantLatticeWitnessOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $coreInvariantLatticeWitnessScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Core invariant lattice witness writer'
+$coreInvariantLatticeWitnessBundlePath = Get-ScriptOutputTail -Output $coreInvariantLatticeWitnessOutput
+if (-not [string]::IsNullOrWhiteSpace($coreInvariantLatticeWitnessBundlePath)) {
+    $statePayload.lastCoreInvariantLatticeWitnessBundle = $coreInvariantLatticeWitnessBundlePath
+    $statePayload.coreInvariantLatticeWitnessStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $coreInvariantLatticeWitnessStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $summary = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = $nowUtc.ToString('o')
@@ -1704,6 +1740,12 @@ $summary = [ordered]@{
     coldAdmissionEligibilityGateStatePath = $statePayload.coldAdmissionEligibilityGateStatePath
     lastArchiveDispositionLedgerBundle = $statePayload.lastArchiveDispositionLedgerBundle
     archiveDispositionLedgerStatePath = $statePayload.archiveDispositionLedgerStatePath
+    lastInterlockDensityLedgerBundle = $statePayload.lastInterlockDensityLedgerBundle
+    interlockDensityLedgerStatePath = $statePayload.interlockDensityLedgerStatePath
+    lastBrittleDurableDifferentiationSurfaceBundle = $statePayload.lastBrittleDurableDifferentiationSurfaceBundle
+    brittleDurableDifferentiationSurfaceStatePath = $statePayload.brittleDurableDifferentiationSurfaceStatePath
+    lastCoreInvariantLatticeWitnessBundle = $statePayload.lastCoreInvariantLatticeWitnessBundle
+    coreInvariantLatticeWitnessStatePath = $statePayload.coreInvariantLatticeWitnessStatePath
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
@@ -2054,6 +2096,15 @@ if (-not [string]::IsNullOrWhiteSpace($coldAdmissionEligibilityGateBundlePath)) 
 }
 if (-not [string]::IsNullOrWhiteSpace($archiveDispositionLedgerBundlePath)) {
     Write-Host ('[local-automation-cycle] ArchiveDispositionLedger: {0}' -f $archiveDispositionLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($interlockDensityLedgerBundlePath)) {
+    Write-Host ('[local-automation-cycle] InterlockDensityLedger: {0}' -f $interlockDensityLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($brittleDurableDifferentiationSurfaceBundlePath)) {
+    Write-Host ('[local-automation-cycle] BrittleDurableDifferentiationSurface: {0}' -f $brittleDurableDifferentiationSurfaceBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($coreInvariantLatticeWitnessBundlePath)) {
+    Write-Host ('[local-automation-cycle] CoreInvariantLatticeWitness: {0}' -f $coreInvariantLatticeWitnessBundlePath)
 }
 
 if ($latestStatus -eq $blockedStatus) {

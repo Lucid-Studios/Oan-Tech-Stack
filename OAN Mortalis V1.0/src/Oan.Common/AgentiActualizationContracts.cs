@@ -681,6 +681,57 @@ public sealed record ArchiveDispositionLedgerReceipt(
     string ReasonCode,
     DateTimeOffset TimestampUtc);
 
+public sealed record InterlockDensityLedgerReceipt(
+    string LedgerHandle,
+    string CMEId,
+    string DurabilityWitnessHandle,
+    string VariationTestedReentryLedgerHandle,
+    string ColdAdmissionEligibilityGateHandle,
+    string LedgerState,
+    IReadOnlyList<string> InterlockLinks,
+    int IndependentConstraintLinkCount,
+    int ReentrySurvivalCount,
+    int DurableAlignmentCount,
+    string DensityDisposition,
+    bool DenseInterweaveEmergent,
+    bool LatticeClaimStillWithheld,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record BrittleDurableDifferentiationSurfaceReceipt(
+    string SurfaceHandle,
+    string CMEId,
+    string BrittlenessWitnessHandle,
+    string DurabilityWitnessHandle,
+    string InterlockDensityLedgerHandle,
+    string SurfaceState,
+    IReadOnlyList<string> BrittleFragments,
+    IReadOnlyList<string> DurableKernels,
+    IReadOnlyList<string> CoexistingRegions,
+    string SurfaceDisposition,
+    bool BrittleDurableCoexistenceExposed,
+    bool AverageReadinessDenied,
+    bool FullTrustStillWithheld,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
+public sealed record CoreInvariantLatticeWitnessReceipt(
+    string ReceiptHandle,
+    string CMEId,
+    string InterlockDensityLedgerHandle,
+    string BrittleDurableDifferentiationSurfaceHandle,
+    string ColdAdmissionEligibilityGateHandle,
+    string ArchiveDispositionLedgerHandle,
+    string ReceiptState,
+    IReadOnlyList<string> CandidateCoreInvariants,
+    IReadOnlyList<string> IdentityAdjacencySignals,
+    string InterlockPosture,
+    bool IdentityAdjacentSignificanceEmergent,
+    bool CoreLawSanctificationDenied,
+    bool LatticeGradeInvarianceWitnessed,
+    string ReasonCode,
+    DateTimeOffset TimestampUtc);
+
 public static class AgentiActualizationProjector
 {
     private const string GovernedThreadBirthPrefix = "governed-thread-birth://";
@@ -725,6 +776,9 @@ public static class AgentiActualizationProjector
     private const string HotReactivationTriggerReceiptPrefix = "hot-reactivation-trigger-receipt://";
     private const string ColdAdmissionEligibilityGatePrefix = "cold-admission-eligibility-gate://";
     private const string ArchiveDispositionLedgerPrefix = "archive-disposition-ledger://";
+    private const string InterlockDensityLedgerPrefix = "interlock-density-ledger://";
+    private const string BrittleDurableDifferentiationSurfacePrefix = "brittle-durable-differentiation-surface://";
+    private const string CoreInvariantLatticeWitnessPrefix = "core-invariant-lattice-witness://";
 
     public static AgentiActualUtilitySurfaceReceipt CreateAgentiActualUtilitySurface(
         string cmeId,
@@ -3114,6 +3168,197 @@ public static class AgentiActualizationProjector
             PseudoLineageDenied: true,
             WarmIndefiniteHoldingDenied: warmClockDisposition.StalenessRiskPresent || ripeningStalenessLedger.FreshConstraintContactStillRequired,
             ReasonCode: "archive-disposition-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static InterlockDensityLedgerReceipt CreateInterlockDensityLedgerReceipt(
+        DurabilityWitnessReceipt durabilityWitness,
+        VariationTestedReentryLedgerReceipt variationTestedReentryLedger,
+        ColdAdmissionEligibilityGateReceipt coldAdmissionEligibilityGate,
+        string ledgerState = "interlock-density-ledger-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(variationTestedReentryLedger);
+        ArgumentNullException.ThrowIfNull(coldAdmissionEligibilityGate);
+        EnsurePrefix(durabilityWitness.ReceiptHandle, DurabilityWitnessPrefix, nameof(durabilityWitness));
+        EnsurePrefix(variationTestedReentryLedger.LedgerHandle, VariationTestedReentryLedgerPrefix, nameof(variationTestedReentryLedger));
+        EnsurePrefix(coldAdmissionEligibilityGate.GateHandle, ColdAdmissionEligibilityGatePrefix, nameof(coldAdmissionEligibilityGate));
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerState);
+
+        if (!string.Equals(durabilityWitness.CMEId, variationTestedReentryLedger.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(durabilityWitness.CMEId, coldAdmissionEligibilityGate.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Interlock density ledger requires durability, reentry, and cold eligibility receipts to remain inside one CME continuity lane.");
+        }
+
+        var interlockLinks = durabilityWitness.InterlockSignals
+            .Where(static signal => !string.IsNullOrWhiteSpace(signal))
+            .Select(static signal => $"interlock:{signal}")
+            .Concat(variationTestedReentryLedger.SurvivingPatterns
+                .Where(static pattern => !string.IsNullOrWhiteSpace(pattern))
+                .Select(static pattern => $"reentry:{pattern}"))
+            .Concat(durabilityWitness.DurablePatterns
+                .Where(static pattern => !string.IsNullOrWhiteSpace(pattern))
+                .Select(static pattern => $"durable:{pattern}"))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        var independentConstraintLinkCount = interlockLinks.Length;
+        var densityDisposition = independentConstraintLinkCount >= 8
+            ? "dense-interlock-density"
+            : independentConstraintLinkCount >= 5
+                ? "moderate-interlock-density"
+                : "sparse-interlock-density";
+
+        return new InterlockDensityLedgerReceipt(
+            LedgerHandle: AgentiActualizationKeys.CreateInterlockDensityLedgerHandle(
+                durabilityWitness.CMEId,
+                durabilityWitness.ReceiptHandle,
+                variationTestedReentryLedger.LedgerHandle,
+                coldAdmissionEligibilityGate.GateHandle),
+            CMEId: durabilityWitness.CMEId,
+            DurabilityWitnessHandle: durabilityWitness.ReceiptHandle,
+            VariationTestedReentryLedgerHandle: variationTestedReentryLedger.LedgerHandle,
+            ColdAdmissionEligibilityGateHandle: coldAdmissionEligibilityGate.GateHandle,
+            LedgerState: ledgerState.Trim(),
+            InterlockLinks: interlockLinks,
+            IndependentConstraintLinkCount: independentConstraintLinkCount,
+            ReentrySurvivalCount: variationTestedReentryLedger.SurvivingPatterns.Count,
+            DurableAlignmentCount: durabilityWitness.DurablePatterns.Count,
+            DensityDisposition: densityDisposition,
+            DenseInterweaveEmergent: independentConstraintLinkCount >= 8 && durabilityWitness.InterlockDensityEmergent,
+            LatticeClaimStillWithheld: true,
+            ReasonCode: "interlock-density-ledger-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static BrittleDurableDifferentiationSurfaceReceipt CreateBrittleDurableDifferentiationSurfaceReceipt(
+        BrittlenessWitnessReceipt brittlenessWitness,
+        DurabilityWitnessReceipt durabilityWitness,
+        InterlockDensityLedgerReceipt interlockDensityLedger,
+        string surfaceState = "brittle-durable-differentiation-surface-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(brittlenessWitness);
+        ArgumentNullException.ThrowIfNull(durabilityWitness);
+        ArgumentNullException.ThrowIfNull(interlockDensityLedger);
+        EnsurePrefix(brittlenessWitness.ReceiptHandle, BrittlenessWitnessPrefix, nameof(brittlenessWitness));
+        EnsurePrefix(durabilityWitness.ReceiptHandle, DurabilityWitnessPrefix, nameof(durabilityWitness));
+        EnsurePrefix(interlockDensityLedger.LedgerHandle, InterlockDensityLedgerPrefix, nameof(interlockDensityLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(surfaceState);
+
+        if (!string.Equals(brittlenessWitness.CMEId, durabilityWitness.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(brittlenessWitness.CMEId, interlockDensityLedger.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Brittle durable differentiation requires brittleness, durability, and interlock density receipts to remain inside one CME continuity lane.");
+        }
+
+        var brittleFragments = brittlenessWitness.BrittlePatterns
+            .Where(static pattern => !string.IsNullOrWhiteSpace(pattern))
+            .Select(static pattern => $"brittle:{pattern}")
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var durableKernels = durabilityWitness.DurablePatterns
+            .Where(static pattern => !string.IsNullOrWhiteSpace(pattern))
+            .Select(static pattern => $"durable:{pattern}")
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var coexistingRegions = brittleFragments
+            .Concat(durableKernels)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var coexistenceExposed = brittleFragments.Length > 0 && durableKernels.Length > 0;
+
+        return new BrittleDurableDifferentiationSurfaceReceipt(
+            SurfaceHandle: AgentiActualizationKeys.CreateBrittleDurableDifferentiationSurfaceHandle(
+                brittlenessWitness.CMEId,
+                brittlenessWitness.ReceiptHandle,
+                durabilityWitness.ReceiptHandle,
+                interlockDensityLedger.LedgerHandle),
+            CMEId: brittlenessWitness.CMEId,
+            BrittlenessWitnessHandle: brittlenessWitness.ReceiptHandle,
+            DurabilityWitnessHandle: durabilityWitness.ReceiptHandle,
+            InterlockDensityLedgerHandle: interlockDensityLedger.LedgerHandle,
+            SurfaceState: surfaceState.Trim(),
+            BrittleFragments: brittleFragments,
+            DurableKernels: durableKernels,
+            CoexistingRegions: coexistingRegions,
+            SurfaceDisposition: coexistenceExposed ? "mixed-structure-under-review" : "single-structure-dominant",
+            BrittleDurableCoexistenceExposed: coexistenceExposed,
+            AverageReadinessDenied: true,
+            FullTrustStillWithheld: durabilityWitness.ColdPromotionStillWithheld || interlockDensityLedger.LatticeClaimStillWithheld,
+            ReasonCode: "brittle-durable-differentiation-surface-bound",
+            TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
+    }
+
+    public static CoreInvariantLatticeWitnessReceipt CreateCoreInvariantLatticeWitnessReceipt(
+        InterlockDensityLedgerReceipt interlockDensityLedger,
+        BrittleDurableDifferentiationSurfaceReceipt brittleDurableDifferentiationSurface,
+        ColdAdmissionEligibilityGateReceipt coldAdmissionEligibilityGate,
+        ArchiveDispositionLedgerReceipt archiveDispositionLedger,
+        string receiptState = "core-invariant-lattice-witness-ready",
+        DateTimeOffset? timestampUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(interlockDensityLedger);
+        ArgumentNullException.ThrowIfNull(brittleDurableDifferentiationSurface);
+        ArgumentNullException.ThrowIfNull(coldAdmissionEligibilityGate);
+        ArgumentNullException.ThrowIfNull(archiveDispositionLedger);
+        EnsurePrefix(interlockDensityLedger.LedgerHandle, InterlockDensityLedgerPrefix, nameof(interlockDensityLedger));
+        EnsurePrefix(brittleDurableDifferentiationSurface.SurfaceHandle, BrittleDurableDifferentiationSurfacePrefix, nameof(brittleDurableDifferentiationSurface));
+        EnsurePrefix(coldAdmissionEligibilityGate.GateHandle, ColdAdmissionEligibilityGatePrefix, nameof(coldAdmissionEligibilityGate));
+        EnsurePrefix(archiveDispositionLedger.LedgerHandle, ArchiveDispositionLedgerPrefix, nameof(archiveDispositionLedger));
+        ArgumentException.ThrowIfNullOrWhiteSpace(receiptState);
+
+        if (!string.Equals(interlockDensityLedger.CMEId, brittleDurableDifferentiationSurface.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(interlockDensityLedger.CMEId, coldAdmissionEligibilityGate.CMEId, StringComparison.Ordinal) ||
+            !string.Equals(interlockDensityLedger.CMEId, archiveDispositionLedger.CMEId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Core invariant lattice witness requires interlock, differentiation, cold eligibility, and archive receipts to remain inside one CME continuity lane.");
+        }
+
+        var candidateCoreInvariants = new[]
+        {
+            "constraint-before-freeze",
+            "provenance-before-promotion",
+            "reentry-before-inheritance"
+        };
+        var identityAdjacencySignals = new[]
+        {
+            "identity-adjacent-significance-emergent",
+            "archive-provenance-preserved",
+            "core-law-freeze-denied"
+        };
+        var interlockPosture = interlockDensityLedger.DenseInterweaveEmergent && coldAdmissionEligibilityGate.ColdApproachLawful
+            ? "lattice-approach-emergent"
+            : string.Equals(interlockDensityLedger.DensityDisposition, "moderate-interlock-density", StringComparison.Ordinal)
+                ? "pre-lattice-moderate"
+                : "pre-lattice-sparse";
+        var identityAdjacentSignificanceEmergent = interlockDensityLedger.IndependentConstraintLinkCount >= 5 &&
+            brittleDurableDifferentiationSurface.BrittleDurableCoexistenceExposed;
+
+        return new CoreInvariantLatticeWitnessReceipt(
+            ReceiptHandle: AgentiActualizationKeys.CreateCoreInvariantLatticeWitnessHandle(
+                interlockDensityLedger.CMEId,
+                interlockDensityLedger.LedgerHandle,
+                brittleDurableDifferentiationSurface.SurfaceHandle,
+                coldAdmissionEligibilityGate.GateHandle,
+                archiveDispositionLedger.LedgerHandle),
+            CMEId: interlockDensityLedger.CMEId,
+            InterlockDensityLedgerHandle: interlockDensityLedger.LedgerHandle,
+            BrittleDurableDifferentiationSurfaceHandle: brittleDurableDifferentiationSurface.SurfaceHandle,
+            ColdAdmissionEligibilityGateHandle: coldAdmissionEligibilityGate.GateHandle,
+            ArchiveDispositionLedgerHandle: archiveDispositionLedger.LedgerHandle,
+            ReceiptState: receiptState.Trim(),
+            CandidateCoreInvariants: candidateCoreInvariants,
+            IdentityAdjacencySignals: identityAdjacencySignals,
+            InterlockPosture: interlockPosture,
+            IdentityAdjacentSignificanceEmergent: identityAdjacentSignificanceEmergent,
+            CoreLawSanctificationDenied: true,
+            LatticeGradeInvarianceWitnessed: interlockDensityLedger.DenseInterweaveEmergent &&
+                coldAdmissionEligibilityGate.ColdApproachLawful &&
+                !brittleDurableDifferentiationSurface.FullTrustStillWithheld,
+            ReasonCode: "core-invariant-lattice-witness-bound",
             TimestampUtc: timestampUtc ?? DateTimeOffset.UtcNow);
     }
 
