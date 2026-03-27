@@ -1,3 +1,4 @@
+using Oan.Common;
 using SLI.Ingestion;
 using SLI.Lisp;
 
@@ -11,7 +12,7 @@ public sealed record CrypticFloorEvaluation(
 
 public interface ICrypticFloorEvaluator
 {
-    CrypticFloorEvaluation Evaluate(string input);
+    CrypticFloorEvaluation Evaluate(string input, GovernedSeedHostedSeedToCrypticTransitPacket seededTransitPacket);
 }
 
 public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
@@ -27,9 +28,10 @@ public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
         _lispBundleService = lispBundleService ?? throw new ArgumentNullException(nameof(lispBundleService));
     }
 
-    public CrypticFloorEvaluation Evaluate(string input)
+    public CrypticFloorEvaluation Evaluate(string input, GovernedSeedHostedSeedToCrypticTransitPacket seededTransitPacket)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(input);
+        ArgumentNullException.ThrowIfNull(seededTransitPacket);
 
         if (!_lispBundleService.HasCanonicalFloorSet())
         {
@@ -37,6 +39,16 @@ public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
                 CanMintPredicate: false,
                 OutcomeCode: "cryptic-lisp-bundle-incomplete",
                 GovernanceTrace: "cryptic-lisp-canonical-floor-set-required",
+                Packet: null);
+        }
+
+        if (!seededTransitPacket.HostedLlmAccepted ||
+            seededTransitPacket.HostedLlmState is not GovernedSeedHostedLlmEmissionState.Query and not GovernedSeedHostedLlmEmissionState.Complete)
+        {
+            return new CrypticFloorEvaluation(
+                CanMintPredicate: false,
+                OutcomeCode: "hosted-seed-transit-withheld",
+                GovernanceTrace: "prime-hosted-seed-transit-required",
                 Packet: null);
         }
 
@@ -61,7 +73,7 @@ public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
         return new CrypticFloorEvaluation(
             CanMintPredicate: true,
             OutcomeCode: "predicate-minted",
-            GovernanceTrace: "predicate-landing-surface-ready",
+            GovernanceTrace: "predicate-landing-surface-ready-via-hosted-seed-transit",
             Packet: packet);
     }
 }

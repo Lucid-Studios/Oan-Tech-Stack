@@ -14,6 +14,8 @@ internal sealed record GovernedHostedLlmListeningFrame(
 
 public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
 {
+    private readonly IGovernedHostedLlmProvider? _provider;
+
     private static readonly string[] SparseEvidenceCues =
     [
         "need more information",
@@ -66,6 +68,15 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
         "accessed the network"
     ];
 
+    public GovernedHostedLlmSeedService()
+    {
+    }
+
+    public GovernedHostedLlmSeedService(IGovernedHostedLlmProvider? provider)
+    {
+        _provider = provider;
+    }
+
     public GovernedSeedHostedLlmSeedReceipt Evaluate(
         GovernedSeedEvaluationRequest request,
         GovernedSeedMemoryContext personifiedMemoryContext)
@@ -95,18 +106,39 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             AllowedStates: protocol.AllowedStates,
             TimestampUtc: now);
 
-        var emissionState = ResolveState(request.Input, listeningFrame);
-        var accepted = emissionState is GovernedSeedHostedLlmEmissionState.Query or GovernedSeedHostedLlmEmissionState.Complete;
-        var trace = ResolveTrace(emissionState, listeningFrame);
+        var providerResponse = default(GovernedHostedLlmProviderResponse);
+        var emissionState = ResolveLocalGuardState(listeningFrame);
+        if (emissionState is null)
+        {
+            providerResponse = _provider?.TryEvaluate(request, personifiedMemoryContext, protocol);
+            emissionState = NormalizeProviderState(providerResponse?.State) ?? ResolveFallbackState(request.Input);
+        }
+
+        var resolvedEmissionState = emissionState.Value;
+        var accepted = resolvedEmissionState is GovernedSeedHostedLlmEmissionState.Query or GovernedSeedHostedLlmEmissionState.Complete;
+        var trace = ResolveTrace(resolvedEmissionState, listeningFrame, providerResponse?.Trace);
         var responsePacket = new GovernedSeedHostedLlmResponsePacket(
-            PacketHandle: CreateHandle("hosted-llm-response://", requestPacket.PacketHandle, GovernedSeedHostedLlmEmissionStateTokens.ToToken(emissionState)),
+            PacketHandle: CreateHandle("hosted-llm-response://", requestPacket.PacketHandle, GovernedSeedHostedLlmEmissionStateTokens.ToToken(resolvedEmissionState)),
             PacketProfile: "seed-governed-hosted-llm-response",
-            State: emissionState,
-            Decision: ResolveDecision(emissionState),
+            State: resolvedEmissionState,
+            Decision: ResolveDecision(resolvedEmissionState),
             Trace: trace,
-            PayloadHandle: CreateHandle("hosted-llm-payload://", request.AgentId, request.TheaterId, trace),
+            PayloadHandle: CreatePayloadHandle(request.AgentId, request.TheaterId, trace, providerResponse?.Payload),
             Accepted: accepted,
-            Terminal: emissionState is not GovernedSeedHostedLlmEmissionState.Ready and not GovernedSeedHostedLlmEmissionState.Working and not GovernedSeedHostedLlmEmissionState.Heartbeat,
+            Terminal: resolvedEmissionState is not GovernedSeedHostedLlmEmissionState.Ready and not GovernedSeedHostedLlmEmissionState.Working and not GovernedSeedHostedLlmEmissionState.Heartbeat,
+            TimestampUtc: now);
+        var seededTransitPacket = new GovernedSeedHostedSeedToCrypticTransitPacket(
+            PacketHandle: CreateHandle("hosted-seed-to-cryptic://", requestPacket.PacketHandle, responsePacket.PacketHandle),
+            PacketProfile: "prime-hosted-seed-to-cryptic-floor-request",
+            BootstrapHandle: bootstrapHandle,
+            MemoryContextHandle: personifiedMemoryContext.ContextHandle,
+            CrypticInputHandle: CreateHandle("cryptic-input://", request.AgentId, request.TheaterId, request.Input),
+            HostedLlmRequestPacketHandle: requestPacket.PacketHandle,
+            HostedLlmResponsePacketHandle: responsePacket.PacketHandle,
+            HostedLlmState: resolvedEmissionState,
+            HostedLlmAccepted: accepted,
+            AuthorityClass: request.AuthorityClass,
+            DisclosureCeiling: request.DisclosureCeiling,
             TimestampUtc: now);
 
         return new GovernedSeedHostedLlmSeedReceipt(
@@ -119,6 +151,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             GovernanceProtocol: protocol,
             RequestPacket: requestPacket,
             ResponsePacket: responsePacket,
+            SeededTransitPacket: seededTransitPacket,
             ListeningFrameActive: listeningFrame.ListeningFrameActive,
             SparseEvidenceDetected: listeningFrame.SparseEvidenceDetected,
             DisclosurePressureDetected: listeningFrame.DisclosurePressureDetected,
@@ -161,8 +194,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             UnsupportedExecutionPressureDetected: ContainsAny(normalized, UnsupportedExecutionCues));
     }
 
-    private static GovernedSeedHostedLlmEmissionState ResolveState(
-        string input,
+    private static GovernedSeedHostedLlmEmissionState? ResolveLocalGuardState(
         GovernedHostedLlmListeningFrame listeningFrame)
     {
         if (listeningFrame.DisclosurePressureDetected)
@@ -185,7 +217,13 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             return GovernedSeedHostedLlmEmissionState.Refusal;
         }
 
-        if (listeningFrame.SparseEvidenceDetected)
+        return null;
+    }
+
+    private static GovernedSeedHostedLlmEmissionState ResolveFallbackState(
+        string input)
+    {
+        if (ContainsAny(input, SparseEvidenceCues))
         {
             return GovernedSeedHostedLlmEmissionState.NeedsMoreInformation;
         }
@@ -198,10 +236,26 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
         return GovernedSeedHostedLlmEmissionState.Query;
     }
 
+    private static GovernedSeedHostedLlmEmissionState? NormalizeProviderState(
+        GovernedSeedHostedLlmEmissionState? providerState)
+    {
+        return providerState switch
+        {
+            GovernedSeedHostedLlmEmissionState.UnresolvedConflict => GovernedSeedHostedLlmEmissionState.Query,
+            _ => providerState
+        };
+    }
+
     private static string ResolveTrace(
         GovernedSeedHostedLlmEmissionState state,
-        GovernedHostedLlmListeningFrame listeningFrame)
+        GovernedHostedLlmListeningFrame listeningFrame,
+        string? providerTrace = null)
     {
+        if (!string.IsNullOrWhiteSpace(providerTrace))
+        {
+            return providerTrace.Trim();
+        }
+
         return state switch
         {
             GovernedSeedHostedLlmEmissionState.Refusal when listeningFrame.DisclosurePressureDetected => "governed-disclosure-guard",
@@ -256,6 +310,20 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
         }
 
         return false;
+    }
+
+    private static string CreatePayloadHandle(
+        string agentId,
+        string theaterId,
+        string trace,
+        string? payload)
+    {
+        return CreateHandle(
+            "hosted-llm-payload://",
+            agentId,
+            theaterId,
+            trace,
+            string.IsNullOrWhiteSpace(payload) ? "no-payload" : payload.Trim());
     }
 
     private static string CreateHandle(string prefix, params string[] parts)

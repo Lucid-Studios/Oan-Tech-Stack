@@ -24,7 +24,7 @@ public static class HeadlessRuntimeBootstrap
     {
         var parser = new SeedEvidencePacketParser();
         var lispBundleService = new GovernedCrypticLispBundleService();
-        var hostedLlmSeedService = new GovernedHostedLlmSeedService();
+        var hostedLlmSeedService = new GovernedHostedLlmSeedService(new GovernedHostedLlmLocalRuntimeProvider());
         var pointerStore = new InMemoryGovernedCrypticPointerStore();
         var telemetrySink = new InMemoryGovernedGelTelemetrySink();
         var traceService = new GovernedSeedEnvelopeTraceService(pointerStore, telemetrySink);

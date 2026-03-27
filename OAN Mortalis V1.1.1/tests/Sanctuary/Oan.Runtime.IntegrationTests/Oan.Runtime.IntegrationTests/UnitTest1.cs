@@ -124,7 +124,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.True(result.Accepted);
         Assert.Equal("predicate-minted", result.Decision);
         Assert.Equal("QUERY", result.GovernanceState);
-        Assert.Equal("predicate-landing-surface-ready", result.GovernanceTrace);
+        Assert.Equal("predicate-landing-surface-ready-via-hosted-seed-transit", result.GovernanceTrace);
 
         var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(result.Payload!);
         Assert.NotNull(payload);
@@ -140,6 +140,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.NotNull(payload.NexusTransitionRequest);
         Assert.NotNull(payload.NexusTransitionDecision);
         Assert.NotNull(payload.PrimeCrypticReceipt);
+        Assert.NotNull(payload.HostedLlmReceipt);
         Assert.NotNull(payload.StateModulationReceipt);
         Assert.Equal("cpu-only/bootstrap-resident", payload.BootstrapReceipt.BootstrapProfile);
         Assert.True(payload.BootstrapAdmissionReceipt.MembraneWakePermitted);
@@ -873,6 +874,10 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.OperationalContext.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.OperationalContext.HostedLlmResponsePacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.State, payload.OperationalContext.HostedLlmState);
+        Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmRequestPacketHandle);
+        Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmResponsePacketHandle);
+        Assert.Equal(payload.SituationalContext.MemoryContext.ContextHandle, payload.HostedLlmReceipt.SeededTransitPacket.MemoryContextHandle);
+        Assert.True(payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmAccepted);
         Assert.Equal(payload.HostedLlmReceipt.ServiceHandle, payload.StateModulationReceipt.HostedLlmServiceHandle);
         Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.StateModulationReceipt.HostedLlmReceiptHandle);
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.StateModulationReceipt.HostedLlmRequestPacketHandle);

@@ -35,7 +35,7 @@ Verified result:
 - build succeeded
 - tests succeeded
 - hygiene succeeded
-- `81` tests passed across `2` test assemblies
+- `83` tests passed across `2` test assemblies
 
 Solution shape:
 
@@ -109,7 +109,9 @@ The first live runtime vertical slice in this line now proves:
 - the active SLI floor now requires the canonical hosted Lisp bundle set to be present before predicate landing can proceed, which makes the new `SLI.Lisp` surface part of executable truth instead of passive doctrine
 - `OperationalContext` now carries explicit `PrimeToCrypticTransit` and `CrypticToPrimeTransit` contracts plus hosted request/return packets, so the C# Prime host and hosted Lisp/Cryptic medium no longer relate by implication alone and modulation can mirror both interconnect and packet handles directly
 - `AgentiCore` now consults a governed Sanctuary-hosted LLM seed receipt before cryptic floor progression, so Prime-side hosted seed refusal or needs-more-information posture can withhold progression explicitly instead of living only in the old `V1.0` host path
+- the hosted seed receipt now mints a direct seeded transit packet for `SLI.Engine`, so the cryptic floor consumes a governed Prime-hosted seed carrier instead of acting on raw input alone
 - `OperationalContext` and modulation now mirror the hosted LLM seed service, receipt, and packet handles, so the Prime-hosted seed surface is part of the inner-system branch instead of an invisible adjunct
+- `Oan.HostedLlm` now includes a localhost runtime provider seam, so the governed Prime-hosted seed service can consume the running Hosted LLM inference service over `127.0.0.1` while keeping refusal law, packet law, and receipt shaping inside `V1.1.1`
 - the materialized evaluation envelope now receives a duplex pointer handle and GEL telemetry record through `Oan.Trace.Persistence`, so accepted and refused outcomes both leave a lawful outward trace without reviving the old `Data.Cryptic` or `Telemetry.GEL` helper projects
 - SoulFrame now emits bounded projection, return-intake, and stewardship receipts, including first collapse-readiness posture without direct custody mutation
 - SoulFrame stewardship now asks `Oan.Nexus.Control` for collapse-readiness, protected-hold class, and review disposition instead of carrying that policy as a local switch block

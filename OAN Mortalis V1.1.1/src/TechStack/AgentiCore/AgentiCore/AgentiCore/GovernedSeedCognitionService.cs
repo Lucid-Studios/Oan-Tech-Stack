@@ -116,7 +116,7 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
                 ProtectedResidueEvidence: []);
         }
 
-        var floorEvaluation = _floorEvaluator.Evaluate(request.Input);
+        var floorEvaluation = _floorEvaluator.Evaluate(request.Input, hostedLlmReceipt.SeededTransitPacket);
 
         if (!floorEvaluation.CanMintPredicate)
         {

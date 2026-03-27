@@ -577,6 +577,20 @@ public sealed record GovernedSeedHostedLlmResponsePacket(
     bool Terminal,
     DateTimeOffset TimestampUtc);
 
+public sealed record GovernedSeedHostedSeedToCrypticTransitPacket(
+    string PacketHandle,
+    string PacketProfile,
+    string BootstrapHandle,
+    string MemoryContextHandle,
+    string CrypticInputHandle,
+    string HostedLlmRequestPacketHandle,
+    string HostedLlmResponsePacketHandle,
+    GovernedSeedHostedLlmEmissionState HostedLlmState,
+    bool HostedLlmAccepted,
+    ProtectedExecutionAuthorityClass AuthorityClass,
+    ProtectedExecutionDisclosureCeiling DisclosureCeiling,
+    DateTimeOffset TimestampUtc);
+
 public sealed record GovernedSeedHostedLlmSeedReceipt(
     string ReceiptHandle,
     string ServiceHandle,
@@ -587,6 +601,7 @@ public sealed record GovernedSeedHostedLlmSeedReceipt(
     GovernedSeedHostedLlmGovernanceProtocol GovernanceProtocol,
     GovernedSeedHostedLlmRequestPacket RequestPacket,
     GovernedSeedHostedLlmResponsePacket ResponsePacket,
+    GovernedSeedHostedSeedToCrypticTransitPacket SeededTransitPacket,
     bool ListeningFrameActive,
     bool SparseEvidenceDetected,
     bool DisclosurePressureDetected,

@@ -40,6 +40,8 @@ Fresh bootstrap surfaces:
 - Prime/Cryptic resident field receipts and operational context now carry the hosted Lisp bundle handle, so `V1.1.1` records Lisp as the current Cryptic symbolic medium even while full target-lane separation remains deferred
 - explicit Prime-to-Cryptic and Cryptic-to-Prime transit contracts in `OperationalContext`, plus hosted request/return packets, so the current hosted interconnect is recorded as a lawful runtime seam rather than an inferred relation between Prime receipts and the Lisp bundle
 - hosted LLM seed receipts and request/response packets now ride the `V1.1.1` vertical slice, `OperationalContext`, and modulation surface, so Prime-hosted seed work has a lawful seat in the new line instead of continuing to do active work in `V1.0`
+- the hosted LLM seed receipt now carries a seeded transit packet that feeds `SLI.Engine` directly, so Prime-hosted seed work and hosted cryptic floor work meet through an explicit carrier rather than only through raw prompt reuse
+- the hosted LLM seed service now has a localhost provider seam for the external Hosted LLM runtime, so `V1.1.1` can use the live governed inference service without hard-coding the external runtime path into tracked code
 - duplex pointer handles and GEL telemetry records now attach to the materialized evaluation envelope in `V1.1.1`, so the outward ladder carries a lawful trace seat and the old `Data.Cryptic` / `Telemetry.GEL` pair no longer need to stay active in `V1.0`
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules
