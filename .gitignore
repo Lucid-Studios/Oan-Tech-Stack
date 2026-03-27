@@ -27,6 +27,7 @@ OAN Mortalis V1.0/tools/corpus_index/
 
 # Local-only foundational corpus configuration
 OAN Mortalis V1.0/.local/
+OAN Mortalis V1.1.1/.local/
 
 # OAN runtime infrastructure (must remain outside repository history)
 /runtime/

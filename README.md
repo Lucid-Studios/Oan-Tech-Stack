@@ -117,16 +117,14 @@ SLI provides the **symbolic reasoning substrate** used by the CME stack.
 
 # 🧪 Current Build State
 
-Current repository work represents **OAN Mortalus V1.x engineering architecture**.
+The active engineering line is **OAN Mortalis V1.1.1**.
 
-Operational components now include:
+Current repository work represents a Sanctuary-native / TechStack-normalized build where:
 
-- CradleTek Host Runtime
-- Stack Manager
-- Store Registry
-- SoulFrame Authority Controls
-- SLI Symbolic Runtime
-- AgentiCore Cognition Loop
+- Sanctuary owns resident Prime/Cryptic, hosted Lisp, hosted seed, nexus, modulation, and trace persistence
+- CradleTek owns primed custody, mantle, memory, runtime, and host surfaces
+- SoulFrame owns bootstrap and membrane actualization
+- AgentiCore owns active cognition on top of personified work surfaces
 
 System safety states currently implemented:
 
@@ -137,22 +135,29 @@ System safety states currently implemented:
 
 These states allow **fail-closed execution control** within the cognition stack.
 
+`OAN Mortalis V1.0` remains in the repository as a reference-only historical line while archival handling completes.
+
 ---
 
 # 📂 Repository Structure
 
-Typical repository layout:
+Current repository layout:
 
     docs/
         architecture
         governance
         audits
 
-    src/
-        CradleTek
-        SoulFrame
-        AgentiCore
-        SLI.Engine
+    OAN Mortalis V1.1.1/
+        src/
+            Sanctuary/
+            TechStack/
+        tests/
+            Sanctuary/
+        docs/
+
+    OAN Mortalis V1.0/
+        reference-only historical line
 
     .github/
         workflows

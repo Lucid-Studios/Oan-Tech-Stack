@@ -2,15 +2,16 @@
 
 ## Scope
 
-This repository hosts the active `OAN Mortalis V1.0` engineering workspace.
+This repository hosts the active `OAN Mortalis V1.1.1` engineering workspace.
 
 Active implementation target:
 
-- `OAN Mortalis V1.0/`
+- `OAN Mortalis V1.1.1/`
 
 Reference-only material:
 
 - `Build Contracts/`
+- `OAN Mortalis V1.0/`
 - `OAN Mortalis V0.1 Archive/`
 
 ## Before You Change Anything
@@ -18,8 +19,8 @@ Reference-only material:
 Read:
 
 - `AGENTS.md`
-- `OAN Mortalis V1.0/docs/WORKSPACE_RULES.md`
-- `OAN Mortalis V1.0/docs/BUILD_READINESS.md`
+- `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
+- `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
 
 ## Local Verification
 
@@ -35,7 +36,7 @@ These wrappers now run the workspace path hygiene preflight automatically.
 Manual hygiene verification remains available when needed:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.0\tools\verify-private-corpus.ps1
+powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1
 ```
 
 ## Contribution Rules

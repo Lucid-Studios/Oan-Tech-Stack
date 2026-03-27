@@ -27,7 +27,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$activeBuildRoot = Join-Path $repoRoot "OAN Mortalis V1.0"
+$activeBuildRoot = Join-Path $repoRoot "OAN Mortalis V1.1.1"
 $solutionPath = Join-Path $activeBuildRoot "Oan.sln"
 $hygieneScriptPath = Join-Path $activeBuildRoot "tools\verify-private-corpus.ps1"
 $hopngValidationScriptPath = Join-Path $activeBuildRoot "tools\verify-hopng-toolchain.ps1"

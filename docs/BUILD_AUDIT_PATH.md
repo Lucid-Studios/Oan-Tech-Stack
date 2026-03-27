@@ -243,7 +243,7 @@ The build audit wraps:
 
 - `build.ps1`
 - `test.ps1`
-- `OAN Mortalis V1.0/tools/verify-private-corpus.ps1`
+- `OAN Mortalis V1.1.1/tools/verify-private-corpus.ps1`
 
 ## Initial Truthfulness Constraint
 
