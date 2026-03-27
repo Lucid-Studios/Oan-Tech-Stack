@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This document freezes the remaining retirement work between the old `V1.0` line and the active `V1.1.1` build.
+This document freezes the retirement judgment that moved the old `V1.0` line into archived reference-only status beneath the active `V1.1.1` build.
 
-The rule is simple:
+The governing rule is simple:
 
 - carry forward only law-bearing seams that still matter to current executable truth
 - retire old glue, duplicated ownership, and compatibility-heavy runtime surfaces
@@ -95,4 +95,10 @@ So the old `EngramGovernance` services, ledger writer, steward agent, and bootst
 
 `V1.0` is no longer the active architectural teacher.
 
-What remains is reference review, not a live dependency chain.
+Its remaining role is archived reference review, not a live dependency chain.
+
+Archive status:
+
+- `V1.0` remains in the repository for historical review
+- `V1.0` is no longer an active mutation surface
+- `V1.1.1` is the sole active build line

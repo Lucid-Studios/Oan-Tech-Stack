@@ -164,4 +164,6 @@ This line is promotable only when all of the following are true:
 
 The executable retirement queue for `V1.0` is now closed in code.
 
-What remains is reference-only review and archival handling, not active dependency or missing runtime law.
+`V1.0` is now archived in the repository as a reference-only historical line.
+
+It is no longer part of the active engineering or mutation surface, and no current `V1.1.1` runtime law depends on it.

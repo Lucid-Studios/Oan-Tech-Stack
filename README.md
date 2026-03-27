@@ -135,7 +135,7 @@ System safety states currently implemented:
 
 These states allow **fail-closed execution control** within the cognition stack.
 
-`OAN Mortalis V1.0` remains in the repository as a reference-only historical line while archival handling completes.
+`OAN Mortalis V1.0` remains in the repository as an archived, reference-only historical line.
 
 ---
 
