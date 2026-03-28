@@ -1,5 +1,7 @@
 using Oan.Runtime.Headless;
+using Oan.Common;
 using Oan.Trace.Persistence;
+using System.Text.Json;
 
 namespace Oan.Runtime.IntegrationTests;
 
@@ -34,6 +36,16 @@ public sealed class TracePersistenceIntegrationTests
         Assert.Equal(envelope.GovernanceState, record.GovernanceState);
         Assert.Equal(envelope.OutboundLaneContext.ContextHandle, record.OutboundLaneHandle);
         Assert.Contains("query", record.RuntimeState, StringComparison.Ordinal);
+        var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(envelope.Payload!);
+        Assert.NotNull(payload);
+        Assert.Equal(payload!.SanctuaryIngressReceipt!.ReceiptHandle, record.SanctuaryIngressReceiptHandle);
+        Assert.True(record.ObsidianWallApplied);
+        Assert.Equal(GovernedSeedIngressAccessClass.PromptInput, record.IngressAccessClass);
+        Assert.Equal(payload.SituationalContext!.LowMindSfRoute.PacketHandle, record.LowMindSfRouteHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, record.LowMindSfRouteKind);
+        Assert.Equal(payload.HighMindContext!.ContextHandle, record.HighMindContextHandle);
+        Assert.Equal(payload.HighMindContext.UptakeKind, record.HighMindUptakeKind);
+        Assert.Equal(payload.HostedLlmReceipt!.ResponsePacket.State, record.HostedLlmState);
     }
 
     [Fact]
@@ -62,5 +74,15 @@ public sealed class TracePersistenceIntegrationTests
         Assert.NotEmpty(record.PathHandle);
         Assert.False(envelope.Accepted ?? true);
         Assert.Contains((envelope.GovernanceState ?? string.Empty).ToLowerInvariant(), record.RuntimeState, StringComparison.Ordinal);
+        var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(envelope.Payload!);
+        Assert.NotNull(payload);
+        Assert.Equal(payload!.SanctuaryIngressReceipt!.ReceiptHandle, record.SanctuaryIngressReceiptHandle);
+        Assert.True(record.ObsidianWallApplied);
+        Assert.Equal(payload.OperationalContext!.IngressAccessClass, record.IngressAccessClass);
+        Assert.Equal(payload.OperationalContext.LowMindSfRouteHandle, record.LowMindSfRouteHandle);
+        Assert.Equal(payload.OperationalContext.LowMindSfRouteKind, record.LowMindSfRouteKind);
+        Assert.Equal(payload.OperationalContext.HighMindContextHandle, record.HighMindContextHandle);
+        Assert.Equal(payload.OperationalContext.HighMindUptakeKind, record.HighMindUptakeKind);
+        Assert.Equal(payload.OperationalContext.HostedLlmState, record.HostedLlmState);
     }
 }

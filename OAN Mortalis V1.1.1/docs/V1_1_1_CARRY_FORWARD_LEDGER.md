@@ -50,6 +50,7 @@ Fresh bootstrap surfaces:
 - a first explicit `HighMind` uptake service rebuilt fresh in `AgentiCore`, so EC uptake staging now stands as its own named post-SoulFrame seam rather than being diffused across hosted-seed and predicate-mint flow
 - the `HighMind` context now mirrors SoulFrame memory, `LowMind.SF` ingress, and hosted-seed receipt/state into `OperationalContext` and modulation, so `V1.1.1` can read higher-order EC uptake posture directly from the living stack
 - duplex pointer handles and GEL telemetry records now attach to the materialized evaluation envelope in `V1.1.1`, so the outward ladder carries a lawful trace seat and the old `Data.Cryptic` / `Telemetry.GEL` pair no longer need to stay active in `V1.0`
+- the GEL telemetry record now also carries Sanctuary ingress handle, Obsidian Wall state, ingress access class, LowMind route, HighMind uptake, and hosted-seed state, so later documentation and certification surfaces can audit constitutional origin without unpacking the full vertical slice
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules
 

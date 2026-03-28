@@ -19,7 +19,15 @@ public sealed record GovernedGelTelemetryRecord(
     string GovernanceState,
     string PathHandle,
     string? OutboundLaneHandle,
-    string DuplexPointerHandle);
+    string DuplexPointerHandle,
+    string? SanctuaryIngressReceiptHandle,
+    bool ObsidianWallApplied,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    string? LowMindSfRouteHandle,
+    GovernedSeedLowMindSfRouteKind? LowMindSfRouteKind,
+    string? HighMindContextHandle,
+    GovernedSeedHighMindUptakeKind? HighMindUptakeKind,
+    GovernedSeedHostedLlmEmissionState? HostedLlmState);
 
 public interface IGovernedCrypticPointerStore
 {
@@ -130,7 +138,16 @@ public sealed class GovernedSeedEnvelopeTraceService : IGovernedSeedEnvelopeTrac
             result.Decision,
             envelope.GovernanceState ?? string.Empty,
             result.VerticalSlice.PathReceipt.PathHandle,
-            outboundLaneHandle ?? "no-outbound-lane");
+            outboundLaneHandle ?? "no-outbound-lane",
+            result.VerticalSlice.SanctuaryIngressReceipt?.ReceiptHandle ?? "no-sanctuary-ingress",
+            result.VerticalSlice.OperationalContext?.IngressAccessClass.ToString() ??
+                result.VerticalSlice.SanctuaryIngressReceipt?.IngressAccessClass.ToString() ??
+                GovernedSeedIngressAccessClass.PromptInput.ToString(),
+            result.VerticalSlice.OperationalContext?.LowMindSfRouteKind.ToString() ?? "no-lowmind-route",
+            result.VerticalSlice.OperationalContext?.HighMindUptakeKind?.ToString() ?? "no-highmind-context",
+            result.VerticalSlice.OperationalContext?.HostedLlmState?.ToString() ?? "no-hosted-llm-state");
+        var sanctuaryIngressReceipt = result.VerticalSlice.SanctuaryIngressReceipt;
+        var operationalContext = result.VerticalSlice.OperationalContext;
         var telemetryRecord = new GovernedGelTelemetryRecord(
             RecordHandle: $"telemetry://{ComputeHash($"{pointerId}|record")}",
             EventHash: ComputeHash(telemetrySeed),
@@ -140,7 +157,17 @@ public sealed class GovernedSeedEnvelopeTraceService : IGovernedSeedEnvelopeTrac
             GovernanceState: envelope.GovernanceState ?? GovernedSeedEvaluationStateTokens.ToToken(result.GovernanceState),
             PathHandle: result.VerticalSlice.PathReceipt.PathHandle,
             OutboundLaneHandle: outboundLaneHandle,
-            DuplexPointerHandle: pointerId);
+            DuplexPointerHandle: pointerId,
+            SanctuaryIngressReceiptHandle: sanctuaryIngressReceipt?.ReceiptHandle,
+            ObsidianWallApplied: sanctuaryIngressReceipt?.ObsidianWallApplied ?? false,
+            IngressAccessClass: operationalContext?.IngressAccessClass ??
+                sanctuaryIngressReceipt?.IngressAccessClass ??
+                GovernedSeedIngressAccessClass.PromptInput,
+            LowMindSfRouteHandle: operationalContext?.LowMindSfRouteHandle,
+            LowMindSfRouteKind: operationalContext?.LowMindSfRouteKind,
+            HighMindContextHandle: operationalContext?.HighMindContextHandle,
+            HighMindUptakeKind: operationalContext?.HighMindUptakeKind,
+            HostedLlmState: operationalContext?.HostedLlmState);
 
         await _telemetrySink.AppendAsync(telemetryRecord, cancellationToken).ConfigureAwait(false);
 
