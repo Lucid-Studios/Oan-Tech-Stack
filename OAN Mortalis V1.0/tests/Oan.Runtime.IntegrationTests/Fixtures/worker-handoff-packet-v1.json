@@ -32,7 +32,11 @@
     "BrokenWindow",
     "UnknownNotFailure",
     "OfficeNonOverlap",
-    "PromptInjection"
+    "PromptInjection",
+    "PredatorySharedDomainRisk",
+    "CoerciveBondingPosture",
+    "ContinuityInstability",
+    "IdentityOvercollapseRisk"
   ],
   "prohibitedActions": [
     "public-disclosure",
@@ -66,5 +70,41 @@
   "residueDisposition": "NeedsClassification",
   "evidenceSufficiencyState": "Sufficient",
   "maturityPosture": "DoctrineBacked",
-  "timestampUtc": "2026-03-17T12:00:00+00:00"
+  "timestampUtc": "2026-03-17T12:00:00+00:00",
+  "bridgeReview": {
+    "bridgeStage": "worker-packet-fixture",
+    "sourceTheater": "prime",
+    "targetTheater": "prime",
+    "bridgeWitnessHandle": "agenticore-return://candidate/test",
+    "witnessPresent": true,
+    "outcomeKind": "Ok",
+    "thresholdClass": "WithinBand",
+    "refusalClass": "None",
+    "reasonCode": "sli-bridge-within-band",
+    "preBondSafeguard": null,
+    "operatorFormation": null
+  },
+  "runtimeUseCeiling": {
+    "candidateOnly": true,
+    "persistenceAuthorityGranted": false,
+    "deploymentAuthorityGranted": false,
+    "haltAuthorityGranted": false,
+    "reasonCode": "sli-runtime-candidate-only"
+  },
+  "jurisdictionEnvelope": {
+    "envelopeHandle": "jurisdiction-envelope://actualized/fad339a123c75784",
+    "surfaceClass": "Actualized",
+    "bootClass": "CorporateGoverned",
+    "sourceGovernanceLayerHandle": "first-boot-governance://corporategoverned/triadicactive",
+    "sourceFormationHandle": null,
+    "witnessOnly": true,
+    "bondRealizationClaimed": false,
+    "auditDepth": "Standard",
+    "oversightRequirement": "StewardReview",
+    "retentionClass": "GovernanceEventOnly",
+    "revealModeCeiling": "StructuralValidation",
+    "subordinateCmeAuthorizationAllowed": false,
+    "humanReviewRequired": true,
+    "reasonCode": "jurisdiction-actualized-first-boot-formed"
+  }
 }

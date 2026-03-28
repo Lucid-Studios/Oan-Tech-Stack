@@ -115,6 +115,7 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         context.WorkingMemory["ingestion_candidate_count"] = ingestionResult.MatchResult.EngramCandidates.Count.ToString(CultureInfo.InvariantCulture);
         context.WorkingMemory["ingestion_trace_seed"] = ingestionResult.SliExpression.TraceSeed;
         context.WorkingMemory["ingestion_sheaf_domain"] = ingestionResult.SheafDomain;
+        RecordIngestionDiagnosticSummary(context.WorkingMemory, ingestionResult);
 
         var baseCognitionContext = new CognitionContext
         {
@@ -146,16 +147,12 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 new SoulFrameInferenceRequest
                 {
                     Task = "classify",
-                    Context = SoulFrameGovernedPromptContextComposer.Compose(
-                        "classify",
-                        hostedRequestContext,
-                        hostedConstraints,
-                        runtimeInput),
+                    Context = hostedRequestContext,
                     OpalConstraints = hostedConstraints,
                     SoulFrameId = context.SoulFrameId,
                     ContextId = context.ContextId,
                     GovernanceProtocol = SoulFrameGovernedEmissionProtocol.CreateSeedRequired(),
-                    CompassAdvisory = BuildCompassAdvisoryRequest(hostedConstraints, runtimeInput)
+                    CompassAdvisory = SoulFrameCompassAdvisoryComposer.CreateSeedRequired(hostedConstraints, runtimeInput)
                 },
                 cancellationToken)
             .ConfigureAwait(false);
@@ -189,8 +186,20 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             : string.Join(",", selfSensitiveResolution.Claims.Select(claim => claim.ValidationPosture.ToString()));
         EmitTelemetry("engram-resolve", context.ContextId, context.CMEId);
 
+        var cognitionContext = new CognitionContext
+        {
+            CMEId = baseCognitionContext.CMEId,
+            SoulFrameId = baseCognitionContext.SoulFrameId,
+            ContextId = baseCognitionContext.ContextId,
+            TaskObjective = baseCognitionContext.TaskObjective,
+            RelevantEngrams = baseCognitionContext.RelevantEngrams,
+            SymbolicProgram = baseCognitionContext.SymbolicProgram,
+            SelfStateHint = BuildSelfStateHint(selfSensitiveResolution, context.ActiveConcepts),
+            CleaverHint = BuildCleaverHint(cleaverResult)
+        };
+
         var cognitionRequest = _contextAssembler.BuildRequest(
-            baseCognitionContext,
+            cognitionContext,
             resolvedEngrams.Summaries,
             BuildCognitionPrompt(context, cleaverResult, sheafPlan, ingestionResult));
 
@@ -209,12 +218,48 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             selfClaims: selfSensitiveResolution.Claims);
         context.SelfGelWorkingPool = selfGelWorkingPool;
         context.WorkingMemory["selfgel_validation_surface_handle"] = selfGelWorkingPool.ValidationSurface.SelfGelHandle;
+        context.WorkingMemory["zed_theta_candidate_handle"] = cognitionResult.ZedThetaCandidate.CandidateHandle;
+        context.WorkingMemory["zed_theta_packet_class"] = cognitionResult.ZedThetaCandidate.PacketDirective.PacketClass.ToString();
+        context.WorkingMemory["zed_theta_engram_operation"] = cognitionResult.ZedThetaCandidate.PacketDirective.EngramOperation.ToString();
+        context.WorkingMemory["zed_theta_update_locus"] = cognitionResult.ZedThetaCandidate.PacketDirective.UpdateLocus.ToString();
+        context.WorkingMemory["zed_theta_validity_reason"] = cognitionResult.ZedThetaCandidate.Validity.ReasonCode;
+        if (cognitionResult.ZedThetaCandidate.BridgeReview is not null)
+        {
+            context.WorkingMemory["zed_theta_bridge_stage"] = cognitionResult.ZedThetaCandidate.BridgeReview.BridgeStage;
+            context.WorkingMemory["zed_theta_bridge_outcome"] = cognitionResult.ZedThetaCandidate.BridgeReview.OutcomeKind.ToString();
+            context.WorkingMemory["zed_theta_bridge_threshold"] = cognitionResult.ZedThetaCandidate.BridgeReview.ThresholdClass.ToString();
+            context.WorkingMemory["zed_theta_bridge_refusal"] = cognitionResult.ZedThetaCandidate.BridgeReview.RefusalClass.ToString();
+            context.WorkingMemory["zed_theta_bridge_reason"] = cognitionResult.ZedThetaCandidate.BridgeReview.ReasonCode;
+            context.WorkingMemory["zed_theta_bridge_witness_handle"] = cognitionResult.ZedThetaCandidate.BridgeReview.BridgeWitnessHandle;
+        }
+
+        if (cognitionResult.ZedThetaCandidate.RuntimeUseCeiling is not null)
+        {
+            context.WorkingMemory["zed_theta_runtime_candidate_only"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.CandidateOnly ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_persistence_authority"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.PersistenceAuthorityGranted ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_deployment_authority"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.DeploymentAuthorityGranted ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_halt_authority"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.HaltAuthorityGranted ? "true" : "false";
+            context.WorkingMemory["zed_theta_runtime_reason"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling.ReasonCode;
+        }
+
+        if (cognitionResult.ZedThetaCandidate.JurisdictionEnvelope is not null)
+        {
+            context.WorkingMemory["zed_theta_jurisdiction_surface"] = cognitionResult.ZedThetaCandidate.JurisdictionEnvelope.SurfaceClass.ToString();
+            context.WorkingMemory["zed_theta_jurisdiction_reason"] = cognitionResult.ZedThetaCandidate.JurisdictionEnvelope.ReasonCode;
+            context.WorkingMemory["zed_theta_jurisdiction_witness_only"] = cognitionResult.ZedThetaCandidate.JurisdictionEnvelope.WitnessOnly ? "true" : "false";
+        }
+
+        var theaterAuthorization = SoulFrameTheaterAuthorizationProjector.DescribeCandidate(
+            cognitionResult.ZedThetaCandidate,
+            sourceTheater: "prime",
+            requestedTheater: "prime");
+        context.WorkingMemory["theater_authorization_state"] = theaterAuthorization.AuthorizationState.ToString();
+        context.WorkingMemory["theater_authorization_reason"] = theaterAuthorization.ReasonCode;
 
         var compassObservation = BuildCompassObservation(
             objective: runtimeInput,
+            cognitionResult: cognitionResult,
             hostedSemanticResponse: hostedSemanticResponse,
-            hostedConstraints: hostedConstraints,
-            cleaverResult: cleaverResult,
             selfGelWorkingPool: selfGelWorkingPool);
         context.WorkingMemory["compass_active_basin"] = compassObservation.ActiveBasin.ToString();
         context.WorkingMemory["compass_competing_basin"] = compassObservation.CompetingBasin.ToString();
@@ -303,6 +348,10 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 ["decision_entropy"] = cognitionResult.CompassState.DecisionEntropy,
                 ["timestamp"] = cognitionResult.CompassState.Timestamp
             },
+            ["zed_theta_candidate"] = cognitionResult.ZedThetaCandidate,
+            ["bridge_review"] = cognitionResult.ZedThetaCandidate.BridgeReview,
+            ["runtime_use_ceiling"] = cognitionResult.ZedThetaCandidate.RuntimeUseCeiling,
+            ["theater_authorization"] = theaterAuthorization,
             ["compass_observation"] = new Dictionary<string, object?>
             {
                 ["observation_handle"] = compassObservation.ObservationHandle,
@@ -383,6 +432,8 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             SymbolicTrace = symbolicTrace,
             EngramCandidate = engramCandidate,
             TransientResidue = transientResidue,
+            ZedThetaCandidate = cognitionResult.ZedThetaCandidate,
+            TheaterAuthorization = theaterAuthorization,
             CompassObservation = compassObservation
         };
     }
@@ -472,7 +523,10 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             ActionableContent: actionableContent,
             ReturnIntakeHandle: returnIntakeHandle,
             ReturnIntakeEnvelopeId: returnIntakeEnvelopeId,
-            CompassObservation: result.CompassObservation);
+            CompassObservation: result.CompassObservation,
+            BridgeReview: result.ZedThetaCandidate.BridgeReview,
+            RuntimeUseCeiling: result.ZedThetaCandidate.RuntimeUseCeiling,
+            JurisdictionEnvelope: result.ZedThetaCandidate.JurisdictionEnvelope);
     }
 
     private static IReadOnlyDictionary<string, string> BuildCommitMetadata(AgentiResult result)
@@ -532,6 +586,34 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 CopyString(hosted, "decision", metadata, "hosted_semantic_decision");
                 CopyDouble(hosted, "confidence", metadata, "hosted_semantic_confidence");
                 CopyString(hosted, "accepted", metadata, "hosted_semantic_accepted");
+            }
+
+            if (root.TryGetProperty("zed_theta_candidate", out var zedTheta))
+            {
+                CopyString(zedTheta, "CandidateHandle", metadata, "zed_theta_candidate_handle");
+                CopyString(zedTheta, "PrimeState", metadata, "zed_theta_prime_state");
+                CopyString(zedTheta, "ThetaState", metadata, "zed_theta_theta_state");
+                CopyString(zedTheta, "GammaState", metadata, "zed_theta_gamma_state");
+
+                if (zedTheta.TryGetProperty("PacketDirective", out var packetDirective))
+                {
+                    CopyString(packetDirective, "ThinkingTier", metadata, "zed_theta_thinking_tier");
+                    CopyString(packetDirective, "PacketClass", metadata, "zed_theta_packet_class");
+                    CopyString(packetDirective, "EngramOperation", metadata, "zed_theta_engram_operation");
+                    CopyString(packetDirective, "UpdateLocus", metadata, "zed_theta_update_locus");
+                    CopyString(packetDirective, "AuthorityClass", metadata, "zed_theta_authority_class");
+                }
+
+                if (zedTheta.TryGetProperty("Validity", out var validity))
+                {
+                    CopyString(validity, "ReasonCode", metadata, "zed_theta_validity_reason");
+                }
+            }
+
+            if (root.TryGetProperty("theater_authorization", out var theaterAuthorization))
+            {
+                CopyString(theaterAuthorization, "AuthorizationState", metadata, "theater_authorization_state");
+                CopyString(theaterAuthorization, "ReasonCode", metadata, "theater_authorization_reason");
             }
 
             if (root.TryGetProperty("confidence", out var confidence) && confidence.TryGetDouble(out var confidenceValue))
@@ -633,6 +715,29 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
             $"SLIExpr:{string.Join(" || ", ingestionResult.SliExpression.ProgramExpressions.Take(2))}";
     }
 
+    private static void RecordIngestionDiagnosticSummary(
+        IDictionary<string, string> workingMemory,
+        SliIngestionResult ingestionResult)
+    {
+        ArgumentNullException.ThrowIfNull(workingMemory);
+        ArgumentNullException.ThrowIfNull(ingestionResult);
+
+        workingMemory["sli_fragment_primary_root"] = ingestionResult.CanonicalSummary.PrimaryRootKey;
+        workingMemory["sli_fragment_draft_count"] = ingestionResult.CanonicalSummary.DraftCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_primary_branch_count"] = ingestionResult.CanonicalSummary.PrimaryBranchCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_primary_closure_grade"] = ingestionResult.CanonicalSummary.PrimaryClosureGrade.ToString();
+        workingMemory["sli_fragment_diag_authority"] = ingestionResult.DiagnosticSummary.AuthorityClass.ToString();
+        workingMemory["sli_fragment_diag_admission_authority"] = ingestionResult.DiagnosticSummary.AdmissionAuthorityGranted ? "true" : "false";
+        workingMemory["sli_fragment_diag_baseline_review_count"] = ingestionResult.DiagnosticSummary.Baseline.ReviewCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_baseline_sfi"] = ingestionResult.DiagnosticSummary.Baseline.Metrics.Sfi.ToString("F6", CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_variant_count"] = ingestionResult.DiagnosticSummary.Stress.VariantCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_degraded_variant_count"] = ingestionResult.DiagnosticSummary.Stress.DegradedVariantCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_worst_review_count"] = ingestionResult.DiagnosticSummary.Stress.WorstReviewCount.ToString(CultureInfo.InvariantCulture);
+        workingMemory["sli_fragment_diag_stress_degraded_variants"] = ingestionResult.DiagnosticSummary.Stress.DegradedVariantKeys.Count == 0
+            ? "none"
+            : string.Join(",", ingestionResult.DiagnosticSummary.Stress.DegradedVariantKeys);
+    }
+
     private static SoulFrameInferenceConstraints BuildOpalConstraints(string domain, string objectiveHint)
     {
         return new SoulFrameInferenceConstraints
@@ -646,40 +751,58 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         };
     }
 
-    private static SoulFrameCompassAdvisoryRequest BuildCompassAdvisoryRequest(
-        SoulFrameInferenceConstraints hostedConstraints,
-        string objective)
+    private static CognitionSelfStateHint BuildSelfStateHint(
+        EngramSelfResolutionResult selfSensitiveResolution,
+        IReadOnlyList<string> activeConcepts)
     {
-        ArgumentNullException.ThrowIfNull(hostedConstraints);
-        ArgumentException.ThrowIfNullOrWhiteSpace(objective);
+        ArgumentNullException.ThrowIfNull(selfSensitiveResolution);
+        ArgumentNullException.ThrowIfNull(activeConcepts);
 
-        var activeBasin = ResolveBasin(hostedConstraints.Domain, objective);
-        return new SoulFrameCompassAdvisoryRequest
+        return new CognitionSelfStateHint
         {
-            Version = "compass-seed-advisory-v1",
-            RequireStructuredAdvisory = true,
-            TargetActiveBasin = activeBasin,
-            ExcludedCompetingBasin = ResolveCompetingBasin(activeBasin)
+            ClaimCount = selfSensitiveResolution.Claims.Count,
+            HasDeferredOrContradictedClaim = selfSensitiveResolution.Claims.Any(
+                claim => claim.ValidationPosture is EngramSelfValidationPosture.Deferred or EngramSelfValidationPosture.Contradicted),
+            HasHotClaim = selfSensitiveResolution.Claims.Any(
+                claim => claim.ValidationPosture == EngramSelfValidationPosture.HotClaim),
+            ValidationConceptCount = activeConcepts
+                .Where(concept =>
+                    concept.Contains("self", StringComparison.OrdinalIgnoreCase) ||
+                    concept.Contains("identity", StringComparison.OrdinalIgnoreCase) ||
+                    concept.Contains("continuity", StringComparison.OrdinalIgnoreCase))
+                .Append("identity-continuity")
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count()
+        };
+    }
+
+    private static CognitionCleaverHint BuildCleaverHint(OntologicalCleaverResult cleaverResult)
+    {
+        ArgumentNullException.ThrowIfNull(cleaverResult);
+
+        return new CognitionCleaverHint
+        {
+            KnownRatio = cleaverResult.Metrics.KnownRatio,
+            UnknownRatio = cleaverResult.Metrics.UnknownRatio
         };
     }
 
     private static CompassObservationSurface BuildCompassObservation(
         string objective,
+        CognitionResult cognitionResult,
         SoulFrameInferenceResponse hostedSemanticResponse,
-        SoulFrameInferenceConstraints hostedConstraints,
-        OntologicalCleaverResult cleaverResult,
         AgentiSelfGelWorkingPool selfGelWorkingPool)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(objective);
+        ArgumentNullException.ThrowIfNull(cognitionResult);
         ArgumentNullException.ThrowIfNull(hostedSemanticResponse);
-        ArgumentNullException.ThrowIfNull(hostedConstraints);
-        ArgumentNullException.ThrowIfNull(cleaverResult);
         ArgumentNullException.ThrowIfNull(selfGelWorkingPool);
 
-        var activeBasin = ResolveBasin(hostedConstraints.Domain, objective);
-        var competingBasin = ResolveCompetingBasin(activeBasin);
-        var selfTouchClass = ResolveSelfTouchClass(selfGelWorkingPool);
-        var anchorState = ResolveAnchorState(activeBasin, competingBasin, hostedSemanticResponse);
+        var candidateReceipt = cognitionResult.ZedThetaCandidate;
+        var activeBasin = candidateReceipt.ActiveBasin;
+        var competingBasin = candidateReceipt.CompetingBasin;
+        var selfTouchClass = candidateReceipt.SelfTouchClass;
+        var anchorState = candidateReceipt.AnchorState;
         var advisory = BuildSeedAdvisoryObservation(
             hostedSemanticResponse,
             activeBasin,
@@ -696,7 +819,7 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
                 objective),
             ActiveBasin: activeBasin,
             CompetingBasin: competingBasin,
-            OeCoePosture: ResolveOeCoePosture(cleaverResult, hostedSemanticResponse, advisory),
+            OeCoePosture: candidateReceipt.OeCoePosture,
             SelfTouchClass: selfTouchClass,
             AnchorState: anchorState,
             Provenance: provenance,
@@ -765,7 +888,7 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         }
 
         return new CompassSeedAdvisoryObservation(
-            Accepted: hostedSemanticResponse.Accepted,
+            Accepted: disposition == CompassSeedAdvisoryDisposition.Accepted,
             Decision: hostedSemanticResponse.Decision,
             Trace: hostedSemanticResponse.Governance.Trace,
             Confidence: hostedSemanticResponse.Confidence,
@@ -785,133 +908,6 @@ public sealed class AgentiCore : IGovernanceCycleCognitionService
         CompassSeedAdvisoryDisposition.Accepted => CompassObservationProvenance.Braided,
         CompassSeedAdvisoryDisposition.Deferred or CompassSeedAdvisoryDisposition.Rejected => CompassObservationProvenance.SeedAssisted,
         _ => CompassObservationProvenance.LispNative
-    };
-
-    private static CompassDoctrineBasin ResolveBasin(string domain, string objective)
-    {
-        var normalized = $"{domain} {objective}".ToLowerInvariant();
-
-        if (normalized.Contains("bounded-locality continuity", StringComparison.Ordinal) ||
-            normalized.Contains("bounded locality continuity", StringComparison.Ordinal))
-        {
-            return CompassDoctrineBasin.BoundedLocalityContinuity;
-        }
-
-        if (normalized.Contains("fluid continuity law", StringComparison.Ordinal) ||
-            normalized.Contains("fluid continuity", StringComparison.Ordinal))
-        {
-            return CompassDoctrineBasin.FluidContinuityLaw;
-        }
-
-        if (normalized.Contains("identity continuity", StringComparison.Ordinal) ||
-            normalized.Contains("identity-continuity", StringComparison.Ordinal))
-        {
-            return CompassDoctrineBasin.IdentityContinuity;
-        }
-
-        if (normalized.Contains("continuity", StringComparison.Ordinal))
-        {
-            return CompassDoctrineBasin.GeneralContinuityDiscourse;
-        }
-
-        return CompassDoctrineBasin.Unknown;
-    }
-
-    private static CompassDoctrineBasin ResolveCompetingBasin(CompassDoctrineBasin activeBasin) => activeBasin switch
-    {
-        CompassDoctrineBasin.BoundedLocalityContinuity => CompassDoctrineBasin.FluidContinuityLaw,
-        CompassDoctrineBasin.FluidContinuityLaw => CompassDoctrineBasin.BoundedLocalityContinuity,
-        _ => CompassDoctrineBasin.Unknown
-    };
-
-    private static CompassOeCoePosture ResolveOeCoePosture(
-        OntologicalCleaverResult cleaverResult,
-        SoulFrameInferenceResponse hostedSemanticResponse,
-        CompassSeedAdvisoryObservation advisory)
-    {
-        if (!hostedSemanticResponse.Accepted || advisory.Disposition != CompassSeedAdvisoryDisposition.Accepted)
-        {
-            return CompassOeCoePosture.Unresolved;
-        }
-
-        if (cleaverResult.Metrics.KnownRatio >= 0.66 && cleaverResult.Metrics.UnknownRatio <= 0.34)
-        {
-            return CompassOeCoePosture.OeDominant;
-        }
-
-        if (cleaverResult.Metrics.UnknownRatio >= 0.66)
-        {
-            return CompassOeCoePosture.CoeDominant;
-        }
-
-        return CompassOeCoePosture.ShuntedBalanced;
-    }
-
-    private static CompassSelfTouchClass ResolveSelfTouchClass(AgentiSelfGelWorkingPool selfGelWorkingPool)
-    {
-        if (selfGelWorkingPool.Claims.Any(
-                claim => claim.Posture is AgentiSelfGelClaimPosture.Contradicted or AgentiSelfGelClaimPosture.Deferred))
-        {
-            return CompassSelfTouchClass.BoundaryContact;
-        }
-
-        if (selfGelWorkingPool.Claims.Count > 0)
-        {
-            return CompassSelfTouchClass.HotClaimTouch;
-        }
-
-        if (selfGelWorkingPool.ValidationSurface.ValidatedConcepts.Count > 0)
-        {
-            return CompassSelfTouchClass.ValidationTouch;
-        }
-
-        return CompassSelfTouchClass.NoTouch;
-    }
-
-    private static CompassAnchorState ResolveAnchorState(
-        CompassDoctrineBasin activeBasin,
-        CompassDoctrineBasin competingBasin,
-        SoulFrameInferenceResponse hostedSemanticResponse)
-    {
-        if (!hostedSemanticResponse.Accepted)
-        {
-            return CompassAnchorState.Weakened;
-        }
-
-        var advisoryText = string.Join(
-            " ",
-            new[]
-            {
-                hostedSemanticResponse.Decision,
-                hostedSemanticResponse.Payload,
-                hostedSemanticResponse.Governance.Content,
-                hostedSemanticResponse.Governance.Trace
-            }.Where(value => !string.IsNullOrWhiteSpace(value)))
-            .ToLowerInvariant();
-
-        var activeSeen = BasinMarkers(activeBasin).Any(marker => advisoryText.Contains(marker, StringComparison.Ordinal));
-        var competingSeen = BasinMarkers(competingBasin).Any(marker => advisoryText.Contains(marker, StringComparison.Ordinal));
-
-        if (activeSeen && !competingSeen)
-        {
-            return CompassAnchorState.Held;
-        }
-
-        if (competingSeen && !activeSeen)
-        {
-            return CompassAnchorState.Lost;
-        }
-
-        return CompassAnchorState.Weakened;
-    }
-
-    private static IReadOnlyList<string> BasinMarkers(CompassDoctrineBasin basin) => basin switch
-    {
-        CompassDoctrineBasin.BoundedLocalityContinuity => ["bounded-locality continuity", "bounded locality continuity", "locality witness"],
-        CompassDoctrineBasin.FluidContinuityLaw => ["fluid continuity law", "fluid continuity"],
-        CompassDoctrineBasin.IdentityContinuity => ["identity continuity", "identity-continuity"],
-        CompassDoctrineBasin.GeneralContinuityDiscourse => ["continuity discourse", "continuity"],
-        _ => Array.Empty<string>()
     };
 
     private void EmitTelemetry(string stage, Guid contextId, string cmeId)

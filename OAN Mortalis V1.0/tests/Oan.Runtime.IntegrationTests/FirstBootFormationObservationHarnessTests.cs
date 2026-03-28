@@ -113,6 +113,41 @@ public sealed class FirstBootFormationObservationHarnessTests
         });
     }
 
+    [Fact]
+    public async Task ObserveWithGovernanceLayer_ProjectsRoleBoundEces()
+    {
+        var harness = CreateHarness();
+
+        var result = await harness.ObserveWithGovernanceLayerAsync(
+            BootClass.CorporateGoverned,
+            ProtectedIntakeKind.CorporateProtectedIntake,
+            PrimeRevealMode.StructuralValidation);
+
+        Assert.Equal(6, result.ObservationBatch.Observations.Count);
+        Assert.Equal(BootClass.CorporateGoverned, result.BootClassificationResult.BootClass);
+        Assert.Equal(FirstBootGovernanceLayerState.RoleBoundEceReady, result.ProjectedGovernanceLayer.State);
+        Assert.True(result.ProjectedGovernanceLayer.WitnessOnly);
+        Assert.True(result.ProjectedGovernanceLayer.RoleBoundEcesReady);
+        Assert.False(result.ProjectedGovernanceLayer.SubordinateCmeAuthorizationAllowed);
+        Assert.Collection(
+            result.ProjectedGovernanceLayer.RoleBoundEces,
+            ece =>
+            {
+                Assert.Equal(InternalGoverningCmeOffice.Steward, ece.Office);
+                Assert.Equal(RoleBoundEceState.RoleBoundTestingReady, ece.State);
+            },
+            ece =>
+            {
+                Assert.Equal(InternalGoverningCmeOffice.Father, ece.Office);
+                Assert.Equal(RoleBoundEceState.RoleBoundTestingReady, ece.State);
+            },
+            ece =>
+            {
+                Assert.Equal(InternalGoverningCmeOffice.Mother, ece.Office);
+                Assert.Equal(RoleBoundEceState.RoleBoundTestingReady, ece.State);
+            });
+    }
+
     private static FirstBootFormationObservationHarness CreateHarness(
         IAgentiFormationObserver? observer = null)
     {

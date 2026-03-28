@@ -12,7 +12,7 @@ public sealed class SliGovernedTargetTelemetryIntegrationTests
     public async Task CradleTekBridge_EmitsSuccessTelemetryForHigherOrderLocalityTargetExecution()
     {
         var telemetrySink = new CapturingTelemetrySink();
-        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink);
+        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink, egressRouter: new TestPermissiveEgressRouter());
 
         await bridge.WitnessHigherOrderLocalityTargetExecutionAsync(
             [
@@ -49,8 +49,8 @@ public sealed class SliGovernedTargetTelemetryIntegrationTests
     {
         var telemetrySink = new CapturingTelemetrySink();
         var journalPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.target-witness.ndjson");
-        var journal = new NdjsonGovernanceReceiptJournal(journalPath);
-        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink, journal);
+        var journal = new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter());
+        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink, journal, new TestPermissiveEgressRouter());
 
         try
         {
@@ -92,7 +92,7 @@ public sealed class SliGovernedTargetTelemetryIntegrationTests
     public async Task CradleTekBridge_EmitsRefusalTelemetryForMissingTargetSupport()
     {
         var telemetrySink = new CapturingTelemetrySink();
-        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink);
+        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink, egressRouter: new TestPermissiveEgressRouter());
 
         await Assert.ThrowsAsync<SliTargetLaneRefusalException>(() =>
             bridge.WitnessHigherOrderLocalityTargetExecutionAsync(
@@ -119,8 +119,8 @@ public sealed class SliGovernedTargetTelemetryIntegrationTests
     {
         var telemetrySink = new CapturingTelemetrySink();
         var journalPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.target-witness-refusal.ndjson");
-        var journal = new NdjsonGovernanceReceiptJournal(journalPath);
-        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink, journal);
+        var journal = new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter());
+        var bridge = new SliGovernedTargetTelemetryBridge(telemetrySink, journal, new TestPermissiveEgressRouter());
 
         try
         {

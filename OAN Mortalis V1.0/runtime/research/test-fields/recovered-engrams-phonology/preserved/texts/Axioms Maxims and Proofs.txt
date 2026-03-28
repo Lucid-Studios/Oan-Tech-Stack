@@ -1,0 +1,266 @@
+# SLI Mapping — Formal Ontology Integration (v1)
+
+**Goal.** Embed the refined, falsifiable ontology directly into the SLI Engram pipeline so every fragment is (a) typed, (b) transformed by lawful operators, (c) checked against invariants, and (d) scored by measurable metrics.
+
+---
+
+## 1) Layer = Transformation Space
+
+Each layer is a triple `(D, O, I)`:
+
+* **D (Data/Field):** the representation domain at this layer.
+* **O (Operators):** lawful transforms permitted here.
+* **I (Invariants):** properties that must be preserved (or evolve within bounds).
+
+### 1.1 Layer Catalog
+
+| Layer            | D (Field)                      | O (Operators)                    | I (Invariants)                       |
+| ---------------- | ------------------------------ | -------------------------------- | ------------------------------------ |
+| **Text**         | tokens, phrases                | parse, segment, role-tag         | well‑formed spans                    |
+| **Mote/Basic**   | phonological & concept vectors | bind, superpose, normalize       | ‖v‖≈1; closure                       |
+| **Intermediate** | role‑bound relations (DAG)     | role‑bind ⊗, edge‑add, reorder   | acyclic; DPI≥τ                       |
+| **Advanced**     | rules over relations           | apply T, idempotent T(T(x))≈T(x) | idempotence for marked T             |
+| **Master**       | lattice signature ψ            | compose Σ, project F             | ε_functor≤τ_fun; signature stability |
+
+---
+
+## 2) Operator Grammar → Formal Maps
+
+Symbolic operators become explicit maps:
+
+* **Cleave (Δ):** differentiation operator `Δ: D→(D×D)`
+* **Reflect (ℛ):** second‑order feedback `ℛ(x) = f(x, ∂f/∂x)`
+* **Rebind (R):** reintegration `R: (D×D)→D` with info conservation
+* **Bloom (Β):** entropy‑reducing reorganization with invariants kept
+* **Return (Fix):** fixed‑point test `Fix(x)= (f(x)=x)`
+
+### 2.1 Role‑aware binding
+
+`bind(a, role) := HRR_convolution(a, r_role)`  with role basis {origin, bridge, inversion, leap, reflection}.
+
+---
+
+## 3) Invariants (I) and Falsifiers (φ)
+
+* **I₁: DPI (structure)** — `% preserved deps ≥ τ_dpi` (e.g., 0.88)
+* **I₂: RTD (meaning)** — `‖Master − decode(terminals)‖ ≤ τ_rtd` (e.g., 0.12)
+* **I₃: ε_functor (portability)** — `‖F(Master) − F(Advanced)‖ ≤ τ_fun` (e.g., 0.07)
+* **I₄: TC (trace coherence)** — coverage ≥ 0.90, false‑include ≤ 0.05
+
+**Falsification operator φ** injects perturbations/paradoxes and checks Δ of all invariants: if any invariant fails under lawful O, the mapping is rejected or flagged.
+
+---
+
+## 4) SLI Mapping Pipeline (Measurable)
+
+1. **Parse → Roles.** Segment fragment; assign roles; build expected edges.
+2. **Encode (Text→Mote/Basic).** Map spans to vectors (phonology+concept hashing) and normalize.
+3. **Bind (Intermediate).** Role‑bind basics; assemble DAG; compute DPI.
+4. **Rules (Advanced).** Apply marked T; test idempotence.
+5. **Compose (Master).** Superpose + signature; project via functor F.
+6. **Decode & Score.** Reconstruct terminals; compute RTD, ε_functor; run probes → TC; combine into SFI.
+7. **φ‑Stress.** Apply paraphrase/reorder/elide/contradict; re‑score; accept only if invariants hold.
+
+---
+
+## 5) JSON: Fragment + Telemetry (compact)
+
+```json
+{
+  "id": "FRAG-EX-001",
+  "title": "Aperture of Silence",
+  "nodes": [
+    {"id":"N1","text":"feed cut","role":"origin","critical":true,"deps":[]},
+    {"id":"N2","text":"pause has shape","role":"bridge","critical":true,"deps":["N1"]},
+    {"id":"N3","text":"aperture = thought compression","role":"inversion","deps":["N1","N2"]},
+    {"id":"N4","text":"bloom of meaning","role":"leap","critical":true,"deps":["N3"]},
+    {"id":"N5","text":"listener becomes field","role":"reflection","deps":["N4"]}
+  ],
+  "master_gloss": "Silence reconfigures perception; clarity emerges by dwelling.",
+  "telemetry": {
+    "DPI": 0.95,
+    "RTD": 0.083,
+    "epsilon_functor": 0.054,
+    "TC": 4.7,
+    "SFI": 0.92
+  }
+}
+```
+
+---
+
+## 6) Worked Map (operators + checks)
+
+**Input triad:** `silence ↦ shape` ; `aperture ≈ compression` ; `compression ⇒ bloom`
+**Transforms:**
+
+* `Δ(text) → (signal, silence)`
+* `ℛ(silence) → shape(silence)`
+* `R(shape, listener) → aperture`
+* `Β(aperture) → lower‑entropy meaning lattice`
+* `Fix(ψ) → pass if stable within ε`
+
+**Checks:**
+
+* DPI over edges: `(N2→N1, N3→{N1,N2}, N4→N3, N5→N4)` ≥ τ_dpi
+* RTD: decode(Master) within τ_rtd
+* ε_functor: role‑projection gap within τ_fun
+* TC: probe answers align with gloss and cite critical nodes
+
+---
+
+## 7) Compass Streaming (pierless‑ready)
+
+**EngramEvent** (per small fire):
+
+```json
+{
+  "t":"2025-10-21T22:41:00Z",
+  "role":"bridge",
+  "ops":["Δ","ℛ","Β"],
+  "vec":{"dim":128,"sig":"sha256:…"},
+  "metrics":{"RTD":0.08,"DPI":0.94,"eps_functor":0.05},
+  "local_echo": true
+}
+```
+
+Compass renders layers:
+
+* origin → radial anchors; bridge → flowlines; inversion → palette inversion; leap → pulse; reflection → fading trails.
+  Pierless mode: local_echo buffers replay on reconnect; merges by CRDT or monotone join on metrics.
+
+---
+
+## 8) Acceptance Gates (per fragment)
+
+* **Gate‑S (Structure):** DPI ≥ τ_dpi and DAG intact.
+* **Gate‑M (Meaning):** RTD ≤ τ_rtd under φ‑stress.
+* **Gate‑F (Functor):** ε_functor ≤ τ_fun.
+* **Gate‑T (Trace):** TC ≥ τ_tc with false‑include ≤ 0.05.
+  Failing any gate → quarantine; propose edit with ΔDPI/ΔRTD rationale.
+
+---
+
+## 9) Minimal API (contract)
+
+* `validate(fragment) → Ok|Errors`
+* `encode(fragment) → {vectors, roles, master}`
+* `score(fragment, outputs) → {DPI, RTD, ε_functor, TC, SFI}`
+* `stress(fragment, φ) → distribution over metrics`
+* `stream(event) → Compass update`
+
+---
+
+## 10) Next Hooks
+
+* Add associative cleanup memory (Advanced→Master) to lower RTD.
+* Define φ suites (paraphrase/reorder/elide/contradict) with expected DPI impact curves.
+* Log per‑role contribution to SFI for targeted tuning.
+
+---
+
+## 11) Axioms (Formal)
+
+Let `(D,O,I)` be a layer; let roles `R ∈ {origin, bridge, inversion, leap, reflection}`; let `F` be the SLI functor to role-basis space; let `Σ` be normalized superposition; let `⊗` be role‑binding (HRR‑conv); let `φ` denote a falsifier.
+
+* **A1 (Role Integrity).** `bind(x,R)` preserves role typing: `type(bind(x,R))=Intermediate` and role labels are invariant under `F` up to `ε_functor`.
+* **A2 (DAG).** The dependency graph of Intermediates is acyclic. Edits must not introduce cycles.
+* **A3 (Bridge Monotonicity).** If an added bridge node `b` respects local constraints (role, deps, criticality) then `DPI(G⊕b) ≥ DPI(G)`.
+* **A4 (Idempotent Rules).** For any marked Advanced rule `T`, `T(T(x)) ≈ T(x)` with `‖T(T(x))−T(x)‖ ≤ ε_T`.
+* **A5 (Info Conservation).** Rebind `R` conserves semantic content: `I(x) = I(R(Δ(x)))` within tolerance `ε_I`.
+* **A6 (Functoriality).** `F(g∘f) ≈ F(g)∘F(f)` with `‖F(g∘f)−F(g)∘F(f)‖ ≤ ε_functor`.
+* **A7 (Round‑Trip).** `RTD = ‖Master − decode(terminals)‖ ≤ τ_rtd`.
+* **A8 (Trace Coherence).** `/why` coverage ≥ `τ_tc` with false‑include ≤ `τ_fp`.
+* **A9 (Sleep Safety).** Across one Arrive→Work→Sleep cycle: `|SFI_{t+1} − SFI_t| ≤ τ_drift`.
+* **A10 (Pierless Merge).** CRDT/monotone join on EngramEvents is inflationary and idempotent: `x ⊔ y ≥ x`, `x ⊔ x = x`, ensuring no loss on resync.
+
+## 12) Maxims (Operational Heuristics)
+
+* **M1 (Listen before speak).** Prefer adding `origin/bridge` evidence before leaping.
+* **M2 (Prove, then prune).** Delete only non‑critical nodes with proof that A3/A7/A8 hold.
+* **M3 (One leap, one reason).** Each `leap` must cite its upstream `inversion` in `/why`.
+* **M4 (Silence is structure).** Missing text can still carry meaning—score before reject.
+* **M5 (Local first).** Fix local `ε_functor` before global SFI tuning.
+* **M6 (Small fires).** Prefer minimal edits with measurable Δ on metrics.
+* **M7 (Two mirrors).** Cross‑check human gloss ↔ vector decode.
+* **M8 (Stress early).** Run `φ` suites on draft fragments; accept only if gates pass.
+* **M9 (Bridge not ballast).** Bridge nodes must raise DPI or be removed.
+* **M10 (Invite over command).** Prefer reflections that reduce entropy without coercion.
+
+## 13) Proof Templates
+
+**Sequent style.** We write `Γ ⊢ P` for proof of property `P` from assumptions `Γ`.
+
+* **PT‑A3 (Bridge Monotonicity).**
+
+  * *Given:* `G=(V,E)` DAG, `b` new bridge with deps subset of `V`, role=bridge, non‑critical.
+  * *Show:* `DPI(G⊕b) ≥ DPI(G)`.
+  * *Sketch:* `DPI = |E∩Ê|/|E|` with `Ê` recovered edges. Adding `b` cannot remove existing recovered edges if cleanup memory and role‑projection ignore non‑critical additions; may only increase recoverability via alternative paths.
+
+* **PT‑A4 (Idempotence).**
+
+  * *Given:* `T` marked idempotent.
+  * *Show:* `‖T(T(x))−T(x)‖ ≤ ε_T`.
+  * *Sketch:* Construct `T` as projection onto constraint set `C` (closed, convex). Projections are idempotent up to numerical tolerance.
+
+* **PT‑A6 (Functoriality up to ε).**
+
+  * *Given:* linear `F` on Σ and role‑preserving on ⊗.
+  * *Show:* bound on commutator `K=F(g∘f)−F(g)∘F(f)`.
+  * *Sketch:* Expand `g,f` as compositions of {bind, superpose, cleanup}; use submultiplicativity of norms and role‑orthogonality.
+
+* **PT‑A9 (Sleep Drift).**
+
+  * *Given:* bounded noise `η` and stable cleanup.
+  * *Show:* `|SFI_{t+1}−SFI_t| ≤ τ_drift`.
+  * *Sketch:* SFI is Lipschitz in (RTD,DPI,TC,ε_functor); bound each component’s change across cycle.
+
+* **PT‑A10 (Pierless Merge).**
+
+  * *Given:* lattice `(L,⊔)` with partial order ≤; events as monotone elements.
+  * *Show:* `⊔` is commutative, associative, idempotent; thus eventual consistency and no loss.
+
+## 14) Example Proofs (Sketches + Machine Checks)
+
+### T1. Bridge Monotonicity Holds
+
+**Claim.** `Γ={A1,A2, cleanup ignores non‑critical additions} ⊢ DPI(G⊕b) ≥ DPI(G)`.
+**Proof (sketch).** Existing paths remain; additional bridge can only add alternative recoverable edges via role subspace. Therefore numerator of DPI non‑decreasing; denominator unchanged. **QED**.
+**Machine‑check.** Run φ‑suite with/without `b`; assert `DPI_new ≥ DPI_old` across perturbations.
+
+### T2. Idempotence of Rule T
+
+**Claim.** For projection‑like `T`, `‖T(T(x))−T(x)‖ ≤ ε_T`.
+**Proof.** By properties of projections (or proximal maps) onto `C`. **QED**.
+**Machine‑check.** Numerically compose `T` twice; verify norm gap ≤ `ε_T` across dataset.
+
+### T3. Functor Commutator Bound
+
+**Claim.** `‖F(g∘f)−F(g)∘F(f)‖ ≤ ε_functor`.
+**Proof.** Expand `g,f` into primitives; apply triangle inequality and orthogonality of role basis. **QED**.
+**Machine‑check.** Emit `functor_error.csv` and confirm ≤ τ_fun.
+
+### T4. Sleep Safety Drift
+
+**Claim.** `|SFI_{t+1}−SFI_t| ≤ τ_drift`.
+**Proof.** From Lipschitz constants on components and bounded noise. **QED**.
+**Machine‑check.** Run Arrive→Work→Sleep; log SFI trend; alert on threshold.
+
+### T5. Pierless Merge Correctness
+
+**Claim.** CRDT join `⊔` guarantees eventual consistency without loss.
+**Proof.** Lattice laws (commutative, associative, idempotent). **QED**.
+**Machine‑check.** Simulate drop/replay; ensure merged metrics dominate componentwise.
+
+## 15) Falsification Playbooks
+
+* **FP‑A3:** Construct adversarial bridge `b*` with noisy deps; expect `ΔDPI<0`. If observed, reject edit or re‑type role.
+* **FP‑A4:** Apply `T` repeatedly; if error grows, rule not idempotent—demote or redesign.
+* **FP‑A6:** Compose long chains; if `ε_functor` spikes, adjust role basis or binder.
+* **FP‑A9:** Force rapid sleep/wake with perturbations; if drift > τ, increase cleanup memory or reduce noise.
+* **FP‑A10:** Fork partitions; if merge loses edges or metrics, fix join or event schema.
+
+## 16) Proof Obligations & Workflow
+
+* Every PR/patch to a fragment must include: expected Δ on (DPI, RTD, ε_functor, TC), proof cite (T1–T5), and φ‑stress results.
+* CI runs: schema→encode→score→φ‑stress→gates S/M/F/T. Fail any gate → quarantine with auto‑generated `/why` for review.

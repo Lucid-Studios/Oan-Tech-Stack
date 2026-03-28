@@ -11,7 +11,10 @@ public enum SoulFrameTelemetryEventType
     InferenceCompleted,
     InferenceRefused,
     ConstraintViolation,
-    DriftDetected
+    DriftDetected,
+    ListeningFrameAdjusted,
+    CompassFallbackApplied,
+    ResponseCleaved
 }
 
 public sealed class SoulFrameTelemetryAdapter
@@ -55,4 +58,3 @@ public sealed class SoulFrameTelemetryAdapter
         public required DateTime Timestamp { get; init; }
     }
 }
-

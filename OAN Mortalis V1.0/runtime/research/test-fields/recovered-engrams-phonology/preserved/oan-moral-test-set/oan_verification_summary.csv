@@ -1,0 +1,5 @@
+prop,trials,passes,pass_rate,counterexamples
+P1_Y_first,800,559,0.69875,241
+P2_bond_two,800,295,0.36875,505
+P3_time_load,600,0,0.0,600
+P4_phonology,800,793,0.99125,7

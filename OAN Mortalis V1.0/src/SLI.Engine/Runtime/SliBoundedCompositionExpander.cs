@@ -7,6 +7,7 @@ internal sealed class SliBoundedCompositionExpander
 {
     private static readonly HashSet<string> AllowedComposites = new(StringComparer.OrdinalIgnoreCase)
     {
+        "golden-code-bloom",
         "locality-bootstrap",
         "perspective-bounded-observer",
         "participation-bounded-cme",
@@ -83,6 +84,7 @@ internal sealed class SliBoundedCompositionExpander
     private static Dictionary<string, CompositeTemplate> LoadTemplates(IReadOnlyDictionary<string, string> loadedModules)
     {
         var templates = new Dictionary<string, CompositeTemplate>(StringComparer.OrdinalIgnoreCase);
+        LoadModuleTemplates(templates, loadedModules, "golden-code.lisp", "golden-code-composite");
         LoadModuleTemplates(templates, loadedModules, "locality.lisp", "locality-composite");
         LoadModuleTemplates(templates, loadedModules, "rehearsal.lisp", "rehearsal-composite");
         LoadModuleTemplates(templates, loadedModules, "witness.lisp", "witness-composite");

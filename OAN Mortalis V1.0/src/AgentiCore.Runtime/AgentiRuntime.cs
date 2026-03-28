@@ -25,4 +25,34 @@ public sealed class AgentiRuntime : IOanService
         ArgumentException.ThrowIfNullOrWhiteSpace(sliPacket);
         return _sliBridge.SendPacketAsync(sliPacket, cancellationToken);
     }
+
+    public async Task<DuplexPredicateDispatchReceipt> SendDuplexIntentAsync(
+        DuplexPredicateEnvelope envelope,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(envelope);
+
+        var packet = DuplexPredicateSurfaceContracts.CreatePacket(envelope);
+        var bridgeResponse = await _sliBridge.SendPacketAsync(packet, cancellationToken).ConfigureAwait(false);
+        return DuplexPredicateSurfaceContracts.CreateDispatchReceipt(
+            envelope,
+            packet,
+            bridgeResponse,
+            DateTimeOffset.UtcNow);
+    }
+
+    public async Task<ReachDuplexRealizationDispatchReceipt> SendReachDuplexRealizationAsync(
+        ReachDuplexRealizationEnvelope envelope,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(envelope);
+
+        var packet = ReachDuplexRealizationSurfaceContracts.CreatePacket(envelope);
+        var bridgeResponse = await _sliBridge.SendPacketAsync(packet, cancellationToken).ConfigureAwait(false);
+        return ReachDuplexRealizationSurfaceContracts.CreateDispatchReceipt(
+            envelope,
+            packet,
+            bridgeResponse,
+            DateTimeOffset.UtcNow);
+    }
 }

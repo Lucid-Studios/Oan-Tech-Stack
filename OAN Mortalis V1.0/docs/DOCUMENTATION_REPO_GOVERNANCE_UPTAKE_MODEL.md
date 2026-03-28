@@ -109,3 +109,22 @@ The strongest evidence classes are:
 - theory growth that changes governing interpretation
 
 Unaffected documents should remain stable rather than being refreshed for cadence alone.
+
+## Research Subject Intake
+
+When discussion or seam discovery outpaces current build admission, the active repo may stage a bounded research subject for the `Documentation Repo`.
+
+Such a research subject should:
+
+- name the theme to be researched
+- ground itself in current active-repo executable truth first
+- state clearly what is doctrine-backed versus still exploratory
+- identify review-cleanup targets without implying automatic build mutation
+
+Research subjects are valid intake surfaces for theory digestion and review cleanup.
+
+They are not:
+
+- runtime authority
+- executable truth by declaration
+- permission to skip later reconciliation against the active build

@@ -369,7 +369,7 @@ public sealed class HigherOrderLocalityInvariantTests
     public void PublicTelemetryAndResultSchemas_RemainStable()
     {
         Assert.Equal(
-            ["cleave_residue", "compass_state", "confidence", "decision", "decision_branch", "engram_candidate", "reasoning", "sli_tokens", "symbolic_trace", "trace_id"],
+            ["cleave_residue", "compass_state", "confidence", "decision", "decision_branch", "engram_candidate", "golden_code_compass", "reasoning", "sli_tokens", "symbolic_trace", "trace_id", "zed_theta_candidate"],
             GetJsonPropertyNames(typeof(CognitionResult)));
 
         Assert.Equal(

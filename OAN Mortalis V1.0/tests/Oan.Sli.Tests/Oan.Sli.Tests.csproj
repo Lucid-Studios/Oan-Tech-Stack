@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AgentiCore.Runtime\AgentiCore.Runtime.csproj" />
     <ProjectReference Include="..\..\src\CradleTek.Memory\CradleTek.Memory.csproj" />
     <ProjectReference Include="..\..\src\EngramGovernance\EngramGovernance.csproj" />
     <ProjectReference Include="..\..\src\GEL.Contracts\GEL.Contracts.csproj" />

@@ -1,0 +1,78 @@
+{
+  "id": "FRAG-F-BICYCLE",
+  "title": "Object Engram \u2014 Bicycle",
+  "nodes": [
+    {
+      "id": "F1",
+      "text": "mass, geometry, center of mass",
+      "role": "origin",
+      "critical": true,
+      "deps": []
+    },
+    {
+      "id": "F2",
+      "text": "aero cross-section \u21a6 drag CdA",
+      "role": "bridge",
+      "critical": true,
+      "deps": [
+        "F1"
+      ]
+    },
+    {
+      "id": "F3",
+      "text": "yaw/roll coupling at high gusts",
+      "role": "inversion",
+      "critical": false,
+      "deps": [
+        "F1",
+        "F2"
+      ]
+    },
+    {
+      "id": "F4",
+      "text": "tumble regime \u21d2 ballistic arcs",
+      "role": "leap",
+      "critical": true,
+      "deps": [
+        "F3"
+      ]
+    },
+    {
+      "id": "F5",
+      "text": "impact dissipation / lodge",
+      "role": "reflection",
+      "critical": false,
+      "deps": [
+        "F4"
+      ]
+    }
+  ],
+  "edges": [
+    [
+      "F2",
+      "F1"
+    ],
+    [
+      "F3",
+      "F1"
+    ],
+    [
+      "F3",
+      "F2"
+    ],
+    [
+      "F4",
+      "F3"
+    ],
+    [
+      "F5",
+      "F4"
+    ]
+  ],
+  "master_gloss": "Bike identity under forces; drag/yaw, tumble onset, and lodgment.",
+  "local_Z": {
+    "description": "Local Z_F: inertial identity (CoM, principal inertias, frame integrity)",
+    "sig": "sha256:086c4829add842d3"
+  },
+  "parent_fragment": "FRAG-E-BUILT"
+}

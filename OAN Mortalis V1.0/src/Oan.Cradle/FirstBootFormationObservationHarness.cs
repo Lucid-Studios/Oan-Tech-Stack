@@ -2,6 +2,12 @@ using Oan.Common;
 
 namespace Oan.Cradle;
 
+public sealed record FirstBootGovernanceObservationResult(
+    AgentiFormationObservationBatch ObservationBatch,
+    InternalGovernanceBootProfile BootClassificationResult,
+    FirstBootGovernanceLayerReceipt ProjectedGovernanceLayer,
+    SliJurisdictionEnvelopeReceipt ProjectedJurisdictionEnvelope);
+
 public sealed class FirstBootFormationObservationHarness
 {
     private readonly IFirstBootGovernancePolicy _policy;
@@ -16,6 +22,23 @@ public sealed class FirstBootFormationObservationHarness
     }
 
     public async Task<AgentiFormationObservationBatch> ObserveAsync(
+        BootClass bootClass,
+        ProtectedIntakeKind intakeKind,
+        PrimeRevealMode requestedRevealMode,
+        int requestedExpansionCount = 1,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await ObserveWithGovernanceLayerAsync(
+            bootClass,
+            intakeKind,
+            requestedRevealMode,
+            requestedExpansionCount,
+            cancellationToken).ConfigureAwait(false);
+
+        return result.ObservationBatch;
+    }
+
+    public async Task<FirstBootGovernanceObservationResult> ObserveWithGovernanceLayerAsync(
         BootClass bootClass,
         ProtectedIntakeKind intakeKind,
         PrimeRevealMode requestedRevealMode,
@@ -73,6 +96,7 @@ public sealed class FirstBootFormationObservationHarness
             ],
             cancellationToken).ConfigureAwait(false));
 
+        IReadOnlyList<InternalGoverningCmeOffice> formedOffices = [];
         foreach (var office in OrderedOffices)
         {
             var record = _policy.EvaluateFormationEligibility(
@@ -107,10 +131,15 @@ public sealed class FirstBootFormationObservationHarness
                 observationTags:
                 [
                     $"decision:{record.Decision}",
-                    $"reason:{record.ReasonCode}"
-                ],
+                        $"reason:{record.ReasonCode}"
+                    ],
                 cancellationToken).ConfigureAwait(false));
         }
+
+        formedOffices = observations
+            .Where(item => item.Stage == AgentiFormationObservationStage.GoverningOfficeFormation && item.Office is not null)
+            .Select(item => item.Office!.Value)
+            .ToArray();
 
         observations.Add(await CreateAndRecordAsync(
             stage: AgentiFormationObservationStage.TriadicCrossWitness,
@@ -130,7 +159,20 @@ public sealed class FirstBootFormationObservationHarness
             ],
             cancellationToken).ConfigureAwait(false));
 
-        return new AgentiFormationObservationBatch(observations);
+        var governanceLayer = _policy.ProjectGovernanceLayer(
+            bootClass,
+            BootActivationState.TriadicActive,
+            requestedExpansionCount,
+            formedOffices,
+            triadicCrossWitnessComplete: true,
+            bondedConfirmationComplete: false);
+        var jurisdictionEnvelope = SliJurisdictionContracts.ProjectFirstBootEnvelope(governanceLayer);
+
+        return new FirstBootGovernanceObservationResult(
+            new AgentiFormationObservationBatch(observations),
+            bootProfile,
+            governanceLayer,
+            jurisdictionEnvelope);
     }
 
     private async Task<AgentiFormationObservation> CreateAndRecordAsync(

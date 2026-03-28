@@ -2190,7 +2190,7 @@
     "domainDescriptor": "atlas.transformation",
     "operatorCompatibility": "prefix-suffix-capable",
     "variantExamples": [
-      "variable",
+      "varies",
       "varied",
       "variation"
     ],
@@ -3907,16 +3907,14 @@
     "disciplinaryReservations": []
   },
   {
-    "lemma": "enumerate",
-    "symbolicCore": "atlas.core::enumerate",
+    "lemma": "arithmetic",
+    "symbolicCore": "atlas.core::arithmetic",
     "primaryCategory": "classification",
     "secondaryCategories": [],
     "domainDescriptor": "atlas.classification",
-    "operatorCompatibility": "prefix-suffix-capable",
+    "operatorCompatibility": "core-only",
     "variantExamples": [
-      "enumeration",
-      "enumerated",
-      "enumerators"
+      "arithmetic"
     ],
     "reservedDomainStatus": "none",
     "disciplinaryReservations": []
@@ -3965,16 +3963,14 @@
     "disciplinaryReservations": []
   },
   {
-    "lemma": "file",
-    "symbolicCore": "atlas.core::file",
+    "lemma": "equation",
+    "symbolicCore": "atlas.core::equation",
     "primaryCategory": "classification",
     "secondaryCategories": [],
     "domainDescriptor": "atlas.classification",
-    "operatorCompatibility": "prefix-suffix-capable",
+    "operatorCompatibility": "core-only",
     "variantExamples": [
-      "files",
-      "filed",
-      "filing"
+      "equation"
     ],
     "reservedDomainStatus": "none",
     "disciplinaryReservations": []
@@ -4266,14 +4262,14 @@
     "disciplinaryReservations": []
   },
   {
-    "lemma": "series",
-    "symbolicCore": "atlas.core::series",
+    "lemma": "field",
+    "symbolicCore": "atlas.core::field",
     "primaryCategory": "classification",
     "secondaryCategories": [],
     "domainDescriptor": "atlas.classification",
     "operatorCompatibility": "core-only",
     "variantExamples": [
-      "series"
+      "field"
     ],
     "reservedDomainStatus": "none",
     "disciplinaryReservations": []
@@ -4413,29 +4409,27 @@
     "disciplinaryReservations": []
   },
   {
-    "lemma": "unit",
-    "symbolicCore": "atlas.core::unit",
+    "lemma": "resonance",
+    "symbolicCore": "atlas.core::resonance",
     "primaryCategory": "classification",
     "secondaryCategories": [],
     "domainDescriptor": "atlas.classification",
-    "operatorCompatibility": "prefix-suffix-capable",
+    "operatorCompatibility": "core-only",
     "variantExamples": [
-      "units",
-      "subunits",
-      "subunit"
+      "resonance"
     ],
     "reservedDomainStatus": "none",
     "disciplinaryReservations": []
   },
   {
-    "lemma": "version",
-    "symbolicCore": "atlas.core::version",
+    "lemma": "variable",
+    "symbolicCore": "atlas.core::variable",
     "primaryCategory": "classification",
     "secondaryCategories": [],
     "domainDescriptor": "atlas.classification",
-    "operatorCompatibility": "suffix-capable",
+    "operatorCompatibility": "core-only",
     "variantExamples": [
-      "versions"
+      "variable"
     ],
     "reservedDomainStatus": "none",
     "disciplinaryReservations": []

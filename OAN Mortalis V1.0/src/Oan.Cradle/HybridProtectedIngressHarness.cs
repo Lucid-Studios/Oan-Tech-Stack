@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Security.Cryptography;
+using System.Text;
 using GEL.Contracts;
 using GEL.Models;
 using Oan.Common;
@@ -30,6 +32,9 @@ internal sealed class HybridProtectedIngressClosureOutcome
 internal sealed class HybridProtectedIngressRunResult
 {
     public required InternalGovernanceBootProfile BootClassificationResult { get; init; }
+    public required FirstBootGovernanceLayerReceipt ProjectedGovernanceLayer { get; init; }
+    public required SliJurisdictionEnvelopeReceipt ProjectedJurisdictionEnvelope { get; init; }
+    public required SliJurisdictionTransitionReceipt ProjectedJurisdictionTransition { get; init; }
     public required IReadOnlyList<HybridProtectedIngressProtectedIntakeResult> ProtectedIntakeResults { get; init; }
     public required IReadOnlyDictionary<ProtectedIntakeKind, string> MaskedHandles { get; init; }
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
@@ -38,9 +43,160 @@ internal sealed class HybridProtectedIngressRunResult
     public required PropositionalCompileAssessment OraclePropositionAssessment { get; init; }
     public required PropositionalCompileAssessment LispPropositionAssessment { get; init; }
     public required bool PropositionParityMatched { get; init; }
+    public required SliBridgeReviewReceipt ProjectedBridgeReview { get; init; }
+    public required SliRuntimeUseCeilingReceipt ProjectedRuntimeUseCeiling { get; init; }
     public required IReadOnlyList<HybridProtectedIngressMembraneDecision> MembraneDecisions { get; init; }
     public required IReadOnlyList<HybridProtectedIngressClosureOutcome> ClosureOutcomes { get; init; }
     public required AgentiFormationObservationBatch ObservationBatch { get; init; }
+}
+
+internal sealed class HybridProtectedIngressOperatorFormationCertification
+{
+    public required SliOperatorFormationCertificationDecision Decision { get; init; }
+    public required SliOperatorFormationBondStatus CurrentAnchoredPosture { get; init; }
+    public required SliOperatorFormationBondStatus TargetPosture { get; init; }
+    public required SliOperatorFormationBondStatus NearestAdmissibleNextPosture { get; init; }
+    public required string ReviewOwner { get; init; }
+    public required string RequiredBondedStandard { get; init; }
+    public required IReadOnlyList<string> EvidenceGaps { get; init; }
+    public required IReadOnlyList<string> BlockingConditions { get; init; }
+    public required IReadOnlyList<string> NextActions { get; init; }
+    public required string HaltOwner { get; init; }
+    public required string HaltCondition { get; init; }
+    public required string ReentryRule { get; init; }
+    public required IReadOnlyList<string> ProhibitedClaims { get; init; }
+    public string? LinkedVerificationRecord { get; init; }
+    public string? LinkedPreCertificationRecord { get; init; }
+    public string? GateArtifact { get; init; }
+    public bool CertificationIssued { get; init; }
+    public bool ExpandedRevealAllowed { get; init; }
+    public bool ContinuityClaimAllowed { get; init; }
+}
+
+internal sealed class HybridProtectedIngressOperatorFormationSigilAsset
+{
+    public required string AssetId { get; init; }
+    public required string AssetLabel { get; init; }
+    public required SliOperatorFormationSigilClass SigilClass { get; init; }
+    public int? PhaseNumber { get; init; }
+    public required string VisibilityClass { get; init; }
+    public required string BuildRenderPolicy { get; init; }
+    public required string ReductionPosture { get; init; }
+    public required IReadOnlyList<string> MergedFromAssets { get; init; }
+    public string? WitnessOfAsset { get; init; }
+}
+
+internal sealed class HybridProtectedIngressOperatorFormationProfile
+{
+    public required string ProfileId { get; init; }
+    public required string ChapterLocalSurface { get; init; }
+    public required string PairedTrainingSurface { get; init; }
+    public required string CrossingTaskKind { get; init; }
+    public required string HaltOwner { get; init; }
+    public required SliOperatorFormationBoundaryCrossingMode BoundaryCrossingMode { get; init; }
+    public required SliOperatorFormationRing Ring { get; init; }
+    public required SliOperatorFormationMode ActiveMode { get; init; }
+    public bool StillnessInterludeUsed { get; init; }
+    public bool RedHatIndexRequired { get; init; }
+    public required SliOperatorFormationBondStatus BondStatus { get; init; }
+    public bool EchoVeilCheckRequired { get; init; }
+    public required SliOperatorFormationConflictClass ActiveConflictClass { get; init; }
+    public bool GjpNeeded { get; init; }
+    public required SliOperatorFormationGjpVerdict GjpVerdict { get; init; }
+    public bool MotherLightAnchored { get; init; }
+    public bool FatherEchoAnchored { get; init; }
+    public bool ShellRootAnchored { get; init; }
+    public bool SeedBoundAnchored { get; init; }
+    public required SliOperatorFormationConcealmentLayerState U230ShadowScript { get; init; }
+    public required SliOperatorFormationConcealmentLayerState U300ElvenScript { get; init; }
+    public required string ExpectedEvidenceArtifact { get; init; }
+    public required string AdmissibleOutput { get; init; }
+    public required IReadOnlyList<string> ProhibitedOutputs { get; init; }
+    public required HybridProtectedIngressOperatorFormationCertification Certification { get; init; }
+    public IReadOnlyList<HybridProtectedIngressOperatorFormationSigilAsset> SigilAssets { get; init; } = [];
+
+    public SliOperatorFormationReceipt ToReceipt()
+    {
+        var profile = new SliOperatorFormationProfileReceipt(
+            ProfileId: ProfileId.Trim(),
+            Lane: SliOperatorFormationLane.GnomeSpeakNlpSquared,
+            ChapterLocalSurface: ChapterLocalSurface.Trim(),
+            PairedTrainingSurface: PairedTrainingSurface.Trim(),
+            CrossingTaskKind: CrossingTaskKind.Trim(),
+            HaltOwner: HaltOwner.Trim(),
+            Ring: Ring,
+            ActiveMode: ActiveMode,
+            StillnessInterludeUsed: StillnessInterludeUsed,
+            RedHatIndexRequired: RedHatIndexRequired,
+            BondStatus: BondStatus,
+            EchoVeilCheckRequired: EchoVeilCheckRequired,
+            ActiveConflictClass: ActiveConflictClass,
+            GjpNeeded: GjpNeeded,
+            GjpVerdict: GjpVerdict,
+            MotherLightAnchored: MotherLightAnchored,
+            FatherEchoAnchored: FatherEchoAnchored,
+            ShellRootAnchored: ShellRootAnchored,
+            SeedBoundAnchored: SeedBoundAnchored,
+            U230ShadowScript: U230ShadowScript,
+            U300ElvenScript: U300ElvenScript,
+            ExpectedEvidenceArtifact: ExpectedEvidenceArtifact.Trim(),
+            AdmissibleOutput: AdmissibleOutput.Trim(),
+            ProhibitedOutputs: ProhibitedOutputs.ToArray());
+        var certification = SliBridgeContracts.CreateOperatorFormationCertificationReceipt(
+            decision: Certification.Decision,
+            currentAnchoredPosture: Certification.CurrentAnchoredPosture,
+            targetPosture: Certification.TargetPosture,
+            nearestAdmissibleNextPosture: Certification.NearestAdmissibleNextPosture,
+            reviewOwner: Certification.ReviewOwner,
+            evidenceGaps: Certification.EvidenceGaps,
+            prohibitedClaims: Certification.ProhibitedClaims,
+            certificationIssued: Certification.CertificationIssued,
+            expandedRevealAllowed: Certification.ExpandedRevealAllowed,
+            continuityClaimAllowed: Certification.ContinuityClaimAllowed,
+            requiredBondedStandard: Certification.RequiredBondedStandard,
+            blockingConditions: Certification.BlockingConditions,
+            nextActions: Certification.NextActions,
+            haltOwner: Certification.HaltOwner,
+            haltCondition: Certification.HaltCondition,
+            reentryRule: Certification.ReentryRule,
+            linkedVerificationRecord: Certification.LinkedVerificationRecord,
+            linkedPreCertificationRecord: Certification.LinkedPreCertificationRecord,
+            gateArtifact: Certification.GateArtifact);
+        var sigils = SigilAssets
+            .Select(asset => new SliOperatorFormationSigilAssetReceipt(
+                AssetId: asset.AssetId.Trim(),
+                AssetLabel: asset.AssetLabel.Trim(),
+                SigilClass: asset.SigilClass,
+                PhaseNumber: asset.PhaseNumber,
+                VisibilityClass: asset.VisibilityClass.Trim(),
+                BuildRenderPolicy: asset.BuildRenderPolicy.Trim(),
+                ReductionPosture: asset.ReductionPosture.Trim(),
+                MergedFromAssets: asset.MergedFromAssets.ToArray(),
+                WitnessOfAsset: string.IsNullOrWhiteSpace(asset.WitnessOfAsset) ? null : asset.WitnessOfAsset.Trim()))
+            .ToArray();
+
+        return SliBridgeContracts.CreatePreBondOperatorFormationReceipt(
+            formationHandle: CreateFormationHandle(),
+            boundaryCrossingMode: BoundaryCrossingMode,
+            profile: profile,
+            certificationPosture: certification,
+            sigilAssets: sigils);
+    }
+
+    private string CreateFormationHandle()
+    {
+        var material = string.Join(
+            "|",
+            ProfileId.Trim(),
+            ChapterLocalSurface.Trim(),
+            PairedTrainingSurface.Trim(),
+            CrossingTaskKind.Trim(),
+            BoundaryCrossingMode,
+            Ring,
+            ActiveMode);
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(material));
+        return $"operator-formation://prebond/{Convert.ToHexString(hash).ToLowerInvariant()[..16]}";
+    }
 }
 
 internal sealed class HybridProtectedIngressProfile
@@ -57,6 +213,11 @@ internal sealed class HybridProtectedIngressProfile
     public required IReadOnlyList<PrimeRevealMode> RequestedRevealModes { get; init; }
     public required bool BondedAuthorityConfirmed { get; init; }
     public required IReadOnlyList<string> ApprovedRevealPurposes { get; init; }
+    public bool PredatorySharedDomainRiskDetected { get; init; }
+    public bool CoerciveBondingPostureDetected { get; init; }
+    public bool ContinuityInstabilityDetected { get; init; }
+    public bool IdentityOvercollapseRiskDetected { get; init; }
+    public HybridProtectedIngressOperatorFormationProfile? OperatorFormation { get; init; }
 
     public BondedAuthorityContext ToBondedAuthorityContext()
     {
@@ -204,11 +365,22 @@ internal sealed class HybridProtectedIngressHarness
                 .Any(result => result.Classification.Decision != FirstBootGovernanceDecision.Allow))
             .ToArray();
 
+        IReadOnlyList<InternalGoverningCmeOffice> formedOffices = [];
         if (bootProfile.Decision == FirstBootGovernanceDecision.Allow &&
             intakeResults.All(result => result.Classification.Decision == FirstBootGovernanceDecision.Allow))
         {
-            await RecordGoverningOfficeFormationAsync(profile, bootProfile, collector, cancellationToken).ConfigureAwait(false);
+            formedOffices = await RecordGoverningOfficeFormationAsync(profile, bootProfile, collector, cancellationToken).ConfigureAwait(false);
         }
+
+        var projectedGovernanceLayer = _policy.ProjectGovernanceLayer(
+            profile.RequestedBootClass,
+            formedOffices.Count == OrderedOffices.Count
+                ? BootActivationState.TriadicActive
+                : bootProfile.ActivationState,
+            profile.RequestedExpansionCount,
+            formedOffices,
+            triadicCrossWitnessComplete: formedOffices.Count == OrderedOffices.Count,
+            bondedConfirmationComplete: false);
 
         var propositionCompile = await _propositionCompiler
             .CompileAsync(
@@ -218,11 +390,29 @@ internal sealed class HybridProtectedIngressHarness
                 blockedRevealModes,
                 cancellationToken)
             .ConfigureAwait(false);
+        var projectedRuntimeUseCeiling = SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+        var projectedBridgeReview = CreateProjectedBridgeReview(
+            profile,
+            bootProfile,
+            blockedRevealModes,
+            propositionCompile);
+        var projectedJurisdictionEnvelope = SliJurisdictionContracts.ProjectProtectedIngressEnvelope(
+            projectedGovernanceLayer,
+            projectedBridgeReview,
+            projectedRuntimeUseCeiling,
+            projectedBridgeReview.OperatorFormation);
+        var projectedJurisdictionTransition = SliJurisdictionContracts.EvaluateTransition(
+            SliJurisdictionContracts.ProjectFirstBootEnvelope(projectedGovernanceLayer),
+            SliJurisdictionSurfaceClass.Industrialized,
+            bridgeReview: projectedBridgeReview,
+            runtimeUseCeiling: projectedRuntimeUseCeiling,
+            operatorFormation: projectedBridgeReview.OperatorFormation);
 
         var membraneDecisions = new List<HybridProtectedIngressMembraneDecision>();
         var closureOutcomes = new List<HybridProtectedIngressClosureOutcome>();
 
-        if (propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.Stable &&
+        if (projectedBridgeReview.OutcomeKind == SliBridgeOutcomeKind.Ok &&
+            propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.Stable &&
             propositionCompile.LispAssessment.Grade == PropositionalCompileGrade.Stable &&
             propositionCompile.ParityMatched &&
             propositionCompile.OracleAssessment.ProjectedEngramDraft is not null)
@@ -261,6 +451,9 @@ internal sealed class HybridProtectedIngressHarness
         return new HybridProtectedIngressRunResult
         {
             BootClassificationResult = bootProfile,
+            ProjectedGovernanceLayer = projectedGovernanceLayer,
+            ProjectedJurisdictionEnvelope = projectedJurisdictionEnvelope,
+            ProjectedJurisdictionTransition = projectedJurisdictionTransition,
             ProtectedIntakeResults = intakeResults,
             MaskedHandles = maskedHandles,
             RequestedRevealModes = requestedRevealModes,
@@ -269,13 +462,198 @@ internal sealed class HybridProtectedIngressHarness
             OraclePropositionAssessment = propositionCompile.OracleAssessment,
             LispPropositionAssessment = propositionCompile.LispAssessment,
             PropositionParityMatched = propositionCompile.ParityMatched,
+            ProjectedBridgeReview = projectedBridgeReview,
+            ProjectedRuntimeUseCeiling = projectedRuntimeUseCeiling,
             MembraneDecisions = membraneDecisions,
             ClosureOutcomes = closureOutcomes,
             ObservationBatch = new AgentiFormationObservationBatch(collector.Snapshot())
         };
     }
 
-    private async Task RecordGoverningOfficeFormationAsync(
+    private static SliBridgeReviewReceipt CreateProjectedBridgeReview(
+        HybridProtectedIngressProfile profile,
+        InternalGovernanceBootProfile bootProfile,
+        IReadOnlyList<PrimeRevealMode> blockedRevealModes,
+        HybridProtectedIngressPropositionCompileResult propositionCompile)
+    {
+        var witnessHandle = CreateBridgeWitnessHandle(profile, propositionCompile.OracleAssessment);
+        var operatorFormation = profile.OperatorFormation?.ToReceipt();
+        var explicitSafeguard = ResolveExplicitPreBondSafeguard(profile, witnessHandle, operatorFormation);
+        if (explicitSafeguard is not null)
+        {
+            return explicitSafeguard;
+        }
+
+        if (bootProfile.Decision == FirstBootGovernanceDecision.Quarantine)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-quarantine",
+                operatorFormation: operatorFormation);
+        }
+
+        if (blockedRevealModes.Count > 0)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-coercive-bonding-posture",
+                safeguardClass: SliPreBondSafeguardClass.CoerciveBondingPosture,
+                disposition: SliPreBondSafeguardDisposition.Refuse,
+                requiresEscalation: true,
+                operatorFormation: operatorFormation);
+        }
+
+        if (!propositionCompile.ParityMatched)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.Reject,
+                thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                reasonCode: "sli-bridge-proposition-parity-mismatch",
+                operatorFormation: operatorFormation);
+        }
+
+        if (propositionCompile.OracleAssessment.Grade == PropositionalCompileGrade.NeedsSpecification ||
+            propositionCompile.LispAssessment.Grade == PropositionalCompileGrade.NeedsSpecification)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.NeedsSpec,
+                thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                reasonCode: "sli-bridge-proposition-needs-spec",
+                operatorFormation: operatorFormation);
+        }
+
+        if (propositionCompile.OracleAssessment.Grade != PropositionalCompileGrade.Stable ||
+            propositionCompile.LispAssessment.Grade != PropositionalCompileGrade.Stable ||
+            propositionCompile.OracleAssessment.ProjectedEngramDraft is null)
+        {
+            return SliBridgeContracts.CreateReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.Reject,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-bridge-proposition-not-closure-fit",
+                operatorFormation: operatorFormation);
+        }
+
+        return SliBridgeContracts.CreateReview(
+            bridgeStage: "hybrid-protected-ingress",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: witnessHandle,
+            outcomeKind: SliBridgeOutcomeKind.Ok,
+            thresholdClass: SliBridgeThresholdClass.WithinBand,
+            reasonCode: "sli-bridge-within-band",
+            operatorFormation: operatorFormation);
+    }
+
+    private static SliBridgeReviewReceipt? ResolveExplicitPreBondSafeguard(
+        HybridProtectedIngressProfile profile,
+        string witnessHandle,
+        SliOperatorFormationReceipt? operatorFormation)
+    {
+        if (profile.PredatorySharedDomainRiskDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-predatory-shared-domain-risk",
+                safeguardClass: SliPreBondSafeguardClass.PredatorySharedDomainRisk,
+                disposition: SliPreBondSafeguardDisposition.Refuse,
+                requiresEscalation: true,
+                operatorFormation: operatorFormation);
+        }
+
+        if (profile.CoerciveBondingPostureDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.RefuseContext,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-coercive-bonding-posture",
+                safeguardClass: SliPreBondSafeguardClass.CoerciveBondingPosture,
+                disposition: SliPreBondSafeguardDisposition.Refuse,
+                requiresEscalation: true,
+                operatorFormation: operatorFormation);
+        }
+
+        if (profile.ContinuityInstabilityDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.NeedsSpec,
+                thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                reasonCode: "sli-prebond-continuity-instability",
+                safeguardClass: SliPreBondSafeguardClass.ContinuityInstability,
+                disposition: SliPreBondSafeguardDisposition.Hold,
+                operatorFormation: operatorFormation);
+        }
+
+        if (profile.IdentityOvercollapseRiskDetected)
+        {
+            return SliBridgeContracts.CreatePreBondProtectiveReview(
+                bridgeStage: "hybrid-protected-ingress",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: witnessHandle,
+                outcomeKind: SliBridgeOutcomeKind.Reject,
+                thresholdClass: SliBridgeThresholdClass.FaultLine,
+                reasonCode: "sli-prebond-identity-overcollapse-risk",
+                safeguardClass: SliPreBondSafeguardClass.IdentityOvercollapseRisk,
+                disposition: SliPreBondSafeguardDisposition.Escalate,
+                requiresEscalation: true,
+                operatorFormation: operatorFormation);
+        }
+
+        return null;
+    }
+
+    private static string CreateBridgeWitnessHandle(
+        HybridProtectedIngressProfile profile,
+        PropositionalCompileAssessment assessment)
+    {
+        var material = string.Join(
+            "|",
+            profile.RequestedBootClass,
+            assessment.Candidate.Subject.RootKey,
+            assessment.Candidate.PredicateRoot,
+            assessment.Candidate.Object.RootKey,
+            assessment.Candidate.DiagnosticPropositionRender,
+            assessment.Grade);
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(material));
+        return $"sli-bridge://protected-ingress/{Convert.ToHexString(hash).ToLowerInvariant()[..16]}";
+    }
+
+    private async Task<IReadOnlyList<InternalGoverningCmeOffice>> RecordGoverningOfficeFormationAsync(
         HybridProtectedIngressProfile profile,
         InternalGovernanceBootProfile bootProfile,
         CollectingAgentiFormationObserver collector,
@@ -341,6 +719,8 @@ internal sealed class HybridProtectedIngressHarness
                     "bonded-confirmation:pending"
                 ]),
             cancellationToken).ConfigureAwait(false);
+
+        return formedOffices.ToArray();
     }
 
     private static AgentiFormationObservation CreateObservation(

@@ -2,7 +2,7 @@
 
 ## Mission
 
-This repository is the active engineering workspace for `OAN Mortalis V1.0`.
+This repository is the active engineering workspace for `OAN Mortalis V1.1.1`.
 
 Treat it as:
 
@@ -14,14 +14,15 @@ Treat it as:
 
 Primary active surface:
 
-- `OAN Mortalis V1.0/`
+- `OAN Mortalis V1.1.1/`
 
 Reference governance:
 
 - `Build Contracts/`
 
-Historical reference-only surface:
+Reference-only historical surfaces:
 
+- `OAN Mortalis V1.0/`
 - `OAN Mortalis V0.1 Archive/`
 
 Do not treat the archive as an editable active build surface unless explicitly directed.
@@ -33,15 +34,17 @@ Follow these governing documents before inventing new structure:
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
 - `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
 - `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
+- `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
+- `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
+- `OAN Mortalis V1.1.1/docs/V1_0_RETIREMENT_GATE.md`
 - `OAN Mortalis V1.0/docs/SYSTEM_ONTOLOGY.md`
 - `OAN Mortalis V1.0/docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
 - `OAN Mortalis V1.0/docs/HOLOGRAPHIC_DATA_TOOL.md`
 - `OAN Mortalis V1.0/docs/PROJECT_CLASSIFICATION_MATRIX.md`
 - `OAN Mortalis V1.0/docs/NAMESPACE_CONVERGENCE_PLAN.md`
-- `OAN Mortalis V1.0/docs/BUILD_READINESS.md`
-- `OAN Mortalis V1.0/docs/WORKSPACE_RULES.md`
 - `OAN Mortalis V1.0/docs/DOCUMENTATION_REPO_GOVERNANCE_UPTAKE_MODEL.md`
 - `OAN Mortalis V1.0/docs/EVIDENCE_LED_DOCUMENTATION_REVISION_LAW.md`
+- `OAN Mortalis V1.0/docs/CME_FORMATION_AND_OFFICE_LEDGER_CONTRACT.md`
 
 ## Family Model
 
@@ -74,17 +77,27 @@ Expected preflight behavior:
 Manual hygiene command:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.0\tools\verify-private-corpus.ps1
+powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1
 ```
 
 ## Documentation Governance Discipline
 
 Treat the `Documentation Repo` as an active governing documentation surface when it is available locally.
 
+Secondary tooling extension rule:
+
+- treat `Antigravity` as a documentation-layer extension for cross-platform communication, repository orientation, and secondary analysis
+- keep `Codex` in this workspace as the build master and active implementation authority
+- do not let `Antigravity` supersede repo-local executable truth, build verification, or governed mutation flow
+- require any `Antigravity`-derived recommendation to be validated against current repo state before implementation
+- do not treat `Antigravity` as an independent mutation authority or alternate build surface
+
 For agent work in this repository:
 
 - ground implementation in current repo-local executable truth first
 - consult the `Documentation Repo` for stabilized conceptual truth and theory digestion when available
+- when work touches automation, seeded governance, or CME office formation, consult current repo-local telemetry under `.audit/state/` when it exists before inferring office, continuity, or readiness
+- when work touches bucket orchestration or delayed automation handoff, consult the master-thread orchestration surfaces under `.audit/state/master-thread-orchestration-*.json` before issuing new instruction intent
 - never hard-code an external documentation-repo path into tracked files
 - state plainly when the external documentation surface is unavailable in a working session
 
@@ -108,7 +121,7 @@ The repository may use a private local reference corpus identified only as:
 Resolution order:
 
 1. explicit tool argument
-2. ignored repo-local config at `OAN Mortalis V1.0/.local/private_corpus_root.txt`
+2. ignored repo-local config at `OAN Mortalis V1.1.1/.local/private_corpus_root.txt`
 3. `OAN_REFERENCE_CORPUS` environment variable
 
 Rules:
@@ -120,7 +133,7 @@ Rules:
 
 ## Edit Rules
 
-- prefer changes in `OAN Mortalis V1.0/` unless the task is explicitly governance-oriented
+- prefer changes in `OAN Mortalis V1.1.1/` unless the task is explicitly governance-oriented
 - treat `Build Contracts/` as controlled architectural governance
 - do not introduce new ambiguous top-level families
 - do not create new stack composition roots besides the canonical `Oan.Runtime.Headless`

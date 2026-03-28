@@ -36,19 +36,39 @@ public sealed class HybridProtectedIngressHarnessTests
     {
         var observer = new InMemoryAgentiFormationObserver();
         var harness = CreateHarness(observer);
-        var profile = LoadExampleProfile();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation],
+            operatorFormation: CreateOperatorFormationProfile());
 
         var result = await harness.RunAsync(profile);
 
         Assert.Equal(BootClass.CorporateGoverned, result.BootClassificationResult.BootClass);
         Assert.Equal(BootActivationState.Classified, result.BootClassificationResult.ActivationState);
         Assert.Equal(ExpansionRights.None, result.BootClassificationResult.ExpansionRights);
+        Assert.Equal(FirstBootGovernanceLayerState.RoleBoundEceReady, result.ProjectedGovernanceLayer.State);
+        Assert.True(result.ProjectedGovernanceLayer.RoleBoundEcesReady);
+        Assert.True(result.ProjectedGovernanceLayer.WitnessOnly);
+        Assert.Collection(
+            result.ProjectedGovernanceLayer.RoleBoundEces,
+            ece => Assert.Equal(InternalGoverningCmeOffice.Steward, ece.Office),
+            ece => Assert.Equal(InternalGoverningCmeOffice.Father, ece.Office),
+            ece => Assert.Equal(InternalGoverningCmeOffice.Mother, ece.Office));
         Assert.Equal([PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation], result.RequestedRevealModes);
         Assert.Equal([PrimeRevealMode.MaskedSummary, PrimeRevealMode.StructuralValidation], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
         Assert.Equal(PropositionalCompileGrade.Stable, result.OraclePropositionAssessment.Grade);
         Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliBridgeThresholdClass.WithinBand, result.ProjectedBridgeReview.ThresholdClass);
+        Assert.True(result.ProjectedRuntimeUseCeiling.CandidateOnly);
+        Assert.Equal(SliJurisdictionSurfaceClass.Industrialized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionContracts.ReasonIndustrializedIngressCandidate, result.ProjectedJurisdictionEnvelope.ReasonCode);
+        Assert.Equal(SliJurisdictionTransitionDecision.Allow, result.ProjectedJurisdictionTransition.Decision);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionActualizedToIndustrializedAllowed, result.ProjectedJurisdictionTransition.ReasonCode);
         Assert.Equal("HumanPrincipal_A", result.MaskedHandles[ProtectedIntakeKind.HumanProtectedIntake]);
         Assert.Equal("CorporatePrincipal_A", result.MaskedHandles[ProtectedIntakeKind.CorporateProtectedIntake]);
         Assert.Equal("HumanPrincipal_A", result.OraclePropositionAssessment.Candidate.Subject.SymbolicHandle);
@@ -99,6 +119,10 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Stable, result.OraclePropositionAssessment.Grade);
         Assert.Equal(PropositionalCompileGrade.Stable, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionMissingOperatorFormation, result.ProjectedJurisdictionTransition.ReasonCode);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, result.ProjectedJurisdictionTransition.Decision);
         Assert.Equal([PrimeRevealMode.None], result.GrantedRevealModes);
         Assert.Empty(result.BlockedRevealModes);
         Assert.Single(result.MembraneDecisions);
@@ -123,10 +147,18 @@ public sealed class HybridProtectedIngressHarnessTests
         var result = await harness.RunAsync(profile);
 
         Assert.Equal(FirstBootGovernanceDecision.Quarantine, result.BootClassificationResult.Decision);
+        Assert.Equal(FirstBootGovernanceLayerState.Preformalized, result.ProjectedGovernanceLayer.State);
+        Assert.False(result.ProjectedGovernanceLayer.RoleBoundEcesReady);
+        Assert.Empty(result.ProjectedGovernanceLayer.FormedOffices);
         Assert.Equal(PropositionalCompileGrade.Rejected, result.OraclePropositionAssessment.Grade);
         Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
         Assert.Contains("topology.personal-swarm.denied", result.OraclePropositionAssessment.ReasonCodes);
+        Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal("sli-bridge-quarantine", result.ProjectedBridgeReview.ReasonCode);
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, result.ProjectedJurisdictionTransition.Decision);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionBridgeNotOk, result.ProjectedJurisdictionTransition.ReasonCode);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -166,6 +198,13 @@ public sealed class HybridProtectedIngressHarnessTests
         Assert.Equal(PropositionalCompileGrade.Rejected, result.LispPropositionAssessment.Grade);
         Assert.True(result.PropositionParityMatched);
         Assert.Contains("reveal.authorized-field.denied", result.OraclePropositionAssessment.ReasonCodes);
+        Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal("sli-prebond-coercive-bonding-posture", result.ProjectedBridgeReview.ReasonCode);
+        Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
+        Assert.Equal(SliPreBondSafeguardClass.CoerciveBondingPosture, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
+        Assert.Equal(SliJurisdictionSurfaceClass.Actualized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionTransitionDecision.Hold, result.ProjectedJurisdictionTransition.Decision);
+        Assert.Equal(SliJurisdictionContracts.ReasonTransitionBridgeNotOk, result.ProjectedJurisdictionTransition.ReasonCode);
         Assert.Empty(result.MembraneDecisions);
         Assert.Empty(result.ClosureOutcomes);
         Assert.DoesNotContain(
@@ -175,6 +214,128 @@ public sealed class HybridProtectedIngressHarnessTests
                    tag.Contains(profile.HumanCredentialId, StringComparison.Ordinal) ||
                    tag.Contains(profile.CorporateRegistryId, StringComparison.Ordinal));
         Assert.Equal(result.ObservationBatch.Observations.Count, observer.Snapshot().Count);
+    }
+
+    [Fact]
+    public async Task PredatorySharedDomainRisk_IsRefusedBeforeClosure()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.MaskedSummary],
+            predatorySharedDomainRiskDetected: true);
+
+        var result = await harness.RunAsync(profile);
+
+        Assert.Equal(SliBridgeOutcomeKind.RefuseContext, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliBridgeThresholdClass.FaultLine, result.ProjectedBridgeReview.ThresholdClass);
+        Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
+        Assert.Equal(SliPreBondSafeguardClass.PredatorySharedDomainRisk, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
+        Assert.Equal(SliPreBondSafeguardDisposition.Refuse, result.ProjectedBridgeReview.PreBondSafeguard.Disposition);
+        Assert.True(result.ProjectedBridgeReview.PreBondSafeguard.RequiresEscalation);
+        Assert.Empty(result.MembraneDecisions);
+        Assert.Empty(result.ClosureOutcomes);
+    }
+
+    [Fact]
+    public async Task ContinuityInstability_IsHeldBeforeClosure()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.StructuralValidation],
+            continuityInstabilityDetected: true);
+
+        var result = await harness.RunAsync(profile);
+
+        Assert.Equal(SliBridgeOutcomeKind.NeedsSpec, result.ProjectedBridgeReview.OutcomeKind);
+        Assert.Equal(SliBridgeThresholdClass.ThresholdBreach, result.ProjectedBridgeReview.ThresholdClass);
+        Assert.NotNull(result.ProjectedBridgeReview.PreBondSafeguard);
+        Assert.Equal(SliPreBondSafeguardClass.ContinuityInstability, result.ProjectedBridgeReview.PreBondSafeguard!.SafeguardClass);
+        Assert.Equal(SliPreBondSafeguardDisposition.Hold, result.ProjectedBridgeReview.PreBondSafeguard.Disposition);
+        Assert.Empty(result.MembraneDecisions);
+        Assert.Empty(result.ClosureOutcomes);
+    }
+
+    [Fact]
+    public async Task OperatorFormationProfile_IsProjectedIntoBridgeReview()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.MaskedSummary],
+            operatorFormation: CreateOperatorFormationProfile());
+
+        var result = await harness.RunAsync(profile);
+
+        Assert.NotNull(result.ProjectedBridgeReview.OperatorFormation);
+        Assert.True(result.ProjectedBridgeReview.OperatorFormation!.WitnessableProtectiveSubsetOnly);
+        Assert.False(result.ProjectedBridgeReview.OperatorFormation.BondRealizationClaimed);
+        Assert.Equal(
+            SliOperatorFormationBoundaryCrossingMode.InterlacedBondedCrossing,
+            result.ProjectedBridgeReview.OperatorFormation.BoundaryCrossingMode);
+        Assert.Equal(
+            SliOperatorFormationRing.Rootseed,
+            result.ProjectedBridgeReview.OperatorFormation.Profile.Ring);
+        Assert.Equal(
+            SliOperatorFormationMode.Stillness,
+            result.ProjectedBridgeReview.OperatorFormation.Profile.ActiveMode);
+        Assert.Equal(
+            SliOperatorFormationCertificationDecision.Pending,
+            result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Decision);
+        Assert.Equal(2, result.ProjectedBridgeReview.OperatorFormation.SigilAssets.Count);
+        Assert.Contains(
+            result.ProjectedBridgeReview.OperatorFormation.SigilAssets,
+            asset => asset.SigilClass == SliOperatorFormationSigilClass.MergedCompletionKey);
+        Assert.Equal(
+            SliOperatorFormationProgressionState.Blocked,
+            result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.State);
+        Assert.False(result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.PromotionClaimAllowed);
+        Assert.Equal(
+            "certification_reviewer://first-run-lane",
+            result.ProjectedBridgeReview.OperatorFormation.CertificationPosture.Progression.HaltOwner);
+        Assert.Equal(SliJurisdictionSurfaceClass.Industrialized, result.ProjectedJurisdictionEnvelope.SurfaceClass);
+        Assert.Equal(SliJurisdictionTransitionDecision.Allow, result.ProjectedJurisdictionTransition.Decision);
+    }
+
+    [Fact]
+    public async Task OperatorFormationProgression_TargetTransitionReady_WhenGateIsMet()
+    {
+        var harness = CreateHarness();
+        var profile = CloneProfile(
+            LoadExampleProfile(),
+            bootClass: BootClass.CorporateGoverned,
+            requestedExpansionCount: 1,
+            requestedRevealModes: [PrimeRevealMode.StructuralValidation],
+            operatorFormation: CreateOperatorFormationProfile(
+                decision: SliOperatorFormationCertificationDecision.Proceed,
+                evidenceGaps: [],
+                blockingConditions: [],
+                currentAnchoredPosture: SliOperatorFormationBondStatus.VerifiedCandidate,
+                nearestAdmissibleNextPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                targetPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                certificationIssued: true,
+                expandedRevealAllowed: true,
+                continuityClaimAllowed: true));
+
+        var result = await harness.RunAsync(profile);
+        var operatorFormation = result.ProjectedBridgeReview.OperatorFormation;
+        Assert.NotNull(operatorFormation);
+        var certification = operatorFormation!.CertificationPosture;
+
+        Assert.Equal(SliOperatorFormationProgressionState.TargetTransitionReady, certification.Progression.State);
+        Assert.True(certification.Progression.TargetTransitionAllowed);
+        Assert.True(certification.Progression.PromotionClaimAllowed);
+        Assert.True(certification.CertificationIssued);
+        Assert.True(certification.ExpandedRevealAllowed);
+        Assert.True(certification.ContinuityClaimAllowed);
+        Assert.Equal("operator-formation-target-transition-ready", certification.Progression.ReasonCode);
     }
 
     private static HybridProtectedIngressHarness CreateHarness(IAgentiFormationObserver? observer = null)
@@ -205,7 +366,12 @@ public sealed class HybridProtectedIngressHarnessTests
         bool? bondedAuthorityConfirmed = null,
         IReadOnlyList<string>? approvedRevealPurposes = null,
         string? humanPrincipalName = null,
-        string? corporatePrincipalName = null)
+        string? corporatePrincipalName = null,
+        bool? predatorySharedDomainRiskDetected = null,
+        bool? coerciveBondingPostureDetected = null,
+        bool? continuityInstabilityDetected = null,
+        bool? identityOvercollapseRiskDetected = null,
+        HybridProtectedIngressOperatorFormationProfile? operatorFormation = null)
     {
         return new HybridProtectedIngressProfile
         {
@@ -220,7 +386,101 @@ public sealed class HybridProtectedIngressHarnessTests
             RequestedExpansionCount = requestedExpansionCount,
             RequestedRevealModes = requestedRevealModes.ToArray(),
             BondedAuthorityConfirmed = bondedAuthorityConfirmed ?? baseProfile.BondedAuthorityConfirmed,
-            ApprovedRevealPurposes = (approvedRevealPurposes ?? baseProfile.ApprovedRevealPurposes).ToArray()
+            ApprovedRevealPurposes = (approvedRevealPurposes ?? baseProfile.ApprovedRevealPurposes).ToArray(),
+            PredatorySharedDomainRiskDetected = predatorySharedDomainRiskDetected ?? baseProfile.PredatorySharedDomainRiskDetected,
+            CoerciveBondingPostureDetected = coerciveBondingPostureDetected ?? baseProfile.CoerciveBondingPostureDetected,
+            ContinuityInstabilityDetected = continuityInstabilityDetected ?? baseProfile.ContinuityInstabilityDetected,
+            IdentityOvercollapseRiskDetected = identityOvercollapseRiskDetected ?? baseProfile.IdentityOvercollapseRiskDetected,
+            OperatorFormation = operatorFormation ?? baseProfile.OperatorFormation
+        };
+    }
+
+    private static HybridProtectedIngressOperatorFormationProfile CreateOperatorFormationProfile(
+        SliOperatorFormationCertificationDecision decision = SliOperatorFormationCertificationDecision.Pending,
+        IReadOnlyList<string>? evidenceGaps = null,
+        IReadOnlyList<string>? blockingConditions = null,
+        SliOperatorFormationBondStatus currentAnchoredPosture = SliOperatorFormationBondStatus.TrainingOperator,
+        SliOperatorFormationBondStatus nearestAdmissibleNextPosture = SliOperatorFormationBondStatus.VerifiedCandidate,
+        SliOperatorFormationBondStatus targetPosture = SliOperatorFormationBondStatus.PreCertifiedOperator,
+        bool certificationIssued = false,
+        bool expandedRevealAllowed = false,
+        bool continuityClaimAllowed = false)
+    {
+        return new HybridProtectedIngressOperatorFormationProfile
+        {
+            ProfileId = "gs_profile_obsidian_guarded",
+            ChapterLocalSurface = "research/publications/gnomeronacorde-v0.1/source/1_OBSIDIAN_WALL/1a_Casting_Shadow.tex",
+            PairedTrainingSurface = "research/publications/gnome-speak-nlp-v1.0/source/sections/operator_role.tex",
+            CrossingTaskKind = "literacy_alignment",
+            HaltOwner = "bonded_training_reviewer",
+            BoundaryCrossingMode = SliOperatorFormationBoundaryCrossingMode.InterlacedBondedCrossing,
+            Ring = SliOperatorFormationRing.Rootseed,
+            ActiveMode = SliOperatorFormationMode.Stillness,
+            StillnessInterludeUsed = false,
+            RedHatIndexRequired = true,
+            BondStatus = SliOperatorFormationBondStatus.TrainingOperator,
+            EchoVeilCheckRequired = true,
+            ActiveConflictClass = SliOperatorFormationConflictClass.None,
+            GjpNeeded = false,
+            GjpVerdict = SliOperatorFormationGjpVerdict.NotApplicable,
+            MotherLightAnchored = true,
+            FatherEchoAnchored = true,
+            ShellRootAnchored = true,
+            SeedBoundAnchored = true,
+            U230ShadowScript = SliOperatorFormationConcealmentLayerState.Observed,
+            U300ElvenScript = SliOperatorFormationConcealmentLayerState.Observed,
+            ExpectedEvidenceArtifact = "interlace_crossing_proof",
+            AdmissibleOutput = "bounded_training_profile",
+            ProhibitedOutputs = ["unrestricted_archetype_claim", "unauthorized_gjp_invocation"],
+            Certification = new HybridProtectedIngressOperatorFormationCertification
+            {
+                Decision = decision,
+                CurrentAnchoredPosture = currentAnchoredPosture,
+                TargetPosture = targetPosture,
+                NearestAdmissibleNextPosture = nearestAdmissibleNextPosture,
+                ReviewOwner = "certification_reviewer://first-run-lane",
+                RequiredBondedStandard = "first_run_bonding://precertification/minimum-admissible-evidence",
+                EvidenceGaps = (evidenceGaps ?? ["trial_receipt_set", "label_classification_receipt"]).ToArray(),
+                BlockingConditions = (blockingConditions ?? ["incomplete_trial_evidence"]).ToArray(),
+                NextActions = ["Complete the current Gnome Speak trial block.", "Attach the chapter-local label-classification receipt."],
+                HaltOwner = "certification_reviewer://first-run-lane",
+                HaltCondition = "Halt if evidence lineage breaks or if protected meaning is flattened during remediation.",
+                ReentryRule = "Reenter certification review only after the missing trial receipt set and chapter-local classification outputs are attached.",
+                ProhibitedClaims = ["pre-certification issued", "bond actualized"],
+                LinkedVerificationRecord = "first_bonding://verification/pending",
+                LinkedPreCertificationRecord = null,
+                GateArtifact = "verification record",
+                CertificationIssued = certificationIssued,
+                ExpandedRevealAllowed = expandedRevealAllowed,
+                ContinuityClaimAllowed = continuityClaimAllowed
+            },
+            SigilAssets =
+            [
+                new HybridProtectedIngressOperatorFormationSigilAsset
+                {
+                    AssetId = "obsidian_1",
+                    AssetLabel = "OBSIDIAN1",
+                    SigilClass = SliOperatorFormationSigilClass.PhasePartition,
+                    PhaseNumber = 1,
+                    VisibilityClass = "operator_guarded",
+                    BuildRenderPolicy = "staged_render_allowed",
+                    ReductionPosture = "reference_and_render_allowed",
+                    MergedFromAssets = [],
+                    WitnessOfAsset = null
+                },
+                new HybridProtectedIngressOperatorFormationSigilAsset
+                {
+                    AssetId = "obsidian_zed",
+                    AssetLabel = "OBSIDIANzed",
+                    SigilClass = SliOperatorFormationSigilClass.MergedCompletionKey,
+                    PhaseNumber = null,
+                    VisibilityClass = "continuity_sealed",
+                    BuildRenderPolicy = "staged_render_allowed",
+                    ReductionPosture = "descriptive_reduction_allowed",
+                    MergedFromAssets = ["obsidian_1", "obsidian_2", "obsidian_3", "obsidian_4", "obsidian_5"],
+                    WitnessOfAsset = null
+                }
+            ]
         };
     }
 

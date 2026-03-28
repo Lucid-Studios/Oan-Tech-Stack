@@ -8,11 +8,13 @@ public sealed class NdjsonGovernanceReceiptJournal : IGovernanceReceiptJournal
 {
     private static readonly Regex LoopKeyPattern = new("\"loopKey\"\\s*:\\s*\"(?<loopKey>[^\"]+)\"", RegexOptions.Compiled);
     private readonly string _filePath;
+    private readonly IManagedEgressRouter _egressRouter;
     private readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web);
 
-    public NdjsonGovernanceReceiptJournal(string filePath)
+    public NdjsonGovernanceReceiptJournal(string filePath, IManagedEgressRouter? egressRouter = null)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
+        _egressRouter = egressRouter ?? NullEgressRouter.Instance;
     }
 
     public async Task AppendAsync(
@@ -20,14 +22,32 @@ public sealed class NdjsonGovernanceReceiptJournal : IGovernanceReceiptJournal
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        var directory = Path.GetDirectoryName(_filePath);
-        if (!string.IsNullOrWhiteSpace(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
 
-        var json = JsonSerializer.Serialize(entry, _serializerOptions);
-        await File.AppendAllTextAsync(_filePath, json + Environment.NewLine, cancellationToken).ConfigureAwait(false);
+        var envelope = new ManagedEgressEnvelope(
+            EffectKind: SliEgressEffectKind.JournalAppend,
+            RetentionPosture: SliEgressRetentionPosture.GovernanceArtifact,
+            JurisdictionClass: SliEgressJurisdictionClass.AgentiCore,
+            IdentityFormingAllowed: true,
+            TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+            AuthorityReason: "Appending deterministic receipt state to durable file journal"
+        );
+
+        var authorized = await _egressRouter.TryRouteEgressAsync(envelope, async () =>
+        {
+            var directory = Path.GetDirectoryName(_filePath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var json = JsonSerializer.Serialize(entry, _serializerOptions);
+            await File.AppendAllTextAsync(_filePath, json + Environment.NewLine, cancellationToken).ConfigureAwait(false);
+        }, cancellationToken).ConfigureAwait(false);
+
+        if (!authorized)
+        {
+            throw new InvalidOperationException("Managed egress router denied governance receipt journal append.");
+        }
     }
 
     public async Task<GovernanceJournalReplayBatch> ReplayBatchAsync(

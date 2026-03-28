@@ -69,7 +69,7 @@ public sealed class HopngArtifactServiceIntegrationTests
             includeWeatherDisclosureReceipts: true,
             includeOfficeAuthorityReceipts: true);
         var outputRoot = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}-hopng-disclosure-parity");
-        var localService = new LocalHdtHopngArtifactService(outputRoot);
+        var localService = new LocalHdtHopngArtifactService(outputRoot, new TestPermissiveEgressRouter());
         var fallbackService = new UnavailableHopngArtifactService();
 
         var localReceipt = await localService.EmitAsync(request);

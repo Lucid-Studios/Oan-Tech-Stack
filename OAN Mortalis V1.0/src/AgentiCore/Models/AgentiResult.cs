@@ -12,5 +12,7 @@ public sealed class AgentiResult
     public required AgentiSymbolicTrace SymbolicTrace { get; init; }
     public required AgentiEngramCandidate EngramCandidate { get; init; }
     public required AgentiTransientResidue TransientResidue { get; init; }
+    public required ZedThetaCandidateReceipt ZedThetaCandidate { get; init; }
+    public required SliTheaterAuthorizationReceipt TheaterAuthorization { get; init; }
     public CompassObservationSurface? CompassObservation { get; init; }
 }

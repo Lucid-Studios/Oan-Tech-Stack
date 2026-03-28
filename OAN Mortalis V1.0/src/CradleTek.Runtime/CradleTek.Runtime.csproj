@@ -4,6 +4,7 @@
     <ProjectReference Include="..\AgentiCore\AgentiCore.csproj" />
     <ProjectReference Include="..\CradleTek.CognitionHost\CradleTek.CognitionHost.csproj" />
     <ProjectReference Include="..\CradleTek.Host\CradleTek.Host.csproj" />
+    <ProjectReference Include="..\Oan.Common\Oan.Common.csproj" />
     <ProjectReference Include="..\SLI.Engine\SLI.Engine.csproj" />
     <ProjectReference Include="..\Telemetry.GEL\Telemetry.GEL.csproj" />
   </ItemGroup>

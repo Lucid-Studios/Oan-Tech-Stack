@@ -20,17 +20,18 @@ When info is needed from v0.1:
 
 ---
 
-## 3) v1.0 is the only active build target
-**Folder:** `OAN Mortalis V1.0/`  
-**Rule:** All implementation work happens here. All build/test commands run here. All new code lands here.
+## 3) v1.1.1 is the active build target
+**Folder:** `OAN Mortalis V1.1.1/`  
+**Rule:** All implementation work happens here. All repo-root build/test commands run here. All new code lands here unless a task is explicitly reference-only or archival.
 
 ---
 
 ## Path Allowlist
-- **Allowed write paths:** `OAN Mortalis V1.0/**`
-- **Allowed read paths:** `Build Contracts/**`, `OAN Mortalis V0.1 Archive/**`
+- **Allowed write paths:** `OAN Mortalis V1.1.1/**`
+- **Allowed read paths:** `Build Contracts/**`, `OAN Mortalis V1.0/**`, `OAN Mortalis V0.1 Archive/**`
 
 ## Forbidden write paths
 - `Build Contracts/**`
+- `OAN Mortalis V1.0/**`
 - `OAN Mortalis V0.1 Archive/**`
-- Anything else in `Unity Projects/**` outside v1.0
+- Anything else in `Unity Projects/**` outside the active build line

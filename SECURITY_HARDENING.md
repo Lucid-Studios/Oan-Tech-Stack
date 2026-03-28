@@ -17,7 +17,7 @@ The live hardened surface includes tracked files under:
 - `Build Contracts/`
 - `docs/`
 - `Modules/`
-- `OAN Mortalis V1.0/`
+- `OAN Mortalis V1.1.1/`
 - top-level build, test, and security policy files
 
 Rules:

@@ -2,8 +2,10 @@ using System.Security.Cryptography;
 using System.Text;
 using CradleTek.Memory.Interfaces;
 using CradleTek.Memory.Models;
+using CradleTek.CognitionHost.Models;
 using Oan.Common;
 using SLI.Engine.Cognition;
+using SLI.Engine.Nexus;
 using SLI.Engine.Morphology;
 using SLI.Engine.Models;
 using SLI.Engine.Parser;
@@ -21,8 +23,10 @@ public sealed class LispBridge
         "core.lisp",
         "parser.lisp",
         "reasoning.lisp",
+        "golden-code.lisp",
         "engram.lisp",
         "compass.lisp",
+        "diagnostics.lisp",
         "morphology.lisp",
         "locality.lisp",
         "rehearsal.lisp",
@@ -98,7 +102,17 @@ public sealed class LispBridge
 
         var program = LowerProgram(symbolicProgram);
         var context = new SliExecutionContext(frame, _resolver, _semanticDevice);
+        if (SliCompassLocalityShards.IsPilotEligible(program))
+        {
+            context.EnableCompassShardMode();
+        }
+
         await _interpreter.ExecuteProgramAsync(program, context, cancellationToken).ConfigureAwait(false);
+        if (context.ShardModeEnabled)
+        {
+            context.FinalizeCompassShardRun();
+        }
+
         EnforceCanonicalOrdering(context.TraceLines);
 
         var cleaveResidue = context.PrunedBranches.Count == 0
@@ -112,7 +126,13 @@ public sealed class LispBridge
         var compass = BuildCompassState(context.TraceLines);
         var decisionBranch = context.CandidateBranches.FirstOrDefault() ?? context.FinalDecision;
         var traceId = CreateDeterministicTraceId(frame.CMEId, frame.ContextId, traceHash).ToString("D");
-        return new LispExecutionResult
+        var zedThetaCandidate = BuildZedThetaCandidate(context, traceId);
+        var actualizationPacket = SliActualizationWebbingPacketFactory.CreateForCognition(context, traceId, zedThetaCandidate);
+        var liveRuntimeRun = context.ShardModeEnabled
+            ? SliLiveEngramRuntimePacketFactory.CreateRunForCognition(context, traceId, zedThetaCandidate)
+            : null;
+
+        var result = new LispExecutionResult
         {
             TraceId = traceId,
             Decision = context.FinalDecision,
@@ -120,8 +140,22 @@ public sealed class LispBridge
             CleaveResidue = cleaveResidue,
             SymbolicTrace = trace,
             SymbolicTraceHash = traceHash,
-            CompassState = compass
+            CompassState = compass,
+            GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
+            ZedThetaCandidate = zedThetaCandidate,
+            ActualizationPacket = actualizationPacket,
+            LiveRuntimePacket = liveRuntimeRun is not null
+                ? SliLiveEngramRuntimePacketFactory.ResolveCompatibilityPacket(liveRuntimeRun)
+                : SliLiveEngramRuntimePacketFactory.CreateForCognition(context, traceId, zedThetaCandidate),
+            LiveRuntimeRun = liveRuntimeRun
         };
+
+        var snapshot = SliExecutionSnapshotFactory.CreateForCognition(context, result);
+        result.ExecutionSnapshot = snapshot;
+        var crypticWebNexus = CrypticWebNexusFactory.Create(snapshot);
+        result.CrypticWebNexus = crypticWebNexus;
+        result.CrypticWebNexusPortal = CrypticWebNexusFactory.CreatePortal(crypticWebNexus);
+        return result;
     }
 
     internal async Task<SliHigherOrderLocalityResult> ExecuteHigherOrderLocalityProgramAsync(
@@ -595,6 +629,48 @@ public sealed class LispBridge
         };
     }
 
+    private static ZedThetaCandidateReceipt BuildZedThetaCandidate(
+        SliExecutionContext context,
+        string traceId)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(traceId);
+
+        var state = context.GoldenCodeState;
+        var candidateHandle = $"zed-theta:{traceId}";
+        var bridgeReview = SliBridgeContracts.CreateCandidateBridgeReview(
+            bridgeStage: "zed-theta-candidate",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: $"sli-bridge://{traceId}",
+            thetaState: state.ThetaState,
+            gammaState: state.GammaState,
+            packetDirective: state.PacketDirective,
+            identityKernelBoundary: state.IdentityKernelBoundary,
+            validity: state.PacketValidity,
+            activeBasin: state.ActiveBasin,
+            competingBasin: state.CompetingBasin,
+            anchorState: state.AnchorState,
+            selfTouchClass: state.SelfTouchClass);
+        var runtimeUseCeiling = SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling();
+        return new ZedThetaCandidateReceipt(
+            CandidateHandle: candidateHandle,
+            Objective: context.Frame.TaskObjective,
+            PrimeState: state.PrimeState,
+            ThetaState: state.ThetaState,
+            GammaState: state.GammaState,
+            PacketDirective: state.PacketDirective,
+            IdentityKernelBoundary: state.IdentityKernelBoundary,
+            Validity: state.PacketValidity,
+            ActiveBasin: state.ActiveBasin,
+            CompetingBasin: state.CompetingBasin,
+            AnchorState: state.AnchorState,
+            SelfTouchClass: state.SelfTouchClass,
+            OeCoePosture: state.OeCoePosture,
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: runtimeUseCeiling);
+    }
+
     private static double EntropyFromTrace(IReadOnlyList<string> traceLines)
     {
         if (traceLines.Count == 0)
@@ -650,6 +726,14 @@ public sealed class LispBridge
         var localityIndex = IndexOf(traceLines, "locality-bind(");
         var perspectiveIndex = IndexOf(traceLines, "perspective-configure(");
         var participationIndex = IndexOf(traceLines, "participation-configure(");
+        var primeIndex = IndexOf(traceLines, "prime-reflect(");
+        var zedIndex = IndexOf(traceLines, "zed-listen(");
+        var deltaIndex = IndexOf(traceLines, "delta-differentiate(");
+        var sigmaIndex = IndexOf(traceLines, "sigma-cleave(");
+        var psiIndex = IndexOf(traceLines, "psi-modulate(");
+        var omegaIndex = IndexOf(traceLines, "omega-converge(");
+        var thetaIndex = IndexOf(traceLines, "theta-seal(");
+        var compassWorkIndex = IndexOf(traceLines, "compass-work(");
         var compassIndex = IndexOf(traceLines, "compass-update(");
         var decisionIndex = IndexOf(traceLines, "decision-branch(");
         var cleaveIndex = IndexOf(traceLines, "cleave(");
@@ -659,6 +743,14 @@ public sealed class LispBridge
             localityIndex < 0 ||
             perspectiveIndex < 0 ||
             participationIndex < 0 ||
+            primeIndex < 0 ||
+            zedIndex < 0 ||
+            deltaIndex < 0 ||
+            sigmaIndex < 0 ||
+            psiIndex < 0 ||
+            omegaIndex < 0 ||
+            thetaIndex < 0 ||
+            compassWorkIndex < 0 ||
             compassIndex < 0 ||
             decisionIndex < 0 ||
             cleaveIndex < 0 ||
@@ -671,7 +763,15 @@ public sealed class LispBridge
             reasoningIndex < localityIndex &&
             localityIndex < perspectiveIndex &&
             perspectiveIndex < participationIndex &&
-            participationIndex < compassIndex &&
+            participationIndex < primeIndex &&
+            primeIndex < zedIndex &&
+            zedIndex < deltaIndex &&
+            deltaIndex < sigmaIndex &&
+            sigmaIndex < psiIndex &&
+            psiIndex < omegaIndex &&
+            omegaIndex < thetaIndex &&
+            thetaIndex < compassWorkIndex &&
+            compassWorkIndex < compassIndex &&
             compassIndex < decisionIndex &&
             decisionIndex < cleaveIndex &&
             cleaveIndex < commitIndex;

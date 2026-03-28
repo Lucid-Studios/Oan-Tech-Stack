@@ -19,7 +19,7 @@ public sealed class GovernedCompassDriftIntegrationTests
         var storageTelemetry = new RecordingTelemetrySink();
         var publicLayer = new PublicLayerService();
         var mantle = new MantleOfSovereigntyService();
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
 

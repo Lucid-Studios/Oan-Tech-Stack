@@ -1,0 +1,78 @@
+{
+  "id": "FRAG-G-MICRO",
+  "title": "Micro Substrate",
+  "nodes": [
+    {
+      "id": "G1",
+      "text": "soil layer (sand/silt/clay%, moisture)",
+      "role": "origin",
+      "critical": true,
+      "deps": []
+    },
+    {
+      "id": "G2",
+      "text": "grass blade stiffness EI, density \u03c1_g",
+      "role": "bridge",
+      "critical": true,
+      "deps": [
+        "G1"
+      ]
+    },
+    {
+      "id": "G3",
+      "text": "wet clay \u2194 low bearing strength",
+      "role": "inversion",
+      "critical": false,
+      "deps": [
+        "G1",
+        "G2"
+      ]
+    },
+    {
+      "id": "G4",
+      "text": "lodgment depth / shear failure",
+      "role": "leap",
+      "critical": true,
+      "deps": [
+        "G3"
+      ]
+    },
+    {
+      "id": "G5",
+      "text": "rebound/tearing recorded",
+      "role": "reflection",
+      "critical": false,
+      "deps": [
+        "G4"
+      ]
+    }
+  ],
+  "edges": [
+    [
+      "G2",
+      "G1"
+    ],
+    [
+      "G3",
+      "G1"
+    ],
+    [
+      "G3",
+      "G2"
+    ],
+    [
+      "G4",
+      "G3"
+    ],
+    [
+      "G5",
+      "G4"
+    ]
+  ],
+  "master_gloss": "Soil\u2013grass microphysics; failure and lodgment recorded.",
+  "local_Z": {
+    "description": "Local Z_G: substrate modulus & shear baseline",
+    "sig": "sha256:4a4a6c33cc3677a3"
+  },
+  "parent_fragment": "FRAG-F-BICYCLE"
+}

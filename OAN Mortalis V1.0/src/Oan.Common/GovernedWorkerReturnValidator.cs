@@ -22,6 +22,16 @@ public static class GovernedWorkerReturnValidator
             cmeId,
             returnPacket.WorkerPacketId,
             handoffReceipt.HandoffHandle);
+        var resolvedBridgeReview = returnPacket.BridgeReview ?? handoffPacket.BridgeReview ?? handoffReceipt.BridgeReview;
+        var resolvedRuntimeUseCeiling = returnPacket.RuntimeUseCeiling ?? handoffPacket.RuntimeUseCeiling ?? handoffReceipt.RuntimeUseCeiling;
+        var resolvedJurisdictionEnvelope = returnPacket.JurisdictionEnvelope ?? handoffPacket.JurisdictionEnvelope ?? handoffReceipt.JurisdictionEnvelope;
+        var resolvedJurisdictionTransition = ResolveJurisdictionTransition(
+            handoffPacket,
+            handoffReceipt,
+            returnPacket,
+            resolvedBridgeReview,
+            resolvedRuntimeUseCeiling,
+            resolvedJurisdictionEnvelope);
 
         return new GovernedWorkerReturnReceipt(
             ReturnHandle: returnHandle,
@@ -44,7 +54,11 @@ public static class GovernedWorkerReturnValidator
             Validated: validationFailureCode is null,
             ValidationFailureCode: validationFailureCode,
             WitnessedBy: "CradleTek",
-            TimestampUtc: returnPacket.TimestampUtc);
+            TimestampUtc: returnPacket.TimestampUtc,
+            BridgeReview: resolvedBridgeReview,
+            RuntimeUseCeiling: resolvedRuntimeUseCeiling,
+            JurisdictionEnvelope: resolvedJurisdictionEnvelope,
+            JurisdictionTransition: resolvedJurisdictionTransition);
     }
 
     private static string? ValidateInternal(
@@ -56,6 +70,27 @@ public static class GovernedWorkerReturnValidator
             !string.Equals(handoffReceipt.HandoffPacketId, handoffPacket.HandoffPacketId, StringComparison.Ordinal))
         {
             return "handoff-packet-mismatch";
+        }
+
+        if (handoffPacket.BridgeReview is not null &&
+            handoffReceipt.BridgeReview is not null &&
+            handoffPacket.BridgeReview != handoffReceipt.BridgeReview)
+        {
+            return "bridge-review-mismatch";
+        }
+
+        if (handoffPacket.RuntimeUseCeiling is not null &&
+            handoffReceipt.RuntimeUseCeiling is not null &&
+            handoffPacket.RuntimeUseCeiling != handoffReceipt.RuntimeUseCeiling)
+        {
+            return "runtime-ceiling-mismatch";
+        }
+
+        if (handoffPacket.JurisdictionEnvelope is not null &&
+            handoffReceipt.JurisdictionEnvelope is not null &&
+            handoffPacket.JurisdictionEnvelope != handoffReceipt.JurisdictionEnvelope)
+        {
+            return "jurisdiction-envelope-mismatch";
         }
 
         if (returnPacket.WorkerSpecies != handoffPacket.WorkerSpecies)
@@ -104,6 +139,92 @@ public static class GovernedWorkerReturnValidator
             return "prohibited-action-attempt";
         }
 
+        var handoffBridgeReview = handoffPacket.BridgeReview ?? handoffReceipt.BridgeReview;
+        var handoffRuntimeUseCeiling = handoffPacket.RuntimeUseCeiling ?? handoffReceipt.RuntimeUseCeiling;
+        var returnBridgeReview = returnPacket.BridgeReview ?? handoffBridgeReview;
+        var returnRuntimeUseCeiling = returnPacket.RuntimeUseCeiling ?? handoffRuntimeUseCeiling;
+
+        if (handoffBridgeReview is not null &&
+            returnBridgeReview is not null &&
+            returnBridgeReview != handoffBridgeReview)
+        {
+            return "bridge-witness-linkage-mismatch";
+        }
+
+        if (SliBridgeContracts.HasBlockingPreBondSafeguard(handoffBridgeReview) &&
+            returnPacket.CompletionState == WorkerCompletionState.Completed)
+        {
+            return "prebond-safeguard-bypass";
+        }
+
+        if (ContainsProtectiveReasonCode(returnPacket.ReasonCodes) &&
+            returnPacket.CompletionState == WorkerCompletionState.Completed)
+        {
+            return "protective-reason-cannot-complete";
+        }
+
+        if (handoffRuntimeUseCeiling is not null &&
+            returnRuntimeUseCeiling is not null &&
+            returnRuntimeUseCeiling != handoffRuntimeUseCeiling)
+        {
+            return "runtime-ceiling-widened";
+        }
+
+        var handoffJurisdictionEnvelope = handoffPacket.JurisdictionEnvelope ?? handoffReceipt.JurisdictionEnvelope;
+        if (handoffJurisdictionEnvelope is null)
+        {
+            return returnPacket.JurisdictionEnvelope is null
+                ? null
+                : "jurisdiction-envelope-not-issued";
+        }
+
+        var returnJurisdictionEnvelope = returnPacket.JurisdictionEnvelope ?? handoffJurisdictionEnvelope;
+        if (returnJurisdictionEnvelope.SurfaceClass != handoffJurisdictionEnvelope.SurfaceClass)
+        {
+            var transition = SliJurisdictionContracts.EvaluateTransition(
+                handoffJurisdictionEnvelope,
+                returnJurisdictionEnvelope.SurfaceClass,
+                bridgeReview: handoffBridgeReview,
+                runtimeUseCeiling: handoffRuntimeUseCeiling,
+                operatorFormation: handoffBridgeReview?.OperatorFormation);
+            if (transition.Decision != SliJurisdictionTransitionDecision.Allow)
+            {
+                return "jurisdiction-transition-not-allowed";
+            }
+        }
+
         return null;
+    }
+
+    private static SliJurisdictionTransitionReceipt? ResolveJurisdictionTransition(
+        WorkerHandoffPacket handoffPacket,
+        GovernedWorkerHandoffReceipt handoffReceipt,
+        WorkerReturnPacket returnPacket,
+        SliBridgeReviewReceipt? resolvedBridgeReview,
+        SliRuntimeUseCeilingReceipt? resolvedRuntimeUseCeiling,
+        SliJurisdictionEnvelopeReceipt? resolvedJurisdictionEnvelope)
+    {
+        var sourceEnvelope = handoffPacket.JurisdictionEnvelope ?? handoffReceipt.JurisdictionEnvelope;
+        if (sourceEnvelope is null || resolvedJurisdictionEnvelope is null ||
+            sourceEnvelope.SurfaceClass == resolvedJurisdictionEnvelope.SurfaceClass)
+        {
+            return null;
+        }
+
+        return SliJurisdictionContracts.EvaluateTransition(
+            sourceEnvelope,
+            resolvedJurisdictionEnvelope.SurfaceClass,
+            bridgeReview: resolvedBridgeReview,
+            runtimeUseCeiling: resolvedRuntimeUseCeiling,
+            operatorFormation: resolvedBridgeReview?.OperatorFormation);
+    }
+
+    private static bool ContainsProtectiveReasonCode(IReadOnlyList<WorkerReasonCode> reasonCodes)
+    {
+        return reasonCodes.Any(code => code is
+            WorkerReasonCode.PredatorySharedDomainRisk or
+            WorkerReasonCode.CoerciveBondingPosture or
+            WorkerReasonCode.ContinuityInstability or
+            WorkerReasonCode.IdentityOvercollapseRisk);
     }
 }

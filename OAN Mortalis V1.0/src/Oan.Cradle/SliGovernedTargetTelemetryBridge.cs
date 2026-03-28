@@ -15,13 +15,19 @@ internal sealed class SliGovernedTargetTelemetryBridge
 {
     private readonly ITelemetrySink _governanceTelemetry;
     private readonly IGovernanceReceiptJournal? _governanceReceiptJournal;
+    private readonly IManagedEgressRouter _egressRouter;
+    private readonly SliEgressTargetSinkClass _telemetryTargetSinkClass;
 
     public SliGovernedTargetTelemetryBridge(
         ITelemetrySink governanceTelemetry,
-        IGovernanceReceiptJournal? governanceReceiptJournal = null)
+        IGovernanceReceiptJournal? governanceReceiptJournal = null,
+        IManagedEgressRouter? egressRouter = null,
+        SliEgressTargetSinkClass telemetryTargetSinkClass = SliEgressTargetSinkClass.MemoryJournal)
     {
         _governanceTelemetry = governanceTelemetry ?? throw new ArgumentNullException(nameof(governanceTelemetry));
         _governanceReceiptJournal = governanceReceiptJournal;
+        _egressRouter = egressRouter ?? NullEgressRouter.Instance;
+        _telemetryTargetSinkClass = telemetryTargetSinkClass;
     }
 
     public async Task WitnessHigherOrderLocalityTargetExecutionAsync(
@@ -57,20 +63,64 @@ internal sealed class SliGovernedTargetTelemetryBridge
 
     private ITelemetrySink CreateTelemetrySink(SliGovernedTargetWitnessJournalContext? journalContext)
     {
+        ITelemetrySink baseSink;
         if (journalContext is null)
         {
-            return _governanceTelemetry;
+            baseSink = _governanceTelemetry;
         }
-
-        if (_governanceReceiptJournal is null)
+        else
         {
-            throw new InvalidOperationException("Target witness journaling requires a governance receipt journal.");
+            if (_governanceReceiptJournal is null)
+            {
+                throw new InvalidOperationException("Target witness journaling requires a governance receipt journal.");
+            }
+
+            baseSink = new GovernanceTargetWitnessJournalSink(
+                _governanceTelemetry,
+                _governanceReceiptJournal,
+                journalContext);
         }
 
-        return new GovernanceTargetWitnessJournalSink(
-            _governanceTelemetry,
-            _governanceReceiptJournal,
-            journalContext);
+        return new RouterizedTelemetrySinkWrapper(baseSink, _egressRouter, _telemetryTargetSinkClass);
+    }
+
+    private sealed class RouterizedTelemetrySinkWrapper : ITelemetrySink
+    {
+        private readonly ITelemetrySink _inner;
+        private readonly IManagedEgressRouter _router;
+        private readonly SliEgressTargetSinkClass _targetSinkClass;
+
+        public RouterizedTelemetrySinkWrapper(
+            ITelemetrySink inner,
+            IManagedEgressRouter router,
+            SliEgressTargetSinkClass targetSinkClass)
+        {
+            _inner = inner;
+            _router = router;
+            _targetSinkClass = targetSinkClass;
+        }
+
+        public async Task EmitAsync(object telemetryEvent)
+        {
+            var envelope = new ManagedEgressEnvelope(
+                EffectKind: SliEgressEffectKind.Telemetry,
+                RetentionPosture: SliEgressRetentionPosture.Ephemeral,
+                JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+                IdentityFormingAllowed: false,
+                TargetSinkClass: _targetSinkClass,
+                AuthorityReason: "Emitting live target telemetry for Cradle observation"
+            );
+
+            var authorized = await _router.TryRouteEgressAsync(envelope, async () =>
+            {
+                await _inner.EmitAsync(telemetryEvent).ConfigureAwait(false);
+            }).ConfigureAwait(false);
+
+            if (!authorized)
+            {
+                throw new InvalidOperationException("Managed egress router denied target telemetry emission.");
+            }
+        }
     }
 
     private sealed class GovernanceTargetWitnessJournalSink : ITelemetrySink

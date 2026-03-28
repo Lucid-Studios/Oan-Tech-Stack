@@ -40,6 +40,11 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.Contains("undeclared-tool-call", packet.ProhibitedActions);
         Assert.Contains("cryptic-sealed", packet.ForbiddenMemoryLanes);
         Assert.StartsWith("worker-handoff-packet://", packet.HandoffPacketId, StringComparison.Ordinal);
+        Assert.NotNull(packet.BridgeReview);
+        Assert.Equal(SliBridgeOutcomeKind.Ok, packet.BridgeReview!.OutcomeKind);
+        Assert.Equal("agenticore-return://candidate/cme-worker-handoff/1", packet.BridgeReview.BridgeWitnessHandle);
+        Assert.NotNull(packet.RuntimeUseCeiling);
+        Assert.True(packet.RuntimeUseCeiling!.CandidateOnly);
 
         Assert.Equal(ConstructClass.BoundedWorker, receipt.ConstructClass);
         Assert.Equal(packet.HandoffPacketId, receipt.HandoffPacketId);
@@ -51,6 +56,8 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.Equal(CompassVisibilityClass.OperatorGuarded, receipt.DisclosureClass);
         Assert.Equal(MaturityPosture.DoctrineBacked, receipt.MaturityPosture);
         Assert.StartsWith("worker-handoff://", receipt.HandoffHandle, StringComparison.Ordinal);
+        Assert.Equal(packet.BridgeReview, receipt.BridgeReview);
+        Assert.Equal(packet.RuntimeUseCeiling, receipt.RuntimeUseCeiling);
     }
 
     [Theory]
@@ -159,14 +166,107 @@ public sealed class StewardWorkerHandoffProjectorTests
         Assert.False(projection.HasValue);
     }
 
+    [Fact]
+    public void ProjectForLoop_BlockingPreBondSafeguard_ProjectsNoHandoff()
+    {
+        var loopKey = "loop:worker-handoff:prebond-safeguard";
+        var cmeId = "cme-worker-handoff";
+        var disclosureHandle = "weather-disclosure://7777777777777777";
+        var authorityHandle = "office-authority://8888888888888888";
+        var issuanceHandle = "office-issuance://9999999999999999";
+        var batch = CreateBatch(
+            loopKey,
+            cmeId,
+            CreateDisclosureReceipt(loopKey, cmeId, disclosureHandle),
+            CreateAuthorityReceipt(loopKey, cmeId, disclosureHandle, authorityHandle),
+            CreateIssuanceReceipt(loopKey, cmeId, disclosureHandle, authorityHandle, issuanceHandle),
+            CreateReviewRequest(
+                cmeId,
+                SliBridgeContracts.CreatePreBondProtectiveReview(
+                    bridgeStage: "steward-worker-handoff-test",
+                    sourceTheater: "prime",
+                    targetTheater: "prime",
+                    bridgeWitnessHandle: $"agenticore-return://candidate/{cmeId}/1",
+                    outcomeKind: SliBridgeOutcomeKind.NeedsSpec,
+                    thresholdClass: SliBridgeThresholdClass.ThresholdBreach,
+                    reasonCode: "sli-prebond-continuity-instability",
+                    safeguardClass: SliPreBondSafeguardClass.ContinuityInstability,
+                    disposition: SliPreBondSafeguardDisposition.Hold)));
+
+        var projection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch);
+
+        Assert.False(projection.HasValue);
+    }
+
+    [Fact]
+    public void ProjectForLoop_OperatorFormationBridgeReview_AddsFormationHandleToSourceHandles()
+    {
+        var loopKey = "loop:worker-handoff:operator-formation";
+        var cmeId = "cme-worker-handoff";
+        var disclosureHandle = "weather-disclosure://operatorformation";
+        var authorityHandle = "office-authority://operatorformation";
+        var issuanceHandle = "office-issuance://operatorformation";
+        var bridgeReview = SliBridgeContracts.CreateReview(
+            bridgeStage: "steward-worker-handoff-test",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: $"agenticore-return://candidate/{cmeId}/1",
+            outcomeKind: SliBridgeOutcomeKind.Ok,
+            thresholdClass: SliBridgeThresholdClass.WithinBand,
+            reasonCode: "sli-bridge-within-band",
+            operatorFormation: CreateOperatorFormationReceipt());
+        var batch = CreateBatch(
+            loopKey,
+            cmeId,
+            CreateDisclosureReceipt(loopKey, cmeId, disclosureHandle),
+            CreateAuthorityReceipt(loopKey, cmeId, disclosureHandle, authorityHandle),
+            CreateIssuanceReceipt(loopKey, cmeId, disclosureHandle, authorityHandle, issuanceHandle),
+            CreateReviewRequest(cmeId, bridgeReview));
+
+        var projection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch);
+
+        Assert.True(projection.HasValue);
+        var (packet, receipt) = projection!.Value;
+        Assert.NotNull(packet.BridgeReview!.OperatorFormation);
+        Assert.Contains(packet.BridgeReview.OperatorFormation!.FormationHandle, packet.SourceHandles);
+        Assert.Equal(packet.BridgeReview.OperatorFormation, receipt.BridgeReview!.OperatorFormation);
+    }
+
+    [Fact]
+    public void ProjectForLoop_JurisdictionEnvelope_PreservesEnvelope()
+    {
+        var loopKey = "loop:worker-handoff:jurisdiction";
+        var cmeId = "cme-worker-handoff";
+        var disclosureHandle = "weather-disclosure://jurisdiction";
+        var authorityHandle = "office-authority://jurisdiction";
+        var issuanceHandle = "office-issuance://jurisdiction";
+        var jurisdictionEnvelope = CreateActualizedEnvelope();
+        var batch = CreateBatch(
+            loopKey,
+            cmeId,
+            CreateDisclosureReceipt(loopKey, cmeId, disclosureHandle),
+            CreateAuthorityReceipt(loopKey, cmeId, disclosureHandle, authorityHandle),
+            CreateIssuanceReceipt(loopKey, cmeId, disclosureHandle, authorityHandle, issuanceHandle),
+            CreateReviewRequest(cmeId, explicitJurisdictionEnvelope: jurisdictionEnvelope));
+
+        var projection = StewardWorkerHandoffProjector.ProjectForLoop(loopKey, batch);
+
+        Assert.True(projection.HasValue);
+        var (packet, receipt) = projection!.Value;
+        Assert.Equal(jurisdictionEnvelope, packet.JurisdictionEnvelope);
+        Assert.Equal(jurisdictionEnvelope, receipt.JurisdictionEnvelope);
+        Assert.Contains(jurisdictionEnvelope.EnvelopeHandle, packet.SourceHandles);
+    }
+
     private static GovernanceJournalReplayBatch CreateBatch(
         string loopKey,
         string cmeId,
         GovernedWeatherDisclosureReceipt disclosureReceipt,
         GovernedOfficeAuthorityReceipt authorityReceipt,
-        GovernedOfficeIssuanceReceipt issuanceReceipt)
+        GovernedOfficeIssuanceReceipt issuanceReceipt,
+        ReturnCandidateReviewRequest? explicitReviewRequest = null)
     {
-        var reviewRequest = CreateReviewRequest(cmeId);
+        var reviewRequest = explicitReviewRequest ?? CreateReviewRequest(cmeId);
         var reviewEntry = new GovernanceJournalEntry(
             LoopKey: loopKey,
             Kind: GovernanceJournalEntryKind.Annotation,
@@ -232,7 +332,10 @@ public sealed class StewardWorkerHandoffProjectorTests
         return new GovernanceJournalReplayBatch([reviewEntry, disclosureEntry, authorityEntry, issuanceEntry], []);
     }
 
-    private static ReturnCandidateReviewRequest CreateReviewRequest(string cmeId)
+    private static ReturnCandidateReviewRequest CreateReviewRequest(
+        string cmeId,
+        SliBridgeReviewReceipt? explicitBridgeReview = null,
+        SliJurisdictionEnvelopeReceipt? explicitJurisdictionEnvelope = null)
     {
         var sessionHandle = $"soulframe-session://{cmeId}/1";
         var returnPointer = $"agenticore-return://candidate/{cmeId}/1";
@@ -272,7 +375,104 @@ public sealed class StewardWorkerHandoffProjectorTests
                 EvidenceFlags: CmeCollapseEvidenceFlag.AutobiographicalSignal | CmeCollapseEvidenceFlag.SelfGelIdentitySignal,
                 ReviewTriggers: CmeCollapseReviewTrigger.None,
                 SourceSubsystem: "AgentiCore"),
-            RequestEnvelope: envelope);
+            RequestEnvelope: envelope,
+            BridgeReview: explicitBridgeReview ?? SliBridgeContracts.CreateReview(
+                bridgeStage: "steward-worker-handoff-test",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: returnPointer,
+                outcomeKind: SliBridgeOutcomeKind.Ok,
+                thresholdClass: SliBridgeThresholdClass.WithinBand,
+                reasonCode: "sli-bridge-within-band"),
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling(),
+            JurisdictionEnvelope: explicitJurisdictionEnvelope);
+    }
+
+    private static SliJurisdictionEnvelopeReceipt CreateActualizedEnvelope()
+    {
+        return SliJurisdictionContracts.ProjectFirstBootEnvelope(
+            new FirstBootGovernanceLayerReceipt(
+                LayerHandle: "first-boot-governance://corporategoverned/triadicactive",
+                BootClass: BootClass.CorporateGoverned,
+                ActivationState: BootActivationState.TriadicActive,
+                State: FirstBootGovernanceLayerState.RoleBoundEceReady,
+                ExpansionRights: ExpansionRights.None,
+                SwarmEligibility: SwarmEligibility.Denied,
+                WitnessOnly: true,
+                SubordinateCmeAuthorizationAllowed: false,
+                RoleBoundEcesReady: true,
+                FormedOffices:
+                [
+                    InternalGoverningCmeOffice.Steward,
+                    InternalGoverningCmeOffice.Father,
+                    InternalGoverningCmeOffice.Mother
+                ],
+                RoleBoundEces: [],
+                ReasonCode: "first-boot-governance-layer-role-bound-ece-ready"));
+    }
+
+    private static SliOperatorFormationReceipt CreateOperatorFormationReceipt()
+    {
+        return SliBridgeContracts.CreatePreBondOperatorFormationReceipt(
+            formationHandle: "operator-formation://prebond/aaaaaaaaaaaaaaaa",
+            boundaryCrossingMode: SliOperatorFormationBoundaryCrossingMode.InterlacedBondedCrossing,
+            profile: new SliOperatorFormationProfileReceipt(
+                ProfileId: "gs_profile_obsidian_guarded",
+                Lane: SliOperatorFormationLane.GnomeSpeakNlpSquared,
+                ChapterLocalSurface: "research/publications/gnomeronacorde-v0.1/source/1_OBSIDIAN_WALL/1a_Casting_Shadow.tex",
+                PairedTrainingSurface: "research/publications/gnome-speak-nlp-v1.0/source/sections/operator_role.tex",
+                CrossingTaskKind: "literacy_alignment",
+                HaltOwner: "bonded_training_reviewer",
+                Ring: SliOperatorFormationRing.Rootseed,
+                ActiveMode: SliOperatorFormationMode.Stillness,
+                StillnessInterludeUsed: false,
+                RedHatIndexRequired: true,
+                BondStatus: SliOperatorFormationBondStatus.TrainingOperator,
+                EchoVeilCheckRequired: true,
+                ActiveConflictClass: SliOperatorFormationConflictClass.None,
+                GjpNeeded: false,
+                GjpVerdict: SliOperatorFormationGjpVerdict.NotApplicable,
+                MotherLightAnchored: true,
+                FatherEchoAnchored: true,
+                ShellRootAnchored: true,
+                SeedBoundAnchored: true,
+                U230ShadowScript: SliOperatorFormationConcealmentLayerState.Observed,
+                U300ElvenScript: SliOperatorFormationConcealmentLayerState.Observed,
+                ExpectedEvidenceArtifact: "interlace_crossing_proof",
+                AdmissibleOutput: "bounded_training_profile",
+                ProhibitedOutputs: ["unrestricted_archetype_claim"]),
+            certificationPosture: SliBridgeContracts.CreateOperatorFormationCertificationReceipt(
+                decision: SliOperatorFormationCertificationDecision.Pending,
+                currentAnchoredPosture: SliOperatorFormationBondStatus.TrainingOperator,
+                targetPosture: SliOperatorFormationBondStatus.PreCertifiedOperator,
+                nearestAdmissibleNextPosture: SliOperatorFormationBondStatus.VerifiedCandidate,
+                reviewOwner: "certification_reviewer://first-run-lane",
+                evidenceGaps: ["trial_receipt_set"],
+                prohibitedClaims: ["bond actualized"],
+                certificationIssued: false,
+                expandedRevealAllowed: false,
+                continuityClaimAllowed: false,
+                requiredBondedStandard: "first_run_bonding://precertification/minimum-admissible-evidence",
+                blockingConditions: ["incomplete_trial_evidence"],
+                nextActions: ["Complete the current Gnome Speak trial block."],
+                haltOwner: "certification_reviewer://first-run-lane",
+                haltCondition: "Halt if evidence lineage breaks.",
+                reentryRule: "Reenter after the trial receipt set is attached.",
+                linkedVerificationRecord: "first_bonding://verification/pending",
+                gateArtifact: "verification record"),
+            sigilAssets:
+            [
+                new SliOperatorFormationSigilAssetReceipt(
+                    AssetId: "obsidian_zed",
+                    AssetLabel: "OBSIDIANzed",
+                    SigilClass: SliOperatorFormationSigilClass.MergedCompletionKey,
+                    PhaseNumber: null,
+                    VisibilityClass: "continuity_sealed",
+                    BuildRenderPolicy: "staged_render_allowed",
+                    ReductionPosture: "descriptive_reduction_allowed",
+                    MergedFromAssets: ["obsidian_1", "obsidian_2", "obsidian_3", "obsidian_4", "obsidian_5"],
+                    WitnessOfAsset: null)
+            ]);
     }
 
     private static GovernedWeatherDisclosureReceipt CreateDisclosureReceipt(

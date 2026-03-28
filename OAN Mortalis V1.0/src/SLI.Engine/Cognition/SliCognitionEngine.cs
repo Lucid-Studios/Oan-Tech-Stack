@@ -5,9 +5,12 @@ using CradleTek.CognitionHost.Models;
 using CradleTek.Memory.Interfaces;
 using GEL.Runtime;
 using SLI.Engine.Models;
+using SLI.Engine.Nexus;
 using SLI.Engine.Parser;
+using SLI.Engine.Runtime;
 using SLI.Engine.Telemetry;
 using SoulFrame.Host;
+
 
 namespace SLI.Engine.Cognition;
 
@@ -18,6 +21,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
     private readonly SheafMasterEngramService _sheafMasterEngrams;
     private readonly ICognitionEngine? _optionalLowMindEngine;
     private readonly IReadOnlyList<ICognitionObserver> _observers;
+    private readonly IReadOnlyList<ISliSnapshotRouter> _snapshotRouters;
     private bool _initialized;
 
     public SliCognitionEngine(
@@ -26,15 +30,31 @@ public sealed class SliCognitionEngine : ICognitionEngine
         SheafMasterEngramService? sheafMasterEngrams = null,
         ISoulFrameSemanticDevice? semanticDevice = null,
         IEnumerable<ICognitionObserver>? observers = null)
+        : this(resolver, optionalLowMindEngine, sheafMasterEngrams, semanticDevice, observers, null)
+    {
+    }
+
+    internal SliCognitionEngine(
+        IEngramResolver resolver,
+        ICognitionEngine? optionalLowMindEngine,
+        SheafMasterEngramService? sheafMasterEngrams,
+        ISoulFrameSemanticDevice? semanticDevice,
+        IEnumerable<ICognitionObserver>? observers,
+        IEnumerable<ISliSnapshotRouter>? snapshotRouters)
     {
         _lispBridge = new LispBridge(resolver, semanticDevice);
         _optionalLowMindEngine = optionalLowMindEngine;
         _sheafMasterEngrams = sheafMasterEngrams ?? new SheafMasterEngramService();
         _observers = observers?.ToList() ?? [NullCognitionObserver.Instance];
+        _snapshotRouters = snapshotRouters?.ToList() ?? [];
     }
 
     public DecisionSpline? LastDecisionSpline { get; private set; }
     public SliTraceEvent? LastTraceEvent { get; private set; }
+    internal LispExecutionResult? LastExecutionResult { get; private set; }
+    internal SliExecutionSnapshot? LastExecutionSnapshot { get; private set; }
+    internal ICrypticWebNexus? LastCrypticWebNexus { get; private set; }
+    internal ICrypticWebNexusPortal? LastCrypticWebNexusPortal { get; private set; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -65,6 +85,8 @@ public sealed class SliCognitionEngine : ICognitionEngine
             SoulFrameId = request.Context.SoulFrameId,
             ContextId = request.Context.ContextId,
             TaskObjective = request.Context.TaskObjective,
+            SelfStateHint = request.Context.SelfStateHint,
+            CleaverHint = request.Context.CleaverHint,
             Engrams = request.Context.RelevantEngrams
                 .Select(entry => new EngramReference
                 {
@@ -87,6 +109,10 @@ public sealed class SliCognitionEngine : ICognitionEngine
         var lispResult = await _lispBridge
             .ExecuteProgramAsync(program, contextFrame, cancellationToken)
             .ConfigureAwait(false);
+        LastExecutionResult = lispResult;
+        LastExecutionSnapshot = lispResult.ExecutionSnapshot;
+        LastCrypticWebNexus = lispResult.CrypticWebNexus;
+        LastCrypticWebNexusPortal = lispResult.CrypticWebNexusPortal;
 
         CognitionResult? lowMindResult = null;
         if (_optionalLowMindEngine is not null)
@@ -133,6 +159,14 @@ public sealed class SliCognitionEngine : ICognitionEngine
             CompassState = lispResult.CompassState
         };
 
+        if (LastExecutionSnapshot is not null)
+        {
+            foreach (var router in _snapshotRouters)
+            {
+                await router.RouteAsync(LastExecutionSnapshot, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
         return new CognitionResult
         {
             Reasoning = reasoning,
@@ -154,6 +188,8 @@ public sealed class SliCognitionEngine : ICognitionEngine
                 DecisionEntropy = lispResult.CompassState.DecisionEntropy,
                 Timestamp = lispResult.CompassState.Timestamp
             },
+            GoldenCodeCompass = lispResult.GoldenCodeCompass,
+            ZedThetaCandidate = lispResult.ZedThetaCandidate,
             Confidence = confidence
         };
     }
@@ -205,6 +241,7 @@ public sealed class SliCognitionEngine : ICognitionEngine
             "(locality-bootstrap context cme-self task-objective identity-continuity)",
             "(perspective-bounded-observer locality-state task-objective identity-continuity)",
             "(participation-bounded-cme locality-state)",
+            "(golden-code-bloom task-objective predicate-set reasoning-state)",
             "(compass-update context reasoning-state)",
             "(decision-branch cognition-state)",
             "(cleave branch-set)",
@@ -251,18 +288,74 @@ public sealed class SliCognitionEngine : ICognitionEngine
         SheafExecutionPlan sheafPlan)
     {
         var compass = lispResult.CompassState;
+        var goldenCodeSummary = SummarizeGoldenCodeBraid(lispResult.SymbolicTrace);
         var baseReasoning =
             $"SLI Lisp runtime executed {compass.SymbolicDepth} symbolic steps with Id={compass.IdForce:F3}, " +
             $"Superego={compass.SuperegoConstraint:F3}, Ego={compass.EgoStability:F3}, Value={compass.ValueElevation}. " +
+            $"CompassProjection(active={lispResult.GoldenCodeCompass.ActiveBasin}, competing={lispResult.GoldenCodeCompass.CompetingBasin}, anchor={lispResult.GoldenCodeCompass.AnchorState}, self-touch={lispResult.GoldenCodeCompass.SelfTouchClass}, posture={lispResult.GoldenCodeCompass.OeCoePosture}). " +
+            $"GoldenCode(prime={goldenCodeSummary.PrimeReflections}, psi={goldenCodeSummary.PsiModulations}, theta={goldenCodeSummary.ThetaSeals}, gamma={goldenCodeSummary.GammaYields}). " +
             $"Sheaf={sheafPlan.Domain}; Functors={string.Join(">", sheafPlan.FunctorPath)}; " +
             $"Cohomology(missing={sheafPlan.Cohomology.MissingMorphisms.Count}, inconsistent={sheafPlan.Cohomology.InconsistentSymbols.Count}, disconnected={sheafPlan.Cohomology.DisconnectedFunctorChains.Count}).";
+        var actualizationSummary = DescribeActualization(lispResult);
+        var shardReduction = DescribeShardReduction(lispResult);
+        var reasoning = baseReasoning;
+        if (!string.IsNullOrWhiteSpace(actualizationSummary))
+        {
+            reasoning = $"{reasoning} {actualizationSummary}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(shardReduction))
+        {
+            reasoning = $"{reasoning} {shardReduction}";
+        }
 
         if (lowMindResult is null)
         {
-            return baseReasoning;
+            return reasoning;
         }
 
-        return $"{baseReasoning} LowMind augmentation: {lowMindResult.Reasoning}";
+        return $"{reasoning} LowMind augmentation: {lowMindResult.Reasoning}";
+    }
+
+    internal static string DescribeActualization(LispExecutionResult lispResult)
+    {
+        ArgumentNullException.ThrowIfNull(lispResult);
+
+        var actualization = lispResult.ActualizationPacket;
+        if (actualization is null)
+        {
+            return string.Empty;
+        }
+
+        return
+            $"Actualization(claim={actualization.ClaimClass}, contradiction={actualization.ContradictionClass}, route={actualization.ValidationRoute}, disposition={actualization.Disposition}, stages={actualization.WebbingEvents.Count}, candidate-bearing={actualization.CandidateEngramBearing.ToString().ToLowerInvariant()}).";
+    }
+
+    internal static string DescribeShardReduction(LispExecutionResult lispResult)
+    {
+        ArgumentNullException.ThrowIfNull(lispResult);
+
+        var runtimeRun = lispResult.LiveRuntimeRun;
+        if (runtimeRun is null || !runtimeRun.ShardModeEnabled)
+        {
+            return string.Empty;
+        }
+
+        if (runtimeRun.ReductionOutcome == SliLocalityRelationOutcomeKind.Joined)
+        {
+            return $"CompassShards(reduction=Joined, packets={runtimeRun.ShardPackets.Count}, relations={runtimeRun.RelationEvents.Count}).";
+        }
+
+        return $"CompassShards(reduction={runtimeRun.ReductionOutcome}, reason={runtimeRun.ReductionReason}, compatibility=acting-shard-only).";
+    }
+
+    private static GoldenCodeBraidSummary SummarizeGoldenCodeBraid(IReadOnlyList<string> trace)
+    {
+        return new GoldenCodeBraidSummary(
+            PrimeReflections: trace.Count(line => line.Contains("prime-reflect(", StringComparison.Ordinal)),
+            PsiModulations: trace.Count(line => line.Contains("psi-modulate(", StringComparison.Ordinal)),
+            ThetaSeals: trace.Count(line => line.Contains("theta-seal(", StringComparison.Ordinal)),
+            GammaYields: trace.Count(line => line.Contains("gamma-yield(", StringComparison.Ordinal)));
     }
 
     private static string HashHex(string value)
@@ -325,4 +418,10 @@ public sealed class SliCognitionEngine : ICognitionEngine
             _ => CognitionValueElevation.Neutral
         };
     }
+
+    private sealed record GoldenCodeBraidSummary(
+        int PrimeReflections,
+        int PsiModulations,
+        int ThetaSeals,
+        int GammaYields);
 }

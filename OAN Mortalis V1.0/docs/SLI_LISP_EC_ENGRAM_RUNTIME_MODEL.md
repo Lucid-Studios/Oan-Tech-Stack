@@ -27,6 +27,10 @@ This note does define:
 - trace and residue duties
 - return and collapse eligibility at the runtime boundary
 
+The stored structure versus admitted use versus live expression distinction is defined separately in:
+
+- `docs/SKILL_ABILITY_TALENT_ENGRAM_ADMISSION_LAW.md`
+
 ## Root Principle
 
 An engram in the SLI/Lisp EC runtime is a lawful symbolic-operational unit, not merely remembered content.
@@ -91,6 +95,14 @@ Minimum lawful runtime classes:
   - a unit that has cooled enough to stand as a bounded stabilized surface
 
 These are runtime classes, not yet public contracts.
+
+## Recovered Experiment Lineage
+
+The recovered `Engrams and Phonology` family is preserved as bounded lineage in:
+
+- `runtime/research/test-fields/recovered-engrams-phonology/`
+
+Its role in this document is historical only. It is useful as an ancestor seam for fragment roles, Compass-style event emission, and measurable gate vocabulary, but it does not supersede the active runtime doctrine recorded here.
 
 ## Runtime States
 

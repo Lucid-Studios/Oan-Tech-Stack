@@ -4,6 +4,10 @@ param(
 
     [switch] $NoRestore,
 
+    [string] $BuildVersion,
+
+    [string] $AssemblyVersion,
+
     [switch] $ValidateHopng,
 
     [switch] $HopngPrimeInspect,
@@ -50,14 +54,53 @@ function Get-FileSha256 {
 }
 
 function Get-GitValue {
-    param([string[]] $Arguments)
+    param(
+        [string[]] $Arguments,
+        [string] $WorkingDirectory
+    )
 
-    $output = & git @Arguments 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    $escapedArguments = $Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') {
+            '"' + ($_ -replace '"', '\"') + '"'
+        }
+        else {
+            $_
+        }
+    }
+
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = [string]::Join(' ', $escapedArguments)
+    if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+        $startInfo.WorkingDirectory = $WorkingDirectory
+    }
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    [void] $process.Start()
+    $stdout = $process.StandardOutput.ReadToEnd()
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+
+    if ($process.ExitCode -ne 0) {
         return $null
     }
 
-    return ($output | Out-String).Trim()
+    $lines = @(
+        @($stdout, $stderr) |
+            ForEach-Object { "$_".Trim() } |
+            ForEach-Object { $_ -split "(`r`n|`n|`r)" } |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_) -and
+                -not $_.StartsWith('warning:', [System.StringComparison]::OrdinalIgnoreCase)
+            }
+    )
+
+    return ($lines | Out-String).Trim()
 }
 
 function Get-RelativePathString {
@@ -120,7 +163,7 @@ function Invoke-AuditCommand {
     }
 
     $endedAt = Get-Date
-    $capturedText = ($captured | ForEach-Object { "$_" })
+    $capturedText = @($captured | ForEach-Object { "$_" })
     Set-Content -LiteralPath $LogPath -Value $capturedText -Encoding utf8
 
     return [ordered]@{
@@ -130,7 +173,7 @@ function Invoke-AuditCommand {
         exitCode = $exitCode
         succeeded = ($exitCode -eq 0)
         logPath = $LogPath
-        outputLines = $capturedText.Count
+        outputLines = @($capturedText).Count
     }
 }
 
@@ -242,7 +285,7 @@ $testScriptPath = Join-Path $repoRoot 'test.ps1'
 $verifyScriptPath = Join-Path $activeBuildRoot 'tools\verify-private-corpus.ps1'
 
 $runTimestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
-$commitSha = Get-GitValue -Arguments @('rev-parse', 'HEAD')
+$commitSha = Get-GitValue -Arguments @('rev-parse', 'HEAD') -WorkingDirectory $repoRoot
 $shortSha = if ($commitSha) { $commitSha.Substring(0, [Math]::Min(8, $commitSha.Length)) } else { 'nogit' }
 $runId = '{0}-{1}' -f $runTimestamp, $shortSha
 $bundleRoot = Join-Path $repoRoot $OutputRoot
@@ -269,12 +312,16 @@ $runMetadata = [ordered]@{
     solutionPath = Get-RelativePathString -BasePath $repoRoot -TargetPath $solutionPath
     configuration = $Configuration
     commitSha = $commitSha
-    branch = Get-GitValue -Arguments @('rev-parse', '--abbrev-ref', 'HEAD')
-    worktreeState = if ([string]::IsNullOrWhiteSpace((Get-GitValue -Arguments @('status', '--porcelain')))) { 'clean' } else { 'dirty' }
+    branch = Get-GitValue -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -WorkingDirectory $repoRoot
+    worktreeState = if ([string]::IsNullOrWhiteSpace((Get-GitValue -Arguments @('status', '--porcelain') -WorkingDirectory $repoRoot))) { 'clean' } else { 'dirty' }
     toolchain = [ordered]@{
         dotnet = ((& dotnet --version) | Out-String).Trim()
-        git = Get-GitValue -Arguments @('--version')
+        git = Get-GitValue -Arguments @('--version') -WorkingDirectory $repoRoot
         powershell = $PSVersionTable.PSVersion.ToString()
+    }
+    versionOverride = [ordered]@{
+        buildVersion = if ([string]::IsNullOrWhiteSpace($BuildVersion)) { $null } else { $BuildVersion }
+        assemblyVersion = if ([string]::IsNullOrWhiteSpace($AssemblyVersion)) { $null } else { $AssemblyVersion }
     }
     hopngValidationStatus = if ($ValidateHopng) { 'requested' } else { 'not_requested' }
     scriptDigests = [ordered]@{
@@ -325,6 +372,12 @@ try {
     $buildArgs = @('-ExecutionPolicy', 'Bypass', '-File', $buildScriptPath, '-Configuration', $Configuration, '-SkipHygieneCheck')
     if ($NoRestore) {
         $buildArgs += '-NoRestore'
+    }
+    if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
+        $buildArgs += @('-BuildVersion', $BuildVersion)
+    }
+    if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
+        $buildArgs += @('-AssemblyVersion', $AssemblyVersion)
     }
     if ($ValidateHopng) {
         $buildArgs += '-ValidateHopng'
@@ -387,6 +440,12 @@ try {
     Add-NdjsonLine -Path $eventsPath -Value (New-EventRecord -EventType 'TEST_RUN_STARTED' -RunId $runId -Status 'started' -Step 'solution-test' -Data @{ testProjectCount = $testProjects.Count })
     $testLog = Join-Path $logsPath 'test.log'
     $testArgs = @('-ExecutionPolicy', 'Bypass', '-File', $testScriptPath, '-Configuration', $Configuration, '-NoBuild', '-SkipHygieneCheck')
+    if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
+        $testArgs += @('-BuildVersion', $BuildVersion)
+    }
+    if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
+        $testArgs += @('-AssemblyVersion', $AssemblyVersion)
+    }
     $testResult = Invoke-AuditCommand -Executable 'powershell' -Arguments $testArgs -LogPath $testLog
     $stepResults.Add([ordered]@{
         step = 'test'

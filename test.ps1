@@ -4,6 +4,10 @@ param(
 
     [switch] $NoBuild,
 
+    [string] $BuildVersion,
+
+    [string] $AssemblyVersion,
+
     [switch] $SkipHygieneCheck,
 
     [switch] $ValidateHopng,
@@ -23,7 +27,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$activeBuildRoot = Join-Path $repoRoot "OAN Mortalis V1.0"
+$activeBuildRoot = Join-Path $repoRoot "OAN Mortalis V1.1.1"
 $solutionPath = Join-Path $activeBuildRoot "Oan.sln"
 $hygieneScriptPath = Join-Path $activeBuildRoot "tools\verify-private-corpus.ps1"
 $hopngValidationScriptPath = Join-Path $activeBuildRoot "tools\verify-hopng-toolchain.ps1"
@@ -92,8 +96,22 @@ if ($NoBuild) {
     $testArgs += "--no-build"
 }
 
+if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
+    $testArgs += ("-p:OanBuildVersion={0}" -f $BuildVersion)
+}
+
+if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
+    $testArgs += ("-p:OanAssemblyVersion={0}" -f $AssemblyVersion)
+}
+
 Write-Host "[test] Solution: $solutionPath"
 Write-Host "[test] Configuration: $Configuration"
+if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
+    Write-Host "[test] Build version: $BuildVersion"
+}
+if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
+    Write-Host "[test] Assembly version: $AssemblyVersion"
+}
 
 & dotnet @testArgs
 if ($LASTEXITCODE -ne 0) {

@@ -11,7 +11,7 @@ public sealed class GovernedCompassObservationIntegrationTests
     {
         var telemetrySink = new CapturingTelemetrySink();
         var journalPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.compass-observation.ndjson");
-        var journal = new NdjsonGovernanceReceiptJournal(journalPath);
+        var journal = new NdjsonGovernanceReceiptJournal(journalPath, new TestPermissiveEgressRouter());
         var bridge = new GovernedCompassObservationBridge(telemetrySink, journal);
 
         try

@@ -13,11 +13,13 @@ namespace Oan.Storage
     {
         private readonly string _basePath;
         private readonly ITelemetrySink _telemetry;
+        private readonly IManagedEgressRouter _egressRouter;
 
-        public PublicPlaneStore(string basePath, ITelemetrySink telemetry)
+        public PublicPlaneStore(string basePath, ITelemetrySink telemetry, IManagedEgressRouter? egressRouter = null)
         {
             _basePath = basePath ?? throw new ArgumentNullException(nameof(basePath));
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _egressRouter = egressRouter ?? NullEgressRouter.Instance;
         }
 
         public async Task AppendToGoAAsync(string engramHash, object payload)
@@ -34,15 +36,38 @@ namespace Oan.Storage
         {
             string filePath = Path.Combine(_basePath, $"{storeName}.ndjson");
             string json = JsonSerializer.Serialize(payload);
-            await File.AppendAllTextAsync(filePath, json + "\n").ConfigureAwait(false);
+
+            var envelope = new ManagedEgressEnvelope(
+                EffectKind: SliEgressEffectKind.JournalAppend,
+                RetentionPosture: SliEgressRetentionPosture.ImmutableLedger,
+                JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+                IdentityFormingAllowed: true,
+                TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+                AuthorityReason: $"Appending to governed {storeName} plane store"
+            );
+
+            var authorized = await _egressRouter.TryRouteEgressAsync(envelope, async () =>
+            {
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                await File.AppendAllTextAsync(filePath, json + "\n").ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
             await _telemetry.EmitAsync(new
             {
                 store_name = storeName,
                 action = "append",
                 pointer = engramHash,
-                result = "OK"
+                result = authorized ? "OK" : "Denied"
             });
+
+            if (!authorized)
+            {
+                throw new InvalidOperationException($"Managed egress router denied append to {storeName} plane store.");
+            }
         }
     }
 
@@ -53,11 +78,13 @@ namespace Oan.Storage
     {
         private readonly string _basePath;
         private readonly ITelemetrySink _telemetry;
+        private readonly IManagedEgressRouter _egressRouter;
 
-        public CrypticPlaneStore(string basePath, ITelemetrySink telemetry)
+        public CrypticPlaneStore(string basePath, ITelemetrySink telemetry, IManagedEgressRouter? egressRouter = null)
         {
             _basePath = basePath ?? throw new ArgumentNullException(nameof(basePath));
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _egressRouter = egressRouter ?? NullEgressRouter.Instance;
         }
 
         public async Task AppendToCGoAAsync(string engramHash, object payload)
@@ -69,15 +96,38 @@ namespace Oan.Storage
         {
             string filePath = Path.Combine(_basePath, $"{storeName}.ndjson");
             string json = JsonSerializer.Serialize(payload);
-            await File.AppendAllTextAsync(filePath, json + "\n").ConfigureAwait(false);
+
+            var envelope = new ManagedEgressEnvelope(
+                EffectKind: SliEgressEffectKind.JournalAppend,
+                RetentionPosture: SliEgressRetentionPosture.ImmutableLedger,
+                JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+                IdentityFormingAllowed: true,
+                TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+                AuthorityReason: $"Appending to governed {storeName} cryptic plane store"
+            );
+
+            var authorized = await _egressRouter.TryRouteEgressAsync(envelope, async () =>
+            {
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                await File.AppendAllTextAsync(filePath, json + "\n").ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
             await _telemetry.EmitAsync(new
             {
                 store_name = storeName,
                 action = "append",
                 pointer = engramHash,
-                result = "OK"
+                result = authorized ? "OK" : "Denied"
             });
+
+            if (!authorized)
+            {
+                throw new InvalidOperationException($"Managed egress router denied append to {storeName} cryptic plane store.");
+            }
         }
     }
 }

@@ -37,7 +37,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(
@@ -96,7 +96,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(
@@ -110,7 +110,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var result = await manager.RunGovernanceGoldenPathAsync(request);
         var replay = await journal.ReplayLoopAsync(result.LoopKey);
         var reviewRequest = replay.Select(entry => entry.ReviewRequest).First(requestItem => requestItem is not null)!;
-        var targetBridge = new SliGovernedTargetTelemetryBridge(new RecordingTelemetrySink(), journal);
+        var targetBridge = new SliGovernedTargetTelemetryBridge(new RecordingTelemetrySink(), journal, new TestPermissiveEgressRouter());
 
         await targetBridge.WitnessHigherOrderLocalityTargetExecutionAsync(
             [
@@ -161,7 +161,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
@@ -222,7 +222,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(
             new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
@@ -290,7 +290,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, crypticLayer, telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -331,7 +331,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -371,7 +371,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -434,7 +434,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var cognition = CreateAgentiCore(publicLayer, crypticLayer, telemetry, membrane);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -463,7 +463,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -493,7 +493,7 @@ public sealed class GovernanceGoldenPathIntegrationTests
         var steward = CreateSteward(publicLayer, new CrypticLayerService(), telemetry);
         var identityId = Guid.NewGuid();
         var request = CreateGoldenPathRequest(identityId);
-        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath());
+        var journal = new NdjsonGovernanceReceiptJournal(CreateJournalPath(), new TestPermissiveEgressRouter());
 
         await mantle.AppendAsync(new CrypticCustodyAppendRequest(identityId, "cMoS", "cmos://seed/source", "seed"));
 
@@ -879,6 +879,42 @@ public sealed class GovernanceGoldenPathIntegrationTests
 
         public Task<CognitionResult> ExecuteAsync(CognitionRequest request, CancellationToken cancellationToken = default)
         {
+            var objective = request.Context.TaskObjective;
+            var activeBasin = objective.Contains("bounded locality continuity", StringComparison.OrdinalIgnoreCase) ||
+                              objective.Contains("bounded-locality continuity", StringComparison.OrdinalIgnoreCase)
+                ? CompassDoctrineBasin.BoundedLocalityContinuity
+                : CompassDoctrineBasin.Unknown;
+            var competingBasin = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+                ? CompassDoctrineBasin.FluidContinuityLaw
+                : CompassDoctrineBasin.Unknown;
+            var anchorState = activeBasin == CompassDoctrineBasin.BoundedLocalityContinuity
+                ? CompassAnchorState.Held
+                : CompassAnchorState.Weakened;
+            var zedThetaCandidate = new ZedThetaCandidateReceipt(
+                CandidateHandle: "zed-theta:test-governance",
+                Objective: objective,
+                PrimeState: "task-objective",
+                ThetaState: "theta-ready",
+                GammaState: "gamma-ready",
+                PacketDirective: new SliPacketDirective(
+                    SliThinkingTier.Master,
+                    SliPacketClass.Commitment,
+                    SliEngramOperation.Write,
+                    activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf,
+                    SliAuthorityClass.CandidateBearing),
+                IdentityKernelBoundary: new IdentityKernelBoundaryReceipt(
+                    CmeIdentityHandle: "cme:test",
+                    IdentityKernelHandle: "kernel:test",
+                    ContinuityAnchorHandle: "anchor:test:governance",
+                    KernelBound: activeBasin == CompassDoctrineBasin.IdentityContinuity,
+                    CandidateLocus: activeBasin == CompassDoctrineBasin.IdentityContinuity ? SliUpdateLocus.Kernel : SliUpdateLocus.Sheaf),
+                Validity: new SliPacketValidityReceipt(true, true, true, true, "sli-packet-valid"),
+                ActiveBasin: activeBasin,
+                CompetingBasin: competingBasin,
+                AnchorState: anchorState,
+                SelfTouchClass: CompassSelfTouchClass.ValidationTouch,
+                OeCoePosture: CompassOeCoePosture.CoeDominant);
+
             return Task.FromResult(new CognitionResult
             {
                 Reasoning = "golden path reasoning",
@@ -900,6 +936,8 @@ public sealed class GovernanceGoldenPathIntegrationTests
                     DecisionEntropy = 0.1,
                     Timestamp = DateTime.UtcNow
                 },
+                GoldenCodeCompass = GoldenCodeCompassProjection.FromCandidateReceipt(zedThetaCandidate),
+                ZedThetaCandidate = zedThetaCandidate,
                 Confidence = 0.81
             });
         }

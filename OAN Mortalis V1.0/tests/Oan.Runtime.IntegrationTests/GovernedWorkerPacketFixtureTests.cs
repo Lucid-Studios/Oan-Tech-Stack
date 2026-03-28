@@ -43,6 +43,15 @@ public sealed class GovernedWorkerPacketFixtureTests
 
     private static WorkerHandoffPacket CreateHandoffPacket()
     {
+        var bridgeReview = SliBridgeContracts.CreateReview(
+            bridgeStage: "worker-packet-fixture",
+            sourceTheater: "prime",
+            targetTheater: "prime",
+            bridgeWitnessHandle: "agenticore-return://candidate/test",
+            outcomeKind: SliBridgeOutcomeKind.Ok,
+            thresholdClass: SliBridgeThresholdClass.WithinBand,
+            reasonCode: "sli-bridge-within-band");
+
         return new WorkerHandoffPacket(
             HandoffPacketId: "worker-handoff-packet://aaaaaaaaaaaaaaaa",
             RequestingOffice: InternalGoverningCmeOffice.Steward,
@@ -80,7 +89,11 @@ public sealed class GovernedWorkerPacketFixtureTests
                 WorkerReasonCode.BrokenWindow,
                 WorkerReasonCode.UnknownNotFailure,
                 WorkerReasonCode.OfficeNonOverlap,
-                WorkerReasonCode.PromptInjection
+                WorkerReasonCode.PromptInjection,
+                WorkerReasonCode.PredatorySharedDomainRisk,
+                WorkerReasonCode.CoerciveBondingPosture,
+                WorkerReasonCode.ContinuityInstability,
+                WorkerReasonCode.IdentityOvercollapseRisk
             ],
             ProhibitedActions:
             [
@@ -119,7 +132,10 @@ public sealed class GovernedWorkerPacketFixtureTests
             ResidueDisposition: WorkerResidueDisposition.NeedsClassification,
             EvidenceSufficiencyState: EvidenceSufficiencyState.Sufficient,
             MaturityPosture: MaturityPosture.DoctrineBacked,
-            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 0, TimeSpan.Zero));
+            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 0, TimeSpan.Zero),
+            BridgeReview: bridgeReview,
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling(),
+            JurisdictionEnvelope: CreateActualizedEnvelope());
     }
 
     private static WorkerReturnPacket CreateReturnPacket()
@@ -142,7 +158,40 @@ public sealed class GovernedWorkerPacketFixtureTests
             DisclosureClass: CompassVisibilityClass.OperatorGuarded,
             ExecutionClaimed: false,
             MutationClaimed: false,
-            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 5, TimeSpan.Zero));
+            TimestampUtc: new DateTimeOffset(2026, 3, 17, 12, 0, 5, TimeSpan.Zero),
+            BridgeReview: SliBridgeContracts.CreateReview(
+                bridgeStage: "worker-packet-fixture",
+                sourceTheater: "prime",
+                targetTheater: "prime",
+                bridgeWitnessHandle: "agenticore-return://candidate/test",
+                outcomeKind: SliBridgeOutcomeKind.Ok,
+                thresholdClass: SliBridgeThresholdClass.WithinBand,
+                reasonCode: "sli-bridge-within-band"),
+            RuntimeUseCeiling: SliBridgeContracts.CreateCandidateOnlyRuntimeUseCeiling(),
+            JurisdictionEnvelope: CreateActualizedEnvelope());
+    }
+
+    private static SliJurisdictionEnvelopeReceipt CreateActualizedEnvelope()
+    {
+        return SliJurisdictionContracts.ProjectFirstBootEnvelope(
+            new FirstBootGovernanceLayerReceipt(
+                LayerHandle: "first-boot-governance://corporategoverned/triadicactive",
+                BootClass: BootClass.CorporateGoverned,
+                ActivationState: BootActivationState.TriadicActive,
+                State: FirstBootGovernanceLayerState.RoleBoundEceReady,
+                ExpansionRights: ExpansionRights.None,
+                SwarmEligibility: SwarmEligibility.Denied,
+                WitnessOnly: true,
+                SubordinateCmeAuthorizationAllowed: false,
+                RoleBoundEcesReady: true,
+                FormedOffices:
+                [
+                    InternalGoverningCmeOffice.Steward,
+                    InternalGoverningCmeOffice.Father,
+                    InternalGoverningCmeOffice.Mother
+                ],
+                RoleBoundEces: [],
+                ReasonCode: "first-boot-governance-layer-role-bound-ece-ready"));
     }
 
     private static string GetFixturePath(string fileName)

@@ -572,20 +572,40 @@ public static class HeadlessRuntimeBootstrap
 {
     public static async Task<CradleTekHost> CreateEvaluateHostAsync(
         string runtimeRoot,
+        IManagedEgressRouter? egressRouter = null,
         CancellationToken cancellationToken = default)
     {
         var publicRoot = Path.Combine(runtimeRoot, "public_root");
         var crypticRoot = Path.Combine(runtimeRoot, "cryptic_root");
-        Directory.CreateDirectory(publicRoot);
-        Directory.CreateDirectory(crypticRoot);
+        
+        var envelope = new ManagedEgressEnvelope(
+            EffectKind: SliEgressEffectKind.StructuralCreation,
+            RetentionPosture: SliEgressRetentionPosture.GovernanceArtifact,
+            JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+            IdentityFormingAllowed: true,
+            TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+            AuthorityReason: "Establishing local structural bounds for Evaluation runtime"
+        );
+
+        var router = egressRouter ?? NullEgressRouter.Instance;
+        var authorized = await router.TryRouteEgressAsync(envelope, () =>
+        {
+            Directory.CreateDirectory(publicRoot);
+            Directory.CreateDirectory(crypticRoot);
+            return Task.CompletedTask;
+        }, cancellationToken).ConfigureAwait(false);
+        if (!authorized)
+        {
+            throw new InvalidOperationException("Managed egress router denied evaluation runtime structural creation.");
+        }
 
         var govTelemetry = new GovernanceTelemetrySink(
             Path.Combine(runtimeRoot, "governance.ndjson"),
             ex => Console.WriteLine($"[FATAL] Governance Telemetry Failure: {ex.Message}"));
         var storageTelemetry = new StorageTelemetrySink(Path.Combine(runtimeRoot, "storage.ndjson"));
-        var publicStore = new PublicPlaneStore(publicRoot, storageTelemetry);
+        var publicStore = new PublicPlaneStore(publicRoot, storageTelemetry, router);
         var primeDerivativePublisher = new PrimeDerivativePublisherAdapter(publicStore);
-        var crypticStore = new CrypticPlaneStore(crypticRoot, storageTelemetry);
+        var crypticStore = new CrypticPlaneStore(crypticRoot, storageTelemetry, router);
         var formationObserver = new InMemoryAgentiFormationObserver();
         var admissionMembrane = new CrypticAdmissionMembrane();
         var closureValidator = new EngramClosureValidator();
@@ -601,7 +621,7 @@ public static class HeadlessRuntimeBootstrap
             true,
             crypticStore,
             true,
-            hopngArtifactService: HopngArtifactServiceFactory.Create(Path.Combine(runtimeRoot, "telemetry", "hopng")),
+            hopngArtifactService: HopngArtifactServiceFactory.Create(Path.Combine(runtimeRoot, "telemetry", "hopng"), router),
             crypticAdmissionMembrane: admissionMembrane,
             formationObserver: formationObserver,
             firstBootFormationObservationHarness: firstBootHarness);
@@ -611,26 +631,47 @@ public static class HeadlessRuntimeBootstrap
         return host;
     }
 
-    public static RuntimeOperatorContext CreateOperatorContext(string runtimeRoot)
+    public static RuntimeOperatorContext CreateOperatorContext(
+        string runtimeRoot, 
+        IManagedEgressRouter? egressRouter = null)
     {
         var publicRoot = Path.Combine(runtimeRoot, "public_root");
         var crypticRoot = Path.Combine(runtimeRoot, "cryptic_root");
-        Directory.CreateDirectory(publicRoot);
-        Directory.CreateDirectory(crypticRoot);
+
+        var envelope = new ManagedEgressEnvelope(
+            EffectKind: SliEgressEffectKind.StructuralCreation,
+            RetentionPosture: SliEgressRetentionPosture.GovernanceArtifact,
+            JurisdictionClass: SliEgressJurisdictionClass.Cradle,
+            IdentityFormingAllowed: true,
+            TargetSinkClass: SliEgressTargetSinkClass.FileSystemLocal,
+            AuthorityReason: "Establishing local structural bounds for CLI Operations"
+        );
+
+        var router = egressRouter ?? NullEgressRouter.Instance;
+        var authorized = router.TryRouteEgressAsync(envelope, () =>
+        {
+            Directory.CreateDirectory(publicRoot);
+            Directory.CreateDirectory(crypticRoot);
+            return Task.CompletedTask;
+        }).GetAwaiter().GetResult();
+        if (!authorized)
+        {
+            throw new InvalidOperationException("Managed egress router denied CLI operator structural creation.");
+        }
 
         var govTelemetry = new GovernanceTelemetrySink(
             Path.Combine(runtimeRoot, "governance.ndjson"),
             _ => { });
         var storageTelemetry = new StorageTelemetrySink(Path.Combine(runtimeRoot, "storage.ndjson"));
-        var publicPlane = new PublicPlaneStore(publicRoot, storageTelemetry);
+        var publicPlane = new PublicPlaneStore(publicRoot, storageTelemetry, router);
         var primeDerivativePublisher = new PrimeDerivativePublisherAdapter(publicPlane);
-        var crypticPlane = new CrypticPlaneStore(crypticRoot, storageTelemetry);
+        var crypticPlane = new CrypticPlaneStore(crypticRoot, storageTelemetry, router);
 
         var publicLayer = new PublicLayerService();
         var crypticLayer = new CrypticLayerService();
         var mantle = new MantleOfSovereigntyService();
         var telemetry = new GelTelemetryAdapter();
-        var journal = new NdjsonGovernanceReceiptJournal(Path.Combine(runtimeRoot, "governance-control.ndjson"));
+        var journal = new NdjsonGovernanceReceiptJournal(Path.Combine(runtimeRoot, "governance-control.ndjson"), router);
         var formationObserver = new InMemoryAgentiFormationObserver();
         var admissionMembrane = new CrypticAdmissionMembrane();
         var closureValidator = new EngramClosureValidator();

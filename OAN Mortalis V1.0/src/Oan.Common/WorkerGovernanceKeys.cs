@@ -5,6 +5,58 @@ namespace Oan.Common;
 
 public static class WorkerGovernanceKeys
 {
+    public static string CreateIdentityInvariantHandle(
+        string cmeId,
+        Guid identityId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentOutOfRangeException.ThrowIfEqual(identityId, Guid.Empty);
+
+        return $"identity-invariant://{ComputeDigest(cmeId, identityId.ToString("D"))}";
+    }
+
+    public static string CreateWorkerThreadRootHandle(
+        string cmeId,
+        Guid identityId,
+        string sessionHandle,
+        string workingStateHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentOutOfRangeException.ThrowIfEqual(identityId, Guid.Empty);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(workingStateHandle);
+
+        return $"worker-thread-root://{ComputeDigest(cmeId, identityId.ToString("D"), sessionHandle, workingStateHandle)}";
+    }
+
+    public static string CreateGovernedThreadBirthHandle(
+        string cmeId,
+        string threadRootHandle,
+        string governanceLayerHandle,
+        string nexusBindingHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(threadRootHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(governanceLayerHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(nexusBindingHandle);
+
+        return $"governed-thread-birth://{ComputeDigest(cmeId, threadRootHandle, governanceLayerHandle, nexusBindingHandle)}";
+    }
+
+    public static string CreateInterWorkerBraidHandoffPacketId(
+        string cmeId,
+        string sourceThreadBirthHandle,
+        string targetThreadBirthHandle,
+        string predicateContextHandle)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cmeId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceThreadBirthHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetThreadBirthHandle);
+        ArgumentException.ThrowIfNullOrWhiteSpace(predicateContextHandle);
+
+        return $"worker-braid-handoff://{ComputeDigest(cmeId, sourceThreadBirthHandle, targetThreadBirthHandle, predicateContextHandle)}";
+    }
+
     public static string CreateWorkerHandoffPacketId(
         string loopKey,
         string cmeId,

@@ -4,6 +4,9 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+$script:ResolvedRepoRoot = [System.IO.Path]::GetFullPath((Split-Path -Parent (Split-Path -Parent $PSScriptRoot)))
+
+Set-Location -LiteralPath $script:ResolvedRepoRoot
 
 $script:TextExtensions = @(
     ".cs", ".csproj", ".json", ".jsonl", ".lisp", ".md", ".props", ".ps1",
@@ -11,7 +14,7 @@ $script:TextExtensions = @(
 )
 
 function Get-TrackedFiles {
-    $files = & git ls-files
+    $files = & git -C $script:ResolvedRepoRoot ls-files
     if ($LASTEXITCODE -ne 0) {
         throw "Unable to list tracked files. Run this script from inside a git repository."
     }
@@ -20,12 +23,7 @@ function Get-TrackedFiles {
 }
 
 function Get-RepoRoot {
-    $root = & git rev-parse --show-toplevel
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($root)) {
-        throw "Unable to resolve repository root."
-    }
-
-    return [System.IO.Path]::GetFullPath($root)
+    return $script:ResolvedRepoRoot
 }
 
 function Get-LocalCorpusPath {
