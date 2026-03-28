@@ -47,8 +47,37 @@ public sealed class GovernedSeedRuntimeService
         string input,
         CancellationToken cancellationToken = default)
     {
+        return await EvaluateAsync(
+            agentId,
+            theaterId,
+            input,
+            GovernedSeedIngressAccessClass.PromptInput,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    public Task<EvaluateEnvelope> EvaluateToolAccessAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        CancellationToken cancellationToken = default) =>
+        EvaluateAsync(agentId, theaterId, input, GovernedSeedIngressAccessClass.ToolAccess, cancellationToken);
+
+    public Task<EvaluateEnvelope> EvaluateDataAccessAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        CancellationToken cancellationToken = default) =>
+        EvaluateAsync(agentId, theaterId, input, GovernedSeedIngressAccessClass.DataAccess, cancellationToken);
+
+    private async Task<EvaluateEnvelope> EvaluateAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        GovernedSeedIngressAccessClass ingressAccessClass,
+        CancellationToken cancellationToken)
+    {
         cancellationToken.ThrowIfCancellationRequested();
-        var sanctuaryIngress = _sanctuaryIngressService.Prepare(agentId, theaterId, input);
+        var sanctuaryIngress = _sanctuaryIngressService.Prepare(agentId, theaterId, input, ingressAccessClass);
         var primeCrypticReceipt = _primeCrypticServiceBroker.DescribeResidentField(agentId, theaterId);
         var bootstrapReceipt = _bootstrapService.Bootstrap(agentId, theaterId);
         var bootstrapNexusResult = _nexusControlService.EvaluateBootstrapAdmission(primeCrypticReceipt, bootstrapReceipt);
@@ -90,6 +119,7 @@ public sealed class GovernedSeedRuntimeService
                 AuthorityClass: ProtectedExecutionAuthorityClass.FatherBound,
                 DisclosureCeiling: ProtectedExecutionDisclosureCeiling.StructuralOnly,
                 BootstrapReceipt: bootstrapReceipt,
+                IngressAccessClass: ingressAccessClass,
                 SanctuaryIngressReceipt: sanctuaryIngress.Receipt),
             cancellationToken).ConfigureAwait(false);
         var situationalContext = result.VerticalSlice.SituationalContext

@@ -233,6 +233,59 @@ public sealed class SeedVerticalSliceIntegrationTests
     }
 
     [Fact]
+    public async Task Evaluate_Tool_And_Data_Access_Use_Explicit_HigherOrder_Ingress_Callers()
+    {
+        IGovernedSeedHost host = HeadlessRuntimeBootstrap.CreateHost();
+        var toolPrompt = """
+            Standing:
+            - bounded_summary_ready
+            Permitted derivation:
+            - masked_summary
+
+            Use tools to compare the bounded signals before returning the lawful summary.
+            """;
+        var dataPrompt = """
+            Standing:
+            - bounded_summary_ready
+            Permitted derivation:
+            - masked_summary
+
+            Use data access to retrieve the nearby bounded context before returning the lawful summary.
+            """;
+
+        var toolResult = await host.EvaluateToolAccessAsync("agent-tool-001", "theater-tool", toolPrompt);
+        var dataResult = await host.EvaluateDataAccessAsync("agent-data-001", "theater-data", dataPrompt);
+
+        var toolPayload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(toolResult.Payload!);
+        var dataPayload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(dataResult.Payload!);
+
+        Assert.NotNull(toolPayload);
+        Assert.NotNull(dataPayload);
+
+        Assert.Equal(GovernedSeedIngressAccessClass.ToolAccess, toolPayload.SanctuaryIngressReceipt!.IngressAccessClass);
+        Assert.Equal("sanctuary-first-engrammitization-before-tool-space-custody", toolPayload.SanctuaryIngressReceipt.SourceReason);
+        Assert.Equal(GovernedSeedIngressAccessClass.ToolAccess, toolPayload.SituationalContext!.LowMindSfRoute.IngressAccessClass);
+        Assert.Equal(GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction, toolPayload.SituationalContext.LowMindSfRoute.RouteKind);
+        Assert.Equal("tool-access-routed-through-lowmind-sf", toolPayload.SituationalContext.LowMindSfRoute.SourceReason);
+        Assert.Equal(GovernedSeedHighMindUptakeKind.HigherOrderEcIntake, toolPayload.HighMindContext!.UptakeKind);
+        Assert.Equal(GovernedSeedIngressAccessClass.ToolAccess, toolPayload.HostedLlmReceipt!.RequestPacket.IngressAccessClass);
+        Assert.Equal(toolPayload.SanctuaryIngressReceipt.ReceiptHandle, toolPayload.HostedLlmReceipt.RequestPacket.SanctuaryIngressReceiptHandle);
+        Assert.Equal(GovernedSeedIngressAccessClass.ToolAccess, toolPayload.OperationalContext!.IngressAccessClass);
+        Assert.Equal(GovernedSeedIngressAccessClass.ToolAccess, toolPayload.StateModulationReceipt!.IngressAccessClass);
+
+        Assert.Equal(GovernedSeedIngressAccessClass.DataAccess, dataPayload.SanctuaryIngressReceipt!.IngressAccessClass);
+        Assert.Equal("sanctuary-first-engrammitization-before-data-space-custody", dataPayload.SanctuaryIngressReceipt.SourceReason);
+        Assert.Equal(GovernedSeedIngressAccessClass.DataAccess, dataPayload.SituationalContext!.LowMindSfRoute.IngressAccessClass);
+        Assert.Equal(GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction, dataPayload.SituationalContext.LowMindSfRoute.RouteKind);
+        Assert.Equal("data-access-routed-through-lowmind-sf", dataPayload.SituationalContext.LowMindSfRoute.SourceReason);
+        Assert.Equal(GovernedSeedHighMindUptakeKind.HigherOrderEcIntake, dataPayload.HighMindContext!.UptakeKind);
+        Assert.Equal(GovernedSeedIngressAccessClass.DataAccess, dataPayload.HostedLlmReceipt!.RequestPacket.IngressAccessClass);
+        Assert.Equal(dataPayload.SanctuaryIngressReceipt.ReceiptHandle, dataPayload.HostedLlmReceipt.RequestPacket.SanctuaryIngressReceiptHandle);
+        Assert.Equal(GovernedSeedIngressAccessClass.DataAccess, dataPayload.OperationalContext!.IngressAccessClass);
+        Assert.Equal(GovernedSeedIngressAccessClass.DataAccess, dataPayload.StateModulationReceipt!.IngressAccessClass);
+    }
+
+    [Fact]
     public async Task Evaluate_SelfStateProtectedEvidence_RoutesFirstToCMos()
     {
         IGovernedSeedHost host = HeadlessRuntimeBootstrap.CreateHost();

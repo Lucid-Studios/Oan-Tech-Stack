@@ -13,16 +13,24 @@ internal static class Program
     {
         if (args.Length == 0 || !args[0].Equals("evaluate", StringComparison.OrdinalIgnoreCase))
         {
-            Console.Error.WriteLine("Usage: evaluate --input <text> [--agent-id <id>] [--theater-id <id>] [--return-surface-only] [--outbound-object-only] [--outbound-lane-only]");
+            Console.Error.WriteLine("Usage: evaluate --input <text> [--agent-id <id>] [--theater-id <id>] [--tool-access|--data-access] [--return-surface-only] [--outbound-object-only] [--outbound-lane-only]");
             return 2;
         }
 
         var agentId = ReadOption(args, "--agent-id") ?? "agent-001";
         var theaterId = ReadOption(args, "--theater-id") ?? "theater-A";
         var input = ReadOption(args, "--input");
+        var toolAccess = args.Any(static arg => arg.Equals("--tool-access", StringComparison.OrdinalIgnoreCase));
+        var dataAccess = args.Any(static arg => arg.Equals("--data-access", StringComparison.OrdinalIgnoreCase));
         var returnSurfaceOnly = args.Any(static arg => arg.Equals("--return-surface-only", StringComparison.OrdinalIgnoreCase));
         var outboundObjectOnly = args.Any(static arg => arg.Equals("--outbound-object-only", StringComparison.OrdinalIgnoreCase));
         var outboundLaneOnly = args.Any(static arg => arg.Equals("--outbound-lane-only", StringComparison.OrdinalIgnoreCase));
+
+        if (toolAccess && dataAccess)
+        {
+            Console.Error.WriteLine("Choose either --tool-access or --data-access, not both.");
+            return 2;
+        }
 
         if (string.IsNullOrWhiteSpace(input) && Console.IsInputRedirected)
         {
@@ -63,7 +71,11 @@ internal static class Program
             return 0;
         }
 
-        var result = await host.EvaluateAsync(agentId, theaterId, input).ConfigureAwait(false);
+        var result = toolAccess
+            ? await host.EvaluateToolAccessAsync(agentId, theaterId, input).ConfigureAwait(false)
+            : dataAccess
+                ? await host.EvaluateDataAccessAsync(agentId, theaterId, input).ConfigureAwait(false)
+                : await host.EvaluateAsync(agentId, theaterId, input).ConfigureAwait(false);
         Console.WriteLine(JsonSerializer.Serialize(result, OutputJsonOptions));
         return 0;
     }

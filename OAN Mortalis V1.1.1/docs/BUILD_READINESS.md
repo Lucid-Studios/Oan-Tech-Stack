@@ -35,7 +35,7 @@ Verified result:
 - build succeeded
 - tests succeeded
 - hygiene succeeded
-- `84` tests passed across `2` test assemblies
+- `85` tests passed across `2` test assemblies
 
 Solution shape:
 
@@ -111,6 +111,7 @@ The first live runtime vertical slice in this line now proves:
 - `AgentiCore` now consults a governed Sanctuary-hosted LLM seed receipt before cryptic floor progression, so Prime-side hosted seed refusal or needs-more-information posture can withhold progression explicitly instead of living only in the old `V1.0` host path
 - the hosted seed receipt now mints a direct seeded transit packet for `SLI.Engine`, so the cryptic floor consumes a governed Prime-hosted seed carrier instead of acting on raw input alone
 - all terminal-side seed ingress now routes through a SoulFrame `LowMind.SF` packet before `AgentiCore` uptake, so prompt input, tool access, and data access can share one lawful ingress seam even while current runtime entry still defaults to prompt-class traffic
+- `CradleTek.Host`, `CradleTek.Runtime`, and the headless runtime now expose explicit prompt, tool-access, and data-access entrypoints, so higher-order ingress no longer exists only as an internal route classification and can be invoked as a real caller surface
 - the hosted seed request, seeded transit packet, `OperationalContext`, and modulation receipt now mirror the `LowMind.SF` route handle and route kind, so Prime-hosted seed work and hosted cryptic floor work consume the same SoulFrame ingress decision instead of re-deriving it locally
 - `SLI.Engine` now treats the `LowMind.SF` route handle as required ingress law and distinguishes direct prompt transit from higher-order EC transit in its cryptic-floor readiness trace
 - `AgentiCore` now mints an explicit `HighMind` uptake context after hosted-seed evaluation, so EC uptake staging stands as its own post-SoulFrame seam instead of being implied by the hosted-seed receipt or the final predicate path

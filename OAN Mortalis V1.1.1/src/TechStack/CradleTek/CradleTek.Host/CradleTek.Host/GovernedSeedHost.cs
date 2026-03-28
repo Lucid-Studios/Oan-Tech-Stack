@@ -11,6 +11,18 @@ public interface IGovernedSeedHost
         string input,
         CancellationToken cancellationToken = default);
 
+    Task<EvaluateEnvelope> EvaluateToolAccessAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        CancellationToken cancellationToken = default);
+
+    Task<EvaluateEnvelope> EvaluateDataAccessAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        CancellationToken cancellationToken = default);
+
     Task<GovernedSeedReturnSurfaceContext> EvaluateReturnSurfaceAsync(
         string agentId,
         string theaterId,
@@ -45,6 +57,20 @@ public sealed class GovernedSeedHost : IGovernedSeedHost
         string input,
         CancellationToken cancellationToken = default) =>
         _runtimeService.EvaluateAsync(agentId, theaterId, input, cancellationToken);
+
+    public Task<EvaluateEnvelope> EvaluateToolAccessAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        CancellationToken cancellationToken = default) =>
+        _runtimeService.EvaluateToolAccessAsync(agentId, theaterId, input, cancellationToken);
+
+    public Task<EvaluateEnvelope> EvaluateDataAccessAsync(
+        string agentId,
+        string theaterId,
+        string input,
+        CancellationToken cancellationToken = default) =>
+        _runtimeService.EvaluateDataAccessAsync(agentId, theaterId, input, cancellationToken);
 
     public async Task<GovernedSeedReturnSurfaceContext> EvaluateReturnSurfaceAsync(
         string agentId,
