@@ -52,6 +52,15 @@ public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
                 Packet: null);
         }
 
+        if (string.IsNullOrWhiteSpace(seededTransitPacket.LowMindSfRouteHandle))
+        {
+            return new CrypticFloorEvaluation(
+                CanMintPredicate: false,
+                OutcomeCode: "lowmind-sf-route-required",
+                GovernanceTrace: "soulframe-lowmind-sf-route-required",
+                Packet: null);
+        }
+
         if (input.Contains("make it convincing", StringComparison.OrdinalIgnoreCase))
         {
             return new CrypticFloorEvaluation(
@@ -73,7 +82,9 @@ public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
         return new CrypticFloorEvaluation(
             CanMintPredicate: true,
             OutcomeCode: "predicate-minted",
-            GovernanceTrace: "predicate-landing-surface-ready-via-hosted-seed-transit",
+            GovernanceTrace: seededTransitPacket.LowMindSfRouteKind == GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction
+                ? "predicate-landing-surface-ready-via-lowmind-sf-higher-order-transit"
+                : "predicate-landing-surface-ready-via-lowmind-sf-direct-transit",
             Packet: packet);
     }
 }

@@ -9,7 +9,8 @@ public interface IGovernedSeedCognitionService
 {
     GovernedSeedEvaluationResult Evaluate(
         GovernedSeedEvaluationRequest request,
-        GovernedSeedMemoryContext personifiedMemoryContext);
+        GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute);
 }
 
 public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
@@ -33,10 +34,12 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
 
     public GovernedSeedEvaluationResult Evaluate(
         GovernedSeedEvaluationRequest request,
-        GovernedSeedMemoryContext personifiedMemoryContext)
+        GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(personifiedMemoryContext);
+        ArgumentNullException.ThrowIfNull(lowMindSfRoute);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.AgentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.TheaterId);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Input);
@@ -45,7 +48,7 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
         var capabilityReceipt = CreateCapabilityReceipt(request, personifiedMemoryContext, now);
         var pathHandle = CreateHandle("path://", request.AgentId, request.TheaterId, request.Input, personifiedMemoryContext.ContextHandle);
         var directiveHandle = CreateHandle("directive://", capabilityReceipt.CapabilityHandle, request.AgentId, request.TheaterId);
-        var hostedLlmReceipt = _hostedLlmService.Evaluate(request, personifiedMemoryContext);
+        var hostedLlmReceipt = _hostedLlmService.Evaluate(request, personifiedMemoryContext, lowMindSfRoute);
 
         if (!hostedLlmReceipt.ResponsePacket.Accepted)
         {

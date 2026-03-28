@@ -10,6 +10,7 @@ public interface IGovernedHostedLlmProvider
     GovernedHostedLlmProviderResponse? TryEvaluate(
         GovernedSeedEvaluationRequest request,
         GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute,
         GovernedSeedHostedLlmGovernanceProtocol governanceProtocol);
 }
 
@@ -37,17 +38,19 @@ public sealed class GovernedHostedLlmLocalRuntimeProvider : IGovernedHostedLlmPr
     public GovernedHostedLlmProviderResponse? TryEvaluate(
         GovernedSeedEvaluationRequest request,
         GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute,
         GovernedSeedHostedLlmGovernanceProtocol governanceProtocol)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(personifiedMemoryContext);
+        ArgumentNullException.ThrowIfNull(lowMindSfRoute);
         ArgumentNullException.ThrowIfNull(governanceProtocol);
 
         try
         {
             var payload = new GovernedHostedLlmRuntimeInferRequest(
                 Task: "hosted_seed",
-                Context: ComposeContext(request, personifiedMemoryContext),
+                Context: ComposeContext(request, personifiedMemoryContext, lowMindSfRoute),
                 OpalConstraints: new GovernedHostedLlmRuntimeOpalConstraints(MaxTokens: 320),
                 GovernanceProtocol: new GovernedHostedLlmRuntimeGovernanceProtocol(
                     RequireStateEnvelope: governanceProtocol.RequireStateEnvelope,
@@ -106,7 +109,8 @@ public sealed class GovernedHostedLlmLocalRuntimeProvider : IGovernedHostedLlmPr
 
     private static string ComposeContext(
         GovernedSeedEvaluationRequest request,
-        GovernedSeedMemoryContext personifiedMemoryContext)
+        GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute)
     {
         static string JoinOrNone(IEnumerable<string> values) =>
             string.Join(", ", values
@@ -123,6 +127,9 @@ public sealed class GovernedHostedLlmLocalRuntimeProvider : IGovernedHostedLlmPr
         builder.AppendLine("Hosted seed evaluation.");
         builder.AppendLine($"Authority class: {request.AuthorityClass}.");
         builder.AppendLine($"Disclosure ceiling: {request.DisclosureCeiling}.");
+        builder.AppendLine($"Ingress access class: {lowMindSfRoute.IngressAccessClass}.");
+        builder.AppendLine($"LowMind.SF route kind: {lowMindSfRoute.RouteKind}.");
+        builder.AppendLine($"LowMind.SF source reason: {lowMindSfRoute.SourceReason}.");
         builder.AppendLine($"Self resolution disposition: {personifiedMemoryContext.SelfResolutionDisposition}.");
         builder.AppendLine($"Context stability: {personifiedMemoryContext.ContextStability}.");
         builder.AppendLine($"Concept density: {personifiedMemoryContext.ConceptDensity}.");

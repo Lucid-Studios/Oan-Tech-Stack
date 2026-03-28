@@ -42,6 +42,8 @@ Fresh bootstrap surfaces:
 - hosted LLM seed receipts and request/response packets now ride the `V1.1.1` vertical slice, `OperationalContext`, and modulation surface, so Prime-hosted seed work has a lawful seat in the new line instead of continuing to do active work in `V1.0`
 - the hosted LLM seed receipt now carries a seeded transit packet that feeds `SLI.Engine` directly, so Prime-hosted seed work and hosted cryptic floor work meet through an explicit carrier rather than only through raw prompt reuse
 - the hosted LLM seed service now has a localhost provider seam for the external Hosted LLM runtime, so `V1.1.1` can use the live governed inference service without hard-coding the external runtime path into tracked code
+- SoulFrame now mints a `LowMind.SF` route packet before `AgentiCore` uptake, so prompt input, tool access, and data access can share one universal ingress law through `SLI -> LowMind.SF -> SoulFrame` rather than leaving ingress classification implicit inside cognition
+- that `LowMind.SF` route is now mirrored into hosted-seed request/seeded transit packets, `OperationalContext`, and modulation, so the hosted seed, SLI floor, and governance-readable surfaces all consume one SoulFrame ingress decision instead of parallel route guesses
 - duplex pointer handles and GEL telemetry records now attach to the materialized evaluation envelope in `V1.1.1`, so the outward ladder carries a lawful trace seat and the old `Data.Cryptic` / `Telemetry.GEL` pair no longer need to stay active in `V1.0`
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules

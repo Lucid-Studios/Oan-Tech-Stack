@@ -53,6 +53,7 @@ public static class HeadlessRuntimeBootstrap
             new GovernedSeedProtectedHoldRoutingService(nexusControlService),
             new GovernedSeedStewardshipService(nexusControlService),
             memoryContextService,
+            new GovernedSeedLowMindSfRoutingService(),
             new GovernedSeedSituationalContextService());
         var runtime = new GovernedSeedRuntimeService(
             membrane,

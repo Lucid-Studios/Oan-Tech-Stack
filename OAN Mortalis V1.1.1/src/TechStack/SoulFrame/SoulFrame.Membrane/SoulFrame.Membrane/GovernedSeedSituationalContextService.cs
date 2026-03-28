@@ -12,6 +12,7 @@ public interface IGovernedSeedSituationalContextService
         GovernedSeedSoulFrameReturnIntakeReceipt returnIntakeReceipt,
         GovernedSeedProtectedHoldRoutingReceipt holdRoutingReceipt,
         GovernedSeedSoulFrameStewardshipReceipt stewardshipReceipt,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute,
         GovernedSeedMemoryContext memoryContext,
         GovernedSeedEvaluationResult evaluationResult);
 }
@@ -24,6 +25,7 @@ public sealed class GovernedSeedSituationalContextService : IGovernedSeedSituati
         GovernedSeedSoulFrameReturnIntakeReceipt returnIntakeReceipt,
         GovernedSeedProtectedHoldRoutingReceipt holdRoutingReceipt,
         GovernedSeedSoulFrameStewardshipReceipt stewardshipReceipt,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute,
         GovernedSeedMemoryContext memoryContext,
         GovernedSeedEvaluationResult evaluationResult)
     {
@@ -32,6 +34,7 @@ public sealed class GovernedSeedSituationalContextService : IGovernedSeedSituati
         ArgumentNullException.ThrowIfNull(returnIntakeReceipt);
         ArgumentNullException.ThrowIfNull(holdRoutingReceipt);
         ArgumentNullException.ThrowIfNull(stewardshipReceipt);
+        ArgumentNullException.ThrowIfNull(lowMindSfRoute);
         ArgumentNullException.ThrowIfNull(memoryContext);
         ArgumentNullException.ThrowIfNull(evaluationResult);
 
@@ -42,6 +45,7 @@ public sealed class GovernedSeedSituationalContextService : IGovernedSeedSituati
                 projectionReceipt.ProjectionHandle,
                 returnIntakeReceipt.IntakeHandle,
                 stewardshipReceipt.StewardshipHandle,
+                lowMindSfRoute.PacketHandle,
                 memoryContext.ContextHandle),
             ContextProfile: "soulframe-stewardship-situational-context",
             DecisionCode: evaluationResult.Decision,
@@ -62,6 +66,7 @@ public sealed class GovernedSeedSituationalContextService : IGovernedSeedSituati
             HoldDestinationHandles: holdRoutingReceipt.DestinationHandles,
             ReturnDeniedCount: returnIntakeReceipt.Classification.DeniedCount,
             ReturnDeferredCount: returnIntakeReceipt.Classification.DeferredCount,
+            LowMindSfRoute: lowMindSfRoute,
             MemoryContext: memoryContext,
             TimestampUtc: DateTimeOffset.UtcNow);
     }

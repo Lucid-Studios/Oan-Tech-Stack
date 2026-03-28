@@ -13,7 +13,8 @@ public sealed record GovernedSeedEvaluationRequest(
     string Input,
     ProtectedExecutionAuthorityClass AuthorityClass,
     ProtectedExecutionDisclosureCeiling DisclosureCeiling,
-    GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt = null);
+    GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt = null,
+    GovernedSeedIngressAccessClass IngressAccessClass = GovernedSeedIngressAccessClass.PromptInput);
 
 public enum GovernedSeedProtectedResidueKind
 {
@@ -279,6 +280,31 @@ public sealed record GovernedSeedMemoryContext(
     string ConceptDensity,
     DateTimeOffset TimestampUtc);
 
+public enum GovernedSeedIngressAccessClass
+{
+    PromptInput = 0,
+    ToolAccess = 1,
+    DataAccess = 2
+}
+
+public enum GovernedSeedLowMindSfRouteKind
+{
+    DirectPrompt = 0,
+    HigherOrderEcFunction = 1
+}
+
+public sealed record GovernedSeedLowMindSfRoutePacket(
+    string PacketHandle,
+    string PacketProfile,
+    string BootstrapHandle,
+    string MemoryContextHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind RouteKind,
+    bool RoutedThroughSoulFrame,
+    bool RequiresHigherOrderFunction,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
 public sealed record GovernedSeedSituationalContext(
     string ContextHandle,
     string ContextProfile,
@@ -300,6 +326,7 @@ public sealed record GovernedSeedSituationalContext(
     IReadOnlyList<string> HoldDestinationHandles,
     int ReturnDeniedCount,
     int ReturnDeferredCount,
+    GovernedSeedLowMindSfRoutePacket LowMindSfRoute,
     GovernedSeedMemoryContext MemoryContext,
     DateTimeOffset TimestampUtc);
 
@@ -557,6 +584,9 @@ public sealed record GovernedSeedHostedLlmRequestPacket(
     string ProtocolVersion,
     string BootstrapHandle,
     string MemoryContextHandle,
+    string LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
     ProtectedExecutionAuthorityClass AuthorityClass,
     ProtectedExecutionDisclosureCeiling DisclosureCeiling,
     bool RequireStateEnvelope,
@@ -582,6 +612,9 @@ public sealed record GovernedSeedHostedSeedToCrypticTransitPacket(
     string PacketProfile,
     string BootstrapHandle,
     string MemoryContextHandle,
+    string LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
     string CrypticInputHandle,
     string HostedLlmRequestPacketHandle,
     string HostedLlmResponsePacketHandle,
@@ -614,7 +647,8 @@ public interface IGovernedSeedHostedLlmService
 {
     GovernedSeedHostedLlmSeedReceipt Evaluate(
         GovernedSeedEvaluationRequest request,
-        GovernedSeedMemoryContext personifiedMemoryContext);
+        GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute);
 }
 
 public sealed record GovernedSeedPrimeToCrypticTransitPacket(
@@ -624,6 +658,9 @@ public sealed record GovernedSeedPrimeToCrypticTransitPacket(
     string CapabilityHandle,
     string BootstrapHandle,
     string InputHandle,
+    string? LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
     string InterconnectProfile,
     string CarrierKind,
     ProtectedExecutionAuthorityClass AuthorityClass,
@@ -702,6 +739,9 @@ public sealed record GovernedSeedOperationalContext(
     string? HostedLlmRequestPacketHandle,
     string? HostedLlmResponsePacketHandle,
     GovernedSeedHostedLlmEmissionState? HostedLlmState,
+    string? LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
     string BootstrapAdmissionHandle,
     string NexusPostureHandle,
     string NexusDecisionHandle,
@@ -826,6 +866,9 @@ public sealed record GovernedSeedStateModulationReceipt(
     string? HostedLlmRequestPacketHandle,
     string? HostedLlmResponsePacketHandle,
     GovernedSeedHostedLlmEmissionState? HostedLlmState,
+    string? LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
     string? PrimeToCrypticTransitHandle,
     string? PrimeToCrypticPacketHandle,
     string? CrypticToPrimeTransitHandle,

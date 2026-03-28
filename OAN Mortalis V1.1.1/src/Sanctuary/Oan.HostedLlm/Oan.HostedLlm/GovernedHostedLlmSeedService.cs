@@ -79,10 +79,12 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
 
     public GovernedSeedHostedLlmSeedReceipt Evaluate(
         GovernedSeedEvaluationRequest request,
-        GovernedSeedMemoryContext personifiedMemoryContext)
+        GovernedSeedMemoryContext personifiedMemoryContext,
+        GovernedSeedLowMindSfRoutePacket lowMindSfRoute)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(personifiedMemoryContext);
+        ArgumentNullException.ThrowIfNull(lowMindSfRoute);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.AgentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.TheaterId);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Input);
@@ -97,6 +99,9 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             ProtocolVersion: protocol.Version,
             BootstrapHandle: bootstrapHandle,
             MemoryContextHandle: personifiedMemoryContext.ContextHandle,
+            LowMindSfRouteHandle: lowMindSfRoute.PacketHandle,
+            IngressAccessClass: lowMindSfRoute.IngressAccessClass,
+            LowMindSfRouteKind: lowMindSfRoute.RouteKind,
             AuthorityClass: request.AuthorityClass,
             DisclosureCeiling: request.DisclosureCeiling,
             RequireStateEnvelope: protocol.RequireStateEnvelope,
@@ -110,7 +115,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
         var emissionState = ResolveLocalGuardState(listeningFrame);
         if (emissionState is null)
         {
-            providerResponse = _provider?.TryEvaluate(request, personifiedMemoryContext, protocol);
+            providerResponse = _provider?.TryEvaluate(request, personifiedMemoryContext, lowMindSfRoute, protocol);
             emissionState = NormalizeProviderState(providerResponse?.State) ?? ResolveFallbackState(request.Input);
         }
 
@@ -132,6 +137,9 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             PacketProfile: "prime-hosted-seed-to-cryptic-floor-request",
             BootstrapHandle: bootstrapHandle,
             MemoryContextHandle: personifiedMemoryContext.ContextHandle,
+            LowMindSfRouteHandle: lowMindSfRoute.PacketHandle,
+            IngressAccessClass: lowMindSfRoute.IngressAccessClass,
+            LowMindSfRouteKind: lowMindSfRoute.RouteKind,
             CrypticInputHandle: CreateHandle("cryptic-input://", request.AgentId, request.TheaterId, request.Input),
             HostedLlmRequestPacketHandle: requestPacket.PacketHandle,
             HostedLlmResponsePacketHandle: responsePacket.PacketHandle,

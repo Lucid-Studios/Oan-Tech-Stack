@@ -18,6 +18,7 @@ public sealed class GovernedSeedMembraneService : IGovernedSeedMembraneService
     private readonly IGovernedSeedProtectedHoldRoutingService _holdRoutingService;
     private readonly IGovernedSeedStewardshipService _stewardshipService;
     private readonly IGovernedSeedMemoryContextService _memoryContextService;
+    private readonly IGovernedSeedLowMindSfRoutingService _lowMindSfRoutingService;
     private readonly IGovernedSeedSituationalContextService _situationalContextService;
 
     public GovernedSeedMembraneService(
@@ -27,6 +28,7 @@ public sealed class GovernedSeedMembraneService : IGovernedSeedMembraneService
         IGovernedSeedProtectedHoldRoutingService holdRoutingService,
         IGovernedSeedStewardshipService stewardshipService,
         IGovernedSeedMemoryContextService memoryContextService,
+        IGovernedSeedLowMindSfRoutingService lowMindSfRoutingService,
         IGovernedSeedSituationalContextService situationalContextService)
     {
         _cognitionService = cognitionService ?? throw new ArgumentNullException(nameof(cognitionService));
@@ -35,6 +37,7 @@ public sealed class GovernedSeedMembraneService : IGovernedSeedMembraneService
         _holdRoutingService = holdRoutingService ?? throw new ArgumentNullException(nameof(holdRoutingService));
         _stewardshipService = stewardshipService ?? throw new ArgumentNullException(nameof(stewardshipService));
         _memoryContextService = memoryContextService ?? throw new ArgumentNullException(nameof(memoryContextService));
+        _lowMindSfRoutingService = lowMindSfRoutingService ?? throw new ArgumentNullException(nameof(lowMindSfRoutingService));
         _situationalContextService = situationalContextService ?? throw new ArgumentNullException(nameof(situationalContextService));
     }
 
@@ -57,7 +60,11 @@ public sealed class GovernedSeedMembraneService : IGovernedSeedMembraneService
         var memoryContext = await _memoryContextService
             .CreateContextAsync(normalizedRequest, normalizedRequest.BootstrapReceipt, cancellationToken)
             .ConfigureAwait(false);
-        var result = _cognitionService.Evaluate(normalizedRequest, memoryContext);
+        var lowMindSfRoute = _lowMindSfRoutingService.CreateRoute(
+            normalizedRequest,
+            normalizedRequest.BootstrapReceipt,
+            memoryContext);
+        var result = _cognitionService.Evaluate(normalizedRequest, memoryContext, lowMindSfRoute);
         var returnIntakeReceipt = _returnIntakeService.CreateReturnIntake(
             normalizedRequest.BootstrapReceipt,
             projectionReceipt,
@@ -78,6 +85,7 @@ public sealed class GovernedSeedMembraneService : IGovernedSeedMembraneService
             returnIntakeReceipt,
             holdRoutingReceipt,
             stewardshipReceipt,
+            lowMindSfRoute,
             memoryContext,
             result);
 

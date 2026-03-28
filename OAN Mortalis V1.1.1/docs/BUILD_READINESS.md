@@ -35,7 +35,7 @@ Verified result:
 - build succeeded
 - tests succeeded
 - hygiene succeeded
-- `83` tests passed across `2` test assemblies
+- `84` tests passed across `2` test assemblies
 
 Solution shape:
 
@@ -110,6 +110,9 @@ The first live runtime vertical slice in this line now proves:
 - `OperationalContext` now carries explicit `PrimeToCrypticTransit` and `CrypticToPrimeTransit` contracts plus hosted request/return packets, so the C# Prime host and hosted Lisp/Cryptic medium no longer relate by implication alone and modulation can mirror both interconnect and packet handles directly
 - `AgentiCore` now consults a governed Sanctuary-hosted LLM seed receipt before cryptic floor progression, so Prime-side hosted seed refusal or needs-more-information posture can withhold progression explicitly instead of living only in the old `V1.0` host path
 - the hosted seed receipt now mints a direct seeded transit packet for `SLI.Engine`, so the cryptic floor consumes a governed Prime-hosted seed carrier instead of acting on raw input alone
+- all terminal-side seed ingress now routes through a SoulFrame `LowMind.SF` packet before `AgentiCore` uptake, so prompt input, tool access, and data access can share one lawful ingress seam even while current runtime entry still defaults to prompt-class traffic
+- the hosted seed request, seeded transit packet, `OperationalContext`, and modulation receipt now mirror the `LowMind.SF` route handle and route kind, so Prime-hosted seed work and hosted cryptic floor work consume the same SoulFrame ingress decision instead of re-deriving it locally
+- `SLI.Engine` now treats the `LowMind.SF` route handle as required ingress law and distinguishes direct prompt transit from higher-order EC transit in its cryptic-floor readiness trace
 - `OperationalContext` and modulation now mirror the hosted LLM seed service, receipt, and packet handles, so the Prime-hosted seed surface is part of the inner-system branch instead of an invisible adjunct
 - `Oan.HostedLlm` now includes a localhost runtime provider seam, so the governed Prime-hosted seed service can consume the running Hosted LLM inference service over `127.0.0.1` while keeping refusal law, packet law, and receipt shaping inside `V1.1.1`
 - the materialized evaluation envelope now receives a duplex pointer handle and GEL telemetry record through `Oan.Trace.Persistence`, so accepted and refused outcomes both leave a lawful outward trace without reviving the old `Data.Cryptic` or `Telemetry.GEL` helper projects

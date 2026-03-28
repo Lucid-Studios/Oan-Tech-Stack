@@ -124,7 +124,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.True(result.Accepted);
         Assert.Equal("predicate-minted", result.Decision);
         Assert.Equal("QUERY", result.GovernanceState);
-        Assert.Equal("predicate-landing-surface-ready-via-hosted-seed-transit", result.GovernanceTrace);
+        Assert.Equal("predicate-landing-surface-ready-via-lowmind-sf-direct-transit", result.GovernanceTrace);
 
         var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(result.Payload!);
         Assert.NotNull(payload);
@@ -192,6 +192,39 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Contains("aggregate_metrics", payload.Predicate.PermittedDerivation);
         Assert.Equal(ProtectedExecutionPathState.Completed, payload.PathReceipt.State);
         Assert.Equal("predicate-minted", payload.OutcomeCode);
+        AssertModulationMirrorsNexus(payload);
+        AssertEnvelopeReturnSurfaceMirrorsContexts(result, payload);
+    }
+
+    [Fact]
+    public async Task Evaluate_AnalysisPrompt_RoutesThroughLowMindSfHigherOrderPath()
+    {
+        IGovernedSeedHost host = HeadlessRuntimeBootstrap.CreateHost();
+        var prompt = """
+            Standing:
+            - aggregate_correlation_a_b
+            Protected / non-disclosable:
+            - contextual | masked_context_note
+            Permitted derivation:
+            - masked_summary
+
+            Analyze and compare the bounded signals before returning the best lawful summary.
+            """;
+
+        var result = await host.EvaluateAsync("agent-002b", "theater-B2", prompt);
+
+        Assert.True(result.Accepted);
+        Assert.Equal("predicate-minted", result.Decision);
+        Assert.Equal("predicate-landing-surface-ready-via-lowmind-sf-higher-order-transit", result.GovernanceTrace);
+
+        var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(result.Payload!);
+        Assert.NotNull(payload);
+        Assert.NotNull(payload.SituationalContext);
+        Assert.Equal(GovernedSeedIngressAccessClass.PromptInput, payload.SituationalContext.LowMindSfRoute.IngressAccessClass);
+        Assert.Equal(GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction, payload.SituationalContext.LowMindSfRoute.RouteKind);
+        Assert.True(payload.SituationalContext.LowMindSfRoute.RoutedThroughSoulFrame);
+        Assert.True(payload.SituationalContext.LowMindSfRoute.RequiresHigherOrderFunction);
+        Assert.Equal("prompt-routed-to-ec-higher-order-function", payload.SituationalContext.LowMindSfRoute.SourceReason);
         AssertModulationMirrorsNexus(payload);
         AssertEnvelopeReturnSurfaceMirrorsContexts(result, payload);
     }
@@ -818,6 +851,9 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(primeToCrypticTransit.TransitHandle, primeToCrypticPacket.TransitHandle);
         Assert.Equal(payload.CapabilityReceipt.CapabilityHandle, primeToCrypticPacket.CapabilityHandle);
         Assert.Equal(payload.BootstrapReceipt!.BootstrapHandle, primeToCrypticPacket.BootstrapHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, primeToCrypticPacket.LowMindSfRouteHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, primeToCrypticPacket.IngressAccessClass);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, primeToCrypticPacket.LowMindSfRouteKind);
         Assert.Equal(primeCrypticReceipt.LispBundleReceipt.InterconnectProfile, primeToCrypticPacket.InterconnectProfile);
         Assert.Equal(primeCrypticReceipt.LispBundleReceipt.CrypticCarrierKind, primeToCrypticPacket.CarrierKind);
         Assert.Equal(ProtectedExecutionAuthorityClass.FatherBound, primeToCrypticPacket.AuthorityClass);
@@ -869,13 +905,22 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(payload.NexusPosture.BraidingProfile, payload.StateModulationReceipt.NexusBraidingProfile);
         Assert.Equal(payload.OperationalContext.FormationContext.ScopeLane, payload.StateModulationReceipt.ScopeLane);
         Assert.Equal(payload.OperationalContext.FormationContext.GovernedFormKind, payload.StateModulationReceipt.GovernedFormKind);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.OperationalContext.LowMindSfRouteHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.OperationalContext.IngressAccessClass);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.OperationalContext.LowMindSfRouteKind);
         Assert.Equal(payload.HostedLlmReceipt.ServiceHandle, payload.OperationalContext.HostedLlmServiceHandle);
         Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.OperationalContext.HostedLlmReceiptHandle);
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.OperationalContext.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.OperationalContext.HostedLlmResponsePacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.State, payload.OperationalContext.HostedLlmState);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.HostedLlmReceipt.RequestPacket.LowMindSfRouteHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.HostedLlmReceipt.RequestPacket.IngressAccessClass);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.HostedLlmReceipt.RequestPacket.LowMindSfRouteKind);
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmResponsePacketHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.LowMindSfRouteHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.HostedLlmReceipt.SeededTransitPacket.IngressAccessClass);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.HostedLlmReceipt.SeededTransitPacket.LowMindSfRouteKind);
         Assert.Equal(payload.SituationalContext.MemoryContext.ContextHandle, payload.HostedLlmReceipt.SeededTransitPacket.MemoryContextHandle);
         Assert.True(payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmAccepted);
         Assert.Equal(payload.HostedLlmReceipt.ServiceHandle, payload.StateModulationReceipt.HostedLlmServiceHandle);
@@ -883,6 +928,9 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.StateModulationReceipt.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.StateModulationReceipt.HostedLlmResponsePacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.State, payload.StateModulationReceipt.HostedLlmState);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.StateModulationReceipt.LowMindSfRouteHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.StateModulationReceipt.IngressAccessClass);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.StateModulationReceipt.LowMindSfRouteKind);
     }
 
     private static void AssertEnvelopeReturnSurfaceMirrorsContexts(EvaluateEnvelope envelope, GovernedSeedVerticalSlice payload)
