@@ -54,7 +54,8 @@ public sealed class HostedLlmProviderIntegrationTests
             TheaterId: "theater-hosted-llm",
             Input: input,
             AuthorityClass: ProtectedExecutionAuthorityClass.FatherBound,
-            DisclosureCeiling: ProtectedExecutionDisclosureCeiling.StructuralOnly);
+            DisclosureCeiling: ProtectedExecutionDisclosureCeiling.StructuralOnly,
+            SanctuaryIngressReceipt: CreateSanctuaryIngressReceipt());
 
     private static GovernedSeedMemoryContext CreateMemoryContext() =>
         new(
@@ -77,12 +78,30 @@ public sealed class HostedLlmProviderIntegrationTests
             PacketHandle: "lowmind-sf-route://test",
             PacketProfile: "soulframe-lowmind-sf-ingress-route",
             BootstrapHandle: "bootstrap://test",
+            SanctuaryIngressReceiptHandle: "sanctuary-ingress-receipt://test",
             MemoryContextHandle: "memory-context://test",
             IngressAccessClass: GovernedSeedIngressAccessClass.PromptInput,
             RouteKind: GovernedSeedLowMindSfRouteKind.DirectPrompt,
+            ObsidianWallApplied: true,
             RoutedThroughSoulFrame: true,
             RequiresHigherOrderFunction: false,
             SourceReason: "prompt-routed-to-direct-cryptic-prompt",
+            TimestampUtc: DateTimeOffset.UtcNow);
+
+    private static GovernedSeedSanctuaryIngressReceipt CreateSanctuaryIngressReceipt() =>
+        new(
+            ReceiptHandle: "sanctuary-ingress-receipt://test",
+            PacketHandle: "sanctuary-ingress-packet://test",
+            ReceiptProfile: "sanctuary-first-engrammitization-boundary",
+            PacketProfile: "sanctuary-obsidian-wall-preparation",
+            SourceInputHandle: "sanctuary-input://test",
+            PreparedInputHandle: "sanctuary-engram://test",
+            IngressAccessClass: GovernedSeedIngressAccessClass.PromptInput,
+            ExternalInputRequiresCustodyChain: true,
+            ObsidianWallApplied: true,
+            EngrammitizedForCradleTek: true,
+            RawPromptAuthorityTerminated: true,
+            SourceReason: "sanctuary-first-engrammitization-at-obsidian-wall",
             TimestampUtc: DateTimeOffset.UtcNow);
 
     private sealed class StubHostedLlmProvider : IGovernedHostedLlmProvider

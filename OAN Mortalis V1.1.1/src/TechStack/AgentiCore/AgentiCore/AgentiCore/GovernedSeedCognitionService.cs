@@ -16,17 +16,20 @@ public interface IGovernedSeedCognitionService
 public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
 {
     private readonly IGovernedSeedHostedLlmService _hostedLlmService;
+    private readonly IGovernedSeedHighMindUptakeService _highMindUptakeService;
     private readonly ICrypticFloorEvaluator _floorEvaluator;
     private readonly IPredicateMintProjector _predicateProjector;
     private readonly ICrypticDerivationPolicy _derivationPolicy;
 
     public GovernedSeedCognitionService(
         IGovernedSeedHostedLlmService hostedLlmService,
+        IGovernedSeedHighMindUptakeService highMindUptakeService,
         ICrypticFloorEvaluator floorEvaluator,
         IPredicateMintProjector predicateProjector,
         ICrypticDerivationPolicy derivationPolicy)
     {
         _hostedLlmService = hostedLlmService ?? throw new ArgumentNullException(nameof(hostedLlmService));
+        _highMindUptakeService = highMindUptakeService ?? throw new ArgumentNullException(nameof(highMindUptakeService));
         _floorEvaluator = floorEvaluator ?? throw new ArgumentNullException(nameof(floorEvaluator));
         _predicateProjector = predicateProjector ?? throw new ArgumentNullException(nameof(predicateProjector));
         _derivationPolicy = derivationPolicy ?? throw new ArgumentNullException(nameof(derivationPolicy));
@@ -49,6 +52,7 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
         var pathHandle = CreateHandle("path://", request.AgentId, request.TheaterId, request.Input, personifiedMemoryContext.ContextHandle);
         var directiveHandle = CreateHandle("directive://", capabilityReceipt.CapabilityHandle, request.AgentId, request.TheaterId);
         var hostedLlmReceipt = _hostedLlmService.Evaluate(request, personifiedMemoryContext, lowMindSfRoute);
+        var highMindContext = _highMindUptakeService.CreateContext(request, personifiedMemoryContext, lowMindSfRoute, hostedLlmReceipt);
 
         if (!hostedLlmReceipt.ResponsePacket.Accepted)
         {
@@ -107,7 +111,9 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
                     NexusTransitionRequest: null,
                     NexusTransitionDecision: null,
                     PrimeCrypticReceipt: null,
+                    SanctuaryIngressReceipt: request.SanctuaryIngressReceipt,
                     HostedLlmReceipt: hostedLlmReceipt,
+                    HighMindContext: highMindContext,
                     OperationalContext: null,
                     StateModulationReceipt: null,
                     CapabilityReceipt: capabilityReceipt,
@@ -156,7 +162,9 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
                     NexusTransitionRequest: null,
                     NexusTransitionDecision: null,
                     PrimeCrypticReceipt: null,
+                    SanctuaryIngressReceipt: request.SanctuaryIngressReceipt,
                     HostedLlmReceipt: hostedLlmReceipt,
+                    HighMindContext: highMindContext,
                     OperationalContext: null,
                     StateModulationReceipt: null,
                     CapabilityReceipt: capabilityReceipt,
@@ -215,7 +223,9 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
                     NexusTransitionRequest: null,
                     NexusTransitionDecision: null,
                     PrimeCrypticReceipt: null,
+                    SanctuaryIngressReceipt: request.SanctuaryIngressReceipt,
                     HostedLlmReceipt: hostedLlmReceipt,
+                    HighMindContext: highMindContext,
                     OperationalContext: null,
                     StateModulationReceipt: null,
                     CapabilityReceipt: capabilityReceipt,
@@ -304,7 +314,9 @@ public sealed class GovernedSeedCognitionService : IGovernedSeedCognitionService
                 NexusTransitionRequest: null,
                 NexusTransitionDecision: null,
                 PrimeCrypticReceipt: null,
+                SanctuaryIngressReceipt: request.SanctuaryIngressReceipt,
                 HostedLlmReceipt: hostedLlmReceipt,
+                HighMindContext: highMindContext,
                 OperationalContext: null,
                 StateModulationReceipt: null,
                 CapabilityReceipt: capabilityReceipt,

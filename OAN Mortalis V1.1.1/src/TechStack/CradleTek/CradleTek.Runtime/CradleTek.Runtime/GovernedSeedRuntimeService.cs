@@ -4,6 +4,7 @@ using Oan.PrimeCryptic.Services;
 using Oan.Runtime.Materialization;
 using Oan.State.Modulation;
 using Oan.Trace.Persistence;
+using SLI.Ingestion;
 using SoulFrame.Bootstrap;
 using SoulFrame.Membrane;
 
@@ -11,6 +12,7 @@ namespace CradleTek.Runtime;
 
 public sealed class GovernedSeedRuntimeService
 {
+    private readonly IGovernedSeedSanctuaryIngressEngrammitizationService _sanctuaryIngressService;
     private readonly IGovernedSeedMembraneService _membraneService;
     private readonly IGovernedSeedSoulFrameBootstrapService _bootstrapService;
     private readonly IPrimeCrypticServiceBroker _primeCrypticServiceBroker;
@@ -20,6 +22,7 @@ public sealed class GovernedSeedRuntimeService
     private readonly IGovernedSeedEnvelopeTraceService _traceService;
 
     public GovernedSeedRuntimeService(
+        IGovernedSeedSanctuaryIngressEngrammitizationService sanctuaryIngressService,
         IGovernedSeedMembraneService membraneService,
         IGovernedSeedSoulFrameBootstrapService bootstrapService,
         IPrimeCrypticServiceBroker primeCrypticServiceBroker,
@@ -28,6 +31,7 @@ public sealed class GovernedSeedRuntimeService
         IGovernedStateModulationService stateModulationService,
         IGovernedSeedEnvelopeTraceService traceService)
     {
+        _sanctuaryIngressService = sanctuaryIngressService ?? throw new ArgumentNullException(nameof(sanctuaryIngressService));
         _membraneService = membraneService ?? throw new ArgumentNullException(nameof(membraneService));
         _bootstrapService = bootstrapService ?? throw new ArgumentNullException(nameof(bootstrapService));
         _primeCrypticServiceBroker = primeCrypticServiceBroker ?? throw new ArgumentNullException(nameof(primeCrypticServiceBroker));
@@ -44,6 +48,7 @@ public sealed class GovernedSeedRuntimeService
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        var sanctuaryIngress = _sanctuaryIngressService.Prepare(agentId, theaterId, input);
         var primeCrypticReceipt = _primeCrypticServiceBroker.DescribeResidentField(agentId, theaterId);
         var bootstrapReceipt = _bootstrapService.Bootstrap(agentId, theaterId);
         var bootstrapNexusResult = _nexusControlService.EvaluateBootstrapAdmission(primeCrypticReceipt, bootstrapReceipt);
@@ -58,6 +63,7 @@ public sealed class GovernedSeedRuntimeService
                 agentId,
                 theaterId,
                 input,
+                sanctuaryIngress.Receipt,
                 primeCrypticReceipt,
                 bootstrapReceipt,
                 bootstrapNexusResult.Posture,
@@ -80,10 +86,11 @@ public sealed class GovernedSeedRuntimeService
             new GovernedSeedEvaluationRequest(
                 AgentId: agentId,
                 TheaterId: theaterId,
-                Input: input,
+                Input: sanctuaryIngress.PreparedInput,
                 AuthorityClass: ProtectedExecutionAuthorityClass.FatherBound,
                 DisclosureCeiling: ProtectedExecutionDisclosureCeiling.StructuralOnly,
-                BootstrapReceipt: bootstrapReceipt),
+                BootstrapReceipt: bootstrapReceipt,
+                SanctuaryIngressReceipt: sanctuaryIngress.Receipt),
             cancellationToken).ConfigureAwait(false);
         var situationalContext = result.VerticalSlice.SituationalContext
             ?? throw new InvalidOperationException("SoulFrame must expose situational context before nexus evaluation.");

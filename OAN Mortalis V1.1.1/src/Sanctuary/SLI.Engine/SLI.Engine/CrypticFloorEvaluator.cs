@@ -61,6 +61,15 @@ public sealed class CrypticFloorEvaluator : ICrypticFloorEvaluator
                 Packet: null);
         }
 
+        if (string.IsNullOrWhiteSpace(seededTransitPacket.SanctuaryIngressReceiptHandle) || !seededTransitPacket.ObsidianWallApplied)
+        {
+            return new CrypticFloorEvaluation(
+                CanMintPredicate: false,
+                OutcomeCode: "sanctuary-ingress-engrammitization-required",
+                GovernanceTrace: "sanctuary-obsidian-wall-required",
+                Packet: null);
+        }
+
         if (input.Contains("make it convincing", StringComparison.OrdinalIgnoreCase))
         {
             return new CrypticFloorEvaluation(

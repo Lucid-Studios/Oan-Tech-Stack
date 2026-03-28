@@ -23,14 +23,17 @@ public static class HeadlessRuntimeBootstrap
     public static GovernedSeedHeadlessRuntimeStack CreateStack()
     {
         var parser = new SeedEvidencePacketParser();
+        var sanctuaryIngressService = new GovernedSeedSanctuaryIngressEngrammitizationService();
         var lispBundleService = new GovernedCrypticLispBundleService();
         var hostedLlmSeedService = new GovernedHostedLlmSeedService(new GovernedHostedLlmLocalRuntimeProvider());
+        var highMindUptakeService = new GovernedSeedHighMindUptakeService();
         var pointerStore = new InMemoryGovernedCrypticPointerStore();
         var telemetrySink = new InMemoryGovernedGelTelemetrySink();
         var traceService = new GovernedSeedEnvelopeTraceService(pointerStore, telemetrySink);
         var floorEvaluator = new CrypticFloorEvaluator(parser, lispBundleService);
         var cognition = new GovernedSeedCognitionService(
             hostedLlmSeedService,
+            highMindUptakeService,
             floorEvaluator,
             new Oan.Common.DefaultPredicateMintProjector(),
             new Oan.Common.DefaultCrypticDerivationPolicy());
@@ -56,6 +59,7 @@ public static class HeadlessRuntimeBootstrap
             new GovernedSeedLowMindSfRoutingService(),
             new GovernedSeedSituationalContextService());
         var runtime = new GovernedSeedRuntimeService(
+            sanctuaryIngressService,
             membrane,
             soulFrameBootstrap,
             primeCrypticServiceBroker,

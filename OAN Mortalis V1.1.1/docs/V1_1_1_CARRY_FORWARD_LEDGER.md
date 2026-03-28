@@ -43,7 +43,11 @@ Fresh bootstrap surfaces:
 - the hosted LLM seed receipt now carries a seeded transit packet that feeds `SLI.Engine` directly, so Prime-hosted seed work and hosted cryptic floor work meet through an explicit carrier rather than only through raw prompt reuse
 - the hosted LLM seed service now has a localhost provider seam for the external Hosted LLM runtime, so `V1.1.1` can use the live governed inference service without hard-coding the external runtime path into tracked code
 - SoulFrame now mints a `LowMind.SF` route packet before `AgentiCore` uptake, so prompt input, tool access, and data access can share one universal ingress law through `SLI -> LowMind.SF -> SoulFrame` rather than leaving ingress classification implicit inside cognition
+- a first Sanctuary ingress-engrammitization service rebuilt fresh in `SLI.Ingestion`, so external input now crosses an explicit Obsidian Wall receipt before the active CradleTek body takes it up
 - that `LowMind.SF` route is now mirrored into hosted-seed request/seeded transit packets, `OperationalContext`, and modulation, so the hosted seed, SLI floor, and governance-readable surfaces all consume one SoulFrame ingress decision instead of parallel route guesses
+- the Sanctuary ingress receipt now mirrors through LowMind, hosted seed, HighMind, prime-to-cryptic transit, `OperationalContext`, and modulation, so `V1.1.1` can prove first engrammitization happened before EC uptake instead of treating it as doctrine only
+- a first explicit `HighMind` uptake service rebuilt fresh in `AgentiCore`, so EC uptake staging now stands as its own named post-SoulFrame seam rather than being diffused across hosted-seed and predicate-mint flow
+- the `HighMind` context now mirrors SoulFrame memory, `LowMind.SF` ingress, and hosted-seed receipt/state into `OperationalContext` and modulation, so `V1.1.1` can read higher-order EC uptake posture directly from the living stack
 - duplex pointer handles and GEL telemetry records now attach to the materialized evaluation envelope in `V1.1.1`, so the outward ladder carries a lawful trace seat and the old `Data.Cryptic` / `Telemetry.GEL` pair no longer need to stay active in `V1.0`
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules

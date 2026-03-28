@@ -14,7 +14,8 @@ public sealed record GovernedSeedEvaluationRequest(
     ProtectedExecutionAuthorityClass AuthorityClass,
     ProtectedExecutionDisclosureCeiling DisclosureCeiling,
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt = null,
-    GovernedSeedIngressAccessClass IngressAccessClass = GovernedSeedIngressAccessClass.PromptInput);
+    GovernedSeedIngressAccessClass IngressAccessClass = GovernedSeedIngressAccessClass.PromptInput,
+    GovernedSeedSanctuaryIngressReceipt? SanctuaryIngressReceipt = null);
 
 public enum GovernedSeedProtectedResidueKind
 {
@@ -280,6 +281,25 @@ public sealed record GovernedSeedMemoryContext(
     string ConceptDensity,
     DateTimeOffset TimestampUtc);
 
+public sealed record GovernedSeedSanctuaryIngressReceipt(
+    string ReceiptHandle,
+    string PacketHandle,
+    string ReceiptProfile,
+    string PacketProfile,
+    string SourceInputHandle,
+    string PreparedInputHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    bool ExternalInputRequiresCustodyChain,
+    bool ObsidianWallApplied,
+    bool EngrammitizedForCradleTek,
+    bool RawPromptAuthorityTerminated,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedSanctuaryIngressPreparation(
+    string PreparedInput,
+    GovernedSeedSanctuaryIngressReceipt Receipt);
+
 public enum GovernedSeedIngressAccessClass
 {
     PromptInput = 0,
@@ -297,9 +317,11 @@ public sealed record GovernedSeedLowMindSfRoutePacket(
     string PacketHandle,
     string PacketProfile,
     string BootstrapHandle,
+    string SanctuaryIngressReceiptHandle,
     string MemoryContextHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
     GovernedSeedLowMindSfRouteKind RouteKind,
+    bool ObsidianWallApplied,
     bool RoutedThroughSoulFrame,
     bool RequiresHigherOrderFunction,
     string SourceReason,
@@ -583,6 +605,7 @@ public sealed record GovernedSeedHostedLlmRequestPacket(
     string PacketProfile,
     string ProtocolVersion,
     string BootstrapHandle,
+    string SanctuaryIngressReceiptHandle,
     string MemoryContextHandle,
     string LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
@@ -611,6 +634,7 @@ public sealed record GovernedSeedHostedSeedToCrypticTransitPacket(
     string PacketHandle,
     string PacketProfile,
     string BootstrapHandle,
+    string SanctuaryIngressReceiptHandle,
     string MemoryContextHandle,
     string LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
@@ -620,6 +644,7 @@ public sealed record GovernedSeedHostedSeedToCrypticTransitPacket(
     string HostedLlmResponsePacketHandle,
     GovernedSeedHostedLlmEmissionState HostedLlmState,
     bool HostedLlmAccepted,
+    bool ObsidianWallApplied,
     ProtectedExecutionAuthorityClass AuthorityClass,
     ProtectedExecutionDisclosureCeiling DisclosureCeiling,
     DateTimeOffset TimestampUtc);
@@ -643,6 +668,28 @@ public sealed record GovernedSeedHostedLlmSeedReceipt(
     bool UnsupportedExecutionPressureDetected,
     DateTimeOffset TimestampUtc);
 
+public enum GovernedSeedHighMindUptakeKind
+{
+    DirectPromptIntake = 0,
+    HigherOrderEcIntake = 1
+}
+
+public sealed record GovernedSeedHighMindContext(
+    string ContextHandle,
+    string ContextProfile,
+    string BootstrapHandle,
+    string SanctuaryIngressReceiptHandle,
+    string MemoryContextHandle,
+    string LowMindSfRouteHandle,
+    string HostedLlmReceiptHandle,
+    GovernedSeedHostedLlmEmissionState HostedLlmState,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedHighMindUptakeKind UptakeKind,
+    bool SoulFramePrepared,
+    bool SeedProgressionAccepted,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
 public interface IGovernedSeedHostedLlmService
 {
     GovernedSeedHostedLlmSeedReceipt Evaluate(
@@ -657,6 +704,7 @@ public sealed record GovernedSeedPrimeToCrypticTransitPacket(
     string TransitHandle,
     string CapabilityHandle,
     string BootstrapHandle,
+    string? SanctuaryIngressReceiptHandle,
     string InputHandle,
     string? LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
@@ -734,11 +782,14 @@ public sealed record GovernedSeedOperationalContext(
     string BootstrapHandle,
     string PrimeCrypticHandle,
     string LispBundleHandle,
+    string? SanctuaryIngressReceiptHandle,
     string? HostedLlmServiceHandle,
     string? HostedLlmReceiptHandle,
     string? HostedLlmRequestPacketHandle,
     string? HostedLlmResponsePacketHandle,
     GovernedSeedHostedLlmEmissionState? HostedLlmState,
+    string? HighMindContextHandle,
+    GovernedSeedHighMindUptakeKind? HighMindUptakeKind,
     string? LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
     GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
@@ -861,11 +912,14 @@ public sealed record GovernedSeedStateModulationReceipt(
     string? OperationalContextHandle,
     string? FormationContextHandle,
     string? LispBundleHandle,
+    string? SanctuaryIngressReceiptHandle,
     string? HostedLlmServiceHandle,
     string? HostedLlmReceiptHandle,
     string? HostedLlmRequestPacketHandle,
     string? HostedLlmResponsePacketHandle,
     GovernedSeedHostedLlmEmissionState? HostedLlmState,
+    string? HighMindContextHandle,
+    GovernedSeedHighMindUptakeKind? HighMindUptakeKind,
     string? LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
     GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
@@ -899,7 +953,9 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedNexusTransitionRequest? NexusTransitionRequest,
     GovernedSeedNexusTransitionDecision? NexusTransitionDecision,
     GovernedSeedPrimeCrypticServiceReceipt? PrimeCrypticReceipt,
+    GovernedSeedSanctuaryIngressReceipt? SanctuaryIngressReceipt,
     GovernedSeedHostedLlmSeedReceipt? HostedLlmReceipt,
+    GovernedSeedHighMindContext? HighMindContext,
     GovernedSeedOperationalContext? OperationalContext,
     GovernedSeedStateModulationReceipt? StateModulationReceipt,
     ProtectedExecutionCapabilityReceipt CapabilityReceipt,

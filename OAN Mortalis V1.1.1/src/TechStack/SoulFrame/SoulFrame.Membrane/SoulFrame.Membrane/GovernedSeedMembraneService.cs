@@ -98,6 +98,7 @@ public sealed class GovernedSeedMembraneService : IGovernedSeedMembraneService
                 ReturnIntakeReceipt = returnIntakeReceipt,
                 StewardshipReceipt = stewardshipReceipt,
                 HoldRoutingReceipt = holdRoutingReceipt,
+                SanctuaryIngressReceipt = normalizedRequest.SanctuaryIngressReceipt,
                 SituationalContext = situationalContext
             }
         };

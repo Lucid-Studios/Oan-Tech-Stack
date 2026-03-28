@@ -41,6 +41,7 @@ public sealed class GovernedSeedLowMindSfRoutingService : IGovernedSeedLowMindSf
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(bootstrapReceipt);
         ArgumentNullException.ThrowIfNull(memoryContext);
+        ArgumentNullException.ThrowIfNull(request.SanctuaryIngressReceipt);
 
         var routeKind = ResolveRouteKind(request);
         var sourceReason = ResolveSourceReason(request.IngressAccessClass, routeKind);
@@ -49,15 +50,18 @@ public sealed class GovernedSeedLowMindSfRoutingService : IGovernedSeedLowMindSf
             PacketHandle: CreateHandle(
                 "lowmind-sf-route://",
                 bootstrapReceipt.BootstrapHandle,
+                request.SanctuaryIngressReceipt.ReceiptHandle,
                 memoryContext.ContextHandle,
                 request.IngressAccessClass.ToString(),
                 routeKind.ToString(),
                 request.Input),
             PacketProfile: "soulframe-lowmind-sf-ingress-route",
             BootstrapHandle: bootstrapReceipt.BootstrapHandle,
+            SanctuaryIngressReceiptHandle: request.SanctuaryIngressReceipt.ReceiptHandle,
             MemoryContextHandle: memoryContext.ContextHandle,
             IngressAccessClass: request.IngressAccessClass,
             RouteKind: routeKind,
+            ObsidianWallApplied: request.SanctuaryIngressReceipt.ObsidianWallApplied,
             RoutedThroughSoulFrame: true,
             RequiresHigherOrderFunction: routeKind == GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction,
             SourceReason: sourceReason,

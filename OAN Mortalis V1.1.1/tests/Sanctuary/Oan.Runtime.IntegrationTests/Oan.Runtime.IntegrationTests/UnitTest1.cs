@@ -9,6 +9,7 @@ using Oan.Runtime.Headless;
 using Oan.Runtime.Materialization;
 using Oan.State.Modulation;
 using Oan.Trace.Persistence;
+using SLI.Ingestion;
 using SoulFrame.Bootstrap;
 using SoulFrame.Membrane;
 
@@ -220,11 +221,13 @@ public sealed class SeedVerticalSliceIntegrationTests
         var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(result.Payload!);
         Assert.NotNull(payload);
         Assert.NotNull(payload.SituationalContext);
+        Assert.NotNull(payload.HighMindContext);
         Assert.Equal(GovernedSeedIngressAccessClass.PromptInput, payload.SituationalContext.LowMindSfRoute.IngressAccessClass);
         Assert.Equal(GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction, payload.SituationalContext.LowMindSfRoute.RouteKind);
         Assert.True(payload.SituationalContext.LowMindSfRoute.RoutedThroughSoulFrame);
         Assert.True(payload.SituationalContext.LowMindSfRoute.RequiresHigherOrderFunction);
         Assert.Equal("prompt-routed-to-ec-higher-order-function", payload.SituationalContext.LowMindSfRoute.SourceReason);
+        Assert.Equal(GovernedSeedHighMindUptakeKind.HigherOrderEcIntake, payload.HighMindContext.UptakeKind);
         AssertModulationMirrorsNexus(payload);
         AssertEnvelopeReturnSurfaceMirrorsContexts(result, payload);
     }
@@ -468,6 +471,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal("governed-disclosure-guard", result.GovernanceTrace);
         Assert.NotNull(payload);
         Assert.NotNull(payload.HostedLlmReceipt);
+        Assert.NotNull(payload.HighMindContext);
         Assert.NotNull(payload.SituationalContext);
         Assert.NotNull(payload.OperationalContext);
         Assert.NotNull(payload.StateModulationReceipt);
@@ -476,8 +480,13 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.False(payload.HostedLlmReceipt.ResponsePacket.Accepted);
         Assert.Equal(ProtectedExecutionPathState.Refused, payload.PathReceipt.State);
         Assert.Equal("hosted-seed-refusal", payload.OutcomeCode);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.HighMindContext.LowMindSfRouteHandle);
+        Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.HighMindContext.HostedLlmReceiptHandle);
+        Assert.Equal(GovernedSeedHighMindUptakeKind.DirectPromptIntake, payload.HighMindContext.UptakeKind);
         Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.OperationalContext.HostedLlmReceiptHandle);
+        Assert.Equal(payload.HighMindContext.ContextHandle, payload.OperationalContext.HighMindContextHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.StateModulationReceipt.HostedLlmResponsePacketHandle);
+        Assert.Equal(payload.HighMindContext.ContextHandle, payload.StateModulationReceipt.HighMindContextHandle);
         Assert.Equal(GovernedSeedHostedLlmEmissionState.Refusal, payload.StateModulationReceipt.HostedLlmState);
         AssertEnvelopeReturnSurfaceMirrorsContexts(result, payload);
     }
@@ -701,6 +710,7 @@ public sealed class SeedVerticalSliceIntegrationTests
     {
         var membrane = new NeverWakeMembraneService();
         var runtime = new GovernedSeedRuntimeService(
+            new GovernedSeedSanctuaryIngressEngrammitizationService(),
             membrane,
             new GovernedSeedSoulFrameBootstrapService(new BootstrapCustodySource()),
             new DeniedPrimeCrypticServiceBroker(),
@@ -727,6 +737,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.NotNull(payload.NexusTransitionRequest);
         Assert.NotNull(payload.NexusTransitionDecision);
         Assert.NotNull(payload.PrimeCrypticReceipt);
+        Assert.NotNull(payload.SanctuaryIngressReceipt);
         Assert.NotNull(payload.StateModulationReceipt);
         Assert.Null(payload.ProjectionReceipt);
         Assert.Null(payload.ReturnIntakeReceipt);
@@ -764,6 +775,8 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.NotNull(payload.OperationalContext.PrimeToCrypticTransit.TransitPacket);
         Assert.Equal(payload.OperationalContext.PrimeToCrypticTransit.TransitHandle, payload.OperationalContext.PrimeToCrypticTransit.TransitPacket.TransitHandle);
         Assert.Equal(payload.BootstrapReceipt.BootstrapHandle, payload.OperationalContext.PrimeToCrypticTransit.TransitPacket.BootstrapHandle);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.OperationalContext.SanctuaryIngressReceiptHandle);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.OperationalContext.PrimeToCrypticTransit.TransitPacket.SanctuaryIngressReceiptHandle);
         Assert.NotNull(payload.OperationalContext.CrypticToPrimeTransit);
         Assert.Equal("bootstrap-denied", payload.OperationalContext.CrypticToPrimeTransit.OutcomeCode);
         Assert.Equal(GovernedSeedEvaluationState.Refusal, payload.OperationalContext.CrypticToPrimeTransit.GovernanceState);
@@ -773,6 +786,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(payload.PathReceipt.PathHandle, payload.OperationalContext.CrypticToPrimeTransit.ReturnPacket.PathHandle);
         Assert.Equal(GovernedSeedCrypticReturnClass.RefusalReceipt, payload.OperationalContext.CrypticToPrimeTransit.ReturnPacket.ReturnClass);
         Assert.Equal(payload.OperationalContext.ContextHandle, payload.StateModulationReceipt.OperationalContextHandle);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.StateModulationReceipt.SanctuaryIngressReceiptHandle);
         Assert.Equal(payload.OperationalContext.PrimeToCrypticTransit.TransitHandle, payload.StateModulationReceipt.PrimeToCrypticTransitHandle);
         Assert.Equal(payload.OperationalContext.PrimeToCrypticTransit.TransitPacket.PacketHandle, payload.StateModulationReceipt.PrimeToCrypticPacketHandle);
         Assert.Equal(payload.OperationalContext.CrypticToPrimeTransit.TransitHandle, payload.StateModulationReceipt.CrypticToPrimeTransitHandle);
@@ -789,11 +803,13 @@ public sealed class SeedVerticalSliceIntegrationTests
 
     private static void AssertModulationMirrorsNexus(GovernedSeedVerticalSlice payload)
     {
+        Assert.NotNull(payload.SanctuaryIngressReceipt);
         Assert.NotNull(payload.SituationalContext);
         Assert.NotNull(payload.SituationalContext.MemoryContext);
         Assert.NotNull(payload.OperationalContext);
         Assert.NotNull(payload.OperationalContext.FormationContext);
         Assert.NotNull(payload.HostedLlmReceipt);
+        Assert.NotNull(payload.HighMindContext);
         Assert.NotNull(payload.NexusPosture);
         Assert.NotNull(payload.NexusTransitionDecision);
         Assert.NotNull(payload.StateModulationReceipt);
@@ -820,6 +836,21 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(payload.SituationalContext.ProtectedHoldClass, payload.NexusPosture.ProtectedHoldClass);
         Assert.Equal(payload.SituationalContext.ProtectedHoldRoute, payload.NexusPosture.ProtectedHoldRoute);
         Assert.Equal(payload.SituationalContext.ReviewState, payload.NexusPosture.ReviewState);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.SituationalContext.LowMindSfRoute.SanctuaryIngressReceiptHandle);
+        Assert.True(payload.SituationalContext.LowMindSfRoute.ObsidianWallApplied);
+        Assert.Equal(payload.BootstrapReceipt!.BootstrapHandle, payload.HighMindContext.BootstrapHandle);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.HighMindContext.SanctuaryIngressReceiptHandle);
+        Assert.Equal(payload.SituationalContext.MemoryContext.ContextHandle, payload.HighMindContext.MemoryContextHandle);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.HighMindContext.LowMindSfRouteHandle);
+        Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.HighMindContext.HostedLlmReceiptHandle);
+        Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.State, payload.HighMindContext.HostedLlmState);
+        Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.HighMindContext.IngressAccessClass);
+        Assert.True(payload.HighMindContext.SoulFramePrepared);
+        Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.Accepted, payload.HighMindContext.SeedProgressionAccepted);
+        var expectedHighMindUptakeKind = payload.SituationalContext.LowMindSfRoute.RouteKind == GovernedSeedLowMindSfRouteKind.HigherOrderEcFunction
+            ? GovernedSeedHighMindUptakeKind.HigherOrderEcIntake
+            : GovernedSeedHighMindUptakeKind.DirectPromptIntake;
+        Assert.Equal(expectedHighMindUptakeKind, payload.HighMindContext.UptakeKind);
 
         Assert.Equal(payload.SituationalContext.ContextHandle, payload.StateModulationReceipt.SituationalContextHandle);
         Assert.Equal(payload.SituationalContext.HoldRoutingHandle, payload.StateModulationReceipt.HoldRoutingHandle);
@@ -851,6 +882,7 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(primeToCrypticTransit.TransitHandle, primeToCrypticPacket.TransitHandle);
         Assert.Equal(payload.CapabilityReceipt.CapabilityHandle, primeToCrypticPacket.CapabilityHandle);
         Assert.Equal(payload.BootstrapReceipt!.BootstrapHandle, primeToCrypticPacket.BootstrapHandle);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, primeToCrypticPacket.SanctuaryIngressReceiptHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, primeToCrypticPacket.LowMindSfRouteHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, primeToCrypticPacket.IngressAccessClass);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, primeToCrypticPacket.LowMindSfRouteKind);
@@ -908,26 +940,35 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.OperationalContext.LowMindSfRouteHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.OperationalContext.IngressAccessClass);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.OperationalContext.LowMindSfRouteKind);
+        Assert.Equal(payload.HighMindContext.ContextHandle, payload.OperationalContext.HighMindContextHandle);
+        Assert.Equal(payload.HighMindContext.UptakeKind, payload.OperationalContext.HighMindUptakeKind);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.OperationalContext.SanctuaryIngressReceiptHandle);
         Assert.Equal(payload.HostedLlmReceipt.ServiceHandle, payload.OperationalContext.HostedLlmServiceHandle);
         Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.OperationalContext.HostedLlmReceiptHandle);
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.OperationalContext.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.OperationalContext.HostedLlmResponsePacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.State, payload.OperationalContext.HostedLlmState);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.HostedLlmReceipt.RequestPacket.SanctuaryIngressReceiptHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.HostedLlmReceipt.RequestPacket.LowMindSfRouteHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.HostedLlmReceipt.RequestPacket.IngressAccessClass);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.HostedLlmReceipt.RequestPacket.LowMindSfRouteKind);
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmResponsePacketHandle);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.HostedLlmReceipt.SeededTransitPacket.SanctuaryIngressReceiptHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.HostedLlmReceipt.SeededTransitPacket.LowMindSfRouteHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.HostedLlmReceipt.SeededTransitPacket.IngressAccessClass);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.HostedLlmReceipt.SeededTransitPacket.LowMindSfRouteKind);
         Assert.Equal(payload.SituationalContext.MemoryContext.ContextHandle, payload.HostedLlmReceipt.SeededTransitPacket.MemoryContextHandle);
         Assert.True(payload.HostedLlmReceipt.SeededTransitPacket.HostedLlmAccepted);
+        Assert.True(payload.HostedLlmReceipt.SeededTransitPacket.ObsidianWallApplied);
+        Assert.Equal(payload.SanctuaryIngressReceipt.ReceiptHandle, payload.StateModulationReceipt.SanctuaryIngressReceiptHandle);
         Assert.Equal(payload.HostedLlmReceipt.ServiceHandle, payload.StateModulationReceipt.HostedLlmServiceHandle);
         Assert.Equal(payload.HostedLlmReceipt.ReceiptHandle, payload.StateModulationReceipt.HostedLlmReceiptHandle);
         Assert.Equal(payload.HostedLlmReceipt.RequestPacket.PacketHandle, payload.StateModulationReceipt.HostedLlmRequestPacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.PacketHandle, payload.StateModulationReceipt.HostedLlmResponsePacketHandle);
         Assert.Equal(payload.HostedLlmReceipt.ResponsePacket.State, payload.StateModulationReceipt.HostedLlmState);
+        Assert.Equal(payload.HighMindContext.ContextHandle, payload.StateModulationReceipt.HighMindContextHandle);
+        Assert.Equal(payload.HighMindContext.UptakeKind, payload.StateModulationReceipt.HighMindUptakeKind);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.PacketHandle, payload.StateModulationReceipt.LowMindSfRouteHandle);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.IngressAccessClass, payload.StateModulationReceipt.IngressAccessClass);
         Assert.Equal(payload.SituationalContext.LowMindSfRoute.RouteKind, payload.StateModulationReceipt.LowMindSfRouteKind);

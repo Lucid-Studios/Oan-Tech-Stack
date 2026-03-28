@@ -85,6 +85,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(personifiedMemoryContext);
         ArgumentNullException.ThrowIfNull(lowMindSfRoute);
+        ArgumentNullException.ThrowIfNull(request.SanctuaryIngressReceipt);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.AgentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.TheaterId);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Input);
@@ -98,6 +99,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             PacketProfile: "seed-governed-hosted-llm-request",
             ProtocolVersion: protocol.Version,
             BootstrapHandle: bootstrapHandle,
+            SanctuaryIngressReceiptHandle: request.SanctuaryIngressReceipt.ReceiptHandle,
             MemoryContextHandle: personifiedMemoryContext.ContextHandle,
             LowMindSfRouteHandle: lowMindSfRoute.PacketHandle,
             IngressAccessClass: lowMindSfRoute.IngressAccessClass,
@@ -136,6 +138,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             PacketHandle: CreateHandle("hosted-seed-to-cryptic://", requestPacket.PacketHandle, responsePacket.PacketHandle),
             PacketProfile: "prime-hosted-seed-to-cryptic-floor-request",
             BootstrapHandle: bootstrapHandle,
+            SanctuaryIngressReceiptHandle: request.SanctuaryIngressReceipt.ReceiptHandle,
             MemoryContextHandle: personifiedMemoryContext.ContextHandle,
             LowMindSfRouteHandle: lowMindSfRoute.PacketHandle,
             IngressAccessClass: lowMindSfRoute.IngressAccessClass,
@@ -145,6 +148,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             HostedLlmResponsePacketHandle: responsePacket.PacketHandle,
             HostedLlmState: resolvedEmissionState,
             HostedLlmAccepted: accepted,
+            ObsidianWallApplied: request.SanctuaryIngressReceipt.ObsidianWallApplied,
             AuthorityClass: request.AuthorityClass,
             DisclosureCeiling: request.DisclosureCeiling,
             TimestampUtc: now);
