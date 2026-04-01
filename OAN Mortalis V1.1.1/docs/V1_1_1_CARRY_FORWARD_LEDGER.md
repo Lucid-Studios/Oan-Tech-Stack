@@ -12,6 +12,7 @@ Carried contract and law surfaces:
 - `Oan.Common/PersonificationStandingEvaluator.cs`
 - `Oan.Common/AgentiActualizationStandingProjector.cs`
 - `Oan.Common/FirstBootGovernanceContracts.cs`
+- `Oan.Common/FirstRunConstitutionContracts.cs`
 - the standing, derivation, and predicate audit tests that prove those laws
 
 ## Rewritten Fresh In This Line
@@ -35,6 +36,7 @@ Fresh bootstrap surfaces:
 - bounded ledger grammar for `Talents`, `Skills`, `Abilities`, `Education`, `Jobs`, and `Career` continuity, carried as lawful inner-system state rather than as a UI or dashboard surface
 - a first-class `SLI.Lisp` project rebuilt as a Sanctuary-native hosted Cryptic module bundle, carrying the old Lisp module set forward as explicit embedded symbolic runtime material rather than leaving it diffused across `V1.0`
 - a first-class `Oan.HostedLlm` project rebuilt as a Sanctuary-native Prime-hosted seed service, carrying forward the old governed emission protocol and seeded listening/guard surface without reviving `CradleTek.CognitionHost` or the old `SoulFrame.Host` client sprawl
+- a first-class `Oan.FirstRun` project rebuilt as a Sanctuary-native constitutional first-run projection layer, carrying the new v2 state law, readiness ladder, transition gates, and failure doctrine beside the legacy first-boot contracts instead of through them
 - a first-class `Oan.Trace.Persistence` project rebuilt as a Sanctuary-native duplex pointer and GEL telemetry seam, carrying forward the tiny `Data.Cryptic` and `Telemetry.GEL` utility law without restoring old host or storage glue
 - the minimal `SoulFrame.Identity` law rebuilt directly into the SoulFrame bootstrap receipt as a lawful identity seat, carrying forward the old SoulFrame handle, opal-engram seat reference, operator-bond reference, self/cself pairing, default runtime policy, detached attachment state, and integrity hash without reviving the old registry/context services
 - Prime/Cryptic resident field receipts and operational context now carry the hosted Lisp bundle handle, so `V1.1.1` records Lisp as the current Cryptic symbolic medium even while full target-lane separation remains deferred
@@ -51,6 +53,9 @@ Fresh bootstrap surfaces:
 - the `HighMind` context now mirrors SoulFrame memory, `LowMind.SF` ingress, and hosted-seed receipt/state into `OperationalContext` and modulation, so `V1.1.1` can read higher-order EC uptake posture directly from the living stack
 - duplex pointer handles and GEL telemetry records now attach to the materialized evaluation envelope in `V1.1.1`, so the outward ladder carries a lawful trace seat and the old `Data.Cryptic` / `Telemetry.GEL` pair no longer need to stay active in `V1.0`
 - the GEL telemetry record now also carries Sanctuary ingress handle, Obsidian Wall state, ingress access class, LowMind route, HighMind uptake, and hosted-seed state, so later documentation and certification surfaces can audit constitutional origin without unpacking the full vertical slice
+- runtime, modulation, and GEL telemetry now also carry the projected first-run constitutional receipt, current state, readiness ladder, provisional-versus-actualized posture, and Opal standing, so later GEL assimilation has an outward constitutional evidence seam to inherit from
+- that first-run projection now also carries an explicit pre-governance packet plus local authority trace, constitutional contact, local keypair genesis source, local keypair genesis, first cryptic braid establishment, first cryptic braid, first cryptic conditioning source, and first cryptic conditioning as source-backed receipts projected from current seams, so `V1.1.1` can state what lawful beginning has and has not crossed before `Mother/Father`, admitted body standing, and later bond work are claimed
+- the hosted-LLM guard surface is now explicitly named `GuardFrame`, preserving `ListeningFrame` for the later EC interior construct rather than spending that name on a hosted-seed guard shim
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules
 
@@ -75,3 +80,12 @@ Future imports from the prior line must satisfy all of the following:
 - law-bearing rather than convenience-bearing
 - free of active compatibility sludge
 - compatible with the new family and boundary posture
+
+## Current Family Classification
+
+- `CradleTek` carries the governed body: custody, mantle, memory, protected
+  runtime, and exposed service boundaries
+- `SoulFrame` carries the first lived interior: bootstrap, membrane, LowMind
+  posture, stewardship, and bounded projection shaping
+- `AgentiCore` carries chambered cognition: `HighMind` uptake and later EC
+  interior work without re-owning body, custody, or projection membrane law

@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
@@ -19,6 +19,17 @@ function Resolve-PathFromRepo {
         [string] $BasePath,
         [string] $CandidatePath
     )
+
+    if (-not (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue)) {
+        $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+        if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+            . $oanWorkspaceResolverPath
+        }
+    }
+
+    if (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue) {
+        return Resolve-OanWorkspacePath -BasePath $BasePath -CandidatePath $CandidatePath
+    }
 
     if ([System.IO.Path]::IsPathRooted($CandidatePath)) {
         return [System.IO.Path]::GetFullPath($CandidatePath)
@@ -103,11 +114,7 @@ if ($null -eq $cycleState) {
 $sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
 $runtimeReadinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'readinessState')
 
-$sourceFiles = @(
-    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/Oan.Common/WorkerThreadGovernanceContracts.cs')
-    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/Oan.Common/WorkerGovernanceKeys.cs')
-    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore/Services/GovernedWorkerThreadService.cs')
-)
+$sourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'worker-thread-identity' -CyclePolicy $cyclePolicy
 $missingSourceFiles = @($sourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
 $contractsSource = if (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
 $serviceSource = if (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }

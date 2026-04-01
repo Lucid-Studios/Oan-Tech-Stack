@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -74,6 +74,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oan.Trace.Persistence", "Oan.Trace.Persistence", "{0F9126ED-BE47-40D5-B786-CDB98FD28FD3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.Trace.Persistence", "src\Sanctuary\Oan.Trace.Persistence\Oan.Trace.Persistence\Oan.Trace.Persistence.csproj", "{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oan.FirstRun", "Oan.FirstRun", "{A2C11B61-B6A6-4253-8AD8-FBC06CB979F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.FirstRun", "src\Sanctuary\Oan.FirstRun\Oan.FirstRun\Oan.FirstRun.csproj", "{66FAC028-97EA-457C-B394-52886DB75E54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -172,6 +176,10 @@ Global
 		{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66FAC028-97EA-457C-B394-52886DB75E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66FAC028-97EA-457C-B394-52886DB75E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66FAC028-97EA-457C-B394-52886DB75E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66FAC028-97EA-457C-B394-52886DB75E54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{87A0BA2C-E91B-412F-8A1C-AE0B88124EA3} = {690CBEA5-AB5E-407E-9D34-8453B2C10D8B}
@@ -208,5 +216,7 @@ Global
 		{74DBDCAC-E5C4-436F-8873-1D647EDE6EF4} = {75F31C43-CB2D-4741-8D6F-D63C98B0796E}
 		{0F9126ED-BE47-40D5-B786-CDB98FD28FD3} = {87A0BA2C-E91B-412F-8A1C-AE0B88124EA3}
 		{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23} = {0F9126ED-BE47-40D5-B786-CDB98FD28FD3}
+		{A2C11B61-B6A6-4253-8AD8-FBC06CB979F5} = {87A0BA2C-E91B-412F-8A1C-AE0B88124EA3}
+		{66FAC028-97EA-457C-B394-52886DB75E54} = {A2C11B61-B6A6-4253-8AD8-FBC06CB979F5}
 	EndGlobalSection
 EndGlobal

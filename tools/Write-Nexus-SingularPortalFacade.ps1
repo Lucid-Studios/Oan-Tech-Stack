@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
@@ -19,6 +19,17 @@ function Resolve-PathFromRepo {
         [string] $BasePath,
         [string] $CandidatePath
     )
+
+    if (-not (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue)) {
+        $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+        if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+            . $oanWorkspaceResolverPath
+        }
+    }
+
+    if (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue) {
+        return Resolve-OanWorkspacePath -BasePath $BasePath -CandidatePath $CandidatePath
+    }
 
     if ([System.IO.Path]::IsPathRooted($CandidatePath)) {
         return [System.IO.Path]::GetFullPath($CandidatePath)
@@ -104,18 +115,7 @@ if ($null -eq $cycleState) {
 $protectedStateLegibilitySurfaceState = Read-JsonFileOrNull -Path $protectedStateLegibilitySurfaceStatePath
 $bondedOperatorLocalityReadinessState = Read-JsonFileOrNull -Path $bondedOperatorLocalityReadinessStatePath
 
-$portalSourceFiles = @(
-    'OAN Mortalis V1.0/src/SLI.Engine/Nexus/ICrypticWebNexusPortal.cs',
-    'OAN Mortalis V1.0/src/SLI.Engine/Nexus/CrypticWebNexusPortalContracts.cs',
-    'OAN Mortalis V1.0/src/SLI.Engine/Nexus/ExecutionSnapshotCrypticWebNexusPortal.cs',
-    'OAN Mortalis V1.0/src/SLI.Engine/Nexus/CrypticWebNexusFactory.cs'
-)
-
-$resolvedPortalSourceFiles = @(
-    foreach ($file in $portalSourceFiles) {
-        Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $file
-    }
-)
+$resolvedPortalSourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'nexus-portal-base' -CyclePolicy $cyclePolicy
 $missingPortalSourceFiles = @($resolvedPortalSourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
 
 $portalState = 'awaiting-bounded-legibility'

@@ -4,6 +4,7 @@ using CradleTek.Host;
 using CradleTek.Mantle;
 using CradleTek.Memory;
 using CradleTek.Runtime;
+using Oan.FirstRun;
 using Oan.PrimeCryptic.Services;
 using Oan.Nexus.Control;
 using Oan.State.Modulation;
@@ -45,7 +46,9 @@ public static class HeadlessRuntimeBootstrap
             new GovernedSelfGelValidationHandleProjector());
         var primeCrypticServiceBroker = new PrimeCrypticServiceBroker(lispBundleService);
         var nexusControlService = new GovernedNexusControlService();
-        var runtimeMaterializationService = new GovernedSeedRuntimeMaterializationService();
+        var runtimeMaterializationService = new GovernedSeedRuntimeMaterializationService(
+            new GovernedFirstRunConstitutionService(),
+            new GovernedSeedPreGovernanceService());
         var stateModulationService = new GovernedStateModulationService();
         var custodySource = new BootstrapCustodySource();
         var soulFrameBootstrap = new GovernedSeedSoulFrameBootstrapService(custodySource);

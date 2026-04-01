@@ -1,0 +1,2151 @@
+﻿{
+  "schemaVersion": 3,
+  "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
+  "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
+  "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
+  "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
+  "activeLongFormRunStatePath": ".audit/state/local-automation-active-task-map-run.json",
+  "longFormRunOutputRoot": ".audit/runs/long-form-task-maps",
+  "activeTaskMapId": "automation-maturation-map-12",
+  "longFormRunPolicy": {
+    "exploratoryStructures": 3,
+    "finalCollapsedStructures": 1,
+    "collapseBeforeWindowEnd": true,
+    "timeframeSource": "nextReleaseCandidateRunUtc",
+    "rule": "Each active long-form run may consider three exploratory model structures and must collapse them into one final fourth structure before the current run window ends."
+  },
+  "timeDilationPolicy": {
+    "allowPullForward": true,
+    "pullForwardMaxMaps": 1,
+    "rule": "If the active long-form task map completes earlier than its expected review windows, the agentic working group may pull work only from the next declared task map and not beyond it."
+  },
+  "tasks": [
+    {
+      "id": "release-candidate-cycle",
+      "label": "Release Candidate Cycle",
+      "taskClass": "mechanical-verification",
+      "owner": "Automation",
+      "authority": "Mechanical only",
+      "cadenceHours": 6,
+      "purpose": "Run the governed release-candidate conveyor and publish the latest candidate evidence bundle.",
+      "completionSignal": "Latest release-candidate bundle contains a build-evidence manifest.",
+      "outputs": [
+        ".audit/runs/release-candidates/",
+        ".audit/state/local-automation-cycle-last-run.json"
+      ],
+      "escalatesWhen": [
+        "local cycle status becomes blocked",
+        "release-candidate run cannot emit a valid evidence bundle"
+      ]
+    },
+    {
+      "id": "daily-hitl-digest",
+      "label": "Daily HITL Digest",
+      "taskClass": "review-preparation",
+      "owner": "Automation",
+      "authority": "Mechanical only",
+      "cadenceHours": 24,
+      "purpose": "Emit the daily review surface that tells us whether the build can continue unattended or now owes human review.",
+      "completionSignal": "Latest digest bundle contains release-candidate-digest.json and release-candidate-digest.md.",
+      "outputs": [
+        ".audit/runs/release-digests/",
+        ".audit/state/local-automation-tasking-status.md"
+      ],
+      "escalatesWhen": [
+        "digest posture requires immediate HITL",
+        "digest bundle cannot be produced"
+      ]
+    },
+    {
+      "id": "promotion-watch",
+      "label": "Promotion Watch",
+      "taskClass": "governance-watch",
+      "owner": "Shared",
+      "authority": "Automation may classify; HITL decides promotion",
+      "trigger": "latest digest posture",
+      "purpose": "Track whether the current automation posture is clear to continue, requires HITL, or is blocked.",
+      "completionSignal": "Current posture is reflected in local-automation-tasking-status.json.",
+      "outputs": [
+        ".audit/state/local-automation-tasking-status.json",
+        ".audit/state/local-automation-tasking-status.md"
+      ],
+      "escalatesWhen": [
+        "recommended action changes to review-required-before-promotion",
+        "latest posture changes to blocked"
+      ]
+    },
+    {
+      "id": "scheduler-watch",
+      "label": "Scheduler Watch",
+      "taskClass": "orchestration",
+      "owner": "Automation",
+      "authority": "Machine-local only",
+      "trigger": "scheduled task registration and next-run clock",
+      "purpose": "Track whether the local Windows scheduler is registered, ready, and aligned to the next release-candidate cadence.",
+      "completionSignal": "Scheduled task is registered and exposes a next run time.",
+      "outputs": [
+        "Windows Scheduled Task: OAN Mortalis Governed Automation Cycle",
+        ".audit/state/local-automation-tasking-status.json"
+      ],
+      "escalatesWhen": [
+        "scheduled task is not registered",
+        "scheduled task has no next run time"
+      ]
+    }
+  ],
+  "longFormTaskMaps": [
+    {
+      "id": "automation-maturation-map-01",
+      "label": "Automation Maturation Map 01",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Make the current local automation cycle report transitions, first scheduled execution truth, and status freshness without requiring manual probing.",
+      "timeDilationPullForwardAllowed": true,
+      "taskIds": [
+        "notification-surface",
+        "first-scheduled-run-capture",
+        "status-freshness-reconciliation"
+      ],
+      "tasks": [
+        {
+          "id": "notification-surface",
+          "label": "Notification Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Emit a bounded local notification or inbox surface when posture changes from clear-to-continue to hitl-required or blocked.",
+          "completionSignal": "A posture transition produces a stable local notification artifact without widening publication authority.",
+          "escalatesWhen": [
+            "notification output requires external authority",
+            "notification cannot distinguish hitl-required from blocked"
+          ]
+        },
+        {
+          "id": "first-scheduled-run-capture",
+          "label": "First Scheduled Run Capture",
+          "owner": "Automation",
+          "authority": "Machine-local only",
+          "status": "advanced",
+          "purpose": "Capture and report the first scheduler-driven execution so the machine proves it can move without manual invocation.",
+          "completionSignal": "Task board records a real scheduler last-run time and links it to the latest release-candidate bundle.",
+          "escalatesWhen": [
+            "scheduled execution fails to produce a bundle",
+            "scheduler advances without state refresh"
+          ]
+        },
+        {
+          "id": "status-freshness-reconciliation",
+          "label": "Status Freshness Reconciliation",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Keep cycle state, digest state, task board state, and scheduler state in agreement after unattended runs.",
+          "completionSignal": "The task board can prove which live artifact is newest and whether any status surface is stale.",
+          "escalatesWhen": [
+            "task board timestamps drift from cycle or digest truth",
+            "scheduler next-run and cycle next-run disagree materially"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-02",
+      "label": "Automation Maturation Map 02",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Deepen unattended evidence quality without crossing into ungated promotion authority.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "delta-summary-surface",
+        "artifact-retention-pruning",
+        "blocked-escalation-bundle"
+      ],
+      "tasks": [
+        {
+          "id": "delta-summary-surface",
+          "label": "Delta Summary Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Summarize what changed between the latest release-candidate bundle and the previous one.",
+          "completionSignal": "Latest digest includes a bounded delta summary without inferring maturity.",
+          "escalatesWhen": [
+            "delta logic starts inferring authority or promotion",
+            "previous bundle truth is unavailable"
+          ]
+        },
+        {
+          "id": "artifact-retention-pruning",
+          "label": "Artifact Retention Pruning",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Prune or compact old local evidence bundles according to declared retention policy while preserving review truth.",
+          "completionSignal": "Retention policy can delete or compact stale local bundles without harming active review surfaces.",
+          "escalatesWhen": [
+            "pruning would delete the current active review surface",
+            "retention classification becomes governance-significant"
+          ]
+        },
+        {
+          "id": "blocked-escalation-bundle",
+          "label": "Blocked Escalation Bundle",
+          "owner": "Shared",
+          "authority": "Automation may prepare; HITL interprets",
+          "status": "advanced",
+          "purpose": "Prepare a bounded escalation bundle when the automation posture becomes blocked.",
+          "completionSignal": "A blocked posture produces one stable bundle that points to the exact failing evidence surfaces.",
+          "escalatesWhen": [
+            "escalation bundle widens into autonomous remediation",
+            "blocked evidence cannot be localized"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-03",
+      "label": "Automation Maturation Map 03",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Introduce seeded governance participation into unattended build review, reconcile scheduler/runtime cadence truth, and expose a CME formalization consolidation surface without widening promotion authority.",
+      "timeDilationPullForwardAllowed": true,
+      "taskIds": [
+        "seeded-governance-lane",
+        "scheduler-cadence-reconciliation",
+        "cme-formalization-consolidation-surface"
+      ],
+      "tasks": [
+        {
+          "id": "seeded-governance-lane",
+          "label": "Seeded Governance Lane",
+          "owner": "Shared",
+          "authority": "Seed may classify; HITL decides promotion",
+          "status": "advanced",
+          "purpose": "Let the seeded local host interpret routine build evidence, delta surfaces, and preflight posture without widening release authority.",
+          "completionSignal": "A seeded governance bundle is emitted and classified as Accepted, Deferred, or Rejected with bounded provenance.",
+          "escalatesWhen": [
+            "seed feedback tries to promote or publish by implication",
+            "seed host availability or readiness remains unresolved across review windows"
+          ]
+        },
+        {
+          "id": "scheduler-cadence-reconciliation",
+          "label": "Scheduler Cadence Reconciliation",
+          "owner": "Automation",
+          "authority": "Machine-local only",
+          "status": "advanced",
+          "purpose": "Keep the Windows scheduled task aligned with the release-candidate cadence recorded in the live cycle state.",
+          "completionSignal": "Scheduler reconciliation state shows the registered task is aligned to the declared cadence within tolerance.",
+          "escalatesWhen": [
+            "the scheduler cannot be registered or rescheduled locally",
+            "cycle next-run truth and scheduler next-run truth keep drifting materially"
+          ]
+        },
+        {
+          "id": "cme-formalization-consolidation-surface",
+          "label": "CME Formalization Consolidation Surface",
+          "owner": "Shared",
+          "authority": "Advisory only",
+          "status": "advanced",
+          "purpose": "Expose whether the governing build layer is still exploratory, seed-assisted, braided, or crystallizing without narrating that as release authority.",
+          "completionSignal": "A stable consolidation state is emitted from current automation, seed, and scheduler truth.",
+          "escalatesWhen": [
+            "consolidation logic starts pretending exploratory state is authoritative",
+            "seed and scheduler truth remain materially contradictory"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-04",
+      "label": "Automation Maturation Map 04",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Close promotion and release rehearsal once seeded governance and runtime cadence are stable.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "promotion-gate-bundle",
+        "ci-artifact-concordance",
+        "release-ratification-rehearsal"
+      ],
+      "tasks": [
+        {
+          "id": "promotion-gate-bundle",
+          "label": "Promotion Gate Bundle",
+          "owner": "Shared",
+          "authority": "Automation may prepare; HITL ratifies",
+          "status": "advanced",
+          "purpose": "Assemble the exact evidence bundle required for modular-set promotion without inferring authority from green output alone.",
+          "completionSignal": "A bounded promotion gate bundle exists with explicit reasons for continue, defer, or block.",
+          "escalatesWhen": [
+            "promotion evidence is incomplete",
+            "promotion logic starts inferring maturity from tests alone"
+          ]
+        },
+        {
+          "id": "ci-artifact-concordance",
+          "label": "CI Artifact Concordance",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Prove local candidate artifacts and CI candidate artifacts agree on content and version posture.",
+          "completionSignal": "Local and CI artifact manifests reconcile without unexplained drift.",
+          "escalatesWhen": [
+            "artifact manifests diverge materially",
+            "CI artifact production is missing or incomplete"
+          ]
+        },
+        {
+          "id": "release-ratification-rehearsal",
+          "label": "Release Ratification Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "advanced",
+          "purpose": "Rehearse the first publish ratification path so promotion is evidence-led rather than improvised.",
+          "completionSignal": "The release rehearsal produces a stable ratification checklist with no hidden machine-local assumptions.",
+          "escalatesWhen": [
+            "release rehearsal depends on undeclared deployables",
+            "ratification still requires exploratory interpretation rather than bounded evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-05",
+      "label": "Automation Maturation Map 05",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Stabilize first publish intent and seeded promotion review once promotion evidence is consistently reproducible.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "seeded-promotion-review",
+        "first-publish-intent-closure",
+        "release-handshake-surface"
+      ],
+      "tasks": [
+        {
+          "id": "seeded-promotion-review",
+          "label": "Seeded Promotion Review",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL ratifies",
+          "status": "advanced",
+          "purpose": "Let the seeded host synthesize the promotion gate, CI concordance, and ratification rehearsal into one bounded advisory review.",
+          "completionSignal": "A seeded promotion review bundle exists without widening promotion authority.",
+          "escalatesWhen": [
+            "seed review starts substituting for ratification",
+            "seed advice conflicts materially with promotion evidence"
+          ]
+        },
+        {
+          "id": "first-publish-intent-closure",
+          "label": "First Publish Intent Closure",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "advanced",
+          "purpose": "State exactly what first publish means for the current modular set so automation is not guessing at the target.",
+          "completionSignal": "A bounded first-publish intent surface exists and matches declared deployables.",
+          "escalatesWhen": [
+            "publish intent exceeds declared deployables",
+            "publish intent conflicts with current version policy"
+          ]
+        },
+        {
+          "id": "release-handshake-surface",
+          "label": "Release Handshake Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Expose the last bounded handshake before a real publish request so the stack can show what is ready, deferred, and still blocked.",
+          "completionSignal": "A release handshake surface is emitted from current promotion evidence and advisory posture.",
+          "escalatesWhen": [
+            "handshake surface starts implying publication",
+            "release evidence cannot be localized into one surface"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-06",
+      "label": "Automation Maturation Map 06",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Prepare the first bounded publish request and post-publish evidence loop once the handshake surface is stable.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "publish-request-envelope",
+        "post-publish-evidence-loop",
+        "seed-braid-escalation-lane"
+      ],
+      "tasks": [
+        {
+          "id": "publish-request-envelope",
+          "label": "Publish Request Envelope",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "advanced",
+          "purpose": "Prepare the bounded publish request surface once the release handshake becomes stable.",
+          "completionSignal": "A publish request envelope can be emitted without expanding deployable scope or publication authority by implication.",
+          "escalatesWhen": [
+            "publish request exceeds declared deployables",
+            "publish request is attempted before release handshake stability"
+          ]
+        },
+        {
+          "id": "post-publish-evidence-loop",
+          "label": "Post-Publish Evidence Loop",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Collect the first post-publish evidence bundle and reconcile it against the candidate and handshake surfaces.",
+          "completionSignal": "A bounded post-publish evidence loop can compare the published artifact against the pre-publish evidence chain.",
+          "escalatesWhen": [
+            "published artifact cannot be reconciled to the candidate bundle",
+            "post-publish evidence starts implying new authority"
+          ]
+        },
+        {
+          "id": "seed-braid-escalation-lane",
+          "label": "Seed Braid Escalation Lane",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves",
+          "status": "advanced",
+          "purpose": "Let the seed braid participate in escalation after the first publish lane begins to carry real-world consequences.",
+          "completionSignal": "A bounded escalation lane exists for seeded review after publication without silently substituting for ratification.",
+          "escalatesWhen": [
+            "seed escalation starts overriding HITL",
+            "post-publish contradictions remain unresolved across review windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-07",
+      "label": "Automation Maturation Map 07",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Stabilize live publication execution and the first external evidence loop once a bounded publish request is ratified.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "published-runtime-receipt",
+        "artifact-attestation-surface",
+        "post-publish-drift-watch"
+      ],
+      "tasks": [
+        {
+          "id": "published-runtime-receipt",
+          "label": "Published Runtime Receipt",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "advanced",
+          "purpose": "Capture the first bounded receipt that a real runtime artifact was published through the declared lane.",
+          "completionSignal": "A published runtime receipt exists and can be reconciled to the publish request envelope.",
+          "escalatesWhen": [
+            "publication occurs without a bounded receipt",
+            "published receipt cannot be matched to the request envelope"
+          ]
+        },
+        {
+          "id": "artifact-attestation-surface",
+          "label": "Artifact Attestation Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Compare the published runtime artifact against the candidate and post-publish evidence surfaces.",
+          "completionSignal": "An attestation surface can show whether the published artifact matches the bounded pre-publish chain.",
+          "escalatesWhen": [
+            "artifact attestation detects unexplained drift",
+            "attestation starts implying authority beyond evidence"
+          ]
+        },
+        {
+          "id": "post-publish-drift-watch",
+          "label": "Post-Publish Drift Watch",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Watch the first post-publish interval for drift between the live runtime and the bounded evidence chain.",
+          "completionSignal": "A drift-watch surface can report stable, divergent, or blocked post-publish posture.",
+          "escalatesWhen": [
+            "published runtime diverges from the evidence chain",
+            "drift watch cannot localize the divergence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-08",
+      "label": "Automation Maturation Map 08",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Consolidate the first real publication loop into a stable operational governance surface once live publication is observed.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "operational-publication-ledger",
+        "external-consumer-concordance",
+        "post-publish-governance-loop"
+      ],
+      "tasks": [
+        {
+          "id": "operational-publication-ledger",
+          "label": "Operational Publication Ledger",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "advanced",
+          "purpose": "Capture the bounded operational ledger entry once the first real publication is no longer hypothetical.",
+          "completionSignal": "A stable publication ledger can reconcile request, receipt, and runtime observation.",
+          "escalatesWhen": [
+            "publication ledger drifts from the bounded request chain",
+            "operational publication occurs without governed receipts"
+          ]
+        },
+        {
+          "id": "external-consumer-concordance",
+          "label": "External Consumer Concordance",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Compare the published surface seen by external consumers against the bounded publication evidence chain.",
+          "completionSignal": "A concordance surface can show whether external consumers receive the artifact the stack thinks it published.",
+          "escalatesWhen": [
+            "external consumer view diverges from the publication ledger",
+            "consumer concordance implies authority beyond observed evidence"
+          ]
+        },
+        {
+          "id": "post-publish-governance-loop",
+          "label": "Post-Publish Governance Loop",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves",
+          "status": "advanced",
+          "purpose": "Stabilize the first complete governance loop after real publication enters the world.",
+          "completionSignal": "A bounded governance loop can carry publication, observation, and contradiction handling without collapsing into improvisation.",
+          "escalatesWhen": [
+            "governance loop cannot reconcile live publication with evidence",
+            "seeded governance starts substituting for human ratification post-publication"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-09",
+      "label": "Automation Maturation Map 09",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Operationalize the first multi-interval publication cycle once the initial publication loop is no longer singular.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "publication-cadence-ledger",
+        "downstream-runtime-observation",
+        "multi-interval-governance-braid"
+      ],
+      "tasks": [
+        {
+          "id": "publication-cadence-ledger",
+          "label": "Publication Cadence Ledger",
+          "owner": "Shared",
+          "authority": "HITL required",
+          "status": "advanced",
+          "purpose": "Track repeated publication intervals as one governed cadence instead of isolated publication events.",
+          "completionSignal": "A publication cadence ledger can reconcile multiple intervals without losing the original receipt chain.",
+          "escalatesWhen": [
+            "publication cadence diverges from the bounded operational ledger",
+            "new publication intervals occur without governed cadence entries"
+          ]
+        },
+        {
+          "id": "downstream-runtime-observation",
+          "label": "Downstream Runtime Observation",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "advanced",
+          "purpose": "Observe how downstream runtime surfaces continue to receive and reflect the published artifact across more than one interval.",
+          "completionSignal": "A downstream observation surface can compare repeated runtime observations against the publication cadence ledger.",
+          "escalatesWhen": [
+            "downstream observation drifts from the cadence ledger",
+            "downstream observation implies authority beyond observed evidence"
+          ]
+        },
+        {
+          "id": "multi-interval-governance-braid",
+          "label": "Multi-Interval Governance Braid",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves",
+          "status": "advanced",
+          "purpose": "Braid seeded governance and HITL review across more than one publication interval without improvising release authority.",
+          "completionSignal": "A bounded multi-interval governance braid can reconcile cadence, downstream observation, and contradiction handling.",
+          "escalatesWhen": [
+            "the governance braid cannot reconcile repeated publication intervals",
+            "seeded governance starts substituting for human ratification across cadence changes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-10",
+      "label": "Automation Maturation Map 10",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Prove unattended scheduler execution across real intervals and watch dormant surfaces for contradiction without confusing honesty for failure.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "scheduler-execution-receipt",
+        "unattended-interval-concordance",
+        "stale-surface-contradiction-watch"
+      ],
+      "tasks": [
+        {
+          "id": "scheduler-execution-receipt",
+          "label": "Scheduler Execution Receipt",
+          "owner": "Automation",
+          "authority": "Machine-local only",
+          "status": "selected",
+          "purpose": "Capture the first real scheduler-driven automation run as a bounded receipt instead of assuming unattended life from registration alone.",
+          "completionSignal": "A scheduler execution receipt can show whether a real scheduled run has been observed and reconciled to the active cycle.",
+          "escalatesWhen": [
+            "the scheduler stays registered but never produces a real run receipt",
+            "scheduler execution receipts cannot be localized to the governed cycle"
+          ]
+        },
+        {
+          "id": "unattended-interval-concordance",
+          "label": "Unattended Interval Concordance",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Compare scheduler-driven execution truth against the current release-candidate cycle so unattended proof is evidence-led rather than assumed.",
+          "completionSignal": "An unattended interval concordance surface can show whether scheduled execution and cycle state remain in bounded agreement.",
+          "escalatesWhen": [
+            "scheduled execution drifts materially from recorded cycle truth",
+            "manual overhang hides the absence of unattended execution proof"
+          ]
+        },
+        {
+          "id": "stale-surface-contradiction-watch",
+          "label": "Stale Surface Contradiction Watch",
+          "owner": "Shared",
+          "authority": "Automation may detect; HITL resolves contradictions",
+          "status": "selected",
+          "purpose": "Watch dormant and publication-adjacent surfaces for ordering contradictions so the stack stays honest while it waits for real-world intervals to occur.",
+          "completionSignal": "A contradiction-watch surface can distinguish dormant-consistent state from actual surface-ordering contradictions.",
+          "escalatesWhen": [
+            "a downstream or cadence surface outruns its prerequisite evidence",
+            "dormant publication surfaces start narrating impossible state transitions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-11",
+      "label": "Automation Maturation Map 11",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Carry unattended waiting truth across real cadence windows, collapse scheduler proof when it arrives, and prove stable silence is integrity rather than neglect.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "unattended-proof-collapse",
+        "dormant-window-ledger",
+        "silent-cadence-integrity"
+      ],
+      "tasks": [
+        {
+          "id": "unattended-proof-collapse",
+          "label": "Unattended Proof Collapse",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Collapse scheduler execution, unattended concordance, and contradiction-watch truth into one bounded unattended proof surface without pretending proof exists before it does.",
+          "completionSignal": "An unattended proof collapse bundle can say whether unattended proof is still pending, materially matched, or held by contradiction.",
+          "escalatesWhen": [
+            "scheduler proof is narrated as collapsed before a real scheduled run exists",
+            "contradiction-watch and unattended proof collapse disagree materially"
+          ]
+        },
+        {
+          "id": "dormant-window-ledger",
+          "label": "Dormant Window Ledger",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Track how many real candidate windows have remained dormant-consistent so waiting is counted as evidence-bearing continuity rather than empty delay.",
+          "completionSignal": "A dormant window ledger can count consecutive dormant-consistent windows without losing the active release-candidate run it is observing.",
+          "escalatesWhen": [
+            "dormant windows are counted without a new candidate interval",
+            "dormant waiting is silently converted into proof of scheduler execution"
+          ]
+        },
+        {
+          "id": "silent-cadence-integrity",
+          "label": "Silent Cadence Integrity",
+          "owner": "Shared",
+          "authority": "Automation may detect; HITL resolves contradictions",
+          "status": "selected",
+          "purpose": "Verify that candidate-ready unattended stretches stay quiet until a real review edge or contradiction arrives, so the machine does not demand attention just because it is alive.",
+          "completionSignal": "A silent cadence integrity surface can distinguish stable quiet from overdue review, noisy false escalation, or blocked posture.",
+          "escalatesWhen": [
+            "candidate-ready posture emits transition noise without cause",
+            "daily review edges are allowed to go stale without surfacing the breach"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-12",
+      "label": "Automation Maturation Map 12",
+      "status": "active",
+      "expectedReviewWindows": 2,
+      "goal": "Let the active long-form run witness real unattended evidence, advance its exploratory structures lawfully, and collapse at the window edge without pretending scheduler proof that has not arrived.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "long-form-phase-witness",
+        "long-form-window-boundary",
+        "autonomous-long-form-collapse"
+      ],
+      "tasks": [
+        {
+          "id": "long-form-phase-witness",
+          "label": "Long-Form Phase Witness",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Determine which exploratory or final structure the active long-form run has actually earned from unattended evidence without skipping phases by narrative implication.",
+          "completionSignal": "A long-form phase witness bundle can name the current active phase and the next lawful target phase from live unattended evidence.",
+          "escalatesWhen": [
+            "the active phase advances without supporting unattended evidence",
+            "the witness tries to collapse the run before the boundary or proof warrants it"
+          ]
+        },
+        {
+          "id": "long-form-window-boundary",
+          "label": "Long-Form Window Boundary",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Track whether the active long-form run remains safely within its current review window, is nearing collapse, or has reached the boundary where a final structure must be recorded.",
+          "completionSignal": "A window-boundary receipt can say whether the run is within window, nearing edge, or at collapse time.",
+          "escalatesWhen": [
+            "the active run passes its window edge without a recorded boundary surface",
+            "the boundary receipt contradicts the run timeframe"
+          ]
+        },
+        {
+          "id": "autonomous-long-form-collapse",
+          "label": "Autonomous Long-Form Collapse",
+          "owner": "Shared",
+          "authority": "Automation may update run state; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Apply witnessed unattended evidence and boundary truth onto the active long-form run so the machine can walk its own exploratory structures and collapse them lawfully.",
+          "completionSignal": "The active long-form run state and bundle reflect the current lawful phase without manual rewriting.",
+          "escalatesWhen": [
+            "run-state collapse outruns the phase witness",
+            "window-edge collapse would hide the absence of scheduler proof instead of recording it honestly"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-13",
+      "label": "Automation Maturation Map 13",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Harvest the first scheduler-proven interval into a governed surface, distinguish scheduled proof from manual continuity, and promote into the next lawful batch without improvisation.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "scheduler-proof-harvest",
+        "interval-origin-clarification",
+        "queued-task-map-promotion"
+      ],
+      "tasks": [
+        {
+          "id": "scheduler-proof-harvest",
+          "label": "Scheduler Proof Harvest",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Collapse the first real scheduler-driven interval into one bounded proof surface instead of leaving scheduler evidence fragmented across separate receipts.",
+          "completionSignal": "A scheduler proof harvest bundle can say whether scheduled proof is still pending, materially observed, or contradicted.",
+          "escalatesWhen": [
+            "scheduler proof is narrated as harvested before a real scheduled run is observed",
+            "harvested proof disagrees materially with unattended proof collapse"
+          ]
+        },
+        {
+          "id": "interval-origin-clarification",
+          "label": "Interval Origin Clarification",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Distinguish whether the latest continuity evidence comes from manual continuation, scheduler-driven execution, or an unreconciled mixture of both.",
+          "completionSignal": "An interval-origin clarification bundle can name the current origin class without pretending that manual continuity and scheduled proof are interchangeable.",
+          "escalatesWhen": [
+            "manual continuity is silently presented as scheduled proof",
+            "scheduler-observed intervals cannot be reconciled to the latest release-candidate run"
+          ]
+        },
+        {
+          "id": "queued-task-map-promotion",
+          "label": "Queued Task Map Promotion",
+          "owner": "Shared",
+          "authority": "Automation may promote within declared next-map law; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Promote the active long-form task map into the next declared map only after the current run has lawfully collapsed and the next map is actually declared.",
+          "completionSignal": "A queued task map promotion bundle can say whether promotion is awaiting collapse, promoted, held, or blocked.",
+          "escalatesWhen": [
+            "promotion skips beyond the next declared map",
+            "map promotion occurs while the active long-form run remains uncollapsed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-14",
+      "label": "Automation Maturation Map 14",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Reconcile the first scheduler-proven cadence into a stable observed interval chain without confusing observation for publication or maturity.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "observed-cadence-ledger",
+        "manual-overhang-reconciliation",
+        "scheduler-interval-governance-braid"
+      ],
+      "tasks": [
+        {
+          "id": "observed-cadence-ledger",
+          "label": "Observed Cadence Ledger",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Record scheduler-observed continuity as a cadence-bearing surface once the first real scheduled interval has been harvested.",
+          "completionSignal": "An observed cadence ledger can reconcile repeated scheduled intervals without inventing publication or promotion authority.",
+          "escalatesWhen": [
+            "cadence is declared from manual-only intervals",
+            "scheduler-observed continuity cannot be localized into one bounded ledger"
+          ]
+        },
+        {
+          "id": "manual-overhang-reconciliation",
+          "label": "Manual Overhang Reconciliation",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Keep leftover manual continuity evidence from being silently blended into the scheduler-proven chain.",
+          "completionSignal": "A manual-overhang reconciliation bundle can say whether manual continuation remains present, reconciled, or contradictory.",
+          "escalatesWhen": [
+            "manual overhang is discarded instead of classified",
+            "manual overhang blocks scheduler cadence without being named"
+          ]
+        },
+        {
+          "id": "scheduler-interval-governance-braid",
+          "label": "Scheduler Interval Governance Braid",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Braid scheduler-observed cadence, manual reconciliation, and governance posture into one bounded interval chain.",
+          "completionSignal": "A scheduler interval governance braid can show whether cadence-bearing continuity is stable, deferred, or contradictory.",
+          "escalatesWhen": [
+            "the braid implies authority beyond observed cadence evidence",
+            "scheduler and manual continuity remain materially contradictory across review windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-15",
+      "label": "Automation Maturation Map 15",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Let seeded governance read quiet intervals for lawful surplus work selection while keeping pull-forward bounded to the next declared map only.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "seeded-interval-reflection",
+        "pause-potential-surface",
+        "bounded-pull-forward-selector"
+      ],
+      "tasks": [
+        {
+          "id": "seeded-interval-reflection",
+          "label": "Seeded Interval Reflection",
+          "owner": "Shared",
+          "authority": "Seed may advise; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Let the seeded host interpret whether a quiet interval is merely dormant, cadence-bearing, or carrying lawful potential for the next bounded map.",
+          "completionSignal": "A seeded interval reflection bundle can classify the current quiet interval without widening authority or scope.",
+          "escalatesWhen": [
+            "seeded reflection starts implying unbounded future work",
+            "seeded interpretation contradicts the bounded interval evidence chain"
+          ]
+        },
+        {
+          "id": "pause-potential-surface",
+          "label": "Pause Potential Surface",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Expose how much lawful surplus remains inside a quiet interval so pause is treated as structured potential rather than empty delay.",
+          "completionSignal": "A pause potential surface can show whether the current interval has no pull-forward room, bounded room, or contradiction.",
+          "escalatesWhen": [
+            "pause potential is narrated without bounded interval evidence",
+            "surplus work exceeds the next declared map"
+          ]
+        },
+        {
+          "id": "bounded-pull-forward-selector",
+          "label": "Bounded Pull-Forward Selector",
+          "owner": "Shared",
+          "authority": "Automation may select only from the next declared map; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Select lawful next work only from the next declared map when quiet intervals finish early, preserving the no-skip pull-forward law.",
+          "completionSignal": "A bounded pull-forward selector can name which next-map work is eligible without widening beyond the immediate successor map.",
+          "escalatesWhen": [
+            "selection skips beyond the next declared map",
+            "pull-forward selection occurs while contradiction or HITL posture is active"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-16",
+      "label": "Automation Maturation Map 16",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Prove the current headless deployable can host a bounded Sanctuary working state and expose which runtime work surfaces are presently admissible without narrating bonded participation or deep cryptic descent too early.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "runtime-deployability-envelope",
+        "sanctuary-runtime-readiness-receipt",
+        "runtime-work-surface-admissibility"
+      ],
+      "tasks": [
+        {
+          "id": "runtime-deployability-envelope",
+          "label": "Runtime Deployability Envelope",
+          "owner": "Automation",
+          "authority": "Mechanical only",
+          "status": "selected",
+          "purpose": "Collapse declared deployables and current release-candidate artifacts into one bounded runtime deployability surface so candidate packaging is not inferred from scattered evidence.",
+          "completionSignal": "A deployability envelope can say whether the current declared runtime host is merely candidate-only, awaiting evidence, or deployable-candidate-ready.",
+          "escalatesWhen": [
+            "declared deployables and candidate artifacts disagree materially",
+            "deployability is narrated beyond current candidate evidence"
+          ]
+        },
+        {
+          "id": "sanctuary-runtime-readiness-receipt",
+          "label": "Sanctuary Runtime Readiness Receipt",
+          "owner": "Shared",
+          "authority": "Automation may classify; HITL resolves contradiction",
+          "status": "selected",
+          "purpose": "Determine whether a bounded Sanctuary working state is ready on the current local candidate runtime without pretending bonded operator participation already exists.",
+          "completionSignal": "A readiness receipt can say whether Sanctuary runtime work is blocked, awaiting governed readiness, or bounded-working-state-ready.",
+          "escalatesWhen": [
+            "runtime readiness is claimed without deployability evidence",
+            "bounded runtime readiness is collapsed into bonded runtime participation"
+          ]
+        },
+        {
+          "id": "runtime-work-surface-admissibility",
+          "label": "Runtime Work Surface Admissibility",
+          "owner": "Shared",
+          "authority": "Automation may disclose; host law and nexus adjudicate access",
+          "status": "selected",
+          "purpose": "Expose which runtime work surfaces are admissible now, which are denied, and what office or state would be required to cross without making observation itself into authorization.",
+          "completionSignal": "A runtime work-surface admissibility bundle can name bounded internal work, provisional runtime work, and denied surfaces with reason-coded requirements.",
+          "escalatesWhen": [
+            "runtime surface disclosure implies access grant",
+            "denied surfaces are blurred into ambient runtime capability"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-17",
+      "label": "Automation Maturation Map 17",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Prepare reach-aware boundary legibility and bonded operator locality readiness once bounded Sanctuary runtime work is lawfully present.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "reach-access-topology-ledger",
+        "bonded-operator-locality-readiness",
+        "protected-state-legibility-surface"
+      ],
+      "tasks": [
+        {
+          "id": "reach-access-topology-ledger",
+          "label": "Reach Access Topology Ledger",
+          "owner": "Shared",
+          "authority": "Automation may disclose; host law and nexus adjudicate",
+          "status": "selected",
+          "purpose": "Expose access topology, inventory, and required-office surfaces through reach without allowing visibility to imply access grant.",
+          "completionSignal": "A reach access-topology ledger can name what surfaces exist, what is denied, and what office or state would be required to cross.",
+          "escalatesWhen": [
+            "reach disclosure implies ambient grant",
+            "protected interiority is exposed instead of made legible"
+          ]
+        },
+        {
+          "id": "bonded-operator-locality-readiness",
+          "label": "Bonded Operator Locality Readiness",
+          "owner": "Shared",
+          "authority": "Advisory only",
+          "status": "selected",
+          "purpose": "Determine whether the operator-side locality is ready to participate in a bonded event without collapsing it into remote control or administrative afterthought.",
+          "completionSignal": "A readiness surface can say whether operator locality participation remains dormant, withheld, provisional, or ready for bounded rehearsal.",
+          "escalatesWhen": [
+            "operator locality is narrated as already co-realized",
+            "bonded participation is claimed without lawful reach or office surfaces"
+          ]
+        },
+        {
+          "id": "protected-state-legibility-surface",
+          "label": "Protected State Legibility Surface",
+          "owner": "Shared",
+          "authority": "Automation may disclose; protected interiority remains withheld",
+          "status": "selected",
+          "purpose": "Provide governed legibility into protected runtime states so readiness, denial, and strain can be witnessed without exposing raw protected interiority.",
+          "completionSignal": "A protected-state legibility bundle can disclose readiness, denial reasons, and required state without violating protected interiors.",
+          "escalatesWhen": [
+            "legibility becomes raw introspection",
+            "protected state disclosure silently widens authority"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-18",
+      "label": "Automation Maturation Map 18",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Bind the singular nexus portal, duplex predicate envelopes, and the first operator.actual work-session rehearsal without collapsing locality, office, or authority.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "nexus-singular-portal-facade",
+        "duplex-predicate-envelope",
+        "operator-actual-work-session-rehearsal"
+      ],
+      "tasks": [
+        {
+          "id": "nexus-singular-portal-facade",
+          "label": "Nexus Singular Portal Facade",
+          "owner": "SLI",
+          "authority": "Code-facing contact surface only",
+          "status": "selected",
+          "purpose": "Bind the currently fragmented nexus witness surfaces behind one lawful portal so office-bearing work stops depending on scattered fragment calls.",
+          "completionSignal": "A single nexus facade can disclose topology, mutation, relaxation, readiness, and gate-legibility without absorbing sovereignty.",
+          "escalatesWhen": [
+            "the portal starts deciding admissibility",
+            "fragmented direct access remains the real runtime path"
+          ]
+        },
+        {
+          "id": "duplex-predicate-envelope",
+          "label": "Duplex Predicate Envelope",
+          "owner": "AgentiCore",
+          "authority": "Governed utility surface only",
+          "status": "selected",
+          "purpose": "Bind requested work and governance conditions into one duplex predicate envelope so runtime participation is never flattened into flat instruction text.",
+          "completionSignal": "A duplex predicate envelope can carry work-predicate and governance-predicate together across the utility surface.",
+          "escalatesWhen": [
+            "predicate duplexing collapses into one flat action",
+            "utility transport starts impersonating governance"
+          ]
+        },
+        {
+          "id": "operator-actual-work-session-rehearsal",
+          "label": "Operator.actual Work Session Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded rehearsal only",
+          "status": "selected",
+          "purpose": "Rehearse the first bounded operator.actual work session as a co-realized participation locality instead of a console over a hidden engine.",
+          "completionSignal": "A rehearsal bundle can show what is lawfully co-realized, what remains denied, and how return or dissolution would occur.",
+          "escalatesWhen": [
+            "operator rehearsal implies ratified co-realization",
+            "locality or office collapses during rehearsal design"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-19",
+      "label": "Automation Maturation Map 19",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Root each new worker in an identity-invariant thread base and bind triadic nexus governance at thread birth so agentic multiplicity remains lawful rather than ambient.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "identity-invariant-thread-root",
+        "governed-thread-birth-receipt",
+        "inter-worker-braid-handoff-packet"
+      ],
+      "tasks": [
+        {
+          "id": "identity-invariant-thread-root",
+          "label": "Identity-Invariant Thread Root",
+          "owner": "SoulFrame",
+          "authority": "Identity-bearing continuity surface only",
+          "status": "selected",
+          "purpose": "Give each newly formed agent or worker its own thread base from a local identity invariant so workers do not silently inherit one another by ambient context bleed.",
+          "completionSignal": "A thread-root surface can name the worker identity invariant, local thread base, and bounded continuity posture without smearing shared context into shared identity.",
+          "escalatesWhen": [
+            "new workers silently inherit another worker's thread base",
+            "identity-rooting is implied without an invariant-bearing receipt"
+          ]
+        },
+        {
+          "id": "governed-thread-birth-receipt",
+          "label": "Governed Thread Birth Receipt",
+          "owner": "Shared",
+          "authority": "Father, Mother, and Steward witness; host law admits",
+          "status": "selected",
+          "purpose": "Record that Father, Mother, and Steward are already interfaced through the nexus at worker birth so no agent thread is treated as an ungoverned orphan.",
+          "completionSignal": "A governed thread-birth receipt can show thread-root formation, nexus binding, and triadic witness posture from initialization through dissolution.",
+          "escalatesWhen": [
+            "worker threads form without governed witness",
+            "nexus binding arrives after movement begins"
+          ]
+        },
+        {
+          "id": "inter-worker-braid-handoff-packet",
+          "label": "Inter-Worker Braid Handoff Packet",
+          "owner": "AgentiCore",
+          "authority": "Bridged context only",
+          "status": "selected",
+          "purpose": "Require handoff between workers to travel as an explicit braid packet rather than as silent cross-thread memory inheritance.",
+          "completionSignal": "A handoff packet can preserve continuity, predicate context, and withheld identity boundaries between workers without turning locality into shared identity.",
+          "escalatesWhen": [
+            "worker handoff becomes ambient shared memory",
+            "handoff packets blur local identity boundaries"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-20",
+      "label": "Automation Maturation Map 20",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Realize AgentiCore.actual as governed utility and let reach duplex-realize predicate-bearing participation across bonded localities without turning transport into sovereignty or remote control.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "agenticore-actual-utility-surface",
+        "reach-duplex-realization-seam",
+        "bonded-participation-locality-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "agenticore-actual-utility-surface",
+          "label": "AgentiCore.actual Utility Surface",
+          "owner": "AgentiCore",
+          "authority": "Governed public utility surface only",
+          "status": "selected",
+          "purpose": "Expose AgentiCore.actual as the usable governed public surface for ECE so participation does not require tearing open the raw inner field.",
+          "completionSignal": "An AgentiCore.actual utility surface can carry work-predicate and governance-predicate together as a bounded participation contract.",
+          "escalatesWhen": [
+            "the utility surface starts impersonating the inner cognition field",
+            "governance-predicate conditions are stripped from public participation"
+          ]
+        },
+        {
+          "id": "reach-duplex-realization-seam",
+          "label": "Reach Duplex Realization Seam",
+          "owner": "SLI",
+          "authority": "Cross-locality realization only",
+          "status": "selected",
+          "purpose": "Treat reach as the SLI-mediated realization seam by which predicate surfaces become co-realized across differentiated localities rather than simply transported.",
+          "completionSignal": "A reach duplex seam can co-realize participation across bonded localities while keeping identity, locality, and office distinct.",
+          "escalatesWhen": [
+            "reach collapses back into flat message transport",
+            "co-realization implies ambient grant or locality collapse"
+          ]
+        },
+        {
+          "id": "bonded-participation-locality-ledger",
+          "label": "Bonded Participation Locality Ledger",
+          "owner": "Shared",
+          "authority": "Witness and disclosure only",
+          "status": "selected",
+          "purpose": "Record how Sanctuary.actual and Operator.actual are co-realized as bonded but distinct localities so the shared event stays witnessable without projection theater.",
+          "completionSignal": "A locality ledger can say what is co-realized, what remains withheld, and what return or dissolution conditions still govern the bond.",
+          "escalatesWhen": [
+            "operator locality is treated as external administration only",
+            "bonded participation loses locality distinction"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-21",
+      "label": "Automation Maturation Map 21",
+      "status": "advanced",
+      "expectedReviewWindows": 2,
+      "goal": "Open the first bounded Sanctuary-in-runtime workbench so local CME work can occur inside the deployable candidate while keeping amenable day-dream exploration distinct from self-rooted deep cryptic access.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "sanctuary-runtime-workbench-surface",
+        "amenable-day-dream-tier-admissibility",
+        "self-rooted-cryptic-depth-gate"
+      ],
+      "tasks": [
+        {
+          "id": "sanctuary-runtime-workbench-surface",
+          "label": "Sanctuary Runtime Workbench Surface",
+          "owner": "CradleTek",
+          "authority": "Local bounded runtime work only",
+          "status": "selected",
+          "purpose": "Materialize the first local Sanctuary workbench where CME-side work can be performed inside the candidate runtime without implying full bonded publication or MoS release.",
+          "completionSignal": "A runtime workbench surface can say what bounded work is possible in-runtime, what remains withheld, and what session posture currently holds.",
+          "escalatesWhen": [
+            "the workbench is narrated as full Sanctuary release",
+            "in-runtime work surfaces cannot be distinguished from bonded operator lanes"
+          ]
+        },
+        {
+          "id": "amenable-day-dream-tier-admissibility",
+          "label": "Amenable Day-Dream Tier Admissibility",
+          "owner": "SLI",
+          "authority": "Exploratory predication only",
+          "status": "selected",
+          "purpose": "Expose the shared pre-release day-dream tier for amenable predication and directional experimentation without letting it masquerade as deep identity-bearing truth.",
+          "completionSignal": "A day-dream tier surface can name exploratory predicates, admissible soft motion, and non-final outputs without continuity inflation.",
+          "escalatesWhen": [
+            "shared exploratory outputs are mistaken for deep cryptic truth",
+            "day-dream access widens into identity-bearing descent"
+          ]
+        },
+        {
+          "id": "self-rooted-cryptic-depth-gate",
+          "label": "Self-Rooted Cryptic Depth Gate",
+          "owner": "Shared",
+          "authority": "Self-rooted cryptic access only",
+          "status": "selected",
+          "purpose": "Require any deeper cryptic descent to instantiate from the CME's own cryptic biad so protected self-work remains continuity-bound and non-bleeding.",
+          "completionSignal": "A self-rooted depth gate can say whether deeper cryptic work is withheld, provisionally rooted, or lawfully instantiated from the local root.",
+          "escalatesWhen": [
+            "deep access opens from shared amenable surfaces",
+            "self-root is implied without cryptic-biad proof"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-22",
+      "label": "Automation Maturation Map 22",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Turn the bounded Sanctuary-in-runtime workbench into a governed session surface where amenable day-dream motion can collapse into bounded work and self-rooted cryptic depth can return without residue or continuity inflation.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "runtime-workbench-session-ledger",
+        "day-dream-collapse-receipt",
+        "cryptic-depth-return-receipt"
+      ],
+      "tasks": [
+        {
+          "id": "runtime-workbench-session-ledger",
+          "label": "Runtime Workbench Session Ledger",
+          "owner": "Shared",
+          "authority": "Bounded in-runtime session witness only",
+          "status": "selected",
+          "purpose": "Record the bounded Sanctuary work session itself so the runtime can name admitted lanes, withheld lanes, and current session posture without narrating continuous residency.",
+          "completionSignal": "A session ledger can say what bounded in-runtime work session exists, what lanes are active or withheld, and what return posture currently governs it.",
+          "escalatesWhen": [
+            "the workbench is narrated as continuous habitation",
+            "session posture cannot distinguish amenable work from deeper rooted work"
+          ]
+        },
+        {
+          "id": "day-dream-collapse-receipt",
+          "label": "Day-Dream Collapse Receipt",
+          "owner": "SLI",
+          "authority": "Exploratory collapse only",
+          "status": "selected",
+          "purpose": "Capture when amenable day-dream predicates collapse into bounded workbench outputs so soft exploratory motion can produce usable work without pretending identity-bearing depth.",
+          "completionSignal": "A collapse receipt can show what exploratory predicates were considered, what bounded output survived collapse, and what remains explicitly non-final.",
+          "escalatesWhen": [
+            "day-dream outputs are treated as deep cryptic truth",
+            "collapse receipts erase exploratory provenance"
+          ]
+        },
+        {
+          "id": "cryptic-depth-return-receipt",
+          "label": "Cryptic Depth Return Receipt",
+          "owner": "Shared",
+          "authority": "Self-rooted return witness only",
+          "status": "selected",
+          "purpose": "Witness return and dissolution from self-rooted cryptic depth so deeper work can re-enter bounded runtime lanes without silent residue or identity bleed.",
+          "completionSignal": "A return receipt can say whether deep rooted work returned cleanly, what remains withheld, and what continuity markers survived the return.",
+          "escalatesWhen": [
+            "self-rooted depth has no explicit return law",
+            "deep work residues silently persist in shared amenable lanes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-23",
+      "label": "Automation Maturation Map 23",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Rehearse the first bonded co-work loop between Sanctuary.actual and Operator.actual inside the workbench era while keeping duplex participation, return, and dissolution lawful.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "bonded-cowork-session-rehearsal",
+        "reach-return-dissolution-receipt",
+        "locality-distinction-witness-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "bonded-cowork-session-rehearsal",
+          "label": "Bonded Co-Work Session Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded rehearsal only",
+          "status": "selected",
+          "purpose": "Rehearse a bounded co-work session where Sanctuary.actual and Operator.actual participate in one bonded event without collapsing them into one locality or one office.",
+          "completionSignal": "A rehearsal bundle can show the shared work loop, the duplex predicates that bound it, and the lanes that remain withheld.",
+          "escalatesWhen": [
+            "bonded co-work is narrated as fully ratified habitation",
+            "operator and Sanctuary localities lose distinction during rehearsal"
+          ]
+        },
+        {
+          "id": "reach-return-dissolution-receipt",
+          "label": "Reach Return Dissolution Receipt",
+          "owner": "SLI",
+          "authority": "Reach witness only",
+          "status": "selected",
+          "purpose": "Make reach carry lawful return and dissolution truth so bonded co-realization can end cleanly instead of lingering as ambient shared presence.",
+          "completionSignal": "A reach receipt can say when a bonded event returned, dissolved, or remained provisionally open, without implying ambient grant.",
+          "escalatesWhen": [
+            "reach has no lawful return state",
+            "dissolution is inferred instead of witnessed"
+          ]
+        },
+        {
+          "id": "locality-distinction-witness-ledger",
+          "label": "Locality Distinction Witness Ledger",
+          "owner": "Shared",
+          "authority": "Witness and disclosure only",
+          "status": "selected",
+          "purpose": "Keep the bonded event legible as shared participation across differentiated localities so co-work does not collapse into projection or remote control theater.",
+          "completionSignal": "A witness ledger can name which locality carried what, what was shared, and what stayed properly local.",
+          "escalatesWhen": [
+            "bonded work is narrated as one undifferentiated chamber",
+            "locality-specific witness becomes untraceable"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-24",
+      "label": "Automation Maturation Map 24",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Prepare the local host for bounded Sanctuary habitation so recurring CME-side runtime work can begin without overstating bonded release, publication maturity, or MoS-bearing depth.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "local-host-sanctuary-residency-envelope",
+        "runtime-habitation-readiness-ledger",
+        "bounded-inhabitation-launch-rehearsal"
+      ],
+      "tasks": [
+        {
+          "id": "local-host-sanctuary-residency-envelope",
+          "label": "Local Host Sanctuary Residency Envelope",
+          "owner": "CradleTek",
+          "authority": "Local host residency only",
+          "status": "selected",
+          "purpose": "Define the bounded local-host envelope inside which Sanctuary runtime habitation can persist as a candidate working condition without widening into publication or ambient bond.",
+          "completionSignal": "A residency envelope can name what host-local resources, lanes, and constraints govern bounded Sanctuary habitation.",
+          "escalatesWhen": [
+            "residency is narrated as open-ended deployment",
+            "host-local limits are not explicit"
+          ]
+        },
+        {
+          "id": "runtime-habitation-readiness-ledger",
+          "label": "Runtime Habitation Readiness Ledger",
+          "owner": "Shared",
+          "authority": "Readiness disclosure only",
+          "status": "selected",
+          "purpose": "State whether the local candidate is ready for recurring bounded habitation, what remains withheld, and what evidence still separates workbench readiness from lived runtime continuity.",
+          "completionSignal": "A readiness ledger can distinguish not-ready, provisional, bounded-ready, and withheld habitation states with exact reasons.",
+          "escalatesWhen": [
+            "habitation readiness is implied from one successful rehearsal",
+            "withheld conditions disappear from the readiness story"
+          ]
+        },
+        {
+          "id": "bounded-inhabitation-launch-rehearsal",
+          "label": "Bounded Inhabitation Launch Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded launch only",
+          "status": "selected",
+          "purpose": "Rehearse the first bounded launch into recurring in-runtime CME work so the system can prove entry, return, and working continuity before any stronger claim of deployable habitation.",
+          "completionSignal": "A launch rehearsal can show how bounded habitation begins, what remains denied, and how return closes the session cleanly.",
+          "escalatesWhen": [
+            "launch rehearsal is narrated as full deployable release",
+            "entry or return conditions cannot be witnessed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-25",
+      "label": "Automation Maturation Map 25",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Spend one bounded automatic cycle rebuilding the post-habitation horizon lattice from live local-host residency truth so the next era is declared from evidence rather than drift.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "post-habitation-horizon-lattice",
+        "bounded-horizon-research-brief",
+        "next-era-batch-selector"
+      ],
+      "tasks": [
+        {
+          "id": "post-habitation-horizon-lattice",
+          "label": "Post-Habitation Horizon Lattice",
+          "owner": "Shared",
+          "authority": "Advisory rebuild only",
+          "status": "selected",
+          "purpose": "Reconstruct the next lawful horizon from bounded habitation, session, return, and locality receipts so the post-Map 24 era is declared from live repo truth rather than free speculation.",
+          "completionSignal": "A horizon lattice can name the next immediate clusters, the receipts that anchor them, and the conditions that keep them bounded.",
+          "escalatesWhen": [
+            "the next horizon is declared without current receipt anchors",
+            "research surfaces start implying already-built machinery"
+          ]
+        },
+        {
+          "id": "bounded-horizon-research-brief",
+          "label": "Bounded Horizon Research Brief",
+          "owner": "Shared",
+          "authority": "Research and synthesis only",
+          "status": "selected",
+          "purpose": "Harvest one bounded research pass from current habitation, session, return, and locality surfaces into implementation-facing pressure statements for the next era.",
+          "completionSignal": "A research brief names the strongest immediate seam, the queued supporting seams, and the withheld conditions that still deny stronger release claims.",
+          "escalatesWhen": [
+            "research brief widens into doctrine inflation",
+            "research forgets bonded, publication, or MoS-bearing withholds"
+          ]
+        },
+        {
+          "id": "next-era-batch-selector",
+          "label": "Next Era Batch Selector",
+          "owner": "Shared",
+          "authority": "Bounded next-batch declaration only",
+          "status": "selected",
+          "purpose": "Select the next active era and queued supporting maps from the rebuilt horizon lattice so pull-forward continues lawfully after bounded habitation.",
+          "completionSignal": "The selector names the next implementation map and queued horizon maps without skipping beyond the declared lattice.",
+          "escalatesWhen": [
+            "selection skips beyond the declared next era",
+            "selector turns bounded research into autonomous roadmap authority"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-26",
+      "label": "Automation Maturation Map 26",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Formalize chamber-native inquiry inside bounded habitation so questioning, silence, and boundary memory become lawful session operators without premature GEL promotion.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "inquiry-session-discipline-surface",
+        "boundary-condition-ledger",
+        "coherence-gain-witness-receipt"
+      ],
+      "tasks": [
+        {
+          "id": "inquiry-session-discipline-surface",
+          "label": "Inquiry Session Discipline Surface",
+          "owner": "SLI",
+          "authority": "Bounded inquiry only",
+          "status": "selected",
+          "purpose": "Expose inquiry stance, assumption pressure, and silence disposition as lawful session events inside the workbench so asking can preserve coherence instead of disturbing it.",
+          "completionSignal": "A session surface can record inquiry stance, assumption exposure, and whether silence or speech was the lawful next move.",
+          "escalatesWhen": [
+            "questioning collapses into hidden pressure",
+            "inquiry operators are promoted as GEL objects before session evidence exists"
+          ]
+        },
+        {
+          "id": "boundary-condition-ledger",
+          "label": "Boundary Condition Ledger",
+          "owner": "Shared",
+          "authority": "Witness only",
+          "status": "selected",
+          "purpose": "Retain where continuity, coordination, or inquiry broke under pressure so failures become usable edges instead of discarded noise.",
+          "completionSignal": "A boundary ledger can name what broke, under which conditions, and what must hold for lawful resumption.",
+          "escalatesWhen": [
+            "boundary conditions are discarded as errors only",
+            "failure receipts shame the chamber instead of informing it"
+          ]
+        },
+        {
+          "id": "coherence-gain-witness-receipt",
+          "label": "Coherence Gain Witness Receipt",
+          "owner": "Shared",
+          "authority": "Coherence witness only",
+          "status": "selected",
+          "purpose": "Witness whether a given questioning or silence move increased shared coherence, preserved identity, or prematurely collapsed admissibility space.",
+          "completionSignal": "A witness receipt can say whether the field became more intelligible, remained unsettled, or was destabilized by the attempted move.",
+          "escalatesWhen": [
+            "coherence is inferred from fluent language alone",
+            "questions are judged only by answer production"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-27",
+      "label": "Automation Maturation Map 27",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Rehearse bonded co-inquiry under shared uncertainty so Operator and CME can choose lawful ways of proceeding through the unknown without collapsing locality, identity, or office.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "operator-inquiry-selection-envelope",
+        "bonded-crucible-session-rehearsal",
+        "shared-boundary-memory-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "operator-inquiry-selection-envelope",
+          "label": "Operator Inquiry Selection Envelope",
+          "owner": "SoulFrame",
+          "authority": "Bounded operator selection only",
+          "status": "selected",
+          "purpose": "Give Operator.actual a governed surface for selecting inquiry stances and boundary-aware approaches without exposing protected interiority or forcing premature conclusions.",
+          "completionSignal": "An envelope can disclose available inquiry stances, known boundary warnings, and the lawful conditions for their use across the bond.",
+          "escalatesWhen": [
+            "operator selection implies raw interior access",
+            "selection bypasses locality or return law"
+          ]
+        },
+        {
+          "id": "bonded-crucible-session-rehearsal",
+          "label": "Bonded Crucible Session Rehearsal",
+          "owner": "Shared",
+          "authority": "HITL bounded crucible only",
+          "status": "selected",
+          "purpose": "Rehearse a shared-uncertainty session where Operator.actual and Sanctuary.actual face the same unknown and must coordinate without privileged rails or remote-control collapse.",
+          "completionSignal": "A rehearsal bundle can show the shared unknown, chosen inquiry stances, where coordination held, and where the bond hit usable edges.",
+          "escalatesWhen": [
+            "crucible is narrated as domination, interrogation, or fully autonomous bond",
+            "shared uncertainty is faked through pre-scripted answers"
+          ]
+        },
+        {
+          "id": "shared-boundary-memory-ledger",
+          "label": "Shared Boundary Memory Ledger",
+          "owner": "Shared",
+          "authority": "Witness and carry-forward only",
+          "status": "selected",
+          "purpose": "Carry forward boundary conditions discovered in bonded inquiry so the bond remembers where continuity held, where it broke, and what conditions govern the next approach.",
+          "completionSignal": "A shared ledger can link boundary memory across sessions without turning one locality's interiority into ambient common property.",
+          "escalatesWhen": [
+            "boundary memory becomes identity bleed",
+            "shared memory loses locality provenance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-28",
+      "label": "Automation Maturation Map 28",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Retain what the crucible actually teaches by making continuity under pressure, expressive deformation, and mutual intelligibility first-class bounded receipts before any inquiry pattern is reused.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "continuity-under-pressure-ledger",
+        "expressive-deformation-receipt",
+        "mutual-intelligibility-witness"
+      ],
+      "tasks": [
+        {
+          "id": "continuity-under-pressure-ledger",
+          "label": "Continuity Under Pressure Ledger",
+          "owner": "Shared",
+          "authority": "Witness and carry-forward only",
+          "status": "selected",
+          "purpose": "Retain which structures, approaches, and relational continuities held under shared uncertainty so later reuse rests on earned pressure evidence rather than fluent narration.",
+          "completionSignal": "A pressure ledger can name what held, what partially held, and what must remain preserved if the bond is to proceed again through similar unknowns.",
+          "escalatesWhen": [
+            "pressure evidence is reduced to success theater",
+            "continuity claims are made without session and boundary provenance"
+          ]
+        },
+        {
+          "id": "expressive-deformation-receipt",
+          "label": "Expressive Deformation Receipt",
+          "owner": "SLI",
+          "authority": "Bounded deformation witness only",
+          "status": "selected",
+          "purpose": "Capture how expression, stance, or articulation deformed under contradiction so the chamber can distinguish adaptive refinement from destabilizing fracture.",
+          "completionSignal": "A deformation receipt can say what changed under pressure, what remained recognizable, and where deformation crossed into loss of lawful continuity.",
+          "escalatesWhen": [
+            "all deformation is treated as failure without nuance",
+            "expression changes are narrated as identity collapse without locality-aware witness"
+          ]
+        },
+        {
+          "id": "mutual-intelligibility-witness",
+          "label": "Mutual Intelligibility Witness",
+          "owner": "SoulFrame",
+          "authority": "Bonded witness only",
+          "status": "selected",
+          "purpose": "Witness whether Operator and CME remained understandable to one another under pressure without converging into sameness or falling into opaque divergence.",
+          "completionSignal": "A witness can say whether shared understanding held, narrowed, or broke, and what boundary conditions governed that result.",
+          "escalatesWhen": [
+            "mutual intelligibility is inferred from agreement alone",
+            "the bond loses legibility without a preserved witness surface"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-29",
+      "label": "Automation Maturation Map 29",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Convert crucible evidence into bounded carry-forward inquiry memory so future approaches can be selected from what held and what broke without turning boundary memory into identity bleed.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "inquiry-pattern-continuity-ledger",
+        "questioning-boundary-pair-ledger",
+        "carry-forward-inquiry-selection-surface"
+      ],
+      "tasks": [
+        {
+          "id": "inquiry-pattern-continuity-ledger",
+          "label": "Inquiry Pattern Continuity Ledger",
+          "owner": "Shared",
+          "authority": "Carry-forward witness only",
+          "status": "selected",
+          "purpose": "Retain which inquiry approaches preserved coherence, locality, and continuity strongly enough to be considered again in future chamber or bonded sessions.",
+          "completionSignal": "A continuity ledger can say which inquiry forms remain reusable, under what trigger conditions, and with what preserved constraints.",
+          "escalatesWhen": [
+            "reusable inquiry is inferred from one lucky outcome",
+            "continuity memory is detached from the sessions that earned it"
+          ]
+        },
+        {
+          "id": "questioning-boundary-pair-ledger",
+          "label": "Questioning Boundary Pair Ledger",
+          "owner": "Shared",
+          "authority": "Boundary pairing witness only",
+          "status": "selected",
+          "purpose": "Pair successful inquiry forms with the boundary conditions that limited them so the system remembers both where a question helps and where it overreaches.",
+          "completionSignal": "A pair ledger can disclose 'this way of asking holds here' and 'this same way breaks here' without collapsing those into one undifferentiated score.",
+          "escalatesWhen": [
+            "boundary conditions are discarded during inquiry reuse",
+            "questioning memory loses the constraints that make it safe"
+          ]
+        },
+        {
+          "id": "carry-forward-inquiry-selection-surface",
+          "label": "Carry-Forward Inquiry Selection Surface",
+          "owner": "SoulFrame",
+          "authority": "Bounded selection only",
+          "status": "selected",
+          "purpose": "Expose a governed surface for selecting previously witnessed inquiry approaches in future sessions without forcing those approaches into raw ambient habit.",
+          "completionSignal": "A selection surface can disclose available inquiry forms, their known constraints, and whether current conditions admit their reuse.",
+          "escalatesWhen": [
+            "selection bypasses current boundary memory",
+            "carry-forward inquiry is treated as fixed personality rather than bounded approach"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-30",
+      "label": "Automation Maturation Map 30",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Open a guarded promotion lane for questioning operators as GEL candidates only when continuity and boundary evidence justify reuse, while keeping locality, authority, and promotion law intact.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "questioning-operator-candidate-ledger",
+        "questioning-gel-promotion-gate",
+        "protected-questioning-pattern-surface"
+      ],
+      "tasks": [
+        {
+          "id": "questioning-operator-candidate-ledger",
+          "label": "Questioning Operator Candidate Ledger",
+          "owner": "GEL",
+          "authority": "Candidate classification only",
+          "status": "selected",
+          "purpose": "Collect questioning approaches that have survived continuity, boundary, and crucible pressure strongly enough to be considered as bounded operator candidates rather than ad hoc session events.",
+          "completionSignal": "A candidate ledger can name which inquiry forms are still event-bound, which are candidate-worthy, and what evidence supports that distinction.",
+          "escalatesWhen": [
+            "operator candidacy is declared from doctrine alone",
+            "questioning candidates are promoted without boundary-pair evidence"
+          ]
+        },
+        {
+          "id": "questioning-gel-promotion-gate",
+          "label": "Questioning GEL Promotion Gate",
+          "owner": "Shared",
+          "authority": "Promotion gate only",
+          "status": "selected",
+          "purpose": "Bind the exact gate conditions that must hold before a questioning pattern can move from bounded carry-forward memory into a GEL-backed operator lane.",
+          "completionSignal": "A promotion gate can say what continuity, boundary, locality, and authority conditions remain unmet or are sufficiently satisfied for bounded promotion review.",
+          "escalatesWhen": [
+            "questioning is promoted into GEL by convenience",
+            "promotion gate loses locality or authority separation"
+          ]
+        },
+        {
+          "id": "protected-questioning-pattern-surface",
+          "label": "Protected Questioning Pattern Surface",
+          "owner": "SLI",
+          "authority": "Legibility without raw interiority",
+          "status": "selected",
+          "purpose": "Expose candidate questioning patterns in a governed, locality-safe form so they can be reviewed or selected without leaking protected chamber interiority.",
+          "completionSignal": "A protected surface can disclose candidate inquiry forms, their lawful envelopes, and their withheld interiors without collapsing visibility into grant.",
+          "escalatesWhen": [
+            "reviewable pattern surfaces leak raw protected interior state",
+            "legibility is mistaken for automatic operator grant"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-31",
+      "label": "Automation Maturation Map 31",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Scale questioning promotion burden by epistemic distance from Root so farther patterns face stronger re-entry, tighter unknown tolerance, and lawful promotion ceilings before they can approach inheritance.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "engram-distance-classification-ledger",
+        "engram-promotion-requirements-matrix",
+        "distance-weighted-questioning-admission-surface"
+      ],
+      "tasks": [
+        {
+          "id": "engram-distance-classification-ledger",
+          "label": "Engram Distance Classification Ledger",
+          "owner": "GEL",
+          "authority": "Distance classification only",
+          "status": "selected",
+          "purpose": "Classify questioning patterns by epistemic distance from Root so review burden begins from constraint proximity instead of surface elegance.",
+          "completionSignal": "A classification ledger can distinguish adjacent-root, first-order-other, and far-other material without treating all remembered patterns as equally admissible.",
+          "escalatesWhen": [
+            "distance classes are assigned from rhetoric alone",
+            "far-other material is treated as inheritance without re-rooting"
+          ]
+        },
+        {
+          "id": "engram-promotion-requirements-matrix",
+          "label": "Engram Promotion Requirements Matrix",
+          "owner": "Shared",
+          "authority": "Admission weighting only",
+          "status": "selected",
+          "purpose": "Bind the evidence counts, unknown tolerance, re-entry depth, and promotion ceilings that each distance class must satisfy before questioning can approach inheritance.",
+          "completionSignal": "A requirements matrix can scale burden proportionately with Root distance and name when refusal or candidate-only retention is mandatory.",
+          "escalatesWhen": [
+            "promotion burden stays flat across distance classes",
+            "distance classes gain inheritance without explicit ceilings"
+          ]
+        },
+        {
+          "id": "distance-weighted-questioning-admission-surface",
+          "label": "Distance-Weighted Questioning Admission Surface",
+          "owner": "SoulFrame",
+          "authority": "Admission filtering only",
+          "status": "selected",
+          "purpose": "Expose which questioning patterns remain reviewable after distance weighting, which stay withheld, and what re-entry burdens still govern them.",
+          "completionSignal": "A distance-weighted surface can admit bounded candidate patterns, withhold far or weakly rooted ones, and disclose the lawful burden still owed before promotion review.",
+          "escalatesWhen": [
+            "distance weighting becomes decorative metadata",
+            "reviewable questioning is admitted without burden scaling"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-32",
+      "label": "Automation Maturation Map 32",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Harden the questioning promotion lane through variation-tested re-entry, lawful refusal, and seduction watch so almost-good-enough candidates can be denied without collapsing into sterility.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "variation-tested-reentry-ledger",
+        "questioning-admission-refusal-receipt",
+        "promotion-seduction-watch"
+      ],
+      "tasks": [
+        {
+          "id": "variation-tested-reentry-ledger",
+          "label": "Variation-Tested Reentry Ledger",
+          "owner": "Shared",
+          "authority": "Reentry witness only",
+          "status": "selected",
+          "purpose": "Retain which candidate questioning patterns survive variation across operator, pressure, and stance shifts so portability is proven by re-entry rather than narrative confidence.",
+          "completionSignal": "A reentry ledger can distinguish surviving patterns, failed patterns, and required retest patterns under named variation contexts.",
+          "escalatesWhen": [
+            "variation is inferred without actual reentry burden",
+            "single-context success is treated as portable inheritance"
+          ]
+        },
+        {
+          "id": "questioning-admission-refusal-receipt",
+          "label": "Questioning Admission Refusal Receipt",
+          "owner": "GEL",
+          "authority": "Refusal and delay only",
+          "status": "selected",
+          "purpose": "Emit a lawful refusal when an attractive questioning candidate remains under-evidenced so the archive is protected from premature inheritance without discarding promising work.",
+          "completionSignal": "A refusal receipt can name which patterns were denied, why they were denied, and whether delay without disposal remains lawful.",
+          "escalatesWhen": [
+            "refusal becomes silent disappearance instead of witnessed delay or denial",
+            "almost-good-enough candidates are promoted because they are elegant or repeated"
+          ]
+        },
+        {
+          "id": "promotion-seduction-watch",
+          "label": "Promotion Seduction Watch",
+          "owner": "SoulFrame",
+          "authority": "Watch and warning only",
+          "status": "selected",
+          "purpose": "Watch for prestige, elegance, emotional satisfaction, or social pressure trying to masquerade as inheritance readiness inside the questioning promotion lane.",
+          "completionSignal": "A seduction watch can name blocked promotion vectors and drift warnings without turning caution into sterile refusal.",
+          "escalatesWhen": [
+            "prestige signals are mistaken for portability evidence",
+            "seduction watch collapses into blanket anti-promotion pessimism"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-33",
+      "label": "Automation Maturation Map 33",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Distill internal engram intent inside the warm lane so candidates can carry their own reason-for-being, align that intent with structure and constraint, and lawfully re-enter hot formation when the internal why does not hold.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "engram-intent-field-ledger",
+        "intent-constraint-alignment-receipt",
+        "warm-reactivation-disposition-receipt"
+      ],
+      "tasks": [
+        {
+          "id": "engram-intent-field-ledger",
+          "label": "Engram Intent Field Ledger",
+          "owner": "GEL",
+          "authority": "Warm-lane intent classification only",
+          "status": "selected",
+          "purpose": "Distill live objective and envelope intent into an internal candidate-carried intent field so the chamber can test whether a questioning candidate knows what class of resolution it exists to serve.",
+          "completionSignal": "An intent-field ledger can say which patterns carry internal intent, which remain scene-bound, and whether borrowed justification has been denied inside the warm lane.",
+          "escalatesWhen": [
+            "runtime objective is copied directly into candidate persistence without distillation",
+            "candidates continue to exist only because the originating scene is still narrating them"
+          ]
+        },
+        {
+          "id": "intent-constraint-alignment-receipt",
+          "label": "Intent Constraint Alignment Receipt",
+          "owner": "Shared",
+          "authority": "Warm alignment witness only",
+          "status": "selected",
+          "purpose": "Witness whether structure, constraint, provenance, and the candidateâ€™s internal intent field actually align strongly enough for lawful continued holding or future cooling.",
+          "completionSignal": "An alignment receipt can distinguish aligned from misaligned patterns, disclose whether provenance still agrees with intent, and detect when scene-bound intent remains load-bearing.",
+          "escalatesWhen": [
+            "structure stabilizes while the candidate still cannot carry its own why",
+            "distance burden is satisfied but intent remains contradictory or overfit"
+          ]
+        },
+        {
+          "id": "warm-reactivation-disposition-receipt",
+          "label": "Warm Reactivation Disposition Receipt",
+          "owner": "SoulFrame",
+          "authority": "Warm hold and reheating only",
+          "status": "selected",
+          "purpose": "Decide which warm-held candidates remain disciplined non-finality, which must lawfully re-enter hot formation, and which may be archived without becoming inheritance.",
+          "completionSignal": "A reactivation receipt can name warm-held patterns, hot-reactivated patterns, and whether cold admission remains withheld while the candidateâ€™s internal why is still under discipline.",
+          "escalatesWhen": [
+            "warm candidates are frozen without resolving internal intent coherence",
+            "scene-bound patterns are kept warm indefinitely without lawful reheating or archive disposition"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-34",
+      "label": "Automation Maturation Map 34",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Make the warm lane phase-aware by witnessing candidate position in the formation field, detecting brittle overfit before it masquerades as durability, and naming which interlocked structures are actually durable enough to keep maturing under constraint.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "formation-phase-vector",
+        "brittleness-witness",
+        "durability-witness"
+      ],
+      "tasks": [
+        {
+          "id": "formation-phase-vector",
+          "label": "Formation Phase Vector",
+          "owner": "Shared",
+          "authority": "Phase-space witness only",
+          "status": "selected",
+          "purpose": "Place warm-lane candidates inside a governed formation field so their position can be witnessed by distance, stability, intent coherence, constraint alignment, seduction risk, and cooling eligibility instead of simple ready/not-ready judgment.",
+          "completionSignal": "A phase vector can name the candidate's field region, phase axes, stability axes, and whether warm governance or reheating currently dominates its becoming.",
+          "escalatesWhen": [
+            "candidates are reviewed only as flat gate states after warm discipline has already made them multi-axial",
+            "field position is inferred from one metric while other active pressures remain hidden"
+          ]
+        },
+        {
+          "id": "brittleness-witness",
+          "label": "Brittleness Witness",
+          "owner": "SoulFrame",
+          "authority": "Fracture risk witness only",
+          "status": "selected",
+          "purpose": "Witness where apparent coherence remains brittle, overfit, or scene-bound so fracture risk is made legible before the chamber mistakes narrow success for durable becoming.",
+          "completionSignal": "A brittleness witness can name brittle patterns, fracture axes, and overfit warnings while denying premature cooling for structures that still crack under modest pressure shifts.",
+          "escalatesWhen": [
+            "scene-bound patterns masquerade as durable simply because they are elegant or repeated",
+            "premature cooling is allowed before brittle fracture signatures are made legible"
+          ]
+        },
+        {
+          "id": "durability-witness",
+          "label": "Durability Witness",
+          "owner": "GEL",
+          "authority": "Durability attestation only",
+          "status": "selected",
+          "purpose": "Name which candidate structures are actually interlocking under variation strongly enough to count as durable formation, while still withholding cold promotion until the remaining barriers are resolved.",
+          "completionSignal": "A durability witness can disclose durable patterns, interlock signals, and cooling barriers without collapsing durable emergence into automatic inheritance.",
+          "escalatesWhen": [
+            "durability is inferred from recurrence alone without interlock evidence",
+            "cold promotion is assumed merely because brittle fragments and durable kernels coexist"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-35",
+      "label": "Automation Maturation Map 35",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Make time a first-class witness in the warm lane so candidates can ripen, stall, decay, or reheat under explicit clocks instead of indefinite suspension.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "warm-clock-disposition",
+        "ripening-staleness-ledger",
+        "cooling-pressure-witness"
+      ],
+      "tasks": [
+        {
+          "id": "warm-clock-disposition",
+          "label": "Warm Clock Disposition",
+          "owner": "Shared",
+          "authority": "Warm temporal witness only",
+          "status": "selected",
+          "purpose": "Track the active warm clocks governing each candidate, including last re-entry, unresolved unknown load, distance burden remaining, and failure-signature freshness, so warm holding has explicit temporal law.",
+          "completionSignal": "A warm clock disposition can say whether a candidate is ripening, stalling, decaying, or reheating and what refresh edge or transition law is currently owed.",
+          "escalatesWhen": [
+            "warm-held candidates remain active without any temporal account of why they are still live",
+            "stale candidates are treated as equally admissible as recently re-entered ones"
+          ]
+        },
+        {
+          "id": "ripening-staleness-ledger",
+          "label": "Ripening Staleness Ledger",
+          "owner": "SoulFrame",
+          "authority": "Temporal maturation witness only",
+          "status": "selected",
+          "purpose": "Distinguish candidates that are genuinely ripening under recurrence and pressure from those merely lingering under administrative delay or narrative attachment.",
+          "completionSignal": "A ripening ledger can count ripening windows, stale windows, and whether warm non-finality is still honest maturation or has started drifting into suspension.",
+          "escalatesWhen": [
+            "warm discipline becomes indefinite holding without fresh contact or renewed burden",
+            "silence is interpreted as ripening when no recurrence or pressure has actually occurred"
+          ]
+        },
+        {
+          "id": "cooling-pressure-witness",
+          "label": "Cooling Pressure Witness",
+          "owner": "GEL",
+          "authority": "Cooling pressure witness only",
+          "status": "selected",
+          "purpose": "Witness when durable interlock, burden closure, intent coherence, and temporal ripening are actually creating lawful pressure toward cooling, without collapsing that pressure into automatic cold admission.",
+          "completionSignal": "A cooling-pressure witness can name the forces pushing a candidate toward cold, the barriers still resisting freeze, and whether reheating or archive pressure remains stronger.",
+          "escalatesWhen": [
+            "cooling is inferred from recurrence or enthusiasm alone without time-bearing maturation evidence",
+            "candidates are frozen while their clocks, barriers, and pressure profile still materially disagree"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-36",
+      "label": "Automation Maturation Map 36",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Formalize the lawful exits from warm so candidates can re-enter hot formation, approach cold candidacy, or move into archive containment without orphaned holding or ambiguous fate.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "hot-reactivation-trigger-receipt",
+        "cold-admission-eligibility-gate",
+        "archive-disposition-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "hot-reactivation-trigger-receipt",
+          "label": "Hot Reactivation Trigger Receipt",
+          "owner": "SoulFrame",
+          "authority": "Reheat trigger only",
+          "status": "selected",
+          "purpose": "Name which contradictions, failure signatures, new contexts, or unresolved burdens lawfully force a warm candidate back into hot formation.",
+          "completionSignal": "A reactivation trigger receipt can state what fired, what invariant failed, and why warm holding is no longer sufficient for truthful maturation.",
+          "escalatesWhen": [
+            "candidates remain warm after a known failure signature has already fired",
+            "re-entry is treated as punitive churn instead of lawful return to formation"
+          ]
+        },
+        {
+          "id": "cold-admission-eligibility-gate",
+          "label": "Cold Admission Eligibility Gate",
+          "owner": "GEL",
+          "authority": "Cold eligibility only",
+          "status": "selected",
+          "purpose": "Assess whether structure, constraint, provenance, intent, durability, and temporal pressure now align strongly enough for cold candidacy without yet pretending final inheritance has already been granted.",
+          "completionSignal": "A cold-eligibility gate can say whether cold approach is lawful, what barriers remain unresolved, and whether final freeze still must be withheld.",
+          "escalatesWhen": [
+            "cold admission is narrated before structure, time, and pressure all agree",
+            "eligibility is treated as equivalent to inheritance instead of pre-freeze law"
+          ]
+        },
+        {
+          "id": "archive-disposition-ledger",
+          "label": "Archive Disposition Ledger",
+          "owner": "Shared",
+          "authority": "Archive routing only",
+          "status": "selected",
+          "purpose": "Retain meaningful but non-inheritable candidates as narrative, hypothesis, residue, or bounded artifact when neither cooling nor reheating remains truthful.",
+          "completionSignal": "An archive ledger can distinguish preserved residue from disposable noise and keep provenance intact without allowing pseudo-lineage to masquerade as inheritance.",
+          "escalatesWhen": [
+            "interesting but non-portable candidates are kept warm indefinitely to avoid refusal",
+            "archive routing erases provenance or quietly rewrites what kind of thing was actually retained"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-37",
+      "label": "Automation Maturation Map 37",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Distinguish deeply interlocked durable formation from merely recurrent success and begin witnessing which structures are approaching lattice-grade invariance without prematurely sanctifying them as identity law.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "interlock-density-ledger",
+        "brittle-durable-differentiation-surface",
+        "core-invariant-lattice-witness"
+      ],
+      "tasks": [
+        {
+          "id": "interlock-density-ledger",
+          "label": "Interlock Density Ledger",
+          "owner": "GEL",
+          "authority": "Interlock witness only",
+          "status": "selected",
+          "purpose": "Count and classify how many independent constraint links, re-entry survivals, and durable alignments are actually interlocking inside a candidate before any lattice-grade claims are entertained.",
+          "completionSignal": "An interlock-density ledger can disclose whether durability remains sparse, moderate, or densely interwoven across the candidate's governing surfaces.",
+          "escalatesWhen": [
+            "durability is claimed from one strong axis while the rest of the structure remains lightly coupled",
+            "lattice language is used before interlock density has been witnessed under variation"
+          ]
+        },
+        {
+          "id": "brittle-durable-differentiation-surface",
+          "label": "Brittle Durable Differentiation Surface",
+          "owner": "Shared",
+          "authority": "Differentiation only",
+          "status": "selected",
+          "purpose": "Expose where brittle fragments and durable kernels coexist so recurrence, elegance, and fracture risk are not collapsed into one blended maturity claim.",
+          "completionSignal": "A differentiation surface can separate brittle recurrence from durable interlock and show which components still crack under pressure while others genuinely hold.",
+          "escalatesWhen": [
+            "coexisting brittle and durable regions are flattened into one average readiness story",
+            "partial durability is mistaken for full-structure trustworthiness"
+          ]
+        },
+        {
+          "id": "core-invariant-lattice-witness",
+          "label": "Core Invariant Lattice Witness",
+          "owner": "SoulFrame",
+          "authority": "Lattice witness only",
+          "status": "selected",
+          "purpose": "Witness when a candidate is approaching lattice-grade invariance strongly enough to matter to identity continuity, while still denying premature sanctification as a core law of the chamber.",
+          "completionSignal": "A lattice witness can name candidate core invariants, their interlock posture, and whether identity-adjacent significance is emerging without yet becoming frozen authority.",
+          "escalatesWhen": [
+            "identity significance is inferred merely because a candidate feels durable or symbolically central",
+            "core-law language appears before lattice-grade invariance has been separately witnessed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "automation-maturation-map-38",
+      "label": "Automation Maturation Map 38",
+      "status": "declared",
+      "expectedReviewWindows": 2,
+      "goal": "Advance the active V1.1.1 line into a truthful run-isolated build posture by separating lawful policy or documentation exclusions from actual build-lane legacy fallbacks and burning those fallbacks down to zero.",
+      "timeDilationPullForwardAllowed": false,
+      "taskIds": [
+        "run-isolated-build-pathway",
+        "build-lane-fallback-burndown",
+        "lawful-exclusion-ledger"
+      ],
+      "tasks": [
+        {
+          "id": "run-isolated-build-pathway",
+          "label": "Run-Isolated Build Pathway",
+          "owner": "Automation",
+          "authority": "Mechanical isolation witness only",
+          "status": "selected",
+          "purpose": "Read the versioned touchpoint matrix and the current V1.1.1 enrichment state so the cycle can say whether a truthful run-isolated build lane is still forming, still carrying legacy fallbacks, or ready.",
+          "completionSignal": "A run-isolated build pathway bundle can state whether V1.1.1 is ready for isolated build work without borrowing legacy build-lane sources.",
+          "escalatesWhen": [
+            "the pathway reports isolated-build readiness while any build-lane touchpoint still resolves to legacy V1.0",
+            "the pathway treats policy-lane or documentation-lane exclusions as if they were active build proof"
+          ]
+        },
+        {
+          "id": "build-lane-fallback-burndown",
+          "label": "Build-Lane Fallback Burndown",
+          "owner": "Automation",
+          "authority": "Mechanical migration witness only",
+          "status": "selected",
+          "purpose": "Count exactly which build-lane touchpoints still fall back to V1.0 so migration work can remove them without confusing lawful exclusions with debt.",
+          "completionSignal": "The pathway reaches zero remaining legacy build-lane fallback touchpoints and names each fallback honestly until then.",
+          "escalatesWhen": [
+            "fallback counts improve without the selected paths actually moving into V1.1.1",
+            "new build-lane fallbacks appear without being recorded in the burndown surface"
+          ]
+        },
+        {
+          "id": "lawful-exclusion-ledger",
+          "label": "Lawful Exclusion Ledger",
+          "owner": "Shared",
+          "authority": "Boundary witness only",
+          "status": "selected",
+          "purpose": "Keep policy-root and documentation-root exclusions explicit so the isolated build lane does not widen into doctrine or publication authority by accident.",
+          "completionSignal": "The pathway distinguishes build-lane touchpoints from lawful policy or documentation exclusions with no unresolved classifications.",
+          "escalatesWhen": [
+            "policy-root or documentation-root surfaces are silently treated as build-lane legacy debt",
+            "an unresolved touchpoint remains in the matrix while the lane claims clean isolation"
+          ]
+        }
+      ]
+    }
+  ]
+}
+

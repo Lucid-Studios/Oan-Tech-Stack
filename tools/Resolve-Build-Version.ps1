@@ -60,8 +60,10 @@ function Normalize-RepoPath {
     param([string] $Path)
 
     $normalized = $Path.Replace('\', '/')
-    if ($normalized.StartsWith('OAN Mortalis V1.0/', [System.StringComparison]::Ordinal)) {
-        return $normalized.Substring('OAN Mortalis V1.0/'.Length)
+    foreach ($prefix in @('OAN Mortalis V1.1.1/', 'OAN Mortalis V1.1.1/')) {
+        if ($normalized.StartsWith($prefix, [System.StringComparison]::Ordinal)) {
+            return $normalized.Substring($prefix.Length)
+        }
     }
 
     return $normalized
@@ -133,10 +135,10 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     $RepoRoot = Split-Path -Parent $PSScriptRoot
 }
 
-$activeBuildRoot = Join-Path $RepoRoot 'OAN Mortalis V1.0'
-$policyPath = Join-Path $activeBuildRoot 'build\version-policy.json'
-$familyMaturityPath = Join-Path $activeBuildRoot 'build\family-maturity.json'
-$hitlGatesPath = Join-Path $activeBuildRoot 'build\hitl-gates.json'
+$policyRoot = Join-Path $RepoRoot 'OAN Mortalis V1.1.1\build'
+$policyPath = Join-Path $policyRoot 'version-policy.json'
+$familyMaturityPath = Join-Path $policyRoot 'family-maturity.json'
+$hitlGatesPath = Join-Path $policyRoot 'hitl-gates.json'
 
 $policy = Get-Content -Raw -LiteralPath $policyPath | ConvertFrom-Json
 $familyMaturity = Get-Content -Raw -LiteralPath $familyMaturityPath | ConvertFrom-Json
@@ -264,9 +266,9 @@ $declaredHitlGatesArray = @($hitlGates.gates | ForEach-Object { [string] $_.id }
 $decision = @{}
 $decision['schemaVersion'] = 1
 $decision['generatedAtUtc'] = (Get-Date).ToUniversalTime().ToString('o')
-$decision['policySource'] = 'OAN Mortalis V1.0/build/version-policy.json'
-$decision['familyMaturitySource'] = 'OAN Mortalis V1.0/build/family-maturity.json'
-$decision['hitlGateSource'] = 'OAN Mortalis V1.0/build/hitl-gates.json'
+$decision['policySource'] = 'OAN Mortalis V1.1.1/build/version-policy.json'
+$decision['familyMaturitySource'] = 'OAN Mortalis V1.1.1/build/family-maturity.json'
+$decision['hitlGateSource'] = 'OAN Mortalis V1.1.1/build/hitl-gates.json'
 $decision['changeBasis'] = @{
     mode = $changeMode
     baseRef = $BaseRef

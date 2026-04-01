@@ -75,6 +75,7 @@ public sealed class BootstrapBoundaryTests
             "SLI.Engine",
             "SLI.Ingestion",
             "Oan.Common",
+            "Oan.FirstRun",
             "Oan.Nexus.Control",
             "Oan.HostedLlm",
             "Oan.PrimeCryptic.Services",
@@ -120,6 +121,18 @@ public sealed class BootstrapBoundaryTests
     }
 
     [Fact]
+    public void V111_CradleTek_Host_Must_Expose_Body_Boundary_Through_Runtime_Only()
+    {
+        var projectPath = GetProjectPath("CradleTek.Host");
+        var projectText = File.ReadAllText(projectPath);
+
+        Assert.Contains("CradleTek.Runtime.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("AgentiCore.csproj", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void V111_SoulFrame_Membrane_May_Ask_Nexus_But_Not_Own_Runtime_Or_Custody()
     {
         var projectPath = GetProjectPath("SoulFrame.Membrane");
@@ -132,6 +145,20 @@ public sealed class BootstrapBoundaryTests
     }
 
     [Fact]
+    public void V111_AgentiCore_Must_Remain_Chambered_Cognition_And_Not_Depend_On_Body_Families()
+    {
+        var projectPath = GetProjectPath("AgentiCore");
+        var projectText = File.ReadAllText(projectPath);
+
+        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("SLI.Engine.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("SLI.Ingestion.csproj", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("Oan.Runtime", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void V111_SoulFrame_Bootstrap_Must_Depend_On_CradleTek_Custody()
     {
         var projectPath = GetProjectPath("SoulFrame.Bootstrap");
@@ -139,6 +166,15 @@ public sealed class BootstrapBoundaryTests
 
         Assert.Contains("CradleTek.Custody.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.Runtime.csproj", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V111_SoulFrame_Bootstrap_Must_Not_Depend_On_AgentiCore()
+    {
+        var projectPath = GetProjectPath("SoulFrame.Bootstrap");
+        var projectText = File.ReadAllText(projectPath);
+
+        Assert.DoesNotContain("AgentiCore.csproj", projectText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -303,6 +339,269 @@ public sealed class BootstrapBoundaryTests
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("Oan.State.Modulation", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V111_Runtime_Headless_Must_Compose_FirstRun_Projection()
+    {
+        var projectPath = GetProjectPath("Oan.Runtime.Headless");
+        var projectText = File.ReadAllText(projectPath);
+
+        Assert.Contains("Oan.FirstRun.csproj", projectText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V111_HostedLlm_Guard_Surface_Must_Not_Use_Legacy_ListeningFrame_Name()
+    {
+        var lineRoot = GetLineRoot();
+        var legacyFieldName = "Listening" + "FrameActive";
+        var legacyTypeName = "GovernedHostedLlm" + "ListeningFrame";
+        var violations = Directory
+            .EnumerateFiles(lineRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            .Where(file => File.ReadAllText(file).Contains(legacyFieldName, StringComparison.Ordinal) ||
+                           File.ReadAllText(file).Contains(legacyTypeName, StringComparison.Ordinal))
+            .Select(file => Path.GetRelativePath(lineRoot, file))
+            .ToArray();
+
+        Assert.True(violations.Length == 0, string.Join(Environment.NewLine, violations));
+    }
+
+    [Fact]
+    public void V111_BuildHoldUnlock_Docs_Are_Aligned_And_RuntimeSpec_Is_Present()
+    {
+        var lineRoot = GetLineRoot();
+        var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var unlockReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_HOLD_UNLOCK_READINESS.md");
+        var runtimeSpecPath = Path.Combine(lineRoot, "docs", "LATE_PATH_RUNTIME_PROJECTION_SPEC.md");
+
+        var buildReadinessText = File.ReadAllText(buildReadinessPath);
+        var unlockReadinessText = File.ReadAllText(unlockReadinessPath);
+        var runtimeSpecText = File.ReadAllText(runtimeSpecPath);
+
+        var sharedMarkers = new[]
+        {
+            "`chapter-5: frame-now`",
+            "`chapter-6: frame-now`",
+            "`chapter-7: frame-now/spec-now`",
+            "`chapter-8: frame-now/spec-now`",
+            "`chapter-9: hold`",
+            "`companion-tool-telemetry: admitted-optional-bounded`"
+        };
+
+        foreach (var marker in sharedMarkers)
+        {
+            Assert.Contains(marker, buildReadinessText, StringComparison.Ordinal);
+            Assert.Contains(marker, unlockReadinessText, StringComparison.Ordinal);
+        }
+
+        var runtimeSpecMarkers = new[]
+        {
+            "GovernedSeedElementalBindingProjectionService",
+            "GovernedSeedActualizationSealProjectionService",
+            "GovernedSeedLivingAgentiCoreProjectionService",
+            "FirstRunElementalBindingPacket",
+            "FirstRunActualizationSealPacket",
+            "FirstRunLivingAgentiCorePacket",
+            "live `OE -> SoulFrame` loading behavior",
+            "live `cOE -> AgentiCore` loading behavior",
+            "no live `ListeningFrame` runtime behavior"
+        };
+
+        foreach (var marker in runtimeSpecMarkers)
+        {
+            Assert.Contains(marker, runtimeSpecText, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void V111_Enrichment_Automation_Pathway_Is_Aligned_Across_Docs_And_Policy()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var unlockReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_HOLD_UNLOCK_READINESS.md");
+        var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
+        var companionTelemetryDocPath = Path.Combine(lineRoot, "docs", "COMPANION_TOOL_TELEMETRY_LANE.md");
+        var cyclePolicyPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "build", "local-automation-cycle.json");
+
+        var buildReadinessText = File.ReadAllText(buildReadinessPath);
+        var unlockReadinessText = File.ReadAllText(unlockReadinessPath);
+        var pathwayDocText = File.ReadAllText(pathwayDocPath);
+        var companionTelemetryDocText = File.ReadAllText(companionTelemetryDocPath);
+        var cyclePolicyText = File.ReadAllText(cyclePolicyPath);
+
+        Assert.Contains("`v111-enrichment-automation: admitted-local-bounded`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`v111-enrichment-automation: admitted-local-bounded`", unlockReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`companion-tool-telemetry: admitted-optional-bounded`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`companion-tool-telemetry: admitted-optional-bounded`", unlockReadinessText, StringComparison.Ordinal);
+
+        var pathwayMarkers = new[]
+        {
+            "`v111-enrichment-automation: admitted-local-bounded`",
+            "`companion-tool-telemetry: admitted-optional-bounded`",
+            "seed-LLM",
+            "production-pre-release",
+            "`.hopng: optional-bounded`",
+            "COMPANION_TOOL_TELEMETRY_LANE.md"
+        };
+
+        foreach (var marker in pathwayMarkers)
+        {
+            Assert.Contains(marker, pathwayDocText, StringComparison.Ordinal);
+        }
+
+        var companionTelemetryDocMarkers = new[]
+        {
+            "`companion-tool-telemetry: admitted-optional-bounded`",
+            "Holographic Data Tool",
+            "Trivium Forum",
+            "Write-CompanionToolTelemetry.ps1"
+        };
+
+        foreach (var marker in companionTelemetryDocMarkers)
+        {
+            Assert.Contains(marker, companionTelemetryDocText, StringComparison.Ordinal);
+        }
+
+        var policyMarkers = new[]
+        {
+            "\"optionalTriviumForumToolRoot\"",
+            "\"companionToolTelemetryOutputRoot\"",
+            "\"companionToolTelemetryStatePath\"",
+            "\"v111EnrichmentPathwayOutputRoot\"",
+            "\"v111EnrichmentPathwayStatePath\"",
+            "\"keepCompanionToolTelemetryBundles\"",
+            "\"keepV111EnrichmentPathwayBundles\""
+        };
+
+        foreach (var marker in policyMarkers)
+        {
+            Assert.Contains(marker, cyclePolicyText, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void V111_Enrichment_Automation_Scripts_Are_Wired_Into_Cycle_And_Retention()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var cycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1");
+        var companionTelemetryScriptPath = Path.Combine(repoRoot, "tools", "Write-CompanionToolTelemetry.ps1");
+        var companionTelemetryWrapperPath = Path.Combine(repoRoot, "tools", "Invoke-CompanionToolTelemetry.ps1");
+        var writerScriptPath = Path.Combine(repoRoot, "tools", "Write-V111-EnrichmentPathway.ps1");
+        var wrapperScriptPath = Path.Combine(repoRoot, "tools", "Invoke-V111-EnrichmentPathway.ps1");
+        var retentionScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Automation-RetentionPruning.ps1");
+        var seededBuildGovernanceScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Seeded-Build-Governance.ps1");
+
+        var cycleScriptText = File.ReadAllText(cycleScriptPath);
+        var companionTelemetryScriptText = File.ReadAllText(companionTelemetryScriptPath);
+        var companionTelemetryWrapperText = File.ReadAllText(companionTelemetryWrapperPath);
+        var writerScriptText = File.ReadAllText(writerScriptPath);
+        var wrapperScriptText = File.ReadAllText(wrapperScriptPath);
+        var retentionScriptText = File.ReadAllText(retentionScriptPath);
+        var seededBuildGovernanceScriptText = File.ReadAllText(seededBuildGovernanceScriptPath);
+
+        var cycleMarkers = new[]
+        {
+            "Resolve-OanWorkspacePath.ps1",
+            "Write-CompanionToolTelemetry.ps1",
+            "Write-V111-EnrichmentPathway.ps1",
+            "lastCompanionToolTelemetryBundle",
+            "companionToolTelemetryStatePath",
+            "lastV111EnrichmentPathwayBundle",
+            "v111EnrichmentPathwayStatePath",
+            "[local-automation-cycle] CompanionToolTelemetry",
+            "[local-automation-cycle] V111EnrichmentPathway"
+        };
+
+        foreach (var marker in cycleMarkers)
+        {
+            Assert.Contains(marker, cycleScriptText, StringComparison.Ordinal);
+        }
+
+        var companionTelemetryMarkers = new[]
+        {
+            "companion-tool-telemetry",
+            "Holographic Data Tool",
+            "Trivium Forum",
+            "awaiting-audit-lane",
+            "partial-companion-tool-telemetry"
+        };
+
+        foreach (var marker in companionTelemetryMarkers)
+        {
+            Assert.Contains(marker, companionTelemetryScriptText, StringComparison.Ordinal);
+        }
+
+        var companionTelemetryWrapperMarkers = new[]
+        {
+            "Invoke-Local-Automation-Cycle.ps1",
+            "Write-CompanionToolTelemetry.ps1",
+            "companionToolTelemetryStatePath"
+        };
+
+        foreach (var marker in companionTelemetryWrapperMarkers)
+        {
+            Assert.Contains(marker, companionTelemetryWrapperText, StringComparison.Ordinal);
+        }
+
+        var writerMarkers = new[]
+        {
+            "v111-enrichment-pathway",
+            "continue-v111-enrichment-full-body-work",
+            "pause-and-run-seed-llm-wrinkle-test",
+            "optional-bounded",
+            "companionToolTelemetryState",
+            "holographicDataToolTelemetryState",
+            "triviumForumTelemetryState"
+        };
+
+        foreach (var marker in writerMarkers)
+        {
+            Assert.Contains(marker, writerScriptText, StringComparison.Ordinal);
+        }
+
+        var wrapperMarkers = new[]
+        {
+            "Invoke-Local-Automation-Cycle.ps1",
+            "Write-CompanionToolTelemetry.ps1",
+            "Write-V111-EnrichmentPathway.ps1",
+            "v111EnrichmentPathwayStatePath"
+        };
+
+        foreach (var marker in wrapperMarkers)
+        {
+            Assert.Contains(marker, wrapperScriptText, StringComparison.Ordinal);
+        }
+
+        var retentionMarkers = new[]
+        {
+            "lastCompanionToolTelemetryBundle",
+            "companionToolTelemetryOutputRoot",
+            "keepCompanionToolTelemetryBundles",
+            "lastV111EnrichmentPathwayBundle",
+            "v111EnrichmentPathwayOutputRoot",
+            "keepV111EnrichmentPathwayBundles"
+        };
+
+        foreach (var marker in retentionMarkers)
+        {
+            Assert.Contains(marker, retentionScriptText, StringComparison.Ordinal);
+        }
+
+        var seededGovernanceMarkers = new[]
+        {
+            "Resolve-OanWorkspacePath.ps1",
+            "Resolve-OanWorkspaceTouchPoint",
+            "tool.localLlmPreflight"
+        };
+
+        foreach (var marker in seededGovernanceMarkers)
+        {
+            Assert.Contains(marker, seededBuildGovernanceScriptText, StringComparison.Ordinal);
+        }
     }
 
     private static IReadOnlyList<string> FindTokenViolations(IEnumerable<string> forbiddenTokens)

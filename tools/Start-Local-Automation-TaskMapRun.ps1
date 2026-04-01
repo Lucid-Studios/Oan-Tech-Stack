@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json',
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-tasking.json',
     [string] $CycleStatePath = '.audit/state/local-automation-cycle.json',
     [string] $ActiveTaskMapStatePath = '.audit/state/local-automation-active-task-map-selection.json'
 )
@@ -15,6 +15,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -177,6 +180,7 @@ $runPayload = [ordered]@{
     selectedTasks = $selectedTasks
     phases = $phaseEntries
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $runPayload | Out-Null
 
 Write-JsonFile -Path $runJsonPath -Value $runPayload
 Write-JsonFile -Path $runStatePath -Value $runPayload
@@ -221,6 +225,7 @@ foreach ($phase in $phaseEntries) {
     $markdownLines += ('| {0} | {1} | {2} |' -f $phase.label, $phase.kind, $phase.status)
 }
 
+$markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
 Set-Content -LiteralPath $runMarkdownPath -Value $markdownLines -Encoding utf8
 
 Write-Host ('[long-form-task-map-run] State: {0}' -f $runStatePath)

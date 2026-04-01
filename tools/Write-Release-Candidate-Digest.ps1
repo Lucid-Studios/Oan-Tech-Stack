@@ -18,6 +18,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     }
 }
 
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
+
 function Resolve-PathFromRepo {
     param(
         [string] $BasePath,
@@ -328,6 +331,7 @@ $digest = [ordered]@{
     }
     runsRequiringHitl = $hitlRuns
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $digest | Out-Null
 
 $jsonPath = Join-Path $digestBundlePath 'release-candidate-digest.json'
 $markdownPath = Join-Path $digestBundlePath 'release-candidate-digest.md'
@@ -335,6 +339,7 @@ $deltaJsonPath = Join-Path $digestBundlePath 'delta-summary.json'
 $deltaMarkdownPath = Join-Path $digestBundlePath 'delta-summary.md'
 Write-JsonFile -Path $jsonPath -Value $digest
 if ($null -ne $deltaSummary) {
+    Add-AutomationCascadeOperatorPromptProperty -InputObject $deltaSummary | Out-Null
     Write-JsonFile -Path $deltaJsonPath -Value $deltaSummary
 }
 
@@ -441,6 +446,7 @@ if ($hitlRuns.Count -gt 0) {
     }
 }
 
+$markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
 Set-Content -LiteralPath $markdownPath -Value $markdownLines -Encoding utf8
 
 if ($null -ne $deltaSummary) {
@@ -461,6 +467,7 @@ if ($null -ne $deltaSummary) {
         ('| Published Artifacts | {0} | {1} |' -f $(if ($deltaSummary.publishedArtifacts.added.Count -gt 0) { $deltaSummary.publishedArtifacts.added -join ', ' } else { 'none' }), $(if ($deltaSummary.publishedArtifacts.removed.Count -gt 0) { $deltaSummary.publishedArtifacts.removed -join ', ' } else { 'none' }))
     )
 
+    $deltaMarkdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $deltaMarkdownLines
     Set-Content -LiteralPath $deltaMarkdownPath -Value $deltaMarkdownLines -Encoding utf8
 }
 

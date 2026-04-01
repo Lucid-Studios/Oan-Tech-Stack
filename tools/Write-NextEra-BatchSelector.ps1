@@ -1,8 +1,8 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json',
-    [string] $FormalSurfaceMarkdownPath = 'OAN Mortalis V1.0/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-tasking.json',
+    [string] $FormalSurfaceMarkdownPath = 'OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md'
 )
 
 Set-StrictMode -Version Latest
@@ -17,7 +17,21 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 function Resolve-PathFromRepo {
-    param([string] $BasePath, [string] $CandidatePath)
+    param(
+        [string] $BasePath,
+        [string] $CandidatePath
+    )
+
+    if (-not (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue)) {
+        $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+        if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+            . $oanWorkspaceResolverPath
+        }
+    }
+
+    if (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue) {
+        return Resolve-OanWorkspacePath -BasePath $BasePath -CandidatePath $CandidatePath
+    }
 
     if ([System.IO.Path]::IsPathRooted($CandidatePath)) {
         return [System.IO.Path]::GetFullPath($CandidatePath)

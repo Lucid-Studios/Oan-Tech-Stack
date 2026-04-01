@@ -1,8 +1,8 @@
 param(
     [string] $RepoRoot,
-    [string] $BucketPolicyPath = 'OAN Mortalis V1.0/build/workspace-bucket-groups.json',
-    [string] $FamilyMaturityPath = 'OAN Mortalis V1.0/build/family-maturity.json',
-    [string] $DeployablesPath = 'OAN Mortalis V1.0/build/deployables.json',
+    [string] $BucketPolicyPath = 'OAN Mortalis V1.1.1/build/workspace-bucket-groups.json',
+    [string] $FamilyMaturityPath = 'OAN Mortalis V1.1.1/build/family-maturity.json',
+    [string] $DeployablesPath = 'OAN Mortalis V1.1.1/build/deployables.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'
 )
 
@@ -16,6 +16,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -172,6 +175,7 @@ $resolvedBucketPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Ca
 $resolvedFamilyMaturityPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $FamilyMaturityPath
 $resolvedDeployablesPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $DeployablesPath
 $resolvedTaskStatusPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskStatusPath
+$activeBuildRootPath = 'OAN Mortalis V1.1.1'
 
 $bucketPolicy = Read-JsonFile -Path $resolvedBucketPolicyPath
 $familyMaturity = Read-JsonFile -Path $resolvedFamilyMaturityPath
@@ -205,7 +209,7 @@ $activeTaskMapId = [string] (Get-ObjectPropertyValueOrNull -InputObject $longFor
 $activeTaskMapStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $longFormTasking -PropertyName 'activeTaskMapStatus')
 
 $projectEntries = foreach ($project in @($familyMaturity.projects)) {
-    $repoRelativeProjectPath = Normalize-RepoRelativePath -Path (Join-Path 'OAN Mortalis V1.0' ([string] $project.path))
+    $repoRelativeProjectPath = Normalize-RepoRelativePath -Path (Join-Path $activeBuildRootPath ([string] $project.path))
     [pscustomobject]@{
         project = [string] $project.project
         family = [string] $project.family
@@ -218,7 +222,7 @@ $projectEntries = foreach ($project in @($familyMaturity.projects)) {
 }
 
 $deployableEntries = foreach ($deployable in @($deployablesPolicy.deployables)) {
-    $repoRelativeProjectPath = Normalize-RepoRelativePath -Path (Join-Path 'OAN Mortalis V1.0' ([string] $deployable.projectPath))
+    $repoRelativeProjectPath = Normalize-RepoRelativePath -Path (Join-Path $activeBuildRootPath ([string] $deployable.projectPath))
     [pscustomobject]@{
         name = [string] $deployable.name
         family = [string] $deployable.family
@@ -303,6 +307,7 @@ $summary = [pscustomobject]@{
     activeBucketIds = @($activeBuckets | ForEach-Object { $_.id })
     buckets = $bucketSummaries
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $summary | Out-Null
 
 Write-JsonFile -Path $statusJsonPath -Value $summary
 
@@ -352,6 +357,7 @@ if (-not [string]::IsNullOrWhiteSpace($markdownDirectory)) {
     New-Item -ItemType Directory -Force -Path $markdownDirectory | Out-Null
 }
 
+$markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
 $markdownLines | Set-Content -LiteralPath $statusMarkdownPath -Encoding utf8
 
 Write-Host ('[workspace-bucket-status] State: {0}' -f $statusJsonPath)

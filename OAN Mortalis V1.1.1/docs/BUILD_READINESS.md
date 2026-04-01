@@ -18,7 +18,57 @@ Active line-local solution:
 
 Assessment date:
 
-- March 27, 2026
+- March 31, 2026
+
+Current hold-lane clarification:
+
+- chapter-five uptake and first Steward witness formation are tracked in
+  `CHAPTER_FIVE_STEWARD_UPTAKE_HOLD.md`
+- the hardened chapter-five build-facing uptake now lives in
+  `CHAPTER_FIVE_PROTOCOLIZATION_UPTAKE.md`
+- the hardened chapter-six build-facing uptake now lives in
+  `CHAPTER_SIX_STEWARD_WITNESSED_OE_UPTAKE.md`
+- the hardened chapter-seven build-facing uptake now lives in
+  `CHAPTER_SEVEN_ELEMENTAL_BINDING_UPTAKE.md`
+- the hardened chapter-eight build-facing uptake now lives in
+  `CHAPTER_EIGHT_ACTUALIZATION_SEAL_UPTAKE.md`
+- the current chapter-nine clarified hold lives in
+  `CHAPTER_NINE_LIVING_AGENTICORE_HOLD.md`
+- the first-run phase-one chapter-five subordinate packet is fixed in
+  `FIRST_RUN_PROTOCOLIZATION_PACKET.md`
+- the first-run phase-one chapter-six subordinate packet is fixed in
+  `FIRST_RUN_STEWARD_WITNESSED_OE_PACKET.md`
+- the first-run phase-one chapter-seven subordinate packet is fixed in
+  `FIRST_RUN_ELEMENTAL_BINDING_PACKET.md`
+- the first-run phase-one chapter-eight subordinate packet is fixed in
+  `FIRST_RUN_ACTUALIZATION_SEAL_PACKET.md`
+- the first-run phase-one chapter-nine framing packet is fixed in
+  `FIRST_RUN_LIVING_AGENTICORE_PACKET.md`
+- the contract-first build-hold unlock checklist now lives in
+  `BUILD_HOLD_UNLOCK_READINESS.md`
+- the next-cycle late-path runtime source plan now lives in
+  `LATE_PATH_RUNTIME_PROJECTION_SPEC.md`
+- the first bounded `V1.1.1` automation lane now lives in
+  `V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md`
+- the bounded companion-tool telemetry lane now lives in
+  `COMPANION_TOOL_TELEMETRY_LANE.md`
+- the companion-tool telemetry bot wrapper lives in
+  `tools/Invoke-CompanionToolTelemetry.ps1`
+- the active `HITL -> SLI` bridge law is fixed in
+  `Build Contracts/Crosscutting/authority/HITL_SLI_BRIDGE_CONTRACT.md`
+- the Law of Equivalent Exchange is fixed in
+  `Build Contracts/Crosscutting/authority/EQUIVALENT_EXCHANGE_NATURAL_LAW_CONTRACT.md`
+
+Current contract-first unlock map:
+
+- `chapter-5: frame-now`
+- `chapter-6: frame-now`
+- `chapter-7: frame-now/spec-now`
+- `chapter-8: frame-now/spec-now`
+- `chapter-9: hold`
+- `.hopng: optional-bounded`
+- `companion-tool-telemetry: admitted-optional-bounded`
+- `v111-enrichment-automation: admitted-local-bounded`
 
 ## Current Verified State
 
@@ -35,11 +85,11 @@ Verified result:
 - build succeeded
 - tests succeeded
 - hygiene succeeded
-- `85` tests passed across `2` test assemblies
+- `123` tests passed across `2` test assemblies
 
 Solution shape:
 
-- `20` source projects
+- `21` source projects
 - `2` test projects
 - operational tree normalized under:
   - `src/Sanctuary`
@@ -55,6 +105,7 @@ The initial carried law surface is limited to:
 - protected execution receipts and act-family vocabulary
 - predicate-mint contracts
 - `Oan.Nexus.Control` as the Sanctuary-native governing interface layer where Prime, Cryptic, and Steward posture is braided into transition decisions
+- `Oan.FirstRun` as the Sanctuary-native constitutional first-run projection layer, so `V1.1.1` can express promotion law, readiness, and failure posture without rewriting the older legacy first-boot contracts in place
 - `Oan.PrimeCryptic.Services` as the Sanctuary-native always-on Prime/Cryptic broker layer
 - `Oan.HostedLlm` as the Sanctuary-native Prime-hosted seed service layer, so governed hosted seed inference no longer lives in the old `V1.0` cognition-host stack
 - `Oan.Trace.Persistence` as the Sanctuary-native duplex pointer and GEL telemetry layer, so traceable outward persistence no longer depends on the tiny old `Data.Cryptic` and `Telemetry.GEL` helper projects
@@ -116,12 +167,18 @@ The first live runtime vertical slice in this line now proves:
 - `SLI.Engine` now treats the `LowMind.SF` route handle as required ingress law and distinguishes direct prompt transit from higher-order EC transit in its cryptic-floor readiness trace
 - `AgentiCore` now mints an explicit `HighMind` uptake context after hosted-seed evaluation, so EC uptake staging stands as its own post-SoulFrame seam instead of being implied by the hosted-seed receipt or the final predicate path
 - that `HighMind` context now mirrors the inline SoulFrame memory handle, `LowMind.SF` route handle, and hosted-seed receipt/state into `OperationalContext` and modulation, so the inner-system branch can read EC uptake posture directly without reconstructing it from scattered cognition receipts
+- the hosted seed guard surface is now named `GuardFrame`, reserving `ListeningFrame` for the later EC interior construct instead of leaking hosted-seed naming into future AgentiCore doctrine
 - `OperationalContext` and modulation now mirror the hosted LLM seed service, receipt, and packet handles, so the Prime-hosted seed surface is part of the inner-system branch instead of an invisible adjunct
 - `Oan.HostedLlm` now includes a localhost runtime provider seam, so the governed Prime-hosted seed service can consume the running Hosted LLM inference service over `127.0.0.1` while keeping refusal law, packet law, and receipt shaping inside `V1.1.1`
 - Sanctuary now performs a first engrammitization pass at ingress before the active CradleTek body wakes, so external terminal input crosses an explicit Obsidian Wall receipt before LowMind routing, hosted-seed evaluation, HighMind uptake, and cryptic-floor transit can proceed
 - that Sanctuary ingress receipt now mirrors through the LowMind route, hosted-seed request and seeded transit packets, prime-to-cryptic transit packet, `OperationalContext`, and modulation, so the line can prove that raw prompt authority terminated before EC uptake rather than merely implying it
 - the materialized evaluation envelope now receives a duplex pointer handle and GEL telemetry record through `Oan.Trace.Persistence`, so accepted and refused outcomes both leave a lawful outward trace without reviving the old `Data.Cryptic` or `Telemetry.GEL` helper projects
 - trace telemetry now carries Sanctuary ingress, Obsidian Wall application, ingress class, LowMind route, HighMind uptake, and hosted-seed state, so constitutional origin and EC uptake law can be audited without reopening the full payload first
+- runtime, modulation, and GEL telemetry now also carry the projected first-run constitutional receipt, current first-run state, readiness ladder, provisional-versus-actualized posture, and Opal actualization standing, so constitutional beginning survives outward as observational evidence rather than staying trapped in the payload
+- runtime, modulation, and GEL telemetry now also carry an explicit pre-governance packet handle plus source-backed receipt handles for local authority trace, local keypair genesis source, first cryptic braid establishment, first cryptic conditioning source, constitutional contact, local keypair genesis, first cryptic braid, and first cryptic conditioning, so the line can distinguish lawful contact and cryptic rooting from later parent/governance standing without pretending that full installer-side legal or bond UX already exists
+- first-run contracts now also admit a subordinate chapter-five protocolization packet plus narrow Equivalent-Exchange transition review, so vessel/calibration/archive/consent/rupture-return/seal posture can be named in the constitutional receipt path without widening bond behavior ahead of later runtime projection
+- first-run contracts now also admit a subordinate chapter-six Steward-witnessed `OE/cOE` packet, so office-family differentiation, Prime/Cryptic key authorization, and later `SoulFrame`/`AgentiCore` build authorization can be named without implying `CME` placement
+- first-run contracts now also admit subordinate chapter-seven, chapter-eight, and chapter-nine packets, so elemental binding load law, actualization-seal truth, and living `AgentiCore` attachment can be framed without implying live runtime unlock
 - SoulFrame now emits bounded projection, return-intake, and stewardship receipts, including first collapse-readiness posture without direct custody mutation
 - SoulFrame stewardship now asks `Oan.Nexus.Control` for collapse-readiness, protected-hold class, and review disposition instead of carrying that policy as a local switch block
 - SoulFrame now resolves protected first-route posture toward `cGOA`, `cMoS`, or split first-route holding using typed ingress evidence and explicit custody hold surfaces
@@ -139,8 +196,28 @@ The first live runtime vertical slice in this line now proves:
 
 Current role split emerging from the carried line:
 
+- `CradleTek` is the governed instance body, so custody, mantle, memory,
+  runtime orchestration, and exposed service boundaries should stay classified
+  there rather than drifting into `SoulFrame` or `AgentiCore`
 - `SoulFrame` is the working stewardship layer, so most per-CME stewardship labor should accumulate there rather than in `CradleTek` or `AgentiCore`
+- `SoulFrame` is also the first lived interior and projection membrane, so
+  LowMind handling, situational shaping, and bounded outward projection should
+  stay there rather than collapsing into body or cognition ownership
+- early `SoulFrame` bootstrap in the current line is still build-hold plumbing,
+  not yet chapter-six developmental entitlement
+- `AgentiCore` is the chambered cognition layer, so `HighMind` uptake and later
+  EC interior work should stay there without re-owning body, custody, or
+  projection membrane duties
 - `Mother` and `Father` should remain governance-facing offices instead of becoming sinks for everyday runtime work
+- constitutional first-run law now belongs to `Sanctuary`, while actualized training, certification, and capability remain future individuated CME work instead of governance-layer badge state
+- `HITL` remains the witness-bearing ingress authority while `SLI` remains the
+  continuity-bearing interior authority, so implementation media must not
+  collapse that bridge into a mere `English -> Lisp` shorthand
+
+The active self-surface split for that later work is:
+
+- `SelfGEL` as the readable, admissible operator-work self surface
+- `cSelfGEL` as the cryptic, sealed cradle-local witness and control surface
 
 The normalized operational tree now makes that split visible in the line itself:
 

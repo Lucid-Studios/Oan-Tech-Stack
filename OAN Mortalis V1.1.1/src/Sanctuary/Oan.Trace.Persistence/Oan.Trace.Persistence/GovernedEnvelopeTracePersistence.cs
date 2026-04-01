@@ -27,7 +27,22 @@ public sealed record GovernedGelTelemetryRecord(
     GovernedSeedLowMindSfRouteKind? LowMindSfRouteKind,
     string? HighMindContextHandle,
     GovernedSeedHighMindUptakeKind? HighMindUptakeKind,
-    GovernedSeedHostedLlmEmissionState? HostedLlmState);
+    GovernedSeedHostedLlmEmissionState? HostedLlmState,
+    string? FirstRunReceiptHandle,
+    string? PreGovernancePacketHandle,
+    string? LocalAuthorityTraceHandle,
+    string? ConstitutionalContactHandle,
+    string? LocalKeypairGenesisSourceHandle,
+    string? LocalKeypairGenesisHandle,
+    string? FirstCrypticBraidEstablishmentHandle,
+    string? FirstCrypticBraidHandle,
+    string? FirstCrypticConditioningSourceHandle,
+    string? FirstCrypticConditioningHandle,
+    FirstRunConstitutionState? FirstRunState,
+    FirstRunOperatorReadinessState? FirstRunReadinessState,
+    bool? FirstRunStateProvisional,
+    bool? FirstRunStateActualized,
+    bool FirstRunOpalActualized);
 
 public interface IGovernedCrypticPointerStore
 {
@@ -145,7 +160,19 @@ public sealed class GovernedSeedEnvelopeTraceService : IGovernedSeedEnvelopeTrac
                 GovernedSeedIngressAccessClass.PromptInput.ToString(),
             result.VerticalSlice.OperationalContext?.LowMindSfRouteKind.ToString() ?? "no-lowmind-route",
             result.VerticalSlice.OperationalContext?.HighMindUptakeKind?.ToString() ?? "no-highmind-context",
-            result.VerticalSlice.OperationalContext?.HostedLlmState?.ToString() ?? "no-hosted-llm-state");
+            result.VerticalSlice.OperationalContext?.HostedLlmState?.ToString() ?? "no-hosted-llm-state",
+            result.VerticalSlice.OperationalContext?.PreGovernancePacketHandle ?? "no-pre-governance-packet",
+            result.VerticalSlice.OperationalContext?.LocalAuthorityTraceHandle ?? "no-local-authority-trace",
+            result.VerticalSlice.OperationalContext?.ConstitutionalContactHandle ?? "no-constitutional-contact",
+            result.VerticalSlice.OperationalContext?.LocalKeypairGenesisSourceHandle ?? "no-local-keypair-genesis-source",
+            result.VerticalSlice.OperationalContext?.LocalKeypairGenesisHandle ?? "no-local-keypair-genesis",
+            result.VerticalSlice.OperationalContext?.FirstCrypticBraidEstablishmentHandle ?? "no-first-cryptic-braid-establishment",
+            result.VerticalSlice.OperationalContext?.FirstCrypticBraidHandle ?? "no-first-cryptic-braid",
+            result.VerticalSlice.OperationalContext?.FirstCrypticConditioningSourceHandle ?? "no-first-cryptic-conditioning-source",
+            result.VerticalSlice.OperationalContext?.FirstCrypticConditioningHandle ?? "no-first-cryptic-conditioning",
+            result.VerticalSlice.OperationalContext?.FirstRunState?.ToString() ?? "no-first-run-state",
+            result.VerticalSlice.OperationalContext?.FirstRunReadinessState?.ToString() ?? "no-first-run-readiness",
+            (result.VerticalSlice.OperationalContext?.FirstRunOpalActualized ?? false).ToString());
         var sanctuaryIngressReceipt = result.VerticalSlice.SanctuaryIngressReceipt;
         var operationalContext = result.VerticalSlice.OperationalContext;
         var telemetryRecord = new GovernedGelTelemetryRecord(
@@ -167,7 +194,22 @@ public sealed class GovernedSeedEnvelopeTraceService : IGovernedSeedEnvelopeTrac
             LowMindSfRouteKind: operationalContext?.LowMindSfRouteKind,
             HighMindContextHandle: operationalContext?.HighMindContextHandle,
             HighMindUptakeKind: operationalContext?.HighMindUptakeKind,
-            HostedLlmState: operationalContext?.HostedLlmState);
+            HostedLlmState: operationalContext?.HostedLlmState,
+            FirstRunReceiptHandle: operationalContext?.FirstRunReceiptHandle,
+            PreGovernancePacketHandle: operationalContext?.PreGovernancePacketHandle,
+            LocalAuthorityTraceHandle: operationalContext?.LocalAuthorityTraceHandle,
+            ConstitutionalContactHandle: operationalContext?.ConstitutionalContactHandle,
+            LocalKeypairGenesisSourceHandle: operationalContext?.LocalKeypairGenesisSourceHandle,
+            LocalKeypairGenesisHandle: operationalContext?.LocalKeypairGenesisHandle,
+            FirstCrypticBraidEstablishmentHandle: operationalContext?.FirstCrypticBraidEstablishmentHandle,
+            FirstCrypticBraidHandle: operationalContext?.FirstCrypticBraidHandle,
+            FirstCrypticConditioningSourceHandle: operationalContext?.FirstCrypticConditioningSourceHandle,
+            FirstCrypticConditioningHandle: operationalContext?.FirstCrypticConditioningHandle,
+            FirstRunState: operationalContext?.FirstRunState,
+            FirstRunReadinessState: operationalContext?.FirstRunReadinessState,
+            FirstRunStateProvisional: operationalContext?.FirstRunStateProvisional,
+            FirstRunStateActualized: operationalContext?.FirstRunStateActualized,
+            FirstRunOpalActualized: operationalContext?.FirstRunOpalActualized ?? false);
 
         await _telemetrySink.AppendAsync(telemetryRecord, cancellationToken).ConfigureAwait(false);
 

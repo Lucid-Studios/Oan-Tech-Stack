@@ -278,7 +278,7 @@ function Get-ProjectOutputWitness {
 }
 
 $repoRoot = (Resolve-Path -LiteralPath (Split-Path -Parent $MyInvocation.MyCommand.Path)).Path | Split-Path -Parent
-$activeBuildRoot = Join-Path $repoRoot 'OAN Mortalis V1.0'
+$activeBuildRoot = Join-Path $repoRoot 'OAN Mortalis V1.1.1'
 $solutionPath = Join-Path $activeBuildRoot 'Oan.sln'
 $buildScriptPath = Join-Path $repoRoot 'build.ps1'
 $testScriptPath = Join-Path $repoRoot 'test.ps1'

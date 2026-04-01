@@ -38,10 +38,10 @@ Private human and corporate intake must remain Cryptic-masked by default and mus
 
 ## Archive Boundary
 
-`OAN Mortalis V0.1 Archive/` is historical and inert.
+Historical `OAN Mortalis` archives are outside this repository and inert with respect to the active build.
 
 Rules:
 
 - archive content is excluded from live protected-intake surfaces
 - automation, CI, and LLM harnesses must not treat the archive as live runtime or admissible protected-intake source material unless explicitly requested
-- historical path artifacts may remain in the archive, but they do not satisfy live-surface hygiene standards and must not be imported into active surfaces
+- historical path artifacts may exist in external archives, but they do not satisfy live-surface hygiene standards and must not be imported into active surfaces

@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
     [string] $PreviousStatus,
     [string] $CurrentStatus,
     [switch] $ForceNotification,
@@ -17,6 +17,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -212,6 +215,7 @@ if ($shouldNotify) {
         popupAttempted = $popupAttempted
         popupSucceeded = $popupSucceeded
     }
+    Add-AutomationCascadeOperatorPromptProperty -InputObject $bundlePayload | Out-Null
 
     Write-JsonFile -Path $bundleJsonPath -Value $bundlePayload
 
@@ -231,6 +235,7 @@ if ($shouldNotify) {
         ('- Popup succeeded: `{0}`' -f $bundlePayload.popupSucceeded)
     )
 
+    $markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
     Set-Content -LiteralPath $bundleMarkdownPath -Value $markdownLines -Encoding utf8
 }
 
@@ -252,6 +257,7 @@ $statePayload = [ordered]@{
     popupAttempted = $popupAttempted
     popupSucceeded = $popupSucceeded
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $statePayload | Out-Null
 
 Write-JsonFile -Path $notificationStatePath -Value $statePayload
 Write-Host ('[local-automation-notification] State: {0}' -f $notificationStatePath)

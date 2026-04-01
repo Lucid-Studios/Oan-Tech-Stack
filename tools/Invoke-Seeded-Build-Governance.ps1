@@ -2,7 +2,7 @@ param(
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
@@ -16,11 +16,20 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     }
 }
 
+$oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+    . $oanWorkspaceResolverPath
+}
+
 function Resolve-PathFromRepo {
     param(
         [string] $BasePath,
         [string] $CandidatePath
     )
+
+    if (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue) {
+        return Resolve-OanWorkspacePath -BasePath $BasePath -CandidatePath $CandidatePath
+    }
 
     if ([System.IO.Path]::IsPathRooted($CandidatePath)) {
         return [System.IO.Path]::GetFullPath($CandidatePath)
@@ -236,7 +245,7 @@ if (-not [bool] $seedPolicy.enabled) {
         $dispositionReason = 'seed-preflight-disabled'
     } else {
         $preflightAttempted = $true
-        $runLocalLlmPreflightPath = Join-Path $resolvedRepoRoot 'OAN Mortalis V1.0\tools\run-local-llm-preflight.ps1'
+        $runLocalLlmPreflightPath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
         try {
             & powershell -ExecutionPolicy Bypass -File $runLocalLlmPreflightPath `
                 -Configuration $Configuration `

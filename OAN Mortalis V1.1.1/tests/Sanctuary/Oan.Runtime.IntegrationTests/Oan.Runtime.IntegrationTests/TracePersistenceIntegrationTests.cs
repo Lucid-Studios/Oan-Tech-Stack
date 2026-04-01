@@ -46,6 +46,23 @@ public sealed class TracePersistenceIntegrationTests
         Assert.Equal(payload.HighMindContext!.ContextHandle, record.HighMindContextHandle);
         Assert.Equal(payload.HighMindContext.UptakeKind, record.HighMindUptakeKind);
         Assert.Equal(payload.HostedLlmReceipt!.ResponsePacket.State, record.HostedLlmState);
+        Assert.NotNull(payload.PreGovernancePacket);
+        Assert.NotNull(payload.FirstRunConstitution);
+        Assert.Equal(payload.FirstRunConstitution!.ReceiptHandle, record.FirstRunReceiptHandle);
+        Assert.Equal(payload.PreGovernancePacket!.PacketHandle, record.PreGovernancePacketHandle);
+        Assert.Equal(payload.PreGovernancePacket.LocalAuthorityTrace!.ReceiptHandle, record.LocalAuthorityTraceHandle);
+        Assert.Equal(payload.PreGovernancePacket.LocalKeypairGenesisSource!.ReceiptHandle, record.LocalKeypairGenesisSourceHandle);
+        Assert.Equal(payload.FirstRunConstitution.ConstitutionalContactHandle, record.ConstitutionalContactHandle);
+        Assert.Equal(payload.FirstRunConstitution.LocalKeypairGenesisHandle, record.LocalKeypairGenesisHandle);
+        Assert.Equal(payload.PreGovernancePacket.FirstCrypticBraidEstablishment!.ReceiptHandle, record.FirstCrypticBraidEstablishmentHandle);
+        Assert.Equal(payload.FirstRunConstitution.FirstCrypticBraidHandle, record.FirstCrypticBraidHandle);
+        Assert.Equal(payload.PreGovernancePacket.FirstCrypticConditioningSource!.ReceiptHandle, record.FirstCrypticConditioningSourceHandle);
+        Assert.Equal(payload.FirstRunConstitution.FirstCrypticConditioningHandle, record.FirstCrypticConditioningHandle);
+        Assert.Equal(payload.FirstRunConstitution.CurrentState, record.FirstRunState);
+        Assert.Equal(payload.FirstRunConstitution.ReadinessState, record.FirstRunReadinessState);
+        Assert.Equal(payload.FirstRunConstitution.CurrentStateProvisional, record.FirstRunStateProvisional);
+        Assert.Equal(payload.FirstRunConstitution.CurrentStateActualized, record.FirstRunStateActualized);
+        Assert.Equal(payload.FirstRunConstitution.OpalActualized, record.FirstRunOpalActualized);
     }
 
     [Fact]
@@ -84,5 +101,22 @@ public sealed class TracePersistenceIntegrationTests
         Assert.Equal(payload.OperationalContext.HighMindContextHandle, record.HighMindContextHandle);
         Assert.Equal(payload.OperationalContext.HighMindUptakeKind, record.HighMindUptakeKind);
         Assert.Equal(payload.OperationalContext.HostedLlmState, record.HostedLlmState);
+        Assert.NotNull(payload.PreGovernancePacket);
+        Assert.NotNull(payload.FirstRunConstitution);
+        Assert.Equal(payload.FirstRunConstitution!.ReceiptHandle, record.FirstRunReceiptHandle);
+        Assert.Equal(payload.PreGovernancePacket!.PacketHandle, record.PreGovernancePacketHandle);
+        Assert.Equal(payload.PreGovernancePacket.LocalAuthorityTrace!.ReceiptHandle, record.LocalAuthorityTraceHandle);
+        Assert.Equal(payload.PreGovernancePacket.LocalKeypairGenesisSource!.ReceiptHandle, record.LocalKeypairGenesisSourceHandle);
+        Assert.Equal(payload.FirstRunConstitution.ConstitutionalContactHandle, record.ConstitutionalContactHandle);
+        Assert.Equal(payload.FirstRunConstitution.LocalKeypairGenesisHandle, record.LocalKeypairGenesisHandle);
+        Assert.Equal(payload.PreGovernancePacket.FirstCrypticBraidEstablishment!.ReceiptHandle, record.FirstCrypticBraidEstablishmentHandle);
+        Assert.Equal(payload.FirstRunConstitution.FirstCrypticBraidHandle, record.FirstCrypticBraidHandle);
+        Assert.Equal(payload.PreGovernancePacket.FirstCrypticConditioningSource!.ReceiptHandle, record.FirstCrypticConditioningSourceHandle);
+        Assert.Equal(payload.FirstRunConstitution.FirstCrypticConditioningHandle, record.FirstCrypticConditioningHandle);
+        Assert.Equal(payload.FirstRunConstitution.CurrentState, record.FirstRunState);
+        Assert.Equal(payload.FirstRunConstitution.ReadinessState, record.FirstRunReadinessState);
+        Assert.Equal(payload.FirstRunConstitution.CurrentStateProvisional, record.FirstRunStateProvisional);
+        Assert.Equal(payload.FirstRunConstitution.CurrentStateActualized, record.FirstRunStateActualized);
+        Assert.Equal(payload.FirstRunConstitution.OpalActualized, record.FirstRunOpalActualized);
     }
 }

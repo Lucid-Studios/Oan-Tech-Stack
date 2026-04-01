@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ManifestPath,
     [string] $DigestBundlePath,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'
 )
 
@@ -17,6 +17,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -115,6 +118,7 @@ $bundlePayload = [ordered]@{
     taskStatusPath = if (Test-Path -LiteralPath $resolvedTaskStatusPath -PathType Leaf) { Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $resolvedTaskStatusPath } else { $null }
     recommendedAction = if ($null -ne $digestJson) { [string] $digestJson.recommendedAction } else { 'review-required-blocked' }
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $bundlePayload | Out-Null
 
 Write-JsonFile -Path $bundleJsonPath -Value $bundlePayload
 
@@ -145,6 +149,7 @@ if ($bundlePayload.gatesTriggered.Count -gt 0) {
     }
 }
 
+$markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
 Set-Content -LiteralPath $bundleMarkdownPath -Value $markdownLines -Encoding utf8
 
 $statePayload = [ordered]@{
@@ -155,6 +160,7 @@ $statePayload = [ordered]@{
     sourceManifestPath = $bundlePayload.sourceManifestPath
     recommendedAction = $bundlePayload.recommendedAction
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $statePayload | Out-Null
 
 Write-JsonFile -Path $blockedEscalationStatePath -Value $statePayload
 Write-Host ('[blocked-escalation-bundle] Bundle: {0}' -f $bundlePath)

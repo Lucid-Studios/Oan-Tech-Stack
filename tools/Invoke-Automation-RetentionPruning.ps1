@@ -1,7 +1,7 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-tasking.json'
 )
 
 Set-StrictMode -Version Latest
@@ -154,6 +154,9 @@ function Get-ProtectedDirectorySet {
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastAmenableDayDreamTierAdmissibilityBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastSelfRootedCrypticDepthGateBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastRuntimeWorkbenchSessionLedgerBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastCompanionToolTelemetryBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastV111EnrichmentPathwayBundle'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastRunIsolatedBuildPathwayBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastDayDreamCollapseReceiptBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastCrypticDepthReturnReceiptBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastBondedCoWorkSessionRehearsalBundle'),
@@ -473,6 +476,18 @@ $roots = @(
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkbenchSessionLedgerOutputRoot)
         keep = [int] $retentionPolicy.keepRuntimeWorkbenchSessionLedgerBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.companionToolTelemetryOutputRoot)
+        keep = [int] $retentionPolicy.keepCompanionToolTelemetryBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.v111EnrichmentPathwayOutputRoot)
+        keep = [int] $retentionPolicy.keepV111EnrichmentPathwayBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runIsolatedBuildPathwayOutputRoot)
+        keep = [int] $retentionPolicy.keepRunIsolatedBuildPathwayBundles
     },
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.dayDreamCollapseReceiptOutputRoot)

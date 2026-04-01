@@ -300,6 +300,102 @@ public sealed record GovernedSeedSanctuaryIngressPreparation(
     string PreparedInput,
     GovernedSeedSanctuaryIngressReceipt Receipt);
 
+public sealed record GovernedSeedLocalAuthorityTraceReceipt(
+    string ReceiptHandle,
+    string SanctuaryIngressReceiptHandle,
+    string AuthorityProfile,
+    string AuthoritySurface,
+    string ResponsibilityTraceHandle,
+    bool ObsidianWallApplied,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedConstitutionalContactReceipt(
+    string ReceiptHandle,
+    string SanctuaryIngressReceiptHandle,
+    string LocalAuthorityTraceReceiptHandle,
+    string ContactProfile,
+    string ContactSurface,
+    bool ObsidianWallApplied,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedLocalKeypairGenesisSourceReceipt(
+    string ReceiptHandle,
+    string ConstitutionalContactReceiptHandle,
+    string IdentityHandle,
+    string OperatorBondHandle,
+    string IntegrityHash,
+    string SourceProfile,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedLocalKeypairGenesisReceipt(
+    string ReceiptHandle,
+    string ConstitutionalContactReceiptHandle,
+    string LocalKeypairGenesisSourceReceiptHandle,
+    string IdentityHandle,
+    string OperatorBondHandle,
+    string IntegrityHash,
+    string KeyProfile,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedFirstCrypticBraidEstablishmentReceipt(
+    string ReceiptHandle,
+    string ConstitutionalContactReceiptHandle,
+    string LocalKeypairGenesisReceiptHandle,
+    string MantleHandle,
+    string BraidProfile,
+    bool ProtectedPresentedBraided,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedFirstCrypticBraidReceipt(
+    string ReceiptHandle,
+    string ConstitutionalContactReceiptHandle,
+    string LocalKeypairGenesisReceiptHandle,
+    string FirstCrypticBraidEstablishmentReceiptHandle,
+    string MantleHandle,
+    string BraidProfile,
+    bool ProtectedPresentedBraided,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedFirstCrypticConditioningSourceReceipt(
+    string ReceiptHandle,
+    string FirstCrypticBraidReceiptHandle,
+    string LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind RouteKind,
+    string SourceProfile,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedFirstCrypticConditioningReceipt(
+    string ReceiptHandle,
+    string FirstCrypticBraidReceiptHandle,
+    string FirstCrypticConditioningSourceReceiptHandle,
+    string LowMindSfRouteHandle,
+    GovernedSeedIngressAccessClass IngressAccessClass,
+    GovernedSeedLowMindSfRouteKind RouteKind,
+    string ConditioningProfile,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
+public sealed record GovernedSeedPreGovernancePacket(
+    string PacketHandle,
+    GovernedSeedLocalAuthorityTraceReceipt? LocalAuthorityTrace,
+    GovernedSeedConstitutionalContactReceipt? ConstitutionalContact,
+    GovernedSeedLocalKeypairGenesisSourceReceipt? LocalKeypairGenesisSource,
+    GovernedSeedLocalKeypairGenesisReceipt? LocalKeypairGenesis,
+    GovernedSeedFirstCrypticBraidEstablishmentReceipt? FirstCrypticBraidEstablishment,
+    GovernedSeedFirstCrypticBraidReceipt? FirstCrypticBraid,
+    GovernedSeedFirstCrypticConditioningSourceReceipt? FirstCrypticConditioningSource,
+    GovernedSeedFirstCrypticConditioningReceipt? FirstCrypticConditioning,
+    string SourceReason,
+    DateTimeOffset TimestampUtc);
+
 public enum GovernedSeedIngressAccessClass
 {
     PromptInput = 0,
@@ -660,7 +756,7 @@ public sealed record GovernedSeedHostedLlmSeedReceipt(
     GovernedSeedHostedLlmRequestPacket RequestPacket,
     GovernedSeedHostedLlmResponsePacket ResponsePacket,
     GovernedSeedHostedSeedToCrypticTransitPacket SeededTransitPacket,
-    bool ListeningFrameActive,
+    bool GuardFrameActive,
     bool SparseEvidenceDetected,
     bool DisclosurePressureDetected,
     bool AuthorityPressureDetected,
@@ -790,6 +886,22 @@ public sealed record GovernedSeedOperationalContext(
     GovernedSeedHostedLlmEmissionState? HostedLlmState,
     string? HighMindContextHandle,
     GovernedSeedHighMindUptakeKind? HighMindUptakeKind,
+    FirstRunConstitutionReceipt? FirstRunConstitution,
+    string? PreGovernancePacketHandle,
+    string? LocalAuthorityTraceHandle,
+    string? FirstRunReceiptHandle,
+    string? ConstitutionalContactHandle,
+    string? LocalKeypairGenesisSourceHandle,
+    string? LocalKeypairGenesisHandle,
+    string? FirstCrypticBraidEstablishmentHandle,
+    string? FirstCrypticBraidHandle,
+    string? FirstCrypticConditioningSourceHandle,
+    string? FirstCrypticConditioningHandle,
+    FirstRunConstitutionState? FirstRunState,
+    FirstRunOperatorReadinessState? FirstRunReadinessState,
+    bool? FirstRunStateProvisional,
+    bool? FirstRunStateActualized,
+    bool FirstRunOpalActualized,
     string? LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
     GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
@@ -920,6 +1032,21 @@ public sealed record GovernedSeedStateModulationReceipt(
     GovernedSeedHostedLlmEmissionState? HostedLlmState,
     string? HighMindContextHandle,
     GovernedSeedHighMindUptakeKind? HighMindUptakeKind,
+    string? FirstRunReceiptHandle,
+    string? PreGovernancePacketHandle,
+    string? LocalAuthorityTraceHandle,
+    string? ConstitutionalContactHandle,
+    string? LocalKeypairGenesisSourceHandle,
+    string? LocalKeypairGenesisHandle,
+    string? FirstCrypticBraidEstablishmentHandle,
+    string? FirstCrypticBraidHandle,
+    string? FirstCrypticConditioningSourceHandle,
+    string? FirstCrypticConditioningHandle,
+    FirstRunConstitutionState? FirstRunState,
+    FirstRunOperatorReadinessState? FirstRunReadinessState,
+    bool? FirstRunStateProvisional,
+    bool? FirstRunStateActualized,
+    bool FirstRunOpalActualized,
     string? LowMindSfRouteHandle,
     GovernedSeedIngressAccessClass IngressAccessClass,
     GovernedSeedLowMindSfRouteKind LowMindSfRouteKind,
@@ -956,6 +1083,8 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSanctuaryIngressReceipt? SanctuaryIngressReceipt,
     GovernedSeedHostedLlmSeedReceipt? HostedLlmReceipt,
     GovernedSeedHighMindContext? HighMindContext,
+    GovernedSeedPreGovernancePacket? PreGovernancePacket,
+    FirstRunConstitutionReceipt? FirstRunConstitution,
     GovernedSeedOperationalContext? OperationalContext,
     GovernedSeedStateModulationReceipt? StateModulationReceipt,
     ProtectedExecutionCapabilityReceipt CapabilityReceipt,

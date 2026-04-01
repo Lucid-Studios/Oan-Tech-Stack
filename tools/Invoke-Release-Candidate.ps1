@@ -117,8 +117,9 @@ else {
     $repoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 }
 
-$activeBuildRoot = Join-Path $repoRoot 'OAN Mortalis V1.0'
-$deployablesPath = Join-Path $activeBuildRoot 'build\deployables.json'
+$activeBuildRoot = Join-Path $repoRoot 'OAN Mortalis V1.1.1'
+$automationPolicyRoot = Join-Path $repoRoot 'OAN Mortalis V1.1.1\build'
+$deployablesPath = Join-Path $automationPolicyRoot 'deployables.json'
 $resolveVersionScriptPath = Join-Path $repoRoot 'tools\Resolve-Build-Version.ps1'
 $writeManifestScriptPath = Join-Path $repoRoot 'tools\Write-Build-EvidenceManifest.ps1'
 $buildAuditScriptPath = Join-Path $repoRoot 'tools\Invoke-Build-Audit.ps1'

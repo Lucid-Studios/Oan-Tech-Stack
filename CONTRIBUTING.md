@@ -11,8 +11,8 @@ Active implementation target:
 Reference-only material:
 
 - `Build Contracts/`
-- `OAN Mortalis V1.0/`
-- `OAN Mortalis V0.1 Archive/`
+- archived historical lines outside this repository
+
 
 ## Before You Change Anything
 
@@ -43,7 +43,7 @@ powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-priv
 
 - make changes only in the active build unless the task explicitly requires otherwise
 - do not edit `Build Contracts/`
-- do not edit `OAN Mortalis V0.1 Archive/`
+- do not treat external archives as active build surfaces
 - do not commit local absolute paths outside the repository root
 - do not commit private corpus paths, credentials, runtime payloads, or machine-local artifacts
 - keep changes scoped to one technical concern where possible

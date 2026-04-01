@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\\..\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
+    <ProjectReference Include="..\\..\\Oan.FirstRun\\Oan.FirstRun\\Oan.FirstRun.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

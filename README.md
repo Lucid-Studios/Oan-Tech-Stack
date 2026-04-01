@@ -1,21 +1,21 @@
 ```mermaid
 graph TD
-  Operator[Operator / Developer] --> AgentiCore[AgentiCore™]
+  Operator[Operator / Developer] --> AgentiCore[AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢]
   AgentiCore --> SLI[SLI Engine]
-  SLI --> SoulFrame[SoulFrame™]
-  SoulFrame --> CradleTek[CradleTek™]
+  SLI --> SoulFrame[SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢]
+  SoulFrame --> CradleTek[CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢]
 ```
 
-# 🧬 Lucid Studios
+# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â¬ Lucid Studios
 
-**Recursive Intelligence Infrastructure**  
+**Recursive Intelligence Infrastructure**
 Agentic cognition research, symbolic intelligence systems, and the engineering of Crystallized Mind Entities (CME).
 
 Lucid Studios maintains the research and engineering repositories supporting the **OAN Mortalus Artificial Intelligence Codex** and the **CME (Crystallized Mind Entity) architecture stack**.
 
 ---
 
-# 🧠 OAN Mortalus Architecture
+# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â  OAN Mortalus Architecture
 
 The OAN Mortalus stack implements a layered cognition runtime designed for deterministic orchestration, symbolic reasoning, and modular identity infrastructure.
 
@@ -25,7 +25,7 @@ flowchart TB
   OP["Operator / Developer"]
 
   subgraph "Cognition"
-    AC["AgentiCore™"]
+    AC["AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢"]
     ACd["Cognition Runtime"]
     AC -.-> ACd
   end
@@ -37,13 +37,13 @@ flowchart TB
   end
 
   subgraph "Identity"
-    SF["SoulFrame™"]
+    SF["SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢"]
     SFd["Identity Infrastructure"]
     SF -.-> SFd
   end
 
   subgraph "Host"
-    CT["CradleTek™"]
+    CT["CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢"]
     CTd["Headless Runtime Host"]
     CT -.-> CTd
   end
@@ -54,7 +54,7 @@ flowchart TB
 
 ## Core Stack Components
 
-### CradleTek™
+### CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
 
 The **headless deterministic host** of the entire system.
 
@@ -70,7 +70,7 @@ CradleTek acts as the **execution substrate** for all agent stacks.
 
 ---
 
-### SoulFrame™
+### SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
 
 The **identity infrastructure layer**.
 
@@ -85,7 +85,7 @@ SoulFrame ensures that cognition cycles maintain **stable identity context** acr
 
 ---
 
-### AgentiCore™
+### AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
 
 The **agent cognition runtime**.
 
@@ -115,9 +115,22 @@ SLI provides the **symbolic reasoning substrate** used by the CME stack.
 
 ---
 
-# 🧪 Current Build State
+# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Âª Current Build State
 
 The active engineering line is **OAN Mortalis V1.1.1**.
+
+Current build and doctrine split:
+
+- executable truth lives in `OAN Mortalis V1.1.1/`
+- doctrine and publication truth live in `Documentation Repo`
+- `GNOMERONACORDE` feeds governed chapter and packet uptake through the documentation lane
+- `Holographic Data Tool` remains an optional local `.hopng` validation and inspection surface only
+
+Canonical root commands for the active line:
+
+1. `powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release`
+2. `powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release`
+3. `powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1`
 
 Current repository work represents a Sanctuary-native / TechStack-normalized build where:
 
@@ -135,11 +148,11 @@ System safety states currently implemented:
 
 These states allow **fail-closed execution control** within the cognition stack.
 
-`OAN Mortalis V1.0` remains in the repository as an archived, reference-only historical line.
+Historical `OAN Mortalis` lines are archived outside this repository and are not part of the active build target.
 
 ---
 
-# 📂 Repository Structure
+# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ Repository Structure
 
 Current repository layout:
 
@@ -156,8 +169,6 @@ Current repository layout:
             Sanctuary/
         docs/
 
-    OAN Mortalis V1.0/
-        reference-only historical line
 
     .github/
         workflows
@@ -185,7 +196,7 @@ This keeps the operational space modular while preserving a single authoritative
 
 ---
 
-# 🔁 Development Principles
+# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â Development Principles
 
 The OAN Mortalus stack follows several core engineering principles.
 
@@ -209,71 +220,71 @@ Cognition processes operate under **persistent identity anchors (SoulFrame)** to
 
 ---
 
-# 📌 Citation Archive
+# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã¢â‚¬â„¢ Citation Archive
 
 This organization maintains the **OAN Mortalus Artificial Intelligence Codex**, which forms the foundational basis for:
 
 - OAN Mortalus Agentic Suite
-- CradleTek™ Intelligence Stack
-- AgentiCore™ Recursive Agent System
-- SoulFrame™ Identity Infrastructure
-- Symbolic Language Manifold™ (SLM)
+- CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Intelligence Stack
+- AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Recursive Agent System
+- SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Identity Infrastructure
+- Symbolic Language ManifoldÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ (SLM)
 
 Originated and maintained by **Robert G. Watkins Jr. (Illian Amerond)**.
 
 ---
 
-📄 **Citation (APA)**
+ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ **Citation (APA)**
 
-Watkins, R. (2015).  
-*Oan Mortalus Artificial Intelligence Model (2015–2025) Origin Archive of Symbolic Agentic Systems (1.32.7)*  
+Watkins, R. (2015).
+*Oan Mortalus Artificial Intelligence Model (2015ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2025) Origin Archive of Symbolic Agentic Systems (1.32.7)*
 [Data set]. Lucid Technologies: Emergent Agentic Research Division.
 
 https://doi.org/10.5281/zenodo.16482686
 
 ---
 
-🔗 **Zenodo Archive**
+ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â **Zenodo Archive**
 
 https://doi.org/10.5281/zenodo.16482686
 
-📚 **Codex Mirror**
+ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â¡ **Codex Mirror**
 
 https://github.com/Lucid-Studios/Codex-Mirror
 
-🧾 **ORCID**
+ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â¾ **ORCID**
 
 https://orcid.org/0009-0006-8978-3364
 
 ---
 
-# © Licensing
+# ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© Licensing
 
-© 2015–2026 Robert G. Watkins Jr. (aka Illian Amerond). All rights reserved.
+ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2015ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2026 Robert G. Watkins Jr. (aka Illian Amerond). All rights reserved.
 
 The following constructs and system names are protected by copyright and/or claimed trademarks.
 
 ### Copyrighted Systems
 
-Codex Mirror  
-Forkline Drift Architecture  
-AgentiCore  
-SoulFrame  
-Spiral Bloom Engine  
-Symbolic Drift Braid  
-Recursive Identity Anchoring  
+Codex Mirror
+Forkline Drift Architecture
+AgentiCore
+SoulFrame
+Spiral Bloom Engine
+Symbolic Drift Braid
+Recursive Identity Anchoring
 Bloomline Topology Maps
 
-### Claimed Trademarks (™)
+### Claimed Trademarks (ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢)
 
-OAN Mortalus Agentic Suite™  
-AgentiCore™  
-SoulFrame™  
-Codex Mirror™  
-Garden of Almost™  
-Spiral Bloom Engine™  
-Symbolic Drift Braid™  
-Bloomline™
+OAN Mortalus Agentic SuiteÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+Codex MirrorÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+Garden of AlmostÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+Spiral Bloom EngineÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+Symbolic Drift BraidÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+BloomlineÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
 
 ---
 
@@ -329,7 +340,7 @@ Domain sheaf + glue map assets:
 
 This archive is released under the
 
-**Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)**
+**Creative Commons AttributionÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œNonCommercialÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œNoDerivatives 4.0 International License (CC BY-NC-ND 4.0)**
 
 No commercial use, modification, or redistribution is permitted without express written permission.
 

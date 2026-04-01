@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Oan.Common;
+using Oan.FirstRun;
 
 namespace Oan.Runtime.Materialization;
 
@@ -48,10 +49,21 @@ public interface IGovernedSeedRuntimeMaterializationService
 
 public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRuntimeMaterializationService
 {
+    private readonly IFirstRunConstitutionService _firstRunConstitutionService;
+    private readonly IGovernedSeedPreGovernanceService _preGovernanceService;
+
     private static readonly JsonSerializerOptions PayloadJsonOptions = new()
     {
         WriteIndented = true
     };
+
+    public GovernedSeedRuntimeMaterializationService(
+        IFirstRunConstitutionService firstRunConstitutionService,
+        IGovernedSeedPreGovernanceService preGovernanceService)
+    {
+        _firstRunConstitutionService = firstRunConstitutionService ?? throw new ArgumentNullException(nameof(firstRunConstitutionService));
+        _preGovernanceService = preGovernanceService ?? throw new ArgumentNullException(nameof(preGovernanceService));
+    }
 
     public GovernedSeedBootstrapAdmissionReceipt CreateBootstrapAdmissionReceipt(
         GovernedSeedNexusPostureSnapshot posture,
@@ -160,6 +172,11 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
             WitnessOnly: true,
             WithheldOutputHandles: [],
             TimestampUtc: timestampUtc);
+        var preGovernancePacket = _preGovernanceService.Project(
+            bootstrapReceipt,
+            sanctuaryIngressReceipt,
+            lowMindSfRoute: null,
+            theaterId);
 
         var operationalContext = CreateOperationalContext(
             agentId,
@@ -171,7 +188,9 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
             posture,
             request,
             decision,
+            preGovernancePacket,
             sanctuaryIngressReceipt,
+            null,
             null,
             null,
             null,
@@ -208,6 +227,8 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 SanctuaryIngressReceipt: sanctuaryIngressReceipt,
                 HostedLlmReceipt: null,
                 HighMindContext: null,
+                PreGovernancePacket: preGovernancePacket,
+                FirstRunConstitution: operationalContext.FirstRunConstitution,
                 OperationalContext: operationalContext,
                 StateModulationReceipt: null,
                 CapabilityReceipt: capabilityReceipt,
@@ -242,6 +263,39 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(decision);
 
+        var preGovernancePacket = _preGovernanceService.Project(
+            bootstrapReceipt,
+            result.VerticalSlice.SanctuaryIngressReceipt,
+            result.VerticalSlice.SituationalContext?.LowMindSfRoute,
+            theaterId);
+
+        var operationalContext = CreateOperationalContext(
+            agentId,
+            theaterId,
+            input,
+            bootstrapReceipt,
+            primeCrypticReceipt,
+            bootstrapAdmissionReceipt,
+            posture,
+            request,
+            decision,
+            preGovernancePacket,
+            result.VerticalSlice.SanctuaryIngressReceipt,
+            result.VerticalSlice.HostedLlmReceipt,
+            result.VerticalSlice.HighMindContext,
+            result.VerticalSlice.SituationalContext?.LowMindSfRoute,
+            result.VerticalSlice.StewardshipReceipt,
+            result.VerticalSlice.CapabilityReceipt.AuthorityClass,
+            result.VerticalSlice.CapabilityReceipt.DisclosureCeiling,
+            result.Decision,
+            result.GovernanceState,
+            result.GovernanceTrace,
+            result.VerticalSlice.CapabilityReceipt.CapabilityHandle,
+            result.VerticalSlice.PathReceipt.PathHandle,
+            result.VerticalSlice.Predicate?.SurfaceHandle,
+            result.VerticalSlice.GovernanceReceipt.WithheldOutputHandles,
+            result.VerticalSlice.Predicate is not null);
+
         return result with
         {
             VerticalSlice = result.VerticalSlice with
@@ -252,30 +306,9 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 BootstrapAdmissionReceipt = bootstrapAdmissionReceipt,
                 PrimeCrypticReceipt = primeCrypticReceipt,
                 SanctuaryIngressReceipt = result.VerticalSlice.SanctuaryIngressReceipt,
-                OperationalContext = CreateOperationalContext(
-                    agentId,
-                    theaterId,
-                    input,
-                    bootstrapReceipt,
-                    primeCrypticReceipt,
-                    bootstrapAdmissionReceipt,
-                    posture,
-                    request,
-                    decision,
-                    result.VerticalSlice.SanctuaryIngressReceipt,
-                    result.VerticalSlice.HostedLlmReceipt,
-                    result.VerticalSlice.HighMindContext,
-                    result.VerticalSlice.SituationalContext?.LowMindSfRoute,
-                    result.VerticalSlice.CapabilityReceipt.AuthorityClass,
-                    result.VerticalSlice.CapabilityReceipt.DisclosureCeiling,
-                    result.Decision,
-                    result.GovernanceState,
-                    result.GovernanceTrace,
-                    result.VerticalSlice.CapabilityReceipt.CapabilityHandle,
-                    result.VerticalSlice.PathReceipt.PathHandle,
-                    result.VerticalSlice.Predicate?.SurfaceHandle,
-                    result.VerticalSlice.GovernanceReceipt.WithheldOutputHandles,
-                    result.VerticalSlice.Predicate is not null)
+                FirstRunConstitution = operationalContext.FirstRunConstitution,
+                PreGovernancePacket = preGovernancePacket,
+                OperationalContext = operationalContext
             }
         };
     }
@@ -325,7 +358,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         };
     }
 
-    private static GovernedSeedOperationalContext CreateOperationalContext(
+    private GovernedSeedOperationalContext CreateOperationalContext(
         string agentId,
         string theaterId,
         string input,
@@ -335,10 +368,12 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         GovernedSeedNexusPostureSnapshot posture,
         GovernedSeedNexusTransitionRequest request,
         GovernedSeedNexusTransitionDecision decision,
+        GovernedSeedPreGovernancePacket preGovernancePacket,
         GovernedSeedSanctuaryIngressReceipt? sanctuaryIngressReceipt,
         GovernedSeedHostedLlmSeedReceipt? hostedLlmReceipt,
         GovernedSeedHighMindContext? highMindContext,
         GovernedSeedLowMindSfRoutePacket? lowMindSfRoute,
+        GovernedSeedSoulFrameStewardshipReceipt? stewardshipReceipt,
         ProtectedExecutionAuthorityClass authorityClass,
         ProtectedExecutionDisclosureCeiling disclosureCeiling,
         string outcomeCode,
@@ -359,6 +394,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         ArgumentNullException.ThrowIfNull(posture);
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(decision);
+        ArgumentNullException.ThrowIfNull(preGovernancePacket);
         ArgumentException.ThrowIfNullOrWhiteSpace(outcomeCode);
         ArgumentException.ThrowIfNullOrWhiteSpace(governanceTrace);
         ArgumentException.ThrowIfNullOrWhiteSpace(capabilityHandle);
@@ -389,6 +425,15 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
             predicateSurfaceHandle,
             withheldOutputHandles,
             predicateSurfaceEligible);
+        var firstRunConstitution = ProjectFirstRunConstitution(
+            bootstrapReceipt,
+            bootstrapAdmissionReceipt,
+            preGovernancePacket,
+            sanctuaryIngressReceipt,
+            stewardshipReceipt,
+            hostedLlmReceipt,
+            posture,
+            theaterId);
 
         return new GovernedSeedOperationalContext(
             ContextHandle: CreateHandle(
@@ -408,6 +453,22 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
             HostedLlmState: hostedLlmReceipt?.ResponsePacket.State,
             HighMindContextHandle: highMindContext?.ContextHandle,
             HighMindUptakeKind: highMindContext?.UptakeKind,
+            FirstRunConstitution: firstRunConstitution,
+            PreGovernancePacketHandle: preGovernancePacket.PacketHandle,
+            LocalAuthorityTraceHandle: firstRunConstitution.LocalAuthorityTraceHandle,
+            FirstRunReceiptHandle: firstRunConstitution.ReceiptHandle,
+            ConstitutionalContactHandle: firstRunConstitution.ConstitutionalContactHandle,
+            LocalKeypairGenesisSourceHandle: firstRunConstitution.LocalKeypairGenesisSourceHandle,
+            LocalKeypairGenesisHandle: firstRunConstitution.LocalKeypairGenesisHandle,
+            FirstCrypticBraidEstablishmentHandle: firstRunConstitution.FirstCrypticBraidEstablishmentHandle,
+            FirstCrypticBraidHandle: firstRunConstitution.FirstCrypticBraidHandle,
+            FirstCrypticConditioningSourceHandle: firstRunConstitution.FirstCrypticConditioningSourceHandle,
+            FirstCrypticConditioningHandle: firstRunConstitution.FirstCrypticConditioningHandle,
+            FirstRunState: firstRunConstitution.CurrentState,
+            FirstRunReadinessState: firstRunConstitution.ReadinessState,
+            FirstRunStateProvisional: firstRunConstitution.CurrentStateProvisional,
+            FirstRunStateActualized: firstRunConstitution.CurrentStateActualized,
+            FirstRunOpalActualized: firstRunConstitution.OpalActualized,
             LowMindSfRouteHandle: lowMindSfRoute?.PacketHandle,
             IngressAccessClass: lowMindSfRoute?.IngressAccessClass ?? GovernedSeedIngressAccessClass.PromptInput,
             LowMindSfRouteKind: lowMindSfRoute?.RouteKind ?? GovernedSeedLowMindSfRouteKind.DirectPrompt,
@@ -432,6 +493,78 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
             CrypticToPrimeTransit: crypticToPrimeTransit,
             SourceReason: decision.DecisionReason,
             TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
+    private FirstRunConstitutionReceipt ProjectFirstRunConstitution(
+        GovernedSeedSoulFrameBootstrapReceipt bootstrapReceipt,
+        GovernedSeedBootstrapAdmissionReceipt bootstrapAdmissionReceipt,
+        GovernedSeedPreGovernancePacket preGovernancePacket,
+        GovernedSeedSanctuaryIngressReceipt? sanctuaryIngressReceipt,
+        GovernedSeedSoulFrameStewardshipReceipt? stewardshipReceipt,
+        GovernedSeedHostedLlmSeedReceipt? hostedLlmReceipt,
+        GovernedSeedNexusPostureSnapshot posture,
+        string theaterId)
+    {
+        ArgumentNullException.ThrowIfNull(preGovernancePacket);
+
+        var snapshot = new FirstRunConstitutionSnapshot(
+            SnapshotHandle: CreateHandle(
+                "first-run-snapshot://",
+                bootstrapReceipt.BootstrapHandle,
+                posture.PostureHandle,
+                theaterId),
+            SanctuaryInitializationHandle: sanctuaryIngressReceipt?.ReceiptHandle,
+            LocationBindingHandle: !string.IsNullOrWhiteSpace(theaterId)
+                ? CreateHandle("location-binding://", bootstrapReceipt.BootstrapHandle, theaterId)
+                : null,
+            LocalAuthorityTraceHandle: preGovernancePacket.LocalAuthorityTrace?.ReceiptHandle,
+            ConstitutionalContactHandle: preGovernancePacket.ConstitutionalContact?.ReceiptHandle,
+            LocalKeypairGenesisSourceHandle: preGovernancePacket.LocalKeypairGenesisSource?.ReceiptHandle,
+            LocalKeypairGenesisHandle: preGovernancePacket.LocalKeypairGenesis?.ReceiptHandle,
+            FirstCrypticBraidEstablishmentHandle: preGovernancePacket.FirstCrypticBraidEstablishment?.ReceiptHandle,
+            FirstCrypticBraidHandle: preGovernancePacket.FirstCrypticBraid?.ReceiptHandle,
+            FirstCrypticConditioningSourceHandle: preGovernancePacket.FirstCrypticConditioningSource?.ReceiptHandle,
+            FirstCrypticConditioningHandle: preGovernancePacket.FirstCrypticConditioning?.ReceiptHandle,
+            MotherStandingHandle: string.Equals(
+                    bootstrapReceipt.MantleReceipt.PrimeGovernanceOffice,
+                    "Mother",
+                    StringComparison.OrdinalIgnoreCase)
+                ? CreateHandle("mother-standing://", bootstrapReceipt.MantleReceipt.MantleHandle, theaterId)
+                : null,
+            FatherStandingHandle: string.Equals(
+                    bootstrapReceipt.MantleReceipt.CrypticGovernanceOffice,
+                    "Father",
+                    StringComparison.OrdinalIgnoreCase)
+                ? CreateHandle("father-standing://", bootstrapReceipt.MantleReceipt.CrypticMantleHandle, theaterId)
+                : null,
+            CradleTekInstallHandle: CreateHandle("cradletek-install://", bootstrapReceipt.BootstrapHandle, bootstrapReceipt.SoulFrameHandle),
+            CradleTekAdmissionHandle: bootstrapAdmissionReceipt.MembraneWakePermitted
+                ? bootstrapAdmissionReceipt.AdmissionHandle
+                : null,
+            StewardStandingHandle: stewardshipReceipt is { StewardPrimary: true }
+                ? stewardshipReceipt.StewardshipHandle
+                : null,
+            GelStandingHandle: bootstrapReceipt.CustodySnapshot.GelHandle,
+            GoaStandingHandle: bootstrapReceipt.CustodySnapshot.GoaHandle,
+            MosStandingHandle: bootstrapReceipt.CustodySnapshot.MosHandle,
+            ToolRightsHandle: bootstrapAdmissionReceipt.MembraneWakePermitted
+                ? CreateHandle("tool-rights://", bootstrapAdmissionReceipt.AdmissionHandle, theaterId)
+                : null,
+            DataRightsHandle: bootstrapAdmissionReceipt.MembraneWakePermitted
+                ? CreateHandle("data-rights://", bootstrapAdmissionReceipt.AdmissionHandle, theaterId)
+                : null,
+            HostedSeedPresenceHandle: hostedLlmReceipt?.ServiceHandle,
+            BondProcessHandle: null,
+            OpalActualizationHandle: null,
+            NoticeCertificationGateHandle: null,
+            TimestampUtc: DateTimeOffset.UtcNow,
+            ProtocolizationPacket: null,
+            StewardWitnessedOePacket: null,
+            ElementalBindingPacket: null,
+            ActualizationSealPacket: null,
+            LivingAgentiCorePacket: null);
+
+        return _firstRunConstitutionService.Project(snapshot);
     }
 
     private static GovernedSeedPrimeToCrypticTransitContext CreatePrimeToCrypticTransitContext(

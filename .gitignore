@@ -15,18 +15,17 @@
 /.audit/
 
 # Build status artifacts with machine-local paths
-OAN Mortalis V1.0/audit_results.txt
-OAN Mortalis V1.0/audit_results_f1.txt
-OAN Mortalis V1.0/build_error.txt
+**/audit_results.txt
+**/audit_results_f1.txt
+**/build_error.txt
 
 # Large/local artifacts
 Modules/Antigravity.exe
 
 # Local indexer scratch output
-OAN Mortalis V1.0/tools/corpus_index/
+**/tools/corpus_index/
 
 # Local-only foundational corpus configuration
-OAN Mortalis V1.0/.local/
 OAN Mortalis V1.1.1/.local/
 
 # OAN runtime infrastructure (must remain outside repository history)
@@ -57,6 +56,5 @@ OAN Mortalis V1.1.1/.local/
 
 # External CradleTek runtime roots
 /opt/cradletek/
-/OAN Mortalis V1.0/opt/cradletek/
 Modules/SymbolicCryptic_01/Symbolic Language Engine/telemetry/
 Modules/SymbolicCryptic_01/Symbolic Language Engine/.governance_keys/

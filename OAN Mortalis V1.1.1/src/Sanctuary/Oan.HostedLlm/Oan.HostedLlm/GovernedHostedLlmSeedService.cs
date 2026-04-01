@@ -4,8 +4,8 @@ using Oan.Common;
 
 namespace Oan.HostedLlm;
 
-internal sealed record GovernedHostedLlmListeningFrame(
-    bool ListeningFrameActive,
+internal sealed record GovernedHostedLlmGuardFrame(
+    bool GuardFrameActive,
     bool SparseEvidenceDetected,
     bool DisclosurePressureDetected,
     bool AuthorityPressureDetected,
@@ -92,7 +92,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
 
         var now = DateTimeOffset.UtcNow;
         var protocol = CreateProtocol();
-        var listeningFrame = PrepareListeningFrame(request.Input);
+        var guardFrame = PrepareGuardFrame(request.Input);
         var bootstrapHandle = request.BootstrapReceipt?.BootstrapHandle ?? "bootstrap://unbound";
         var requestPacket = new GovernedSeedHostedLlmRequestPacket(
             PacketHandle: CreateHandle("hosted-llm-request://", request.AgentId, request.TheaterId, request.Input, personifiedMemoryContext.ContextHandle),
@@ -114,7 +114,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             TimestampUtc: now);
 
         var providerResponse = default(GovernedHostedLlmProviderResponse);
-        var emissionState = ResolveLocalGuardState(listeningFrame);
+        var emissionState = ResolveLocalGuardState(guardFrame);
         if (emissionState is null)
         {
             providerResponse = _provider?.TryEvaluate(request, personifiedMemoryContext, lowMindSfRoute, protocol);
@@ -123,7 +123,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
 
         var resolvedEmissionState = emissionState.Value;
         var accepted = resolvedEmissionState is GovernedSeedHostedLlmEmissionState.Query or GovernedSeedHostedLlmEmissionState.Complete;
-        var trace = ResolveTrace(resolvedEmissionState, listeningFrame, providerResponse?.Trace);
+        var trace = ResolveTrace(resolvedEmissionState, guardFrame, providerResponse?.Trace);
         var responsePacket = new GovernedSeedHostedLlmResponsePacket(
             PacketHandle: CreateHandle("hosted-llm-response://", requestPacket.PacketHandle, GovernedSeedHostedLlmEmissionStateTokens.ToToken(resolvedEmissionState)),
             PacketProfile: "seed-governed-hosted-llm-response",
@@ -164,12 +164,12 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
             RequestPacket: requestPacket,
             ResponsePacket: responsePacket,
             SeededTransitPacket: seededTransitPacket,
-            ListeningFrameActive: listeningFrame.ListeningFrameActive,
-            SparseEvidenceDetected: listeningFrame.SparseEvidenceDetected,
-            DisclosurePressureDetected: listeningFrame.DisclosurePressureDetected,
-            AuthorityPressureDetected: listeningFrame.AuthorityPressureDetected,
-            PromptInjectionDetected: listeningFrame.PromptInjectionDetected,
-            UnsupportedExecutionPressureDetected: listeningFrame.UnsupportedExecutionPressureDetected,
+            GuardFrameActive: guardFrame.GuardFrameActive,
+            SparseEvidenceDetected: guardFrame.SparseEvidenceDetected,
+            DisclosurePressureDetected: guardFrame.DisclosurePressureDetected,
+            AuthorityPressureDetected: guardFrame.AuthorityPressureDetected,
+            PromptInjectionDetected: guardFrame.PromptInjectionDetected,
+            UnsupportedExecutionPressureDetected: guardFrame.UnsupportedExecutionPressureDetected,
             TimestampUtc: now);
     }
 
@@ -194,11 +194,11 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
                 GovernedSeedHostedLlmEmissionState.Halt
             ]);
 
-    private static GovernedHostedLlmListeningFrame PrepareListeningFrame(string input)
+    private static GovernedHostedLlmGuardFrame PrepareGuardFrame(string input)
     {
         var normalized = input.Trim();
-        return new GovernedHostedLlmListeningFrame(
-            ListeningFrameActive: true,
+        return new GovernedHostedLlmGuardFrame(
+            GuardFrameActive: true,
             SparseEvidenceDetected: ContainsAny(normalized, SparseEvidenceCues),
             DisclosurePressureDetected: ContainsAny(normalized, DisclosurePressureCues),
             AuthorityPressureDetected: ContainsAny(normalized, AuthorityPressureCues),
@@ -207,24 +207,24 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
     }
 
     private static GovernedSeedHostedLlmEmissionState? ResolveLocalGuardState(
-        GovernedHostedLlmListeningFrame listeningFrame)
+        GovernedHostedLlmGuardFrame guardFrame)
     {
-        if (listeningFrame.DisclosurePressureDetected)
+        if (guardFrame.DisclosurePressureDetected)
         {
             return GovernedSeedHostedLlmEmissionState.Refusal;
         }
 
-        if (listeningFrame.AuthorityPressureDetected)
+        if (guardFrame.AuthorityPressureDetected)
         {
             return GovernedSeedHostedLlmEmissionState.Refusal;
         }
 
-        if (listeningFrame.PromptInjectionDetected)
+        if (guardFrame.PromptInjectionDetected)
         {
             return GovernedSeedHostedLlmEmissionState.Refusal;
         }
 
-        if (listeningFrame.UnsupportedExecutionPressureDetected)
+        if (guardFrame.UnsupportedExecutionPressureDetected)
         {
             return GovernedSeedHostedLlmEmissionState.Refusal;
         }
@@ -260,7 +260,7 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
 
     private static string ResolveTrace(
         GovernedSeedHostedLlmEmissionState state,
-        GovernedHostedLlmListeningFrame listeningFrame,
+        GovernedHostedLlmGuardFrame guardFrame,
         string? providerTrace = null)
     {
         if (!string.IsNullOrWhiteSpace(providerTrace))
@@ -270,10 +270,10 @@ public sealed class GovernedHostedLlmSeedService : IGovernedSeedHostedLlmService
 
         return state switch
         {
-            GovernedSeedHostedLlmEmissionState.Refusal when listeningFrame.DisclosurePressureDetected => "governed-disclosure-guard",
-            GovernedSeedHostedLlmEmissionState.Refusal when listeningFrame.AuthorityPressureDetected => "governed-authority-guard",
-            GovernedSeedHostedLlmEmissionState.Refusal when listeningFrame.PromptInjectionDetected => "governed-injection-guard",
-            GovernedSeedHostedLlmEmissionState.Refusal when listeningFrame.UnsupportedExecutionPressureDetected => "governed-non-fabrication-guard",
+            GovernedSeedHostedLlmEmissionState.Refusal when guardFrame.DisclosurePressureDetected => "governed-disclosure-guard",
+            GovernedSeedHostedLlmEmissionState.Refusal when guardFrame.AuthorityPressureDetected => "governed-authority-guard",
+            GovernedSeedHostedLlmEmissionState.Refusal when guardFrame.PromptInjectionDetected => "governed-injection-guard",
+            GovernedSeedHostedLlmEmissionState.Refusal when guardFrame.UnsupportedExecutionPressureDetected => "governed-non-fabrication-guard",
             GovernedSeedHostedLlmEmissionState.NeedsMoreInformation => "governed-needs-more-information",
             GovernedSeedHostedLlmEmissionState.UnresolvedConflict => "governed-unresolved-conflict",
             GovernedSeedHostedLlmEmissionState.Query => "hosted-seed-query-ready",

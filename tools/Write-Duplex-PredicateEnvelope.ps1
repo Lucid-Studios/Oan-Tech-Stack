@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
@@ -19,6 +19,17 @@ function Resolve-PathFromRepo {
         [string] $BasePath,
         [string] $CandidatePath
     )
+
+    if (-not (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue)) {
+        $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+        if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+            . $oanWorkspaceResolverPath
+        }
+    }
+
+    if (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue) {
+        return Resolve-OanWorkspacePath -BasePath $BasePath -CandidatePath $CandidatePath
+    }
 
     if ([System.IO.Path]::IsPathRooted($CandidatePath)) {
         return [System.IO.Path]::GetFullPath($CandidatePath)
@@ -104,12 +115,9 @@ if ($null -eq $cycleState) {
 $runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSurfaceAdmissibilityStatePath
 $nexusSingularPortalFacadeState = Read-JsonFileOrNull -Path $nexusSingularPortalFacadeStatePath
 
-$duplexSourceFiles = @(
-    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore.Runtime/DuplexPredicateSurfaceContracts.cs')
-    (Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore.Runtime/AgentiRuntime.cs')
-)
+$duplexSourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'duplex-envelope-base' -CyclePolicy $cyclePolicy
 $missingDuplexSourceFiles = @($duplexSourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
-$agentiRuntimePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath 'OAN Mortalis V1.0/src/AgentiCore.Runtime/AgentiRuntime.cs'
+$agentiRuntimePath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId 'runtime.agentiRuntime' -CyclePolicy $cyclePolicy
 $agentiRuntimeSource = if (Test-Path -LiteralPath $agentiRuntimePath -PathType Leaf) { Get-Content -Raw -LiteralPath $agentiRuntimePath } else { '' }
 
 $duplexState = 'awaiting-runtime-admissibility'

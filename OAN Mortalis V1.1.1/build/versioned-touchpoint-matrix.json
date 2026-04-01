@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "matrixOwner": "OAN Mortalis V1.1.1/build/versioned-touchpoint-matrix.json",
+  "description": "Maps local legacy V1.0 touch points onto the active V1.1.1 workspace where equivalents exist, while preserving lawful fallback to the staged legacy surfaces until uptake is complete.",
+  "touchPoints": {
+    "policy.deployables": {
+      "legacyPath": "OAN Mortalis V1.1.1/build/deployables.json",
+      "localCandidates": [
+        "{automationPolicyRoot}/deployables.json"
+      ],
+      "preferLocalCandidate": true
+    },
+    "policy.versionPolicy": {
+      "legacyPath": "OAN Mortalis V1.1.1/build/version-policy.json",
+      "localCandidates": [
+        "{automationPolicyRoot}/version-policy.json"
+      ],
+      "preferLocalCandidate": true
+    },
+    "policy.hitlGates": {
+      "legacyPath": "OAN Mortalis V1.1.1/build/hitl-gates.json",
+      "localCandidates": [
+        "{automationPolicyRoot}/hitl-gates.json"
+      ],
+      "preferLocalCandidate": true
+    },
+    "tool.localLlmPreflight": {
+      "legacyPath": "OAN Mortalis V1.1.1/tools/run-local-llm-preflight.ps1",
+      "localCandidates": [
+        "{activeBuildRoot}/tools/run-local-llm-preflight.ps1"
+      ]
+    },
+    "docs.localAutomationTaskingSurface": {
+      "legacyPath": "OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
+      "localCandidates": [
+        "{activeBuildRoot}/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md"
+      ]
+    },
+    "common.agentiActualizationContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/AgentiActualizationContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/AgentiActualizationContracts.cs"
+      ]
+    },
+    "common.agentiActualizationKeys": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/AgentiActualizationKeys.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/AgentiActualizationKeys.cs"
+      ]
+    },
+    "common.firstBootGovernanceContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/FirstBootGovernanceContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/FirstBootGovernanceContracts.cs"
+      ]
+    },
+    "common.sanctuaryWorkbenchContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/SanctuaryWorkbenchContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/SanctuaryWorkbenchContracts.cs"
+      ]
+    },
+    "common.sanctuaryWorkbenchKeys": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/SanctuaryWorkbenchKeys.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/SanctuaryWorkbenchKeys.cs"
+      ]
+    },
+    "common.workerGovernanceKeys": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/WorkerGovernanceKeys.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/WorkerGovernanceKeys.cs"
+      ]
+    },
+    "common.workerThreadGovernanceContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/WorkerThreadGovernanceContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/WorkerThreadGovernanceContracts.cs"
+      ]
+    },
+    "service.governedReachRealization": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore/Services/GovernedReachRealizationService.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/Services/GovernedReachRealizationService.cs",
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/GovernedReachRealizationService.cs"
+      ]
+    },
+    "service.governedWorkerThread": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore/Services/GovernedWorkerThreadService.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/Services/GovernedWorkerThreadService.cs",
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/GovernedWorkerThreadService.cs"
+      ]
+    },
+    "service.sanctuaryRuntimeWorkbench": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/CradleTek.Runtime/SanctuaryRuntimeWorkbenchService.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/TechStack/CradleTek/CradleTek.Runtime/CradleTek.Runtime/SanctuaryRuntimeWorkbenchService.cs"
+      ]
+    },
+    "runtime.agentiRuntime": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore.Runtime/AgentiRuntime.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore.Runtime/AgentiCore.Runtime/AgentiRuntime.cs",
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/AgentiRuntime.cs"
+      ]
+    },
+    "runtime.duplexPredicateSurfaceContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore.Runtime/DuplexPredicateSurfaceContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore.Runtime/AgentiCore.Runtime/DuplexPredicateSurfaceContracts.cs",
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/DuplexPredicateSurfaceContracts.cs"
+      ]
+    },
+    "runtime.reachDuplexRealizationSurfaceContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore.Runtime/ReachDuplexRealizationSurfaceContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore.Runtime/AgentiCore.Runtime/ReachDuplexRealizationSurfaceContracts.cs",
+        "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/ReachDuplexRealizationSurfaceContracts.cs"
+      ]
+    },
+    "sli.crypticWebNexusFactory": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/CrypticWebNexusFactory.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/CrypticWebNexusFactory.cs",
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/CrypticWebNexusFactory.cs",
+        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/CrypticWebNexusFactory.cs"
+      ]
+    },
+    "sli.crypticWebNexusPortalContracts": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/CrypticWebNexusPortalContracts.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/CrypticWebNexusPortalContracts.cs",
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/CrypticWebNexusPortalContracts.cs",
+        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/CrypticWebNexusPortalContracts.cs"
+      ]
+    },
+    "sli.executionSnapshotCrypticWebNexusPortal": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/ExecutionSnapshotCrypticWebNexusPortal.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/ExecutionSnapshotCrypticWebNexusPortal.cs",
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/ExecutionSnapshotCrypticWebNexusPortal.cs",
+        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/ExecutionSnapshotCrypticWebNexusPortal.cs"
+      ]
+    },
+    "sli.iCrypticWebNexusPortal": {
+      "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/ICrypticWebNexusPortal.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/ICrypticWebNexusPortal.cs",
+        "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/ICrypticWebNexusPortal.cs",
+        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/ICrypticWebNexusPortal.cs"
+      ]
+    },
+    "tests.sanctuaryRuntimeWorkbenchService": {
+      "legacyPath": "OAN Mortalis V1.1.1/tests/Oan.Runtime.IntegrationTests/SanctuaryRuntimeWorkbenchServiceTests.cs",
+      "localCandidates": [
+        "{activeBuildRoot}/tests/Sanctuary/Oan.Runtime.IntegrationTests/Oan.Runtime.IntegrationTests/SanctuaryRuntimeWorkbenchServiceTests.cs"
+      ]
+    }
+  },
+  "families": {
+    "policy.publishIntent": {
+      "touchPoints": [
+        "policy.deployables",
+        "policy.versionPolicy"
+      ]
+    },
+    "policy.publishRequest": {
+      "touchPoints": [
+        "policy.deployables",
+        "policy.versionPolicy",
+        "policy.hitlGates"
+      ]
+    },
+    "agenticore-actual-pair": {
+      "touchPoints": [
+        "common.agentiActualizationContracts",
+        "service.governedReachRealization"
+      ]
+    },
+    "agenticore-actual-base": {
+      "touchPoints": [
+        "common.agentiActualizationContracts",
+        "common.agentiActualizationKeys",
+        "service.governedReachRealization"
+      ]
+    },
+    "agenticore-actual-runtime": {
+      "touchPoints": [
+        "common.agentiActualizationContracts",
+        "common.agentiActualizationKeys",
+        "service.governedReachRealization",
+        "runtime.agentiRuntime"
+      ]
+    },
+    "agenticore-actual-integration": {
+      "touchPoints": [
+        "common.agentiActualizationContracts",
+        "common.agentiActualizationKeys",
+        "service.governedReachRealization",
+        "tests.sanctuaryRuntimeWorkbenchService"
+      ]
+    },
+    "sanctuary-workbench-base": {
+      "touchPoints": [
+        "common.sanctuaryWorkbenchContracts",
+        "common.sanctuaryWorkbenchKeys",
+        "service.sanctuaryRuntimeWorkbench"
+      ]
+    },
+    "sanctuary-workbench-integration": {
+      "touchPoints": [
+        "common.sanctuaryWorkbenchContracts",
+        "common.sanctuaryWorkbenchKeys",
+        "service.sanctuaryRuntimeWorkbench",
+        "tests.sanctuaryRuntimeWorkbenchService"
+      ]
+    },
+    "worker-thread-base": {
+      "touchPoints": [
+        "common.workerThreadGovernanceContracts",
+        "service.governedWorkerThread"
+      ]
+    },
+    "worker-thread-identity": {
+      "touchPoints": [
+        "common.workerThreadGovernanceContracts",
+        "common.workerGovernanceKeys",
+        "service.governedWorkerThread"
+      ]
+    },
+    "worker-thread-birth": {
+      "touchPoints": [
+        "common.workerThreadGovernanceContracts",
+        "common.firstBootGovernanceContracts",
+        "service.governedWorkerThread"
+      ]
+    },
+    "duplex-envelope-base": {
+      "touchPoints": [
+        "runtime.duplexPredicateSurfaceContracts",
+        "runtime.agentiRuntime"
+      ]
+    },
+    "reach-duplex-realization": {
+      "touchPoints": [
+        "runtime.reachDuplexRealizationSurfaceContracts",
+        "runtime.agentiRuntime",
+        "service.governedReachRealization",
+        "common.agentiActualizationContracts"
+      ]
+    },
+    "nexus-portal-base": {
+      "touchPoints": [
+        "sli.iCrypticWebNexusPortal",
+        "sli.crypticWebNexusPortalContracts",
+        "sli.executionSnapshotCrypticWebNexusPortal",
+        "sli.crypticWebNexusFactory"
+      ]
+    }
+  }
+}
+

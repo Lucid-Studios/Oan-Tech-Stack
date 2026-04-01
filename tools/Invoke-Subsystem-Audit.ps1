@@ -104,197 +104,43 @@ function Get-SubsystemPayloadWitnesses {
         [object[]] $OwnedProjects
     )
 
-    if ($SubsystemName -eq 'SoulFrame') {
-        return @(
-            [ordered]@{
-                witness = 'projection-shape'
-                classification = 'summary_only'
-                note = 'Bounded projection is proven by contract and tests to carry non-empty SessionHandle, WorkingStateHandle, and ProvenanceMarker while withholding custody-shaped payload material.'
-                references = @(
-                    'OAN Mortalis V1.0/src/Oan.Common/SoulFrameMembraneContracts.cs',
-                    'OAN Mortalis V1.0/src/SoulFrame.Host/SoulFrameHostClient.cs',
-                    'OAN Mortalis V1.0/tests/Oan.SoulFrame.Tests/SoulFrameHostClientTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'return-candidate-shape'
-                classification = 'summary_only'
-                note = 'Return intake is candidate-only by contract and tests, with SessionHandle, ReturnCandidatePointer, ProvenanceMarker, and IntakeIntent but no patch or write-back semantics.'
-                references = @(
-                    'OAN Mortalis V1.0/src/Oan.Common/SoulFrameMembraneContracts.cs',
-                    'OAN Mortalis V1.0/src/SoulFrame.Host/SoulFrameHostClient.cs',
-                    'OAN Mortalis V1.0/tests/Oan.SoulFrame.Tests/SoulFrameHostClientTests.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreMembraneCallerTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'authority-boundary'
-                classification = 'empty_by_design'
-                note = 'SoulFrame intentionally does not expose custody mutation, broad store access, orchestration control, or Prime publication payloads through the membrane surface.'
-                references = @(
-                    'OAN Mortalis V1.0/src/Oan.Common/SoulFrameMembraneContracts.cs',
-                    'OAN Mortalis V1.0/src/SoulFrame.Host/SoulFrameHostClient.cs'
-                )
-            }
-        )
-    }
-
-    if ($SubsystemName -eq 'AgentiCore') {
-        return @(
-            [ordered]@{
-                witness = 'bounded-worker-state'
-                classification = 'summary_only'
-                note = 'Bounded worker state is proven by code and tests to carry non-empty SessionHandle, WorkingStateHandle, and ProvenanceMarker while rejecting custody-shaped widening.'
-                references = @(
-                    'OAN Mortalis V1.0/src/AgentiCore/Services/BoundedMembraneWorkerService.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreMembraneCallerTests.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreFlowMembraneIntegrationTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'return-candidate-pointer'
-                classification = 'payload_present'
-                note = 'AgentiCore emits explicit candidate-shaped return pointers on the bounded membrane path, and tests prove those pointers are non-empty and remain in the agenticore-return:// namespace.'
-                references = @(
-                    'OAN Mortalis V1.0/src/AgentiCore/Services/BoundedMembraneWorkerService.cs',
-                    'OAN Mortalis V1.0/src/AgentiCore/Services/AgentiCore.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreMembraneCallerTests.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreFlowMembraneIntegrationTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'governance-cycle-candidate-payload'
-                classification = 'payload_present'
-                note = 'The governance-cycle path returns a non-empty candidate payload derived from bounded cognition results, rather than only emitting an empty shell or state transition marker.'
-                references = @(
-                    'OAN Mortalis V1.0/src/AgentiCore/Services/AgentiCore.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/StewardAgentGovernanceTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'authority-boundary'
-                classification = 'empty_by_design'
-                note = 'AgentiCore intentionally does not widen WorkingStateHandle into custody access and does not gain publication or orchestration authority through the bounded worker stage.'
-                references = @(
-                    'OAN Mortalis V1.0/src/AgentiCore/Services/BoundedMembraneWorkerService.cs',
-                    'OAN Mortalis V1.0/src/AgentiCore/Services/AgentiCore.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/AgentiCoreFlowMembraneIntegrationTests.cs'
-                )
-            }
-        )
-    }
-
-    if ($SubsystemName -eq 'GovernanceConnective') {
-        return @(
-            [ordered]@{
-                witness = 'governance-decision-receipt'
-                classification = 'payload_present'
-                note = 'Governance adjudication emits non-empty decision receipts with explicit decision, adjudicator identity, rationale code, and downstream authorization state.'
-                references = @(
-                    'OAN Mortalis V1.0/src/EngramGovernance/Services/StewardAgent.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/StewardAgentGovernanceTests.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'approved-reengrammitization'
-                classification = 'payload_present'
-                note = 'Approved governance outcomes produce a governed reengrammitization request and accepted Cryptic receipt, proving that residue admission is carrying real payload input rather than only advancing loop state.'
-                references = @(
-                    'OAN Mortalis V1.0/src/CradleTek.Mantle/MantleOfSovereigntyService.cs',
-                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'rejected-deferred-downstream-suppression'
-                classification = 'empty_by_policy'
-                note = 'Rejected and deferred decisions explicitly authorize no Cryptic mutation and no Prime publication; emptiness here is policy-enforced rather than an accidental absence of work.'
-                references = @(
-                    'OAN Mortalis V1.0/src/EngramGovernance/Services/StewardAgent.cs',
-                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Audit.Tests/StewardAgentGovernanceTests.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'prime-publication-lanes'
-                classification = 'payload_present'
-                note = 'Prime publication lanes are independently materialized and tracked: approved loops publish pointer and checked-view outputs separately, while replay and retry preserve lane-aware completion without duplicating already completed acts.'
-                references = @(
-                    'OAN Mortalis V1.0/src/CradleTek.Public/PublicLayerService.cs',
-                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceGoldenPathIntegrationTests.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceOperationalControlIntegrationTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'replay-and-recovery-status'
-                classification = 'summary_only'
-                note = 'Journal-first replay returns explicit loop stage, failure, and lane-completion truth for status and recovery control, proving that continuation is based on recorded evidence rather than implicit state-machine assumption.'
-                references = @(
-                    'OAN Mortalis V1.0/src/Oan.Storage/GovernanceReceiptJournal.cs',
-                    'OAN Mortalis V1.0/src/Oan.Cradle/StackManager.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Runtime.IntegrationTests/GovernanceOperationalControlIntegrationTests.cs'
-                )
-            }
-        )
-    }
-
-    if ($SubsystemName -eq 'SLI') {
-        return @(
-            [ordered]@{
-                witness = 'sli-ingestion-structure'
-                classification = 'payload_present'
-                note = 'SLI ingestion produces canonical program expressions, symbol trees, constructor graphs, and candidate tokens rather than only wrapping lower-layer inputs.'
-                references = @(
-                    'OAN Mortalis V1.0/src/SLI.Ingestion/SliIngestionEngine.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliIngestionTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'symbolic-cognition-trace'
-                classification = 'payload_present'
-                note = 'The SLI cognition engine emits non-empty decision branches, cleave residue, confidence, and symbolic traces, showing real symbolic execution rather than ceremonial naming.'
-                references = @(
-                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliCognitionEngineTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'lisp-bridge-roundtrip'
-                classification = 'payload_present'
-                note = 'The Lisp bridge accepts and returns structured packet content in memory, proving the current symbolic bridge is carrying routing material rather than existing only as an architectural placeholder.'
-                references = @(
-                    'OAN Mortalis V1.0/src/SLI.Engine/LispSliBridgeStub.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliEngineBridgeTests.cs'
-                )
-            }
-            [ordered]@{
-                witness = 'authority-boundary'
-                classification = 'empty_by_design'
-                note = 'SLI does not adjudicate governance, widen custody access, or impersonate the SoulFrame membrane in the currently proven paths; its role remains symbolic ingestion, routing, and execution.'
-                references = @(
-                    'OAN Mortalis V1.0/src/Oan.Sli/RoutingEngine.cs',
-                    'OAN Mortalis V1.0/src/SLI.Ingestion/SliIngestionEngine.cs',
-                    'OAN Mortalis V1.0/tests/Oan.Sli.Tests/SliIngestionTests.cs'
-                )
-            }
-        )
-    }
-
     $classification = if ($OwnedProjects.Count -gt 0) { 'summary_only' } else { 'unimplemented' }
-    $note = if ($OwnedProjects.Count -gt 0) {
-        'Subsystem audit v1 is using build and test evidence plus targeted probes; runtime payload content remains a bounded summary until a deeper pass measures subsystem-specific outputs directly.'
+    $ownedProjectReferences = @($OwnedProjects | ForEach-Object { [string] $_.projectPath } | Select-Object -First 8)
+    if ($ownedProjectReferences.Count -eq 0) {
+        $ownedProjectReferences = @('summary.md')
     }
-    else {
-        'No owned projects were identified for this subsystem in the current audit bundle.'
+
+    $runtimeNotes = @{
+        CradleTek = 'CradleTek truth is currently summarized from the active V1.1.1 build lane and subsystem probes. This lane covers custody, host, runtime, mantle, and memory ownership without treating the summary as direct runtime authority.'
+        SoulFrame = 'SoulFrame truth is currently summarized from the active V1.1.1 build lane and subsystem probes. This lane covers bootstrap and membrane ownership without widening the subsystem into custody, publication, or orchestration authority.'
+        AgentiCore = 'AgentiCore truth is currently summarized from the active V1.1.1 build lane and subsystem probes. This lane covers chambered cognition and governed utility without flattening those surfaces into general repo authority.'
+        GovernanceConnective = 'Governance connective truth is currently summarized from the active V1.1.1 build lane and subsystem probes. This lane covers Sanctuary governance, first-run shaping, hosted-seed mediation, trace persistence, and GEL-facing connective law as build-facing evidence rather than free narrative.'
+        SLI = 'SLI truth is currently summarized from the active V1.1.1 build lane and subsystem probes. This lane covers ingestion, hosted Lisp, symbolic execution, and the HITL-to-SLI bridge without treating symbolic surfaces as self-authorizing governance.'
+    }
+
+    $ownedProjectNote = if ($OwnedProjects.Count -gt 0) {
+        'Owned projects were identified for this subsystem in the active V1.1.1 solution and are being summarized directly from the current build tree.'
+    } else {
+        'No owned projects were identified for this subsystem in the active build audit bundle.'
+    }
+
+    $runtimeNote = if ($runtimeNotes.ContainsKey($SubsystemName)) {
+        [string] $runtimeNotes[$SubsystemName]
+    } else {
+        'Subsystem audit v1 is using build and test evidence plus targeted probes; runtime payload content remains a bounded summary until a deeper subsystem-specific evidence pass is introduced.'
     }
 
     return @(
         [ordered]@{
+            witness = 'owned-project-surface'
+            classification = $classification
+            note = $ownedProjectNote
+            references = $ownedProjectReferences
+        }
+        [ordered]@{
             witness = 'runtime-payload-truth'
             classification = $classification
-            note = $note
+            note = $runtimeNote
             references = @('summary.md')
         }
     )
@@ -335,48 +181,48 @@ else {
 
 $subsystemDefinitions = @{
     CradleTek = @{
-        Prefixes = @('OAN Mortalis V1.0/src/CradleTek.', 'OAN Mortalis V1.0/src/Oan.Cradle/', 'OAN Mortalis V1.0/src/Oan.Runtime.Headless/')
+        Prefixes = @('OAN Mortalis V1.1.1/src/TechStack/CradleTek/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.Runtime.Headless/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.Runtime.Materialization/')
         Tests = @('Oan.Runtime.IntegrationTests')
-        Ownership = @('Application and swarm orchestration fabric', 'Loop composition root', 'Control-plane routing and local recovery entrypoints')
-        Inputs = @('Governance loop contracts', 'Journal-first status and recovery evidence', 'Store registry service resolution')
-        Outputs = @('Runtime loop execution', 'Status views', 'Resume and retry coordination')
-        Placement = 'CradleTek remains the application fabric and should not absorb custody, membrane, or publication law.'
+        Ownership = @('Runtime host and orchestration fabric', 'Custody, mantle, and memory seams', 'Materialized return and audit surfaces')
+        Inputs = @('Sanctuary governance decisions', 'Bounded ingress and hosted-seed outputs', 'Active solution build evidence')
+        Outputs = @('Headless runtime execution', 'Operational contexts and return shaping', 'Host-visible evidence surfaces')
+        Placement = 'CradleTek remains the governed host substrate and should not absorb doctrine, publication, or free-floating documentation authority.'
     }
     SoulFrame = @{
-        Prefixes = @('OAN Mortalis V1.0/src/SoulFrame.', 'OAN Mortalis V1.0/src/Oan.SoulFrame/')
-        Tests = @('Oan.SoulFrame.Tests')
-        Ownership = @('Self-state membrane', 'Bounded projection and candidate intake', 'Identity-safe mediation')
-        Inputs = @('Cryptic-side governed source state', 'Bounded cognition return candidates')
-        Outputs = @('Mitigated self-state projections', 'Return intake candidates', 'Membrane-scoped telemetry')
-        Placement = 'SoulFrame remains a membrane, not a general execution or storage blob.'
+        Prefixes = @('OAN Mortalis V1.1.1/src/TechStack/SoulFrame/')
+        Tests = @('Oan.Audit.Tests')
+        Ownership = @('Bootstrap and membrane identity surfaces', 'Bounded projection and return-intake mediation', 'Stewardship-facing continuity seams')
+        Inputs = @('Sanctuary legality and bootstrap context', 'CradleTek and AgentiCore receipts')
+        Outputs = @('Mediated membrane posture', 'Bootstrap-bearing continuity surfaces', 'Bounded outward return posture')
+        Placement = 'SoulFrame remains a stewardship membrane and should not be widened into a general host, storage, or publication sink.'
     }
     AgentiCore = @{
-        Prefixes = @('OAN Mortalis V1.0/src/AgentiCore', 'OAN Mortalis V1.0/src/Oan.AgentiCore/')
+        Prefixes = @('OAN Mortalis V1.1.1/src/TechStack/AgentiCore/')
         Tests = @('Oan.Audit.Tests')
-        Ownership = @('Bounded worker cognition', 'Local working-state use', 'Candidate-shaped return emission')
-        Inputs = @('SoulFrame-bounded handles', 'Local bounded cognition requests')
-        Outputs = @('Candidate return material', 'Working-state observations')
-        Placement = 'AgentiCore should grow by composition around the bounded worker rather than by widening its authority.'
+        Ownership = @('Chambered cognition execution', 'Governed utility and working-state use', 'Candidate-bearing return posture')
+        Inputs = @('SoulFrame memory and ingress context', 'Hosted-seed and symbolic floor decisions')
+        Outputs = @('Cognition-stage receipts', 'Candidate-bearing runtime posture', 'Governed utility surfaces')
+        Placement = 'AgentiCore should grow by bounded cognition and utility seams rather than by widening into custody, documentation, or publication authority.'
     }
     GovernanceConnective = @{
-        Prefixes = @('OAN Mortalis V1.0/src/EngramGovernance/', 'OAN Mortalis V1.0/src/Oan.Storage/', 'OAN Mortalis V1.0/src/CradleTek.Mantle/', 'OAN Mortalis V1.0/src/CradleTek.Public/', 'OAN Mortalis V1.0/src/Data.Cryptic/')
+        Prefixes = @('OAN Mortalis V1.1.1/src/Sanctuary/Oan.Common/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.Nexus.Control/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.PrimeCryptic.Services/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.State.Modulation/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.Trace.Persistence/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.HostedLlm/', 'OAN Mortalis V1.1.1/src/Sanctuary/Oan.FirstRun/', 'OAN Mortalis V1.1.1/src/TechStack/GEL/')
         Tests = @('Oan.Runtime.IntegrationTests', 'Oan.Audit.Tests')
-        Ownership = @('Governance adjudication', 'Receipt journaling', 'Cryptic re-engrammitization gate', 'Prime derivative publication lanes')
-        Inputs = @('Return candidate review requests', 'Approved governance decisions', 'Journal replay evidence')
-        Outputs = @('Decision receipts', 'Downstream act receipts', 'Governed Prime publication outputs')
-        Placement = 'This connective layer should remain explicit and payload-proven rather than dissolve back into GEL or orchestration convenience.'
+        Ownership = @('Sanctuary governance and nexus decisions', 'First-run and hosted-seed connective law', 'Trace persistence and GEL-facing connective surfaces')
+        Inputs = @('Executable runtime receipts', 'Ingress and readiness evidence', 'Governed first-run and hosted-seed state')
+        Outputs = @('Governance-readable decisions', 'Traceable connective receipts', 'Build-facing law and telemetry surfaces')
+        Placement = 'This connective layer should remain explicit and build-facing rather than collapsing into documentation prose or host convenience.'
     }
     SLI = @{
-        Prefixes = @('OAN Mortalis V1.0/src/Oan.Sli/', 'OAN Mortalis V1.0/src/SLI.')
-        Tests = @('Oan.Sli.Tests')
-        Ownership = @('Symbolic routing and ingestion', 'Deterministic symbolic execution', 'Lisp and parser surfaces')
-        Inputs = @('Core runtime requests', 'Symbolic payloads', 'Deterministic harness inputs')
-        Outputs = @('Symbolic execution results', 'Routing decisions', 'Ingestion artifacts')
-        Placement = 'SLI should attach to proven runtime paths and not compensate for unclear lower-layer truth.'
+        Prefixes = @('OAN Mortalis V1.1.1/src/Sanctuary/SLI.')
+        Tests = @()
+        Ownership = @('Symbolic routing and ingestion', 'Hosted Lisp and symbolic execution', 'The HITL-to-SLI bridge surface')
+        Inputs = @('Governed ingress and hosted-seed packets', 'Symbolic runtime requests', 'Deterministic harness inputs')
+        Outputs = @('Symbolic execution receipts', 'Routing decisions', 'Ingress and hosted Lisp evidence')
+        Placement = 'SLI should attach to proven runtime paths and bridge law, not compensate for unclear lower-layer truth.'
         SymbolicContribution = @(
-            'Canonical SLI expressions and symbol trees that do not already exist in lower-layer inputs',
-            'Non-empty symbolic traces, decision branches, and cleave residue from SLI cognition execution',
-            'In-memory Lisp packet bridge behavior that proves current symbolic routing is more than naming ceremony'
+            'Canonical symbolic ingress and execution surfaces in the active Sanctuary lane',
+            'Hosted Lisp receipts and symbolic-floor evidence in the current build line',
+            'HITL-to-SLI bridge law that keeps ingress authority distinct from interior continuity authority'
         )
     }
 }

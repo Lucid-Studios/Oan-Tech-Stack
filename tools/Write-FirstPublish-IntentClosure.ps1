@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
@@ -19,6 +19,17 @@ function Resolve-PathFromRepo {
         [string] $BasePath,
         [string] $CandidatePath
     )
+
+    if (-not (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue)) {
+        $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+        if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+            . $oanWorkspaceResolverPath
+        }
+    }
+
+    if (Get-Command -Name Resolve-OanWorkspacePath -ErrorAction SilentlyContinue) {
+        return Resolve-OanWorkspacePath -BasePath $BasePath -CandidatePath $CandidatePath
+    }
 
     if ([System.IO.Path]::IsPathRooted($CandidatePath)) {
         return [System.IO.Path]::GetFullPath($CandidatePath)
@@ -63,9 +74,9 @@ $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Can
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
 $firstPublishIntentOutputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.firstPublishIntentOutputRoot)
 $firstPublishIntentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.firstPublishIntentStatePath)
-$deployablesPath = Join-Path (Join-Path $resolvedRepoRoot 'OAN Mortalis V1.0') 'build\deployables.json'
-$versionPolicyPath = Join-Path (Join-Path $resolvedRepoRoot 'OAN Mortalis V1.0') 'build\version-policy.json'
-$familyMaturityPath = Join-Path (Join-Path $resolvedRepoRoot 'OAN Mortalis V1.0') 'build\family-maturity.json'
+$deployablesPath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId 'policy.deployables' -CyclePolicy $cyclePolicy
+$versionPolicyPath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId 'policy.versionPolicy' -CyclePolicy $cyclePolicy
+    $familyMaturityPath = Join-Path (Join-Path $resolvedRepoRoot 'OAN Mortalis V1.1.1') 'build\family-maturity.json'
 
 $deployables = Get-Content -Raw -LiteralPath $deployablesPath | ConvertFrom-Json
 $versionPolicy = Get-Content -Raw -LiteralPath $versionPolicyPath | ConvertFrom-Json

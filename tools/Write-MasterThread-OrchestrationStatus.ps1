@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $OrchestrationPolicyPath = 'OAN Mortalis V1.0/build/master-thread-orchestration.json',
+    [string] $OrchestrationPolicyPath = 'OAN Mortalis V1.1.1/build/master-thread-orchestration.json',
     [string] $BucketStatusPath = '.audit/state/workspace-bucket-status.json',
     [string] $CycleStatePath = '.audit/state/local-automation-cycle.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'
@@ -16,6 +16,11 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
+$automationControlSignalsHelperPath = Join-Path $PSScriptRoot 'Automation-ControlSignals.ps1'
+. $automationControlSignalsHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -218,6 +223,10 @@ $currentBranch = Get-GitStringValue -RepositoryRoot $resolvedRepoRoot -ArgumentL
 $currentHeadCommit = Get-GitStringValue -RepositoryRoot $resolvedRepoRoot -ArgumentList @('rev-parse', 'HEAD')
 $currentWorktreeState = if (@(Get-GitChangedRepoPaths -RepositoryRoot $resolvedRepoRoot).Count -gt 0) { 'dirty' } else { 'clean' }
 $currentAutomationPosture = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastKnownStatus')
+$currentAutomationActionClass = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'actionClass')
+if ([string]::IsNullOrWhiteSpace($currentAutomationActionClass)) {
+    $currentAutomationActionClass = Get-AutomationActionClassFromStatus -Status $currentAutomationPosture
+}
 $movementAdmissibilityState = if ($currentAutomationPosture -eq [string] $policy.blockedStatus) {
     'held-by-blocked-posture'
 } elseif (@($policy.allowedContinuationStatuses) -contains $currentAutomationPosture) {
@@ -316,6 +325,7 @@ $statusPayload = [ordered]@{
         currentHeadCommit = $currentHeadCommit
         repoWorktreeState = $currentWorktreeState
         currentAutomationPosture = $currentAutomationPosture
+        currentAutomationActionClass = $currentAutomationActionClass
         publishReady = $publishReady
         activeLongFormTaskMapId = [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $taskStatus -PropertyName 'longFormTasking') -PropertyName 'activeTaskMapId')
     }
@@ -336,6 +346,7 @@ $statusPayload = [ordered]@{
     instructionIndexStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $instructionIndexStatePath
     instructions = $instructionSummaries
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $statusPayload | Out-Null
 
 Write-JsonFile -Path $statusJsonPath -Value $statusPayload
 
@@ -351,6 +362,7 @@ $markdownLines = @(
     ('- Current head commit: `{0}`' -f $statusPayload.sourceMasterThread.currentHeadCommit),
     ('- Repo worktree state: `{0}`' -f $statusPayload.sourceMasterThread.repoWorktreeState),
     ('- Current automation posture: `{0}`' -f $statusPayload.sourceMasterThread.currentAutomationPosture),
+    ('- Current automation action class: `{0}`' -f $statusPayload.sourceMasterThread.currentAutomationActionClass),
     ('- Publish ready: `{0}`' -f $statusPayload.sourceMasterThread.publishReady),
     ('- Codex run-once support: `{0}`' -f $statusPayload.codexAutomationSupport.supportState),
     ('- Movement admissibility: `{0}`' -f $statusPayload.movementAdmissibilityState),
@@ -393,6 +405,7 @@ if (@($instructionSummaries).Count -gt 0) {
     $markdownLines += ''
 }
 
+$markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
 Set-Content -LiteralPath $statusMarkdownPath -Value $markdownLines -Encoding utf8
 
 Write-Host ('[master-thread-orchestration] State: {0}' -f $statusJsonPath)

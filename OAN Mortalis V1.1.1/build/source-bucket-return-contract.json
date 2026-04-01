@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "sourceBucketFederationPolicyPath": "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+  "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
+  "requestIndexStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-request-index.json",
+  "federationStatusStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-federation-status.json",
+  "returnIdPattern": "source-bucket-return://YYYY-MM-DD/short-id",
+  "targetBucketLabels": [
+    "IUTT SLI & Lisp",
+    "Latex Styles",
+    "Trivium Forum",
+    "Holographic Data Tool"
+  ],
+  "listenerStates": [
+    "received",
+    "understood",
+    "admissible",
+    "actionable",
+    "withheld_or_escalated"
+  ],
+  "workingStates": [
+    "idle",
+    "active",
+    "paused",
+    "blocked",
+    "completed"
+  ],
+  "governanceActions": [
+    "admit",
+    "hold",
+    "narrow",
+    "defer",
+    "refuse",
+    "return",
+    "escalate"
+  ],
+  "workClasses": [
+    "advancing_surface",
+    "structured_form",
+    "root_artifact",
+    "held_candidate",
+    "retained_artifact"
+  ],
+  "returnClasses": [
+    "frame-now",
+    "spec-now",
+    "implement-now",
+    "hold"
+  ],
+  "requiredFields": [
+    "returnId",
+    "requestId",
+    "targetBucketLabel",
+    "listenerState",
+    "workingState",
+    "subject",
+    "predicate",
+    "governanceAction",
+    "workClass",
+    "returnClass",
+    "standingResult",
+    "artifactsTouched",
+    "verificationOutcomes",
+    "triadRefs",
+    "neededFollowup",
+    "hitlRequired"
+  ],
+  "hitlReviewSequence": [
+    "received",
+    "understood",
+    "admissible",
+    "actionable",
+    "withheld_or_escalated"
+  ],
+  "integrationRule": "Build may ingest only admitted source-bucket returns and their lawful receipts. Raw external repo drift is not a build mutation authority."
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-04-01T08:39:53.6406215Z",
+  "policyPath": "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+  "requestContractPath": "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
+  "requestOutboxRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests",
+  "federationStatusStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-federation-status.json",
+  "status": "ready-for-first-request",
+  "activeRequestCount": 0,
+  "completedRequestCount": 0,
+  "withheldRequestCount": 0,
+  "activeRequestIds": [],
+  "latestRequestId": null,
+  "requestsByBucket": {
+    "IUTT SLI & Lisp": {
+      "active": 0,
+      "completed": 0,
+      "withheld": 0
+    },
+    "Latex Styles": {
+      "active": 0,
+      "completed": 0,
+      "withheld": 0
+    },
+    "Trivium Forum": {
+      "active": 0,
+      "completed": 0,
+      "withheld": 0
+    },
+    "Holographic Data Tool": {
+      "active": 0,
+      "completed": 0,
+      "withheld": 0
+    }
+  },
+  "notes": [
+    "The line-local source-bucket outbox is initialized but no bounded requests have been published yet."
+  ]
+}

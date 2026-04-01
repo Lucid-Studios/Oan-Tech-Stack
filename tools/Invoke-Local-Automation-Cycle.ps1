@@ -2,7 +2,7 @@ param(
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
     [string] $RepoRoot,
-    [string] $PolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
+    [string] $PolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
     [string] $BaseRef,
     [string] $RequestedVersion,
     [switch] $ForceReleaseCandidate,
@@ -19,6 +19,11 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
+$automationControlSignalsHelperPath = Join-Path $PSScriptRoot 'Automation-ControlSignals.ps1'
+. $automationControlSignalsHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -119,6 +124,45 @@ function Invoke-ChildPowershellScript {
         [string] $FailureContext
     )
 
+    $scriptFileIndex = [System.Array]::IndexOf($ArgumentList, '-File')
+    if ($scriptFileIndex -ge 0 -and ($scriptFileIndex + 1) -lt $ArgumentList.Length) {
+        $resolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+        if (Test-Path -LiteralPath $resolverPath -PathType Leaf) {
+            $scriptPath = [string] $ArgumentList[$scriptFileIndex + 1]
+            $scriptArgs = if (($scriptFileIndex + 2) -lt $ArgumentList.Length) {
+                @($ArgumentList[($scriptFileIndex + 2)..($ArgumentList.Length - 1)])
+            } else {
+                @()
+            }
+
+            $escapedResolverPath = $resolverPath.Replace("'", "''")
+            $escapedScriptPath = $scriptPath.Replace("'", "''")
+            $renderedScriptArgs = @(
+                foreach ($scriptArg in $scriptArgs) {
+                    $scriptArgText = [string] $scriptArg
+                    if ($scriptArgText.StartsWith('-')) {
+                        $scriptArgText
+                    } else {
+                        "'" + $scriptArgText.Replace("'", "''") + "'"
+                    }
+                }
+            )
+
+            $command = "& { . '$escapedResolverPath'; & '$escapedScriptPath'"
+            if ($renderedScriptArgs.Count -gt 0) {
+                $command += ' ' + ($renderedScriptArgs -join ' ')
+            }
+            $command += ' }'
+
+            $output = & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -Command $command
+            if ($LASTEXITCODE -ne 0) {
+                throw '{0} failed with exit code {1}.' -f $FailureContext, $LASTEXITCODE
+            }
+
+            return @($output)
+        }
+    }
+
     $output = & powershell -NoProfile -NonInteractive -WindowStyle Hidden @ArgumentList
     if ($LASTEXITCODE -ne 0) {
         throw '{0} failed with exit code {1}.' -f $FailureContext, $LASTEXITCODE
@@ -154,6 +198,10 @@ $releaseCandidateOutputRoot = [string] $policy.releaseCandidateOutputRoot
 $digestOutputRoot = [string] $policy.digestOutputRoot
 $blockedEscalationOutputRoot = [string] $policy.blockedEscalationOutputRoot
 $statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.statePath)
+$dopingHeaderStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dopingHeaderStatePath)
+$cycleReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.cycleReceiptStatePath)
+$readinessNoticeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.readinessNoticeStatePath)
+$pauseNoticeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.pauseNoticeStatePath)
 $retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.retentionStatePath)
 $blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.blockedEscalationStatePath)
 $notificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.notificationStatePath)
@@ -211,6 +259,9 @@ $sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $res
 $amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.amenableDayDreamTierAdmissibilityStatePath)
 $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.selfRootedCrypticDepthGateStatePath)
 $runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeWorkbenchSessionLedgerStatePath)
+$companionToolTelemetryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.companionToolTelemetryStatePath)
+$v111EnrichmentPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.v111EnrichmentPathwayStatePath)
+$runIsolatedBuildPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runIsolatedBuildPathwayStatePath)
 $dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dayDreamCollapseReceiptStatePath)
 $crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.crypticDepthReturnReceiptStatePath)
 $bondedCoWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.bondedCoWorkSessionRehearsalStatePath)
@@ -268,8 +319,41 @@ $blockedStatus = [string] $policy.blockedStatus
 $state = Read-JsonFileOrNull -Path $statePath
 $previousStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastKnownStatus')
 $nowUtc = (Get-Date).ToUniversalTime()
+$cycleRunStartedAtUtc = $nowUtc
+$automationCycleRunId = 'local-automation-cycle-{0}' -f $cycleRunStartedAtUtc.ToString('yyyyMMddTHHmmssZ')
 $lastReleaseCandidateRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastReleaseCandidateRunUtc')
 $lastDigestUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDigestUtc')
+
+$dopingHeaderPayload = New-AutomationDopingHeaderPayload `
+    -RunId $automationCycleRunId `
+    -Lane 'build-governance-automation' `
+    -Objective 'Run the governed local automation cycle and reconcile release-candidate, digest, and downstream evidence surfaces.' `
+    -Phase 'cycle-entry' `
+    -Milestone 'local-automation-cycle' `
+    -Artifacts @(
+        'tools/Invoke-Local-Automation-Cycle.ps1'
+        'tools/Automation-CascadePrompt.ps1'
+        'tools/Automation-ControlSignals.ps1'
+        $PolicyPath
+    ) `
+    -AuthorizedTools @(
+        'powershell'
+        'git'
+        'dotnet'
+        'repo-local scripts'
+        'windows-scheduled-task'
+    ) `
+    -VerificationExpectations @(
+        'release-candidate manifest'
+        'digest bundle when due'
+        'task status refresh'
+        'master-thread orchestration refresh'
+    ) `
+    -ForwardConditioningNotes @(
+        'Reconcile first against the admitted root state in OAN Tech Stack before advancing downstream automation surfaces.'
+    )
+Add-AutomationCascadeOperatorPromptProperty -InputObject $dopingHeaderPayload | Out-Null
+Write-JsonFile -Path $dopingHeaderStatePath -Value $dopingHeaderPayload
 
 $releaseCandidateDue = $ForceReleaseCandidate.IsPresent
 if (-not $releaseCandidateDue) {
@@ -383,9 +467,12 @@ $nextMandatoryReviewUtc = if ($null -eq $newLastDigestUtc) {
 } else {
     $newLastDigestUtc.AddHours($digestCadenceHours)
 }
+$automationActionClass = Get-AutomationActionClassFromStatus -Status $latestStatus
+$normalizedLatestStatus = ([string] $latestStatus).ToLowerInvariant()
 
 $statePayload = [ordered]@{
     schemaVersion = 1
+    runId = $automationCycleRunId
     generatedAtUtc = $nowUtc.ToString('o')
     policyPath = $resolvedPolicyPath
     cadenceHours = [ordered]@{
@@ -402,7 +489,13 @@ $statePayload = [ordered]@{
     nextMandatoryHitlReviewUtc = $nextMandatoryReviewUtc.ToString('o')
     releaseCandidateTriggered = $releaseCandidateDue
     digestTriggered = $digestDue
+    actionClass = $automationActionClass
+    dopingHeaderStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dopingHeaderStatePath
+    cycleReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cycleReceiptStatePath
+    readinessNoticeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $readinessNoticeStatePath
+    pauseNoticeStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $pauseNoticeStatePath
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $statePayload | Out-Null
 $summaryPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '.audit/state/local-automation-cycle-last-run.json'
 $statePayload.lastBlockedEscalationBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastBlockedEscalationBundle')
 $statePayload.blockedEscalationTriggered = $false
@@ -514,6 +607,12 @@ $statePayload.lastSelfRootedCrypticDepthGateBundle = [string] (Get-ObjectPropert
 $statePayload.selfRootedCrypticDepthGateStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $selfRootedCrypticDepthGateStatePath
 $statePayload.lastRuntimeWorkbenchSessionLedgerBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRuntimeWorkbenchSessionLedgerBundle')
 $statePayload.runtimeWorkbenchSessionLedgerStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runtimeWorkbenchSessionLedgerStatePath
+$statePayload.lastCompanionToolTelemetryBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCompanionToolTelemetryBundle')
+$statePayload.companionToolTelemetryStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $companionToolTelemetryStatePath
+$statePayload.lastV111EnrichmentPathwayBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastV111EnrichmentPathwayBundle')
+$statePayload.v111EnrichmentPathwayStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $v111EnrichmentPathwayStatePath
+$statePayload.lastRunIsolatedBuildPathwayBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastRunIsolatedBuildPathwayBundle')
+$statePayload.runIsolatedBuildPathwayStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runIsolatedBuildPathwayStatePath
 $statePayload.lastDayDreamCollapseReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDayDreamCollapseReceiptBundle')
 $statePayload.dayDreamCollapseReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dayDreamCollapseReceiptStatePath
 $statePayload.lastCrypticDepthReturnReceiptBundle = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastCrypticDepthReturnReceiptBundle')
@@ -1115,6 +1214,33 @@ if (-not [string]::IsNullOrWhiteSpace($runtimeWorkbenchSessionLedgerBundlePath))
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
+$companionToolTelemetryScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CompanionToolTelemetry.ps1'
+$companionToolTelemetryOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $companionToolTelemetryScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Companion tool telemetry writer'
+$companionToolTelemetryBundlePath = Get-ScriptOutputTail -Output $companionToolTelemetryOutput
+if (-not [string]::IsNullOrWhiteSpace($companionToolTelemetryBundlePath)) {
+    $statePayload.lastCompanionToolTelemetryBundle = $companionToolTelemetryBundlePath
+    $statePayload.companionToolTelemetryStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $companionToolTelemetryStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$v111EnrichmentPathwayScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-V111-EnrichmentPathway.ps1'
+$v111EnrichmentPathwayOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $v111EnrichmentPathwayScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'V1.1.1 enrichment pathway writer'
+$v111EnrichmentPathwayBundlePath = Get-ScriptOutputTail -Output $v111EnrichmentPathwayOutput
+if (-not [string]::IsNullOrWhiteSpace($v111EnrichmentPathwayBundlePath)) {
+    $statePayload.lastV111EnrichmentPathwayBundle = $v111EnrichmentPathwayBundlePath
+    $statePayload.v111EnrichmentPathwayStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $v111EnrichmentPathwayStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$runIsolatedBuildPathwayScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-RunIsolated-BuildPathway.ps1'
+$runIsolatedBuildPathwayOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $runIsolatedBuildPathwayScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Run-isolated build pathway writer'
+$runIsolatedBuildPathwayBundlePath = Get-ScriptOutputTail -Output $runIsolatedBuildPathwayOutput
+if (-not [string]::IsNullOrWhiteSpace($runIsolatedBuildPathwayBundlePath)) {
+    $statePayload.lastRunIsolatedBuildPathwayBundle = $runIsolatedBuildPathwayBundlePath
+    $statePayload.runIsolatedBuildPathwayStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $runIsolatedBuildPathwayStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
 $dayDreamCollapseReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-DayDream-CollapseReceipt.ps1'
 $dayDreamCollapseReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $dayDreamCollapseReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Day-dream collapse receipt writer'
 $dayDreamCollapseReceiptBundlePath = Get-ScriptOutputTail -Output $dayDreamCollapseReceiptOutput
@@ -1540,11 +1666,17 @@ if (-not [string]::IsNullOrWhiteSpace($coreInvariantLatticeWitnessBundlePath)) {
 
 $summary = [ordered]@{
     schemaVersion = 1
+    runId = $automationCycleRunId
     generatedAtUtc = $nowUtc.ToString('o')
     statePath = $statePath
     lastReleaseCandidateBundle = $releaseCandidateBundlePath
     lastKnownStatus = $latestStatus
+    actionClass = $automationActionClass
     lastDigestBundle = $digestBundlePath
+    dopingHeaderStatePath = $statePayload.dopingHeaderStatePath
+    cycleReceiptStatePath = $statePayload.cycleReceiptStatePath
+    readinessNoticeStatePath = $statePayload.readinessNoticeStatePath
+    pauseNoticeStatePath = $statePayload.pauseNoticeStatePath
     lastNotificationBundle = $statePayload.lastNotificationBundle
     notificationStatePath = $statePayload.notificationStatePath
     lastSeededGovernanceBundle = $seededGovernanceBundlePath
@@ -1652,6 +1784,12 @@ $summary = [ordered]@{
     selfRootedCrypticDepthGateStatePath = $statePayload.selfRootedCrypticDepthGateStatePath
     lastRuntimeWorkbenchSessionLedgerBundle = $statePayload.lastRuntimeWorkbenchSessionLedgerBundle
     runtimeWorkbenchSessionLedgerStatePath = $statePayload.runtimeWorkbenchSessionLedgerStatePath
+    lastCompanionToolTelemetryBundle = $statePayload.lastCompanionToolTelemetryBundle
+    companionToolTelemetryStatePath = $statePayload.companionToolTelemetryStatePath
+    lastV111EnrichmentPathwayBundle = $statePayload.lastV111EnrichmentPathwayBundle
+    v111EnrichmentPathwayStatePath = $statePayload.v111EnrichmentPathwayStatePath
+    lastRunIsolatedBuildPathwayBundle = $statePayload.lastRunIsolatedBuildPathwayBundle
+    runIsolatedBuildPathwayStatePath = $statePayload.runIsolatedBuildPathwayStatePath
     lastDayDreamCollapseReceiptBundle = $statePayload.lastDayDreamCollapseReceiptBundle
     dayDreamCollapseReceiptStatePath = $statePayload.dayDreamCollapseReceiptStatePath
     lastCrypticDepthReturnReceiptBundle = $statePayload.lastCrypticDepthReturnReceiptBundle
@@ -1749,6 +1887,7 @@ $summary = [ordered]@{
     nextReleaseCandidateRunUtc = $statePayload.nextReleaseCandidateRunUtc
     nextMandatoryHitlReviewUtc = $statePayload.nextMandatoryHitlReviewUtc
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $summary | Out-Null
 
 Write-JsonFile -Path $summaryPath -Value $summary
 
@@ -1789,8 +1928,167 @@ if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun) -and (Test-
 $taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
 $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
+$receiptStatus = if ($latestStatus -eq $blockedStatus) { 'blocked' } else { 'completed' }
+$receiptStandingResult = switch ($normalizedLatestStatus) {
+    'candidate-ready' { 'candidate_ready' }
+    'hitl-required' { 'review_gated' }
+    'blocked' { 'suspended' }
+    default { 'clarification_required' }
+}
+$receiptSummary = switch ($normalizedLatestStatus) {
+    'candidate-ready' { 'Automation cycle completed in candidate-ready posture and may continue within cadence.' }
+    'hitl-required' { 'Automation cycle completed in review-gated posture; bounded mechanical continuation may proceed while promotion awaits HITL.' }
+    'blocked' { 'Automation cycle ended in blocked posture and is paused pending HITL review.' }
+    default { 'Automation cycle completed with an unclassified posture and requires clarification before wider promotion.' }
+}
+$carryForwardClass = switch ($normalizedLatestStatus) {
+    'candidate-ready' { 'continue-within-cadence' }
+    'hitl-required' { 'promotable-with-review' }
+    'blocked' { 'blocked-awaiting-hitl' }
+    default { 'clarification-required' }
+}
+$nextLawfulActions = switch ($normalizedLatestStatus) {
+    'candidate-ready' { @('continue-automation-until-next-cadence', 'refresh-status-surfaces-on-schedule') }
+    'hitl-required' { @('continue-bounded-mechanical-maintenance', 'await-hitl-review-before-promotion') }
+    'blocked' { @('wait-for-hitl-blocked-review', 'preserve-bounded-state-until-remediation') }
+    default { @('clarify-current-posture-before-next-promotion-step') }
+}
+$receiptVerification = [ordered]@{
+    release_candidate_manifest = if (Test-Path -LiteralPath $manifestPath -PathType Leaf) { 'passed' } else { 'missing' }
+    digest_surface = if (-not [string]::IsNullOrWhiteSpace($digestBundlePath)) { 'available' } else { 'not-required' }
+    task_status_surface = if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) { 'written' } else { 'missing' }
+    workspace_bucket_surface = if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) { 'written' } else { 'missing' }
+    master_thread_orchestration_surface = if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun)) { 'written' } else { 'missing' }
+    notification_surface = if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) { 'written' } else { 'not-triggered' }
+}
+$receiptArtifactsTouched = @(
+    $dopingHeaderStatePath
+    $statePath
+    $summaryPath
+    $taskStatusPath
+    $workspaceBucketStatusPath
+    $masterThreadOrchestrationStatePathFromRun
+    $notificationStatePathFromRun
+    $releaseCandidateBundlePath
+    $digestBundlePath
+    $blockedEscalationBundlePath
+) | ForEach-Object {
+    if (-not [string]::IsNullOrWhiteSpace($_)) {
+        Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $_
+    }
+}
+$cycleReceiptPayload = New-AutomationReceiptPayload `
+    -ReceiptId ('receipt-{0}' -f $automationCycleRunId) `
+    -RunId $automationCycleRunId `
+    -Lane 'build-governance-automation' `
+    -Summary $receiptSummary `
+    -Status $receiptStatus `
+    -StandingResult $receiptStandingResult `
+    -ArtifactsTouched $receiptArtifactsTouched `
+    -Verification $receiptVerification `
+    -CarryForwardClass $carryForwardClass `
+    -NextLawfulActions $nextLawfulActions `
+    -HitlRequired ($latestStatus -in @('hitl-required', $blockedStatus)) `
+    -HitlReason $(if ($latestStatus -eq 'hitl-required') { 'promotion-or-commit-review-required' } elseif ($latestStatus -eq $blockedStatus) { 'blocked-posture-requires-hitl-review' } else { '' })
+Add-AutomationCascadeOperatorPromptProperty -InputObject $cycleReceiptPayload | Out-Null
+Write-JsonFile -Path $cycleReceiptStatePath -Value $cycleReceiptPayload
+
+$statePayload.lastCycleReceiptId = [string] $cycleReceiptPayload.receipt_id
+$statePayload.lastCycleReceiptStatus = [string] $cycleReceiptPayload.status
+$summary.lastCycleReceiptId = $statePayload.lastCycleReceiptId
+$summary.lastCycleReceiptStatus = $statePayload.lastCycleReceiptStatus
+
+$activeNoticePath = $null
+if ($latestStatus -eq $blockedStatus) {
+    if (Test-Path -LiteralPath $readinessNoticeStatePath -PathType Leaf) {
+        Remove-Item -LiteralPath $readinessNoticeStatePath -Force
+    }
+
+    $pauseDependsOn = @(
+        $manifestPath
+        $blockedEscalationBundlePath
+        $masterThreadOrchestrationStatePathFromRun
+    ) | ForEach-Object {
+        if (-not [string]::IsNullOrWhiteSpace($_)) {
+            Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $_
+        }
+    }
+    $pauseNoticePayload = New-AutomationNoticePayload `
+        -NoticeId ('notice-{0}-pause' -f $automationCycleRunId) `
+        -Lane 'build-governance-automation' `
+        -Type 'pause_notice' `
+        -Status 'paused' `
+        -Summary 'Automation cycle is paused because the current posture is blocked.' `
+        -DependsOn $pauseDependsOn `
+        -EnablesWhenCleared @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-remediation') `
+        -NextLawfulAction 'wait-for-hitl-blocked-review' `
+        -HitlRequired $true
+    Add-AutomationCascadeOperatorPromptProperty -InputObject $pauseNoticePayload | Out-Null
+    Write-JsonFile -Path $pauseNoticeStatePath -Value $pauseNoticePayload
+    $activeNoticePath = $pauseNoticeStatePath
+    $statePayload.currentNoticeType = [string] $pauseNoticePayload.type
+    $statePayload.currentNoticeStatus = [string] $pauseNoticePayload.status
+    $statePayload.lastNoticeId = [string] $pauseNoticePayload.notice_id
+    $summary.currentNoticeType = $statePayload.currentNoticeType
+    $summary.currentNoticeStatus = $statePayload.currentNoticeStatus
+    $summary.lastNoticeId = $statePayload.lastNoticeId
+} else {
+    if (Test-Path -LiteralPath $pauseNoticeStatePath -PathType Leaf) {
+        Remove-Item -LiteralPath $pauseNoticeStatePath -Force
+    }
+
+    $readinessStatus = if ($latestStatus -eq 'hitl-required') { 'ready-with-review-gate' } else { 'ready' }
+    $readinessSummary = if ($latestStatus -eq 'hitl-required') {
+        'Automation cycle completed in review-gated posture; bounded continuation may proceed while promotion remains under HITL review.'
+    } else {
+        'Automation cycle completed in candidate-ready posture and may continue within its scheduled cadence.'
+    }
+    $readinessNoticePayload = New-AutomationNoticePayload `
+        -NoticeId ('notice-{0}-readiness' -f $automationCycleRunId) `
+        -Lane 'build-governance-automation' `
+        -Type 'readiness_notice' `
+        -Status $readinessStatus `
+        -Summary $readinessSummary `
+        -DependsOn @() `
+        -EnablesWhenCleared @('continue-bounded-cycle-execution', 'allow-downstream-status-ingestion') `
+        -NextLawfulAction $(if ($latestStatus -eq 'hitl-required') { 'await-hitl-review-before-promotion' } else { 'continue-automation-until-next-cadence' }) `
+        -HitlRequired ($latestStatus -eq 'hitl-required')
+    Add-AutomationCascadeOperatorPromptProperty -InputObject $readinessNoticePayload | Out-Null
+    Write-JsonFile -Path $readinessNoticeStatePath -Value $readinessNoticePayload
+    $activeNoticePath = $readinessNoticeStatePath
+    $statePayload.currentNoticeType = [string] $readinessNoticePayload.type
+    $statePayload.currentNoticeStatus = [string] $readinessNoticePayload.status
+    $statePayload.lastNoticeId = [string] $readinessNoticePayload.notice_id
+    $summary.currentNoticeType = $statePayload.currentNoticeType
+    $summary.currentNoticeStatus = $statePayload.currentNoticeStatus
+    $summary.lastNoticeId = $statePayload.lastNoticeId
+}
+
+Write-JsonFile -Path $statePath -Value $statePayload
+Write-JsonFile -Path $summaryPath -Value $summary
+
+$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
+$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
+
+Set-AutomationCascadePromptOnArtifacts -RepoRoot $resolvedRepoRoot -Value @(
+    $statePayload
+    $summary
+    $dopingHeaderStatePath
+    $cycleReceiptStatePath
+    $activeNoticePath
+    $taskStatusPath
+    $workspaceBucketStatusPath
+    $masterThreadOrchestrationStatePathFromRun
+    $notificationStatePathFromRun
+)
+
 Write-Host ('[local-automation-cycle] Status: {0}' -f $latestStatus)
 Write-Host ('[local-automation-cycle] State: {0}' -f $statePath)
+Write-Host ('[local-automation-cycle] DopingHeader: {0}' -f $dopingHeaderStatePath)
+Write-Host ('[local-automation-cycle] CycleReceipt: {0}' -f $cycleReceiptStatePath)
+if (-not [string]::IsNullOrWhiteSpace($activeNoticePath)) {
+    Write-Host ('[local-automation-cycle] ControlNotice: {0}' -f $activeNoticePath)
+}
 if (-not [string]::IsNullOrWhiteSpace($retentionStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] Retention: {0}' -f $retentionStatePathFromRun)
 }
@@ -1964,6 +2262,15 @@ if (-not [string]::IsNullOrWhiteSpace($selfRootedCrypticDepthGateBundlePath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($runtimeWorkbenchSessionLedgerBundlePath)) {
     Write-Host ('[local-automation-cycle] RuntimeWorkbenchSessionLedger: {0}' -f $runtimeWorkbenchSessionLedgerBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($companionToolTelemetryBundlePath)) {
+    Write-Host ('[local-automation-cycle] CompanionToolTelemetry: {0}' -f $companionToolTelemetryBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($v111EnrichmentPathwayBundlePath)) {
+    Write-Host ('[local-automation-cycle] V111EnrichmentPathway: {0}' -f $v111EnrichmentPathwayBundlePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($runIsolatedBuildPathwayBundlePath)) {
+    Write-Host ('[local-automation-cycle] RunIsolatedBuildPathway: {0}' -f $runIsolatedBuildPathwayBundlePath)
 }
 if (-not [string]::IsNullOrWhiteSpace($dayDreamCollapseReceiptBundlePath)) {
     Write-Host ('[local-automation-cycle] DayDreamCollapseReceipt: {0}' -f $dayDreamCollapseReceiptBundlePath)

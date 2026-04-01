@@ -1,7 +1,7 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.0/build/local-automation-cycle.json',
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.0/build/local-automation-tasking.json',
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-tasking.json',
     [string] $ActiveTaskMapStatePath = '.audit/state/local-automation-active-task-map-selection.json'
 )
 
@@ -15,6 +15,11 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
+$automationControlSignalsHelperPath = Join-Path $PSScriptRoot 'Automation-ControlSignals.ps1'
+. $automationControlSignalsHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -162,6 +167,7 @@ function Resolve-LongFormTaskLiveStatus {
         [object] $AmenableDayDreamTierAdmissibilityState,
         [object] $SelfRootedCrypticDepthGateState,
         [object] $RuntimeWorkbenchSessionLedgerState,
+        [object] $RunIsolatedBuildPathwayState,
         [object] $DayDreamCollapseReceiptState,
         [object] $CrypticDepthReturnReceiptState,
         [object] $BondedCoWorkSessionRehearsalState,
@@ -722,6 +728,51 @@ function Resolve-LongFormTaskLiveStatus {
                 return 'active'
             }
         }
+        'run-isolated-build-pathway' {
+            if ($null -ne $RunIsolatedBuildPathwayState) {
+                if ([bool] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'legacyFree') -and
+                    [string] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'pathwayState') -eq 'run-isolated-build-ready') {
+                    return 'completed'
+                }
+
+                return [string] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'pathwayState')
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'build-lane-fallback-burndown' {
+            if ($null -ne $RunIsolatedBuildPathwayState) {
+                if ([int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'remainingLegacyTouchPointCount') -eq 0 -and
+                    [int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'unresolvedTouchPointCount') -eq 0) {
+                    return 'completed'
+                }
+
+                if ([int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'unresolvedTouchPointCount') -gt 0) {
+                    return 'touchpoint-resolution-incomplete'
+                }
+
+                return 'legacy-fallbacks-remain'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
+        'lawful-exclusion-ledger' {
+            if ($null -ne $RunIsolatedBuildPathwayState) {
+                if ([int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'unresolvedTouchPointCount') -eq 0) {
+                    return 'completed'
+                }
+
+                return 'touchpoint-resolution-incomplete'
+            }
+
+            if ($PolicyStatus -eq 'selected') {
+                return 'active'
+            }
+        }
         'day-dream-collapse-receipt' {
             if ($null -ne $DayDreamCollapseReceiptState) {
                 return 'completed'
@@ -1150,6 +1201,50 @@ function Resolve-LongFormTaskLiveStatus {
     return $PolicyStatus
 }
 
+function Resolve-RunIsolatedBuildTaskLiveStatus {
+    param(
+        [string] $TaskId,
+        [string] $CurrentLiveStatus,
+        [object] $RunIsolatedBuildPathwayState
+    )
+
+    if ($null -eq $RunIsolatedBuildPathwayState) {
+        return $CurrentLiveStatus
+    }
+
+    switch ($TaskId) {
+        'run-isolated-build-pathway' {
+            if ([bool] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'legacyFree') -and
+                [string] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'pathwayState') -eq 'run-isolated-build-ready') {
+                return 'completed'
+            }
+
+            return [string] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'pathwayState')
+        }
+        'build-lane-fallback-burndown' {
+            if ([int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'remainingLegacyTouchPointCount') -eq 0 -and
+                [int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'unresolvedTouchPointCount') -eq 0) {
+                return 'completed'
+            }
+
+            if ([int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'unresolvedTouchPointCount') -gt 0) {
+                return 'touchpoint-resolution-incomplete'
+            }
+
+            return 'legacy-fallbacks-remain'
+        }
+        'lawful-exclusion-ledger' {
+            if ([int] (Get-ObjectPropertyValueOrNull -InputObject $RunIsolatedBuildPathwayState -PropertyName 'unresolvedTouchPointCount') -eq 0) {
+                return 'completed'
+            }
+
+            return 'touchpoint-resolution-incomplete'
+        }
+    }
+
+    return $CurrentLiveStatus
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $resolvedTaskingPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskingPolicyPath
@@ -1181,6 +1276,16 @@ if (Test-Path -LiteralPath $cycleStatePath -PathType Leaf) {
 }
 
 $lastKnownStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastKnownStatus')
+$currentActionClass = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'actionClass')
+if ([string]::IsNullOrWhiteSpace($currentActionClass)) {
+    $currentActionClass = Get-AutomationActionClassFromStatus -Status $lastKnownStatus
+}
+$dopingHeaderStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'dopingHeaderStatePath')
+$cycleReceiptStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'cycleReceiptStatePath')
+$readinessNoticeStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'readinessNoticeStatePath')
+$pauseNoticeStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'pauseNoticeStatePath')
+$currentNoticeTypeFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'currentNoticeType')
+$currentNoticeStatusFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'currentNoticeStatus')
 $lastReleaseCandidateRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastReleaseCandidateRunUtc')
 $nextReleaseCandidateRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextReleaseCandidateRunUtc')
 $lastDigestUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastDigestUtc')
@@ -1249,6 +1354,7 @@ $sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $res
 $amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.amenableDayDreamTierAdmissibilityStatePath)
 $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.selfRootedCrypticDepthGateStatePath)
 $runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkbenchSessionLedgerStatePath)
+$runIsolatedBuildPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runIsolatedBuildPathwayStatePath)
 $dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.dayDreamCollapseReceiptStatePath)
 $crypticDepthReturnReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.crypticDepthReturnReceiptStatePath)
 $bondedCoWorkSessionRehearsalStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.bondedCoWorkSessionRehearsalStatePath)
@@ -1353,6 +1459,7 @@ $sanctuaryRuntimeWorkbenchSurfaceState = Read-JsonFileOrNull -Path $sanctuaryRun
 $amenableDayDreamTierAdmissibilityState = Read-JsonFileOrNull -Path $amenableDayDreamTierAdmissibilityStatePath
 $selfRootedCrypticDepthGateState = Read-JsonFileOrNull -Path $selfRootedCrypticDepthGateStatePath
 $runtimeWorkbenchSessionLedgerState = Read-JsonFileOrNull -Path $runtimeWorkbenchSessionLedgerStatePath
+$runIsolatedBuildPathwayState = Read-JsonFileOrNull -Path $runIsolatedBuildPathwayStatePath
 $dayDreamCollapseReceiptState = Read-JsonFileOrNull -Path $dayDreamCollapseReceiptStatePath
 $crypticDepthReturnReceiptState = Read-JsonFileOrNull -Path $crypticDepthReturnReceiptStatePath
 $bondedCoWorkSessionRehearsalState = Read-JsonFileOrNull -Path $bondedCoWorkSessionRehearsalStatePath
@@ -1545,7 +1652,7 @@ if ($null -ne $activeLongFormTaskMap) {
     $activeLongFormTaskStatuses = @(
         $activeLongFormTasks |
         ForEach-Object {
-            Resolve-LongFormTaskLiveStatus `
+            $taskLiveStatus = Resolve-LongFormTaskLiveStatus `
                 -TaskId ([string] $_.id) `
                 -PolicyStatus ([string] $_.status) `
                 -LatestDigestBundlePath $latestDigestBundlePath `
@@ -1603,6 +1710,7 @@ if ($null -ne $activeLongFormTaskMap) {
                 -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
                 -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
                 -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
+                -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState `
                 -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
                 -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
                 -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
@@ -1652,6 +1760,11 @@ if ($null -ne $activeLongFormTaskMap) {
                 -CoreInvariantLatticeWitnessState $coreInvariantLatticeWitnessState `
                 -LastKnownStatus $lastKnownStatus `
                 -BlockedStatus ([string] $cyclePolicy.blockedStatus)
+
+            Resolve-RunIsolatedBuildTaskLiveStatus `
+                -TaskId ([string] $_.id) `
+                -CurrentLiveStatus $taskLiveStatus `
+                -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState
         }
     )
     $activeLongFormTasksCompleted = @($activeLongFormTaskStatuses | Where-Object { $_ -eq 'completed' }).Count
@@ -1761,6 +1874,7 @@ $taskMapEntries = @(
                     -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
                     -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
                     -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
+                    -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState `
                     -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
                     -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
                     -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
@@ -1810,6 +1924,11 @@ $taskMapEntries = @(
                     -CoreInvariantLatticeWitnessState $coreInvariantLatticeWitnessState `
                     -LastKnownStatus $lastKnownStatus `
                     -BlockedStatus ([string] $cyclePolicy.blockedStatus)
+
+                $liveStatus = Resolve-RunIsolatedBuildTaskLiveStatus `
+                    -TaskId ([string] $_.id) `
+                    -CurrentLiveStatus $liveStatus `
+                    -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState
 
                 [ordered]@{
                     id = [string] $_.id
@@ -1873,10 +1992,17 @@ $statusPayload = [ordered]@{
     scheduler = $scheduler
     currentPosture = [ordered]@{
         lastKnownStatus = $lastKnownStatus
+        actionClass = $currentActionClass
         recommendedAction = $recommendedAction
         requiresImmediateHitl = $requiresImmediateHitl
         lastReleaseCandidateBundle = $lastReleaseCandidateBundle
         lastDigestBundle = $lastDigestBundle
+        dopingHeaderStatePath = $dopingHeaderStatePathFromCycle
+        cycleReceiptStatePath = $cycleReceiptStatePathFromCycle
+        readinessNoticeStatePath = $readinessNoticeStatePathFromCycle
+        pauseNoticeStatePath = $pauseNoticeStatePathFromCycle
+        currentNoticeType = $currentNoticeTypeFromCycle
+        currentNoticeStatus = $currentNoticeStatusFromCycle
         seededGovernanceDisposition = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.disposition } else { $null }
         seededGovernanceReason = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.dispositionReason } else { $null }
         seededGovernanceProvenance = if ($null -ne $seededGovernanceState) { [string] $seededGovernanceState.provenance } else { $null }
@@ -2515,6 +2641,38 @@ $statusPayload = [ordered]@{
     tasks = $taskEntries
 }
 
+if ($null -ne $runIsolatedBuildPathwayState -and $null -ne $statusPayload.longFormTasking) {
+    $runIsolatedTaskMap = @(
+        @($statusPayload.longFormTasking.taskMaps) |
+        Where-Object { [string] $_.id -eq 'automation-maturation-map-38' } |
+        Select-Object -First 1
+    )
+    if ($runIsolatedTaskMap -is [System.Array]) {
+        $runIsolatedTaskMap = if ($runIsolatedTaskMap.Count -gt 0) { $runIsolatedTaskMap[0] } else { $null }
+    }
+
+    if ($null -ne $runIsolatedTaskMap) {
+        foreach ($taskEntry in @($runIsolatedTaskMap.tasks)) {
+            $taskEntry.liveStatus = Resolve-RunIsolatedBuildTaskLiveStatus `
+                -TaskId ([string] $taskEntry.id) `
+                -CurrentLiveStatus ([string] $taskEntry.liveStatus) `
+                -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState
+        }
+
+        $runIsolatedTaskMap.completedTaskCount = @(
+            @($runIsolatedTaskMap.tasks) |
+            Where-Object { [string] $_.liveStatus -eq 'completed' }
+        ).Count
+
+        if ([string] $statusPayload.longFormTasking.activeTaskMapId -eq 'automation-maturation-map-38') {
+            $statusPayload.longFormTasking.activeTaskMapCompletedTaskCount = $runIsolatedTaskMap.completedTaskCount
+            $statusPayload.longFormTasking.activeTaskMapTotalTaskCount = @($runIsolatedTaskMap.tasks).Count
+        }
+    }
+}
+
+Add-AutomationCascadeOperatorPromptProperty -InputObject $statusPayload | Out-Null
+
 Write-JsonFile -Path $statusJsonPath -Value $statusPayload
 
 $markdownLines = @(
@@ -2530,8 +2688,10 @@ $markdownLines = @(
     ('- Scheduler registered: `{0}`' -f $scheduler.registered),
     ('- Scheduler state: `{0}`' -f $scheduler.state),
     ('- Current posture: `{0}`' -f $lastKnownStatus),
+    ('- Current action class: `{0}`' -f $currentActionClass),
     ('- Recommended action: `{0}`' -f $recommendedAction),
     ('- Requires immediate HITL: `{0}`' -f $requiresImmediateHitl),
+    ('- Active control notice: `{0}`' -f $(if (-not [string]::IsNullOrWhiteSpace($currentNoticeTypeFromCycle)) { ('{0} ({1})' -f $currentNoticeTypeFromCycle, $currentNoticeStatusFromCycle) } else { 'uninitialized' })),
     ('- Master-thread orchestration: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.orchestrationState } else { 'uninitialized' })),
     ('- Orchestration next action: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.nextAction } else { 'uninitialized' })),
     ('- Next release-candidate run (UTC): `{0}`' -f $(if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { 'uninitialized' })),
@@ -4103,6 +4263,7 @@ if ($null -ne $activeLongFormTaskMap) {
             -AmenableDayDreamTierAdmissibilityState $amenableDayDreamTierAdmissibilityState `
             -SelfRootedCrypticDepthGateState $selfRootedCrypticDepthGateState `
             -RuntimeWorkbenchSessionLedgerState $runtimeWorkbenchSessionLedgerState `
+            -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState `
             -DayDreamCollapseReceiptState $dayDreamCollapseReceiptState `
             -CrypticDepthReturnReceiptState $crypticDepthReturnReceiptState `
             -BondedCoWorkSessionRehearsalState $bondedCoWorkSessionRehearsalState `
@@ -4152,6 +4313,10 @@ if ($null -ne $activeLongFormTaskMap) {
             -CoreInvariantLatticeWitnessState $coreInvariantLatticeWitnessState `
             -LastKnownStatus $lastKnownStatus `
             -BlockedStatus ([string] $cyclePolicy.blockedStatus)
+        $taskLiveStatus = Resolve-RunIsolatedBuildTaskLiveStatus `
+            -TaskId ([string] $task.id) `
+            -CurrentLiveStatus $taskLiveStatus `
+            -RunIsolatedBuildPathwayState $runIsolatedBuildPathwayState
         $markdownLines += ('| {0} | {1} | {2} | {3} |' -f [string] $task.label, [string] $task.owner, [string] $task.status, $taskLiveStatus)
     }
 
@@ -4180,6 +4345,7 @@ foreach ($task in $taskEntries) {
     $markdownLines += ('| {0} | {1} | {2} | {3} | {4} |' -f $task.label, $task.owner, $task.status, $(if ($task.lastRunUtc) { $task.lastRunUtc } else { 'not-yet-run' }), $(if ($task.nextRunUtc) { $task.nextRunUtc } else { 'not-scheduled' }))
 }
 
+$markdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $markdownLines
 Set-Content -LiteralPath $statusMarkdownPath -Value $markdownLines -Encoding utf8
 
 Write-Host ('[local-automation-status] JSON: {0}' -f $statusJsonPath)

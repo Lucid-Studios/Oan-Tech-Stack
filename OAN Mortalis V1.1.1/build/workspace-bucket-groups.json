@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/WORKSPACE_BUCKET_GROUP_SYSTEM.md",
+  "statusJsonPath": ".audit/state/workspace-bucket-status.json",
+  "statusMarkdownPath": ".audit/state/workspace-bucket-status.md",
+  "buckets": [
+    {
+      "id": "build-governance-automation",
+      "label": "Build Governance And Automation",
+      "purpose": "Shared build scripts, governance contracts, automation policies, and repo-level control surfaces.",
+      "families": [],
+      "projectNames": [],
+      "pathPatterns": [
+        ".github/*",
+        "Build Contracts/*",
+        "tools/*",
+        "build.ps1",
+        "test.ps1",
+        "README.md",
+        "OAN Mortalis V1.1.1/build/*",
+        "OAN Mortalis V1.1.1/docs/GOVERNED_BUILD_AUTOMATION_CONVEYOR.md",
+        "OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
+        "OAN Mortalis V1.1.1/docs/WORKSPACE_BUCKET_GROUP_SYSTEM.md",
+        "OAN Mortalis V1.1.1/docs/WORKSPACE_RULES.md",
+        "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
+        "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md"
+      ]
+    },
+    {
+      "id": "cradletek-cryptic-substrate",
+      "label": "CradleTek And Cryptic Substrate",
+      "purpose": "Hosting, cryptic residency, memory, protected transit, and substrate-bearing governance surfaces.",
+      "families": [
+        "CradleTek",
+        "GEL"
+      ],
+      "projectNames": [],
+      "pathPatterns": [
+        "OAN Mortalis V1.1.1/src/TechStack/CradleTek/*",
+        "OAN Mortalis V1.1.1/src/TechStack/GEL/*",
+        "Build Contracts/Crosscutting/authority/EQUIVALENT_EXCHANGE_NATURAL_LAW_CONTRACT.md",
+        "Build Contracts/Crosscutting/authority/SANCTUARY_DEPLOYMENT_LAYER_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "soulframe-office-governance",
+      "label": "SoulFrame And Office Governance",
+      "purpose": "Identity-facing legality, office-bearing boundaries, acknowledgement, and continuity gating surfaces.",
+      "families": [
+        "SoulFrame"
+      ],
+      "projectNames": [],
+      "pathPatterns": [
+        "OAN Mortalis V1.1.1/src/TechStack/SoulFrame/*",
+        "OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md",
+        "OAN Mortalis V1.1.1/docs/FIRST_RUN_STEWARD_WITNESSED_OE_PACKET.md",
+        "OAN Mortalis V1.1.1/docs/CHAPTER_SIX_STEWARD_WITNESSED_OE_UPTAKE.md"
+      ]
+    },
+    {
+      "id": "agenticore-runtime-harness",
+      "label": "AgentiCore Runtime Harness",
+      "purpose": "Agent runtime harnessing, seeded participation, and active cognition orchestration surfaces.",
+      "families": [
+        "AgentiCore"
+      ],
+      "projectNames": [],
+      "pathPatterns": [
+        "OAN Mortalis V1.1.1/src/TechStack/AgentiCore/*",
+        "OAN Mortalis V1.1.1/docs/FIRST_RUN_LIVING_AGENTICORE_PACKET.md",
+        "OAN Mortalis V1.1.1/docs/CHAPTER_NINE_LIVING_AGENTICORE_HOLD.md"
+      ]
+    },
+    {
+      "id": "sli-lisp-topology",
+      "label": "SLI And Lisp Topology",
+      "purpose": "Symbolic protocol, Lisp-native cognition, topological field doctrine, and nexus-facing seams.",
+      "families": [
+        "SLI"
+      ],
+      "projectNames": [],
+      "pathPatterns": [
+        "OAN Mortalis V1.1.1/src/Sanctuary/SLI.*",
+        "Build Contracts/Crosscutting/authority/HITL_SLI_BRIDGE_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "oan-runtime-composition",
+      "label": "OAN Runtime Composition",
+      "purpose": "Umbrella composition, canonical runtime host, storage, spinal/runtime tests, and deployable release surfaces.",
+      "families": [],
+      "projectNames": [
+        "Oan.Runtime.Headless",
+        "Oan.Common",
+        "Oan.Nexus.Control",
+        "Oan.PrimeCryptic.Services",
+        "Oan.Runtime.Materialization",
+        "Oan.State.Modulation",
+        "Oan.HostedLlm",
+        "Oan.Trace.Persistence",
+        "Oan.FirstRun",
+        "Oan.Audit.Tests",
+        "Oan.Runtime.IntegrationTests"
+      ],
+      "pathPatterns": [
+        "OAN Mortalis V1.1.1/src/Sanctuary/Oan.*",
+        "OAN Mortalis V1.1.1/tests/Sanctuary/*",
+        "OAN Mortalis V1.1.1/docs/*"
+      ]
+    },
+    {
+      "id": "documentation-and-research",
+      "label": "Documentation And Research",
+      "purpose": "Review cleanup, architecture digestion, theory uptake, and bounded research staging for the Documentation Repo lane.",
+      "families": [],
+      "projectNames": [],
+      "pathPatterns": [
+        "docs/*",
+        "OAN Mortalis V1.1.1/docs/DOCUMENTATION_REPO_*"
+      ]
+    }
+  ]
+}
+

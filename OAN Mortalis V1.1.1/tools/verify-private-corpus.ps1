@@ -53,11 +53,7 @@ function Get-ManagedTrackedTextFiles {
     )
 
     foreach ($file in $Files) {
-        if ($file -like "OAN Mortalis V0.1 Archive/*") {
-            continue
-        }
-
-        $isManagedSurface = (
+$isManagedSurface = (
             $file -eq "README.md" -or
             $file -eq "AGENTS.md" -or
             $file -eq "SECURITY.md" -or

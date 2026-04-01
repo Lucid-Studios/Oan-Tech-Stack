@@ -21,7 +21,7 @@ Allowed write surface:
 Forbidden write surface:
 
 - `Build Contracts/**`
-- `OAN Mortalis V0.1 Archive/**`
+- any archived publication surface outside the repository root
 - any external path outside the repository root
 
 ## Build Surface

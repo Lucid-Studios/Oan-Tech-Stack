@@ -13,7 +13,7 @@ param(
     [int] $PollingIntervalSeconds,
     [int] $PollingWindowMinutes,
     [string] $RepoRoot,
-    [string] $OrchestrationPolicyPath = 'OAN Mortalis V1.0/build/master-thread-orchestration.json',
+    [string] $OrchestrationPolicyPath = 'OAN Mortalis V1.1.1/build/master-thread-orchestration.json',
     [string] $BucketStatusPath = '.audit/state/workspace-bucket-status.json',
     [string] $CycleStatePath = '.audit/state/local-automation-cycle.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'
@@ -29,6 +29,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
         $RepoRoot = (Get-Location).Path
     }
 }
+
+$automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
+. $automationCascadePromptHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -324,6 +327,7 @@ $payload = [ordered]@{
         publishEligible = $publishEligible
     }
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $payload | Out-Null
 
 $codexAutomationIntentPayload = [ordered]@{
     schemaVersion = 1
@@ -344,6 +348,7 @@ $codexAutomationIntentPayload = [ordered]@{
     pollingIntervalSeconds = $effectivePollingIntervalSeconds
     pollingWindowMinutes = $effectivePollingWindowMinutes
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $codexAutomationIntentPayload | Out-Null
 
 Write-JsonFile -Path $instructionJsonPath -Value $payload
 Write-JsonFile -Path $codexAutomationIntentJsonPath -Value $codexAutomationIntentPayload
@@ -369,6 +374,7 @@ $instructionMarkdownLines = @(
     ('- Movement admissibility: `{0}`' -f $movementAdmissibilityState),
     ''
 )
+$instructionMarkdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $instructionMarkdownLines
 Set-Content -LiteralPath $instructionMarkdownPath -Value $instructionMarkdownLines -Encoding utf8
 
 $automationMarkdownLines = @(
@@ -389,6 +395,7 @@ $automationMarkdownLines = @(
     '',
     $codexAutomationIntentPayload.suggestedPrompt
 )
+$automationMarkdownLines = Add-AutomationCascadePromptMarkdownLines -MarkdownLines $automationMarkdownLines
 Set-Content -LiteralPath $codexAutomationIntentMarkdownPath -Value $automationMarkdownLines -Encoding utf8
 
 $existingIndex = Read-JsonFileOrNull -Path $instructionIndexStatePath
@@ -405,6 +412,7 @@ $indexPayload = [ordered]@{
     recentInstructionIds = @($createdInstructionIds | Select-Object -Last 16)
     codexAutomationSupportState = [string] $policy.codexAutomationSupport.supportState
 }
+Add-AutomationCascadeOperatorPromptProperty -InputObject $indexPayload | Out-Null
 
 Write-JsonFile -Path $instructionIndexStatePath -Value $indexPayload
 Write-Host ('[master-thread-orchestration] Instruction: {0}' -f $bundlePath)

@@ -22,6 +22,7 @@
     <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\CradleTek\\CradleTek.Memory\\CradleTek.Memory\\CradleTek.Memory.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\CradleTek\\CradleTek.Runtime\\CradleTek.Runtime\\CradleTek.Runtime.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\Oan.FirstRun\\Oan.FirstRun\\Oan.FirstRun.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\Oan.Runtime.Headless\\Oan.Runtime.Headless\\Oan.Runtime.Headless.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\SLI.Engine\\SLI.Engine\\SLI.Engine.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\SLI.Ingestion\\SLI.Ingestion\\SLI.Ingestion.csproj" />

@@ -20,12 +20,12 @@ Reference governance:
 
 - `Build Contracts/`
 
-Reference-only historical surfaces:
+Archived historical lines:
 
-- `OAN Mortalis V1.0/`
-- `OAN Mortalis V0.1 Archive/`
+- historical lines now live outside this repository
+- do not treat external archives as active build surfaces
 
-Do not treat the archive as an editable active build surface unless explicitly directed.
+Do not treat any external archive as an editable active build surface unless explicitly directed.
 
 ## Architectural Constitution
 
@@ -37,14 +37,14 @@ Follow these governing documents before inventing new structure:
 - `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
 - `OAN Mortalis V1.1.1/docs/V1_0_RETIREMENT_GATE.md`
-- `OAN Mortalis V1.0/docs/SYSTEM_ONTOLOGY.md`
-- `OAN Mortalis V1.0/docs/STACK_AUTHORITY_AND_MUTATION_LAW.md`
-- `OAN Mortalis V1.0/docs/HOLOGRAPHIC_DATA_TOOL.md`
-- `OAN Mortalis V1.0/docs/PROJECT_CLASSIFICATION_MATRIX.md`
-- `OAN Mortalis V1.0/docs/NAMESPACE_CONVERGENCE_PLAN.md`
-- `OAN Mortalis V1.0/docs/DOCUMENTATION_REPO_GOVERNANCE_UPTAKE_MODEL.md`
-- `OAN Mortalis V1.0/docs/EVIDENCE_LED_DOCUMENTATION_REVISION_LAW.md`
-- `OAN Mortalis V1.0/docs/CME_FORMATION_AND_OFFICE_LEDGER_CONTRACT.md`
+- `OAN Mortalis V1.1.1/docs/GOVERNED_BUILD_AUTOMATION_CONVEYOR.md`
+- `OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md`
+- `OAN Mortalis V1.1.1/docs/MASTER_THREAD_BUCKET_ORCHESTRATION_LAW.md`
+- `OAN Mortalis V1.1.1/docs/WORKSPACE_BUCKET_GROUP_SYSTEM.md`
+- `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
+
+
+- `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 
 ## Family Model
 
