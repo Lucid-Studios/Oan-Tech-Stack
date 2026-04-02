@@ -49,6 +49,7 @@ That admission law is fixed in:
 
 - `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+- `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 
 This means the seed lane may remain `Deferred` for its own advisory posture
 while the active build still treats it as locally admitted, but only when the

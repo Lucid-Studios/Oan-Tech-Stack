@@ -25,6 +25,7 @@ The workflow must be read through the current active surfaces:
 - `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
 - `LATE_PATH_RUNTIME_PROJECTION_SPEC.md`
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+- `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 
 The active line remains:
 

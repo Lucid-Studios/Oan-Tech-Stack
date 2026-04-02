@@ -439,6 +439,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("`automation-close-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`seeded-governance-build-admission-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`runtime-workbench-governance-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`discernment-admissibility-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`bounded-ec-loop: frame-now`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`engram-predicate-minting: hold`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`single-flight-main-worker: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
@@ -455,6 +456,7 @@ public sealed class BootstrapBoundaryTests
             "COMPANION_TOOL_TELEMETRY_LANE.md",
             "SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md",
             "RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md",
+            "DISCERNMENT_AND_ADMISSIBILITY_LAW.md",
             "`buildAdmissionState = admitted-local-bounded`"
         };
 
@@ -580,6 +582,46 @@ public sealed class BootstrapBoundaryTests
         foreach (var marker in sessionLedgerMarkers)
         {
             Assert.Contains(marker, sessionLedgerWriterText, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void V111_Discernment_And_Admissibility_Law_Is_Anchored_In_Active_Doctrine()
+    {
+        var lineRoot = GetLineRoot();
+        var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var workflowMapPath = Path.Combine(lineRoot, "docs", "V1_1_1_WORKFLOW_MILESTONE_MAP.md");
+        var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
+        var discernmentLawPath = Path.Combine(lineRoot, "docs", "DISCERNMENT_AND_ADMISSIBILITY_LAW.md");
+
+        var buildReadinessText = File.ReadAllText(buildReadinessPath);
+        var workflowMapText = File.ReadAllText(workflowMapPath);
+        var pathwayDocText = File.ReadAllText(pathwayDocPath);
+        var discernmentLawText = File.ReadAllText(discernmentLawPath);
+
+        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", workflowMapText, StringComparison.Ordinal);
+        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", pathwayDocText, StringComparison.Ordinal);
+
+        var doctrineMarkers = new[]
+        {
+            "transport is not formation",
+            "formation is not admission",
+            "admission is not implementation",
+            "`Dialectic` builds the predicate field.",
+            "`Rhetoric` carries partially formed meaning between agents and surfaces.",
+            "`Discernment` tests candidate structures against defined conditions.",
+            "`Yes/No` records lawful closure under those conditions.",
+            "No provisional structure earns promotion by repetition, fluency, urgency, or convenience.",
+            "The primary corruption risk is not inability to produce.",
+            "It is inability to refuse correctly.",
+            "## Minimum Receipts For Promotion",
+            "promotionDecision"
+        };
+
+        foreach (var marker in doctrineMarkers)
+        {
+            Assert.Contains(marker, discernmentLawText, StringComparison.Ordinal);
         }
     }
 

@@ -75,6 +75,8 @@ Current hold-lane clarification:
   `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
 - the runtime workbench governance and bounded `EC` law now lives in
   `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+- the discernment and admissibility law now lives in
+  `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - the active worker-thread root and Sanctuary workbench source owners now live
   in `src/Sanctuary/Oan.Common/Oan.Common/`,
   `src/TechStack/AgentiCore/AgentiCore/AgentiCore/`, and
@@ -100,6 +102,7 @@ Current contract-first unlock map:
 - `automation-close-law: frame-now`
 - `seeded-governance-build-admission-law: frame-now`
 - `runtime-workbench-governance-law: frame-now`
+- `discernment-admissibility-law: frame-now`
 - `bounded-ec-loop: frame-now`
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`

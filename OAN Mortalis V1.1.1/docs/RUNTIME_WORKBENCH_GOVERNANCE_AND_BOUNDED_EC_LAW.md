@@ -13,6 +13,10 @@ This note defines the active `V1.1.1` law for:
 
 It is a constitutional sheet for the current build line.
 
+It works alongside `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`, which governs when
+predicate candidates may move from provisional rhetoric-bearing standing into
+closure-bearing admission.
+
 It does not claim full `SoulFrame` life, full `AgentiCore` habitation,
 engram minting, or outward duplex authority.
 
@@ -26,6 +30,7 @@ That means:
 
 - configured is not the same as bound
 - provisional is not the same as ready
+- rhetoric-bearing is not the same as admissible
 - symbolic uptake is not the same as cognition
 - cognition is not the same as autobiographical carry-forward
 
