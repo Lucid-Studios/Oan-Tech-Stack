@@ -108,6 +108,68 @@ function Get-MeaningfulScheduledDateTimeUtcStringOrNull {
     return $utcValue.ToString('o')
 }
 
+function Get-ScheduledTaskSnapshot {
+    param([string] $TaskName)
+
+    $snapshot = [ordered]@{
+        taskName = $TaskName
+        registered = $false
+        state = 'not-registered'
+        lastRunTimeUtc = $null
+        nextRunTimeUtc = $null
+    }
+
+    if (-not (Get-Command -Name Get-ScheduledTask -ErrorAction SilentlyContinue)) {
+        return [pscustomobject] $snapshot
+    }
+
+    try {
+        $scheduledTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
+        $scheduledInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Stop
+        $snapshot.registered = $true
+        $snapshot.state = [string] $scheduledTask.State
+        $snapshot.lastRunTimeUtc = Get-MeaningfulScheduledDateTimeUtcStringOrNull -Value ([datetime] $scheduledInfo.LastRunTime)
+        if ([string]::Equals([string] $scheduledTask.State, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
+            $snapshot.nextRunTimeUtc = $null
+        } else {
+            $snapshot.nextRunTimeUtc = Get-MeaningfulScheduledDateTimeUtcStringOrNull -Value ([datetime] $scheduledInfo.NextRunTime)
+        }
+    } catch {
+    }
+
+    return [pscustomobject] $snapshot
+}
+
+function Resolve-OfficeSchedulerStatus {
+    param(
+        [object] $Snapshot,
+        [string] $DesiredStatusWhenReady = 'healthy-armed',
+        [bool] $AllowAwaitingRearm = $false
+    )
+
+    if ($null -eq $Snapshot -or -not [bool] $Snapshot.registered) {
+        return 'scheduler-unregistered'
+    }
+
+    if ([string]::Equals([string] $Snapshot.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
+        if ($AllowAwaitingRearm) {
+            return 'healthy-awaiting-rearm'
+        }
+
+        return 'drift-detected'
+    }
+
+    if ([string]::IsNullOrWhiteSpace([string] $Snapshot.nextRunTimeUtc)) {
+        if ($AllowAwaitingRearm) {
+            return 'healthy-awaiting-rearm'
+        }
+
+        return 'drift-detected'
+    }
+
+    return $DesiredStatusWhenReady
+}
+
 function Resolve-LongFormTaskLiveStatus {
     param(
         [string] $TaskId,
@@ -1280,6 +1342,13 @@ $currentActionClass = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycl
 if ([string]::IsNullOrWhiteSpace($currentActionClass)) {
     $currentActionClass = Get-AutomationActionClassFromStatus -Status $lastKnownStatus
 }
+$mainWorkerTerminalState = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'mainWorkerTerminalState')
+$mainWorkerArmState = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'mainWorkerArmState')
+$lastMainWorkerCloseUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastMainWorkerCloseUtc')
+$nextMainWorkerWakeUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextMainWorkerWakeUtc')
+$nextWatchdogRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextWatchdogRunUtc')
+$nextDailyHitlDigestRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextDailyHitlDigestRunUtc')
+$lastMainWorkerCloseDisposition = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastMainWorkerCloseDisposition')
 $dopingHeaderStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'dopingHeaderStatePath')
 $cycleReceiptStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'cycleReceiptStatePath')
 $readinessNoticeStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'readinessNoticeStatePath')
@@ -1323,6 +1392,7 @@ $publicationCadenceLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRep
 $downstreamRuntimeObservationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.downstreamRuntimeObservationStatePath)
 $multiIntervalGovernanceBraidStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.multiIntervalGovernanceBraidStatePath)
 $schedulerExecutionReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerExecutionReceiptStatePath)
+$watchdogStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.watchdogStatePath)
 $unattendedIntervalConcordanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.unattendedIntervalConcordanceStatePath)
 $staleSurfaceContradictionWatchStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.staleSurfaceContradictionWatchStatePath)
 $unattendedProofCollapseStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.unattendedProofCollapseStatePath)
@@ -1428,6 +1498,7 @@ $publicationCadenceLedgerState = Read-JsonFileOrNull -Path $publicationCadenceLe
 $downstreamRuntimeObservationState = Read-JsonFileOrNull -Path $downstreamRuntimeObservationStatePath
 $multiIntervalGovernanceBraidState = Read-JsonFileOrNull -Path $multiIntervalGovernanceBraidStatePath
 $schedulerExecutionReceiptState = Read-JsonFileOrNull -Path $schedulerExecutionReceiptStatePath
+$watchdogState = Read-JsonFileOrNull -Path $watchdogStatePath
 $unattendedIntervalConcordanceState = Read-JsonFileOrNull -Path $unattendedIntervalConcordanceStatePath
 $staleSurfaceContradictionWatchState = Read-JsonFileOrNull -Path $staleSurfaceContradictionWatchStatePath
 $unattendedProofCollapseState = Read-JsonFileOrNull -Path $unattendedProofCollapseStatePath
@@ -1516,24 +1587,22 @@ if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
     }
 }
 
+$schedulerTopology = $taskingPolicy.schedulerTaskTopology
+$mainWorkerScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.mainWorkerTaskName)
+$watchdogScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.watchdogTaskName)
+$dailyDigestScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.dailyDigestTaskName)
 $scheduler = [ordered]@{
-    taskName = [string] $taskingPolicy.scheduledTaskName
-    registered = $false
-    state = 'not-registered'
-    lastRunTimeUtc = $null
-    nextRunTimeUtc = $null
-}
-
-if (Get-Command -Name Get-ScheduledTask -ErrorAction SilentlyContinue) {
-    try {
-        $scheduledTask = Get-ScheduledTask -TaskName ([string] $taskingPolicy.scheduledTaskName) -ErrorAction Stop
-        $scheduledInfo = Get-ScheduledTaskInfo -TaskName ([string] $taskingPolicy.scheduledTaskName) -ErrorAction Stop
-        $scheduler.registered = $true
-        $scheduler.state = [string] $scheduledTask.State
-        $scheduler.lastRunTimeUtc = Get-MeaningfulScheduledDateTimeUtcStringOrNull -Value ([datetime] $scheduledInfo.LastRunTime)
-        $scheduler.nextRunTimeUtc = Get-MeaningfulScheduledDateTimeUtcStringOrNull -Value ([datetime] $scheduledInfo.NextRunTime)
-    } catch {
+    topology = [ordered]@{
+        mainWorkerTaskName = [string] $schedulerTopology.mainWorkerTaskName
+        watchdogTaskName = [string] $schedulerTopology.watchdogTaskName
+        dailyDigestTaskName = [string] $schedulerTopology.dailyDigestTaskName
+        mainWorkerCadenceMinutes = [int] $schedulerTopology.mainWorkerCadenceMinutes
+        watchdogCadenceHours = [int] $schedulerTopology.watchdogCadenceHours
+        dailyDigestCadenceHours = [int] $schedulerTopology.dailyDigestCadenceHours
     }
+    mainWorker = $mainWorkerScheduler
+    watchdog = $watchdogScheduler
+    dailyDigest = $dailyDigestScheduler
 }
 
 $releaseCandidateTaskStatus = if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
@@ -1544,16 +1613,6 @@ $releaseCandidateTaskStatus = if ($lastKnownStatus -eq [string] $cyclePolicy.blo
     'due'
 } else {
     'waiting-for-cadence'
-}
-
-$dailyDigestTaskStatus = if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
-    'review-now-blocked'
-} elseif ($null -eq $nextMandatoryHitlReviewUtc) {
-    'uninitialized'
-} elseif ($nextMandatoryHitlReviewUtc -le $nowUtc) {
-    'review-due'
-} else {
-    'waiting-for-daily-review'
 }
 
 $promotionWatchStatus = 'clear-to-continue'
@@ -1570,14 +1629,35 @@ if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
     $promotionWatchStatus = 'hitl-required'
 }
 
-$schedulerWatchStatus = if (-not [bool] $scheduler.registered) {
-    'scheduler-unregistered'
-} elseif ([string]::Equals([string] $scheduler.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
-    'scheduler-paused-for-hitl'
-} elseif ([string]::IsNullOrWhiteSpace([string] $scheduler.nextRunTimeUtc)) {
-    'scheduler-missing-next-run'
+$mainWorkerTaskStatus = switch ($mainWorkerTerminalState) {
+    'pause-hitl' { 'paused-hitl' }
+    'done' { 'done-retired' }
+    'fault-recoverable' { 'fault-recoverable' }
+    default {
+        switch ($mainWorkerArmState) {
+            'armed' { 'healthy-armed' }
+            'awaiting-rearm' { 'healthy-awaiting-rearm' }
+            'paused-hitl' { 'paused-hitl' }
+            'done-retired' { 'done-retired' }
+            'fault-recoverable' { 'fault-recoverable' }
+            'drift-detected' { 'drift-detected' }
+            default { Resolve-OfficeSchedulerStatus -Snapshot $mainWorkerScheduler -DesiredStatusWhenReady 'healthy-armed' -AllowAwaitingRearm $true }
+        }
+    }
+}
+
+$watchdogTaskStatus = if ($null -ne $watchdogState) {
+    [string] $watchdogState.watchdogState
 } else {
-    'scheduler-ready'
+    Resolve-OfficeSchedulerStatus -Snapshot $watchdogScheduler -DesiredStatusWhenReady 'healthy-armed'
+}
+
+$dailyDigestTaskStatus = if (-not [bool] $dailyDigestScheduler.registered) {
+    'scheduler-unregistered'
+} elseif ([string]::IsNullOrWhiteSpace([string] $dailyDigestScheduler.nextRunTimeUtc)) {
+    'healthy-awaiting-rearm'
+} else {
+    'healthy-armed'
 }
 
 $taskEntries = @(
@@ -1589,29 +1669,29 @@ $taskEntries = @(
         $latestBundle = $null
 
         switch ($taskId) {
-            'release-candidate-cycle' {
-                $status = $releaseCandidateTaskStatus
-                $lastRunUtc = if ($null -ne $lastReleaseCandidateRunUtc) { $lastReleaseCandidateRunUtc.ToString('o') } else { $null }
-                $nextRunUtc = if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { $null }
+            'main-worker-cycle' {
+                $status = $mainWorkerTaskStatus
+                $lastRunUtc = if ($null -ne $lastMainWorkerCloseUtc) { $lastMainWorkerCloseUtc.ToString('o') } elseif ($mainWorkerScheduler.lastRunTimeUtc) { [string] $mainWorkerScheduler.lastRunTimeUtc } else { $null }
+                $nextRunUtc = if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } elseif ($mainWorkerScheduler.nextRunTimeUtc) { [string] $mainWorkerScheduler.nextRunTimeUtc } else { $null }
                 $latestBundle = $lastReleaseCandidateBundle
+            }
+            'hourly-watchdog' {
+                $status = $watchdogTaskStatus
+                $lastRunUtc = if ($watchdogScheduler.lastRunTimeUtc) { [string] $watchdogScheduler.lastRunTimeUtc } else { $null }
+                $nextRunUtc = if ($null -ne $nextWatchdogRunUtc) { $nextWatchdogRunUtc.ToString('o') } elseif ($watchdogScheduler.nextRunTimeUtc) { [string] $watchdogScheduler.nextRunTimeUtc } else { $null }
+                $latestBundle = if ($null -ne $watchdogState) { [string] $watchdogState.bundlePath } else { [string] $watchdogScheduler.taskName }
             }
             'daily-hitl-digest' {
                 $status = $dailyDigestTaskStatus
                 $lastRunUtc = if ($null -ne $lastDigestUtc) { $lastDigestUtc.ToString('o') } else { $null }
-                $nextRunUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
+                $nextRunUtc = if ($null -ne $nextDailyHitlDigestRunUtc) { $nextDailyHitlDigestRunUtc.ToString('o') } elseif ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } elseif ($dailyDigestScheduler.nextRunTimeUtc) { [string] $dailyDigestScheduler.nextRunTimeUtc } else { $null }
                 $latestBundle = $lastDigestBundle
             }
             'promotion-watch' {
                 $status = $promotionWatchStatus
                 $lastRunUtc = if ($null -ne $lastDigestUtc) { $lastDigestUtc.ToString('o') } else { $null }
-                $nextRunUtc = if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
+                $nextRunUtc = if ($null -ne $nextDailyHitlDigestRunUtc) { $nextDailyHitlDigestRunUtc.ToString('o') } elseif ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { $null }
                 $latestBundle = $lastDigestBundle
-            }
-            'scheduler-watch' {
-                $status = $schedulerWatchStatus
-                $lastRunUtc = [string] $scheduler.lastRunTimeUtc
-                $nextRunUtc = [string] $scheduler.nextRunTimeUtc
-                $latestBundle = [string] $scheduler.taskName
             }
         }
 
@@ -1995,6 +2075,13 @@ $statusPayload = [ordered]@{
     currentPosture = [ordered]@{
         lastKnownStatus = $lastKnownStatus
         actionClass = $currentActionClass
+        mainWorkerTerminalState = $mainWorkerTerminalState
+        mainWorkerArmState = $mainWorkerArmState
+        lastMainWorkerCloseUtc = if ($null -ne $lastMainWorkerCloseUtc) { $lastMainWorkerCloseUtc.ToString('o') } else { $null }
+        lastMainWorkerCloseDisposition = $lastMainWorkerCloseDisposition
+        nextMainWorkerWakeUtc = if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { $null }
+        nextWatchdogRunUtc = if ($null -ne $nextWatchdogRunUtc) { $nextWatchdogRunUtc.ToString('o') } else { $null }
+        nextDailyHitlDigestRunUtc = if ($null -ne $nextDailyHitlDigestRunUtc) { $nextDailyHitlDigestRunUtc.ToString('o') } else { $null }
         recommendedAction = $recommendedAction
         requiresImmediateHitl = $requiresImmediateHitl
         lastReleaseCandidateBundle = $lastReleaseCandidateBundle
@@ -2014,7 +2101,7 @@ $statusPayload = [ordered]@{
         notificationTriggered = if ($null -ne $notificationState) { [bool] $notificationState.triggered } else { $null }
         notificationTriggerReason = if ($null -ne $notificationState) { [string] $notificationState.triggerReason } else { $null }
         lastNotificationBundle = if ($null -ne $notificationState) { [string] $notificationState.lastNotificationBundle } else { $null }
-        schedulerReconciliationAction = if ($null -ne $schedulerReconciliationState) { [string] $schedulerReconciliationState.actionTaken } else { $null }
+        schedulerReconciliationAction = if ($null -ne $schedulerReconciliationState) { @($schedulerReconciliationState.actionTaken | ForEach-Object { [string] $_ }) } else { @() }
         schedulerAligned = if ($null -ne $schedulerReconciliationState) { [bool] $schedulerReconciliationState.aligned } else { $null }
         cmeConsolidationState = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.consolidationState } else { $null }
         cmeConsolidationReason = if ($null -ne $cmeConsolidationState) { [string] $cmeConsolidationState.reasonCode } else { $null }
@@ -2686,30 +2773,43 @@ $markdownLines = @(
     ('- Active map posture: `{0}`' -f $activeLongFormTaskMapStatus),
     ('- Pull-forward allowed from next map: `{0}`' -f $canPullForwardFromNextMap),
     ('- Queued next maps: `{0}`' -f $(if (@($queuedBatchTaskMaps).Count -gt 0) { ((@($queuedBatchTaskMaps | ForEach-Object { [string] $_.label }) -join ' -> ')) } else { 'none' })),
-    ('- Scheduler task: `{0}`' -f $scheduler.taskName),
-    ('- Scheduler registered: `{0}`' -f $scheduler.registered),
-    ('- Scheduler state: `{0}`' -f $scheduler.state),
     ('- Current posture: `{0}`' -f $lastKnownStatus),
     ('- Current action class: `{0}`' -f $currentActionClass),
+    ('- Main worker terminal state: `{0}`' -f $(if (-not [string]::IsNullOrWhiteSpace($mainWorkerTerminalState)) { $mainWorkerTerminalState } else { 'uninitialized' })),
+    ('- Main worker arm state: `{0}`' -f $(if (-not [string]::IsNullOrWhiteSpace($mainWorkerArmState)) { $mainWorkerArmState } else { 'uninitialized' })),
     ('- Recommended action: `{0}`' -f $recommendedAction),
     ('- Requires immediate HITL: `{0}`' -f $requiresImmediateHitl),
     ('- Active control notice: `{0}`' -f $(if (-not [string]::IsNullOrWhiteSpace($currentNoticeTypeFromCycle)) { ('{0} ({1})' -f $currentNoticeTypeFromCycle, $currentNoticeStatusFromCycle) } else { 'uninitialized' })),
     ('- Master-thread orchestration: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.orchestrationState } else { 'uninitialized' })),
     ('- Orchestration next action: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.nextAction } else { 'uninitialized' })),
+    ('- Next main-worker wake (UTC): `{0}`' -f $(if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { 'not-scheduled' })),
+    ('- Next watchdog run (UTC): `{0}`' -f $(if ($null -ne $nextWatchdogRunUtc) { $nextWatchdogRunUtc.ToString('o') } else { 'not-scheduled' })),
+    ('- Next daily digest run (UTC): `{0}`' -f $(if ($null -ne $nextDailyHitlDigestRunUtc) { $nextDailyHitlDigestRunUtc.ToString('o') } else { 'not-scheduled' })),
     ('- Next release-candidate run (UTC): `{0}`' -f $(if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { 'uninitialized' })),
     ('- Next mandatory HITL review (UTC): `{0}`' -f $(if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { 'uninitialized' })),
     ''
 )
 
-if ($scheduler.registered) {
-    $markdownLines += @(
-        '## Scheduler',
-        '',
-        ('- Last scheduled run (UTC): `{0}`' -f $(if ($scheduler.lastRunTimeUtc) { $scheduler.lastRunTimeUtc } else { 'not-yet-run' })),
-        ('- Next scheduled run (UTC): `{0}`' -f $(if ($scheduler.nextRunTimeUtc) { $scheduler.nextRunTimeUtc } else { 'not-available' })),
-        ''
-    )
-}
+$markdownLines += @(
+    '## Scheduler',
+    '',
+    ('- Main worker task: `{0}`' -f $scheduler.mainWorker.taskName),
+    ('- Main worker registered: `{0}`' -f $scheduler.mainWorker.registered),
+    ('- Main worker state: `{0}`' -f $scheduler.mainWorker.state),
+    ('- Main worker last run (UTC): `{0}`' -f $(if ($scheduler.mainWorker.lastRunTimeUtc) { $scheduler.mainWorker.lastRunTimeUtc } else { 'not-yet-run' })),
+    ('- Main worker next run (UTC): `{0}`' -f $(if ($scheduler.mainWorker.nextRunTimeUtc) { $scheduler.mainWorker.nextRunTimeUtc } else { 'not-scheduled' })),
+    ('- Watchdog task: `{0}`' -f $scheduler.watchdog.taskName),
+    ('- Watchdog registered: `{0}`' -f $scheduler.watchdog.registered),
+    ('- Watchdog state: `{0}`' -f $scheduler.watchdog.state),
+    ('- Watchdog last run (UTC): `{0}`' -f $(if ($scheduler.watchdog.lastRunTimeUtc) { $scheduler.watchdog.lastRunTimeUtc } else { 'not-yet-run' })),
+    ('- Watchdog next run (UTC): `{0}`' -f $(if ($scheduler.watchdog.nextRunTimeUtc) { $scheduler.watchdog.nextRunTimeUtc } else { 'not-scheduled' })),
+    ('- Daily digest task: `{0}`' -f $scheduler.dailyDigest.taskName),
+    ('- Daily digest registered: `{0}`' -f $scheduler.dailyDigest.registered),
+    ('- Daily digest state: `{0}`' -f $scheduler.dailyDigest.state),
+    ('- Daily digest last run (UTC): `{0}`' -f $(if ($scheduler.dailyDigest.lastRunTimeUtc) { $scheduler.dailyDigest.lastRunTimeUtc } else { 'not-yet-run' })),
+    ('- Daily digest next run (UTC): `{0}`' -f $(if ($scheduler.dailyDigest.nextRunTimeUtc) { $scheduler.dailyDigest.nextRunTimeUtc } else { 'not-scheduled' })),
+    ''
+)
 
 if ($null -ne $seededGovernanceState) {
     $markdownLines += @(
@@ -2740,10 +2840,13 @@ if ($null -ne $schedulerReconciliationState) {
     $markdownLines += @(
         '## Scheduler Reconciliation',
         '',
-        ('- Action taken: `{0}`' -f [string] $schedulerReconciliationState.actionTaken),
+        ('- Action taken: `{0}`' -f ((@($schedulerReconciliationState.actionTaken | ForEach-Object { [string] $_ }) -join '`, `'))),
         ('- Aligned: `{0}`' -f [bool] $schedulerReconciliationState.aligned),
-        ('- Desired next run (UTC): `{0}`' -f [string] $schedulerReconciliationState.desiredNextRunUtc),
-        ('- Final next run (UTC): `{0}`' -f [string] $schedulerReconciliationState.finalNextRunUtc),
+        ('- Main worker terminal state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $schedulerReconciliationState -PropertyName 'mainWorker') -PropertyName 'terminalState')),
+        ('- Main worker final arm state: `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $schedulerReconciliationState -PropertyName 'mainWorker') -PropertyName 'finalArmState')),
+        ('- Main worker final next wake (UTC): `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $schedulerReconciliationState -PropertyName 'mainWorker') -PropertyName 'finalNextWakeUtc')),
+        ('- Watchdog next run (UTC): `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $schedulerReconciliationState -PropertyName 'watchdog') -PropertyName 'finalNextRunUtc')),
+        ('- Daily digest next run (UTC): `{0}`' -f [string] (Get-ObjectPropertyValueOrNull -InputObject (Get-ObjectPropertyValueOrNull -InputObject $schedulerReconciliationState -PropertyName 'dailyDigest') -PropertyName 'finalNextRunUtc')),
         ''
     )
 }

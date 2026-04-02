@@ -275,7 +275,7 @@ $bucketStates = foreach ($bucketLabel in @($federationPolicy.sourceBucketLabels)
     $latestBucketRequestCount = @($latestBucketRequest).Count
 
     $bucketState = 'no-build-need'
-    if ($touchPointCount -gt 0 -and $bucketRequestCount -gt 0) {
+    if ($bucketRequestCount -gt 0) {
         $bucketState = 'request-published-awaiting-return'
     } elseif ($touchPointCount -gt 0 -and $requestPublicationGateState -in @('blocked', 'clarify-before-requesting')) {
         $bucketState = 'build-need-held-by-gate'

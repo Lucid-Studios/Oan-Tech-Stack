@@ -79,6 +79,50 @@ function Get-MeaningfulScheduledDateTimeUtcOrNull {
     return $utcValue
 }
 
+function Get-TaskSnapshot {
+    param([string] $TaskName)
+
+    $snapshot = [ordered]@{
+        taskName = $TaskName
+        registered = $false
+        state = 'not-registered'
+        lastRunUtc = $null
+        nextRunUtc = $null
+    }
+
+    if (-not (Get-Command -Name Get-ScheduledTask -ErrorAction SilentlyContinue)) {
+        return [pscustomobject] $snapshot
+    }
+
+    try {
+        $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
+        $taskInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Stop
+        $snapshot.registered = $true
+        $snapshot.state = [string] $task.State
+        $snapshot.lastRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $taskInfo.LastRunTime)
+        if ([string]::Equals([string] $task.State, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
+            $snapshot.nextRunUtc = $null
+        } else {
+            $snapshot.nextRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $taskInfo.NextRunTime)
+        }
+    } catch {
+    }
+
+    return [pscustomobject] $snapshot
+}
+
+function Convert-SnapshotForPayload {
+    param([object] $Snapshot)
+
+    return [ordered]@{
+        taskName = [string] $Snapshot.taskName
+        registered = [bool] $Snapshot.registered
+        state = [string] $Snapshot.state
+        lastRunUtc = if ($null -ne $Snapshot.lastRunUtc) { $Snapshot.lastRunUtc.ToString('o') } else { $null }
+        nextRunUtc = if ($null -ne $Snapshot.nextRunUtc) { $Snapshot.nextRunUtc.ToString('o') } else { $null }
+    }
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
@@ -94,70 +138,72 @@ if ($null -eq $cycleState) {
 }
 
 $schedulerReconciliationState = Read-JsonFileOrNull -Path $schedulerReconciliationStatePath
-$taskName = 'OAN Mortalis Governed Automation Cycle'
-$schedulerRegistered = $false
-$schedulerState = 'not-registered'
-$lastScheduledRunUtc = $null
-$nextScheduledRunUtc = $null
+$topology = $cyclePolicy.schedulerTaskTopology
 
-if (Get-Command -Name Get-ScheduledTask -ErrorAction SilentlyContinue) {
-    try {
-        $scheduledTask = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
-        $scheduledInfo = Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction Stop
-        $schedulerRegistered = $true
-        $schedulerState = [string] $scheduledTask.State
-        $lastScheduledRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $scheduledInfo.LastRunTime)
-        $nextScheduledRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $scheduledInfo.NextRunTime)
-    } catch {
+$mainWorkerSnapshot = Get-TaskSnapshot -TaskName ([string] $topology.mainWorkerTaskName)
+$watchdogSnapshot = Get-TaskSnapshot -TaskName ([string] $topology.watchdogTaskName)
+$dailyDigestSnapshot = Get-TaskSnapshot -TaskName ([string] $topology.dailyDigestTaskName)
+
+$terminalState = [string] $cycleState.mainWorkerTerminalState
+$armState = [string] $cycleState.mainWorkerArmState
+$receiptState = switch ($terminalState) {
+    'pause-hitl' { 'paused-hitl' }
+    'done' { 'done-retired' }
+    'fault-recoverable' { 'fault-recoverable' }
+    default {
+        if ($armState -eq 'armed') {
+            'healthy-armed'
+        } elseif ($armState -eq 'awaiting-rearm') {
+            'healthy-awaiting-rearm'
+        } elseif ($armState -eq 'drift-detected') {
+            'drift-detected'
+        } else {
+            'healthy-awaiting-rearm'
+        }
     }
 }
 
-$receiptState = 'candidate-only'
-$reasonCode = 'scheduler-execution-receipt-candidate-only'
-$nextAction = 'continue-candidate-automation'
+$reasonCode = switch ($receiptState) {
+    'healthy-armed' { 'scheduler-execution-main-worker-armed' }
+    'healthy-awaiting-rearm' { 'scheduler-execution-awaiting-rearm' }
+    'paused-hitl' { 'scheduler-execution-paused-hitl' }
+    'done-retired' { 'scheduler-execution-done-retired' }
+    'fault-recoverable' { 'scheduler-execution-fault-recoverable' }
+    default { 'scheduler-execution-drift-detected' }
+}
 
-if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
-    $receiptState = 'blocked'
-    $reasonCode = 'scheduler-execution-receipt-automation-blocked'
-    $nextAction = 'investigate-blocked-state'
-} elseif (-not $schedulerRegistered) {
-    $receiptState = 'awaiting-scheduler-registration'
-    $reasonCode = 'scheduler-execution-receipt-scheduler-unregistered'
-    $nextAction = 'register-or-reconcile-scheduler'
-} elseif ($null -eq $lastScheduledRunUtc) {
-    $receiptState = 'awaiting-scheduler-run'
-    $reasonCode = 'scheduler-execution-receipt-not-yet-observed'
-    $nextAction = 'allow-scheduled-cycle-to-fire'
-} else {
-    $receiptState = 'receipt-captured'
-    $reasonCode = 'scheduler-execution-receipt-captured'
-    $nextAction = 'reconcile-unattended-interval'
+$nextAction = switch ($receiptState) {
+    'healthy-armed' { 'allow-main-worker-to-run' }
+    'healthy-awaiting-rearm' { 'allow-watchdog-or-close-handler-to-rearm' }
+    'paused-hitl' { 'await-operator-resume' }
+    'done-retired' { 'hold-complete-state-until-new-admission' }
+    'fault-recoverable' { 'await-remediation-before-rearm' }
+    default { 'inspect-drift-before-rearm' }
 }
 
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
-$commitKey = if (-not [string]::IsNullOrWhiteSpace([string] $cycleState.lastReleaseCandidateBundle)) {
-    [System.IO.Path]::GetFileName([string] $cycleState.lastReleaseCandidateBundle)
-} else {
-    'no-run'
-}
-$bundlePath = Join-Path $schedulerExecutionReceiptOutputRoot ('{0}-{1}' -f $timestamp, $commitKey)
+$bundleSuffix = if (-not [string]::IsNullOrWhiteSpace([string] $cycleState.runId)) { [string] $cycleState.runId } else { 'no-run' }
+$bundlePath = Join-Path $schedulerExecutionReceiptOutputRoot ('{0}-{1}' -f $timestamp, $bundleSuffix)
 $bundleJsonPath = Join-Path $bundlePath 'scheduler-execution-receipt.json'
 $bundleMarkdownPath = Join-Path $bundlePath 'scheduler-execution-receipt.md'
 
 $payload = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 2
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
     receiptState = $receiptState
     reasonCode = $reasonCode
     nextAction = $nextAction
-    taskName = $taskName
-    schedulerRegistered = $schedulerRegistered
-    schedulerState = $schedulerState
-    lastScheduledRunUtc = if ($null -ne $lastScheduledRunUtc) { $lastScheduledRunUtc.ToString('o') } else { $null }
-    nextScheduledRunUtc = if ($null -ne $nextScheduledRunUtc) { $nextScheduledRunUtc.ToString('o') } else { $null }
-    schedulerReconciliationAction = if ($null -ne $schedulerReconciliationState) { [string] $schedulerReconciliationState.actionTaken } else { $null }
-    lastReleaseCandidateRunUtc = [string] $cycleState.lastReleaseCandidateRunUtc
+    mainWorkerTerminalState = $terminalState
+    mainWorkerArmState = $armState
+    schedulerAligned = if ($null -ne $schedulerReconciliationState) { [bool] $schedulerReconciliationState.aligned } else { $false }
+    schedulerReconciliationAction = if ($null -ne $schedulerReconciliationState) { @($schedulerReconciliationState.actionTaken | ForEach-Object { [string] $_ }) } else { @() }
+    tasks = [ordered]@{
+        mainWorker = Convert-SnapshotForPayload -Snapshot $mainWorkerSnapshot
+        watchdog = Convert-SnapshotForPayload -Snapshot $watchdogSnapshot
+        dailyDigest = Convert-SnapshotForPayload -Snapshot $dailyDigestSnapshot
+    }
     sourceCandidateBundle = [string] $cycleState.lastReleaseCandidateBundle
+    sourceDigestBundle = [string] $cycleState.lastDigestBundle
 }
 
 Write-JsonFile -Path $bundleJsonPath -Value $payload
@@ -169,26 +215,43 @@ $markdownLines = @(
     ('- Receipt state: `{0}`' -f $payload.receiptState),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
-    ('- Scheduler registered: `{0}`' -f $payload.schedulerRegistered),
-    ('- Scheduler state: `{0}`' -f $payload.schedulerState),
-    ('- Last scheduled run (UTC): `{0}`' -f $(if ($payload.lastScheduledRunUtc) { $payload.lastScheduledRunUtc } else { 'not-yet-run' })),
-    ('- Next scheduled run (UTC): `{0}`' -f $(if ($payload.nextScheduledRunUtc) { $payload.nextScheduledRunUtc } else { 'not-available' })),
-    ('- Scheduler reconciliation action: `{0}`' -f $(if ($payload.schedulerReconciliationAction) { $payload.schedulerReconciliationAction } else { 'unknown' })),
-    ('- Last release-candidate run (UTC): `{0}`' -f $(if ($payload.lastReleaseCandidateRunUtc) { $payload.lastReleaseCandidateRunUtc } else { 'missing' })),
-    ('- Source candidate bundle: `{0}`' -f $(if ($payload.sourceCandidateBundle) { $payload.sourceCandidateBundle } else { 'missing' }))
+    ('- Main-worker terminal state: `{0}`' -f $payload.mainWorkerTerminalState),
+    ('- Main-worker arm state: `{0}`' -f $payload.mainWorkerArmState),
+    ('- Scheduler aligned: `{0}`' -f $payload.schedulerAligned),
+    ''
 )
+
+foreach ($taskEntry in @(
+        [ordered]@{ Label = 'Main Worker'; Snapshot = $payload.tasks.mainWorker },
+        [ordered]@{ Label = 'Watchdog'; Snapshot = $payload.tasks.watchdog },
+        [ordered]@{ Label = 'Daily Digest'; Snapshot = $payload.tasks.dailyDigest }
+    )) {
+    $snapshot = $taskEntry.Snapshot
+    $markdownLines += @(
+        ('## {0}' -f $taskEntry.Label),
+        '',
+        ('- Task name: `{0}`' -f $snapshot.taskName),
+        ('- Registered: `{0}`' -f $snapshot.registered),
+        ('- State: `{0}`' -f $snapshot.state),
+        ('- Last run (UTC): `{0}`' -f $(if ($snapshot.lastRunUtc) { $snapshot.lastRunUtc } else { 'not-yet-run' })),
+        ('- Next run (UTC): `{0}`' -f $(if ($snapshot.nextRunUtc) { $snapshot.nextRunUtc } else { 'not-scheduled' })),
+        ''
+    )
+}
 
 Set-Content -LiteralPath $bundleMarkdownPath -Value $markdownLines -Encoding utf8
 
 $statePayload = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 2
     generatedAtUtc = $payload.generatedAtUtc
     bundlePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bundlePath
     receiptState = $payload.receiptState
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
-    lastScheduledRunUtc = $payload.lastScheduledRunUtc
-    nextScheduledRunUtc = $payload.nextScheduledRunUtc
+    mainWorkerTerminalState = $payload.mainWorkerTerminalState
+    mainWorkerArmState = $payload.mainWorkerArmState
+    schedulerAligned = $payload.schedulerAligned
+    tasks = $payload.tasks
 }
 
 Write-JsonFile -Path $schedulerExecutionReceiptStatePath -Value $statePayload

@@ -213,16 +213,14 @@ It does not require a human to bless every green pass.
 
 It does require a human to review at least once every `24` hours, or sooner if the stack enters a blocked state.
 
-The current `5` minute loop should be treated as temporary transport law.
-
-The target constitution is:
+The current constitution is now:
 
 - single-flight main worker
 - hourly watchdog reflection and crash recovery
 - daily HITL digest governance
 
-So the scheduler must eventually stop acting like the parent of
-continuation and become only the actuator of the next admitted wake.
+So the scheduler now acts only as the actuator of the next admitted wake.
+Continuation truth is set by worker close, not by the wall clock.
 
 The cycle now includes a bounded notification seam:
 

@@ -441,8 +441,9 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("`runtime-workbench-governance-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`bounded-ec-loop: frame-now`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`engram-predicate-minting: hold`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`single-flight-main-worker: spec-now`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`hourly-watchdog-reflection: spec-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`single-flight-main-worker: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`hourly-watchdog-reflection: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`daily-hitl-digest-office: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
 
         var pathwayMarkers = new[]
         {
@@ -487,9 +488,14 @@ public sealed class BootstrapBoundaryTests
             "\"companionToolTelemetryStatePath\"",
             "\"v111EnrichmentPathwayOutputRoot\"",
             "\"v111EnrichmentPathwayStatePath\"",
-            "\"scheduledTaskName\"",
-            "\"pauseSchedulerOnHitlRequired\"",
-            "\"pauseSchedulerOnBlocked\"",
+            "\"schedulerTaskTopology\"",
+            "\"mainWorkerTaskName\"",
+            "\"watchdogTaskName\"",
+            "\"dailyDigestTaskName\"",
+            "\"pauseMainWorkerOnTerminalStates\"",
+            "\"pauseMainWorkerOnBlocked\"",
+            "\"watchdogOutputRoot\"",
+            "\"watchdogStatePath\"",
             "\"keepCompanionToolTelemetryBundles\"",
             "\"keepV111EnrichmentPathwayBundles\""
         };
@@ -723,6 +729,51 @@ public sealed class BootstrapBoundaryTests
         Assert.True(schedulerSyncIndex > summaryWriteIndex);
         Assert.True(schedulerReceiptIndex > schedulerSyncIndex);
         Assert.True(taskStatusIndex > schedulerReceiptIndex);
+    }
+
+    [Fact]
+    public void V111_LocalAutomation_ThreeOffice_Scheduler_Scripts_Are_Wired()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var installMainWorkerPath = Path.Combine(repoRoot, "tools", "Install-Local-AutomationCycleTask.ps1");
+        var installWatchdogPath = Path.Combine(repoRoot, "tools", "Install-Local-AutomationWatchdogTask.ps1");
+        var installDigestPath = Path.Combine(repoRoot, "tools", "Install-Local-AutomationDigestTask.ps1");
+        var watchdogScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Watchdog.ps1");
+        var digestScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-HitlDigest.ps1");
+        var schedulerSyncPath = Path.Combine(repoRoot, "tools", "Sync-Local-AutomationScheduler.ps1");
+        var taskStatusPath = Path.Combine(repoRoot, "tools", "Write-Local-Automation-TaskStatus.ps1");
+
+        var installMainWorkerText = File.ReadAllText(installMainWorkerPath);
+        var installWatchdogText = File.ReadAllText(installWatchdogPath);
+        var installDigestText = File.ReadAllText(installDigestPath);
+        var watchdogScriptText = File.ReadAllText(watchdogScriptPath);
+        var digestScriptText = File.ReadAllText(digestScriptPath);
+        var schedulerSyncText = File.ReadAllText(schedulerSyncPath);
+        var taskStatusText = File.ReadAllText(taskStatusPath);
+
+        Assert.Contains("Mode: one-shot-main-worker", installMainWorkerText, StringComparison.Ordinal);
+        Assert.DoesNotContain("-RepetitionInterval", installMainWorkerText, StringComparison.Ordinal);
+
+        Assert.Contains("Invoke-Local-Automation-Watchdog.ps1", installWatchdogText, StringComparison.Ordinal);
+        Assert.Contains("-RepetitionInterval", installWatchdogText, StringComparison.Ordinal);
+
+        Assert.Contains("Invoke-Local-Automation-HitlDigest.ps1", installDigestText, StringComparison.Ordinal);
+        Assert.Contains("-RepetitionInterval", installDigestText, StringComparison.Ordinal);
+
+        Assert.Contains("Sync-Local-AutomationScheduler.ps1", watchdogScriptText, StringComparison.Ordinal);
+        Assert.Contains("watchdogState", watchdogScriptText, StringComparison.Ordinal);
+
+        Assert.Contains("Write-Release-Candidate-Digest.ps1", digestScriptText, StringComparison.Ordinal);
+        Assert.Contains("nextDailyHitlDigestRunUtc", digestScriptText, StringComparison.Ordinal);
+
+        Assert.Contains("mainWorkerTaskName", schedulerSyncText, StringComparison.Ordinal);
+        Assert.Contains("watchdogTaskName", schedulerSyncText, StringComparison.Ordinal);
+        Assert.Contains("dailyDigestTaskName", schedulerSyncText, StringComparison.Ordinal);
+
+        Assert.Contains("'main-worker-cycle'", taskStatusText, StringComparison.Ordinal);
+        Assert.Contains("'hourly-watchdog'", taskStatusText, StringComparison.Ordinal);
+        Assert.Contains("'daily-hitl-digest'", taskStatusText, StringComparison.Ordinal);
     }
 
     private static IReadOnlyList<string> FindTokenViolations(IEnumerable<string> forbiddenTokens)

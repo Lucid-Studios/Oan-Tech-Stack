@@ -1,14 +1,12 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
-    [string] $TaskName = 'OAN Mortalis Governed Automation Cycle',
+    [string] $TaskName = 'OAN Mortalis Governed Automation Watchdog',
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
-    [int] $IntervalMinutes = 5,
-    [Nullable[int]] $IntervalHours,
+    [int] $CadenceHours = 1,
     [datetime] $StartAt,
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
-    [string] $CycleStatePath = '.audit/state/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
@@ -20,14 +18,6 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     } else {
         $RepoRoot = (Get-Location).Path
     }
-}
-
-if ($PSBoundParameters.ContainsKey('IntervalHours') -and -not $PSBoundParameters.ContainsKey('IntervalMinutes')) {
-    $IntervalMinutes = [int] $IntervalHours.Value * 60
-}
-
-if ($IntervalMinutes -lt 1) {
-    throw 'IntervalMinutes must be greater than or equal to 1.'
 }
 
 function Resolve-PathFromRepo {
@@ -67,12 +57,12 @@ function Get-SafeLocalStartTime {
 }
 
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
-$cycleScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Local-Automation-Cycle.ps1'
+$watchdogScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Local-Automation-Watchdog.ps1'
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
-$resolvedCycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CycleStatePath
+$resolvedCycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '.audit/state/local-automation-cycle.json'
 
-if (-not (Test-Path -LiteralPath $cycleScriptPath -PathType Leaf)) {
-    throw "Local automation cycle script not found at '$cycleScriptPath'."
+if (-not (Test-Path -LiteralPath $watchdogScriptPath -PathType Leaf)) {
+    throw "Local automation watchdog script not found at '$watchdogScriptPath'."
 }
 
 $desiredStartUtc = $null
@@ -80,30 +70,26 @@ if (-not $PSBoundParameters.ContainsKey('StartAt')) {
     if (Test-Path -LiteralPath $resolvedCyclePolicyPath -PathType Leaf) {
         $policy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
         $topology = $policy.PSObject.Properties['schedulerTaskTopology']
-        if ($null -ne $topology -and $null -ne $topology.Value.PSObject.Properties['mainWorkerCadenceMinutes']) {
-            $IntervalMinutes = [int] $topology.Value.mainWorkerCadenceMinutes
+        if ($null -ne $topology -and $null -ne $topology.Value.PSObject.Properties['watchdogCadenceHours']) {
+            $CadenceHours = [int] $topology.Value.watchdogCadenceHours
         }
     }
 
     if (Test-Path -LiteralPath $resolvedCycleStatePath -PathType Leaf) {
         $state = Get-Content -Raw -LiteralPath $resolvedCycleStatePath | ConvertFrom-Json
-        $desiredWakeValue = $null
-        if ($state.PSObject.Properties['nextMainWorkerWakeUtc']) {
-            $desiredWakeValue = $state.nextMainWorkerWakeUtc
-        } elseif ($state.PSObject.Properties['nextAutomationCycleRunUtc']) {
-            $desiredWakeValue = $state.nextAutomationCycleRunUtc
+        $desiredWatchdogValue = $null
+        if ($state.PSObject.Properties['nextWatchdogRunUtc']) {
+            $desiredWatchdogValue = $state.nextWatchdogRunUtc
         }
 
-        $desiredStartUtc = Get-OptionalDateTimeUtc -Value $desiredWakeValue
+        $desiredStartUtc = Get-OptionalDateTimeUtc -Value $desiredWatchdogValue
     }
 
     if ($null -ne $desiredStartUtc) {
         $StartAt = Get-SafeLocalStartTime -DesiredUtc $desiredStartUtc
     } else {
-        $StartAt = Get-SafeLocalStartTime -DesiredUtc ((Get-Date).ToUniversalTime().AddMinutes($IntervalMinutes))
+        $StartAt = Get-SafeLocalStartTime -DesiredUtc ((Get-Date).ToUniversalTime().AddHours($CadenceHours))
     }
-} else {
-    $StartAt = [datetime] $StartAt
 }
 
 $scheduledPowershellArguments = @(
@@ -111,7 +97,7 @@ $scheduledPowershellArguments = @(
     '-NonInteractive',
     '-WindowStyle', 'Hidden',
     '-ExecutionPolicy', 'Bypass',
-    '-File', ('"{0}"' -f $cycleScriptPath),
+    '-File', ('"{0}"' -f $watchdogScriptPath),
     '-Configuration', $Configuration,
     '-RepoRoot', ('"{0}"' -f $resolvedRepoRoot)
 )
@@ -120,25 +106,23 @@ $action = New-ScheduledTaskAction `
     -Execute 'powershell.exe' `
     -Argument ([string]::Join(' ', $scheduledPowershellArguments)) `
     -WorkingDirectory $resolvedRepoRoot
-$trigger = New-ScheduledTaskTrigger -Once -At $StartAt
+$trigger = New-ScheduledTaskTrigger -Once -At $StartAt -RepetitionInterval (New-TimeSpan -Hours $CadenceHours) -RepetitionDuration (New-TimeSpan -Days 3650)
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
-$description = 'Runs one close-governed OAN automation pass and relies on lawful rearm after close.'
+$description = 'Runs the hourly OAN automation watchdog for reflection, drift detection, and crash recovery.'
 
 if ($PSCmdlet.ShouldProcess($TaskName, 'Register scheduled task')) {
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Description $description -Force | Out-Null
 }
-
-$registeredTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
-$registeredTaskInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Stop
 
 $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
 if (Test-Path -LiteralPath $taskStatusScriptPath -PathType Leaf) {
     & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot | Out-Null
 }
 
+$registeredTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
+$registeredTaskInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Stop
 Write-Host ('[local-automation-task] TaskName: {0}' -f $TaskName)
-Write-Host ('[local-automation-task] Mode: one-shot-main-worker')
-Write-Host ('[local-automation-task] IntervalMinutes: {0}' -f $IntervalMinutes)
+Write-Host ('[local-automation-task] Mode: repeating-watchdog')
 Write-Host ('[local-automation-task] StartAt: {0}' -f $StartAt.ToString('o'))
 Write-Host ('[local-automation-task] State: {0}' -f $registeredTask.State)
 if ($registeredTaskInfo.NextRunTime -and $registeredTaskInfo.NextRunTime.Year -gt 1900) {

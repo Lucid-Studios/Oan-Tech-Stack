@@ -102,9 +102,10 @@ Current contract-first unlock map:
 - `runtime-workbench-governance-law: frame-now`
 - `bounded-ec-loop: frame-now`
 - `engram-predicate-minting: hold`
-- `single-flight-main-worker: spec-now`
-- `hourly-watchdog-reflection: spec-now`
-- `continuous-automation-cadence: temporary-5-minute-transport`
+- `single-flight-main-worker: admitted-local-mechanical`
+- `hourly-watchdog-reflection: admitted-local-mechanical`
+- `daily-hitl-digest-office: admitted-local-mechanical`
+- `main-worker-rearm-interval: 5-minute-close-governed`
 - `explicit-hitl-pause: admitted-operator-stop-boundary`
 
 ## Current Verified State

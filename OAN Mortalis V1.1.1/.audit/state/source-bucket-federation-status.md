@@ -1,13 +1,13 @@
 ﻿# Source-Bucket Federation Status
 
-- Generated at (UTC): `2026-04-01T22:51:45.1040751Z`
+- Generated at (UTC): `2026-04-02T13:51:55.2167956Z`
 - Federation state: `requests-published-awaiting-returns`
 - Reason code: `source-bucket-federation-review-before-requesting`
 - Next action: `wait-for-lawful-source-bucket-returns-or-operator-review`
 - Request publication gate state: `review-before-requesting`
 - Gate action class: `frame-now`
 - Active request count: `2`
-- Total research handoff count: `18`
+- Total research handoff count: `11`
 - Master-thread orchestration state: `awaiting-publishable-master-thread`
 - V1.1.1 enrichment pathway state: `awaiting-runtime-workbench-session-ledger`
 - Run-isolated build pathway state: `awaiting-v111-enrichment-open`
@@ -48,13 +48,13 @@
 
 - Bucket state: `request-published-awaiting-return`
 - Listener telemetry state: `telemetry-present`
-- Requested touchpoints: `7`
+- Requested touchpoints: `0`
 - Active requests: `1`
 - Latest request id: `source-bucket-request://2026-04-01/trivium-forum-002`
 - Latest bundle path: `OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests/2026-04-01-trivium-forum-002`
 - Latest needed return class: `spec-now`
-- Requested touchpoint ids: `common.sanctuaryWorkbenchContracts`, `common.sanctuaryWorkbenchKeys`, `common.workerGovernanceKeys`, `common.workerThreadGovernanceContracts`, `service.governedWorkerThread`, `service.sanctuaryRuntimeWorkbench`, `tests.sanctuaryRuntimeWorkbenchService`
-- Research reasons: `The bounded Sanctuary workbench remains an operator-workflow refinement surface and is not admitted runtime code in the current line.; Workbench keys stay with the bounded operator workflow refinement lane until a real V1.1.1 workbench surface is admitted.; Worker-governance keys remain a future multi-party workflow seam and should be refined through the Trivium lane before build admission.; Worker-thread governance is still a workflow and conference refinement surface rather than current active build law.; Worker-thread services belong to the multi-party workflow refinement lane and are not active standalone build requirements.; The runtime workbench remains a future operator-work surface and should be refined before it becomes an executable V1.1.1 dependency.; Workbench integration tests belong with the deferred runtime workbench surface and should mature in the workflow research lane first.`
+- Requested touchpoint ids: `none`
+- Research reasons: `none`
 
 ## Holographic Data Tool
 

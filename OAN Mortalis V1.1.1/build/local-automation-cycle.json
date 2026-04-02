@@ -5,7 +5,7 @@
   "localReleaseCandidateCadenceHours": 6,
   "mandatoryHitlDigestCadenceHours": 24,
   "targetTemporalConstitution": {
-    "status": "target-spec-now-not-yet-implemented",
+    "status": "implemented-three-office-topology",
     "executionModel": "single-flight-close-governed",
     "nextWakeAuthority": "main-worker-close-state",
     "currentTransportCadenceMinutes": 5,
@@ -17,6 +17,14 @@
       "done",
       "fault-recoverable"
     ]
+  },
+  "schedulerTaskTopology": {
+    "mainWorkerTaskName": "OAN Mortalis Governed Automation Cycle",
+    "watchdogTaskName": "OAN Mortalis Governed Automation Watchdog",
+    "dailyDigestTaskName": "OAN Mortalis Governed HITL Digest",
+    "mainWorkerCadenceMinutes": 5,
+    "watchdogCadenceHours": 1,
+    "dailyDigestCadenceHours": 24
   },
   "digestWindowHours": 24,
   "activeBuildRoot": "OAN Mortalis V1.1.1",
@@ -66,6 +74,7 @@
   "downstreamRuntimeObservationOutputRoot": ".audit/runs/downstream-runtime-observation",
   "multiIntervalGovernanceBraidOutputRoot": ".audit/runs/multi-interval-governance-braid",
   "schedulerExecutionReceiptOutputRoot": ".audit/runs/scheduler-execution-receipts",
+  "watchdogOutputRoot": ".audit/runs/automation-watchdog",
   "unattendedIntervalConcordanceOutputRoot": ".audit/runs/unattended-interval-concordance",
   "staleSurfaceContradictionWatchOutputRoot": ".audit/runs/stale-surface-contradiction-watch",
   "unattendedProofCollapseOutputRoot": ".audit/runs/unattended-proof-collapse",
@@ -181,6 +190,7 @@
   "downstreamRuntimeObservationStatePath": ".audit/state/local-automation-downstream-runtime-observation-last-run.json",
   "multiIntervalGovernanceBraidStatePath": ".audit/state/local-automation-multi-interval-governance-braid-last-run.json",
   "schedulerExecutionReceiptStatePath": ".audit/state/local-automation-scheduler-execution-receipt-last-run.json",
+  "watchdogStatePath": ".audit/state/local-automation-watchdog-last-run.json",
   "unattendedIntervalConcordanceStatePath": ".audit/state/local-automation-unattended-interval-concordance-last-run.json",
   "staleSurfaceContradictionWatchStatePath": ".audit/state/local-automation-stale-surface-contradiction-watch-last-run.json",
   "unattendedProofCollapseStatePath": ".audit/state/local-automation-unattended-proof-collapse-last-run.json",
@@ -305,8 +315,11 @@
   "schedulerReconciliationPolicy": {
     "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
     "driftToleranceMinutes": 3,
-    "pauseSchedulerOnHitlRequired": true,
-    "pauseSchedulerOnBlocked": true
+    "pauseMainWorkerOnTerminalStates": [
+      "pause-hitl",
+      "fault-recoverable"
+    ],
+    "pauseMainWorkerOnBlocked": true
   },
   "retentionPolicy": {
     "keepReleaseCandidateBundles": 8,
@@ -335,6 +348,7 @@
     "keepDownstreamRuntimeObservationBundles": 8,
     "keepMultiIntervalGovernanceBraidBundles": 8,
     "keepSchedulerExecutionReceiptBundles": 8,
+    "keepWatchdogBundles": 8,
     "keepUnattendedIntervalConcordanceBundles": 8,
     "keepStaleSurfaceContradictionWatchBundles": 8,
     "keepUnattendedProofCollapseBundles": 8,

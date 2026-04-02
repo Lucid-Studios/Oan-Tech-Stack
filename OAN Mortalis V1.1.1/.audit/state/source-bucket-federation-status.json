@@ -1,6 +1,6 @@
 ﻿{
     "schemaVersion":  1,
-    "generatedAtUtc":  "2026-04-01T22:51:45.1040751Z",
+    "generatedAtUtc":  "2026-04-02T13:51:55.2167956Z",
     "policyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
     "formalSurfaceMarkdownPath":  "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
     "requestContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
@@ -18,7 +18,7 @@
                              "source-bucket-request://2026-04-01/iutt-sli-lisp-001",
                              "source-bucket-request://2026-04-01/trivium-forum-002"
                          ],
-    "totalResearchHandOffCount":  18,
+    "totalResearchHandOffCount":  11,
     "companionTelemetryState":  "companion-tool-telemetry-present",
     "masterThreadOrchestrationState":  "awaiting-publishable-master-thread",
     "v111EnrichmentPathwayState":  "awaiting-runtime-workbench-session-ledger",
@@ -87,25 +87,13 @@
                              "targetBucketLabel":  "Trivium Forum",
                              "bucketState":  "request-published-awaiting-return",
                              "listenerTelemetryState":  "telemetry-present",
-                             "requestedTouchPointCount":  7,
+                             "requestedTouchPointCount":  0,
                              "requestedTouchPointIds":  [
-                                                            "common.sanctuaryWorkbenchContracts",
-                                                            "common.sanctuaryWorkbenchKeys",
-                                                            "common.workerGovernanceKeys",
-                                                            "common.workerThreadGovernanceContracts",
-                                                            "service.governedWorkerThread",
-                                                            "service.sanctuaryRuntimeWorkbench",
-                                                            "tests.sanctuaryRuntimeWorkbenchService"
+
                                                         ],
-                             "researchReasons":  [
-                                                     "The bounded Sanctuary workbench remains an operator-workflow refinement surface and is not admitted runtime code in the current line.",
-                                                     "Workbench keys stay with the bounded operator workflow refinement lane until a real V1.1.1 workbench surface is admitted.",
-                                                     "Worker-governance keys remain a future multi-party workflow seam and should be refined through the Trivium lane before build admission.",
-                                                     "Worker-thread governance is still a workflow and conference refinement surface rather than current active build law.",
-                                                     "Worker-thread services belong to the multi-party workflow refinement lane and are not active standalone build requirements.",
-                                                     "The runtime workbench remains a future operator-work surface and should be refined before it becomes an executable V1.1.1 dependency.",
-                                                     "Workbench integration tests belong with the deferred runtime workbench surface and should mature in the workflow research lane first."
-                                                 ],
+                             "researchReasons":  {
+
+                                                 },
                              "activeRequestCount":  1,
                              "latestRequestId":  "source-bucket-request://2026-04-01/trivium-forum-002",
                              "latestBundlePath":  "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests/2026-04-01-trivium-forum-002",

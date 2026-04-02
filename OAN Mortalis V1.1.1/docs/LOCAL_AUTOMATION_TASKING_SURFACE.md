@@ -119,29 +119,23 @@ becomes an escalation object.
 
 ## Continuous Cadence
 
-The current implementation still uses a shorter unattended transport loop:
+The local automation lane now runs as a three-office topology:
 
-- automation cycle cadence: every `5` minutes
-- release-candidate cadence: every `6` hours
-- mandatory `HITL` digest cadence: every `24` hours
+- main worker cadence: one close-governed wake at a time, rearmed for `5`
+  minutes after lawful close only when continuation remains admitted
+- hourly watchdog cadence: every `1` hour
+- daily `HITL` digest cadence: every `24` hours
 
-This is temporary transport law, not the final temporal constitution.
-
-The close-law target is recorded in:
+The governing close law is recorded in:
 
 - `docs/LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
 
-That target says the main worker should become single-flight and rearm only
-after lawful close, while an hourly watchdog handles reflection and crash
-recovery.
+The scheduler is now transport only. The worker close determines whether the
+next main-worker wake is armed, paused, retired, or left fault-recoverable.
 
-Until that migration lands, the `5` minute loop should be read as a bounded
-transport seam that keeps the lane moving without granting scheduler timing the
-final authority over continuation.
+## Temporal Constitution
 
-## Target Temporal Constitution
-
-The intended automation offices are:
+The implemented automation offices are:
 
 - `main worker`
   one governed pass, one terminal close state, one possible rearm decision
@@ -157,8 +151,9 @@ The governing correction is:
 - `pause-hitl`, `done`, and `fault-recoverable` may not self-rearm the main
   worker
 
-When the posture becomes `hitl-required` or `blocked`, the current scheduled
-cycle must still pause instead of running past the review boundary.
+Generic `hitl-required` remains advisory and review-gated. The main worker
+stops only on explicit `pause-hitl`, `done`, or `fault-recoverable` close
+states.
 
 ## Contract Barrier Escalation
 
@@ -180,16 +175,33 @@ status surfaces rather than flattening every barrier into generic failure.
 
 ## Formal Tasks
 
-### Release Candidate Cycle
+### Main Worker Cycle
 
 - Owner: `Automation`
-- Authority: `Mechanical only`
-- Cadence: every `6` hours
-- Purpose: run the governed release-candidate conveyor and emit the latest candidate evidence bundle
-- Completion signal: a valid `build-evidence-manifest.json` exists in the newest release-candidate bundle
+- Authority: `Mechanical only within bounded close law`
+- Cadence: one armed wake at a time, using a `5` minute rearm interval only
+  after lawful close
+- Purpose: run one governed build pass, close in one terminal state, and arm
+  exactly one next wake only when continuation remains lawful
+- Completion signal: the latest cycle state, receipt, and notice surfaces agree
+  on one terminal close outcome
 - Escalates when:
-  - the local cycle becomes `blocked`
-  - the release-candidate run cannot emit a valid bundle
+  - the cycle cannot close into one lawful terminal state
+  - a required rearm would borrow authority from timing instead of close
+
+### Hourly Watchdog
+
+- Owner: `Automation`
+- Authority: `Machine-local continuity witness only`
+- Cadence: every `1` hour
+- Purpose: reflect on the last close state, detect drift or crash residue, and
+  rearm only the lawful missing main-worker wake
+- Completion signal: the watchdog writes one bounded state surface that
+  classifies the lane as healthy, paused, done, drift-detected, or
+  fault-recoverable
+- Escalates when:
+  - the last close truth and current scheduler truth contradict each other
+  - recovery would require fabricating continuation
 
 ### Daily HITL Digest
 
@@ -213,57 +225,18 @@ status surfaces rather than flattening every barrier into generic failure.
   - the recommended action becomes review-required-before-promotion
   - the posture becomes `blocked`
 
-### Scheduler Watch
-
-- Owner: `Automation`
-- Authority: `Machine-local only`
-- Trigger: Windows scheduled task registration and next-run clock
-- Purpose: ensure the local automation lane is actually schedulable and not merely manually provable
-- Completion signal: the scheduled task is registered and exposes a next run time
-- Escalates when:
-  - the scheduled task is not registered
-  - the scheduled task has no next run time
-
-This task currently reports the temporary transport seam.
-
-Its target form is broader:
-
-- distinguish healthy awaiting rearm from unhealthy missing rearm
-- distinguish lawful pause from defect
-- distinguish quiet completion from crash silence
-
-That target language is governed by `LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`.
-
-### Hourly Watchdog Reflection
-
-- Owner: `Automation`
-- Authority: `Mechanical only`
-- Trigger: every `1` hour
-- Purpose: reflect on the last closed worker state, detect drift or crash
-  residue, and decide whether lawful rearm, continued pause, or escalation is
-  required
-- Completion signal: the current lane is classified as healthy, paused, done,
-  drifted, or fault-recoverable without widening main-worker authority
-- Escalates when:
-  - the last worker close state and current scheduler truth contradict each
-    other
-  - the main worker should have rearmed but no lawful wake exists
-  - crash residue or stale evidence prevents truthful recovery
-
-This is a target office now and not yet the implemented runtime behavior.
-
 ### Explicit HITL Pause
 
 - Owner: `Operator`
 - Authority: `Human-governed admission`
-- Trigger: `hitl-required` or `blocked`
+- Trigger: explicit `pause-hitl` or a recoverable blocked/fault close
 - Purpose: stop the unattended loop at the exact point where continuation would
   require explicit `HITL` approval
-- Completion signal: the scheduled task is paused and the active notice surface
-  becomes `pause_notice`
+- Completion signal: the main worker is left unarmed and the active notice
+  surface becomes `pause_notice`
 - Clears when:
   - the operator admits resumption explicitly
-  - the scheduled task is re-enabled for the next lawful cycle
+  - the main worker is rearmed for the next lawful cycle
 
 ## First Long-Form Task Set
 

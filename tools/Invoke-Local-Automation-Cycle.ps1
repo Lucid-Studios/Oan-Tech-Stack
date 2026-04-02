@@ -325,21 +325,14 @@ $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
 $digestCadenceHours = [int] $policy.mandatoryHitlDigestCadenceHours
 $digestWindowHours = [int] $policy.digestWindowHours
 $blockedStatus = [string] $policy.blockedStatus
+$schedulerTopology = Get-ObjectPropertyValueOrNull -InputObject $policy -PropertyName 'schedulerTaskTopology'
 $schedulerPolicy = Get-ObjectPropertyValueOrNull -InputObject $policy -PropertyName 'schedulerReconciliationPolicy'
-$schedulerTaskName = if ($null -ne $schedulerPolicy -and -not [string]::IsNullOrWhiteSpace([string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerPolicy -PropertyName 'scheduledTaskName'))) {
+$schedulerTaskName = if ($null -ne $schedulerTopology -and -not [string]::IsNullOrWhiteSpace([string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerTopology -PropertyName 'mainWorkerTaskName'))) {
+    [string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerTopology -PropertyName 'mainWorkerTaskName')
+} elseif ($null -ne $schedulerPolicy -and -not [string]::IsNullOrWhiteSpace([string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerPolicy -PropertyName 'scheduledTaskName'))) {
     [string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerPolicy -PropertyName 'scheduledTaskName')
 } else {
     'OAN Mortalis Governed Automation Cycle'
-}
-$pauseSchedulerOnHitlRequired = if ($null -ne $schedulerPolicy -and $null -ne $schedulerPolicy.PSObject.Properties['pauseSchedulerOnHitlRequired']) {
-    [bool] $schedulerPolicy.pauseSchedulerOnHitlRequired
-} else {
-    $false
-}
-$pauseSchedulerOnBlocked = if ($null -ne $schedulerPolicy -and $null -ne $schedulerPolicy.PSObject.Properties['pauseSchedulerOnBlocked']) {
-    [bool] $schedulerPolicy.pauseSchedulerOnBlocked
-} else {
-    $true
 }
 
 $state = Read-JsonFileOrNull -Path $statePath
@@ -433,48 +426,9 @@ $latestStatus = [string] $manifest.status
 $latestRunGeneratedAtUtc = [datetime]::Parse([string] $manifest.generatedAtUtc, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
 $nowUtc = (Get-Date).ToUniversalTime()
 
-$digestDue = $ForceDigest.IsPresent
-if (-not $digestDue) {
-    if ($latestStatus -in @('hitl-required', $blockedStatus)) {
-        $digestDue = $true
-    } elseif ($null -eq $lastDigestUtc) {
-        $digestDue = $true
-    } else {
-        $digestDue = $lastDigestUtc.AddHours($digestCadenceHours) -le $nowUtc
-    }
-}
-
-$digestReportedNextMandatoryReviewUtc = if ($latestStatus -eq $blockedStatus) {
-    $nowUtc
-} elseif ($digestDue) {
-    $nowUtc.AddHours($digestCadenceHours)
-} elseif ($null -eq $lastDigestUtc) {
-    $nowUtc.AddHours($digestCadenceHours)
-} else {
-    $lastDigestUtc.AddHours($digestCadenceHours)
-}
-
-$digestBundlePath = $null
-if ($digestDue) {
-    $writeDigestScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Release-Candidate-Digest.ps1'
-    $digestArgs = @(
-        '-ExecutionPolicy', 'Bypass',
-        '-File', $writeDigestScriptPath,
-        '-RepoRoot', $resolvedRepoRoot,
-        '-RunRoot', $releaseCandidateOutputRoot,
-        '-OutputRoot', $digestOutputRoot,
-        '-WindowHours', $digestWindowHours,
-        '-ReferenceTimeUtc', $nowUtc.ToString('o'),
-        '-NextMandatoryReviewUtc', $digestReportedNextMandatoryReviewUtc.ToString('o')
-    )
-
-    $digestOutput = Invoke-ChildPowershellScript -ArgumentList $digestArgs -FailureContext 'Daily HITL digest writer'
-
-    $digestBundlePath = Get-ScriptOutputTail -Output $digestOutput
-    if ([string]::IsNullOrWhiteSpace($digestBundlePath)) {
-        throw 'Local automation cycle did not receive a digest bundle path.'
-    }
-} else {
+$digestBundlePath = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastDigestBundle')
+if ([string]::IsNullOrWhiteSpace($digestBundlePath) -or -not (Test-Path -LiteralPath $digestBundlePath -PathType Container)) {
+    $digestBundlePath = $null
     if (Test-Path -LiteralPath $digestRunRoot -PathType Container) {
         $latestDigest = Get-ChildItem -LiteralPath $digestRunRoot -Directory |
             Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'release-candidate-digest.json') -PathType Leaf } |
@@ -487,14 +441,59 @@ if ($digestDue) {
     }
 }
 
-$newLastDigestUtc = if ($digestDue) { $nowUtc } else { $lastDigestUtc }
-$nextMandatoryReviewUtc = if ($null -eq $newLastDigestUtc) {
-    $nowUtc.AddHours($digestCadenceHours)
+$newLastDigestUtc = $lastDigestUtc
+$nextMandatoryReviewUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'nextMandatoryHitlReviewUtc')
+if ($null -eq $nextMandatoryReviewUtc) {
+    if ($null -ne $newLastDigestUtc) {
+        $nextMandatoryReviewUtc = $newLastDigestUtc.AddHours($digestCadenceHours)
+    } else {
+        $nextMandatoryReviewUtc = $nowUtc.AddHours($digestCadenceHours)
+    }
+}
+$nextDailyHitlDigestRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'nextDailyHitlDigestRunUtc')
+if ($null -eq $nextDailyHitlDigestRunUtc) {
+    $nextDailyHitlDigestRunUtc = $nextMandatoryReviewUtc
+}
+
+$normalizedLatestStatus = ([string] $latestStatus).ToLowerInvariant()
+$mainWorkerTerminalState = switch ($normalizedLatestStatus) {
+    'candidate-ready' { 'continue' }
+    'hitl-required' { 'continue' }
+    'done' { 'done' }
+    'blocked' { 'fault-recoverable' }
+    default { 'fault-recoverable' }
+}
+$mainWorkerArmState = switch ($mainWorkerTerminalState) {
+    'continue' { 'awaiting-rearm' }
+    'pause-hitl' { 'paused-hitl' }
+    'done' { 'done-retired' }
+    default { 'fault-recoverable' }
+}
+$nextMainWorkerWakeUtc = if ($mainWorkerTerminalState -eq 'continue') {
+    $nowUtc.AddMinutes($automationCadenceMinutes)
 } else {
-    $newLastDigestUtc.AddHours($digestCadenceHours)
+    $null
+}
+$lastMainWorkerCloseDisposition = switch ($mainWorkerTerminalState) {
+    'continue' {
+        if ($latestStatus -eq 'hitl-required') {
+            'review-gated-continue'
+        } else {
+            'continue-within-bounded-close-law'
+        }
+    }
+    'pause-hitl' { 'explicit-pause-hitl' }
+    'done' { 'objective-complete' }
+    'fault-recoverable' {
+        if ($latestStatus -eq $blockedStatus) {
+            'blocked-fault-recoverable'
+        } else {
+            'close-clarification-fault-recoverable'
+        }
+    }
+    default { 'close-clarification-fault-recoverable' }
 }
 $automationActionClass = Get-AutomationActionClassFromStatus -Status $latestStatus
-$normalizedLatestStatus = ([string] $latestStatus).ToLowerInvariant()
 
 $statePayload = [ordered]@{
     schemaVersion = 1
@@ -514,11 +513,18 @@ $statePayload = [ordered]@{
     lastKnownStatus = $latestStatus
     lastDigestUtc = if ($null -ne $newLastDigestUtc) { $newLastDigestUtc.ToString('o') } else { $null }
     lastDigestBundle = $digestBundlePath
-    nextAutomationCycleRunUtc = $nowUtc.AddMinutes($automationCadenceMinutes).ToString('o')
+    mainWorkerTerminalState = $mainWorkerTerminalState
+    mainWorkerArmState = $mainWorkerArmState
+    nextMainWorkerWakeUtc = if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { $null }
+    nextAutomationCycleRunUtc = if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { $null }
+    nextWatchdogRunUtc = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'nextWatchdogRunUtc')
     nextReleaseCandidateRunUtc = $latestRunGeneratedAtUtc.AddHours($releaseCadenceHours).ToString('o')
     nextMandatoryHitlReviewUtc = $nextMandatoryReviewUtc.ToString('o')
+    nextDailyHitlDigestRunUtc = $nextDailyHitlDigestRunUtc.ToString('o')
+    lastMainWorkerCloseUtc = $nowUtc.ToString('o')
+    lastMainWorkerCloseDisposition = $lastMainWorkerCloseDisposition
     releaseCandidateTriggered = $releaseCandidateDue
-    digestTriggered = $digestDue
+    digestTriggered = $false
     actionClass = $automationActionClass
     dopingHeaderStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $dopingHeaderStatePath
     cycleReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $cycleReceiptStatePath
@@ -1687,6 +1693,11 @@ $summary = [ordered]@{
     lastReleaseCandidateBundle = $releaseCandidateBundlePath
     lastKnownStatus = $latestStatus
     actionClass = $automationActionClass
+    mainWorkerTerminalState = $statePayload.mainWorkerTerminalState
+    mainWorkerArmState = $statePayload.mainWorkerArmState
+    nextMainWorkerWakeUtc = $statePayload.nextMainWorkerWakeUtc
+    lastMainWorkerCloseUtc = $statePayload.lastMainWorkerCloseUtc
+    lastMainWorkerCloseDisposition = $statePayload.lastMainWorkerCloseDisposition
     lastDigestBundle = $digestBundlePath
     dopingHeaderStatePath = $statePayload.dopingHeaderStatePath
     cycleReceiptStatePath = $statePayload.cycleReceiptStatePath
@@ -1921,8 +1932,6 @@ if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun
 }
 
 $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
-$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
-$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
 $sourceBucketFederationCycleScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-SourceBucket-FederationCycle.ps1'
 $sourceBucketFederationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $sourceBucketFederationCycleScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-FederationPolicyPath', $sourceBucketFederationPolicyPath) -FailureContext 'Source-bucket federation cycle'
@@ -1972,63 +1981,99 @@ if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun) -and (Test-
     Write-JsonFile -Path $summaryPath -Value $summary
 }
 
-$taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
-$taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
+$taskStatusPath = $null
 
-$pauseForExplicitHitl = ($latestStatus -eq 'hitl-required' -and $pauseSchedulerOnHitlRequired) -or ($latestStatus -eq $blockedStatus -and $pauseSchedulerOnBlocked)
-$receiptStatus = if ($pauseForExplicitHitl) {
-    'paused'
-} elseif ($latestStatus -eq $blockedStatus) {
-    'blocked'
-} else {
-    'completed'
+$pauseForExplicitHitl = ($mainWorkerTerminalState -eq 'pause-hitl')
+$faultRecoverableStop = ($mainWorkerTerminalState -eq 'fault-recoverable')
+$receiptStatus = switch ($mainWorkerTerminalState) {
+    'pause-hitl' { 'paused' }
+    'fault-recoverable' {
+        if ($latestStatus -eq $blockedStatus) {
+            'blocked'
+        } else {
+            'fault-recoverable'
+        }
+    }
+    default { 'completed' }
 }
 $receiptStandingResult = switch ($normalizedLatestStatus) {
     'candidate-ready' { 'candidate_ready' }
     'hitl-required' { 'review_gated' }
     'blocked' { 'suspended' }
+    'done' { 'completed' }
     default { 'clarification_required' }
 }
-$receiptSummary = switch ($normalizedLatestStatus) {
-    'candidate-ready' { 'Automation cycle completed in candidate-ready posture and may continue within cadence.' }
-    'hitl-required' {
-        if ($pauseForExplicitHitl) {
-            'Automation cycle paused for explicit HITL review before further continuation.'
-        } else {
+$receiptSummary = switch ($mainWorkerTerminalState) {
+    'continue' {
+        if ($normalizedLatestStatus -eq 'hitl-required') {
             'Automation cycle completed in review-gated posture; bounded mechanical continuation may proceed while promotion awaits HITL.'
+        } else {
+            'Automation cycle completed in candidate-ready posture and may continue within cadence.'
         }
     }
-    'blocked' { 'Automation cycle ended in blocked posture and is paused pending HITL review.' }
+    'pause-hitl' { 'Automation cycle paused for explicit HITL review before further continuation.' }
+    'done' { 'Automation cycle completed the current bounded objective and retired the main worker pending new admission.' }
+    'fault-recoverable' {
+        if ($latestStatus -eq $blockedStatus) {
+            'Automation cycle ended in blocked posture and is paused pending remediation or HITL review.'
+        } else {
+            'Automation cycle ended in a recoverable fault posture and must not self-rearm.'
+        }
+    }
     default { 'Automation cycle completed with an unclassified posture and requires clarification before wider promotion.' }
 }
-$carryForwardClass = switch ($normalizedLatestStatus) {
-    'candidate-ready' { 'continue-within-cadence' }
-    'hitl-required' {
-        if ($pauseForExplicitHitl) {
-            'paused-awaiting-hitl'
+$carryForwardClass = switch ($mainWorkerTerminalState) {
+    'continue' {
+        if ($normalizedLatestStatus -eq 'hitl-required') {
+            'continue-with-review'
         } else {
-            'promotable-with-review'
+            'continue-within-cadence'
         }
     }
-    'blocked' { 'blocked-awaiting-hitl' }
+    'pause-hitl' { 'paused-awaiting-hitl' }
+    'done' { 'done-retired' }
+    'fault-recoverable' {
+        if ($latestStatus -eq $blockedStatus) {
+            'blocked-awaiting-remediation'
+        } else {
+            'fault-recoverable-awaiting-clarification'
+        }
+    }
     default { 'clarification-required' }
 }
-$nextLawfulActions = switch ($normalizedLatestStatus) {
-    'candidate-ready' { @('continue-automation-until-next-cadence', 'refresh-status-surfaces-on-schedule') }
-    'hitl-required' {
-        if ($pauseForExplicitHitl) {
-            @('await-hitl-review-before-resume', 'preserve-current-state-until-operator-admission')
-        } else {
+$nextLawfulActions = switch ($mainWorkerTerminalState) {
+    'continue' {
+        if ($normalizedLatestStatus -eq 'hitl-required') {
             @('continue-bounded-mechanical-maintenance', 'await-hitl-review-before-promotion')
+        } else {
+            @('continue-automation-until-next-cadence', 'refresh-status-surfaces-on-schedule')
         }
     }
-    'blocked' { @('wait-for-hitl-blocked-review', 'preserve-bounded-state-until-remediation') }
+    'pause-hitl' { @('await-hitl-review-before-resume', 'preserve-current-state-until-operator-admission') }
+    'done' { @('hold-complete-state-until-new-admission') }
+    'fault-recoverable' {
+        if ($latestStatus -eq $blockedStatus) {
+            @('wait-for-hitl-blocked-review', 'preserve-bounded-state-until-remediation')
+        } else {
+            @('clarify-current-posture-before-resume', 'preserve-bounded-state-until-remediation')
+        }
+    }
     default { @('clarify-current-posture-before-next-promotion-step') }
+}
+$receiptHitlRequired = ($mainWorkerTerminalState -eq 'pause-hitl') -or ($latestStatus -in @('hitl-required', $blockedStatus))
+$receiptHitlReason = if ($latestStatus -eq 'hitl-required') {
+    'promotion-or-commit-review-required'
+} elseif ($latestStatus -eq $blockedStatus) {
+    'blocked-posture-requires-hitl-review'
+} elseif ($mainWorkerTerminalState -eq 'pause-hitl') {
+    'explicit-pause-hitl'
+} else {
+    ''
 }
 $receiptVerification = [ordered]@{
     release_candidate_manifest = if (Test-Path -LiteralPath $manifestPath -PathType Leaf) { 'passed' } else { 'missing' }
-    digest_surface = if (-not [string]::IsNullOrWhiteSpace($digestBundlePath)) { 'available' } else { 'not-required' }
-    task_status_surface = if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) { 'written' } else { 'missing' }
+    digest_surface = if (-not [string]::IsNullOrWhiteSpace($digestBundlePath)) { 'available' } else { 'awaiting-daily-digest-office' }
+    task_status_surface = 'scheduled-post-close-write'
     workspace_bucket_surface = if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) { 'written' } else { 'missing' }
     master_thread_orchestration_surface = if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun)) { 'written' } else { 'missing' }
     source_bucket_request_index_surface = if (Test-Path -LiteralPath $sourceBucketRequestIndexStatePath -PathType Leaf) { 'written' } else { 'missing' }
@@ -2068,8 +2113,8 @@ $cycleReceiptPayload = New-AutomationReceiptPayload `
     -Verification $receiptVerification `
     -CarryForwardClass $carryForwardClass `
     -NextLawfulActions $nextLawfulActions `
-    -HitlRequired ($latestStatus -in @('hitl-required', $blockedStatus)) `
-    -HitlReason $(if ($latestStatus -eq 'hitl-required') { 'promotion-or-commit-review-required' } elseif ($latestStatus -eq $blockedStatus) { 'blocked-posture-requires-hitl-review' } else { '' })
+    -HitlRequired $receiptHitlRequired `
+    -HitlReason $receiptHitlReason
 Add-AutomationCascadeOperatorPromptProperty -InputObject $cycleReceiptPayload | Out-Null
 Write-JsonFile -Path $cycleReceiptStatePath -Value $cycleReceiptPayload
 
@@ -2078,36 +2123,28 @@ $statePayload.lastCycleReceiptStatus = [string] $cycleReceiptPayload.status
 $summary.lastCycleReceiptId = $statePayload.lastCycleReceiptId
 $summary.lastCycleReceiptStatus = $statePayload.lastCycleReceiptStatus
 
-$schedulerPauseApplied = $false
-$schedulerPauseReason = if ($latestStatus -eq 'hitl-required') {
-    'hitl-review-required'
-} elseif ($latestStatus -eq $blockedStatus) {
-    'blocked-posture'
-} else {
-    ''
-}
-
-if ($pauseForExplicitHitl -and (Get-Command -Name Disable-ScheduledTask -ErrorAction SilentlyContinue)) {
-    try {
-        Disable-ScheduledTask -TaskName $schedulerTaskName -ErrorAction Stop | Out-Null
-        $schedulerPauseApplied = $true
-    }
-    catch {
-        $schedulerPauseApplied = $false
-    }
-}
-
 $statePayload.schedulerTaskName = $schedulerTaskName
-$statePayload.schedulerPauseRequested = $pauseForExplicitHitl
-$statePayload.schedulerPauseApplied = $schedulerPauseApplied
-$statePayload.schedulerPauseReason = $schedulerPauseReason
+$statePayload.schedulerPauseRequested = ($pauseForExplicitHitl -or $faultRecoverableStop)
+$statePayload.schedulerPauseApplied = $false
+$statePayload.schedulerPauseReason = switch ($mainWorkerTerminalState) {
+    'pause-hitl' { 'pause-hitl' }
+    'fault-recoverable' {
+        if ($latestStatus -eq $blockedStatus) {
+            'blocked-posture'
+        } else {
+            'fault-recoverable'
+        }
+    }
+    'done' { 'done-retired' }
+    default { '' }
+}
 $summary.schedulerTaskName = $schedulerTaskName
-$summary.schedulerPauseRequested = $pauseForExplicitHitl
-$summary.schedulerPauseApplied = $schedulerPauseApplied
-$summary.schedulerPauseReason = $schedulerPauseReason
+$summary.schedulerPauseRequested = $statePayload.schedulerPauseRequested
+$summary.schedulerPauseApplied = $statePayload.schedulerPauseApplied
+$summary.schedulerPauseReason = $statePayload.schedulerPauseReason
 
 $activeNoticePath = $null
-if ($pauseForExplicitHitl) {
+if ($pauseForExplicitHitl -or $faultRecoverableStop) {
     if (Test-Path -LiteralPath $readinessNoticeStatePath -PathType Leaf) {
         Remove-Item -LiteralPath $readinessNoticeStatePath -Force
     }
@@ -2121,20 +2158,26 @@ if ($pauseForExplicitHitl) {
             Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $_
         }
     }
-    $pauseNoticeSummary = if ($latestStatus -eq 'hitl-required') {
+    $pauseNoticeSummary = if ($mainWorkerTerminalState -eq 'pause-hitl') {
         'Automation cycle is paused because the current posture now requires explicit HITL review before continuation.'
+    } elseif ($latestStatus -eq $blockedStatus) {
+        'Automation cycle is paused because the current posture is blocked and must not self-rearm.'
     } else {
-        'Automation cycle is paused because the current posture is blocked.'
+        'Automation cycle is paused because the current posture is fault-recoverable and must not self-rearm.'
     }
-    $pauseNextAction = if ($latestStatus -eq 'hitl-required') {
+    $pauseNextAction = if ($mainWorkerTerminalState -eq 'pause-hitl') {
         'await-hitl-review-before-resume'
-    } else {
+    } elseif ($latestStatus -eq $blockedStatus) {
         'wait-for-hitl-blocked-review'
-    }
-    $pauseEnablesWhenCleared = if ($latestStatus -eq 'hitl-required') {
-        @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-hitl-admission')
     } else {
+        'clarify-current-posture-before-resume'
+    }
+    $pauseEnablesWhenCleared = if ($mainWorkerTerminalState -eq 'pause-hitl') {
+        @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-hitl-admission')
+    } elseif ($latestStatus -eq $blockedStatus) {
         @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-remediation')
+    } else {
+        @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-clarification')
     }
     $pauseNoticePayload = New-AutomationNoticePayload `
         -NoticeId ('notice-{0}-pause' -f $automationCycleRunId) `
@@ -2160,8 +2203,41 @@ if ($pauseForExplicitHitl) {
         Remove-Item -LiteralPath $pauseNoticeStatePath -Force
     }
 
-    $readinessStatus = 'ready'
-    $readinessSummary = 'Automation cycle completed in candidate-ready posture and may continue within its scheduled cadence.'
+    $readinessStatus = switch ($mainWorkerTerminalState) {
+        'done' { 'done-retired' }
+        default {
+            if ($latestStatus -eq 'hitl-required') {
+                'review-gated'
+            } else {
+                'ready'
+            }
+        }
+    }
+    $readinessSummary = switch ($mainWorkerTerminalState) {
+        'done' { 'Automation cycle completed the current bounded objective and retired the main worker pending new admission.' }
+        default {
+            if ($latestStatus -eq 'hitl-required') {
+                'Automation cycle may continue bounded mechanical work while promotion remains review-gated for HITL.'
+            } else {
+                'Automation cycle completed in candidate-ready posture and may continue within its scheduled cadence.'
+            }
+        }
+    }
+    $readinessEnablesWhenCleared = switch ($mainWorkerTerminalState) {
+        'done' { @('hold-complete-state-until-new-admission') }
+        default { @('continue-bounded-cycle-execution', 'allow-downstream-status-ingestion') }
+    }
+    $readinessNextLawfulAction = switch ($mainWorkerTerminalState) {
+        'done' { 'hold-complete-state-until-new-admission' }
+        default {
+            if ($latestStatus -eq 'hitl-required') {
+                'continue-bounded-mechanical-maintenance'
+            } else {
+                'continue-automation-until-next-cadence'
+            }
+        }
+    }
+    $readinessHitlRequired = ($latestStatus -eq 'hitl-required')
     $readinessNoticePayload = New-AutomationNoticePayload `
         -NoticeId ('notice-{0}-readiness' -f $automationCycleRunId) `
         -Lane 'build-governance-automation' `
@@ -2169,9 +2245,9 @@ if ($pauseForExplicitHitl) {
         -Status $readinessStatus `
         -Summary $readinessSummary `
         -DependsOn @() `
-        -EnablesWhenCleared @('continue-bounded-cycle-execution', 'allow-downstream-status-ingestion') `
-        -NextLawfulAction 'continue-automation-until-next-cadence' `
-        -HitlRequired $false
+        -EnablesWhenCleared $readinessEnablesWhenCleared `
+        -NextLawfulAction $readinessNextLawfulAction `
+        -HitlRequired $readinessHitlRequired
     Add-AutomationCascadeOperatorPromptProperty -InputObject $readinessNoticePayload | Out-Null
     Write-JsonFile -Path $readinessNoticeStatePath -Value $readinessNoticePayload
     $activeNoticePath = $readinessNoticeStatePath

@@ -2,7 +2,7 @@
   "schemaVersion": 3,
   "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
   "targetTemporalConstitution": {
-    "status": "target-spec-now-not-yet-implemented",
+    "status": "implemented-three-office-topology",
     "mainWorkerOffice": "single-flight-close-governed",
     "watchdogOffice": "hourly-reflection-and-crash-recovery",
     "dailyDigestOffice": "operator-governance-surface",
@@ -13,6 +13,14 @@
       "done",
       "fault-recoverable"
     ]
+  },
+  "schedulerTaskTopology": {
+    "mainWorkerTaskName": "OAN Mortalis Governed Automation Cycle",
+    "watchdogTaskName": "OAN Mortalis Governed Automation Watchdog",
+    "dailyDigestTaskName": "OAN Mortalis Governed HITL Digest",
+    "mainWorkerCadenceMinutes": 5,
+    "watchdogCadenceHours": 1,
+    "dailyDigestCadenceHours": 24
   },
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
   "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
@@ -34,21 +42,39 @@
   },
   "tasks": [
     {
-      "id": "release-candidate-cycle",
-      "label": "Release Candidate Cycle",
-      "taskClass": "mechanical-verification",
+      "id": "main-worker-cycle",
+      "label": "Main Worker Cycle",
+      "taskClass": "close-governed-execution",
       "owner": "Automation",
-      "authority": "Mechanical only",
-      "cadenceHours": 6,
-      "purpose": "Run the governed release-candidate conveyor and publish the latest candidate evidence bundle.",
-      "completionSignal": "Latest release-candidate bundle contains a build-evidence manifest.",
+      "authority": "Mechanical only within bounded close law",
+      "cadenceMinutes": 5,
+      "purpose": "Run one governed build pass, close in one terminal state, and arm exactly one next wake only when continuation remains lawful.",
+      "completionSignal": "The latest cycle state, receipt, and notice surfaces agree on one terminal close outcome.",
       "outputs": [
-        ".audit/runs/release-candidates/",
-        ".audit/state/local-automation-cycle-last-run.json"
+        ".audit/state/local-automation-cycle.json",
+        ".audit/state/local-automation-cycle-receipt-last-run.json"
       ],
       "escalatesWhen": [
-        "local cycle status becomes blocked",
-        "release-candidate run cannot emit a valid evidence bundle"
+        "the cycle cannot close into one lawful terminal state",
+        "a required rearm would borrow authority from timing instead of close"
+      ]
+    },
+    {
+      "id": "hourly-watchdog",
+      "label": "Hourly Watchdog",
+      "taskClass": "reflection-and-crash-recovery",
+      "owner": "Automation",
+      "authority": "Machine-local continuity witness only",
+      "cadenceHours": 1,
+      "purpose": "Reflect on the last close state, detect drift or crash residue, and rearm only the lawful missing main-worker wake.",
+      "completionSignal": "The watchdog writes one bounded state surface that classifies the lane as healthy, paused, done, fault-recoverable, or drift-detected.",
+      "outputs": [
+        ".audit/runs/automation-watchdog/",
+        ".audit/state/local-automation-watchdog-last-run.json"
+      ],
+      "escalatesWhen": [
+        "the last close truth and current scheduler truth contradict each other",
+        "recovery would require fabricating continuation"
       ]
     },
     {
@@ -58,7 +84,7 @@
       "owner": "Automation",
       "authority": "Mechanical only",
       "cadenceHours": 24,
-      "purpose": "Emit the daily review surface that tells us whether the build can continue unattended or now owes human review.",
+      "purpose": "Emit the daily review surface that tells us whether the build can continue unattended or now owes human review, independent of the main-worker cadence.",
       "completionSignal": "Latest digest bundle contains release-candidate-digest.json and release-candidate-digest.md.",
       "outputs": [
         ".audit/runs/release-digests/",
@@ -76,7 +102,7 @@
       "owner": "Shared",
       "authority": "Automation may classify; HITL decides promotion",
       "trigger": "latest digest posture",
-      "purpose": "Track whether the current automation posture is clear to continue, requires HITL, or is blocked.",
+      "purpose": "Track whether the current automation posture is clear to continue, review-gated, or blocked without automatically pausing the main worker.",
       "completionSignal": "Current posture is reflected in local-automation-tasking-status.json.",
       "outputs": [
         ".audit/state/local-automation-tasking-status.json",
@@ -85,24 +111,6 @@
       "escalatesWhen": [
         "recommended action changes to review-required-before-promotion",
         "latest posture changes to blocked"
-      ]
-    },
-    {
-      "id": "scheduler-watch",
-      "label": "Scheduler Watch",
-      "taskClass": "orchestration",
-      "owner": "Automation",
-      "authority": "Machine-local only",
-      "trigger": "scheduled task registration and next-run clock",
-      "purpose": "Track whether the local Windows scheduler is registered, ready, and aligned to the next release-candidate cadence.",
-      "completionSignal": "Scheduled task is registered and exposes a next run time.",
-      "outputs": [
-        "Windows Scheduled Task: OAN Mortalis Governed Automation Cycle",
-        ".audit/state/local-automation-tasking-status.json"
-      ],
-      "escalatesWhen": [
-        "scheduled task is not registered",
-        "scheduled task has no next run time"
       ]
     }
   ],

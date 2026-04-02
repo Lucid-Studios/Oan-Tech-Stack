@@ -39,6 +39,24 @@ function Read-JsonFileOrNull {
     return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
 }
 
+function Get-ObjectPropertyValueOrNull {
+    param(
+        [object] $InputObject,
+        [string] $PropertyName
+    )
+
+    if ($null -eq $InputObject) {
+        return $null
+    }
+
+    $property = $InputObject.PSObject.Properties[$PropertyName]
+    if ($null -eq $property) {
+        return $null
+    }
+
+    return $property.Value
+}
+
 function Write-JsonFile {
     param(
         [string] $Path,
@@ -53,6 +71,44 @@ function Write-JsonFile {
     $Value | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $Path -Encoding utf8
 }
 
+function Set-JsonNoteProperty {
+    param(
+        [object] $InputObject,
+        [string] $PropertyName,
+        [object] $Value
+    )
+
+    if ($null -eq $InputObject) {
+        throw 'InputObject is required.'
+    }
+
+    if ($InputObject -is [System.Collections.IDictionary]) {
+        $InputObject[$PropertyName] = $Value
+        return
+    }
+
+    if ($InputObject.PSObject.Properties[$PropertyName]) {
+        $InputObject.PSObject.Properties[$PropertyName].Value = $Value
+    } else {
+        Add-Member -InputObject $InputObject -NotePropertyName $PropertyName -NotePropertyValue $Value -Force
+    }
+}
+
+function Get-OptionalDateTimeUtc {
+    param([object] $Value)
+
+    if ($null -eq $Value) {
+        return $null
+    }
+
+    $stringValue = [string] $Value
+    if ([string]::IsNullOrWhiteSpace($stringValue)) {
+        return $null
+    }
+
+    return [datetime]::Parse($stringValue, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
+}
+
 function Get-MeaningfulScheduledDateTimeUtcOrNull {
     param([datetime] $Value)
 
@@ -64,10 +120,107 @@ function Get-MeaningfulScheduledDateTimeUtcOrNull {
     return $utcValue
 }
 
+function Get-TaskSnapshot {
+    param([string] $TaskName)
+
+    $snapshot = [ordered]@{
+        taskName = $TaskName
+        registered = $false
+        state = 'not-registered'
+        lastRunUtc = $null
+        nextRunUtc = $null
+    }
+
+    try {
+        $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
+        $taskInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Stop
+        $snapshot.registered = $true
+        $snapshot.state = [string] $task.State
+        $snapshot.lastRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $taskInfo.LastRunTime)
+        if ([string]::Equals([string] $task.State, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
+            $snapshot.nextRunUtc = $null
+        } else {
+            $snapshot.nextRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $taskInfo.NextRunTime)
+        }
+    }
+    catch {
+    }
+
+    return [pscustomobject] $snapshot
+}
+
+function Get-DriftMinutes {
+    param(
+        [datetime] $DesiredUtc,
+        [datetime] $ActualUtc
+    )
+
+    if ($null -eq $DesiredUtc -or $null -eq $ActualUtc) {
+        return [double]::PositiveInfinity
+    }
+
+    return [math]::Abs(($ActualUtc - $DesiredUtc).TotalMinutes)
+}
+
+function Invoke-InstallScript {
+    param(
+        [string] $ScriptPath,
+        [string] $RepoRoot,
+        [string] $TaskName,
+        [string] $Configuration,
+        [datetime] $DesiredStartUtc
+    )
+
+    $minimumUtc = (Get-Date).ToUniversalTime().AddSeconds(15)
+    $effectiveStartUtc = if ($DesiredStartUtc -lt $minimumUtc) { $minimumUtc } else { $DesiredStartUtc }
+    $localStart = [System.TimeZoneInfo]::ConvertTimeFromUtc($effectiveStartUtc, [System.TimeZoneInfo]::Local)
+
+    & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $ScriptPath `
+        -RepoRoot $RepoRoot `
+        -TaskName $TaskName `
+        -Configuration $Configuration `
+        -StartAt $localStart.ToString('o') | Out-Null
+}
+
+function Get-MainWorkerTerminalState {
+    param([object] $CycleState)
+
+    $terminalState = [string] $CycleState.mainWorkerTerminalState
+    if (-not [string]::IsNullOrWhiteSpace($terminalState)) {
+        return $terminalState
+    }
+
+    switch ([string] $CycleState.lastKnownStatus) {
+        'candidate-ready' { return 'continue' }
+        'hitl-required' { return 'continue' }
+        'blocked' { return 'fault-recoverable' }
+        'done' { return 'done' }
+        default { return 'fault-recoverable' }
+    }
+}
+
+function Get-MainWorkerArmState {
+    param(
+        [object] $CycleState,
+        [string] $TerminalState
+    )
+
+    $armState = [string] $CycleState.mainWorkerArmState
+    if (-not [string]::IsNullOrWhiteSpace($armState)) {
+        return $armState
+    }
+
+    switch ($TerminalState) {
+        'continue' { return 'awaiting-rearm' }
+        'pause-hitl' { return 'paused-hitl' }
+        'done' { return 'done-retired' }
+        default { return 'fault-recoverable' }
+    }
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
-$schedulerPolicy = $cyclePolicy.schedulerReconciliationPolicy
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $schedulerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerReconciliationStatePath)
 $cycleState = Read-JsonFileOrNull -Path $cycleStatePath
@@ -76,111 +229,188 @@ if ($null -eq $cycleState) {
     throw 'Local automation cycle state is required before scheduler reconciliation can run.'
 }
 
-$desiredNextRunRaw = if ($cycleState.PSObject.Properties['nextAutomationCycleRunUtc']) {
-    [string] $cycleState.nextAutomationCycleRunUtc
-} else {
-    [string] $cycleState.nextReleaseCandidateRunUtc
-}
-$desiredNextRunUtc = [datetime]::Parse($desiredNextRunRaw, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
-$taskName = if ($null -ne $schedulerPolicy -and -not [string]::IsNullOrWhiteSpace([string] $schedulerPolicy.scheduledTaskName)) {
-    [string] $schedulerPolicy.scheduledTaskName
-} else {
-    'OAN Mortalis Governed Automation Cycle'
-}
-$toleranceMinutes = if ($null -ne $schedulerPolicy -and $null -ne $schedulerPolicy.PSObject.Properties['driftToleranceMinutes']) {
-    [int] $schedulerPolicy.driftToleranceMinutes
-} else {
-    3
-}
-$cycleCadenceMinutes = if ($cycleState.PSObject.Properties['cadenceMinutes'] -and $cycleState.cadenceMinutes.PSObject.Properties['automationCycle']) {
-    [int] $cycleState.cadenceMinutes.automationCycle
-} elseif ($cyclePolicy.PSObject.Properties['localAutomationCadenceMinutes']) {
-    [int] $cyclePolicy.localAutomationCadenceMinutes
-} else {
-    [int] $cyclePolicy.localReleaseCandidateCadenceHours * 60
-}
-$actionTaken = 'none'
-$registeredBefore = $false
-$previousNextRunUtc = $null
-$finalNextRunUtc = $null
-$wasDisabled = $false
+$topology = $cyclePolicy.schedulerTaskTopology
+$reconciliationPolicy = $cyclePolicy.schedulerReconciliationPolicy
+$mainWorkerTaskName = [string] $topology.mainWorkerTaskName
+$watchdogTaskName = [string] $topology.watchdogTaskName
+$dailyDigestTaskName = [string] $topology.dailyDigestTaskName
+$mainWorkerCadenceMinutes = [int] $topology.mainWorkerCadenceMinutes
+$watchdogCadenceHours = [int] $topology.watchdogCadenceHours
+$dailyDigestCadenceHours = [int] $topology.dailyDigestCadenceHours
+$driftToleranceMinutes = [int] $reconciliationPolicy.driftToleranceMinutes
+$pauseMainWorkerOnTerminalStates = @($reconciliationPolicy.pauseMainWorkerOnTerminalStates | ForEach-Object { [string] $_ })
+$pauseMainWorkerOnBlocked = [bool] $reconciliationPolicy.pauseMainWorkerOnBlocked
+$blockedStatus = [string] $cyclePolicy.blockedStatus
+$nowUtc = (Get-Date).ToUniversalTime()
 
 if (-not (Get-Command -Name Get-ScheduledTask -ErrorAction SilentlyContinue)) {
-    $statePayload = [ordered]@{
-        schemaVersion = 1
-        generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
-        actionTaken = 'unsupported'
-        desiredNextRunUtc = $desiredNextRunUtc.ToString('o')
+    $unsupportedPayload = [ordered]@{
+        schemaVersion = 2
+        generatedAtUtc = $nowUtc.ToString('o')
+        actionTaken = @('unsupported')
         aligned = $false
     }
-
-    Write-JsonFile -Path $schedulerStatePath -Value $statePayload
+    Write-JsonFile -Path $schedulerStatePath -Value $unsupportedPayload
     Write-Host ('[local-automation-scheduler-sync] State: {0}' -f $schedulerStatePath)
     $schedulerStatePath
     return
 }
 
-try {
-    $task = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
-    $taskInfo = Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction Stop
-    $registeredBefore = $true
-    $wasDisabled = ($task.State -eq 'Disabled')
-    $previousNextRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $taskInfo.NextRunTime)
+$mainWorkerTerminalState = Get-MainWorkerTerminalState -CycleState $cycleState
+$desiredMainWorkerArmState = Get-MainWorkerArmState -CycleState $cycleState -TerminalState $mainWorkerTerminalState
+$desiredMainWorkerWakeValue = $null
+if ($cycleState.PSObject.Properties['nextMainWorkerWakeUtc']) {
+    $desiredMainWorkerWakeValue = $cycleState.nextMainWorkerWakeUtc
+} elseif ($cycleState.PSObject.Properties['nextAutomationCycleRunUtc']) {
+    $desiredMainWorkerWakeValue = $cycleState.nextAutomationCycleRunUtc
 }
-catch {
-    $registeredBefore = $false
+$desiredMainWorkerWakeUtc = Get-OptionalDateTimeUtc -Value $desiredMainWorkerWakeValue
+$desiredWatchdogRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextWatchdogRunUtc')
+$desiredDigestRunValue = $null
+if ($cycleState.PSObject.Properties['nextDailyHitlDigestRunUtc']) {
+    $desiredDigestRunValue = $cycleState.nextDailyHitlDigestRunUtc
+} elseif ($cycleState.PSObject.Properties['nextMandatoryHitlReviewUtc']) {
+    $desiredDigestRunValue = $cycleState.nextMandatoryHitlReviewUtc
+}
+$desiredDigestRunUtc = Get-OptionalDateTimeUtc -Value $desiredDigestRunValue
+
+if ($null -eq $desiredMainWorkerWakeUtc -and $mainWorkerTerminalState -eq 'continue') {
+    $desiredMainWorkerWakeUtc = $nowUtc.AddMinutes($mainWorkerCadenceMinutes)
+}
+if ($null -eq $desiredWatchdogRunUtc) {
+    $desiredWatchdogRunUtc = $nowUtc.AddHours($watchdogCadenceHours)
+}
+if ($null -eq $desiredDigestRunUtc) {
+    $desiredDigestRunUtc = $nowUtc.AddHours($dailyDigestCadenceHours)
 }
 
-$driftMinutes = if ($null -ne $previousNextRunUtc) {
-    [math]::Abs(($previousNextRunUtc - $desiredNextRunUtc).TotalMinutes)
-} else {
-    [double]::PositiveInfinity
-}
+$installMainWorkerScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationCycleTask.ps1'
+$installWatchdogScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationWatchdogTask.ps1'
+$installDigestScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationDigestTask.ps1'
+$actionsTaken = New-Object System.Collections.Generic.List[string]
 
-if ($registeredBefore -and $wasDisabled) {
-    Enable-ScheduledTask -TaskName $taskName -ErrorAction Stop | Out-Null
-    $actionTaken = 'enabled'
-}
+$mainWorkerBefore = Get-TaskSnapshot -TaskName $mainWorkerTaskName
+$watchdogBefore = Get-TaskSnapshot -TaskName $watchdogTaskName
+$dailyDigestBefore = Get-TaskSnapshot -TaskName $dailyDigestTaskName
 
-if (-not $registeredBefore -or $driftMinutes -gt $toleranceMinutes) {
-    $installScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationCycleTask.ps1'
-    & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $installScriptPath `
-        -RepoRoot $resolvedRepoRoot `
-        -TaskName $taskName `
-        -Configuration $Configuration `
-        -IntervalMinutes $cycleCadenceMinutes | Out-Null
+$shouldArmMainWorker = ($mainWorkerTerminalState -eq 'continue') -and ($desiredMainWorkerArmState -notin @('paused-hitl', 'done-retired', 'fault-recoverable', 'drift-detected'))
+$finalMainWorkerArmState = $desiredMainWorkerArmState
 
-    $actionTaken = if ($registeredBefore) {
-        if ($actionTaken -eq 'enabled') { 'enabled-and-rescheduled' } else { 'rescheduled' }
-    } else {
-        'registered'
+foreach ($repeatingTask in @(
+        [pscustomobject]@{
+            TaskName = $watchdogTaskName
+            DesiredRunUtc = $desiredWatchdogRunUtc
+            InstallScriptPath = $installWatchdogScriptPath
+        },
+        [pscustomobject]@{
+            TaskName = $dailyDigestTaskName
+            DesiredRunUtc = $desiredDigestRunUtc
+            InstallScriptPath = $installDigestScriptPath
+        }
+    )) {
+    $snapshot = Get-TaskSnapshot -TaskName $repeatingTask.TaskName
+    $driftMinutes = Get-DriftMinutes -DesiredUtc $repeatingTask.DesiredRunUtc -ActualUtc $snapshot.nextRunUtc
+    if ((-not $snapshot.registered) -or
+        [string]::Equals([string] $snapshot.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase) -or
+        $null -eq $snapshot.nextRunUtc -or
+        $driftMinutes -gt $driftToleranceMinutes) {
+        Invoke-InstallScript -ScriptPath $repeatingTask.InstallScriptPath -RepoRoot $resolvedRepoRoot -TaskName $repeatingTask.TaskName -Configuration $Configuration -DesiredStartUtc $repeatingTask.DesiredRunUtc
+        [void] $actionsTaken.Add(('reconciled:{0}' -f $repeatingTask.TaskName))
     }
 }
 
-$finalTask = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
-$finalTaskInfo = Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction Stop
-$finalNextRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $finalTaskInfo.NextRunTime)
-$finalDriftMinutes = if ($null -ne $finalNextRunUtc) {
-    [math]::Abs(($finalNextRunUtc - $desiredNextRunUtc).TotalMinutes)
+if ($shouldArmMainWorker) {
+    $mainDriftMinutes = Get-DriftMinutes -DesiredUtc $desiredMainWorkerWakeUtc -ActualUtc $mainWorkerBefore.nextRunUtc
+    if ((-not $mainWorkerBefore.registered) -or
+        [string]::Equals([string] $mainWorkerBefore.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase) -or
+        $null -eq $mainWorkerBefore.nextRunUtc -or
+        $mainDriftMinutes -gt $driftToleranceMinutes) {
+        Invoke-InstallScript -ScriptPath $installMainWorkerScriptPath -RepoRoot $resolvedRepoRoot -TaskName $mainWorkerTaskName -Configuration $Configuration -DesiredStartUtc $desiredMainWorkerWakeUtc
+        [void] $actionsTaken.Add(('rearmed:{0}' -f $mainWorkerTaskName))
+    }
 } else {
-    [double]::PositiveInfinity
+    if ($mainWorkerBefore.registered -and -not [string]::Equals([string] $mainWorkerBefore.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
+        try {
+            Disable-ScheduledTask -TaskName $mainWorkerTaskName -ErrorAction Stop | Out-Null
+            [void] $actionsTaken.Add(('disabled:{0}' -f $mainWorkerTaskName))
+        }
+        catch {
+        }
+    }
 }
 
-$statePayload = [ordered]@{
-    schemaVersion = 1
-    generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
-    taskName = $taskName
-    registeredBefore = $registeredBefore
-    actionTaken = $actionTaken
-    desiredNextRunUtc = $desiredNextRunUtc.ToString('o')
-    previousNextRunUtc = if ($null -ne $previousNextRunUtc) { $previousNextRunUtc.ToString('o') } else { $null }
-    finalNextRunUtc = if ($null -ne $finalNextRunUtc) { $finalNextRunUtc.ToString('o') } else { $null }
-    driftToleranceMinutes = $toleranceMinutes
-    cadenceMinutes = $cycleCadenceMinutes
-    finalDriftMinutes = $finalDriftMinutes
-    aligned = ($finalDriftMinutes -le $toleranceMinutes)
+$mainWorkerAfter = Get-TaskSnapshot -TaskName $mainWorkerTaskName
+$watchdogAfter = Get-TaskSnapshot -TaskName $watchdogTaskName
+$dailyDigestAfter = Get-TaskSnapshot -TaskName $dailyDigestTaskName
+
+$mainWorkerAligned = $false
+if ($shouldArmMainWorker) {
+    $finalMainDriftMinutes = Get-DriftMinutes -DesiredUtc $desiredMainWorkerWakeUtc -ActualUtc $mainWorkerAfter.nextRunUtc
+    $mainWorkerAligned = $mainWorkerAfter.registered -and
+        (-not [string]::Equals([string] $mainWorkerAfter.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) -and
+        ($null -ne $mainWorkerAfter.nextRunUtc) -and
+        ($finalMainDriftMinutes -le $driftToleranceMinutes)
+    $finalMainWorkerArmState = if ($mainWorkerAligned) { 'armed' } else { 'drift-detected' }
+} else {
+    $mainWorkerAligned = ($null -eq $mainWorkerAfter.nextRunUtc)
+    if ($mainWorkerTerminalState -eq 'pause-hitl') {
+        $finalMainWorkerArmState = 'paused-hitl'
+    } elseif ($mainWorkerTerminalState -eq 'done') {
+        $finalMainWorkerArmState = 'done-retired'
+    } elseif ($mainWorkerTerminalState -eq 'fault-recoverable' -or $cycleState.lastKnownStatus -eq $blockedStatus) {
+        $finalMainWorkerArmState = 'fault-recoverable'
+    }
 }
 
-Write-JsonFile -Path $schedulerStatePath -Value $statePayload
+$watchdogAligned = $watchdogAfter.registered -and ($null -ne $watchdogAfter.nextRunUtc)
+$dailyDigestAligned = $dailyDigestAfter.registered -and ($null -ne $dailyDigestAfter.nextRunUtc)
+
+$finalMainWorkerWakeUtcString = if ($mainWorkerAligned -and $null -ne $mainWorkerAfter.nextRunUtc) { $mainWorkerAfter.nextRunUtc.ToString('o') } else { $null }
+$finalWatchdogRunUtcString = if ($watchdogAligned -and $null -ne $watchdogAfter.nextRunUtc) { $watchdogAfter.nextRunUtc.ToString('o') } else { $null }
+$finalDailyDigestRunUtcString = if ($dailyDigestAligned -and $null -ne $dailyDigestAfter.nextRunUtc) { $dailyDigestAfter.nextRunUtc.ToString('o') } else { $null }
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'mainWorkerTerminalState' -Value $mainWorkerTerminalState
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'mainWorkerArmState' -Value $finalMainWorkerArmState
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextMainWorkerWakeUtc' -Value $finalMainWorkerWakeUtcString
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextAutomationCycleRunUtc' -Value $finalMainWorkerWakeUtcString
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextWatchdogRunUtc' -Value $finalWatchdogRunUtcString
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextDailyHitlDigestRunUtc' -Value $finalDailyDigestRunUtcString
+Write-JsonFile -Path $cycleStatePath -Value $cycleState
+
+$payload = [ordered]@{
+    schemaVersion = 2
+    generatedAtUtc = $nowUtc.ToString('o')
+    actionTaken = if ($actionsTaken.Count -gt 0) { @($actionsTaken) } else { @('none') }
+    driftToleranceMinutes = $driftToleranceMinutes
+    aligned = ($mainWorkerAligned -and $watchdogAligned -and $dailyDigestAligned)
+    mainWorker = [ordered]@{
+        taskName = $mainWorkerTaskName
+        terminalState = $mainWorkerTerminalState
+        desiredArmState = $desiredMainWorkerArmState
+        finalArmState = $finalMainWorkerArmState
+        desiredNextWakeUtc = if ($null -ne $desiredMainWorkerWakeUtc) { $desiredMainWorkerWakeUtc.ToString('o') } else { $null }
+        finalNextWakeUtc = if ($null -ne $mainWorkerAfter.nextRunUtc) { $mainWorkerAfter.nextRunUtc.ToString('o') } else { $null }
+        registeredBefore = $mainWorkerBefore.registered
+        state = $mainWorkerAfter.state
+        aligned = $mainWorkerAligned
+    }
+    watchdog = [ordered]@{
+        taskName = $watchdogTaskName
+        desiredNextRunUtc = if ($null -ne $desiredWatchdogRunUtc) { $desiredWatchdogRunUtc.ToString('o') } else { $null }
+        finalNextRunUtc = if ($null -ne $watchdogAfter.nextRunUtc) { $watchdogAfter.nextRunUtc.ToString('o') } else { $null }
+        registeredBefore = $watchdogBefore.registered
+        state = $watchdogAfter.state
+        aligned = $watchdogAligned
+    }
+    dailyDigest = [ordered]@{
+        taskName = $dailyDigestTaskName
+        desiredNextRunUtc = if ($null -ne $desiredDigestRunUtc) { $desiredDigestRunUtc.ToString('o') } else { $null }
+        finalNextRunUtc = if ($null -ne $dailyDigestAfter.nextRunUtc) { $dailyDigestAfter.nextRunUtc.ToString('o') } else { $null }
+        registeredBefore = $dailyDigestBefore.registered
+        state = $dailyDigestAfter.state
+        aligned = $dailyDigestAligned
+    }
+}
+
+Write-JsonFile -Path $schedulerStatePath -Value $payload
 Write-Host ('[local-automation-scheduler-sync] State: {0}' -f $schedulerStatePath)
 $schedulerStatePath
