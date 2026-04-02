@@ -6,6 +6,9 @@ This law defines the conditions under which a provisional predicate, frame, or
 specification may be promoted into closure-bearing standing within
 `OAN Mortalis V1.1.1`.
 
+Grounded exemplars for this law are carried in
+`DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`.
+
 The line must distinguish between:
 
 - transport of meaning

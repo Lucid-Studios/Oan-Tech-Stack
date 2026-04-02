@@ -26,6 +26,7 @@ The workflow must be read through the current active surfaces:
 - `LATE_PATH_RUNTIME_PROJECTION_SPEC.md`
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
+- `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
 
 The active line remains:
 

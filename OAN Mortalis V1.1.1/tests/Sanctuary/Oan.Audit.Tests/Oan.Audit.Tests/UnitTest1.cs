@@ -593,15 +593,20 @@ public sealed class BootstrapBoundaryTests
         var workflowMapPath = Path.Combine(lineRoot, "docs", "V1_1_1_WORKFLOW_MILESTONE_MAP.md");
         var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
         var discernmentLawPath = Path.Combine(lineRoot, "docs", "DISCERNMENT_AND_ADMISSIBILITY_LAW.md");
+        var discernmentCasebookPath = Path.Combine(lineRoot, "docs", "DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md");
 
         var buildReadinessText = File.ReadAllText(buildReadinessPath);
         var workflowMapText = File.ReadAllText(workflowMapPath);
         var pathwayDocText = File.ReadAllText(pathwayDocPath);
         var discernmentLawText = File.ReadAllText(discernmentLawPath);
+        var discernmentCasebookText = File.ReadAllText(discernmentCasebookPath);
 
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", workflowMapText, StringComparison.Ordinal);
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", pathwayDocText, StringComparison.Ordinal);
+        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md", workflowMapText, StringComparison.Ordinal);
+        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md", pathwayDocText, StringComparison.Ordinal);
 
         var doctrineMarkers = new[]
         {
@@ -622,6 +627,30 @@ public sealed class BootstrapBoundaryTests
         foreach (var marker in doctrineMarkers)
         {
             Assert.Contains(marker, discernmentLawText, StringComparison.Ordinal);
+        }
+
+        var casebookMarkers = new[]
+        {
+            "## Case Format",
+            "CASE-PROVISIONAL-001",
+            "CASE-PROMOTE-001",
+            "CASE-HOLD-001",
+            "CASE-REFUSE-001",
+            "CASE-CATEGORY-ERROR-001",
+            "CASE-INSUFFICIENT-RECEIPTS-001",
+            "CASE-MODAL-SEPARATION-001",
+            "runtime workbench-session ledger",
+            "source-bucket return",
+            "raw source-bucket repo drift",
+            ".hopng",
+            "awaiting-publishable-master-thread",
+            "The law defines admissibility.",
+            "The casebook teaches admissibility."
+        };
+
+        foreach (var marker in casebookMarkers)
+        {
+            Assert.Contains(marker, discernmentCasebookText, StringComparison.Ordinal);
         }
     }
 
