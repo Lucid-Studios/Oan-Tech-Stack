@@ -151,15 +151,17 @@ function Get-TaskSnapshot {
 
 function Get-DriftMinutes {
     param(
-        [datetime] $DesiredUtc,
-        [datetime] $ActualUtc
+        [object] $DesiredUtc,
+        [object] $ActualUtc
     )
 
     if ($null -eq $DesiredUtc -or $null -eq $ActualUtc) {
         return [double]::PositiveInfinity
     }
 
-    return [math]::Abs(($ActualUtc - $DesiredUtc).TotalMinutes)
+    $desiredDateTime = [datetime] $DesiredUtc
+    $actualDateTime = [datetime] $ActualUtc
+    return [math]::Abs(($actualDateTime - $desiredDateTime).TotalMinutes)
 }
 
 function Invoke-InstallScript {
