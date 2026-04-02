@@ -436,6 +436,13 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("`v111-enrichment-automation: admitted-local-bounded`", unlockReadinessText, StringComparison.Ordinal);
         Assert.Contains("`companion-tool-telemetry: admitted-optional-bounded`", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`companion-tool-telemetry: admitted-optional-bounded`", unlockReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`automation-close-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`seeded-governance-build-admission-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`runtime-workbench-governance-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`bounded-ec-loop: frame-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`engram-predicate-minting: hold`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`single-flight-main-worker: spec-now`", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`hourly-watchdog-reflection: spec-now`", buildReadinessText, StringComparison.Ordinal);
 
         var pathwayMarkers = new[]
         {
@@ -444,7 +451,10 @@ public sealed class BootstrapBoundaryTests
             "seed-LLM",
             "production-pre-release",
             "`.hopng: optional-bounded`",
-            "COMPANION_TOOL_TELEMETRY_LANE.md"
+            "COMPANION_TOOL_TELEMETRY_LANE.md",
+            "SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md",
+            "RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md",
+            "`buildAdmissionState = admitted-local-bounded`"
         };
 
         foreach (var marker in pathwayMarkers)
@@ -467,11 +477,19 @@ public sealed class BootstrapBoundaryTests
 
         var policyMarkers = new[]
         {
+            "\"localAutomationCadenceMinutes\"",
+            "\"targetTemporalConstitution\"",
+            "\"single-flight-close-governed\"",
+            "\"watchdogReflectionCadenceHours\"",
+            "\"fault-recoverable\"",
             "\"optionalTriviumForumToolRoot\"",
             "\"companionToolTelemetryOutputRoot\"",
             "\"companionToolTelemetryStatePath\"",
             "\"v111EnrichmentPathwayOutputRoot\"",
             "\"v111EnrichmentPathwayStatePath\"",
+            "\"scheduledTaskName\"",
+            "\"pauseSchedulerOnHitlRequired\"",
+            "\"pauseSchedulerOnBlocked\"",
             "\"keepCompanionToolTelemetryBundles\"",
             "\"keepV111EnrichmentPathwayBundles\""
         };
@@ -479,6 +497,83 @@ public sealed class BootstrapBoundaryTests
         foreach (var marker in policyMarkers)
         {
             Assert.Contains(marker, cyclePolicyText, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void V111_RuntimeWorkbench_Governance_Law_Is_Aligned_Across_Docs_And_Writers()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var workflowMapPath = Path.Combine(lineRoot, "docs", "V1_1_1_WORKFLOW_MILESTONE_MAP.md");
+        var governanceLawPath = Path.Combine(lineRoot, "docs", "RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md");
+        var resolverHelperPath = Path.Combine(repoRoot, "tools", "Resolve-OanWorkspacePath.ps1");
+        var threadRootWriterPath = Path.Combine(repoRoot, "tools", "Write-IdentityInvariant-ThreadRoot.ps1");
+        var workbenchSurfaceWriterPath = Path.Combine(repoRoot, "tools", "Write-Sanctuary-RuntimeWorkbenchSurface.ps1");
+        var sessionLedgerWriterPath = Path.Combine(repoRoot, "tools", "Write-RuntimeWorkbench-SessionLedger.ps1");
+
+        var buildReadinessText = File.ReadAllText(buildReadinessPath);
+        var workflowMapText = File.ReadAllText(workflowMapPath);
+        var governanceLawText = File.ReadAllText(governanceLawPath);
+        var resolverHelperText = File.ReadAllText(resolverHelperPath);
+        var threadRootWriterText = File.ReadAllText(threadRootWriterPath);
+        var workbenchSurfaceWriterText = File.ReadAllText(workbenchSurfaceWriterPath);
+        var sessionLedgerWriterText = File.ReadAllText(sessionLedgerWriterPath);
+
+        Assert.Contains("RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md", buildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md", workflowMapText, StringComparison.Ordinal);
+        Assert.Contains("bind-worker-thread-root-governance-surface", governanceLawText, StringComparison.Ordinal);
+        Assert.Contains("bounded-governance-analysis-workbench", governanceLawText, StringComparison.Ordinal);
+        Assert.Contains("CradleTek -> SLI -> SoulFrame -> ListeningFrame -> Compass -> cOE", governanceLawText, StringComparison.Ordinal);
+        Assert.Contains("engramPredicateEligibilityState", governanceLawText, StringComparison.Ordinal);
+        Assert.Contains("Get-OanWorkspaceTouchPointFamilyResolution", resolverHelperText, StringComparison.Ordinal);
+
+        var threadRootMarkers = new[]
+        {
+            "governanceRootId",
+            "scopeClass",
+            "bindState",
+            "witnessStatus",
+            "carryForwardPolicy",
+            "researchHandOffPending"
+        };
+
+        foreach (var marker in threadRootMarkers)
+        {
+            Assert.Contains(marker, threadRootWriterText, StringComparison.Ordinal);
+        }
+
+        var workbenchSurfaceMarkers = new[]
+        {
+            "firstAdmittedSurfaceClass",
+            "bounded-governance-analysis-workbench",
+            "ecHabitationState",
+            "outwardDuplexAuthorityState",
+            "researchHandOffPending"
+        };
+
+        foreach (var marker in workbenchSurfaceMarkers)
+        {
+            Assert.Contains(marker, workbenchSurfaceWriterText, StringComparison.Ordinal);
+        }
+
+        var sessionLedgerMarkers = new[]
+        {
+            "sessionId",
+            "projectSpaceId",
+            "currentStateClass",
+            "admissibilityStatus",
+            "predicateLandingClass",
+            "autobiographicalPromotionState",
+            "engramPredicateEligibilityState",
+            "continuityAnchor",
+            "researchHandOffPending"
+        };
+
+        foreach (var marker in sessionLedgerMarkers)
+        {
+            Assert.Contains(marker, sessionLedgerWriterText, StringComparison.Ordinal);
         }
     }
 
@@ -602,6 +697,32 @@ public sealed class BootstrapBoundaryTests
         {
             Assert.Contains(marker, seededBuildGovernanceScriptText, StringComparison.Ordinal);
         }
+    }
+
+    [Fact]
+    public void V111_LocalAutomationCycle_Reconciles_Scheduler_After_Close_State_Is_Written()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var cycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1");
+        var cycleScriptText = File.ReadAllText(cycleScriptPath);
+
+        var pauseDecisionIndex = cycleScriptText.LastIndexOf("$pauseForExplicitHitl = ", StringComparison.Ordinal);
+        var summaryWriteIndex = cycleScriptText.LastIndexOf("Write-JsonFile -Path $summaryPath -Value $summary", StringComparison.Ordinal);
+        var schedulerSyncIndex = cycleScriptText.LastIndexOf("$schedulerSyncScriptPath = Join-Path $resolvedRepoRoot 'tools\\Sync-Local-AutomationScheduler.ps1'", StringComparison.Ordinal);
+        var schedulerReceiptIndex = cycleScriptText.LastIndexOf("$schedulerExecutionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\\Write-SchedulerExecution-Receipt.ps1'", StringComparison.Ordinal);
+        var taskStatusIndex = cycleScriptText.LastIndexOf("$taskStatusOutput = Invoke-ChildPowershellScript", StringComparison.Ordinal);
+
+        Assert.True(pauseDecisionIndex >= 0);
+        Assert.True(summaryWriteIndex >= 0);
+        Assert.True(schedulerSyncIndex >= 0);
+        Assert.True(schedulerReceiptIndex >= 0);
+        Assert.True(taskStatusIndex >= 0);
+
+        Assert.True(summaryWriteIndex > pauseDecisionIndex);
+        Assert.True(schedulerSyncIndex > summaryWriteIndex);
+        Assert.True(schedulerReceiptIndex > schedulerSyncIndex);
+        Assert.True(taskStatusIndex > schedulerReceiptIndex);
     }
 
     private static IReadOnlyList<string> FindTokenViolations(IEnumerable<string> forbiddenTokens)

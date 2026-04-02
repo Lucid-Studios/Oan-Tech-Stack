@@ -18,6 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\Oan.FirstRun\\Oan.FirstRun\\Oan.FirstRun.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\GEL\\GEL.Contracts\\GEL.Contracts\\GEL.Contracts.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\GEL\\GEL.Contracts\\GEL.Contracts.csproj" />
   </ItemGroup>
 </Project>

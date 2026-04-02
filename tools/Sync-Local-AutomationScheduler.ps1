@@ -67,6 +67,7 @@ function Get-MeaningfulScheduledDateTimeUtcOrNull {
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
+$schedulerPolicy = $cyclePolicy.schedulerReconciliationPolicy
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $schedulerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.schedulerReconciliationStatePath)
 $cycleState = Read-JsonFileOrNull -Path $cycleStatePath
@@ -75,13 +76,34 @@ if ($null -eq $cycleState) {
     throw 'Local automation cycle state is required before scheduler reconciliation can run.'
 }
 
-$desiredNextRunUtc = [datetime]::Parse([string] $cycleState.nextReleaseCandidateRunUtc, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
-$taskName = 'OAN Mortalis Governed Automation Cycle'
-$toleranceMinutes = [int] $cyclePolicy.schedulerReconciliationPolicy.driftToleranceMinutes
+$desiredNextRunRaw = if ($cycleState.PSObject.Properties['nextAutomationCycleRunUtc']) {
+    [string] $cycleState.nextAutomationCycleRunUtc
+} else {
+    [string] $cycleState.nextReleaseCandidateRunUtc
+}
+$desiredNextRunUtc = [datetime]::Parse($desiredNextRunRaw, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
+$taskName = if ($null -ne $schedulerPolicy -and -not [string]::IsNullOrWhiteSpace([string] $schedulerPolicy.scheduledTaskName)) {
+    [string] $schedulerPolicy.scheduledTaskName
+} else {
+    'OAN Mortalis Governed Automation Cycle'
+}
+$toleranceMinutes = if ($null -ne $schedulerPolicy -and $null -ne $schedulerPolicy.PSObject.Properties['driftToleranceMinutes']) {
+    [int] $schedulerPolicy.driftToleranceMinutes
+} else {
+    3
+}
+$cycleCadenceMinutes = if ($cycleState.PSObject.Properties['cadenceMinutes'] -and $cycleState.cadenceMinutes.PSObject.Properties['automationCycle']) {
+    [int] $cycleState.cadenceMinutes.automationCycle
+} elseif ($cyclePolicy.PSObject.Properties['localAutomationCadenceMinutes']) {
+    [int] $cyclePolicy.localAutomationCadenceMinutes
+} else {
+    [int] $cyclePolicy.localReleaseCandidateCadenceHours * 60
+}
 $actionTaken = 'none'
 $registeredBefore = $false
 $previousNextRunUtc = $null
 $finalNextRunUtc = $null
+$wasDisabled = $false
 
 if (-not (Get-Command -Name Get-ScheduledTask -ErrorAction SilentlyContinue)) {
     $statePayload = [ordered]@{
@@ -102,6 +124,7 @@ try {
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
     $taskInfo = Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction Stop
     $registeredBefore = $true
+    $wasDisabled = ($task.State -eq 'Disabled')
     $previousNextRunUtc = Get-MeaningfulScheduledDateTimeUtcOrNull -Value ([datetime] $taskInfo.NextRunTime)
 }
 catch {
@@ -114,15 +137,24 @@ $driftMinutes = if ($null -ne $previousNextRunUtc) {
     [double]::PositiveInfinity
 }
 
+if ($registeredBefore -and $wasDisabled) {
+    Enable-ScheduledTask -TaskName $taskName -ErrorAction Stop | Out-Null
+    $actionTaken = 'enabled'
+}
+
 if (-not $registeredBefore -or $driftMinutes -gt $toleranceMinutes) {
     $installScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationCycleTask.ps1'
     & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $installScriptPath `
         -RepoRoot $resolvedRepoRoot `
         -TaskName $taskName `
         -Configuration $Configuration `
-        -IntervalHours ([int] $cyclePolicy.localReleaseCandidateCadenceHours) | Out-Null
+        -IntervalMinutes $cycleCadenceMinutes | Out-Null
 
-    $actionTaken = if ($registeredBefore) { 'rescheduled' } else { 'registered' }
+    $actionTaken = if ($registeredBefore) {
+        if ($actionTaken -eq 'enabled') { 'enabled-and-rescheduled' } else { 'rescheduled' }
+    } else {
+        'registered'
+    }
 }
 
 $finalTask = Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
@@ -144,6 +176,7 @@ $statePayload = [ordered]@{
     previousNextRunUtc = if ($null -ne $previousNextRunUtc) { $previousNextRunUtc.ToString('o') } else { $null }
     finalNextRunUtc = if ($null -ne $finalNextRunUtc) { $finalNextRunUtc.ToString('o') } else { $null }
     driftToleranceMinutes = $toleranceMinutes
+    cadenceMinutes = $cycleCadenceMinutes
     finalDriftMinutes = $finalDriftMinutes
     aligned = ($finalDriftMinutes -le $toleranceMinutes)
 }

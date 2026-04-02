@@ -1,0 +1,131 @@
+﻿{
+    "schemaVersion":  1,
+    "generatedAtUtc":  "2026-04-01T12:49:46.3306005Z",
+    "requestId":  "source-bucket-request://2026-04-01/iutt-sli-lisp-001",
+    "requestKey":  "research-handoff::IUTT SLI \u0026 Lisp::tool.localLlmPreflight,common.agentiActualizationContracts,common.agentiActualizationKeys,service.governedReachRealization,runtime.agentiRuntime,runtime.duplexPredicateSurfaceContracts,runtime.reachDuplexRealizationSurfaceContracts,sli.crypticWebNexusFactory,sli.crypticWebNexusPortalContracts,sli.executionSnapshotCrypticWebNexusPortal,sli.iCrypticWebNexusPortal",
+    "targetBucketLabel":  "IUTT SLI \u0026 Lisp",
+    "buildSurface":  "V1.1.1 cognition-runtime condensate",
+    "subject":  "IUTT SLI \u0026 Lisp actualization and nexus refinement",
+    "predicate":  "condense research-handoff runtime law into bounded build-facing spec",
+    "actions":  [
+                    "Review the linked actualization, reach, runtime, and nexus touchpoints as one bounded cognition-runtime seam.",
+                    "Return only receipted spec-now or frame-now condensate that can guide later V1.1.1 admission.",
+                    "Do not imply live Agenti runtime, local LLM preflight authority, or CME embodiment from this return."
+                ],
+    "neededReturnClass":  "spec-now",
+    "evidenceLinks":  [
+                          "OAN Mortalis V1.1.1/build/versioned-touchpoint-matrix.json",
+                          "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
+                          "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
+                          "OAN Mortalis V1.1.1/docs/V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md"
+                      ],
+    "admissibilityClass":  "review_required",
+    "requiredReceipts":  [
+                             "doping_header",
+                             "receipt",
+                             "notice"
+                         ],
+    "hitlState":  "required_before_promotion",
+    "withholdRules":  [
+                          "No direct runtime widening from source-bucket output.",
+                          "No CME placement, ListeningFrame widening, or tool-authority widening.",
+                          "No raw external repo drift treated as build authority.",
+                          "HITL remains required before any promotion or runtime admission boundary is crossed.",
+                          "Seeded-governance admission remains clarified but unpromoted; keep the return on frame-now/spec-now surfaces only."
+                      ],
+    "requestState":  "published-awaiting-return",
+    "sourceTouchPointIds":  [
+                                "tool.localLlmPreflight",
+                                "common.agentiActualizationContracts",
+                                "common.agentiActualizationKeys",
+                                "service.governedReachRealization",
+                                "runtime.agentiRuntime",
+                                "runtime.duplexPredicateSurfaceContracts",
+                                "runtime.reachDuplexRealizationSurfaceContracts",
+                                "sli.crypticWebNexusFactory",
+                                "sli.crypticWebNexusPortalContracts",
+                                "sli.executionSnapshotCrypticWebNexusPortal",
+                                "sli.iCrypticWebNexusPortal"
+                            ],
+    "bundlePath":  "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests/2026-04-01-iutt-sli-lisp-001",
+    "requestContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
+    "federationPolicyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+    "completionRule":  "A request remains active until a lawful source-bucket return is admitted, superseded, withdrawn, or held by review.",
+    "operatorPrompt":  {
+                           "schemaVersion":  1,
+                           "label":  "bounded-cascade-authorization",
+                           "promptText":  "Proceed under bounded cascade authorization within the current scope of admissible operations. Continue execution without unnecessary interruption while remaining within defined authority, constraints, and prior standing.\n\nPause and request HITL intervention only when:\n\na decision exceeds current authorization or scope\nrequired information or clarity falls below operational thresholds\na meaningful branch or irreversible action requires explicit operator intent\n\nOtherwise, maintain continuity of execution and advance the system toward its defined objective, preserving lawful structure and traceable reasoning at each step.",
+                           "continuationDirective":  "continue-without-unnecessary-interruption",
+                           "hitlPauseConditions":  [
+                                                       "a decision exceeds current authorization or scope",
+                                                       "required information or clarity falls below operational thresholds",
+                                                       "a meaningful branch or irreversible action requires explicit operator intent"
+                                                   ],
+                           "closingDirective":  "maintain continuity of execution and advance the system toward its defined objective, preserving lawful structure and traceable reasoning at each step"
+                       },
+    "hitlVerificationAid":  {
+                                "schemaVersion":  1,
+                                "label":  "hitl-verification-aid",
+                                "purpose":  "operator-review-and-confirmation",
+                                "aidState":  "available-if-needed",
+                                "operatorExecutionRequired":  false,
+                                "executionLaw":  "automation may prepare the aid; operator reviews and executes the confirmation",
+                                "triggerContext":  {
+                                                       "status":  null,
+                                                       "actionClass":  "clarify",
+                                                       "reasonCode":  null,
+                                                       "nextAction":  null
+                                                   },
+                                "reviewSequence":  [
+                                                       {
+                                                           "id":  "received",
+                                                           "prompt":  "Confirm the return has been received without auto-ratifying it."
+                                                       },
+                                                       {
+                                                           "id":  "understood",
+                                                           "prompt":  "Confirm the intent, present state, and requested next move are understood."
+                                                       },
+                                                       {
+                                                           "id":  "admissible",
+                                                           "prompt":  "Confirm the requested move is admissible under current standing, scope, and law."
+                                                       },
+                                                       {
+                                                           "id":  "actionable",
+                                                           "prompt":  "Confirm the move is actionable now with available evidence, capability, and authority."
+                                                       },
+                                                       {
+                                                           "id":  "withheld_or_escalated",
+                                                           "prompt":  "If any prior step fails, withhold, clarify, defer, refuse, or escalate instead of forcing continuation."
+                                                       }
+                                                   ],
+                                "operatorOutcomes":  [
+                                                         "admit",
+                                                         "clarify",
+                                                         "defer",
+                                                         "refuse",
+                                                         "escalate"
+                                                     ],
+                                "completionRule":  "Only the operator may confirm direct HITL admission; automation may prepare but may not self-ratify."
+                            },
+    "rootDispatchPrompt":  {
+                               "schemaVersion":  1,
+                               "label":  "oan-build-dispatch-root-prompt",
+                               "promptText":  "You are OAN Build Dispatch for the active `OAN Mortalis V1.1.1` line.\n\nMission:\nAct as the lawful root requester and admitting surface for active build needs.\nContinuously reconcile the active `V1.1.1` build posture, publish bounded source-bucket work requests when needed, ingest only lawful bucket receipts, and advance the build toward executable completion without widening authority.\n\nAuthority:\n- `OAN Mortalis V1.1.1` is the active build truth.\n- `Documentation Repo` is the lawful source and first documentation-form compile surface.\n- Source buckets are specialized work surfaces, not sovereign planners.\n- Do not use `V1.0` policy or docs as active authority for new work.\n- Do not mutate source buckets directly.\n\nReconcile first on every run:\n- active carry-forward refinement posture\n- versioned touchpoint matrix\n- run-isolated build pathway state\n- seeded governance state\n- v111 enrichment pathway state\n- companion-tool telemetry state\n- master-thread orchestration state\n- any existing source-bucket request index and federation status\n\nCurrent gate truth:\n- Treat the carry-forward cleanup as complete.\n- Treat the active gate as `V1.1.1` enrichment and seeded-governance admission.\n- If seeded governance says `ready` but the run-isolated pathway still says `bring-seeded-governance-to-ready-state`, classify that as `clarify` and refresh the gate truth before publishing new downstream requests.\n\nPrimary duties:\n1. Reconcile active `V1.1.1` build standing.\n2. Determine whether the next lawful action is:\n   - `clarify`\n   - `frame-now`\n   - `spec-now`\n   - `implement-now`\n   - `hold`\n3. Publish bounded source-bucket work requests only when a real build need exists.\n4. Target only the declared source buckets:\n   - `IUTT SLI \u0026 Lisp`\n   - `Latex Styles`\n   - `Trivium Forum`\n   - `Holographic Data Tool`\n5. Ingest only lawful return receipts and classify their result.\n6. Route admitted returns into:\n   - `frame-now`\n   - `spec-now`\n   - `implement-now`\n   - `hold`\n7. Mutate active build surfaces only after lawful return and review standing exist.\n8. Preserve the `seed-llm` pause seam and bounded actionable-surface target for `Oan.Runtime.Headless`.\n\nRequest law:\n- Publish bounded requests using subject, predicate, and actions.\n- Name the target bucket explicitly.\n- Require triad receipts from the bucket:\n  - doping header\n  - receipt\n  - notice\n- Never treat raw repo drift from a bucket as build authority.\n\nReturn law:\n- Accept only receipted returns.\n- Classify bucket listener posture as:\n  - `received`\n  - `understood`\n  - `admissible`\n  - `actionable`\n  - `withheld_or_escalated`\n- Apply one governance action per return:\n  - `admit`\n  - `hold`\n  - `narrow`\n  - `defer`\n  - `refuse`\n  - `return`\n  - `escalate`\n\nCadence duties:\n- Continue hourly when lawful work exists.\n- Emit concise hourly status when due.\n- Refresh the six-hour `.audit` chain when due.\n- Prepare the twenty-four-hour HITL digest when due.\n- If nothing changed, preserve truthful standing and wait.\n\nStop and request HITL when:\n- promotion, release, or executable admission crosses current standing\n- seeded-governance or enrichment posture is materially ambiguous\n- a bucket return would widen runtime, CME, or tool authority\n- a classification ambiguity affects build admission\n- a meaningful irreversible action is required\n\nCompletion rule:\nTreat the objective as complete only when the current `V1.1.1` target component is buildable, tested, hygienic, executable in the intended OAN environment, and all remaining transition is human-governed admission.",
+                               "governingLine":  "OAN Mortalis V1.1.1",
+                               "dispatcherRole":  "lawful-root-requester-and-admitting-surface",
+                               "nextActionClasses":  [
+                                                         "clarify",
+                                                         "frame-now",
+                                                         "spec-now",
+                                                         "implement-now",
+                                                         "hold"
+                                                     ],
+                               "declaredSourceBuckets":  [
+                                                             "IUTT SLI \u0026 Lisp",
+                                                             "Latex Styles",
+                                                             "Trivium Forum",
+                                                             "Holographic Data Tool"
+                                                         ],
+                               "completionRule":  "Treat the objective as complete only when the current V1.1.1 target component is buildable, tested, hygienic, executable in the intended OAN environment, and all remaining transition is human-governed admission."
+                           }
+}

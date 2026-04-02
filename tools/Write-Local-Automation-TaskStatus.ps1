@@ -1572,6 +1572,8 @@ if ($lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
 
 $schedulerWatchStatus = if (-not [bool] $scheduler.registered) {
     'scheduler-unregistered'
+} elseif ([string]::Equals([string] $scheduler.state, 'Disabled', [System.StringComparison]::OrdinalIgnoreCase)) {
+    'scheduler-paused-for-hitl'
 } elseif ([string]::IsNullOrWhiteSpace([string] $scheduler.nextRunTimeUtc)) {
     'scheduler-missing-next-run'
 } else {

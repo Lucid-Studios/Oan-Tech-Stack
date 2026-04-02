@@ -1,11 +1,15 @@
 ﻿{
   "schemaVersion": 1,
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/MASTER_THREAD_BUCKET_ORCHESTRATION_LAW.md",
+  "rootDispatchPromptMarkdownPath": "OAN Mortalis V1.1.1/docs/OAN_BUILD_DISPATCH_ROOT_PROMPT.md",
   "codexAutomationIntentContractMarkdownPath": "OAN Mortalis V1.1.1/docs/CODEX_AUTOMATION_ONCE_INTENT_CONTRACT.md",
   "statusJsonPath": ".audit/state/master-thread-orchestration-status.json",
   "statusMarkdownPath": ".audit/state/master-thread-orchestration-status.md",
   "instructionOutputRoot": ".audit/runs/master-thread-orchestration",
   "instructionIndexStatePath": ".audit/state/master-thread-orchestration-index.json",
+  "seededGovernanceStatePath": ".audit/state/local-automation-seeded-governance-last-run.json",
+  "runIsolatedBuildPathwayStatePath": ".audit/state/local-automation-run-isolated-build-pathway-last-run.json",
+  "v111EnrichmentPathwayStatePath": ".audit/state/local-automation-v111-enrichment-pathway-last-run.json",
   "minimumPublishDelayMinutes": 1,
   "defaultPollingIntervalSeconds": 30,
   "defaultPollingWindowMinutes": 15,
@@ -35,4 +39,3 @@
     "superseded"
   ]
 }
-

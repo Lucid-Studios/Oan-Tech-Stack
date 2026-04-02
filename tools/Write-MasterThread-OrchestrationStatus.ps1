@@ -209,9 +209,15 @@ $resolvedCycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Cand
 $resolvedTaskStatusPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $TaskStatusPath
 
 $policy = Read-JsonFile -Path $resolvedOrchestrationPolicyPath
+$resolvedSeededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.seededGovernanceStatePath)
+$resolvedRunIsolatedBuildPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runIsolatedBuildPathwayStatePath)
+$resolvedV111EnrichmentPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.v111EnrichmentPathwayStatePath)
 $bucketStatus = Read-JsonFile -Path $resolvedBucketStatusPath
 $cycleState = Read-JsonFileOrNull -Path $resolvedCycleStatePath
 $taskStatus = Read-JsonFileOrNull -Path $resolvedTaskStatusPath
+$seededGovernanceState = Read-JsonFileOrNull -Path $resolvedSeededGovernanceStatePath
+$runIsolatedBuildPathwayState = Read-JsonFileOrNull -Path $resolvedRunIsolatedBuildPathwayStatePath
+$v111EnrichmentPathwayState = Read-JsonFileOrNull -Path $resolvedV111EnrichmentPathwayStatePath
 
 $statusJsonPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.statusJsonPath)
 $statusMarkdownPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.statusMarkdownPath)
@@ -227,6 +233,19 @@ $currentAutomationActionClass = [string] (Get-ObjectPropertyValueOrNull -InputOb
 if ([string]::IsNullOrWhiteSpace($currentAutomationActionClass)) {
     $currentAutomationActionClass = Get-AutomationActionClassFromStatus -Status $currentAutomationPosture
 }
+$seededGovernanceReadyState = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyState')
+$seededGovernanceDisposition = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'disposition')
+$runIsolatedBuildPathwayStateValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $runIsolatedBuildPathwayState -PropertyName 'pathwayState')
+$runIsolatedBuildNextAction = [string] (Get-ObjectPropertyValueOrNull -InputObject $runIsolatedBuildPathwayState -PropertyName 'nextAction')
+$v111EnrichmentPathwayStateValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $v111EnrichmentPathwayState -PropertyName 'pathwayState')
+$v111EnrichmentNextAction = [string] (Get-ObjectPropertyValueOrNull -InputObject $v111EnrichmentPathwayState -PropertyName 'nextAction')
+$seededGovernanceGateMismatch = (
+    $seededGovernanceReadyState -eq 'ready' -and
+    (
+        $runIsolatedBuildNextAction -eq 'bring-seeded-governance-to-ready-state' -or
+        $v111EnrichmentNextAction -eq 'bring-seeded-governance-to-ready-state'
+    )
+)
 $movementAdmissibilityState = if ($currentAutomationPosture -eq [string] $policy.blockedStatus) {
     'held-by-blocked-posture'
 } elseif (@($policy.allowedContinuationStatuses) -contains $currentAutomationPosture) {
@@ -289,7 +308,12 @@ $orchestrationState = 'dormant'
 $reasonCode = 'master-thread-orchestration-dormant'
 $nextAction = 'continue-bounded-observation'
 
-if (-not $publishReady) {
+if ($seededGovernanceGateMismatch) {
+    $orchestrationState = 'clarify-required'
+    $reasonCode = 'master-thread-orchestration-gate-truth-mismatch'
+    $nextAction = 'refresh-gate-truth-before-publishing-downstream-requests'
+    $movementAdmissibilityState = 'held-by-clarify-seam'
+} elseif (-not $publishReady) {
     $orchestrationState = 'awaiting-publishable-master-thread'
     $reasonCode = 'master-thread-orchestration-awaiting-publishable-master-thread'
     $nextAction = 'publish-clean-commit-to-git-workflow-before-releasing-intent'
@@ -316,6 +340,7 @@ $statusPayload = [ordered]@{
     generatedAtUtc = $nowUtc.ToString('o')
     policyPath = $resolvedOrchestrationPolicyPath
     formalSurfaceMarkdownPath = [string] $policy.formalSurfaceMarkdownPath
+    rootDispatchPromptMarkdownPath = [string] $policy.rootDispatchPromptMarkdownPath
     codexAutomationIntentContractMarkdownPath = [string] $policy.codexAutomationIntentContractMarkdownPath
     orchestrationState = $orchestrationState
     reasonCode = $reasonCode
@@ -334,6 +359,16 @@ $statusPayload = [ordered]@{
         nativeRunOnceSupported = [bool] $policy.codexAutomationSupport.nativeRunOnceSupported
         supportReason = [string] $policy.codexAutomationSupport.reason
     }
+    gateReconciliation = [ordered]@{
+        seededGovernanceDisposition = $seededGovernanceDisposition
+        seededGovernanceReadyState = $seededGovernanceReadyState
+        runIsolatedBuildPathwayState = $runIsolatedBuildPathwayStateValue
+        runIsolatedBuildNextAction = $runIsolatedBuildNextAction
+        v111EnrichmentPathwayState = $v111EnrichmentPathwayStateValue
+        v111EnrichmentNextAction = $v111EnrichmentNextAction
+        gateMismatchDetected = $seededGovernanceGateMismatch
+        gateMismatchActionClass = if ($seededGovernanceGateMismatch) { 'clarify' } else { 'continue' }
+    }
     movementAdmissibilityState = $movementAdmissibilityState
     eligibleTargetBucketIds = @($eligibleTargetBuckets | ForEach-Object { [string] $_.id })
     eligibleTargetBucketLabels = @($eligibleTargetBuckets | ForEach-Object { [string] $_.label })
@@ -347,6 +382,7 @@ $statusPayload = [ordered]@{
     instructions = $instructionSummaries
 }
 Add-AutomationCascadeOperatorPromptProperty -InputObject $statusPayload | Out-Null
+Add-BuildDispatchRootPromptProperty -InputObject $statusPayload | Out-Null
 
 Write-JsonFile -Path $statusJsonPath -Value $statusPayload
 
@@ -355,6 +391,7 @@ $markdownLines = @(
     '',
     ('- Generated at (UTC): `{0}`' -f $statusPayload.generatedAtUtc),
     ('- Formal surface: `{0}`' -f $statusPayload.formalSurfaceMarkdownPath),
+    ('- Root dispatch prompt: `{0}`' -f $statusPayload.rootDispatchPromptMarkdownPath),
     ('- Orchestration state: `{0}`' -f $statusPayload.orchestrationState),
     ('- Reason code: `{0}`' -f $statusPayload.reasonCode),
     ('- Next action: `{0}`' -f $statusPayload.nextAction),
@@ -366,6 +403,13 @@ $markdownLines = @(
     ('- Publish ready: `{0}`' -f $statusPayload.sourceMasterThread.publishReady),
     ('- Codex run-once support: `{0}`' -f $statusPayload.codexAutomationSupport.supportState),
     ('- Movement admissibility: `{0}`' -f $statusPayload.movementAdmissibilityState),
+    ('- Seeded governance disposition: `{0}`' -f $(if ($statusPayload.gateReconciliation.seededGovernanceDisposition) { $statusPayload.gateReconciliation.seededGovernanceDisposition } else { 'missing' })),
+    ('- Seeded governance ready state: `{0}`' -f $(if ($statusPayload.gateReconciliation.seededGovernanceReadyState) { $statusPayload.gateReconciliation.seededGovernanceReadyState } else { 'missing' })),
+    ('- Run-isolated pathway state: `{0}`' -f $(if ($statusPayload.gateReconciliation.runIsolatedBuildPathwayState) { $statusPayload.gateReconciliation.runIsolatedBuildPathwayState } else { 'missing' })),
+    ('- Run-isolated next action: `{0}`' -f $(if ($statusPayload.gateReconciliation.runIsolatedBuildNextAction) { $statusPayload.gateReconciliation.runIsolatedBuildNextAction } else { 'missing' })),
+    ('- V1.1.1 enrichment pathway state: `{0}`' -f $(if ($statusPayload.gateReconciliation.v111EnrichmentPathwayState) { $statusPayload.gateReconciliation.v111EnrichmentPathwayState } else { 'missing' })),
+    ('- V1.1.1 enrichment next action: `{0}`' -f $(if ($statusPayload.gateReconciliation.v111EnrichmentNextAction) { $statusPayload.gateReconciliation.v111EnrichmentNextAction } else { 'missing' })),
+    ('- Gate mismatch detected: `{0}`' -f [bool] $statusPayload.gateReconciliation.gateMismatchDetected),
     ('- Eligible target buckets: `{0}`' -f $(if (@($statusPayload.eligibleTargetBucketLabels).Count -gt 0) { ((@($statusPayload.eligibleTargetBucketLabels) -join '`, `')) } else { 'none' })),
     ('- Total instructions: `{0}`' -f $statusPayload.instructionCount),
     ('- Queued instructions: `{0}`' -f $statusPayload.queuedInstructionCount),

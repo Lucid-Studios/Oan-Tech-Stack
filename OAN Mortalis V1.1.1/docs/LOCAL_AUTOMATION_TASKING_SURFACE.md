@@ -117,6 +117,49 @@ The automation must not use runtime scheduling to:
 If runtime scheduling would cross one of those lines, the scheduling request
 becomes an escalation object.
 
+## Continuous Cadence
+
+The current implementation still uses a shorter unattended transport loop:
+
+- automation cycle cadence: every `5` minutes
+- release-candidate cadence: every `6` hours
+- mandatory `HITL` digest cadence: every `24` hours
+
+This is temporary transport law, not the final temporal constitution.
+
+The close-law target is recorded in:
+
+- `docs/LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
+
+That target says the main worker should become single-flight and rearm only
+after lawful close, while an hourly watchdog handles reflection and crash
+recovery.
+
+Until that migration lands, the `5` minute loop should be read as a bounded
+transport seam that keeps the lane moving without granting scheduler timing the
+final authority over continuation.
+
+## Target Temporal Constitution
+
+The intended automation offices are:
+
+- `main worker`
+  one governed pass, one terminal close state, one possible rearm decision
+- `hourly watchdog`
+  reflection, drift detection, crash recovery, and lawful rearm witness
+- `daily HITL digest`
+  operator-facing governance and review surface
+
+The governing correction is:
+
+- no next-run truth may be written before end-state truth is known
+- only a closed `continue` state may arm the next main-worker wake
+- `pause-hitl`, `done`, and `fault-recoverable` may not self-rearm the main
+  worker
+
+When the posture becomes `hitl-required` or `blocked`, the current scheduled
+cycle must still pause instead of running past the review boundary.
+
 ## Contract Barrier Escalation
 
 The automation must escalate when it reaches a contract barrier.
@@ -175,11 +218,52 @@ status surfaces rather than flattening every barrier into generic failure.
 - Owner: `Automation`
 - Authority: `Machine-local only`
 - Trigger: Windows scheduled task registration and next-run clock
-- Purpose: ensure the local automation cycle is actually scheduled and not merely manually provable
+- Purpose: ensure the local automation lane is actually schedulable and not merely manually provable
 - Completion signal: the scheduled task is registered and exposes a next run time
 - Escalates when:
   - the scheduled task is not registered
   - the scheduled task has no next run time
+
+This task currently reports the temporary transport seam.
+
+Its target form is broader:
+
+- distinguish healthy awaiting rearm from unhealthy missing rearm
+- distinguish lawful pause from defect
+- distinguish quiet completion from crash silence
+
+That target language is governed by `LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`.
+
+### Hourly Watchdog Reflection
+
+- Owner: `Automation`
+- Authority: `Mechanical only`
+- Trigger: every `1` hour
+- Purpose: reflect on the last closed worker state, detect drift or crash
+  residue, and decide whether lawful rearm, continued pause, or escalation is
+  required
+- Completion signal: the current lane is classified as healthy, paused, done,
+  drifted, or fault-recoverable without widening main-worker authority
+- Escalates when:
+  - the last worker close state and current scheduler truth contradict each
+    other
+  - the main worker should have rearmed but no lawful wake exists
+  - crash residue or stale evidence prevents truthful recovery
+
+This is a target office now and not yet the implemented runtime behavior.
+
+### Explicit HITL Pause
+
+- Owner: `Operator`
+- Authority: `Human-governed admission`
+- Trigger: `hitl-required` or `blocked`
+- Purpose: stop the unattended loop at the exact point where continuation would
+  require explicit `HITL` approval
+- Completion signal: the scheduled task is paused and the active notice surface
+  becomes `pause_notice`
+- Clears when:
+  - the operator admits resumption explicitly
+  - the scheduled task is re-enabled for the next lawful cycle
 
 ## First Long-Form Task Set
 
@@ -806,4 +890,3 @@ HITL remains mandatory for:
 - authority widening
 - publication promotion
 - unresolved blocked states
-

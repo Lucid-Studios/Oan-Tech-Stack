@@ -114,10 +114,20 @@ if ($null -eq $cycleState) {
 $sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
 $runtimeReadinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'readinessState')
 
-$sourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'worker-thread-identity' -CyclePolicy $cyclePolicy
-$missingSourceFiles = @($sourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
-$contractsSource = if (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
-$serviceSource = if (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }
+if (-not (Get-Command -Name Resolve-OanWorkspaceTouchPointFamily -ErrorAction SilentlyContinue)) {
+    $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+    if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+        . $oanWorkspaceResolverPath
+    }
+}
+
+$familyResolution = @(Get-OanWorkspaceTouchPointFamilyResolution -BasePath $resolvedRepoRoot -FamilyName 'worker-thread-identity' -CyclePolicy $cyclePolicy)
+$sourceFiles = @($familyResolution | ForEach-Object { [string] $_.SelectedPath })
+$missingSourceFiles = @($familyResolution | Where-Object { -not [bool] $_.SelectedPathExists })
+$missingBuildTouchPoints = @($missingSourceFiles | Where-Object { [string] $_.TouchPointStatus -ne 'research-handoff' })
+$researchHandOffTouchPoints = @($missingSourceFiles | Where-Object { [string] $_.TouchPointStatus -eq 'research-handoff' })
+$contractsSource = if ($sourceFiles.Count -gt 0 -and (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
+$serviceSource = if ($sourceFiles.Count -gt 2 -and (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }
 $threadRootProjectionBound = $contractsSource.IndexOf('CreateIdentityInvariantThreadRoot', [System.StringComparison]::Ordinal) -ge 0
 $serviceBindingBound = $serviceSource.IndexOf('CreateIdentityThreadRoot', [System.StringComparison]::Ordinal) -ge 0
 
@@ -133,10 +143,14 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $threadRootState = 'awaiting-bounded-runtime-readiness'
     $reasonCode = 'identity-invariant-thread-root-runtime-not-ready'
     $nextAction = if ($null -ne $sanctuaryRuntimeReadinessState) { [string] $sanctuaryRuntimeReadinessState.nextAction } else { 'emit-sanctuary-runtime-readiness-receipt' }
-} elseif ($missingSourceFiles.Count -gt 0 -or -not $threadRootProjectionBound -or -not $serviceBindingBound) {
+} elseif ($missingBuildTouchPoints.Count -gt 0 -or -not $threadRootProjectionBound -or -not $serviceBindingBound) {
     $threadRootState = 'awaiting-thread-root-binding'
     $reasonCode = 'identity-invariant-thread-root-source-missing'
     $nextAction = 'bind-worker-thread-root-governance-surface'
+} elseif ($researchHandOffTouchPoints.Count -gt 0) {
+    $threadRootState = 'awaiting-thread-root-research-return'
+    $reasonCode = 'identity-invariant-thread-root-research-handoff-pending'
+    $nextAction = 'review-source-bucket-return-for-worker-thread-root'
 } else {
     $threadRootState = 'identity-thread-root-ready'
     $reasonCode = 'identity-invariant-thread-root-bound'
@@ -153,12 +167,53 @@ $bundlePath = Join-Path $outputRoot ('{0}-{1}' -f $timestamp, $bundleKey)
 $bundleJsonPath = Join-Path $bundlePath 'identity-invariant-thread-root.json'
 $bundleMarkdownPath = Join-Path $bundlePath 'identity-invariant-thread-root.md'
 
+$projectSpaceId = 'oan-mortalis-v1.1.1'
+$threadId = 'worker-thread-root://local-main-worker'
+$governanceRootId = 'identity-invariant://bounded-local-governance-root'
+$scopeClass = 'bounded-local-thread-governance'
+$bindBurdenClass = 'worker-thread-governance-root'
+$continuityParent = 'none'
+$authorizationBasis = 'bounded-runtime-readiness'
+$carryForwardPolicy = 'receipted-thread-local-only'
+$witnessEventId = 'thread-root-bind-{0}' -f $timestamp
+
+$stateClass = 'provisional'
+$bindState = 'provisional-bind'
+$witnessStatus = 'awaiting-thread-root-bind-witness'
+
+if ($threadRootState -eq 'blocked') {
+    $stateClass = 'hold'
+    $bindState = 'hold'
+    $witnessStatus = 'thread-root-hold-witnessed'
+} elseif ($threadRootState -eq 'identity-thread-root-ready') {
+    $stateClass = 'ready'
+    $bindState = 'bound'
+    $witnessStatus = 'thread-root-bind-witnessed'
+} elseif ($threadRootState -eq 'awaiting-bounded-runtime-readiness') {
+    $bindState = 'configured'
+}
+
 $payload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
     threadRootState = $threadRootState
     reasonCode = $reasonCode
     nextAction = $nextAction
+    researchHandOffPending = $researchHandOffTouchPoints.Count -gt 0
+    researchHandOffTouchPointIds = @($researchHandOffTouchPoints | ForEach-Object { [string] $_.TouchPointId })
+    projectSpaceId = $projectSpaceId
+    threadId = $threadId
+    governanceRootId = $governanceRootId
+    scopeClass = $scopeClass
+    stateClass = $stateClass
+    bindState = $bindState
+    witnessStatus = $witnessStatus
+    witnessEventId = $witnessEventId
+    bindTimestampUtc = (Get-Date).ToUniversalTime().ToString('o')
+    bindBurdenClass = $bindBurdenClass
+    continuityParent = $continuityParent
+    authorizationBasis = $authorizationBasis
+    carryForwardPolicy = $carryForwardPolicy
     runtimeReadinessState = $runtimeReadinessState
     continuityClass = 'identity-invariant-local-thread-root'
     ambientSharedIdentityDenied = $true
@@ -188,6 +243,21 @@ $markdownLines = @(
     ('- Thread-root state: `{0}`' -f $payload.threadRootState),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
+    ('- Research handoff pending: `{0}`' -f [bool] $payload.researchHandOffPending),
+    ('- Research handoff touchpoints: `{0}`' -f $(if (@($payload.researchHandOffTouchPointIds).Count -gt 0) { (@($payload.researchHandOffTouchPointIds) -join '`, `') } else { 'none' })),
+    ('- Project-space id: `{0}`' -f $payload.projectSpaceId),
+    ('- Thread id: `{0}`' -f $payload.threadId),
+    ('- Governance-root id: `{0}`' -f $payload.governanceRootId),
+    ('- Scope class: `{0}`' -f $payload.scopeClass),
+    ('- State class: `{0}`' -f $payload.stateClass),
+    ('- Bind state: `{0}`' -f $payload.bindState),
+    ('- Witness status: `{0}`' -f $payload.witnessStatus),
+    ('- Witness event id: `{0}`' -f $payload.witnessEventId),
+    ('- Bind timestamp (UTC): `{0}`' -f $payload.bindTimestampUtc),
+    ('- Bind burden class: `{0}`' -f $payload.bindBurdenClass),
+    ('- Continuity parent: `{0}`' -f $payload.continuityParent),
+    ('- Authorization basis: `{0}`' -f $payload.authorizationBasis),
+    ('- Carry-forward policy: `{0}`' -f $payload.carryForwardPolicy),
     ('- Runtime readiness state: `{0}`' -f $(if ($payload.runtimeReadinessState) { $payload.runtimeReadinessState } else { 'missing' })),
     ('- Continuity class: `{0}`' -f $payload.continuityClass),
     ('- Ambient shared identity denied: `{0}`' -f [bool] $payload.ambientSharedIdentityDenied),
@@ -215,10 +285,26 @@ $statePayload = [ordered]@{
     threadRootState = $payload.threadRootState
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
+    researchHandOffPending = $payload.researchHandOffPending
+    researchHandOffTouchPointIds = $payload.researchHandOffTouchPointIds
+    projectSpaceId = $payload.projectSpaceId
+    threadId = $payload.threadId
+    governanceRootId = $payload.governanceRootId
+    scopeClass = $payload.scopeClass
+    stateClass = $payload.stateClass
+    bindState = $payload.bindState
+    witnessStatus = $payload.witnessStatus
+    witnessEventId = $payload.witnessEventId
+    bindTimestampUtc = $payload.bindTimestampUtc
+    bindBurdenClass = $payload.bindBurdenClass
+    continuityParent = $payload.continuityParent
+    authorizationBasis = $payload.authorizationBasis
+    carryForwardPolicy = $payload.carryForwardPolicy
     runtimeReadinessState = $payload.runtimeReadinessState
     threadRootProjectionBound = $payload.threadRootProjectionBound
     serviceBindingBound = $payload.serviceBindingBound
     sourceFileCount = $payload.sourceFileCount
+    missingSourceFileCount = $payload.missingSourceFileCount
 }
 
 Write-JsonFile -Path $statePath -Value $statePayload

@@ -8,13 +8,15 @@ The new line exists to rebuild from audited law-bearing surfaces instead of exte
 
 ## Source Oracle
 
-The preserved migration oracle is the current `OAN Mortalis V1.0` line plus its latest stack-wide audit bundle.
+The preserved migration oracle is the archived `V1.0` historical line plus its
+latest stack-wide audit bundle.
 
-During overlap:
+After promotion:
 
-- `V1.0` remains the root-controlled oracle
-- `V1.0` accepts critical fixes only
-- `V1.1.1` earns promotion through folder-local build, test, hygiene, and truthful runtime behavior
+- `V1.0` remains historical reference only
+- `V1.1.1` is the active build line
+- any non-admitted carry-forward seam must be classified through the refinement
+  split instead of being silently treated as a live fallback
 
 ## Bootstrap Law
 
@@ -42,4 +44,6 @@ The first runtime truth this line must hold is:
 
 ## Promotion Event
 
-Promotion is the moment when root wrappers, root CI, and root audit entrypoints flip to `V1.1.1`, and the prior `V1.0` line is archived with an inert read-only posture.
+Promotion is the moment when root wrappers, root CI, and root audit entrypoints
+flip to `V1.1.1`, and the prior `V1.0` line becomes an inert historical
+archive.

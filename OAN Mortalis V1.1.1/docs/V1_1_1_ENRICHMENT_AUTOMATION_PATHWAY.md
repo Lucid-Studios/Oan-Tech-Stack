@@ -21,6 +21,8 @@ The current build-facing marker is:
 - `v111-enrichment-automation: admitted-local-bounded`
 - `companion-tool-telemetry: admitted-optional-bounded`
 - `source-bucket-federation-control-plane: admitted-local-bounded`
+- `source-bucket-federation-cycle: admitted-local-mechanical`
+- `source-bucket-return-intake: admitted-local-mechanical`
 - `automation-hitl-verification-aid: admitted-operator-aid-bounded`
 
 That means:
@@ -41,7 +43,24 @@ already produced all of the following:
   bounded internal allowance
 - runtime workbench session ledger at
   `runtime-workbench-session-ledger-ready`
-- seeded governance at `Accepted` / `ready`
+- seeded governance at `buildAdmissionState = admitted-local-bounded`
+
+That admission law is fixed in:
+
+- `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
+- `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+
+This means the seed lane may remain `Deferred` for its own advisory posture
+while the active build still treats it as locally admitted, but only when the
+bounded build-admission law says that is lawful.
+
+It also means the first admitted runtime surface before any wider EC claim is
+the bounded governance-and-analysis workbench, not full habitation.
+
+If seeded governance reaches `ready` while downstream pathway surfaces still
+leave build admission unresolved, that is a `clarify` seam.
+
+The lane must refresh gate truth before continuing.
 
 Those are the minimum proof surfaces required before the line may honestly say
 that end-to-end enrichment work is open.
@@ -119,8 +138,8 @@ The governing relation is:
 - `Holographic Data Tool`
   may contribute bounded `.audit` telemetry now when it emits it
 - `Trivium Forum`
-  may contribute bounded multi-party conference telemetry as soon as its own
-  `.audit` lane emits truthful local state
+  may contribute bounded multi-party conference telemetry through its own
+  truthful `.audit` lane
 
 ## HITL Verification Aid
 
@@ -145,9 +164,19 @@ The review sequence is fixed as:
 
 Automation may prepare that aid whenever `HITL` is needed.
 Only the `Operator` may execute the confirmation.
-  `.audit` lane is emitted
-- missing companion telemetry must be logged as missing rather than being
-  smoothed over by assumption
+
+Missing companion telemetry must still be logged as missing rather than being
+smoothed over by assumption.
+
+## Root Dispatch
+
+The active root automation prompt for this lane now lives in:
+
+- `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
+- `V1_1_1_WORKFLOW_MILESTONE_MAP.md`
+
+That dispatcher must treat seeded-governance admission mismatch as a
+`clarify` seam before publishing downstream requests.
 
 The companion telemetry note is:
 
@@ -172,6 +201,18 @@ The first declared source buckets are:
 - `Trivium Forum`
 - `Holographic Data Tool`
 
+The first active matrix-driven request publication is narrower:
+
+- `IUTT SLI & Lisp`
+  active request publication admitted now
+- `Trivium Forum`
+  active request publication admitted now
+
+The current declared-but-idle listening buckets remain:
+
+- `Latex Styles`
+- `Holographic Data Tool`
+
 The governing note is:
 
 - `SOURCE_BUCKET_FEDERATION_LANE.md`
@@ -181,14 +222,41 @@ The governing note is:
 The governing automation tools for this pathway are:
 
 - `tools/Invoke-Local-Automation-Cycle.ps1`
+- `tools/Resume-Local-AutomationCycleTask.ps1`
 - `tools/Invoke-CompanionToolTelemetry.ps1`
 - `tools/Write-CompanionToolTelemetry.ps1`
+- `tools/New-SourceBucket-WorkRequest.ps1`
+- `tools/Write-SourceBucket-FederationStatus.ps1`
+- `tools/Invoke-SourceBucket-FederationCycle.ps1`
+- `tools/Write-SourceBucket-ReturnIntegrationStatus.ps1`
+- `tools/Invoke-SourceBucket-ReturnCycle.ps1`
+
+The temporal close-law target for this tooling surface is:
+
+- `LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
+
+So the current short scheduler loop should be treated as temporary transport.
+
+The target form is:
+
+- single-flight main worker
+- hourly watchdog reflection
+- daily `HITL` digest governance
 - `tools/Write-V111-EnrichmentPathway.ps1`
+
+The unattended cycle now runs every `5` minutes while the release-candidate
+and daily `HITL` checkpoints keep their broader cadence. When the posture
+becomes `hitl-required` or `blocked`, the scheduled task must pause and await
+explicit operator resumption.
 - `tools/Invoke-V111-EnrichmentPathway.ps1`
 
 The emitted audit surface is:
 
 - `.audit/state/local-automation-companion-tool-telemetry-last-run.json`
+- `.audit/state/source-bucket-request-index.json`
+- `.audit/state/source-bucket-return-index.json`
+- `.audit/state/source-bucket-return-integration-status.json`
+- `.audit/state/source-bucket-federation-status.json`
 - `.audit/state/local-automation-v111-enrichment-pathway-last-run.json`
 
 ## Non-Goals

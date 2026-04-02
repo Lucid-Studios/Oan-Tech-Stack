@@ -110,6 +110,7 @@ They are not identity-forming runtime memory.
 
 The repo now carries a local automation cycle for longer unattended stretches:
 
+- current transport cadence: every `5` minutes
 - release-candidate conveyor cadence: every `6` hours
 - mandatory HITL digest cadence: every `24` hours
 - blocked status: stop immediately
@@ -118,6 +119,10 @@ The repo now carries a local automation cycle for longer unattended stretches:
 This cycle is declared in:
 
 - `build/local-automation-cycle.json`
+
+The close-law target for the lane is declared in:
+
+- `docs/LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
 
 The supporting scripts are:
 
@@ -208,6 +213,17 @@ It does not require a human to bless every green pass.
 
 It does require a human to review at least once every `24` hours, or sooner if the stack enters a blocked state.
 
+The current `5` minute loop should be treated as temporary transport law.
+
+The target constitution is:
+
+- single-flight main worker
+- hourly watchdog reflection and crash recovery
+- daily HITL digest governance
+
+So the scheduler must eventually stop acting like the parent of
+continuation and become only the actuator of the next admitted wake.
+
 The cycle now includes a bounded notification seam:
 
 - it stays quiet while posture remains `candidate-ready`
@@ -271,6 +287,7 @@ That seeded lane may:
 - interpret routine build evidence
 - run the local preflight profile
 - classify posture as `Accepted`, `Deferred`, or `Rejected`
+- emit a separate bounded `buildAdmissionState` for active build continuation
 - contribute advisory provenance to the build surface
 
 That seeded lane may not:
@@ -281,6 +298,10 @@ That seeded lane may not:
 - overrule a blocked posture
 
 Seeded outputs are evidence artifacts, not autonomous release truth.
+
+The governing note for that split is:
+
+- `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
 
 ## CME Formation And Office Ledger Lane
 
@@ -423,4 +444,3 @@ The active automation posture is:
 > automate the stretch, verify the truth, and only stop where the stack itself declares a real gate
 
 This keeps the build moving without lying about what is known.
-

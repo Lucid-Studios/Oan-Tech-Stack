@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TechStack", "TechStack", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GEL", "GEL", "{C62A2DBE-5D0D-42E8-963A-5F39FFD1FCC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GEL.Contracts", "src\TechStack\GEL\GEL.Contracts\GEL.Contracts\GEL.Contracts.csproj", "{B6CA2AFA-F061-4B53-865B-9EC13ABC190E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GEL.Contracts", "src\TechStack\GEL\GEL.Contracts\GEL.Contracts.csproj", "{B6CA2AFA-F061-4B53-865B-9EC13ABC190E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CradleTek", "CradleTek", "{A4B00670-699D-4419-9914-8AD22D2CCCAF}"
 EndProject

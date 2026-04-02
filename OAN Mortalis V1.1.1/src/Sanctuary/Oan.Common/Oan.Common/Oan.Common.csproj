@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\\..\\..\\TechStack\\GEL\\GEL.Contracts\\GEL.Contracts\\GEL.Contracts.csproj" />
+    <ProjectReference Include="..\\..\\..\\TechStack\\GEL\\GEL.Contracts\\GEL.Contracts.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

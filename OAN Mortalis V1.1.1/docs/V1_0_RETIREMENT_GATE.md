@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document freezes the retirement judgment that moved the old `V1.0` line into archived reference-only status beneath the active `V1.1.1` build.
+This document freezes the retirement judgment that moved the old `V1.0` line
+into external archived reference-only status beside the active `V1.1.1` build.
 
 The governing rule is simple:
 
@@ -99,6 +100,8 @@ Its remaining role is archived reference review, not a live dependency chain.
 
 Archive status:
 
-- `V1.0` remains in the repository for historical review
+- `V1.0` remains available only as an external historical archive
 - `V1.0` is no longer an active mutation surface
 - `V1.1.1` is the sole active build line
+- any non-admitted carry-forward seam must move into the explicit refinement
+  split tracked in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`

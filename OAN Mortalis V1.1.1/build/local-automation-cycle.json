@@ -1,8 +1,23 @@
 {
   "schemaVersion": 1,
   "defaultConfiguration": "Release",
+  "localAutomationCadenceMinutes": 5,
   "localReleaseCandidateCadenceHours": 6,
   "mandatoryHitlDigestCadenceHours": 24,
+  "targetTemporalConstitution": {
+    "status": "target-spec-now-not-yet-implemented",
+    "executionModel": "single-flight-close-governed",
+    "nextWakeAuthority": "main-worker-close-state",
+    "currentTransportCadenceMinutes": 5,
+    "watchdogReflectionCadenceHours": 1,
+    "dailyHitlDigestCadenceHours": 24,
+    "mainWorkerTerminalStates": [
+      "continue",
+      "pause-hitl",
+      "done",
+      "fault-recoverable"
+    ]
+  },
   "digestWindowHours": 24,
   "activeBuildRoot": "OAN Mortalis V1.1.1",
   "activeBuildSolutionPath": "OAN Mortalis V1.1.1/Oan.sln",
@@ -83,6 +98,9 @@
   "selfRootedCrypticDepthGateOutputRoot": ".audit/runs/self-rooted-cryptic-depth-gate",
   "runtimeWorkbenchSessionLedgerOutputRoot": ".audit/runs/runtime-workbench-session-ledger",
   "companionToolTelemetryOutputRoot": ".audit/runs/companion-tool-telemetry",
+  "sourceBucketFederationPolicyPath": "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+  "sourceBucketWorkRequestOutputRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests",
+  "sourceBucketReturnInboxRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-returns",
   "v111EnrichmentPathwayOutputRoot": ".audit/runs/v111-enrichment-pathway",
   "runIsolatedBuildPathwayOutputRoot": ".audit/runs/run-isolated-build-pathway",
   "dayDreamCollapseReceiptOutputRoot": ".audit/runs/day-dream-collapse-receipt",
@@ -195,6 +213,10 @@
   "selfRootedCrypticDepthGateStatePath": ".audit/state/local-automation-self-rooted-cryptic-depth-gate-last-run.json",
   "runtimeWorkbenchSessionLedgerStatePath": ".audit/state/local-automation-runtime-workbench-session-ledger-last-run.json",
   "companionToolTelemetryStatePath": ".audit/state/local-automation-companion-tool-telemetry-last-run.json",
+  "sourceBucketRequestIndexStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-request-index.json",
+  "sourceBucketReturnIndexStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-return-index.json",
+  "sourceBucketReturnIntegrationStatusStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-return-integration-status.json",
+  "sourceBucketFederationStatusStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-federation-status.json",
   "v111EnrichmentPathwayStatePath": ".audit/state/local-automation-v111-enrichment-pathway-last-run.json",
   "runIsolatedBuildPathwayStatePath": ".audit/state/local-automation-run-isolated-build-pathway-last-run.json",
   "dayDreamCollapseReceiptStatePath": ".audit/state/local-automation-day-dream-collapse-receipt-last-run.json",
@@ -261,6 +283,15 @@
     "startupWaitSeconds": 20,
     "hostEndpoint": "http://127.0.0.1:8181",
     "unreachableDisposition": "Deferred",
+    "buildAdmittedReadyStates": [
+      "ready"
+    ],
+    "buildAdmittedDispositions": [
+      "Accepted"
+    ],
+    "buildAdmittedDeferredReasons": [
+      "seed-preflight-routed-to-research"
+    ],
     "acceptedReadinessStatuses": [
       "ReadyForTelemetryStaging"
     ],
@@ -272,7 +303,10 @@
     ]
   },
   "schedulerReconciliationPolicy": {
-    "driftToleranceMinutes": 3
+    "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
+    "driftToleranceMinutes": 3,
+    "pauseSchedulerOnHitlRequired": true,
+    "pauseSchedulerOnBlocked": true
   },
   "retentionPolicy": {
     "keepReleaseCandidateBundles": 8,
@@ -389,4 +423,3 @@
   ],
   "blockedStatus": "blocked"
 }
-

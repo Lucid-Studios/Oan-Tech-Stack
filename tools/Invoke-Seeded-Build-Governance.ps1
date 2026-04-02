@@ -20,6 +20,10 @@ $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps
 if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
     . $oanWorkspaceResolverPath
 }
+$seededGovernanceAdmissionHelperPath = Join-Path $PSScriptRoot 'Seeded-GovernanceAdmission.ps1'
+if (Test-Path -LiteralPath $seededGovernanceAdmissionHelperPath -PathType Leaf) {
+    . $seededGovernanceAdmissionHelperPath
+}
 
 function Resolve-PathFromRepo {
     param(
@@ -244,43 +248,53 @@ if (-not [bool] $seedPolicy.enabled) {
         $disposition = 'Deferred'
         $dispositionReason = 'seed-preflight-disabled'
     } else {
-        $preflightAttempted = $true
-        $runLocalLlmPreflightPath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
-        try {
-            & powershell -ExecutionPolicy Bypass -File $runLocalLlmPreflightPath `
-                -Configuration $Configuration `
-                -HostEndpoint $hostEndpoint `
-                -OutputRoot $preflightOutputRoot | Out-Null
-
-            $preflightSummaryPath = Join-Path $preflightOutputRoot 'run-summary.json'
-            $preflightSummary = Get-Content -Raw -LiteralPath $preflightSummaryPath | ConvertFrom-Json
-            $preflightSucceeded = $true
-            $preflightReadinessStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('ReadinessStatus', 'readiness_status'))
-            $preflightCriticalFailureCount = [int] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('CriticalFailureCount', 'critical_failure_count'))
-
-            $acceptedStatuses = @($seedPolicy.acceptedReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
-            $deferredStatuses = @($seedPolicy.deferredReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
-            $rejectedStatuses = @($seedPolicy.rejectedReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
-            $normalizedPreflightReadinessStatus = Normalize-SeedStatus -Value $preflightReadinessStatus
-
-            if ($preflightCriticalFailureCount -gt 0 -or $rejectedStatuses -contains $normalizedPreflightReadinessStatus) {
-                $disposition = 'Rejected'
-                $dispositionReason = 'seed-preflight-not-ready'
-            } elseif ($acceptedStatuses -contains $normalizedPreflightReadinessStatus) {
-                $disposition = 'Accepted'
-                $dispositionReason = 'seed-preflight-ready'
-            } elseif ($deferredStatuses -contains $normalizedPreflightReadinessStatus) {
-                $disposition = 'Deferred'
-                $dispositionReason = 'seed-preflight-borderline'
-            } else {
-                $disposition = 'Deferred'
-                $dispositionReason = 'seed-preflight-unclassified'
-            }
-        }
-        catch {
-            $preflightError = $_.Exception.Message
+        $preflightLaneClass = Get-OanWorkspaceTouchPointLaneClass -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
+        if ([string]::Equals($preflightLaneClass, 'research-lane', [System.StringComparison]::OrdinalIgnoreCase)) {
             $disposition = 'Deferred'
-            $dispositionReason = 'seed-preflight-run-failed'
+            $dispositionReason = 'seed-preflight-routed-to-research'
+            $preflightError = Get-OanWorkspaceTouchPointResearchReason -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
+            if ([string]::IsNullOrWhiteSpace($preflightError)) {
+                $preflightError = 'Local LLM preflight is currently routed to research refinement.'
+            }
+        } else {
+            $preflightAttempted = $true
+            $runLocalLlmPreflightPath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
+            try {
+                & powershell -ExecutionPolicy Bypass -File $runLocalLlmPreflightPath `
+                    -Configuration $Configuration `
+                    -HostEndpoint $hostEndpoint `
+                    -OutputRoot $preflightOutputRoot | Out-Null
+
+                $preflightSummaryPath = Join-Path $preflightOutputRoot 'run-summary.json'
+                $preflightSummary = Get-Content -Raw -LiteralPath $preflightSummaryPath | ConvertFrom-Json
+                $preflightSucceeded = $true
+                $preflightReadinessStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('ReadinessStatus', 'readiness_status'))
+                $preflightCriticalFailureCount = [int] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('CriticalFailureCount', 'critical_failure_count'))
+
+                $acceptedStatuses = @($seedPolicy.acceptedReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
+                $deferredStatuses = @($seedPolicy.deferredReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
+                $rejectedStatuses = @($seedPolicy.rejectedReadinessStatuses | ForEach-Object { Normalize-SeedStatus -Value ([string] $_) })
+                $normalizedPreflightReadinessStatus = Normalize-SeedStatus -Value $preflightReadinessStatus
+
+                if ($preflightCriticalFailureCount -gt 0 -or $rejectedStatuses -contains $normalizedPreflightReadinessStatus) {
+                    $disposition = 'Rejected'
+                    $dispositionReason = 'seed-preflight-not-ready'
+                } elseif ($acceptedStatuses -contains $normalizedPreflightReadinessStatus) {
+                    $disposition = 'Accepted'
+                    $dispositionReason = 'seed-preflight-ready'
+                } elseif ($deferredStatuses -contains $normalizedPreflightReadinessStatus) {
+                    $disposition = 'Deferred'
+                    $dispositionReason = 'seed-preflight-borderline'
+                } else {
+                    $disposition = 'Deferred'
+                    $dispositionReason = 'seed-preflight-unclassified'
+                }
+            }
+            catch {
+                $preflightError = $_.Exception.Message
+                $disposition = 'Deferred'
+                $dispositionReason = 'seed-preflight-run-failed'
+            }
         }
     }
 }
@@ -293,6 +307,15 @@ if ($latestStatus -eq 'hitl-required' -and $disposition -eq 'Accepted') {
 if ($disposition -eq 'Accepted') {
     $provenance = 'Braided'
 }
+
+$seededGovernanceAdmission = Get-SeededGovernanceBuildAdmission -SeededGovernanceState ([pscustomobject]@{
+    disposition = $disposition
+    dispositionReason = $dispositionReason
+    readyState = $readyState
+}) -CyclePolicy $cyclePolicy
+$buildAdmissionState = [string] $seededGovernanceAdmission.buildAdmissionState
+$buildAdmissionReason = [string] $seededGovernanceAdmission.buildAdmissionReason
+$buildAdmissionIsAdmitted = [bool] $seededGovernanceAdmission.buildAdmissionIsAdmitted
 
 $bundlePayload = [ordered]@{
     schemaVersion = 1
@@ -314,8 +337,13 @@ $bundlePayload = [ordered]@{
     preflightReadinessStatus = $preflightReadinessStatus
     preflightCriticalFailureCount = $preflightCriticalFailureCount
     preflightSuiteVersion = if ($null -ne $preflightSummary) { [string] (Get-ObjectPropertyValueOrNull -InputObject $preflightSummary -PropertyNames @('SuiteVersion', 'suite_version')) } else { $null }
+    preflightLaneClass = Get-OanWorkspaceTouchPointLaneClass -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
+    preflightResearchBucketLabel = Get-OanWorkspaceTouchPointResearchBucketLabel -BasePath $resolvedRepoRoot -TouchPointId 'tool.localLlmPreflight' -CyclePolicy $cyclePolicy
     disposition = $disposition
     dispositionReason = $dispositionReason
+    buildAdmissionState = $buildAdmissionState
+    buildAdmissionReason = $buildAdmissionReason
+    buildAdmissionIsAdmitted = $buildAdmissionIsAdmitted
     provenance = $provenance
     preflightError = $preflightError
 }
@@ -329,6 +357,9 @@ $markdownLines = @(
     ('- Source status: `{0}`' -f $bundlePayload.sourceStatus),
     ('- Disposition: `{0}`' -f $bundlePayload.disposition),
     ('- Disposition reason: `{0}`' -f $bundlePayload.dispositionReason),
+    ('- Build admission state: `{0}`' -f $bundlePayload.buildAdmissionState),
+    ('- Build admission reason: `{0}`' -f $bundlePayload.buildAdmissionReason),
+    ('- Build admitted: `{0}`' -f $bundlePayload.buildAdmissionIsAdmitted),
     ('- Provenance: `{0}`' -f $bundlePayload.provenance),
     ('- Host endpoint: `{0}`' -f $bundlePayload.hostEndpoint),
     ('- Host reachable: `{0}`' -f $bundlePayload.hostReachable),
@@ -340,6 +371,14 @@ $markdownLines = @(
     ('- Preflight attempted: `{0}`' -f $bundlePayload.preflightAttempted),
     ('- Preflight succeeded: `{0}`' -f $bundlePayload.preflightSucceeded)
 )
+
+if ($bundlePayload.preflightLaneClass) {
+    $markdownLines += ('- Preflight lane class: `{0}`' -f $bundlePayload.preflightLaneClass)
+}
+
+if ($bundlePayload.preflightResearchBucketLabel) {
+    $markdownLines += ('- Preflight research bucket: `{0}`' -f $bundlePayload.preflightResearchBucketLabel)
+}
 
 if ($bundlePayload.preflightReadinessStatus) {
     $markdownLines += ('- Preflight readiness: `{0}`' -f $bundlePayload.preflightReadinessStatus)
@@ -365,6 +404,9 @@ $statePayload = [ordered]@{
     bundlePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $bundlePath
     disposition = $bundlePayload.disposition
     dispositionReason = $bundlePayload.dispositionReason
+    buildAdmissionState = $bundlePayload.buildAdmissionState
+    buildAdmissionReason = $bundlePayload.buildAdmissionReason
+    buildAdmissionIsAdmitted = $bundlePayload.buildAdmissionIsAdmitted
     provenance = $bundlePayload.provenance
     readyState = $bundlePayload.readyState
     readyReasonCode = $bundlePayload.readyReasonCode

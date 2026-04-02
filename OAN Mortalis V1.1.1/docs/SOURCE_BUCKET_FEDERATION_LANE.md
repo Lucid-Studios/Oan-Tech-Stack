@@ -21,6 +21,7 @@ It is not a cross-repo mutation license.
 The current build-facing marker is:
 
 - `source-bucket-federation-control-plane: admitted-local-bounded`
+- `source-bucket-federation-cycle: admitted-local-mechanical`
 
 That means:
 
@@ -28,6 +29,13 @@ That means:
 - requests may be published from the active line
 - integration and execution still depend on lawful return receipts
 - final executable widening remains gated by the current build and `HITL` law
+
+The mechanical federation cycle now runs inside the active build lane to:
+
+- read the versioned touchpoint matrix
+- publish bounded source-bucket work requests into the line-local outbox
+- refresh the request index and federation status surfaces
+- and stop short of any direct cross-repo mutation or runtime widening
 
 ## Line-Local Scope
 
@@ -76,6 +84,23 @@ Current intended specialization is:
   multi-party conference and operator workflow law
 - `Holographic Data Tool`
   braid, artifact, and engram support law
+
+The first active request publication is intentionally narrower than the full
+declared bucket list.
+
+Current matrix-driven publication scope is:
+
+- `IUTT SLI & Lisp`
+  active research-handoff cluster present now
+- `Trivium Forum`
+  active workflow-governance handoff cluster present now
+
+Current declared-but-idle listening buckets are:
+
+- `Latex Styles`
+  declared and bounded, but no active build-handoff request currently emitted
+- `Holographic Data Tool`
+  declared and bounded, but no active build-handoff request currently emitted
 
 ## Dispatch Law
 
@@ -136,6 +161,12 @@ The line-local return contract lives at:
 
 - `OAN Mortalis V1.1.1/build/source-bucket-return-contract.json`
 
+The build-local return inbox and status surfaces now live at:
+
+- `OAN Mortalis V1.1.1/.audit/runs/source-bucket-returns/`
+- `OAN Mortalis V1.1.1/.audit/state/source-bucket-return-index.json`
+- `OAN Mortalis V1.1.1/.audit/state/source-bucket-return-integration-status.json`
+
 The expected first listener states are:
 
 - `received`
@@ -148,6 +179,10 @@ Those states align to the current shared `HITL` verification grammar.
 
 Build ingests only return receipts and their bounded artifacts.
 It does not ingest unreceipted external drift as mutation authority.
+
+The current build-side return intake posture is:
+
+- `source-bucket-return-intake: admitted-local-mechanical`
 
 ## Three Layers
 

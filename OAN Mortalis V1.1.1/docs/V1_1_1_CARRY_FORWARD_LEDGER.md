@@ -81,6 +81,10 @@ Future imports from the prior line must satisfy all of the following:
 - free of active compatibility sludge
 - compatible with the new family and boundary posture
 
+Any carry-forward seam that fails those conditions must not remain as implied
+build debt. It must move into the explicit refinement split tracked in
+`V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`.
+
 ## Current Family Classification
 
 - `CradleTek` carries the governed body: custody, mantle, memory, protected

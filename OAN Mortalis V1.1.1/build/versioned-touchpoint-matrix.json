@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "matrixOwner": "OAN Mortalis V1.1.1/build/versioned-touchpoint-matrix.json",
-  "description": "Maps local legacy V1.0 touch points onto the active V1.1.1 workspace where equivalents exist, while preserving lawful fallback to the staged legacy surfaces until uptake is complete.",
+  "description": "Maps legacy-derived touch points onto the active V1.1.1 workspace, distinguishing admitted local build surfaces from explicit research-lane refinement handoffs.",
   "touchPoints": {
     "policy.deployables": {
       "legacyPath": "OAN Mortalis V1.1.1/build/deployables.json",
@@ -25,6 +25,10 @@
       "preferLocalCandidate": true
     },
     "tool.localLlmPreflight": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Seed LLM preflight remains a future runtime validation seam and is not required for current standalone build truth.",
       "legacyPath": "OAN Mortalis V1.1.1/tools/run-local-llm-preflight.ps1",
       "localCandidates": [
         "{activeBuildRoot}/tools/run-local-llm-preflight.ps1"
@@ -37,12 +41,20 @@
       ]
     },
     "common.agentiActualizationContracts": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Agenti actualization law is still maturing as chapter-eight and chapter-nine runtime doctrine rather than active build-required code.",
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/AgentiActualizationContracts.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/AgentiActualizationContracts.cs"
       ]
     },
     "common.agentiActualizationKeys": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Agenti actualization keying is held with the same future runtime seam as actualization contracts and should not be counted as active build debt.",
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/AgentiActualizationKeys.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/AgentiActualizationKeys.cs"
@@ -79,6 +91,10 @@
       ]
     },
     "service.governedReachRealization": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Reach realization remains a future actualization/runtime seam and should be refined in the IUTT SLI & Lisp lane before local implementation.",
       "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore/Services/GovernedReachRealizationService.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore/AgentiCore/Services/GovernedReachRealizationService.cs",
@@ -99,6 +115,10 @@
       ]
     },
     "runtime.agentiRuntime": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Living Agenti runtime embodiment is a later runtime seam and is intentionally withheld from current standalone build admission.",
       "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore.Runtime/AgentiRuntime.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore.Runtime/AgentiCore.Runtime/AgentiRuntime.cs",
@@ -106,6 +126,10 @@
       ]
     },
     "runtime.duplexPredicateSurfaceContracts": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Duplex predicate surface contracts remain part of the deeper EC/runtime research seam and are not required for the current admitted build slice.",
       "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore.Runtime/DuplexPredicateSurfaceContracts.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore.Runtime/AgentiCore.Runtime/DuplexPredicateSurfaceContracts.cs",
@@ -113,6 +137,10 @@
       ]
     },
     "runtime.reachDuplexRealizationSurfaceContracts": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Reach-duplex realization remains a future runtime law surface and should be refined in research before build uptake.",
       "legacyPath": "OAN Mortalis V1.1.1/src/AgentiCore.Runtime/ReachDuplexRealizationSurfaceContracts.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/TechStack/AgentiCore/AgentiCore.Runtime/AgentiCore.Runtime/ReachDuplexRealizationSurfaceContracts.cs",
@@ -120,6 +148,10 @@
       ]
     },
     "sli.crypticWebNexusFactory": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Cryptic web nexus formation is still an IUTT SLI & Lisp research seam and should not count as missing active build code.",
       "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/CrypticWebNexusFactory.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/CrypticWebNexusFactory.cs",
@@ -128,6 +160,10 @@
       ]
     },
     "sli.crypticWebNexusPortalContracts": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Cryptic web nexus portal contracts remain a research refinement seam and are not yet admitted executable truth.",
       "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/CrypticWebNexusPortalContracts.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/CrypticWebNexusPortalContracts.cs",
@@ -136,6 +172,10 @@
       ]
     },
     "sli.executionSnapshotCrypticWebNexusPortal": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "Execution-snapshot nexus portal behavior remains a future SLI runtime seam and should stay in research until it is concretely admitted.",
       "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/ExecutionSnapshotCrypticWebNexusPortal.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/ExecutionSnapshotCrypticWebNexusPortal.cs",
@@ -144,6 +184,10 @@
       ]
     },
     "sli.iCrypticWebNexusPortal": {
+      "laneClass": "research-lane",
+      "status": "research-handoff",
+      "researchBucketLabel": "IUTT SLI & Lisp",
+      "researchReason": "The cryptic web nexus interface remains part of the later SLI runtime lane and should not remain as unresolved build debt.",
       "legacyPath": "OAN Mortalis V1.1.1/src/SLI.Engine/Nexus/ICrypticWebNexusPortal.cs",
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/ICrypticWebNexusPortal.cs",
@@ -260,4 +304,3 @@
     }
   }
 }
-

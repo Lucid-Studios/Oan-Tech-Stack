@@ -44,6 +44,7 @@ The current contract-first unlock map is:
 - `companion-tool-telemetry: admitted-optional-bounded`
 - `v111-enrichment-automation: admitted-local-bounded`
 - `automation-hitl-verification-aid: admitted-operator-aid-bounded`
+- `oan-build-dispatch: admitted-root-automation-bounded`
 
 Those statuses mean:
 
@@ -121,9 +122,10 @@ That means:
 - build may use the shared `hitlVerificationAid` packet across bucket, tasking,
   notification, and orchestration surfaces as operator aid only
 - build may admit bounded companion-tool telemetry from `Holographic Data Tool`
-  now while logging `Trivium Forum` telemetry as still forming until its own
-  audit lane is emitted
+  and `Trivium Forum` now that both lanes emit truthful local audit state
 - the companion-tool telemetry bot wrapper now lives in
   `tools/Invoke-CompanionToolTelemetry.ps1`
+- the root requester-and-admitter automation prompt now lives in
+  `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
 - the next implementation cycle can move cleanly without rediscovering the
   doctrine seam

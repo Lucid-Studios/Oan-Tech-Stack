@@ -14,6 +14,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     }
 }
 
+$seededGovernanceAdmissionHelperPath = Join-Path $PSScriptRoot 'Seeded-GovernanceAdmission.ps1'
+. $seededGovernanceAdmissionHelperPath
+
 function Resolve-PathFromRepo {
     param(
         [string] $BasePath,
@@ -105,6 +108,7 @@ if ($null -eq $cycleState) {
 $runtimeDeployabilityState = Read-JsonFileOrNull -Path $runtimeDeployabilityStatePath
 $cmeFormationAndOfficeLedgerState = Read-JsonFileOrNull -Path $cmeFormationAndOfficeLedgerStatePath
 $seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
+$seededGovernanceAdmission = Get-SeededGovernanceBuildAdmission -SeededGovernanceState $seededGovernanceState -CyclePolicy $cyclePolicy
 
 $readinessState = 'candidate-only'
 $reasonCode = 'sanctuary-runtime-readiness-candidate-only'
@@ -114,8 +118,11 @@ $workingStateClass = 'bounded-local-candidate-sanctuary'
 $runtimeEnvelopeState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeDeployabilityState -PropertyName 'envelopeState')
 $cmeLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $cmeFormationAndOfficeLedgerState -PropertyName 'ledgerState')
 $cmeOfficeLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $cmeFormationAndOfficeLedgerState -PropertyName 'officeLedgerState')
-$seedDisposition = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'disposition')
-$seedReadyState = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyState')
+$seedDisposition = [string] $seededGovernanceAdmission.disposition
+$seedReadyState = [string] $seededGovernanceAdmission.readyState
+$seededGovernanceBuildAdmissionState = [string] $seededGovernanceAdmission.buildAdmissionState
+$seededGovernanceBuildAdmissionReason = [string] $seededGovernanceAdmission.buildAdmissionReason
+$seededGovernanceBuildAdmitted = [bool] $seededGovernanceAdmission.buildAdmissionIsAdmitted
 
 if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
     $readinessState = 'blocked'
@@ -133,9 +140,9 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $readinessState = 'awaiting-governed-readiness'
     $reasonCode = 'sanctuary-runtime-readiness-governance-evidence-missing'
     $nextAction = 'emit-governed-readiness-surfaces'
-} elseif ($seedDisposition -ne 'Accepted' -or $seedReadyState -ne 'ready') {
+} elseif (-not $seededGovernanceBuildAdmitted) {
     $readinessState = 'awaiting-governed-readiness'
-    $reasonCode = 'sanctuary-runtime-readiness-seed-not-ready'
+    $reasonCode = 'sanctuary-runtime-readiness-build-admission-withheld'
     $nextAction = 'bring-seeded-governance-to-ready-state'
 } elseif ($cmeLedgerState -in @('Provisional', 'Open', 'Active') -and $cmeOfficeLedgerState -in @('Provisional', 'Open')) {
     $readinessState = 'bounded-working-state-ready'
@@ -170,6 +177,9 @@ $payload = [ordered]@{
     cmeCareerContinuityLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $cmeFormationAndOfficeLedgerState -PropertyName 'careerContinuityLedgerState')
     seededGovernanceDisposition = $seedDisposition
     seededGovernanceReadyState = $seedReadyState
+    seededGovernanceBuildAdmissionState = $seededGovernanceBuildAdmissionState
+    seededGovernanceBuildAdmissionReason = $seededGovernanceBuildAdmissionReason
+    seededGovernanceBuildAdmitted = $seededGovernanceBuildAdmitted
     sourceCandidateBundle = [string] $cycleState.lastReleaseCandidateBundle
 }
 
@@ -189,6 +199,9 @@ $markdownLines = @(
     ('- CME career continuity state: `{0}`' -f $(if ($payload.cmeCareerContinuityLedgerState) { $payload.cmeCareerContinuityLedgerState } else { 'missing' })),
     ('- Seeded governance disposition: `{0}`' -f $(if ($payload.seededGovernanceDisposition) { $payload.seededGovernanceDisposition } else { 'missing' })),
     ('- Seeded governance ready state: `{0}`' -f $(if ($payload.seededGovernanceReadyState) { $payload.seededGovernanceReadyState } else { 'missing' })),
+    ('- Seeded governance build admission state: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionState) { $payload.seededGovernanceBuildAdmissionState } else { 'missing' })),
+    ('- Seeded governance build admission reason: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionReason) { $payload.seededGovernanceBuildAdmissionReason } else { 'missing' })),
+    ('- Seeded governance build admitted: `{0}`' -f [bool] $payload.seededGovernanceBuildAdmitted),
     ('- Source candidate bundle: `{0}`' -f $(if ($payload.sourceCandidateBundle) { $payload.sourceCandidateBundle } else { 'missing' }))
 )
 
@@ -207,6 +220,9 @@ $statePayload = [ordered]@{
     cmeOfficeLedgerState = $payload.cmeOfficeLedgerState
     seededGovernanceDisposition = $payload.seededGovernanceDisposition
     seededGovernanceReadyState = $payload.seededGovernanceReadyState
+    seededGovernanceBuildAdmissionState = $payload.seededGovernanceBuildAdmissionState
+    seededGovernanceBuildAdmissionReason = $payload.seededGovernanceBuildAdmissionReason
+    seededGovernanceBuildAdmitted = $payload.seededGovernanceBuildAdmitted
 }
 
 Write-JsonFile -Path $statePath -Value $statePayload

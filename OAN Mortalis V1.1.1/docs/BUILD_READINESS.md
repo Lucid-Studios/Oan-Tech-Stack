@@ -34,6 +34,8 @@ Current hold-lane clarification:
   `CHAPTER_EIGHT_ACTUALIZATION_SEAL_UPTAKE.md`
 - the current chapter-nine clarified hold lives in
   `CHAPTER_NINE_LIVING_AGENTICORE_HOLD.md`
+- the carry-forward refinement condensate now lives in
+  `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`
 - the first-run phase-one chapter-five subordinate packet is fixed in
   `FIRST_RUN_PROTOCOLIZATION_PACKET.md`
 - the first-run phase-one chapter-six subordinate packet is fixed in
@@ -50,10 +52,33 @@ Current hold-lane clarification:
   `LATE_PATH_RUNTIME_PROJECTION_SPEC.md`
 - the first bounded `V1.1.1` automation lane now lives in
   `V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md`
+- the operator-side scheduler resume helper now lives in
+  `tools/Resume-Local-AutomationCycleTask.ps1`
+- the end-to-end active workflow spine now lives in
+  `V1_1_1_WORKFLOW_MILESTONE_MAP.md`
+- the root requester-and-admitter automation prompt now lives in
+  `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
 - the bounded companion-tool telemetry lane now lives in
   `COMPANION_TOOL_TELEMETRY_LANE.md`
 - the companion-tool telemetry bot wrapper lives in
   `tools/Invoke-CompanionToolTelemetry.ps1`
+- the source-bucket federation control plane now lives in
+  `SOURCE_BUCKET_FEDERATION_LANE.md`
+- the source-bucket federation cycle wrapper lives in
+  `tools/Invoke-SourceBucket-FederationCycle.ps1`
+- the source-bucket return intake wrappers now live in
+  `tools/Write-SourceBucket-ReturnIntegrationStatus.ps1` and
+  `tools/Invoke-SourceBucket-ReturnCycle.ps1`
+- the local automation temporal close law now lives in
+  `LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
+- the seeded-governance bounded build-admission law now lives in
+  `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
+- the runtime workbench governance and bounded `EC` law now lives in
+  `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+- the active worker-thread root and Sanctuary workbench source owners now live
+  in `src/Sanctuary/Oan.Common/Oan.Common/`,
+  `src/TechStack/AgentiCore/AgentiCore/AgentiCore/`, and
+  `src/TechStack/CradleTek/CradleTek.Runtime/CradleTek.Runtime/`
 - the active `HITL -> SLI` bridge law is fixed in
   `Build Contracts/Crosscutting/authority/HITL_SLI_BRIDGE_CONTRACT.md`
 - the Law of Equivalent Exchange is fixed in
@@ -68,7 +93,19 @@ Current contract-first unlock map:
 - `chapter-9: hold`
 - `.hopng: optional-bounded`
 - `companion-tool-telemetry: admitted-optional-bounded`
+- `source-bucket-federation-cycle: admitted-local-mechanical`
+- `source-bucket-return-intake: admitted-local-mechanical`
 - `v111-enrichment-automation: admitted-local-bounded`
+- `oan-build-dispatch: admitted-root-automation-bounded`
+- `automation-close-law: frame-now`
+- `seeded-governance-build-admission-law: frame-now`
+- `runtime-workbench-governance-law: frame-now`
+- `bounded-ec-loop: frame-now`
+- `engram-predicate-minting: hold`
+- `single-flight-main-worker: spec-now`
+- `hourly-watchdog-reflection: spec-now`
+- `continuous-automation-cadence: temporary-5-minute-transport`
+- `explicit-hitl-pause: admitted-operator-stop-boundary`
 
 ## Current Verified State
 
@@ -85,7 +122,7 @@ Verified result:
 - build succeeded
 - tests succeeded
 - hygiene succeeded
-- `123` tests passed across `2` test assemblies
+- `131` tests passed across `2` test assemblies
 
 Solution shape:
 
@@ -252,6 +289,10 @@ This line is promotable only when all of the following are true:
 
 The executable retirement queue for `V1.0` is now closed in code.
 
-`V1.0` is now archived in the repository as a reference-only historical line.
+`V1.0` is now archived as an external historical line.
 
-It is no longer part of the active engineering or mutation surface, and no current `V1.1.1` runtime law depends on it.
+It is no longer part of the active engineering or mutation surface, and no
+current `V1.1.1` runtime law depends on it.
+
+Any remaining `V1.0`-derived seams that are not admitted locally must be routed
+through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`.

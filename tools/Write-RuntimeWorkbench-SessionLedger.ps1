@@ -93,6 +93,7 @@ $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Can
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
 
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
+$identityInvariantThreadRootStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.identityInvariantThreadRootStatePath)
 $sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeWorkbenchSurfaceStatePath)
 $amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.amenableDayDreamTierAdmissibilityStatePath)
 $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.selfRootedCrypticDepthGateStatePath)
@@ -104,19 +105,34 @@ if ($null -eq $cycleState) {
     throw 'Local automation cycle state is required before the runtime workbench session-ledger writer can run.'
 }
 
+$identityInvariantThreadRootState = Read-JsonFileOrNull -Path $identityInvariantThreadRootStatePath
 $sanctuaryRuntimeWorkbenchSurfaceState = Read-JsonFileOrNull -Path $sanctuaryRuntimeWorkbenchSurfaceStatePath
 $amenableDayDreamTierAdmissibilityState = Read-JsonFileOrNull -Path $amenableDayDreamTierAdmissibilityStatePath
 $selfRootedCrypticDepthGateState = Read-JsonFileOrNull -Path $selfRootedCrypticDepthGateStatePath
 
+$threadRootState = [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'threadRootState')
+$threadId = [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'threadId')
+$governanceRootId = [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'governanceRootId')
+$threadWitnessStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $identityInvariantThreadRootState -PropertyName 'witnessStatus')
 $workbenchState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'workbenchState')
 $dayDreamTierState = [string] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'tierState')
 $depthGateState = [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'gateState')
 
-$sourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'sanctuary-workbench-base' -CyclePolicy $cyclePolicy
-$missingSourceFiles = @($sourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
-$contractsSource = if (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
-$keysSource = if (Test-Path -LiteralPath $sourceFiles[1] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[1] } else { '' }
-$serviceSource = if (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }
+if (-not (Get-Command -Name Resolve-OanWorkspaceTouchPointFamily -ErrorAction SilentlyContinue)) {
+    $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+    if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+        . $oanWorkspaceResolverPath
+    }
+}
+
+$familyResolution = @(Get-OanWorkspaceTouchPointFamilyResolution -BasePath $resolvedRepoRoot -FamilyName 'sanctuary-workbench-base' -CyclePolicy $cyclePolicy)
+$sourceFiles = @($familyResolution | ForEach-Object { [string] $_.SelectedPath })
+$missingSourceFiles = @($familyResolution | Where-Object { -not [bool] $_.SelectedPathExists })
+$missingBuildTouchPoints = @($missingSourceFiles | Where-Object { [string] $_.TouchPointStatus -ne 'research-handoff' })
+$researchHandOffTouchPoints = @($missingSourceFiles | Where-Object { [string] $_.TouchPointStatus -eq 'research-handoff' })
+$contractsSource = if ($sourceFiles.Count -gt 0 -and (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
+$keysSource = if ($sourceFiles.Count -gt 1 -and (Test-Path -LiteralPath $sourceFiles[1] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[1] } else { '' }
+$serviceSource = if ($sourceFiles.Count -gt 2 -and (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }
 $sessionProjectionBound = $contractsSource.IndexOf('CreateRuntimeWorkbenchSessionLedger', [System.StringComparison]::Ordinal) -ge 0 -and
     $contractsSource.IndexOf('CreateSessionEvent', [System.StringComparison]::Ordinal) -ge 0 -and
     $contractsSource.IndexOf('CreateBoundaryCondition', [System.StringComparison]::Ordinal) -ge 0 -and
@@ -146,10 +162,14 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $sessionLedgerState = 'awaiting-depth-gate'
     $reasonCode = 'runtime-workbench-session-ledger-depth-gate-not-ready'
     $nextAction = if ($null -ne $selfRootedCrypticDepthGateState) { [string] $selfRootedCrypticDepthGateState.nextAction } else { 'emit-self-rooted-cryptic-depth-gate' }
-} elseif ($missingSourceFiles.Count -gt 0 -or -not $sessionProjectionBound -or -not $sessionKeyBound -or -not $serviceBindingBound) {
+} elseif ($missingBuildTouchPoints.Count -gt 0 -or -not $sessionProjectionBound -or -not $sessionKeyBound -or -not $serviceBindingBound) {
     $sessionLedgerState = 'awaiting-session-ledger-binding'
     $reasonCode = 'runtime-workbench-session-ledger-source-missing'
     $nextAction = 'bind-runtime-workbench-session-ledger'
+} elseif ($researchHandOffTouchPoints.Count -gt 0) {
+    $sessionLedgerState = 'awaiting-session-ledger-research-return'
+    $reasonCode = 'runtime-workbench-session-ledger-research-handoff-pending'
+    $nextAction = 'review-source-bucket-return-for-runtime-workbench-session-ledger'
 } else {
     $sessionLedgerState = 'runtime-workbench-session-ledger-ready'
     $reasonCode = 'runtime-workbench-session-ledger-bound'
@@ -166,12 +186,71 @@ $bundlePath = Join-Path $outputRoot ('{0}-{1}' -f $timestamp, $bundleKey)
 $bundleJsonPath = Join-Path $bundlePath 'runtime-workbench-session-ledger.json'
 $bundleMarkdownPath = Join-Path $bundlePath 'runtime-workbench-session-ledger.md'
 
+$projectSpaceId = 'oan-mortalis-v1.1.1'
+$sessionId = 'runtime-workbench-session://v111-bounded-session'
+if ([string]::IsNullOrWhiteSpace($threadId)) {
+    $threadId = 'worker-thread-root://local-main-worker'
+}
+if ([string]::IsNullOrWhiteSpace($governanceRootId)) {
+    $governanceRootId = 'identity-invariant://bounded-local-governance-root'
+}
+
+$currentStateClass = 'provisional'
+$admissibilityStatus = 'provisional'
+$predicateLandingClass = 'candidate-governed-structure'
+$witnessStatus = 'awaiting-session-ledger-witness'
+
+if ($sessionLedgerState -eq 'blocked') {
+    $currentStateClass = 'hold'
+    $admissibilityStatus = 'hold'
+    $predicateLandingClass = 'hold'
+    $witnessStatus = 'session-ledger-hold-witnessed'
+} elseif ($sessionLedgerState -eq 'runtime-workbench-session-ledger-ready') {
+    $currentStateClass = 'ready'
+    $admissibilityStatus = 'admitted'
+    $predicateLandingClass = 'admitted'
+    $witnessStatus = 'session-ledger-witnessed'
+}
+
+$lastLawfulTransition = switch ($sessionLedgerState) {
+    'runtime-workbench-session-ledger-ready' { 'runtime-workbench-session-ledger-bound' }
+    'blocked' { 'automation-blocked' }
+    default { 'bounded-session-open' }
+}
+
+$continuityAnchor = if ($threadRootState -eq 'identity-thread-root-ready') {
+    $governanceRootId
+} else {
+    'identity-invariant-thread-root-pending'
+}
+
 $payload = [ordered]@{
     schemaVersion = 1
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString('o')
     sessionLedgerState = $sessionLedgerState
     reasonCode = $reasonCode
     nextAction = $nextAction
+    researchHandOffPending = $researchHandOffTouchPoints.Count -gt 0
+    researchHandOffTouchPointIds = @($researchHandOffTouchPoints | ForEach-Object { [string] $_.TouchPointId })
+    sessionId = $sessionId
+    threadId = $threadId
+    projectSpaceId = $projectSpaceId
+    governanceRootId = $governanceRootId
+    sessionScope = 'bounded-governance-analysis-workbench'
+    sessionOpenTimestampUtc = (Get-Date).ToUniversalTime().ToString('o')
+    currentStateClass = $currentStateClass
+    witnessStatus = $witnessStatus
+    threadWitnessStatus = $threadWitnessStatus
+    authorizationBasis = 'admitted-local-bounded seeded governance and bounded runtime readiness'
+    continuityAnchor = $continuityAnchor
+    admissibilityStatus = $admissibilityStatus
+    stateReason = $reasonCode
+    lastLawfulTransition = $lastLawfulTransition
+    nextAllowedTransition = $nextAction
+    predicateLandingClass = $predicateLandingClass
+    autobiographicalPromotionState = 'operational-only'
+    engramPredicateEligibilityState = 'not-eligible'
+    carryForwardPolicy = 'receipted-bounded-workbench-only'
     workbenchState = $workbenchState
     dayDreamTierState = $dayDreamTierState
     depthGateState = $depthGateState
@@ -206,6 +285,27 @@ $markdownLines = @(
     ('- Session-ledger state: `{0}`' -f $payload.sessionLedgerState),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
+    ('- Research handoff pending: `{0}`' -f [bool] $payload.researchHandOffPending),
+    ('- Research handoff touchpoints: `{0}`' -f $(if (@($payload.researchHandOffTouchPointIds).Count -gt 0) { (@($payload.researchHandOffTouchPointIds) -join '`, `') } else { 'none' })),
+    ('- Session id: `{0}`' -f $payload.sessionId),
+    ('- Thread id: `{0}`' -f $payload.threadId),
+    ('- Project-space id: `{0}`' -f $payload.projectSpaceId),
+    ('- Governance-root id: `{0}`' -f $payload.governanceRootId),
+    ('- Session scope: `{0}`' -f $payload.sessionScope),
+    ('- Session open timestamp (UTC): `{0}`' -f $payload.sessionOpenTimestampUtc),
+    ('- Current state class: `{0}`' -f $payload.currentStateClass),
+    ('- Witness status: `{0}`' -f $payload.witnessStatus),
+    ('- Thread witness status: `{0}`' -f $(if ($payload.threadWitnessStatus) { $payload.threadWitnessStatus } else { 'missing' })),
+    ('- Authorization basis: `{0}`' -f $payload.authorizationBasis),
+    ('- Continuity anchor: `{0}`' -f $payload.continuityAnchor),
+    ('- Admissibility status: `{0}`' -f $payload.admissibilityStatus),
+    ('- State reason: `{0}`' -f $payload.stateReason),
+    ('- Last lawful transition: `{0}`' -f $payload.lastLawfulTransition),
+    ('- Next allowed transition: `{0}`' -f $payload.nextAllowedTransition),
+    ('- Predicate landing class: `{0}`' -f $payload.predicateLandingClass),
+    ('- Autobiographical promotion state: `{0}`' -f $payload.autobiographicalPromotionState),
+    ('- Engram predicate eligibility state: `{0}`' -f $payload.engramPredicateEligibilityState),
+    ('- Carry-forward policy: `{0}`' -f $payload.carryForwardPolicy),
     ('- Workbench state: `{0}`' -f $(if ($payload.workbenchState) { $payload.workbenchState } else { 'missing' })),
     ('- Day-dream tier state: `{0}`' -f $(if ($payload.dayDreamTierState) { $payload.dayDreamTierState } else { 'missing' })),
     ('- Depth-gate state: `{0}`' -f $(if ($payload.depthGateState) { $payload.depthGateState } else { 'missing' })),
@@ -240,6 +340,27 @@ $statePayload = [ordered]@{
     sessionLedgerState = $payload.sessionLedgerState
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
+    researchHandOffPending = $payload.researchHandOffPending
+    researchHandOffTouchPointIds = $payload.researchHandOffTouchPointIds
+    sessionId = $payload.sessionId
+    threadId = $payload.threadId
+    projectSpaceId = $payload.projectSpaceId
+    governanceRootId = $payload.governanceRootId
+    sessionScope = $payload.sessionScope
+    sessionOpenTimestampUtc = $payload.sessionOpenTimestampUtc
+    currentStateClass = $payload.currentStateClass
+    witnessStatus = $payload.witnessStatus
+    threadWitnessStatus = $payload.threadWitnessStatus
+    authorizationBasis = $payload.authorizationBasis
+    continuityAnchor = $payload.continuityAnchor
+    admissibilityStatus = $payload.admissibilityStatus
+    stateReason = $payload.stateReason
+    lastLawfulTransition = $payload.lastLawfulTransition
+    nextAllowedTransition = $payload.nextAllowedTransition
+    predicateLandingClass = $payload.predicateLandingClass
+    autobiographicalPromotionState = $payload.autobiographicalPromotionState
+    engramPredicateEligibilityState = $payload.engramPredicateEligibilityState
+    carryForwardPolicy = $payload.carryForwardPolicy
     workbenchState = $payload.workbenchState
     dayDreamTierState = $payload.dayDreamTierState
     depthGateState = $payload.depthGateState
@@ -251,8 +372,10 @@ $statePayload = [ordered]@{
     sessionEventCount = $payload.sessionEventCount
     boundaryConditionCount = $payload.boundaryConditionCount
     sessionProjectionBound = $payload.sessionProjectionBound
+    sessionKeyBound = $payload.sessionKeyBound
     serviceBindingBound = $payload.serviceBindingBound
     sourceFileCount = $payload.sourceFileCount
+    missingSourceFileCount = $payload.missingSourceFileCount
 }
 
 Write-JsonFile -Path $statePath -Value $statePayload

@@ -16,6 +16,8 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 $automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
 . $automationCascadePromptHelperPath
+$seededGovernanceAdmissionHelperPath = Join-Path $PSScriptRoot 'Seeded-GovernanceAdmission.ps1'
+. $seededGovernanceAdmissionHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -116,6 +118,7 @@ $runtimeWorkbenchSessionLedgerState = Read-JsonFileOrNull -Path $runtimeWorkbenc
 $seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
 $masterThreadOrchestrationState = Read-JsonFileOrNull -Path $masterThreadOrchestrationStatePath
 $companionToolTelemetryState = Read-JsonFileOrNull -Path $companionToolTelemetryStatePath
+$seededGovernanceAdmission = Get-SeededGovernanceBuildAdmission -SeededGovernanceState $seededGovernanceState -CyclePolicy $cyclePolicy
 
 $pathwayState = 'awaiting-runtime-deployability-envelope'
 $reasonCode = 'v111-enrichment-pathway-runtime-envelope-missing'
@@ -133,14 +136,18 @@ $runtimeEnvelopeState = [string] (Get-ObjectPropertyValueOrNull -InputObject $ru
 $readinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'readinessState')
 $workSurfaceState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibilityState')
 $workbenchState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'sessionLedgerState')
-$seedDisposition = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'disposition')
-$seedReadyState = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyState')
+$seedDisposition = [string] $seededGovernanceAdmission.disposition
+$seedReadyState = [string] $seededGovernanceAdmission.readyState
+$seededGovernanceBuildAdmissionState = [string] $seededGovernanceAdmission.buildAdmissionState
+$seededGovernanceBuildAdmissionReason = [string] $seededGovernanceAdmission.buildAdmissionReason
+$seededGovernanceBuildAdmitted = [bool] $seededGovernanceAdmission.buildAdmissionIsAdmitted
 $orchestrationState = [string] (Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'orchestrationState')
 $orchestrationNextAction = [string] (Get-ObjectPropertyValueOrNull -InputObject $masterThreadOrchestrationState -PropertyName 'nextAction')
 $workbenchReturnPosture = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'returnPosture')
 $companionTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionToolTelemetryState -PropertyName 'companionToolTelemetryState')
 $holographicDataToolTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionToolTelemetryState -PropertyName 'holographicDataToolTelemetryState')
 $triviumForumTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionToolTelemetryState -PropertyName 'triviumForumTelemetryState')
+$seededGovernanceClarifyRequired = [bool] $seededGovernanceAdmission.buildAdmissionClarifyRequired
 
 if ($candidateStatus -eq [string] $cyclePolicy.blockedStatus) {
     $pathwayState = 'blocked'
@@ -159,9 +166,13 @@ if ($candidateStatus -eq [string] $cyclePolicy.blockedStatus) {
     $pathwayState = 'awaiting-seeded-governance'
     $reasonCode = 'v111-enrichment-pathway-seeded-governance-missing'
     $nextAction = 'emit-seeded-governance-surface'
-} elseif ($seedDisposition -ne 'Accepted' -or $seedReadyState -ne 'ready') {
+} elseif ($seededGovernanceClarifyRequired) {
+    $pathwayState = 'clarify-seeded-governance-admission'
+    $reasonCode = 'v111-enrichment-pathway-build-admission-unresolved'
+    $nextAction = 'clarify-seeded-governance-admission-before-continuing'
+} elseif (-not $seededGovernanceBuildAdmitted) {
     $pathwayState = 'awaiting-seeded-governance'
-    $reasonCode = 'v111-enrichment-pathway-seeded-governance-not-ready'
+    $reasonCode = 'v111-enrichment-pathway-build-admission-withheld'
     $nextAction = 'bring-seeded-governance-to-ready-state'
 } elseif ($null -eq $sanctuaryRuntimeReadinessState) {
     $pathwayState = 'awaiting-sanctuary-runtime-readiness'
@@ -234,6 +245,10 @@ $payload = [ordered]@{
     runtimeWorkbenchSessionLedgerState = $workbenchState
     seededGovernanceDisposition = $seedDisposition
     seededGovernanceReadyState = $seedReadyState
+    seededGovernanceBuildAdmissionState = $seededGovernanceBuildAdmissionState
+    seededGovernanceBuildAdmissionReason = $seededGovernanceBuildAdmissionReason
+    seededGovernanceBuildAdmitted = $seededGovernanceBuildAdmitted
+    seededGovernanceClarifyRequired = $seededGovernanceClarifyRequired
     masterThreadOrchestrationState = $orchestrationState
     masterThreadNextAction = $orchestrationNextAction
     workbenchReturnPosture = $workbenchReturnPosture
@@ -274,6 +289,10 @@ $markdownLines = @(
     ('- Runtime workbench session-ledger state: `{0}`' -f $(if ($payload.runtimeWorkbenchSessionLedgerState) { $payload.runtimeWorkbenchSessionLedgerState } else { 'missing' })),
     ('- Seeded governance disposition: `{0}`' -f $(if ($payload.seededGovernanceDisposition) { $payload.seededGovernanceDisposition } else { 'missing' })),
     ('- Seeded governance ready state: `{0}`' -f $(if ($payload.seededGovernanceReadyState) { $payload.seededGovernanceReadyState } else { 'missing' })),
+    ('- Seeded governance build admission state: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionState) { $payload.seededGovernanceBuildAdmissionState } else { 'missing' })),
+    ('- Seeded governance build admission reason: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionReason) { $payload.seededGovernanceBuildAdmissionReason } else { 'missing' })),
+    ('- Seeded governance build admitted: `{0}`' -f [bool] $payload.seededGovernanceBuildAdmitted),
+    ('- Seeded governance clarify required: `{0}`' -f [bool] $payload.seededGovernanceClarifyRequired),
     ('- Master-thread orchestration state: `{0}`' -f $(if ($payload.masterThreadOrchestrationState) { $payload.masterThreadOrchestrationState } else { 'missing' })),
     ('- Master-thread next action: `{0}`' -f $(if ($payload.masterThreadNextAction) { $payload.masterThreadNextAction } else { 'missing' })),
     ('- Workbench return posture: `{0}`' -f $(if ($payload.workbenchReturnPosture) { $payload.workbenchReturnPosture } else { 'missing' })),
@@ -315,6 +334,10 @@ $statePayload = [ordered]@{
     runtimeWorkbenchSessionLedgerState = $payload.runtimeWorkbenchSessionLedgerState
     seededGovernanceDisposition = $payload.seededGovernanceDisposition
     seededGovernanceReadyState = $payload.seededGovernanceReadyState
+    seededGovernanceBuildAdmissionState = $payload.seededGovernanceBuildAdmissionState
+    seededGovernanceBuildAdmissionReason = $payload.seededGovernanceBuildAdmissionReason
+    seededGovernanceBuildAdmitted = $payload.seededGovernanceBuildAdmitted
+    seededGovernanceClarifyRequired = $payload.seededGovernanceClarifyRequired
     masterThreadOrchestrationState = $payload.masterThreadOrchestrationState
     workbenchReturnPosture = $payload.workbenchReturnPosture
     companionToolTelemetryState = $payload.companionToolTelemetryState
@@ -326,4 +349,3 @@ Add-AutomationCascadeOperatorPromptProperty -InputObject $statePayload | Out-Nul
 Write-JsonFile -Path $statePath -Value $statePayload
 Write-Host ('[v111-enrichment-pathway] Bundle: {0}' -f $bundlePath)
 $bundlePath
-

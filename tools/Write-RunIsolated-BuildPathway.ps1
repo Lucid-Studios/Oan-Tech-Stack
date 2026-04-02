@@ -18,6 +18,8 @@ $automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-Cascade
 . $automationCascadePromptHelperPath
 $resolverHelperPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
 . $resolverHelperPath
+$seededGovernanceAdmissionHelperPath = Join-Path $PSScriptRoot 'Seeded-GovernanceAdmission.ps1'
+. $seededGovernanceAdmissionHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -109,24 +111,11 @@ function Test-PathUnderRoot {
     )
 }
 
-function Get-TouchPointLaneClass {
-    param([string] $TouchPointId)
-
-    if ($TouchPointId.StartsWith('policy.', [System.StringComparison]::OrdinalIgnoreCase)) {
-        return 'policy-lane'
-    }
-
-    if ($TouchPointId.StartsWith('docs.', [System.StringComparison]::OrdinalIgnoreCase)) {
-        return 'documentation-lane'
-    }
-
-    return 'build-lane'
-}
-
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
+$seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
 $v111EnrichmentPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.v111EnrichmentPathwayStatePath)
 $outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runIsolatedBuildPathwayOutputRoot)
 $statePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runIsolatedBuildPathwayStatePath)
@@ -136,7 +125,9 @@ if ($null -eq $cycleState) {
     throw 'Local automation cycle state is required before the run-isolated build pathway can run.'
 }
 
+$seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
 $v111EnrichmentPathwayState = Read-JsonFileOrNull -Path $v111EnrichmentPathwayStatePath
+$seededGovernanceAdmission = Get-SeededGovernanceBuildAdmission -SeededGovernanceState $seededGovernanceState -CyclePolicy $cyclePolicy
 $matrix = Read-OanWorkspaceTouchPointMatrix -BasePath $resolvedRepoRoot -CyclePolicy $cyclePolicy
 if ($null -eq $matrix -or $null -eq $matrix.touchPoints) {
     throw 'Versioned touch-point matrix is required before the run-isolated build pathway can run.'
@@ -150,10 +141,11 @@ $touchPointSummaries = @()
 $remainingLegacyTouchPoints = @()
 $unresolvedTouchPoints = @()
 $lawfulExclusions = @()
+$researchHandOffTouchPoints = @()
 
 foreach ($touchPointProperty in $matrix.touchPoints.PSObject.Properties) {
     $touchPointId = [string] $touchPointProperty.Name
-    $laneClass = Get-TouchPointLaneClass -TouchPointId $touchPointId
+    $laneClass = Get-OanWorkspaceTouchPointLaneClass -BasePath $resolvedRepoRoot -TouchPointId $touchPointId -CyclePolicy $cyclePolicy
     $resolution = Get-OanWorkspaceTouchPointResolution -BasePath $resolvedRepoRoot -TouchPointId $touchPointId -CyclePolicy $cyclePolicy
     $selectedPath = Resolve-OanWorkspaceTouchPoint -BasePath $resolvedRepoRoot -TouchPointId $touchPointId -CyclePolicy $cyclePolicy
     $selectedExists = $false
@@ -173,6 +165,9 @@ foreach ($touchPointProperty in $matrix.touchPoints.PSObject.Properties) {
                 $selectedDisposition = 'documentation-lane'
             }
         }
+        'research-lane' {
+            $selectedDisposition = if ($selectedExists) { 'research-materialized' } else { 'research-handoff' }
+        }
         default {
             if ($selectedExists) {
                 if (Test-PathUnderRoot -Path $selectedPath -RootPath $activeBuildRootPath) {
@@ -190,6 +185,9 @@ foreach ($touchPointProperty in $matrix.touchPoints.PSObject.Properties) {
         selectedDisposition = $selectedDisposition
         selectedPath = if ($selectedExists) { Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $selectedPath } else { $null }
         selectedPathExists = $selectedExists
+        touchPointStatus = if ($null -ne $resolution) { [string] $resolution.TouchPointStatus } else { $null }
+        researchBucketLabel = if ($null -ne $resolution) { [string] $resolution.ResearchBucketLabel } else { $null }
+        researchReason = if ($null -ne $resolution) { [string] $resolution.ResearchReason } else { $null }
         fallbackPath = if ($null -ne $resolution -and -not [string]::IsNullOrWhiteSpace([string] $resolution.FallbackPath)) {
             Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath ([string] $resolution.FallbackPath)
         } else {
@@ -220,6 +218,12 @@ foreach ($touchPointProperty in $matrix.touchPoints.PSObject.Properties) {
         'documentation-lane' {
             $lawfulExclusions += [pscustomobject] $summary
         }
+        'research-handoff' {
+            $researchHandOffTouchPoints += [pscustomobject] $summary
+        }
+        'research-materialized' {
+            $researchHandOffTouchPoints += [pscustomobject] $summary
+        }
     }
 }
 
@@ -227,9 +231,16 @@ $buildLaneTouchPoints = @($touchPointSummaries | Where-Object { [string] $_.lane
 $activeBuildTouchPoints = @($buildLaneTouchPoints | Where-Object { [string] $_.selectedDisposition -eq 'active-build' })
 $policyLaneTouchPointCount = @($lawfulExclusions | Where-Object { [string] $_.laneClass -eq 'policy-lane' }).Count
 $documentationLaneTouchPointCount = @($lawfulExclusions | Where-Object { [string] $_.laneClass -eq 'documentation-lane' }).Count
+$researchHandOffTouchPointCount = @($researchHandOffTouchPoints).Count
 $remainingLegacyTouchPointCount = @($remainingLegacyTouchPoints).Count
 $unresolvedTouchPointCount = @($unresolvedTouchPoints).Count
 $legacyFree = ($remainingLegacyTouchPointCount -eq 0 -and $unresolvedTouchPointCount -eq 0)
+$seedDisposition = [string] $seededGovernanceAdmission.disposition
+$seedReadyState = [string] $seededGovernanceAdmission.readyState
+$seededGovernanceBuildAdmissionState = [string] $seededGovernanceAdmission.buildAdmissionState
+$seededGovernanceBuildAdmissionReason = [string] $seededGovernanceAdmission.buildAdmissionReason
+$seededGovernanceBuildAdmitted = [bool] $seededGovernanceAdmission.buildAdmissionIsAdmitted
+$seededGovernanceClarifyRequired = [bool] $seededGovernanceAdmission.buildAdmissionClarifyRequired
 
 $pathwayState = 'awaiting-v111-enrichment-pathway'
 $reasonCode = 'run-isolated-build-pathway-v111-missing'
@@ -239,6 +250,10 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $pathwayState = 'blocked'
     $reasonCode = 'run-isolated-build-pathway-automation-blocked'
     $nextAction = 'investigate-blocked-state'
+} elseif ($seededGovernanceClarifyRequired) {
+    $pathwayState = 'clarify-seeded-governance-admission'
+    $reasonCode = 'run-isolated-build-pathway-build-admission-unresolved'
+    $nextAction = 'clarify-seeded-governance-admission-before-continuing'
 } elseif ($null -eq $v111EnrichmentPathwayState) {
     $pathwayState = 'awaiting-v111-enrichment-pathway'
     $reasonCode = 'run-isolated-build-pathway-v111-missing'
@@ -283,6 +298,12 @@ $payload = [ordered]@{
     legacyFree = $legacyFree
     activeBuildRoot = $context.ActiveBuildRoot
     automationPolicyRoot = $context.AutomationPolicyRoot
+    seededGovernanceDisposition = $seedDisposition
+    seededGovernanceReadyState = $seedReadyState
+    seededGovernanceBuildAdmissionState = $seededGovernanceBuildAdmissionState
+    seededGovernanceBuildAdmissionReason = $seededGovernanceBuildAdmissionReason
+    seededGovernanceBuildAdmitted = $seededGovernanceBuildAdmitted
+    seededGovernanceClarifyRequired = $seededGovernanceClarifyRequired
     v111EnrichmentPathwayState = if ($null -ne $v111EnrichmentPathwayState) { [string] $v111EnrichmentPathwayState.pathwayState } else { $null }
     v111EnrichmentNextAction = if ($null -ne $v111EnrichmentPathwayState) { [string] $v111EnrichmentPathwayState.nextAction } else { $null }
     buildLaneTouchPointCount = @($buildLaneTouchPoints).Count
@@ -290,14 +311,17 @@ $payload = [ordered]@{
     remainingLegacyTouchPointCount = $remainingLegacyTouchPointCount
     unresolvedTouchPointCount = $unresolvedTouchPointCount
     lawfulExclusionTouchPointCount = @($lawfulExclusions).Count
+    researchHandOffTouchPointCount = $researchHandOffTouchPointCount
     lawfulExclusionBreakdown = [ordered]@{
         policyLane = $policyLaneTouchPointCount
         documentationLane = $documentationLaneTouchPointCount
     }
     remainingLegacyTouchPointIds = @($remainingLegacyTouchPoints | ForEach-Object { [string] $_.touchPointId })
     unresolvedTouchPointIds = @($unresolvedTouchPoints | ForEach-Object { [string] $_.touchPointId })
+    researchHandOffTouchPointIds = @($researchHandOffTouchPoints | ForEach-Object { [string] $_.touchPointId })
     remainingLegacyTouchPoints = $remainingLegacyTouchPoints
     unresolvedTouchPoints = $unresolvedTouchPoints
+    researchHandOffTouchPoints = $researchHandOffTouchPoints
     lawfulExclusions = $lawfulExclusions
     touchPoints = $touchPointSummaries
     sourceCandidateBundle = [string] $cycleState.lastReleaseCandidateBundle
@@ -316,11 +340,18 @@ $markdownLines = @(
     ('- Legacy free: `{0}`' -f [bool] $payload.legacyFree),
     ('- Active build root: `{0}`' -f $payload.activeBuildRoot),
     ('- Automation policy root: `{0}`' -f $payload.automationPolicyRoot),
+    ('- Seeded governance disposition: `{0}`' -f $(if ($payload.seededGovernanceDisposition) { $payload.seededGovernanceDisposition } else { 'missing' })),
+    ('- Seeded governance ready state: `{0}`' -f $(if ($payload.seededGovernanceReadyState) { $payload.seededGovernanceReadyState } else { 'missing' })),
+    ('- Seeded governance build admission state: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionState) { $payload.seededGovernanceBuildAdmissionState } else { 'missing' })),
+    ('- Seeded governance build admission reason: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionReason) { $payload.seededGovernanceBuildAdmissionReason } else { 'missing' })),
+    ('- Seeded governance build admitted: `{0}`' -f [bool] $payload.seededGovernanceBuildAdmitted),
+    ('- Seeded governance clarify required: `{0}`' -f [bool] $payload.seededGovernanceClarifyRequired),
     ('- V1.1.1 enrichment pathway state: `{0}`' -f $(if ($payload.v111EnrichmentPathwayState) { $payload.v111EnrichmentPathwayState } else { 'missing' })),
     ('- Build-lane touchpoints: `{0}`' -f $payload.buildLaneTouchPointCount),
     ('- Active-build touchpoints: `{0}`' -f $payload.activeBuildTouchPointCount),
     ('- Remaining legacy fallbacks: `{0}`' -f $payload.remainingLegacyTouchPointCount),
     ('- Unresolved touchpoints: `{0}`' -f $payload.unresolvedTouchPointCount),
+    ('- Research handoffs: `{0}`' -f $payload.researchHandOffTouchPointCount),
     ('- Lawful exclusions: `{0}`' -f $payload.lawfulExclusionTouchPointCount),
     ('- Source candidate bundle: `{0}`' -f $(if ($payload.sourceCandidateBundle) { $payload.sourceCandidateBundle } else { 'missing' }))
 )
@@ -334,6 +365,18 @@ if (@($remainingLegacyTouchPoints).Count -gt 0) {
 
     foreach ($touchPoint in @($remainingLegacyTouchPoints)) {
         $markdownLines += ('- `{0}` -> `{1}`' -f [string] $touchPoint.touchPointId, [string] $touchPoint.selectedPath)
+    }
+}
+
+if (@($researchHandOffTouchPoints).Count -gt 0) {
+    $markdownLines += @(
+        '',
+        '## Research HandOffs',
+        ''
+    )
+
+    foreach ($touchPoint in @($researchHandOffTouchPoints)) {
+        $markdownLines += ('- `{0}` -> bucket `{1}` ({2})' -f [string] $touchPoint.touchPointId, [string] $touchPoint.researchBucketLabel, [string] $touchPoint.researchReason)
     }
 }
 
@@ -370,17 +413,24 @@ $statePayload = [ordered]@{
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
     legacyFree = $payload.legacyFree
+    seededGovernanceDisposition = $payload.seededGovernanceDisposition
+    seededGovernanceReadyState = $payload.seededGovernanceReadyState
+    seededGovernanceBuildAdmissionState = $payload.seededGovernanceBuildAdmissionState
+    seededGovernanceBuildAdmissionReason = $payload.seededGovernanceBuildAdmissionReason
+    seededGovernanceBuildAdmitted = $payload.seededGovernanceBuildAdmitted
+    seededGovernanceClarifyRequired = $payload.seededGovernanceClarifyRequired
     buildLaneTouchPointCount = $payload.buildLaneTouchPointCount
     activeBuildTouchPointCount = $payload.activeBuildTouchPointCount
     remainingLegacyTouchPointCount = $payload.remainingLegacyTouchPointCount
     unresolvedTouchPointCount = $payload.unresolvedTouchPointCount
+    researchHandOffTouchPointCount = $payload.researchHandOffTouchPointCount
     lawfulExclusionTouchPointCount = $payload.lawfulExclusionTouchPointCount
     remainingLegacyTouchPointIds = $payload.remainingLegacyTouchPointIds
     unresolvedTouchPointIds = $payload.unresolvedTouchPointIds
+    researchHandOffTouchPointIds = $payload.researchHandOffTouchPointIds
 }
 Add-AutomationCascadeOperatorPromptProperty -InputObject $statePayload | Out-Null
 
 Write-JsonFile -Path $statePath -Value $statePayload
 Write-Host ('[run-isolated-build-pathway] Bundle: {0}' -f $bundlePath)
 $bundlePath
-

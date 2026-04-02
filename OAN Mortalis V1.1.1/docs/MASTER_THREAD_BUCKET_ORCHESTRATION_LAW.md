@@ -47,6 +47,25 @@ This layer is therefore a governed instruction conveyor.
 
 It is not a sovereign planner.
 
+## Root Dispatch
+
+The active root dispatch surface for this layer is `OAN Build Dispatch`.
+
+Its governing prompt is carried at:
+
+- `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
+
+That prompt exists to keep the root layer honest about four things:
+
+- it requests and admits work rather than doing every kind of work itself
+- it reconciles build truth before it publishes downstream need
+- it accepts only receipted bucket returns as build authority
+- it preserves the bounded `seed-llm` and actionable-surface hold lines
+
+The root dispatch prompt does not supersede repo-local executable truth.
+
+It compiles the current truth into a stable requester-and-admitter posture.
+
 ## Subject-Predicate-Action Sets
 
 Master-thread instructions are expressed as bounded subject-predicate-action sets.
@@ -127,6 +146,26 @@ The orchestration layer may release an instruction from wait toward movement onl
 - targeted bucket posture remains admissible
 
 Only then may the movement-phase layer traverse the work.
+
+## Clarify Seam Rule
+
+The orchestration layer must prefer `clarify` before forced continuation when
+its own governing state surfaces materially disagree.
+
+The current live example is:
+
+- seeded governance may report `ready`
+- while a downstream build surface still asks to `bring-seeded-governance-to-ready-state`
+
+That is not a valid continue signal.
+
+It is a gate-truth mismatch.
+
+When that seam appears, the root dispatcher must:
+
+- classify the next action as `clarify`
+- refresh gate truth first
+- only then publish new downstream requests or release movement intent
 
 ## Lifecycle
 

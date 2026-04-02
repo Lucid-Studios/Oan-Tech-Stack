@@ -1,6 +1,19 @@
 ﻿{
   "schemaVersion": 3,
   "scheduledTaskName": "OAN Mortalis Governed Automation Cycle",
+  "targetTemporalConstitution": {
+    "status": "target-spec-now-not-yet-implemented",
+    "mainWorkerOffice": "single-flight-close-governed",
+    "watchdogOffice": "hourly-reflection-and-crash-recovery",
+    "dailyDigestOffice": "operator-governance-surface",
+    "watchdogReflectionCadenceHours": 1,
+    "mainWorkerTerminalStates": [
+      "continue",
+      "pause-hitl",
+      "done",
+      "fault-recoverable"
+    ]
+  },
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md",
   "statusJsonPath": ".audit/state/local-automation-tasking-status.json",
   "statusMarkdownPath": ".audit/state/local-automation-tasking-status.md",
@@ -2111,11 +2124,11 @@
           "owner": "Automation",
           "authority": "Mechanical isolation witness only",
           "status": "selected",
-          "purpose": "Read the versioned touchpoint matrix and the current V1.1.1 enrichment state so the cycle can say whether a truthful run-isolated build lane is still forming, still carrying legacy fallbacks, or ready.",
-          "completionSignal": "A run-isolated build pathway bundle can state whether V1.1.1 is ready for isolated build work without borrowing legacy build-lane sources.",
+          "purpose": "Read the versioned touchpoint matrix and the current V1.1.1 enrichment state so the cycle can distinguish admitted build surfaces from lawful research handoffs and say whether the isolated build lane is ready.",
+          "completionSignal": "A run-isolated build pathway bundle can state whether V1.1.1 is ready for isolated build work without mistaking research-routed carry-forward seams for active build debt.",
           "escalatesWhen": [
-            "the pathway reports isolated-build readiness while any build-lane touchpoint still resolves to legacy V1.0",
-            "the pathway treats policy-lane or documentation-lane exclusions as if they were active build proof"
+            "the pathway reports isolated-build readiness while any active build-lane touchpoint is still unresolved",
+            "the pathway treats policy, documentation, or research handoffs as if they were active build proof"
           ]
         },
         {
@@ -2124,11 +2137,11 @@
           "owner": "Automation",
           "authority": "Mechanical migration witness only",
           "status": "selected",
-          "purpose": "Count exactly which build-lane touchpoints still fall back to V1.0 so migration work can remove them without confusing lawful exclusions with debt.",
-          "completionSignal": "The pathway reaches zero remaining legacy build-lane fallback touchpoints and names each fallback honestly until then.",
+          "purpose": "Count exactly which active build-lane touchpoints still need local implementation and separate them from lawful research handoffs so refinement work lands in the right lane.",
+          "completionSignal": "The pathway reaches zero remaining unresolved active build-lane touchpoints and names each research handoff honestly until then.",
           "escalatesWhen": [
-            "fallback counts improve without the selected paths actually moving into V1.1.1",
-            "new build-lane fallbacks appear without being recorded in the burndown surface"
+            "burndown counts improve without the selected paths actually moving into V1.1.1",
+            "new unresolved build-lane touchpoints appear without being recorded in the burndown surface"
           ]
         },
         {
@@ -2148,4 +2161,3 @@
     }
   ]
 }
-

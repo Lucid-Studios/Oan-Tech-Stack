@@ -79,7 +79,7 @@ function Get-OanWorkspaceContext {
     }
 
     $resolvedBasePath = [System.IO.Path]::GetFullPath($BasePath)
-    $legacyWorkspaceRoot = $activeBuildRoot
+    $legacyWorkspaceRoot = 'OAN Mortalis V1.0'
     $policyWorkspaceRoot = Split-Path -Parent $automationPolicyRoot
 
     return [ordered]@{
@@ -172,6 +172,92 @@ function Get-OanWorkspaceTouchPointDefinition {
     return $property.Value
 }
 
+function Get-OanWorkspaceTouchPointLaneClass {
+    param(
+        [string] $BasePath,
+        [string] $TouchPointId,
+        [object] $CyclePolicy
+    )
+
+    $definition = Get-OanWorkspaceTouchPointDefinition -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+    if ($null -ne $definition) {
+        $laneClassProperty = $definition.PSObject.Properties['laneClass']
+        if ($null -ne $laneClassProperty -and -not [string]::IsNullOrWhiteSpace([string] $laneClassProperty.Value)) {
+            return [string] $laneClassProperty.Value
+        }
+    }
+
+    if ($TouchPointId.StartsWith('policy.', [System.StringComparison]::OrdinalIgnoreCase)) {
+        return 'policy-lane'
+    }
+
+    if ($TouchPointId.StartsWith('docs.', [System.StringComparison]::OrdinalIgnoreCase)) {
+        return 'documentation-lane'
+    }
+
+    return 'build-lane'
+}
+
+function Get-OanWorkspaceTouchPointStatus {
+    param(
+        [string] $BasePath,
+        [string] $TouchPointId,
+        [object] $CyclePolicy
+    )
+
+    $definition = Get-OanWorkspaceTouchPointDefinition -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+    if ($null -eq $definition) {
+        return $null
+    }
+
+    $statusProperty = $definition.PSObject.Properties['status']
+    if ($null -eq $statusProperty -or [string]::IsNullOrWhiteSpace([string] $statusProperty.Value)) {
+        return $null
+    }
+
+    return [string] $statusProperty.Value
+}
+
+function Get-OanWorkspaceTouchPointResearchBucketLabel {
+    param(
+        [string] $BasePath,
+        [string] $TouchPointId,
+        [object] $CyclePolicy
+    )
+
+    $definition = Get-OanWorkspaceTouchPointDefinition -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+    if ($null -eq $definition) {
+        return $null
+    }
+
+    $bucketProperty = $definition.PSObject.Properties['researchBucketLabel']
+    if ($null -eq $bucketProperty -or [string]::IsNullOrWhiteSpace([string] $bucketProperty.Value)) {
+        return $null
+    }
+
+    return [string] $bucketProperty.Value
+}
+
+function Get-OanWorkspaceTouchPointResearchReason {
+    param(
+        [string] $BasePath,
+        [string] $TouchPointId,
+        [object] $CyclePolicy
+    )
+
+    $definition = Get-OanWorkspaceTouchPointDefinition -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+    if ($null -eq $definition) {
+        return $null
+    }
+
+    $reasonProperty = $definition.PSObject.Properties['researchReason']
+    if ($null -eq $reasonProperty -or [string]::IsNullOrWhiteSpace([string] $reasonProperty.Value)) {
+        return $null
+    }
+
+    return [string] $reasonProperty.Value
+}
+
 function Get-OanWorkspaceTouchPointResolution {
     param(
         [string] $BasePath,
@@ -232,6 +318,10 @@ function Get-OanWorkspaceTouchPointResolution {
         FallbackPath = $fallbackPath
         PreferFirstCandidate = $preferFirstCandidate
         TouchPointId = $TouchPointId
+        LaneClass = Get-OanWorkspaceTouchPointLaneClass -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+        TouchPointStatus = Get-OanWorkspaceTouchPointStatus -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+        ResearchBucketLabel = Get-OanWorkspaceTouchPointResearchBucketLabel -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
+        ResearchReason = Get-OanWorkspaceTouchPointResearchReason -BasePath $BasePath -TouchPointId $TouchPointId -CyclePolicy $CyclePolicy
     }
 }
 
@@ -260,7 +350,7 @@ function Resolve-OanWorkspaceTouchPoint {
     return $resolution.FallbackPath
 }
 
-function Resolve-OanWorkspaceTouchPointFamily {
+function Get-OanWorkspaceTouchPointFamilyResolution {
     param(
         [string] $BasePath,
         [string] $FamilyName,
@@ -288,11 +378,45 @@ function Resolve-OanWorkspaceTouchPointFamily {
         @($familyDefinition.touchPoints)
     }
 
-    $resolvedPaths = @()
+    $familyResolution = @()
     foreach ($touchPointId in $touchPointIds) {
-        $resolvedPath = Resolve-OanWorkspaceTouchPoint -BasePath $BasePath -TouchPointId ([string] $touchPointId) -CyclePolicy $CyclePolicy
-        if (-not [string]::IsNullOrWhiteSpace($resolvedPath)) {
-            $resolvedPaths += $resolvedPath
+        $resolvedTouchPointId = [string] $touchPointId
+        $resolution = Get-OanWorkspaceTouchPointResolution -BasePath $BasePath -TouchPointId $resolvedTouchPointId -CyclePolicy $CyclePolicy
+        $selectedPath = Resolve-OanWorkspaceTouchPoint -BasePath $BasePath -TouchPointId $resolvedTouchPointId -CyclePolicy $CyclePolicy
+        $selectedPathExists = -not [string]::IsNullOrWhiteSpace($selectedPath) -and (Test-Path -LiteralPath $selectedPath -PathType Leaf)
+
+        $familyResolution += [pscustomobject]@{
+            FamilyName = $FamilyName
+            TouchPointId = $resolvedTouchPointId
+            LaneClass = if ($null -ne $resolution) { [string] $resolution.LaneClass } else { Get-OanWorkspaceTouchPointLaneClass -BasePath $BasePath -TouchPointId $resolvedTouchPointId -CyclePolicy $CyclePolicy }
+            TouchPointStatus = if ($null -ne $resolution) { [string] $resolution.TouchPointStatus } else { $null }
+            ResearchBucketLabel = if ($null -ne $resolution) { [string] $resolution.ResearchBucketLabel } else { $null }
+            ResearchReason = if ($null -ne $resolution) { [string] $resolution.ResearchReason } else { $null }
+            SelectedPath = $selectedPath
+            SelectedPathExists = $selectedPathExists
+            FallbackPath = if ($null -ne $resolution) { [string] $resolution.FallbackPath } else { $null }
+            CandidatePaths = if ($null -ne $resolution) { @($resolution.Candidates) } else { @() }
+        }
+    }
+
+    return $familyResolution
+}
+
+function Resolve-OanWorkspaceTouchPointFamily {
+    param(
+        [string] $BasePath,
+        [string] $FamilyName,
+        [object] $CyclePolicy
+    )
+
+    if ([string]::IsNullOrWhiteSpace($FamilyName)) {
+        return @()
+    }
+
+    $resolvedPaths = @()
+    foreach ($familyEntry in @(Get-OanWorkspaceTouchPointFamilyResolution -BasePath $BasePath -FamilyName $FamilyName -CyclePolicy $CyclePolicy)) {
+        if (-not [string]::IsNullOrWhiteSpace([string] $familyEntry.SelectedPath)) {
+            $resolvedPaths += [string] $familyEntry.SelectedPath
         }
     }
 

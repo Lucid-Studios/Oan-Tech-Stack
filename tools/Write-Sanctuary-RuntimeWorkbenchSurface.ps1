@@ -115,11 +115,21 @@ $runtimeReadinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $s
 $runtimeWorkState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibilityState')
 $bondedLedgerState = [string] (Get-ObjectPropertyValueOrNull -InputObject $bondedParticipationLocalityLedgerState -PropertyName 'ledgerState')
 
-$sourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'sanctuary-workbench-base' -CyclePolicy $cyclePolicy
-$missingSourceFiles = @($sourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
-$contractsSource = if (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
-$keysSource = if (Test-Path -LiteralPath $sourceFiles[1] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[1] } else { '' }
-$serviceSource = if (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }
+if (-not (Get-Command -Name Resolve-OanWorkspaceTouchPointFamily -ErrorAction SilentlyContinue)) {
+    $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+    if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+        . $oanWorkspaceResolverPath
+    }
+}
+
+$familyResolution = @(Get-OanWorkspaceTouchPointFamilyResolution -BasePath $resolvedRepoRoot -FamilyName 'sanctuary-workbench-base' -CyclePolicy $cyclePolicy)
+$sourceFiles = @($familyResolution | ForEach-Object { [string] $_.SelectedPath })
+$missingSourceFiles = @($familyResolution | Where-Object { -not [bool] $_.SelectedPathExists })
+$missingBuildTouchPoints = @($missingSourceFiles | Where-Object { [string] $_.TouchPointStatus -ne 'research-handoff' })
+$researchHandOffTouchPoints = @($missingSourceFiles | Where-Object { [string] $_.TouchPointStatus -eq 'research-handoff' })
+$contractsSource = if ($sourceFiles.Count -gt 0 -and (Test-Path -LiteralPath $sourceFiles[0] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[0] } else { '' }
+$keysSource = if ($sourceFiles.Count -gt 1 -and (Test-Path -LiteralPath $sourceFiles[1] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[1] } else { '' }
+$serviceSource = if ($sourceFiles.Count -gt 2 -and (Test-Path -LiteralPath $sourceFiles[2] -PathType Leaf)) { Get-Content -Raw -LiteralPath $sourceFiles[2] } else { '' }
 $workbenchProjectionBound = $contractsSource.IndexOf('CreateRuntimeWorkbenchSurface', [System.StringComparison]::Ordinal) -ge 0 -and
     $contractsSource.IndexOf('sanctuary-runtime-workbench-surface-bound', [System.StringComparison]::Ordinal) -ge 0
 $workbenchKeyBound = $keysSource.IndexOf('CreateSanctuaryRuntimeWorkbenchHandle', [System.StringComparison]::Ordinal) -ge 0
@@ -149,10 +159,14 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $workbenchState = 'awaiting-bonded-locality-ledger'
     $reasonCode = 'sanctuary-runtime-workbench-bonded-ledger-not-ready'
     $nextAction = if ($null -ne $bondedParticipationLocalityLedgerState) { [string] $bondedParticipationLocalityLedgerState.nextAction } else { 'emit-bonded-participation-locality-ledger' }
-} elseif ($missingSourceFiles.Count -gt 0 -or -not $workbenchProjectionBound -or -not $workbenchKeyBound -or -not $serviceBindingBound) {
+} elseif ($missingBuildTouchPoints.Count -gt 0 -or -not $workbenchProjectionBound -or -not $workbenchKeyBound -or -not $serviceBindingBound) {
     $workbenchState = 'awaiting-runtime-workbench-binding'
     $reasonCode = 'sanctuary-runtime-workbench-source-missing'
     $nextAction = 'bind-sanctuary-runtime-workbench-surface'
+} elseif ($researchHandOffTouchPoints.Count -gt 0) {
+    $workbenchState = 'awaiting-runtime-workbench-research-return'
+    $reasonCode = 'sanctuary-runtime-workbench-research-handoff-pending'
+    $nextAction = 'review-source-bucket-return-for-sanctuary-runtime-workbench'
 } else {
     $workbenchState = 'sanctuary-runtime-workbench-ready'
     $reasonCode = 'sanctuary-runtime-workbench-surface-bound'
@@ -175,12 +189,17 @@ $payload = [ordered]@{
     workbenchState = $workbenchState
     reasonCode = $reasonCode
     nextAction = $nextAction
+    researchHandOffPending = $researchHandOffTouchPoints.Count -gt 0
+    researchHandOffTouchPointIds = @($researchHandOffTouchPoints | ForEach-Object { [string] $_.TouchPointId })
+    firstAdmittedSurfaceClass = 'bounded-governance-analysis-workbench'
     runtimeDeployabilityState = $deployabilityState
     sanctuaryRuntimeReadinessState = $runtimeReadinessState
     runtimeWorkAdmissibilityState = $runtimeWorkState
     bondedParticipationLocalityLedgerState = $bondedLedgerState
     sessionPosture = 'bounded-workbench-ready'
     boundedWorkClass = 'bounded-local-candidate-sanctuary-workbench'
+    ecHabitationState = 'withheld-pending-bounded-workbench-closure'
+    outwardDuplexAuthorityState = 'withheld-pending-mediated-admission'
     bondedOperatorLaneWithheld = $true
     mosBearingReleaseDenied = $true
     workbenchProjectionBound = $workbenchProjectionBound
@@ -207,12 +226,17 @@ $markdownLines = @(
     ('- Workbench state: `{0}`' -f $payload.workbenchState),
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
+    ('- Research handoff pending: `{0}`' -f [bool] $payload.researchHandOffPending),
+    ('- Research handoff touchpoints: `{0}`' -f $(if (@($payload.researchHandOffTouchPointIds).Count -gt 0) { (@($payload.researchHandOffTouchPointIds) -join '`, `') } else { 'none' })),
+    ('- First admitted surface class: `{0}`' -f $payload.firstAdmittedSurfaceClass),
     ('- Runtime deployability state: `{0}`' -f $(if ($payload.runtimeDeployabilityState) { $payload.runtimeDeployabilityState } else { 'missing' })),
     ('- Sanctuary runtime readiness state: `{0}`' -f $(if ($payload.sanctuaryRuntimeReadinessState) { $payload.sanctuaryRuntimeReadinessState } else { 'missing' })),
     ('- Runtime work admissibility state: `{0}`' -f $(if ($payload.runtimeWorkAdmissibilityState) { $payload.runtimeWorkAdmissibilityState } else { 'missing' })),
     ('- Bonded participation locality-ledger state: `{0}`' -f $(if ($payload.bondedParticipationLocalityLedgerState) { $payload.bondedParticipationLocalityLedgerState } else { 'missing' })),
     ('- Session posture: `{0}`' -f $payload.sessionPosture),
     ('- Bounded work class: `{0}`' -f $payload.boundedWorkClass),
+    ('- EC habitation state: `{0}`' -f $payload.ecHabitationState),
+    ('- Outward duplex authority state: `{0}`' -f $payload.outwardDuplexAuthorityState),
     ('- Bonded operator lane withheld: `{0}`' -f [bool] $payload.bondedOperatorLaneWithheld),
     ('- MoS-bearing release denied: `{0}`' -f [bool] $payload.mosBearingReleaseDenied),
     ('- Workbench projection bound: `{0}`' -f [bool] $payload.workbenchProjectionBound),
@@ -239,15 +263,22 @@ $statePayload = [ordered]@{
     workbenchState = $payload.workbenchState
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
+    researchHandOffPending = $payload.researchHandOffPending
+    researchHandOffTouchPointIds = $payload.researchHandOffTouchPointIds
+    firstAdmittedSurfaceClass = $payload.firstAdmittedSurfaceClass
     runtimeDeployabilityState = $payload.runtimeDeployabilityState
     sanctuaryRuntimeReadinessState = $payload.sanctuaryRuntimeReadinessState
     runtimeWorkAdmissibilityState = $payload.runtimeWorkAdmissibilityState
     bondedParticipationLocalityLedgerState = $payload.bondedParticipationLocalityLedgerState
     sessionPosture = $payload.sessionPosture
     boundedWorkClass = $payload.boundedWorkClass
+    ecHabitationState = $payload.ecHabitationState
+    outwardDuplexAuthorityState = $payload.outwardDuplexAuthorityState
     workbenchProjectionBound = $payload.workbenchProjectionBound
+    workbenchKeyBound = $payload.workbenchKeyBound
     serviceBindingBound = $payload.serviceBindingBound
     sourceFileCount = $payload.sourceFileCount
+    missingSourceFileCount = $payload.missingSourceFileCount
 }
 
 Write-JsonFile -Path $statePath -Value $statePayload

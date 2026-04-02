@@ -260,6 +260,11 @@ $amenableDayDreamTierAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $re
 $selfRootedCrypticDepthGateStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.selfRootedCrypticDepthGateStatePath)
 $runtimeWorkbenchSessionLedgerStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runtimeWorkbenchSessionLedgerStatePath)
 $companionToolTelemetryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.companionToolTelemetryStatePath)
+$sourceBucketFederationPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sourceBucketFederationPolicyPath)
+$sourceBucketRequestIndexStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sourceBucketRequestIndexStatePath)
+$sourceBucketReturnIndexStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sourceBucketReturnIndexStatePath)
+$sourceBucketReturnIntegrationStatusStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sourceBucketReturnIntegrationStatusStatePath)
+$sourceBucketFederationStatusStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.sourceBucketFederationStatusStatePath)
 $v111EnrichmentPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.v111EnrichmentPathwayStatePath)
 $runIsolatedBuildPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.runIsolatedBuildPathwayStatePath)
 $dayDreamCollapseReceiptStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.dayDreamCollapseReceiptStatePath)
@@ -311,10 +316,31 @@ $brittleDurableDifferentiationSurfaceStatePath = Resolve-PathFromRepo -BasePath 
 $coreInvariantLatticeWitnessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $policy.coreInvariantLatticeWitnessStatePath)
 $releaseCandidateRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $releaseCandidateOutputRoot
 $digestRunRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $digestOutputRoot
+$automationCadenceMinutes = if ($policy.PSObject.Properties['localAutomationCadenceMinutes']) {
+    [int] $policy.localAutomationCadenceMinutes
+} else {
+    5
+}
 $releaseCadenceHours = [int] $policy.localReleaseCandidateCadenceHours
 $digestCadenceHours = [int] $policy.mandatoryHitlDigestCadenceHours
 $digestWindowHours = [int] $policy.digestWindowHours
 $blockedStatus = [string] $policy.blockedStatus
+$schedulerPolicy = Get-ObjectPropertyValueOrNull -InputObject $policy -PropertyName 'schedulerReconciliationPolicy'
+$schedulerTaskName = if ($null -ne $schedulerPolicy -and -not [string]::IsNullOrWhiteSpace([string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerPolicy -PropertyName 'scheduledTaskName'))) {
+    [string] (Get-ObjectPropertyValueOrNull -InputObject $schedulerPolicy -PropertyName 'scheduledTaskName')
+} else {
+    'OAN Mortalis Governed Automation Cycle'
+}
+$pauseSchedulerOnHitlRequired = if ($null -ne $schedulerPolicy -and $null -ne $schedulerPolicy.PSObject.Properties['pauseSchedulerOnHitlRequired']) {
+    [bool] $schedulerPolicy.pauseSchedulerOnHitlRequired
+} else {
+    $false
+}
+$pauseSchedulerOnBlocked = if ($null -ne $schedulerPolicy -and $null -ne $schedulerPolicy.PSObject.Properties['pauseSchedulerOnBlocked']) {
+    [bool] $schedulerPolicy.pauseSchedulerOnBlocked
+} else {
+    $true
+}
 
 $state = Read-JsonFileOrNull -Path $statePath
 $previousStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'lastKnownStatus')
@@ -475,6 +501,9 @@ $statePayload = [ordered]@{
     runId = $automationCycleRunId
     generatedAtUtc = $nowUtc.ToString('o')
     policyPath = $resolvedPolicyPath
+    cadenceMinutes = [ordered]@{
+        automationCycle = $automationCadenceMinutes
+    }
     cadenceHours = [ordered]@{
         releaseCandidate = $releaseCadenceHours
         mandatoryHitlDigest = $digestCadenceHours
@@ -485,6 +514,7 @@ $statePayload = [ordered]@{
     lastKnownStatus = $latestStatus
     lastDigestUtc = if ($null -ne $newLastDigestUtc) { $newLastDigestUtc.ToString('o') } else { $null }
     lastDigestBundle = $digestBundlePath
+    nextAutomationCycleRunUtc = $nowUtc.AddMinutes($automationCadenceMinutes).ToString('o')
     nextReleaseCandidateRunUtc = $latestRunGeneratedAtUtc.AddHours($releaseCadenceHours).ToString('o')
     nextMandatoryHitlReviewUtc = $nextMandatoryReviewUtc.ToString('o')
     releaseCandidateTriggered = $releaseCandidateDue
@@ -747,14 +777,8 @@ if (-not [string]::IsNullOrWhiteSpace($seededGovernanceBundlePath)) {
     $statePayload.seededGovernanceStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $seededGovernanceStatePath
     Write-JsonFile -Path $statePath -Value $statePayload
 }
-
-$schedulerSyncScriptPath = Join-Path $resolvedRepoRoot 'tools\Sync-Local-AutomationScheduler.ps1'
-$schedulerSyncOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerSyncScriptPath, '-Configuration', $Configuration, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler reconciliation'
-$schedulerSyncStatePathFromRun = Get-ScriptOutputTail -Output $schedulerSyncOutput
-if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
-    $statePayload.schedulerReconciliationStatePath = $schedulerSyncStatePathFromRun
-    Write-JsonFile -Path $statePath -Value $statePayload
-}
+$schedulerSyncStatePathFromRun = $null
+$schedulerExecutionReceiptBundlePath = $null
 
 $cmeConsolidationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-CmeFormalization-ConsolidationStatus.ps1'
 $cmeConsolidationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $cmeConsolidationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'CME consolidation writer'
@@ -932,15 +956,6 @@ $multiIntervalGovernanceBraidBundlePath = Get-ScriptOutputTail -Output $multiInt
 if (-not [string]::IsNullOrWhiteSpace($multiIntervalGovernanceBraidBundlePath)) {
     $statePayload.lastMultiIntervalGovernanceBraidBundle = $multiIntervalGovernanceBraidBundlePath
     $statePayload.multiIntervalGovernanceBraidStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $multiIntervalGovernanceBraidStatePath
-    Write-JsonFile -Path $statePath -Value $statePayload
-}
-
-$schedulerExecutionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SchedulerExecution-Receipt.ps1'
-$schedulerExecutionReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerExecutionReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler execution receipt writer'
-$schedulerExecutionReceiptBundlePath = Get-ScriptOutputTail -Output $schedulerExecutionReceiptOutput
-if (-not [string]::IsNullOrWhiteSpace($schedulerExecutionReceiptBundlePath)) {
-    $statePayload.lastSchedulerExecutionReceiptBundle = $schedulerExecutionReceiptBundlePath
-    $statePayload.schedulerExecutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerExecutionReceiptStatePath
     Write-JsonFile -Path $statePath -Value $statePayload
 }
 
@@ -1909,6 +1924,38 @@ $taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automatio
 $taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
 $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
+$sourceBucketFederationCycleScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-SourceBucket-FederationCycle.ps1'
+$sourceBucketFederationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $sourceBucketFederationCycleScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-FederationPolicyPath', $sourceBucketFederationPolicyPath) -FailureContext 'Source-bucket federation cycle'
+$sourceBucketFederationStatePathFromRun = Get-ScriptOutputTail -Output $sourceBucketFederationOutput
+if (-not [string]::IsNullOrWhiteSpace($sourceBucketFederationStatePathFromRun) -and (Test-Path -LiteralPath $sourceBucketFederationStatePathFromRun -PathType Leaf)) {
+    $statePayload.sourceBucketFederationStatusStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sourceBucketFederationStatePathFromRun
+    $summary.sourceBucketFederationStatusStatePath = $statePayload.sourceBucketFederationStatusStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+    Write-JsonFile -Path $summaryPath -Value $summary
+}
+if (Test-Path -LiteralPath $sourceBucketRequestIndexStatePath -PathType Leaf) {
+    $statePayload.sourceBucketRequestIndexStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sourceBucketRequestIndexStatePath
+    $summary.sourceBucketRequestIndexStatePath = $statePayload.sourceBucketRequestIndexStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+    Write-JsonFile -Path $summaryPath -Value $summary
+}
+
+$sourceBucketReturnCycleScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-SourceBucket-ReturnCycle.ps1'
+$sourceBucketReturnOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $sourceBucketReturnCycleScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-FederationPolicyPath', $sourceBucketFederationPolicyPath) -FailureContext 'Source-bucket return intake cycle'
+$sourceBucketReturnIntegrationStatePathFromRun = Get-ScriptOutputTail -Output $sourceBucketReturnOutput
+if (-not [string]::IsNullOrWhiteSpace($sourceBucketReturnIntegrationStatePathFromRun) -and (Test-Path -LiteralPath $sourceBucketReturnIntegrationStatePathFromRun -PathType Leaf)) {
+    $statePayload.sourceBucketReturnIntegrationStatusStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sourceBucketReturnIntegrationStatePathFromRun
+    $summary.sourceBucketReturnIntegrationStatusStatePath = $statePayload.sourceBucketReturnIntegrationStatusStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+    Write-JsonFile -Path $summaryPath -Value $summary
+}
+if (Test-Path -LiteralPath $sourceBucketReturnIndexStatePath -PathType Leaf) {
+    $statePayload.sourceBucketReturnIndexStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $sourceBucketReturnIndexStatePath
+    $summary.sourceBucketReturnIndexStatePath = $statePayload.sourceBucketReturnIndexStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+    Write-JsonFile -Path $summaryPath -Value $summary
+}
+
 $notificationScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-AutomationNotification.ps1'
 $notificationOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $notificationScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath, '-PreviousStatus', $previousStatus, '-CurrentStatus', $latestStatus) -FailureContext 'Automation notification writer'
 $notificationStatePathFromRun = Get-ScriptOutputTail -Output $notificationOutput
@@ -1928,7 +1975,14 @@ if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun) -and (Test-
 $taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
 $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
 
-$receiptStatus = if ($latestStatus -eq $blockedStatus) { 'blocked' } else { 'completed' }
+$pauseForExplicitHitl = ($latestStatus -eq 'hitl-required' -and $pauseSchedulerOnHitlRequired) -or ($latestStatus -eq $blockedStatus -and $pauseSchedulerOnBlocked)
+$receiptStatus = if ($pauseForExplicitHitl) {
+    'paused'
+} elseif ($latestStatus -eq $blockedStatus) {
+    'blocked'
+} else {
+    'completed'
+}
 $receiptStandingResult = switch ($normalizedLatestStatus) {
     'candidate-ready' { 'candidate_ready' }
     'hitl-required' { 'review_gated' }
@@ -1937,19 +1991,37 @@ $receiptStandingResult = switch ($normalizedLatestStatus) {
 }
 $receiptSummary = switch ($normalizedLatestStatus) {
     'candidate-ready' { 'Automation cycle completed in candidate-ready posture and may continue within cadence.' }
-    'hitl-required' { 'Automation cycle completed in review-gated posture; bounded mechanical continuation may proceed while promotion awaits HITL.' }
+    'hitl-required' {
+        if ($pauseForExplicitHitl) {
+            'Automation cycle paused for explicit HITL review before further continuation.'
+        } else {
+            'Automation cycle completed in review-gated posture; bounded mechanical continuation may proceed while promotion awaits HITL.'
+        }
+    }
     'blocked' { 'Automation cycle ended in blocked posture and is paused pending HITL review.' }
     default { 'Automation cycle completed with an unclassified posture and requires clarification before wider promotion.' }
 }
 $carryForwardClass = switch ($normalizedLatestStatus) {
     'candidate-ready' { 'continue-within-cadence' }
-    'hitl-required' { 'promotable-with-review' }
+    'hitl-required' {
+        if ($pauseForExplicitHitl) {
+            'paused-awaiting-hitl'
+        } else {
+            'promotable-with-review'
+        }
+    }
     'blocked' { 'blocked-awaiting-hitl' }
     default { 'clarification-required' }
 }
 $nextLawfulActions = switch ($normalizedLatestStatus) {
     'candidate-ready' { @('continue-automation-until-next-cadence', 'refresh-status-surfaces-on-schedule') }
-    'hitl-required' { @('continue-bounded-mechanical-maintenance', 'await-hitl-review-before-promotion') }
+    'hitl-required' {
+        if ($pauseForExplicitHitl) {
+            @('await-hitl-review-before-resume', 'preserve-current-state-until-operator-admission')
+        } else {
+            @('continue-bounded-mechanical-maintenance', 'await-hitl-review-before-promotion')
+        }
+    }
     'blocked' { @('wait-for-hitl-blocked-review', 'preserve-bounded-state-until-remediation') }
     default { @('clarify-current-posture-before-next-promotion-step') }
 }
@@ -1959,6 +2031,10 @@ $receiptVerification = [ordered]@{
     task_status_surface = if (-not [string]::IsNullOrWhiteSpace($taskStatusPath)) { 'written' } else { 'missing' }
     workspace_bucket_surface = if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) { 'written' } else { 'missing' }
     master_thread_orchestration_surface = if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun)) { 'written' } else { 'missing' }
+    source_bucket_request_index_surface = if (Test-Path -LiteralPath $sourceBucketRequestIndexStatePath -PathType Leaf) { 'written' } else { 'missing' }
+    source_bucket_federation_surface = if (-not [string]::IsNullOrWhiteSpace($sourceBucketFederationStatePathFromRun)) { 'written' } else { 'missing' }
+    source_bucket_return_index_surface = if (Test-Path -LiteralPath $sourceBucketReturnIndexStatePath -PathType Leaf) { 'written' } else { 'missing' }
+    source_bucket_return_integration_surface = if (-not [string]::IsNullOrWhiteSpace($sourceBucketReturnIntegrationStatePathFromRun)) { 'written' } else { 'missing' }
     notification_surface = if (-not [string]::IsNullOrWhiteSpace($notificationStatePathFromRun)) { 'written' } else { 'not-triggered' }
 }
 $receiptArtifactsTouched = @(
@@ -1968,6 +2044,10 @@ $receiptArtifactsTouched = @(
     $taskStatusPath
     $workspaceBucketStatusPath
     $masterThreadOrchestrationStatePathFromRun
+    $sourceBucketRequestIndexStatePath
+    $sourceBucketFederationStatePathFromRun
+    $sourceBucketReturnIndexStatePath
+    $sourceBucketReturnIntegrationStatePathFromRun
     $notificationStatePathFromRun
     $releaseCandidateBundlePath
     $digestBundlePath
@@ -1998,8 +2078,36 @@ $statePayload.lastCycleReceiptStatus = [string] $cycleReceiptPayload.status
 $summary.lastCycleReceiptId = $statePayload.lastCycleReceiptId
 $summary.lastCycleReceiptStatus = $statePayload.lastCycleReceiptStatus
 
+$schedulerPauseApplied = $false
+$schedulerPauseReason = if ($latestStatus -eq 'hitl-required') {
+    'hitl-review-required'
+} elseif ($latestStatus -eq $blockedStatus) {
+    'blocked-posture'
+} else {
+    ''
+}
+
+if ($pauseForExplicitHitl -and (Get-Command -Name Disable-ScheduledTask -ErrorAction SilentlyContinue)) {
+    try {
+        Disable-ScheduledTask -TaskName $schedulerTaskName -ErrorAction Stop | Out-Null
+        $schedulerPauseApplied = $true
+    }
+    catch {
+        $schedulerPauseApplied = $false
+    }
+}
+
+$statePayload.schedulerTaskName = $schedulerTaskName
+$statePayload.schedulerPauseRequested = $pauseForExplicitHitl
+$statePayload.schedulerPauseApplied = $schedulerPauseApplied
+$statePayload.schedulerPauseReason = $schedulerPauseReason
+$summary.schedulerTaskName = $schedulerTaskName
+$summary.schedulerPauseRequested = $pauseForExplicitHitl
+$summary.schedulerPauseApplied = $schedulerPauseApplied
+$summary.schedulerPauseReason = $schedulerPauseReason
+
 $activeNoticePath = $null
-if ($latestStatus -eq $blockedStatus) {
+if ($pauseForExplicitHitl) {
     if (Test-Path -LiteralPath $readinessNoticeStatePath -PathType Leaf) {
         Remove-Item -LiteralPath $readinessNoticeStatePath -Force
     }
@@ -2013,15 +2121,30 @@ if ($latestStatus -eq $blockedStatus) {
             Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $_
         }
     }
+    $pauseNoticeSummary = if ($latestStatus -eq 'hitl-required') {
+        'Automation cycle is paused because the current posture now requires explicit HITL review before continuation.'
+    } else {
+        'Automation cycle is paused because the current posture is blocked.'
+    }
+    $pauseNextAction = if ($latestStatus -eq 'hitl-required') {
+        'await-hitl-review-before-resume'
+    } else {
+        'wait-for-hitl-blocked-review'
+    }
+    $pauseEnablesWhenCleared = if ($latestStatus -eq 'hitl-required') {
+        @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-hitl-admission')
+    } else {
+        @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-remediation')
+    }
     $pauseNoticePayload = New-AutomationNoticePayload `
         -NoticeId ('notice-{0}-pause' -f $automationCycleRunId) `
         -Lane 'build-governance-automation' `
         -Type 'pause_notice' `
         -Status 'paused' `
-        -Summary 'Automation cycle is paused because the current posture is blocked.' `
+        -Summary $pauseNoticeSummary `
         -DependsOn $pauseDependsOn `
-        -EnablesWhenCleared @('resume-bounded-cycle-execution', 'reissue-readiness-notice-after-remediation') `
-        -NextLawfulAction 'wait-for-hitl-blocked-review' `
+        -EnablesWhenCleared $pauseEnablesWhenCleared `
+        -NextLawfulAction $pauseNextAction `
         -HitlRequired $true
     Add-AutomationCascadeOperatorPromptProperty -InputObject $pauseNoticePayload | Out-Null
     Write-JsonFile -Path $pauseNoticeStatePath -Value $pauseNoticePayload
@@ -2037,12 +2160,8 @@ if ($latestStatus -eq $blockedStatus) {
         Remove-Item -LiteralPath $pauseNoticeStatePath -Force
     }
 
-    $readinessStatus = if ($latestStatus -eq 'hitl-required') { 'ready-with-review-gate' } else { 'ready' }
-    $readinessSummary = if ($latestStatus -eq 'hitl-required') {
-        'Automation cycle completed in review-gated posture; bounded continuation may proceed while promotion remains under HITL review.'
-    } else {
-        'Automation cycle completed in candidate-ready posture and may continue within its scheduled cadence.'
-    }
+    $readinessStatus = 'ready'
+    $readinessSummary = 'Automation cycle completed in candidate-ready posture and may continue within its scheduled cadence.'
     $readinessNoticePayload = New-AutomationNoticePayload `
         -NoticeId ('notice-{0}-readiness' -f $automationCycleRunId) `
         -Lane 'build-governance-automation' `
@@ -2051,8 +2170,8 @@ if ($latestStatus -eq $blockedStatus) {
         -Summary $readinessSummary `
         -DependsOn @() `
         -EnablesWhenCleared @('continue-bounded-cycle-execution', 'allow-downstream-status-ingestion') `
-        -NextLawfulAction $(if ($latestStatus -eq 'hitl-required') { 'await-hitl-review-before-promotion' } else { 'continue-automation-until-next-cadence' }) `
-        -HitlRequired ($latestStatus -eq 'hitl-required')
+        -NextLawfulAction 'continue-automation-until-next-cadence' `
+        -HitlRequired $false
     Add-AutomationCascadeOperatorPromptProperty -InputObject $readinessNoticePayload | Out-Null
     Write-JsonFile -Path $readinessNoticeStatePath -Value $readinessNoticePayload
     $activeNoticePath = $readinessNoticeStatePath
@@ -2066,6 +2185,23 @@ if ($latestStatus -eq $blockedStatus) {
 
 Write-JsonFile -Path $statePath -Value $statePayload
 Write-JsonFile -Path $summaryPath -Value $summary
+
+$schedulerSyncScriptPath = Join-Path $resolvedRepoRoot 'tools\Sync-Local-AutomationScheduler.ps1'
+$schedulerSyncOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerSyncScriptPath, '-Configuration', $Configuration, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler reconciliation'
+$schedulerSyncStatePathFromRun = Get-ScriptOutputTail -Output $schedulerSyncOutput
+if (-not [string]::IsNullOrWhiteSpace($schedulerSyncStatePathFromRun)) {
+    $statePayload.schedulerReconciliationStatePath = $schedulerSyncStatePathFromRun
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
+
+$schedulerExecutionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SchedulerExecution-Receipt.ps1'
+$schedulerExecutionReceiptOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $schedulerExecutionReceiptScriptPath, '-RepoRoot', $resolvedRepoRoot, '-CyclePolicyPath', $resolvedPolicyPath) -FailureContext 'Scheduler execution receipt writer'
+$schedulerExecutionReceiptBundlePath = Get-ScriptOutputTail -Output $schedulerExecutionReceiptOutput
+if (-not [string]::IsNullOrWhiteSpace($schedulerExecutionReceiptBundlePath)) {
+    $statePayload.lastSchedulerExecutionReceiptBundle = $schedulerExecutionReceiptBundlePath
+    $statePayload.schedulerExecutionReceiptStatePath = Get-RelativePathString -BasePath $resolvedRepoRoot -TargetPath $schedulerExecutionReceiptStatePath
+    Write-JsonFile -Path $statePath -Value $statePayload
+}
 
 $taskStatusOutput = Invoke-ChildPowershellScript -ArgumentList @('-ExecutionPolicy', 'Bypass', '-File', $taskStatusScriptPath, '-RepoRoot', $resolvedRepoRoot) -FailureContext 'Task status writer'
 $taskStatusPath = Get-ScriptOutputTail -Output $taskStatusOutput
@@ -2205,6 +2341,18 @@ if (-not [string]::IsNullOrWhiteSpace($workspaceBucketStatusPath)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($masterThreadOrchestrationStatePathFromRun)) {
     Write-Host ('[local-automation-cycle] MasterThreadOrchestration: {0}' -f $masterThreadOrchestrationStatePathFromRun)
+}
+if (Test-Path -LiteralPath $sourceBucketRequestIndexStatePath -PathType Leaf) {
+    Write-Host ('[local-automation-cycle] SourceBucketRequestIndex: {0}' -f $sourceBucketRequestIndexStatePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($sourceBucketFederationStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] SourceBucketFederation: {0}' -f $sourceBucketFederationStatePathFromRun)
+}
+if (Test-Path -LiteralPath $sourceBucketReturnIndexStatePath -PathType Leaf) {
+    Write-Host ('[local-automation-cycle] SourceBucketReturnIndex: {0}' -f $sourceBucketReturnIndexStatePath)
+}
+if (-not [string]::IsNullOrWhiteSpace($sourceBucketReturnIntegrationStatePathFromRun)) {
+    Write-Host ('[local-automation-cycle] SourceBucketReturnIntegration: {0}' -f $sourceBucketReturnIntegrationStatePathFromRun)
 }
 if (-not [string]::IsNullOrWhiteSpace($runtimeDeployabilityEnvelopeBundlePath)) {
     Write-Host ('[local-automation-cycle] RuntimeDeployabilityEnvelope: {0}' -f $runtimeDeployabilityEnvelopeBundlePath)
