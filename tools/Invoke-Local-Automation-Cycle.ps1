@@ -112,6 +112,33 @@ function Get-OptionalDateTimeUtc {
     return [datetime]::Parse($stringValue, [System.Globalization.CultureInfo]::InvariantCulture, [System.Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime()
 }
 
+function Get-NextHourlyAnchorUtc {
+    param([int] $Minute)
+
+    $localNow = Get-Date
+    $candidateLocal = Get-Date -Year $localNow.Year -Month $localNow.Month -Day $localNow.Day -Hour $localNow.Hour -Minute $Minute -Second 0
+    if ($candidateLocal -le $localNow) {
+        $candidateLocal = $candidateLocal.AddHours(1)
+    }
+
+    return $candidateLocal.ToUniversalTime()
+}
+
+function Get-NextDailyAnchorUtc {
+    param(
+        [int] $Hour,
+        [int] $Minute
+    )
+
+    $localNow = Get-Date
+    $candidateLocal = Get-Date -Year $localNow.Year -Month $localNow.Month -Day $localNow.Day -Hour $Hour -Minute $Minute -Second 0
+    if ($candidateLocal -le $localNow) {
+        $candidateLocal = $candidateLocal.AddDays(1)
+    }
+
+    return $candidateLocal.ToUniversalTime()
+}
+
 function Get-ScriptOutputTail {
     param([object[]] $Output)
 
@@ -447,13 +474,12 @@ if ($null -eq $nextMandatoryReviewUtc) {
     if ($null -ne $newLastDigestUtc) {
         $nextMandatoryReviewUtc = $newLastDigestUtc.AddHours($digestCadenceHours)
     } else {
-        $nextMandatoryReviewUtc = $nowUtc.AddHours($digestCadenceHours)
+        $nextMandatoryReviewUtc = Get-NextDailyAnchorUtc -Hour 12 -Minute 30
     }
 }
 $nextDailyHitlDigestRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'nextDailyHitlDigestRunUtc')
-if ($null -eq $nextDailyHitlDigestRunUtc) {
-    $nextDailyHitlDigestRunUtc = $nextMandatoryReviewUtc
-}
+$nextDailyHitlDigestRunUtc = Get-NextDailyAnchorUtc -Hour 12 -Minute 30
+$nextMandatoryReviewUtc = $nextDailyHitlDigestRunUtc
 
 $normalizedLatestStatus = ([string] $latestStatus).ToLowerInvariant()
 $mainWorkerTerminalState = switch ($normalizedLatestStatus) {
@@ -470,7 +496,7 @@ $mainWorkerArmState = switch ($mainWorkerTerminalState) {
     default { 'fault-recoverable' }
 }
 $nextMainWorkerWakeUtc = if ($mainWorkerTerminalState -eq 'continue') {
-    $nowUtc.AddMinutes($automationCadenceMinutes)
+    Get-NextHourlyAnchorUtc -Minute 0
 } else {
     $null
 }

@@ -17,8 +17,11 @@
   "schedulerTaskTopology": {
     "mainWorkerTaskName": "OAN Mortalis Governed Automation Cycle",
     "watchdogTaskName": "OAN Mortalis Governed Automation Watchdog",
+    "reportConsumptionTaskName": "OAN Mortalis Source-Bucket Report Consumption",
     "dailyDigestTaskName": "OAN Mortalis Governed HITL Digest",
-    "mainWorkerCadenceMinutes": 5,
+    "mainWorkerCadenceMinutes": 60,
+    "reportConsumptionCadenceMinutes": 60,
+    "reportConsumptionCadenceMinuteOffset": 30,
     "watchdogCadenceHours": 1,
     "dailyDigestCadenceHours": 24
   },
@@ -47,8 +50,8 @@
       "taskClass": "close-governed-execution",
       "owner": "Automation",
       "authority": "Mechanical only within bounded close law",
-      "cadenceMinutes": 5,
-      "purpose": "Run one governed build pass, close in one terminal state, and arm exactly one next wake only when continuation remains lawful.",
+      "cadenceMinutes": 60,
+      "purpose": "Run one governed build pass on the hour, close in one terminal state, and arm exactly one next wake only when continuation remains lawful.",
       "completionSignal": "The latest cycle state, receipt, and notice surfaces agree on one terminal close outcome.",
       "outputs": [
         ".audit/state/local-automation-cycle.json",
@@ -75,6 +78,25 @@
       "escalatesWhen": [
         "the last close truth and current scheduler truth contradict each other",
         "recovery would require fabricating continuation"
+      ]
+    },
+    {
+      "id": "source-bucket-report-consumption",
+      "label": "Source-Bucket Report Consumption",
+      "taskClass": "federated-consumption-and-compaction",
+      "owner": "Automation",
+      "authority": "Mechanical only within bounded continuity and retention law",
+      "cadenceMinutes": 60,
+      "purpose": "Consume hourly source-bucket appendices on the half hour, update continuity-bearing standing summaries, compact raw telemetry, and emit bounded GEL candidate packets without promoting raw delta directly into simulated-GEL standing.",
+      "completionSignal": "Current source-bucket standing summary, candidate GEL items, and the report-consumption receipt all agree on one bounded hourly or full-research outcome.",
+      "outputs": [
+        ".audit/state/current-source-bucket-standing-summary.json",
+        ".audit/state/current-candidate-gel-items.json",
+        ".audit/state/source-bucket-report-consumption-last-run.json"
+      ],
+      "escalatesWhen": [
+        "continuity reuse cannot be resolved truthfully",
+        "a contradiction requires pinned review evidence or successor thread opening"
       ]
     },
     {

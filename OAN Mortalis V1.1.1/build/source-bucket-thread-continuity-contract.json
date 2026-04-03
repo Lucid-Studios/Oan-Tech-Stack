@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "contractName": "source-bucket-thread-continuity",
+  "status": "active-v1.1.1",
+  "summary": "Defines the continuity record that lets the root consumer reuse the same continuity-bearing thread by default and open successors only when subject identity, discourse office, or contradiction law requires it.",
+  "requiredFields": [
+    "continuityKey",
+    "currentThreadId",
+    "lastAppendixId",
+    "lastStandingHash",
+    "sealed",
+    "successorThreadId",
+    "successorReason",
+    "bucketLabel",
+    "discourseOffice",
+    "subjectKey",
+    "lastResolvedAtUtc"
+  ],
+  "fieldDefinitions": {
+    "continuityKey": "Machine-visible key for a continuity-bearing lane subject.",
+    "currentThreadId": "The currently active thread identity for this continuity key.",
+    "lastAppendixId": "The most recent appendix that lawfully updated the continuity record.",
+    "lastStandingHash": "Stable hash for the last consumed standing summary.",
+    "sealed": "True when the current thread has been sealed and may not receive further appendices.",
+    "successorThreadId": "Successor thread identity when the current thread has been lawfully succeeded.",
+    "successorReason": "Explicit reason the current thread was succeeded or broken.",
+    "bucketLabel": "Owning source-bucket label.",
+    "discourseOffice": "The office that currently owns this continuity thread.",
+    "subjectKey": "Machine-visible subject identity tracked by the continuity thread.",
+    "lastResolvedAtUtc": "UTC timestamp for the last continuity resolution."
+  },
+  "continuityLaw": {
+    "defaultDisposition": "reuse",
+    "reuseWhen": [
+      "same continuityKey",
+      "same discourseOffice",
+      "same subject identity",
+      "no contradiction requiring adjudication",
+      "no successor transition is required"
+    ],
+    "successorWhen": [
+      "subject identity materially changes",
+      "discourseOffice changes",
+      "a real continuity break occurs",
+      "the prior thread is sealed and succeeded"
+    ]
+  }
+}

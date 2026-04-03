@@ -66,6 +66,18 @@ function Get-SafeLocalStartTime {
     return [System.TimeZoneInfo]::ConvertTimeFromUtc($effectiveUtc, [System.TimeZoneInfo]::Local)
 }
 
+function Get-NextHourlyAnchorUtc {
+    param([int] $Minute)
+
+    $localNow = Get-Date
+    $candidateLocal = Get-Date -Year $localNow.Year -Month $localNow.Month -Day $localNow.Day -Hour $localNow.Hour -Minute $Minute -Second 0
+    if ($candidateLocal -le $localNow) {
+        $candidateLocal = $candidateLocal.AddHours(1)
+    }
+
+    return $candidateLocal.ToUniversalTime()
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $cycleScriptPath = Join-Path $resolvedRepoRoot 'tools\Invoke-Local-Automation-Cycle.ps1'
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
@@ -100,7 +112,7 @@ if (-not $PSBoundParameters.ContainsKey('StartAt')) {
     if ($null -ne $desiredStartUtc) {
         $StartAt = Get-SafeLocalStartTime -DesiredUtc $desiredStartUtc
     } else {
-        $StartAt = Get-SafeLocalStartTime -DesiredUtc ((Get-Date).ToUniversalTime().AddMinutes($IntervalMinutes))
+        $StartAt = Get-SafeLocalStartTime -DesiredUtc (Get-NextHourlyAnchorUtc -Minute 0)
     }
 } else {
     $StartAt = [datetime] $StartAt

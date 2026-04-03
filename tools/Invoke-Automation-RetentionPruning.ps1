@@ -92,6 +92,7 @@ function Get-ProtectedDirectorySet {
         [string] $RepoRootPath,
         [object] $CycleState,
         [object] $BlockedEscalationState,
+        [object] $ReportConsumptionState,
         [object] $TaskingPolicy,
         [string] $TaskingPolicyPathValue
     )
@@ -180,7 +181,9 @@ function Get-ProtectedDirectorySet {
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastInquiryPatternContinuityLedgerBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastQuestioningBoundaryPairLedgerBundle'),
         [string] (Get-ObjectPropertyValueOrNull -InputObject $CycleState -PropertyName 'lastCarryForwardInquirySelectionSurfaceBundle'),
-        [string] (Get-ObjectPropertyValueOrNull -InputObject $BlockedEscalationState -PropertyName 'bundlePath')
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $BlockedEscalationState -PropertyName 'bundlePath'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $ReportConsumptionState -PropertyName 'bundlePath'),
+        [string] (Get-ObjectPropertyValueOrNull -InputObject $ReportConsumptionState -PropertyName 'dailyBundlePath')
     )) {
         if (-not [string]::IsNullOrWhiteSpace($candidate)) {
             [void] $protected.Add((Resolve-PathFromRepo -BasePath $RepoRootPath -CandidatePath $candidate))
@@ -250,10 +253,12 @@ $taskingPolicy = Get-Content -Raw -LiteralPath $resolvedTaskingPolicyPath | Conv
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $retentionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.retentionStatePath)
 $blockedEscalationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.blockedEscalationStatePath)
+$reportConsumptionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketReportConsumptionStatePath)
 
 $cycleState = Read-JsonFileOrNull -Path $cycleStatePath
 $blockedEscalationState = Read-JsonFileOrNull -Path $blockedEscalationStatePath
-$protectedDirectories = Get-ProtectedDirectorySet -RepoRootPath $resolvedRepoRoot -CycleState $cycleState -BlockedEscalationState $blockedEscalationState -TaskingPolicy $taskingPolicy -TaskingPolicyPathValue $resolvedTaskingPolicyPath
+$reportConsumptionState = Read-JsonFileOrNull -Path $reportConsumptionStatePath
+$protectedDirectories = Get-ProtectedDirectorySet -RepoRootPath $resolvedRepoRoot -CycleState $cycleState -BlockedEscalationState $blockedEscalationState -ReportConsumptionState $reportConsumptionState -TaskingPolicy $taskingPolicy -TaskingPolicyPathValue $resolvedTaskingPolicyPath
 
 $retentionPolicy = $cyclePolicy.retentionPolicy
 $roots = @(
@@ -480,6 +485,14 @@ $roots = @(
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.companionToolTelemetryOutputRoot)
         keep = [int] $retentionPolicy.keepCompanionToolTelemetryBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketReportConsumptionOutputRoot)
+        keep = [int] $retentionPolicy.keepSourceBucketReportConsumptionBundles
+    },
+    [ordered]@{
+        path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketReportConsumptionDailyOutputRoot)
+        keep = [int] $retentionPolicy.keepSourceBucketReportConsumptionDailyBundles
     },
     [ordered]@{
         path = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.v111EnrichmentPathwayOutputRoot)

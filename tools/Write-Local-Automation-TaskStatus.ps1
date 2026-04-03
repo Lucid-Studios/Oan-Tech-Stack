@@ -1337,6 +1337,8 @@ if (Test-Path -LiteralPath $cycleStatePath -PathType Leaf) {
     $cycleState = Read-JsonFile -Path $cycleStatePath
 }
 
+$sourceBucketReportConsumptionState = $null
+
 $lastKnownStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastKnownStatus')
 $currentActionClass = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'actionClass')
 if ([string]::IsNullOrWhiteSpace($currentActionClass)) {
@@ -1347,6 +1349,11 @@ $mainWorkerArmState = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycl
 $lastMainWorkerCloseUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastMainWorkerCloseUtc')
 $nextMainWorkerWakeUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextMainWorkerWakeUtc')
 $nextWatchdogRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextWatchdogRunUtc')
+$nextReportConsumptionRunUtc = if ($null -ne $sourceBucketReportConsumptionState) {
+    Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $sourceBucketReportConsumptionState -PropertyName 'nextRunUtc')
+} else {
+    Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextSourceBucketReportConsumptionRunUtc')
+}
 $nextDailyHitlDigestRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextDailyHitlDigestRunUtc')
 $lastMainWorkerCloseDisposition = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'lastMainWorkerCloseDisposition')
 $dopingHeaderStatePathFromCycle = [string] (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'dopingHeaderStatePath')
@@ -1405,6 +1412,9 @@ $schedulerProofHarvestStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRo
 $intervalOriginClarificationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.intervalOriginClarificationStatePath)
 $queuedTaskMapPromotionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.queuedTaskMapPromotionStatePath)
 $masterThreadOrchestrationStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.masterThreadOrchestrationStatePath)
+$sourceBucketReportConsumptionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketReportConsumptionStatePath)
+$currentSourceBucketStandingSummaryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.currentSourceBucketStandingSummaryStatePath)
+$currentCandidateGelItemsStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.currentCandidateGelItemsStatePath)
 $runtimeDeployabilityEnvelopeStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeDeployabilityEnvelopeStatePath)
 $sanctuaryRuntimeReadinessStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeReadinessStatePath)
 $runtimeWorkSurfaceAdmissibilityStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runtimeWorkSurfaceAdmissibilityStatePath)
@@ -1511,6 +1521,9 @@ $schedulerProofHarvestState = Read-JsonFileOrNull -Path $schedulerProofHarvestSt
 $intervalOriginClarificationState = Read-JsonFileOrNull -Path $intervalOriginClarificationStatePath
 $queuedTaskMapPromotionState = Read-JsonFileOrNull -Path $queuedTaskMapPromotionStatePath
 $masterThreadOrchestrationState = Read-JsonFileOrNull -Path $masterThreadOrchestrationStatePath
+$sourceBucketReportConsumptionState = Read-JsonFileOrNull -Path $sourceBucketReportConsumptionStatePath
+$currentSourceBucketStandingSummaryState = Read-JsonFileOrNull -Path $currentSourceBucketStandingSummaryStatePath
+$currentCandidateGelItemsState = Read-JsonFileOrNull -Path $currentCandidateGelItemsStatePath
 $runtimeDeployabilityEnvelopeState = Read-JsonFileOrNull -Path $runtimeDeployabilityEnvelopeStatePath
 $sanctuaryRuntimeReadinessState = Read-JsonFileOrNull -Path $sanctuaryRuntimeReadinessStatePath
 $runtimeWorkSurfaceAdmissibilityState = Read-JsonFileOrNull -Path $runtimeWorkSurfaceAdmissibilityStatePath
@@ -1590,18 +1603,23 @@ if (-not [string]::IsNullOrWhiteSpace($lastDigestBundle)) {
 $schedulerTopology = $taskingPolicy.schedulerTaskTopology
 $mainWorkerScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.mainWorkerTaskName)
 $watchdogScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.watchdogTaskName)
+$reportConsumptionScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.reportConsumptionTaskName)
 $dailyDigestScheduler = Get-ScheduledTaskSnapshot -TaskName ([string] $schedulerTopology.dailyDigestTaskName)
 $scheduler = [ordered]@{
     topology = [ordered]@{
         mainWorkerTaskName = [string] $schedulerTopology.mainWorkerTaskName
         watchdogTaskName = [string] $schedulerTopology.watchdogTaskName
+        reportConsumptionTaskName = [string] $schedulerTopology.reportConsumptionTaskName
         dailyDigestTaskName = [string] $schedulerTopology.dailyDigestTaskName
         mainWorkerCadenceMinutes = [int] $schedulerTopology.mainWorkerCadenceMinutes
+        reportConsumptionCadenceMinutes = [int] $schedulerTopology.reportConsumptionCadenceMinutes
+        reportConsumptionCadenceMinuteOffset = [int] $schedulerTopology.reportConsumptionCadenceMinuteOffset
         watchdogCadenceHours = [int] $schedulerTopology.watchdogCadenceHours
         dailyDigestCadenceHours = [int] $schedulerTopology.dailyDigestCadenceHours
     }
     mainWorker = $mainWorkerScheduler
     watchdog = $watchdogScheduler
+    reportConsumption = $reportConsumptionScheduler
     dailyDigest = $dailyDigestScheduler
 }
 
@@ -1652,6 +1670,18 @@ $watchdogTaskStatus = if ($null -ne $watchdogState) {
     Resolve-OfficeSchedulerStatus -Snapshot $watchdogScheduler -DesiredStatusWhenReady 'healthy-armed'
 }
 
+$reportConsumptionTaskStatus = if ($null -ne $sourceBucketReportConsumptionState) {
+    if ([bool] (Get-ObjectPropertyValueOrNull -InputObject $sourceBucketReportConsumptionState -PropertyName 'fullResearchBoundary')) {
+        'full-research-window-complete'
+    } elseif ([int] (Get-ObjectPropertyValueOrNull -InputObject $sourceBucketReportConsumptionState -PropertyName 'deltaCount') -gt 0) {
+        'consumed-delta'
+    } else {
+        'consumed-no-material-change'
+    }
+} else {
+    Resolve-OfficeSchedulerStatus -Snapshot $reportConsumptionScheduler -DesiredStatusWhenReady 'healthy-armed'
+}
+
 $dailyDigestTaskStatus = if (-not [bool] $dailyDigestScheduler.registered) {
     'scheduler-unregistered'
 } elseif ([string]::IsNullOrWhiteSpace([string] $dailyDigestScheduler.nextRunTimeUtc)) {
@@ -1680,6 +1710,12 @@ $taskEntries = @(
                 $lastRunUtc = if ($watchdogScheduler.lastRunTimeUtc) { [string] $watchdogScheduler.lastRunTimeUtc } else { $null }
                 $nextRunUtc = if ($null -ne $nextWatchdogRunUtc) { $nextWatchdogRunUtc.ToString('o') } elseif ($watchdogScheduler.nextRunTimeUtc) { [string] $watchdogScheduler.nextRunTimeUtc } else { $null }
                 $latestBundle = if ($null -ne $watchdogState) { [string] $watchdogState.bundlePath } else { [string] $watchdogScheduler.taskName }
+            }
+            'source-bucket-report-consumption' {
+                $status = $reportConsumptionTaskStatus
+                $lastRunUtc = if ($null -ne $sourceBucketReportConsumptionState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $sourceBucketReportConsumptionState -PropertyName 'lastRunUtc') } else { $null }
+                $nextRunUtc = if ($null -ne $nextReportConsumptionRunUtc) { $nextReportConsumptionRunUtc.ToString('o') } elseif ($reportConsumptionScheduler.nextRunTimeUtc) { [string] $reportConsumptionScheduler.nextRunTimeUtc } else { $null }
+                $latestBundle = if ($null -ne $sourceBucketReportConsumptionState) { [string] (Get-ObjectPropertyValueOrNull -InputObject $sourceBucketReportConsumptionState -PropertyName 'bundlePath') } else { [string] $reportConsumptionScheduler.taskName }
             }
             'daily-hitl-digest' {
                 $status = $dailyDigestTaskStatus
@@ -2784,6 +2820,7 @@ $markdownLines = @(
     ('- Orchestration next action: `{0}`' -f $(if ($null -ne $masterThreadOrchestrationState) { [string] $masterThreadOrchestrationState.nextAction } else { 'uninitialized' })),
     ('- Next main-worker wake (UTC): `{0}`' -f $(if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { 'not-scheduled' })),
     ('- Next watchdog run (UTC): `{0}`' -f $(if ($null -ne $nextWatchdogRunUtc) { $nextWatchdogRunUtc.ToString('o') } else { 'not-scheduled' })),
+    ('- Next report-consumption run (UTC): `{0}`' -f $(if ($null -ne $nextReportConsumptionRunUtc) { $nextReportConsumptionRunUtc.ToString('o') } else { 'not-scheduled' })),
     ('- Next daily digest run (UTC): `{0}`' -f $(if ($null -ne $nextDailyHitlDigestRunUtc) { $nextDailyHitlDigestRunUtc.ToString('o') } else { 'not-scheduled' })),
     ('- Next release-candidate run (UTC): `{0}`' -f $(if ($null -ne $nextReleaseCandidateRunUtc) { $nextReleaseCandidateRunUtc.ToString('o') } else { 'uninitialized' })),
     ('- Next mandatory HITL review (UTC): `{0}`' -f $(if ($null -ne $nextMandatoryHitlReviewUtc) { $nextMandatoryHitlReviewUtc.ToString('o') } else { 'uninitialized' })),

@@ -220,6 +220,33 @@ function Get-MainWorkerArmState {
     }
 }
 
+function Get-NextHourlyAnchorUtc {
+    param([int] $Minute)
+
+    $localNow = Get-Date
+    $candidateLocal = Get-Date -Year $localNow.Year -Month $localNow.Month -Day $localNow.Day -Hour $localNow.Hour -Minute $Minute -Second 0
+    if ($candidateLocal -le $localNow) {
+        $candidateLocal = $candidateLocal.AddHours(1)
+    }
+
+    return $candidateLocal.ToUniversalTime()
+}
+
+function Get-NextDailyAnchorUtc {
+    param(
+        [int] $Hour,
+        [int] $Minute
+    )
+
+    $localNow = Get-Date
+    $candidateLocal = Get-Date -Year $localNow.Year -Month $localNow.Month -Day $localNow.Day -Hour $Hour -Minute $Minute -Second 0
+    if ($candidateLocal -le $localNow) {
+        $candidateLocal = $candidateLocal.AddDays(1)
+    }
+
+    return $candidateLocal.ToUniversalTime()
+}
+
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
@@ -235,10 +262,15 @@ $topology = $cyclePolicy.schedulerTaskTopology
 $reconciliationPolicy = $cyclePolicy.schedulerReconciliationPolicy
 $mainWorkerTaskName = [string] $topology.mainWorkerTaskName
 $watchdogTaskName = [string] $topology.watchdogTaskName
+$reportConsumptionTaskName = [string] $topology.reportConsumptionTaskName
 $dailyDigestTaskName = [string] $topology.dailyDigestTaskName
 $mainWorkerCadenceMinutes = [int] $topology.mainWorkerCadenceMinutes
+$reportConsumptionCadenceMinutes = [int] $topology.reportConsumptionCadenceMinutes
+$reportConsumptionCadenceMinuteOffset = [int] $topology.reportConsumptionCadenceMinuteOffset
 $watchdogCadenceHours = [int] $topology.watchdogCadenceHours
 $dailyDigestCadenceHours = [int] $topology.dailyDigestCadenceHours
+$dailyDigestLocalHour = [int] $topology.dailyDigestLocalHour
+$dailyDigestLocalMinute = [int] $topology.dailyDigestLocalMinute
 $driftToleranceMinutes = [int] $reconciliationPolicy.driftToleranceMinutes
 $pauseMainWorkerOnTerminalStates = @($reconciliationPolicy.pauseMainWorkerOnTerminalStates | ForEach-Object { [string] $_ })
 $pauseMainWorkerOnBlocked = [bool] $reconciliationPolicy.pauseMainWorkerOnBlocked
@@ -275,24 +307,38 @@ if ($cycleState.PSObject.Properties['nextDailyHitlDigestRunUtc']) {
     $desiredDigestRunValue = $cycleState.nextMandatoryHitlReviewUtc
 }
 $desiredDigestRunUtc = Get-OptionalDateTimeUtc -Value $desiredDigestRunValue
+$reportConsumptionState = $null
+$desiredReportConsumptionRunUtc = $null
+if ($cyclePolicy.PSObject.Properties['sourceBucketReportConsumptionStatePath']) {
+    $reportConsumptionStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketReportConsumptionStatePath)
+    $reportConsumptionState = Read-JsonFileOrNull -Path $reportConsumptionStatePath
+    if ($null -ne $reportConsumptionState) {
+        $desiredReportConsumptionRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $reportConsumptionState -PropertyName 'nextRunUtc')
+    }
+}
 
 if ($null -eq $desiredMainWorkerWakeUtc -and $mainWorkerTerminalState -eq 'continue') {
-    $desiredMainWorkerWakeUtc = $nowUtc.AddMinutes($mainWorkerCadenceMinutes)
+    $desiredMainWorkerWakeUtc = Get-NextHourlyAnchorUtc -Minute 0
 }
 if ($null -eq $desiredWatchdogRunUtc) {
-    $desiredWatchdogRunUtc = $nowUtc.AddHours($watchdogCadenceHours)
+    $desiredWatchdogRunUtc = Get-NextHourlyAnchorUtc -Minute 0
+}
+if ($null -eq $desiredReportConsumptionRunUtc) {
+    $desiredReportConsumptionRunUtc = Get-NextHourlyAnchorUtc -Minute $reportConsumptionCadenceMinuteOffset
 }
 if ($null -eq $desiredDigestRunUtc) {
-    $desiredDigestRunUtc = $nowUtc.AddHours($dailyDigestCadenceHours)
+    $desiredDigestRunUtc = Get-NextDailyAnchorUtc -Hour $dailyDigestLocalHour -Minute $dailyDigestLocalMinute
 }
 
 $installMainWorkerScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationCycleTask.ps1'
 $installWatchdogScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationWatchdogTask.ps1'
+$installReportConsumptionScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-SourceBucket-ReportConsumptionTask.ps1'
 $installDigestScriptPath = Join-Path $resolvedRepoRoot 'tools\Install-Local-AutomationDigestTask.ps1'
 $actionsTaken = New-Object System.Collections.Generic.List[string]
 
 $mainWorkerBefore = Get-TaskSnapshot -TaskName $mainWorkerTaskName
 $watchdogBefore = Get-TaskSnapshot -TaskName $watchdogTaskName
+$reportConsumptionBefore = Get-TaskSnapshot -TaskName $reportConsumptionTaskName
 $dailyDigestBefore = Get-TaskSnapshot -TaskName $dailyDigestTaskName
 
 $shouldArmMainWorker = ($mainWorkerTerminalState -eq 'continue') -and ($desiredMainWorkerArmState -notin @('paused-hitl', 'done-retired', 'fault-recoverable', 'drift-detected'))
@@ -303,6 +349,11 @@ foreach ($repeatingTask in @(
             TaskName = $watchdogTaskName
             DesiredRunUtc = $desiredWatchdogRunUtc
             InstallScriptPath = $installWatchdogScriptPath
+        },
+        [pscustomobject]@{
+            TaskName = $reportConsumptionTaskName
+            DesiredRunUtc = $desiredReportConsumptionRunUtc
+            InstallScriptPath = $installReportConsumptionScriptPath
         },
         [pscustomobject]@{
             TaskName = $dailyDigestTaskName
@@ -343,6 +394,7 @@ if ($shouldArmMainWorker) {
 
 $mainWorkerAfter = Get-TaskSnapshot -TaskName $mainWorkerTaskName
 $watchdogAfter = Get-TaskSnapshot -TaskName $watchdogTaskName
+$reportConsumptionAfter = Get-TaskSnapshot -TaskName $reportConsumptionTaskName
 $dailyDigestAfter = Get-TaskSnapshot -TaskName $dailyDigestTaskName
 
 $mainWorkerAligned = $false
@@ -365,16 +417,19 @@ if ($shouldArmMainWorker) {
 }
 
 $watchdogAligned = $watchdogAfter.registered -and ($null -ne $watchdogAfter.nextRunUtc)
+$reportConsumptionAligned = $reportConsumptionAfter.registered -and ($null -ne $reportConsumptionAfter.nextRunUtc)
 $dailyDigestAligned = $dailyDigestAfter.registered -and ($null -ne $dailyDigestAfter.nextRunUtc)
 
 $finalMainWorkerWakeUtcString = if ($mainWorkerAligned -and $null -ne $mainWorkerAfter.nextRunUtc) { $mainWorkerAfter.nextRunUtc.ToString('o') } else { $null }
 $finalWatchdogRunUtcString = if ($watchdogAligned -and $null -ne $watchdogAfter.nextRunUtc) { $watchdogAfter.nextRunUtc.ToString('o') } else { $null }
+$finalReportConsumptionRunUtcString = if ($reportConsumptionAligned -and $null -ne $reportConsumptionAfter.nextRunUtc) { $reportConsumptionAfter.nextRunUtc.ToString('o') } else { $null }
 $finalDailyDigestRunUtcString = if ($dailyDigestAligned -and $null -ne $dailyDigestAfter.nextRunUtc) { $dailyDigestAfter.nextRunUtc.ToString('o') } else { $null }
 Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'mainWorkerTerminalState' -Value $mainWorkerTerminalState
 Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'mainWorkerArmState' -Value $finalMainWorkerArmState
 Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextMainWorkerWakeUtc' -Value $finalMainWorkerWakeUtcString
 Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextAutomationCycleRunUtc' -Value $finalMainWorkerWakeUtcString
 Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextWatchdogRunUtc' -Value $finalWatchdogRunUtcString
+Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextSourceBucketReportConsumptionRunUtc' -Value $finalReportConsumptionRunUtcString
 Set-JsonNoteProperty -InputObject $cycleState -PropertyName 'nextDailyHitlDigestRunUtc' -Value $finalDailyDigestRunUtcString
 Write-JsonFile -Path $cycleStatePath -Value $cycleState
 
@@ -383,7 +438,7 @@ $payload = [ordered]@{
     generatedAtUtc = $nowUtc.ToString('o')
     actionTaken = if ($actionsTaken.Count -gt 0) { @($actionsTaken) } else { @('none') }
     driftToleranceMinutes = $driftToleranceMinutes
-    aligned = ($mainWorkerAligned -and $watchdogAligned -and $dailyDigestAligned)
+    aligned = ($mainWorkerAligned -and $watchdogAligned -and $reportConsumptionAligned -and $dailyDigestAligned)
     mainWorker = [ordered]@{
         taskName = $mainWorkerTaskName
         terminalState = $mainWorkerTerminalState
@@ -402,6 +457,14 @@ $payload = [ordered]@{
         registeredBefore = $watchdogBefore.registered
         state = $watchdogAfter.state
         aligned = $watchdogAligned
+    }
+    reportConsumption = [ordered]@{
+        taskName = $reportConsumptionTaskName
+        desiredNextRunUtc = if ($null -ne $desiredReportConsumptionRunUtc) { $desiredReportConsumptionRunUtc.ToString('o') } else { $null }
+        finalNextRunUtc = if ($null -ne $reportConsumptionAfter.nextRunUtc) { $reportConsumptionAfter.nextRunUtc.ToString('o') } else { $null }
+        registeredBefore = $reportConsumptionBefore.registered
+        state = $reportConsumptionAfter.state
+        aligned = $reportConsumptionAligned
     }
     dailyDigest = [ordered]@{
         taskName = $dailyDigestTaskName

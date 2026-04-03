@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "contractName": "source-bucket-report-appendix",
+  "status": "active-v1.1.1",
+  "summary": "Defines the bounded appendix envelope emitted by source-bucket lane-watch and working-post runs so root-side report consumption can preserve continuity without treating every hourly emission as a permanent thread or inheritance surface.",
+  "requiredFields": [
+    "appendixId",
+    "bucketLabel",
+    "laneKey",
+    "subjectKey",
+    "continuityKey",
+    "reportClass",
+    "discourseOffice",
+    "generatedAt",
+    "status",
+    "standingClass",
+    "nextLawfulAction",
+    "blockerSet",
+    "milestone",
+    "triadRefs",
+    "continuityDisposition",
+    "successorReason"
+  ],
+  "fieldDefinitions": {
+    "appendixId": "Stable appendix emission identifier for one bounded hourly report.",
+    "bucketLabel": "Named source-bucket owner of the report appendix.",
+    "laneKey": "Bucket-local lane identity such as lane-watch or working-post.",
+    "subjectKey": "The active subject identity carried by the appendix.",
+    "continuityKey": "The continuity-bearing key reused while subject identity and discourse office remain stable.",
+    "reportClass": "Bounded class for the appendix: lane_watch or working_post.",
+    "discourseOffice": "Current office class for continuity resolution.",
+    "generatedAt": "ISO-8601 timestamp for appendix emission.",
+    "status": "Immediate lane-local status carried by the appendix.",
+    "standingClass": "The lane-local standing classification attached to the appendix payload.",
+    "nextLawfulAction": "The next bounded action admitted by the lane at emission time.",
+    "blockerSet": "The active blocker or hold set attached to the appendix.",
+    "milestone": "The current bucket-local milestone or phase posture.",
+    "triadRefs": "Receipt, notice, and doping-header references that witness the appendix emission.",
+    "continuityDisposition": "Root-side continuity hint: reuse, successor, or break.",
+    "successorReason": "Optional explanation when a successor or break is lawful."
+  },
+  "valueSets": {
+    "reportClass": [
+      "lane_watch",
+      "working_post"
+    ],
+    "discourseOffice": [
+      "lane_watch",
+      "working_post",
+      "build_dispatch",
+      "report_consumption",
+      "hitl_review",
+      "gel_research"
+    ],
+    "continuityDisposition": [
+      "reuse",
+      "successor",
+      "break"
+    ]
+  },
+  "nonGoals": [
+    "Permanent thread creation on every hourly run",
+    "Long-term archival of raw telemetry by default",
+    "Direct build admission from appendix transport alone"
+  ]
+}
