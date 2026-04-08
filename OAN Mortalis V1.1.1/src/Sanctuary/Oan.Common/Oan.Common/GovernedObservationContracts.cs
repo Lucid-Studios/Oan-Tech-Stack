@@ -114,7 +114,9 @@ public sealed record CommunityWeatherPacket(
     CommunityStewardAttentionState StewardAttention,
     CompassDriftState AnchorState,
     CompassVisibilityClass VisibilityClass,
-    DateTimeOffset TimestampUtc);
+    DateTimeOffset TimestampUtc,
+    ListeningFrameProjectionPacket? ListeningFrameProjectionPacket = null,
+    CompassProjectionPacket? CompassProjectionPacket = null);
 
 public sealed record GoverningOfficeAuthorityAssessment(
     string CMEId,

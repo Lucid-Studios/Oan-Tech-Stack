@@ -119,7 +119,9 @@ public sealed record FirstRunLivingAgentiCorePacket(
     string? CompassEmbodimentHandle,
     string? EngineeredCognitionHandle,
     bool WiderPublicWideningWithheld,
-    DateTimeOffset TimestampUtc);
+    DateTimeOffset TimestampUtc,
+    ListeningFrameProjectionPacket? ListeningFrameProjectionPacket = null,
+    CompassProjectionPacket? CompassProjectionPacket = null);
 
 public sealed record FirstRunEquivalentExchangeReview(
     string ReviewHandle,

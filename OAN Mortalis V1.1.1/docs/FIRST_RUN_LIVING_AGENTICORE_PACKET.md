@@ -8,6 +8,10 @@ This note defines the phase-one chapter-nine living-`AgentiCore` packet for the
 It exists to let build frame the living post-actualization attachment surface
 without claiming that runtime has already unlocked it.
 
+For the explanatory bridge that names `ListeningFrame` as the loomed body and
+`Compass` as the strumming surface, see
+`LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`.
+
 ## Packet Fields
 
 The packet carries:
@@ -20,6 +24,8 @@ The packet carries:
 - `CompassEmbodimentHandle`
 - `EngineeredCognitionHandle`
 - `WiderPublicWideningWithheld`
+- optional `ListeningFrameProjectionPacket`
+- optional `CompassProjectionPacket`
 
 ## First-Run Reading
 
@@ -28,6 +34,8 @@ Within first run, the packet currently means:
 - the living `AgentiCore` chamber may be framed
 - `SelfGEL` and tool-use attachment may be named
 - `ListeningFrame` may be reserved and described correctly
+- typed `ListeningFrame` and `Compass` posture packets may be carried without
+  implying runtime authority, persistence, or wider public widening
 - wider public/runtime widening must remain explicitly withheld
 
 The current pre-publication bridge also clarifies that later chapter-nine work

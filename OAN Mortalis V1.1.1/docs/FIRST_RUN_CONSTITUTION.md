@@ -28,6 +28,11 @@ binding, chapter-eight actualization seal, and chapter-nine living
 - `FIRST_RUN_ACTUALIZATION_SEAL_PACKET.md`
 - `FIRST_RUN_LIVING_AGENTICORE_PACKET.md`
 
+For the explanatory bridge that maps `ListeningFrame`, `Compass`,
+`SoulFrame`, and the `Prime/Cryptic` split into the current loom/weave and
+instrument-body language, see
+`LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`.
+
 For the current contract-first build-hold unlock posture and the next-cycle
 runtime source plan, see:
 
@@ -194,7 +199,8 @@ Their job is to let the line name late-path structure honestly:
 - chapter seven may frame load law and compression preparation
 - chapter eight may frame the actualization seal and primitive `SelfGEL`
 - chapter nine may frame the living `AgentiCore` surface, `ListeningFrame`,
-  `Zed of Delta`, and tool-use attachment
+  typed `ListeningFrame` and `Compass` projection packets, `Zed of Delta`, and
+  tool-use attachment
 
 At this stage, all three may still lawfully remain withheld in live receipts.
 
