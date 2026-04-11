@@ -60,6 +60,14 @@ Current hold-lane clarification:
   `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
 - the bounded companion-tool telemetry lane now lives in
   `COMPANION_TOOL_TELEMETRY_LANE.md`
+- the end-to-end telemetry bundle and groupoid taxonomy now lives in
+  `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`
+- the first read-only `line-audit-report` schema now lives in
+  `LINE_AUDIT_REPORT_SCHEMA.md`
+- the first root read-only `line-audit-report` implementation now lives in
+  `tools/Get-LineAuditReport.ps1`
+- the first working-model release admissibility surface now lives in
+  `FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - the companion-tool telemetry bot wrapper lives in
   `tools/Invoke-CompanionToolTelemetry.ps1`
 - the source-bucket federation control plane now lives in
@@ -79,8 +87,29 @@ Current hold-lane clarification:
   `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - the discernment and admissibility casebook now lives in
   `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
-- the active worker-thread root and Sanctuary workbench source owners now live
-  in `src/Sanctuary/Oan.Common/Oan.Common/`,
+- the Sanctuary boot and first-run ontology bridge now lives in
+  `SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`
+- the AgentiCore Listening Frame and Compass minimal-build note now lives in
+  `AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md`
+- the Prime/Cryptic duplex law now lives in
+  `PRIME_CRYPTIC_DUPLEX_LAW.md`
+- the `MoS/cMoS/cGoA` instantiation law now lives in
+  `MOS_CMOS_CGOA_INSTANTIATION_LAW.md`
+- the `CME` return-audit and promotion law now lives in
+  `CME_RETURN_AUDIT_AND_PROMOTION_LAW.md`
+- the first bonded cryptic return contract family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
+- the production file and folder topology contract now lives in
+  `PRODUCTION_FILE_AND_FOLDER_TOPOLOGY.md`
+- the domain-and-spline categorical condensate for the active `V1.1.1` doc
+  body now lives in `V1_1_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md`
+- the sibling `OAN Mortalis V1.2.1` line is now scaffolded as an
+  install-first side-by-side build root while `V1.1.1` remains the active
+  executable truth
+- the active repo now distinguishes wider Sanctuary boot ontology from the
+  line-local first-run constitutional projection
+- the active worker-thread root and Sanctuary workbench current source
+  locations now live in `src/Sanctuary/Oan.Common/Oan.Common/`,
   `src/TechStack/AgentiCore/AgentiCore/AgentiCore/`, and
   `src/TechStack/CradleTek/CradleTek.Runtime/CradleTek.Runtime/`
 - the active `HITL -> SLI` bridge law is fixed in
@@ -97,6 +126,20 @@ Current contract-first unlock map:
 - `chapter-9: hold`
 - `.hopng: optional-bounded`
 - `companion-tool-telemetry: admitted-optional-bounded`
+- `telemetry-bundle-taxonomy: frame-now`
+- `line-audit-report-schema: frame-now`
+- `line-audit-report: admitted-root-read-only`
+- `first-working-model-release-gate: frame-now`
+- `first-working-model-seam-definition: frame-now`
+- `first-working-model-rtme-shell-trace: frame-now`
+- `first-working-model-carriage-schema: frame-now`
+- `first-working-model-pre-cme-substrate: frame-now`
+- `first-working-model-sanctuaryid-goa-governing-set: frame-now`
+- `first-working-model-sanctuaryid-goa-root-and-cgel: frame-now`
+- `first-working-model-sanctuary-gel-intake: frame-now`
+- `first-working-model-gel-interior-awareness-and-universe: frame-now`
+- `first-working-model-gel-rest-state: frame-now`
+- `first-working-model-sli-symbolic-transport-form: frame-now`
 - `source-bucket-federation-cycle: admitted-local-mechanical`
 - `source-bucket-return-intake: admitted-local-mechanical`
 - `v111-enrichment-automation: admitted-local-bounded`
@@ -105,13 +148,64 @@ Current contract-first unlock map:
 - `seeded-governance-build-admission-law: frame-now`
 - `runtime-workbench-governance-law: frame-now`
 - `discernment-admissibility-law: frame-now`
+- `agenticore-listening-frame-compass-minimal-build: frame-now/spec-now`
+- `prime-cryptic-duplex-law: frame-now`
+- `mos-cmos-cgoa-instantiation-law: frame-now/spec-now`
+- `cme-return-audit-promotion-law: frame-now/spec-now`
 - `bounded-ec-loop: frame-now`
+
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`
 - `hourly-watchdog-reflection: admitted-local-mechanical`
 - `daily-hitl-digest-office: admitted-local-mechanical`
 - `main-worker-rearm-interval: 5-minute-close-governed`
 - `explicit-hitl-pause: admitted-operator-stop-boundary`
+
+The active first-working-model gate now specifies the immediate admissible
+seam-definition batch for the next `SLI.Engine -> SLI.Lisp -> SanctuaryID.RTME`
+edge, rather than merely naming the seam in the abstract.
+
+That same gate now also carries the first non-executive `SanctuaryID.RTME`
+admission shell and the first witnessed trace path beneath that edge, while
+keeping realization withheld.
+
+That same gate now also carries the first descriptive Lisp/C# carriage schema
+for those already-admitted seam nouns, while keeping live binding and runtime
+consequence withheld.
+
+That same gate now also carries the pre-CME substrate cluster as specified
+threshold work after the carriage schema, so what is given, offered, and
+possible is fixed before first governing `CME` presence becomes discussable.
+
+That same gate now also carries the Sanctuary-side `SanctuaryID.GoA`
+governing-set clarification cluster after the pre-CME substrate cluster, while
+preserving `CmePlacementWithheld` and refusing implied CradleTek
+authorization.
+
+That same gate now also carries the `SanctuaryID.GoA` governance-root and
+`Sanctuary.cGEL` stack-map cluster while preserving `CmePlacementWithheld`,
+preserving predicate-mint `hold`, and refusing implied CradleTek
+authorization.
+
+That same gate now also carries the first `Sanctuary.GEL` semantic intake
+cluster after the governance-root and `Sanctuary.cGEL` stack-map cluster,
+fixing pre-Lisp and pre-code intake from verbatim ingress through membrane
+landing and engram-bearing encoding while keeping predicate promotion,
+engram minting, and runtime activation withheld.
+
+That same gate now also carries the `GEL` interior-awareness and universe-law
+cluster after the semantic intake cluster, distinguishing constructor class
+from categorical engram class, fixing the first admitted universe ring, and
+keeping propositions, procedures, contradiction handling, posture, and
+awareness frame non-runtime.
+
+That same gate now also carries the `GEL` rest-state cluster while keeping
+persistence inside `GEL`, fixing one canonical held interior object, and
+explicitly refusing `Sanctuary.MoS` over-read.
+
+That same gate now also carries the `SLI` symbolic transport-form cluster
+while preserving UTF-8 carrier integrity, shared root transport lineage,
+governed super/sub expansion only, and explicit non-mutation posture.
 
 ## Current Verified State
 
@@ -281,6 +375,9 @@ The bootstrap line does not carry:
 - old filesystem-probing `CradleTek.Memory` resolver services that still assume repo-relative `corpus_index` or `public_root/GEL.ndjson` discovery
 
 ## Promotion Gate
+
+The line-local promotion gate below is subordinate to the broader first
+working-model admissibility note in `FIRST_WORKING_MODEL_RELEASE_GATE.md`.
 
 This line is promotable only when all of the following are true:
 
