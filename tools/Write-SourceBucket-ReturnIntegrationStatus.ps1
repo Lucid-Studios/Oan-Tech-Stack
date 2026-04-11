@@ -120,6 +120,20 @@ function New-UniqueStringArray {
     return [string[]] $items.ToArray()
 }
 
+function Test-RequestStillActive {
+    param([object] $RequestEntry)
+
+    $requestState = [string] (Get-ObjectPropertyValueOrNull -InputObject $RequestEntry -PropertyName 'requestState')
+    return $requestState -notin @(
+        'admitted',
+        'held',
+        'withdrawn',
+        'superseded',
+        'returned',
+        'closed'
+    )
+}
+
 function Test-EnumMembership {
     param(
         [string] $Value,
@@ -334,6 +348,34 @@ $returnEntries = foreach ($returnFile in @($returnFiles)) {
         $returnStanding = 'admitted-for-build-review'
     }
 
+    $definedTerms = if (@($validationErrors | Where-Object { $_ -like 'missing-required-field:*' -or $_ -like 'invalid-*' }).Count -eq 0) { 'pass' } else { 'fail' }
+    $contextualScope = if ($requestMatchState -eq 'matched') { 'pass' } else { 'fail' }
+    $evidenceSufficiency = if ($triadComplete -and ($workingState -eq 'completed' -or $governanceAction -ne 'admit')) { 'pass' } else { 'fail' }
+    $nonContradiction = if (@($validationErrors | Where-Object { $_ -in @('return-class-mismatch-with-request', 'admit-return-not-completed') }).Count -eq 0) { 'pass' } else { 'fail' }
+    $surfaceAppropriateness = if ($governanceAction -ne 'admit' -or $listenerState -in @('admissible', 'actionable')) { 'pass' } else { 'fail' }
+    $promotionWarrant = if ($returnStanding -eq 'admitted-for-build-review') { 'pass' } else { 'fail' }
+    $categoryErrorDetected = $contextualScope -eq 'fail' -or $surfaceAppropriateness -eq 'fail'
+    $promotionWithoutReceiptsDetected = $governanceAction -eq 'admit' -and -not $triadComplete
+    $receiptsSufficientForPromotion = $evidenceSufficiency -eq 'pass' -and $promotionWarrant -eq 'pass'
+    $promotionReceiptState = if ($returnStanding -eq 'invalid-return') { 'invalid' } elseif ($receiptsSufficientForPromotion) { 'sufficient' } else { 'insufficient-for-closure' }
+    $discernmentAction = 'remain-provisional'
+    $standingSurfaceClass = 'rhetoric-bearing'
+    $discernmentReason = 'source-bucket-return-remains-provisional'
+
+    if ($returnStanding -eq 'invalid-return') {
+        $discernmentAction = 'refuse'
+        $standingSurfaceClass = 'refusal-surface'
+        $discernmentReason = if ($categoryErrorDetected) { 'source-bucket-return-category-error-detected' } else { 'source-bucket-return-contract-invalid' }
+    } elseif ($returnStanding -eq 'held-or-escalated') {
+        $discernmentAction = 'hold'
+        $standingSurfaceClass = 'refusal-surface'
+        $discernmentReason = if ($promotionWithoutReceiptsDetected) { 'source-bucket-return-promotion-without-triad-receipts' } else { 'source-bucket-return-held-pending-lawful-admission' }
+    } elseif ($returnStanding -eq 'admitted-for-build-review') {
+        $discernmentAction = 'admit'
+        $standingSurfaceClass = 'closure-bearing'
+        $discernmentReason = 'source-bucket-return-ready-for-build-review'
+    }
+
     [pscustomobject] [ordered]@{
         returnId = $returnId
         requestId = $requestId
@@ -348,6 +390,22 @@ $returnEntries = foreach ($returnFile in @($returnFiles)) {
         hitlRequired = $hitlRequired
         requestMatchState = $requestMatchState
         triadComplete = $triadComplete
+        requestedStanding = $returnClass
+        discernmentAction = $discernmentAction
+        standingSurfaceClass = $standingSurfaceClass
+        promotionReceiptState = $promotionReceiptState
+        receiptsSufficientForPromotion = $receiptsSufficientForPromotion
+        categoryErrorDetected = $categoryErrorDetected
+        promotionWithoutReceiptsDetected = $promotionWithoutReceiptsDetected
+        discernmentReason = $discernmentReason
+        discernmentEvaluation = [pscustomobject]@{
+            definedTerms = $definedTerms
+            contextualScope = $contextualScope
+            evidenceSufficiency = $evidenceSufficiency
+            nonContradiction = $nonContradiction
+            surfaceAppropriateness = $surfaceAppropriateness
+            promotionWarrant = $promotionWarrant
+        }
         integrationDisposition = $integrationDisposition
         returnStanding = $returnStanding
         validationErrors = New-UniqueStringArray -Values @($validationErrors)
@@ -436,6 +494,10 @@ $admittedReturnCount = @($returnEntries | Where-Object { [string] $_.returnStand
 $heldReturnCount = @($returnEntries | Where-Object { [string] $_.integrationDisposition -eq 'hold' }).Count
 $hitlRequiredReturnCount = @($returnEntries | Where-Object { [bool] $_.hitlRequired }).Count
 $invalidReturnCount = @($returnEntries | Where-Object { [string] $_.returnStanding -eq 'invalid-return' }).Count
+$refusedReturnCount = @($returnEntries | Where-Object { [string] $_.discernmentAction -eq 'refuse' }).Count
+$provisionalReturnCount = @($returnEntries | Where-Object { [string] $_.discernmentAction -eq 'remain-provisional' }).Count
+$categoryErrorCount = @($returnEntries | Where-Object { [bool] $_.categoryErrorDetected }).Count
+$promotionWithoutReceiptsCount = @($returnEntries | Where-Object { [bool] $_.promotionWithoutReceiptsDetected }).Count
 
 $integrationState = 'awaiting-source-bucket-returns'
 $reasonCode = 'source-bucket-return-intake-awaiting-returns'
@@ -457,6 +519,40 @@ if ($admittedReturnCount -gt 0) {
     $integrationState = 'returns-received-awaiting-build-review'
     $reasonCode = 'source-bucket-return-intake-awaiting-review'
     $nextAction = 'review-received-source-bucket-return'
+}
+
+$requestedStanding = 'source-bucket-return-build-review'
+$discernmentAction = 'remain-provisional'
+$standingSurfaceClass = 'rhetoric-bearing'
+$promotionReceiptState = 'insufficient-for-closure'
+$receiptsSufficientForPromotion = $false
+$categoryErrorDetected = $categoryErrorCount -gt 0
+$promotionWithoutReceiptsDetected = $promotionWithoutReceiptsCount -gt 0
+$discernmentReason = 'source-bucket-return-intake-awaiting-lawful-returns'
+$discernmentDefinedTerms = if ($invalidReturnCount -gt 0) { 'fail' } else { 'pass' }
+$discernmentContextualScope = if ($categoryErrorCount -gt 0) { 'fail' } else { 'pass' }
+$discernmentEvidenceSufficiency = 'fail'
+$discernmentNonContradiction = if ($invalidReturnCount -gt 0) { 'fail' } else { 'pass' }
+$discernmentSurfaceAppropriateness = if ($categoryErrorCount -gt 0) { 'fail' } else { 'pass' }
+$discernmentPromotionWarrant = 'fail'
+
+if ($admittedReturnCount -gt 0) {
+    $discernmentAction = 'admit'
+    $standingSurfaceClass = 'closure-bearing'
+    $promotionReceiptState = 'sufficient'
+    $receiptsSufficientForPromotion = $true
+    $discernmentReason = 'source-bucket-return-intake-admitted-return-ready'
+    $discernmentEvidenceSufficiency = 'pass'
+    $discernmentPromotionWarrant = 'pass'
+} elseif ($invalidReturnCount -gt 0) {
+    $discernmentAction = 'refuse'
+    $standingSurfaceClass = 'refusal-surface'
+    $promotionReceiptState = 'invalid'
+    $discernmentReason = 'source-bucket-return-intake-category-or-contract-invalid'
+} elseif ($heldReturnCount -gt 0 -and $totalReturnCount -gt 0) {
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = if ($promotionWithoutReceiptsDetected) { 'source-bucket-return-intake-promotion-without-receipts' } else { 'source-bucket-return-intake-held-pending-review' }
 }
 
 $bucketRequestSummaries = foreach ($bucketLabel in @($requestContract.targetBucketLabels)) {
@@ -531,7 +627,27 @@ $statusPayload = [ordered]@{
     admittedReturnCount = $admittedReturnCount
     heldReturnCount = $heldReturnCount
     invalidReturnCount = $invalidReturnCount
+    refusedReturnCount = $refusedReturnCount
+    provisionalReturnCount = $provisionalReturnCount
     hitlRequiredReturnCount = $hitlRequiredReturnCount
+    categoryErrorCount = $categoryErrorCount
+    promotionWithoutReceiptsCount = $promotionWithoutReceiptsCount
+    requestedStanding = $requestedStanding
+    discernmentAction = $discernmentAction
+    standingSurfaceClass = $standingSurfaceClass
+    promotionReceiptState = $promotionReceiptState
+    receiptsSufficientForPromotion = $receiptsSufficientForPromotion
+    categoryErrorDetected = $categoryErrorDetected
+    promotionWithoutReceiptsDetected = $promotionWithoutReceiptsDetected
+    discernmentReason = $discernmentReason
+    discernmentEvaluation = [ordered]@{
+        definedTerms = $discernmentDefinedTerms
+        contextualScope = $discernmentContextualScope
+        evidenceSufficiency = $discernmentEvidenceSufficiency
+        nonContradiction = $discernmentNonContradiction
+        surfaceAppropriateness = $discernmentSurfaceAppropriateness
+        promotionWarrant = $discernmentPromotionWarrant
+    }
     masterThreadOrchestrationState = [string] (Get-ObjectPropertyValueOrNull -InputObject $masterThreadState -PropertyName 'orchestrationState')
     currentAutomationPosture = $taskStatusValue
     v111EnrichmentPathwayState = [string] (Get-ObjectPropertyValueOrNull -InputObject $v111EnrichmentState -PropertyName 'pathwayState')
@@ -563,7 +679,26 @@ $markdownLines = @(
     ('- Admitted return count: `{0}`' -f $statusPayload.admittedReturnCount),
     ('- Held return count: `{0}`' -f $statusPayload.heldReturnCount),
     ('- Invalid return count: `{0}`' -f $statusPayload.invalidReturnCount),
+    ('- Refused return count: `{0}`' -f $statusPayload.refusedReturnCount),
+    ('- Provisional return count: `{0}`' -f $statusPayload.provisionalReturnCount),
     ('- HITL-required return count: `{0}`' -f $statusPayload.hitlRequiredReturnCount),
+    ('- Category error count: `{0}`' -f $statusPayload.categoryErrorCount),
+    ('- Promotion without receipts count: `{0}`' -f $statusPayload.promotionWithoutReceiptsCount),
+    ('- Requested standing: `{0}`' -f $statusPayload.requestedStanding),
+    ('- Discernment action: `{0}`' -f $statusPayload.discernmentAction),
+    ('- Standing surface class: `{0}`' -f $statusPayload.standingSurfaceClass),
+    ('- Promotion receipt state: `{0}`' -f $statusPayload.promotionReceiptState),
+    ('- Receipts sufficient for promotion: `{0}`' -f [bool] $statusPayload.receiptsSufficientForPromotion),
+    ('- Category error detected: `{0}`' -f [bool] $statusPayload.categoryErrorDetected),
+    ('- Promotion without receipts detected: `{0}`' -f [bool] $statusPayload.promotionWithoutReceiptsDetected),
+    ('- Discernment reason: `{0}`' -f $statusPayload.discernmentReason),
+    ('- Discernment evaluation: `definedTerms={0}; contextualScope={1}; evidenceSufficiency={2}; nonContradiction={3}; surfaceAppropriateness={4}; promotionWarrant={5}`' -f
+        $statusPayload.discernmentEvaluation.definedTerms,
+        $statusPayload.discernmentEvaluation.contextualScope,
+        $statusPayload.discernmentEvaluation.evidenceSufficiency,
+        $statusPayload.discernmentEvaluation.nonContradiction,
+        $statusPayload.discernmentEvaluation.surfaceAppropriateness,
+        $statusPayload.discernmentEvaluation.promotionWarrant),
     ('- Master-thread orchestration state: `{0}`' -f $(if ($statusPayload.masterThreadOrchestrationState) { $statusPayload.masterThreadOrchestrationState } else { 'missing' })),
     ('- Current automation posture: `{0}`' -f $(if ($statusPayload.currentAutomationPosture) { $statusPayload.currentAutomationPosture } else { 'missing' })),
     ''

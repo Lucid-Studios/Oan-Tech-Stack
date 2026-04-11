@@ -500,6 +500,7 @@ $nextMainWorkerWakeUtc = if ($mainWorkerTerminalState -eq 'continue') {
 } else {
     $null
 }
+$nextWatchdogRunUtc = Get-NextHourlyAnchorUtc -Minute 0
 $lastMainWorkerCloseDisposition = switch ($mainWorkerTerminalState) {
     'continue' {
         if ($latestStatus -eq 'hitl-required') {
@@ -543,7 +544,7 @@ $statePayload = [ordered]@{
     mainWorkerArmState = $mainWorkerArmState
     nextMainWorkerWakeUtc = if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { $null }
     nextAutomationCycleRunUtc = if ($null -ne $nextMainWorkerWakeUtc) { $nextMainWorkerWakeUtc.ToString('o') } else { $null }
-    nextWatchdogRunUtc = [string] (Get-ObjectPropertyValueOrNull -InputObject $state -PropertyName 'nextWatchdogRunUtc')
+    nextWatchdogRunUtc = $nextWatchdogRunUtc.ToString('o')
     nextReleaseCandidateRunUtc = $latestRunGeneratedAtUtc.AddHours($releaseCadenceHours).ToString('o')
     nextMandatoryHitlReviewUtc = $nextMandatoryReviewUtc.ToString('o')
     nextDailyHitlDigestRunUtc = $nextDailyHitlDigestRunUtc.ToString('o')

@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <SanBuildVersion Condition="'$(SanBuildVersion)' == ''">1.2.1</SanBuildVersion>
+    <SanAssemblyVersion Condition="'$(SanAssemblyVersion)' == ''">1.2.1.0</SanAssemblyVersion>
+    <Version>$(SanBuildVersion)</Version>
+    <FileVersion>$(SanAssemblyVersion)</FileVersion>
+    <AssemblyVersion>$(SanAssemblyVersion)</AssemblyVersion>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <InformationalVersion Condition="'$(SourceRevisionId)' == ''">$(SanBuildVersion)</InformationalVersion>
+    <InformationalVersion Condition="'$(SourceRevisionId)' != ''">$(SanBuildVersion)+$(SourceRevisionId)</InformationalVersion>
+  </PropertyGroup>
+</Project>

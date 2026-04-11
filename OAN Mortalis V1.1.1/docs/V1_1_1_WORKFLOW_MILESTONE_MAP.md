@@ -27,6 +27,8 @@ The workflow must be read through the current active surfaces:
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
+- `AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md`
+- `V1_1_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md`
 
 The active line remains:
 
@@ -175,6 +177,7 @@ It is now governed by live `V1.1.1` admission and release posture.
   the active next action remains `bind-worker-thread-root-governance-surface`
 - Evidence:
   `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+  `AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md`
   `local-automation-runtime-deployability-envelope-last-run.json`
   `local-automation-sanctuary-runtime-readiness-last-run.json`
   `local-automation-runtime-work-surface-admissibility-last-run.json`

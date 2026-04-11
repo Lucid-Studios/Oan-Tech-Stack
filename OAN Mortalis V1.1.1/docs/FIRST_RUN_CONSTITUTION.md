@@ -33,6 +33,10 @@ For the explanatory bridge that maps `ListeningFrame`, `Compass`,
 instrument-body language, see
 `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`.
 
+For the bridge that separates the wider Sanctuary lifecycle from this narrower
+line-local constitutional projection, see
+`SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`.
+
 For the current contract-first build-hold unlock posture and the next-cycle
 runtime source plan, see:
 
@@ -42,6 +46,15 @@ runtime source plan, see:
 The first-run model is a Sanctuary-owned projection of lawful possibility.
 
 It is not a certification engine, and it is not proof that a CME has already actualized capability.
+
+It is also not the whole Sanctuary lifecycle.
+
+Install, Sanctuary boot, onboarding, certification, and first legal run are
+wider than this document and are bridged locally in
+`SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`.
+
+This document remains a subordinate `V1.1.1` constitutional projection inside
+that wider lifecycle.
 
 ## Legacy Boundary
 
@@ -54,9 +67,9 @@ The active constitutional first-run model in `V1.1.1` now lives beside it throug
 
 The legacy first-boot contracts are not rewritten in place and are not the projection owner for the new v2 model.
 
-## Constitutional State Order
+## Current V1.1.1 Constitutional Projection Order
 
-The v2 constitutional state order is:
+The v2 constitutional projection order carried by `V1.1.1` is:
 
 1. `SanctuaryInitialized`
 2. `LocationBound`
@@ -67,6 +80,11 @@ The v2 constitutional state order is:
 7. `FoundationsEstablished`
 8. `BondProcessOpen`
 9. `OpalActualized`
+
+This ladder is the line-local projection beneath the wider Sanctuary
+lifecycle. It does not by itself name `Install State`, `Sanctuary State`,
+`Ready Pre-Certification`, certification, or first legal run as full active
+repo-local states.
 
 ## Pre-Governance Truth Layer
 
@@ -198,9 +216,9 @@ Their job is to let the line name late-path structure honestly:
 
 - chapter seven may frame load law and compression preparation
 - chapter eight may frame the actualization seal and primitive `SelfGEL`
-- chapter nine may frame the living `AgentiCore` surface, `ListeningFrame`,
-  typed `ListeningFrame` and `Compass` projection packets, `Zed of Delta`, and
-  tool-use attachment
+- chapter nine may frame the living `AgentiCore` surface, a future
+  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame` and
+  `Compass` projection packets, `Zed of Delta`, and tool-use attachment
 
 At this stage, all three may still lawfully remain withheld in live receipts.
 
@@ -297,6 +315,11 @@ The later late-path packets preserve the same anti-collapse law:
 
 ## Readiness Ladder
 
+These readiness states are line-local constitutional readiness markers.
+
+They are not the full onboarding, certification, or first-legal-run ladder
+from the wider Sanctuary lifecycle.
+
 Operator readiness is staged, not binary.
 
 - `NotReady`
@@ -322,6 +345,8 @@ The first-run model protects these distinctions:
 - hosted-seed presence does not imply CME individuation
 - bond-process open does not imply Opal actualization
 - `OpalActualized` is the first lawful individuated bonded CME standing
+- `OpalActualized` is not equivalent to the wider research meanings of
+  certification or first legal run
 
 The hosted-LLM guard surface has therefore been renamed from `ListeningFrame` to `GuardFrame`.
 

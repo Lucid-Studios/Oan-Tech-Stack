@@ -14,6 +14,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     }
 }
 
+$discernmentAdmissionHelperPath = Join-Path $PSScriptRoot 'Discernment-Admission.ps1'
+. $discernmentAdmissionHelperPath
+
 function Resolve-PathFromRepo {
     param(
         [string] $BasePath,
@@ -92,6 +95,13 @@ $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $cyclePolicy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
 
+if (-not (Get-Command -Name Resolve-OanWorkspaceTouchPointFamily -ErrorAction SilentlyContinue)) {
+    $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
+    if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
+        . $oanWorkspaceResolverPath
+    }
+}
+
 $cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
 $sanctuaryRuntimeWorkbenchSurfaceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sanctuaryRuntimeWorkbenchSurfaceStatePath)
 $outputRoot = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.amenableDayDreamTierAdmissibilityOutputRoot)
@@ -104,6 +114,7 @@ if ($null -eq $cycleState) {
 
 $sanctuaryRuntimeWorkbenchSurfaceState = Read-JsonFileOrNull -Path $sanctuaryRuntimeWorkbenchSurfaceStatePath
 $workbenchState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'workbenchState')
+$workbenchDiscernment = Get-DiscernmentAdmissionEnvelope -State $sanctuaryRuntimeWorkbenchSurfaceState -DefaultRequestedStanding 'sanctuary-runtime-workbench-ready'
 
 $sourceFiles = Resolve-OanWorkspaceTouchPointFamily -BasePath $resolvedRepoRoot -FamilyName 'sanctuary-workbench-base' -CyclePolicy $cyclePolicy
 $missingSourceFiles = @($sourceFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
@@ -118,15 +129,42 @@ $serviceBindingBound = $serviceSource.IndexOf('CreateAmenableDayDreamTier', [Sys
 $tierState = 'awaiting-runtime-workbench'
 $reasonCode = 'amenable-day-dream-tier-awaiting-runtime-workbench'
 $nextAction = 'emit-sanctuary-runtime-workbench-surface'
+$admissibilityState = 'amenable-exploratory-only'
+$requestedStanding = 'amenable-day-dream-tier-ready'
+$discernmentAction = 'remain-provisional'
+$standingSurfaceClass = 'rhetoric-bearing'
+$promotionReceiptState = 'insufficient-for-closure'
+$receiptsSufficientForPromotion = $false
+$discernmentReason = $reasonCode
 
 if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus) {
     $tierState = 'blocked'
     $reasonCode = 'amenable-day-dream-tier-automation-blocked'
     $nextAction = 'investigate-blocked-state'
-} elseif ($workbenchState -ne 'sanctuary-runtime-workbench-ready') {
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = $reasonCode
+} elseif ($workbenchDiscernment.isRefused) {
+    $tierState = 'refused-by-runtime-workbench-discernment'
+    $reasonCode = 'amenable-day-dream-tier-workbench-refused'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($workbenchDiscernment.nextAction)) { $workbenchDiscernment.nextAction } else { 'emit-sanctuary-runtime-workbench-surface' }
+    $admissibilityState = 'refused-by-upstream-workbench'
+    $discernmentAction = 'refuse'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = $workbenchDiscernment.reason
+} elseif ($workbenchDiscernment.isHeld) {
+    $tierState = 'held-by-runtime-workbench-discernment'
+    $reasonCode = 'amenable-day-dream-tier-workbench-held'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($workbenchDiscernment.nextAction)) { $workbenchDiscernment.nextAction } else { 'emit-sanctuary-runtime-workbench-surface' }
+    $admissibilityState = 'held-by-upstream-workbench'
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = $workbenchDiscernment.reason
+} elseif (-not $workbenchDiscernment.isAdmitted -or $workbenchState -ne 'sanctuary-runtime-workbench-ready') {
     $tierState = 'awaiting-runtime-workbench'
-    $reasonCode = 'amenable-day-dream-tier-workbench-not-ready'
+    $reasonCode = if ($workbenchDiscernment.awaitsPromotion) { 'amenable-day-dream-tier-workbench-promotion-not-earned' } else { 'amenable-day-dream-tier-workbench-not-ready' }
     $nextAction = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] $sanctuaryRuntimeWorkbenchSurfaceState.nextAction } else { 'emit-sanctuary-runtime-workbench-surface' }
+    $discernmentReason = $workbenchDiscernment.reason
 } elseif ($missingSourceFiles.Count -gt 0 -or -not $tierProjectionBound -or -not $tierKeyBound -or -not $serviceBindingBound) {
     $tierState = 'awaiting-day-dream-binding'
     $reasonCode = 'amenable-day-dream-tier-source-missing'
@@ -135,6 +173,11 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $tierState = 'amenable-day-dream-tier-ready'
     $reasonCode = 'amenable-day-dream-tier-admissibility-bound'
     $nextAction = 'emit-self-rooted-cryptic-depth-gate'
+    $discernmentAction = 'admit'
+    $standingSurfaceClass = 'closure-bearing'
+    $promotionReceiptState = 'sufficient'
+    $receiptsSufficientForPromotion = $true
+    $discernmentReason = $reasonCode
 }
 
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
@@ -154,7 +197,18 @@ $payload = [ordered]@{
     reasonCode = $reasonCode
     nextAction = $nextAction
     workbenchState = $workbenchState
-    admissibilityState = 'amenable-exploratory-only'
+    workbenchDiscernmentAction = $workbenchDiscernment.action
+    workbenchStandingSurfaceClass = $workbenchDiscernment.standingSurfaceClass
+    workbenchPromotionReceiptState = $workbenchDiscernment.promotionReceiptState
+    workbenchReceiptsSufficientForPromotion = $workbenchDiscernment.receiptsSufficientForPromotion
+    workbenchDiscernmentReason = $workbenchDiscernment.reason
+    requestedStanding = $requestedStanding
+    discernmentAction = $discernmentAction
+    standingSurfaceClass = $standingSurfaceClass
+    promotionReceiptState = $promotionReceiptState
+    receiptsSufficientForPromotion = $receiptsSufficientForPromotion
+    discernmentReason = $discernmentReason
+    admissibilityState = $admissibilityState
     exploratoryPredicateCount = 3
     nonFinalOutputCount = 2
     exploratoryOnly = $true
@@ -185,6 +239,17 @@ $markdownLines = @(
     ('- Reason code: `{0}`' -f $payload.reasonCode),
     ('- Next action: `{0}`' -f $payload.nextAction),
     ('- Workbench state: `{0}`' -f $(if ($payload.workbenchState) { $payload.workbenchState } else { 'missing' })),
+    ('- Workbench discernment action: `{0}`' -f $payload.workbenchDiscernmentAction),
+    ('- Workbench standing surface class: `{0}`' -f $payload.workbenchStandingSurfaceClass),
+    ('- Workbench promotion receipt state: `{0}`' -f $payload.workbenchPromotionReceiptState),
+    ('- Workbench receipts sufficient for promotion: `{0}`' -f [bool] $payload.workbenchReceiptsSufficientForPromotion),
+    ('- Workbench discernment reason: `{0}`' -f $payload.workbenchDiscernmentReason),
+    ('- Requested standing: `{0}`' -f $payload.requestedStanding),
+    ('- Discernment action: `{0}`' -f $payload.discernmentAction),
+    ('- Standing surface class: `{0}`' -f $payload.standingSurfaceClass),
+    ('- Promotion receipt state: `{0}`' -f $payload.promotionReceiptState),
+    ('- Receipts sufficient for promotion: `{0}`' -f [bool] $payload.receiptsSufficientForPromotion),
+    ('- Discernment reason: `{0}`' -f $payload.discernmentReason),
     ('- Admissibility state: `{0}`' -f $payload.admissibilityState),
     ('- Exploratory predicate count: `{0}`' -f $payload.exploratoryPredicateCount),
     ('- Non-final output count: `{0}`' -f $payload.nonFinalOutputCount),
@@ -216,6 +281,17 @@ $statePayload = [ordered]@{
     reasonCode = $payload.reasonCode
     nextAction = $payload.nextAction
     workbenchState = $payload.workbenchState
+    workbenchDiscernmentAction = $payload.workbenchDiscernmentAction
+    workbenchStandingSurfaceClass = $payload.workbenchStandingSurfaceClass
+    workbenchPromotionReceiptState = $payload.workbenchPromotionReceiptState
+    workbenchReceiptsSufficientForPromotion = $payload.workbenchReceiptsSufficientForPromotion
+    workbenchDiscernmentReason = $payload.workbenchDiscernmentReason
+    requestedStanding = $payload.requestedStanding
+    discernmentAction = $payload.discernmentAction
+    standingSurfaceClass = $payload.standingSurfaceClass
+    promotionReceiptState = $payload.promotionReceiptState
+    receiptsSufficientForPromotion = $payload.receiptsSufficientForPromotion
+    discernmentReason = $payload.discernmentReason
     admissibilityState = $payload.admissibilityState
     exploratoryPredicateCount = $payload.exploratoryPredicateCount
     nonFinalOutputCount = $payload.nonFinalOutputCount

@@ -1,6 +1,6 @@
 ﻿{
     "schemaVersion":  1,
-    "generatedAtUtc":  "2026-04-01T22:51:45.5971692Z",
+    "generatedAtUtc":  "2026-04-08T16:33:07.1937184Z",
     "policyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
     "formalSurfaceMarkdownPath":  "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
     "requestContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
@@ -15,7 +15,27 @@
     "admittedReturnCount":  0,
     "heldReturnCount":  0,
     "invalidReturnCount":  0,
+    "refusedReturnCount":  0,
+    "provisionalReturnCount":  0,
     "hitlRequiredReturnCount":  0,
+    "categoryErrorCount":  0,
+    "promotionWithoutReceiptsCount":  0,
+    "requestedStanding":  "source-bucket-return-build-review",
+    "discernmentAction":  "remain-provisional",
+    "standingSurfaceClass":  "rhetoric-bearing",
+    "promotionReceiptState":  "insufficient-for-closure",
+    "receiptsSufficientForPromotion":  false,
+    "categoryErrorDetected":  false,
+    "promotionWithoutReceiptsDetected":  false,
+    "discernmentReason":  "source-bucket-return-intake-awaiting-lawful-returns",
+    "discernmentEvaluation":  {
+                                  "definedTerms":  "pass",
+                                  "contextualScope":  "pass",
+                                  "evidenceSufficiency":  "fail",
+                                  "nonContradiction":  "pass",
+                                  "surfaceAppropriateness":  "pass",
+                                  "promotionWarrant":  "fail"
+                              },
     "masterThreadOrchestrationState":  "awaiting-publishable-master-thread",
     "currentAutomationPosture":  "",
     "v111EnrichmentPathwayState":  "awaiting-runtime-workbench-session-ledger",
@@ -87,6 +107,7 @@
                           "implement-now",
                           "hold"
                       ],
+    "activeRequestCount":  2,
     "operatorPrompt":  {
                            "schemaVersion":  1,
                            "label":  "bounded-cascade-authorization",

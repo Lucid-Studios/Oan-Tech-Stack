@@ -299,7 +299,6 @@ if ($cycleState.PSObject.Properties['nextMainWorkerWakeUtc']) {
     $desiredMainWorkerWakeValue = $cycleState.nextAutomationCycleRunUtc
 }
 $desiredMainWorkerWakeUtc = Get-OptionalDateTimeUtc -Value $desiredMainWorkerWakeValue
-$desiredWatchdogRunUtc = Get-OptionalDateTimeUtc -Value (Get-ObjectPropertyValueOrNull -InputObject $cycleState -PropertyName 'nextWatchdogRunUtc')
 $desiredDigestRunValue = $null
 if ($cycleState.PSObject.Properties['nextDailyHitlDigestRunUtc']) {
     $desiredDigestRunValue = $cycleState.nextDailyHitlDigestRunUtc
@@ -320,9 +319,7 @@ if ($cyclePolicy.PSObject.Properties['sourceBucketReportConsumptionStatePath']) 
 if ($null -eq $desiredMainWorkerWakeUtc -and $mainWorkerTerminalState -eq 'continue') {
     $desiredMainWorkerWakeUtc = Get-NextHourlyAnchorUtc -Minute 0
 }
-if ($null -eq $desiredWatchdogRunUtc) {
-    $desiredWatchdogRunUtc = Get-NextHourlyAnchorUtc -Minute 0
-}
+$desiredWatchdogRunUtc = Get-NextHourlyAnchorUtc -Minute 0
 if ($null -eq $desiredReportConsumptionRunUtc) {
     $desiredReportConsumptionRunUtc = Get-NextHourlyAnchorUtc -Minute $reportConsumptionCadenceMinuteOffset
 }

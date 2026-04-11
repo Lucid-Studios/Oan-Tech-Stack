@@ -37,6 +37,15 @@ That means:
   possible
 - missing telemetry must be logged as missing, not silently smoothed over
 
+This lane follows `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`.
+
+That means:
+
+- the `.audit/state` file is a packaging surface, not the semantic definition
+  of the carried telemetry
+- the `.audit/runs` directory is a packaging surface, not a standing upgrade
+  of the carried evidence
+
 ## Current Tool Read
 
 The current intended read is:

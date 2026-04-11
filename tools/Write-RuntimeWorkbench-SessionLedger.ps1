@@ -14,6 +14,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     }
 }
 
+$discernmentAdmissionHelperPath = Join-Path $PSScriptRoot 'Discernment-Admission.ps1'
+. $discernmentAdmissionHelperPath
+
 function Resolve-PathFromRepo {
     param(
         [string] $BasePath,
@@ -117,6 +120,9 @@ $threadWitnessStatus = [string] (Get-ObjectPropertyValueOrNull -InputObject $ide
 $workbenchState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeWorkbenchSurfaceState -PropertyName 'workbenchState')
 $dayDreamTierState = [string] (Get-ObjectPropertyValueOrNull -InputObject $amenableDayDreamTierAdmissibilityState -PropertyName 'tierState')
 $depthGateState = [string] (Get-ObjectPropertyValueOrNull -InputObject $selfRootedCrypticDepthGateState -PropertyName 'gateState')
+$workbenchDiscernment = Get-DiscernmentAdmissionEnvelope -State $sanctuaryRuntimeWorkbenchSurfaceState -DefaultRequestedStanding 'sanctuary-runtime-workbench-ready'
+$dayDreamDiscernment = Get-DiscernmentAdmissionEnvelope -State $amenableDayDreamTierAdmissibilityState -DefaultRequestedStanding 'amenable-day-dream-tier-ready'
+$depthGateDiscernment = Get-DiscernmentAdmissionEnvelope -State $selfRootedCrypticDepthGateState -DefaultRequestedStanding 'self-rooted-cryptic-depth-gate-ready'
 
 if (-not (Get-Command -Name Resolve-OanWorkspaceTouchPointFamily -ErrorAction SilentlyContinue)) {
     $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
@@ -150,17 +156,41 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $sessionLedgerState = 'blocked'
     $reasonCode = 'runtime-workbench-session-ledger-automation-blocked'
     $nextAction = 'investigate-blocked-state'
-} elseif ($workbenchState -ne 'sanctuary-runtime-workbench-ready') {
+} elseif ($workbenchDiscernment.isRefused) {
+    $sessionLedgerState = 'refused-by-runtime-workbench-discernment'
+    $reasonCode = 'runtime-workbench-session-ledger-workbench-refused'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($workbenchDiscernment.nextAction)) { $workbenchDiscernment.nextAction } else { 'emit-sanctuary-runtime-workbench-surface' }
+} elseif ($workbenchDiscernment.isHeld) {
+    $sessionLedgerState = 'held-by-runtime-workbench-discernment'
+    $reasonCode = 'runtime-workbench-session-ledger-workbench-held'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($workbenchDiscernment.nextAction)) { $workbenchDiscernment.nextAction } else { 'emit-sanctuary-runtime-workbench-surface' }
+} elseif (-not $workbenchDiscernment.isAdmitted -or $workbenchState -ne 'sanctuary-runtime-workbench-ready') {
     $sessionLedgerState = 'awaiting-runtime-workbench-surface'
-    $reasonCode = 'runtime-workbench-session-ledger-workbench-not-ready'
+    $reasonCode = if ($workbenchDiscernment.awaitsPromotion) { 'runtime-workbench-session-ledger-workbench-promotion-not-earned' } else { 'runtime-workbench-session-ledger-workbench-not-ready' }
     $nextAction = if ($null -ne $sanctuaryRuntimeWorkbenchSurfaceState) { [string] $sanctuaryRuntimeWorkbenchSurfaceState.nextAction } else { 'emit-sanctuary-runtime-workbench-surface' }
-} elseif ($dayDreamTierState -ne 'amenable-day-dream-tier-ready') {
+} elseif ($dayDreamDiscernment.isRefused) {
+    $sessionLedgerState = 'refused-by-day-dream-discernment'
+    $reasonCode = 'runtime-workbench-session-ledger-day-dream-refused'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($dayDreamDiscernment.nextAction)) { $dayDreamDiscernment.nextAction } else { 'emit-amenable-day-dream-tier-admissibility' }
+} elseif ($dayDreamDiscernment.isHeld) {
+    $sessionLedgerState = 'held-by-day-dream-discernment'
+    $reasonCode = 'runtime-workbench-session-ledger-day-dream-held'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($dayDreamDiscernment.nextAction)) { $dayDreamDiscernment.nextAction } else { 'emit-amenable-day-dream-tier-admissibility' }
+} elseif (-not $dayDreamDiscernment.isAdmitted -or $dayDreamTierState -ne 'amenable-day-dream-tier-ready') {
     $sessionLedgerState = 'awaiting-day-dream-tier'
-    $reasonCode = 'runtime-workbench-session-ledger-day-dream-not-ready'
+    $reasonCode = if ($dayDreamDiscernment.awaitsPromotion) { 'runtime-workbench-session-ledger-day-dream-promotion-not-earned' } else { 'runtime-workbench-session-ledger-day-dream-not-ready' }
     $nextAction = if ($null -ne $amenableDayDreamTierAdmissibilityState) { [string] $amenableDayDreamTierAdmissibilityState.nextAction } else { 'emit-amenable-day-dream-tier-admissibility' }
-} elseif ($depthGateState -ne 'self-rooted-cryptic-depth-gate-ready') {
+} elseif ($depthGateDiscernment.isRefused) {
+    $sessionLedgerState = 'refused-by-depth-gate-discernment'
+    $reasonCode = 'runtime-workbench-session-ledger-depth-gate-refused'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($depthGateDiscernment.nextAction)) { $depthGateDiscernment.nextAction } else { 'emit-self-rooted-cryptic-depth-gate' }
+} elseif ($depthGateDiscernment.isHeld) {
+    $sessionLedgerState = 'held-by-depth-gate-discernment'
+    $reasonCode = 'runtime-workbench-session-ledger-depth-gate-held'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($depthGateDiscernment.nextAction)) { $depthGateDiscernment.nextAction } else { 'emit-self-rooted-cryptic-depth-gate' }
+} elseif (-not $depthGateDiscernment.isAdmitted -or $depthGateState -ne 'self-rooted-cryptic-depth-gate-ready') {
     $sessionLedgerState = 'awaiting-depth-gate'
-    $reasonCode = 'runtime-workbench-session-ledger-depth-gate-not-ready'
+    $reasonCode = if ($depthGateDiscernment.awaitsPromotion) { 'runtime-workbench-session-ledger-depth-gate-promotion-not-earned' } else { 'runtime-workbench-session-ledger-depth-gate-not-ready' }
     $nextAction = if ($null -ne $selfRootedCrypticDepthGateState) { [string] $selfRootedCrypticDepthGateState.nextAction } else { 'emit-self-rooted-cryptic-depth-gate' }
 } elseif ($missingBuildTouchPoints.Count -gt 0 -or -not $sessionProjectionBound -or -not $sessionKeyBound -or -not $serviceBindingBound) {
     $sessionLedgerState = 'awaiting-session-ledger-binding'
@@ -199,17 +229,52 @@ $currentStateClass = 'provisional'
 $admissibilityStatus = 'provisional'
 $predicateLandingClass = 'candidate-governed-structure'
 $witnessStatus = 'awaiting-session-ledger-witness'
+$requestedStanding = 'runtime-workbench-session-ledger-ready'
+$discernmentAction = 'remain-provisional'
+$standingSurfaceClass = 'rhetoric-bearing'
+$promotionReceiptState = 'insufficient-for-closure'
+$receiptsSufficientForPromotion = $false
+$categoryErrorDetected = $false
+$promotionWithoutReceiptsDetected = $false
+$discernmentDefinedTerms = 'pass'
+$discernmentContextualScope = 'pass'
+$discernmentEvidenceSufficiency = 'fail'
+$discernmentNonContradiction = 'pass'
+$discernmentSurfaceAppropriateness = 'pass'
+$discernmentPromotionWarrant = 'fail'
 
 if ($sessionLedgerState -eq 'blocked') {
     $currentStateClass = 'hold'
     $admissibilityStatus = 'hold'
     $predicateLandingClass = 'hold'
     $witnessStatus = 'session-ledger-hold-witnessed'
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+} elseif ($sessionLedgerState -like 'held-by-*') {
+    $currentStateClass = 'hold'
+    $admissibilityStatus = 'hold'
+    $predicateLandingClass = 'hold'
+    $witnessStatus = 'session-ledger-hold-witnessed'
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+} elseif ($sessionLedgerState -like 'refused-by-*') {
+    $currentStateClass = 'hold'
+    $admissibilityStatus = 'refuse'
+    $predicateLandingClass = 'refused'
+    $witnessStatus = 'session-ledger-hold-witnessed'
+    $discernmentAction = 'refuse'
+    $standingSurfaceClass = 'refusal-surface'
 } elseif ($sessionLedgerState -eq 'runtime-workbench-session-ledger-ready') {
     $currentStateClass = 'ready'
     $admissibilityStatus = 'admitted'
     $predicateLandingClass = 'admitted'
     $witnessStatus = 'session-ledger-witnessed'
+    $discernmentAction = 'admit'
+    $standingSurfaceClass = 'closure-bearing'
+    $promotionReceiptState = 'sufficient'
+    $receiptsSufficientForPromotion = $true
+    $discernmentEvidenceSufficiency = 'pass'
+    $discernmentPromotionWarrant = 'pass'
 }
 
 $lastLawfulTransition = switch ($sessionLedgerState) {
@@ -223,6 +288,8 @@ $continuityAnchor = if ($threadRootState -eq 'identity-thread-root-ready') {
 } else {
     'identity-invariant-thread-root-pending'
 }
+
+$discernmentReason = $reasonCode
 
 $payload = [ordered]@{
     schemaVersion = 1
@@ -241,6 +308,34 @@ $payload = [ordered]@{
     currentStateClass = $currentStateClass
     witnessStatus = $witnessStatus
     threadWitnessStatus = $threadWitnessStatus
+    workbenchDiscernmentAction = $workbenchDiscernment.action
+    workbenchStandingSurfaceClass = $workbenchDiscernment.standingSurfaceClass
+    workbenchPromotionReceiptState = $workbenchDiscernment.promotionReceiptState
+    workbenchDiscernmentReason = $workbenchDiscernment.reason
+    dayDreamDiscernmentAction = $dayDreamDiscernment.action
+    dayDreamStandingSurfaceClass = $dayDreamDiscernment.standingSurfaceClass
+    dayDreamPromotionReceiptState = $dayDreamDiscernment.promotionReceiptState
+    dayDreamDiscernmentReason = $dayDreamDiscernment.reason
+    depthGateDiscernmentAction = $depthGateDiscernment.action
+    depthGateStandingSurfaceClass = $depthGateDiscernment.standingSurfaceClass
+    depthGatePromotionReceiptState = $depthGateDiscernment.promotionReceiptState
+    depthGateDiscernmentReason = $depthGateDiscernment.reason
+    requestedStanding = $requestedStanding
+    discernmentAction = $discernmentAction
+    standingSurfaceClass = $standingSurfaceClass
+    promotionReceiptState = $promotionReceiptState
+    receiptsSufficientForPromotion = $receiptsSufficientForPromotion
+    categoryErrorDetected = $categoryErrorDetected
+    promotionWithoutReceiptsDetected = $promotionWithoutReceiptsDetected
+    discernmentReason = $discernmentReason
+    discernmentEvaluation = [ordered]@{
+        definedTerms = $discernmentDefinedTerms
+        contextualScope = $discernmentContextualScope
+        evidenceSufficiency = $discernmentEvidenceSufficiency
+        nonContradiction = $discernmentNonContradiction
+        surfaceAppropriateness = $discernmentSurfaceAppropriateness
+        promotionWarrant = $discernmentPromotionWarrant
+    }
     authorizationBasis = 'admitted-local-bounded seeded governance and bounded runtime readiness'
     continuityAnchor = $continuityAnchor
     admissibilityStatus = $admissibilityStatus
@@ -296,6 +391,33 @@ $markdownLines = @(
     ('- Current state class: `{0}`' -f $payload.currentStateClass),
     ('- Witness status: `{0}`' -f $payload.witnessStatus),
     ('- Thread witness status: `{0}`' -f $(if ($payload.threadWitnessStatus) { $payload.threadWitnessStatus } else { 'missing' })),
+    ('- Workbench discernment action: `{0}`' -f $payload.workbenchDiscernmentAction),
+    ('- Workbench standing surface class: `{0}`' -f $payload.workbenchStandingSurfaceClass),
+    ('- Workbench promotion receipt state: `{0}`' -f $payload.workbenchPromotionReceiptState),
+    ('- Workbench discernment reason: `{0}`' -f $payload.workbenchDiscernmentReason),
+    ('- Day-dream discernment action: `{0}`' -f $payload.dayDreamDiscernmentAction),
+    ('- Day-dream standing surface class: `{0}`' -f $payload.dayDreamStandingSurfaceClass),
+    ('- Day-dream promotion receipt state: `{0}`' -f $payload.dayDreamPromotionReceiptState),
+    ('- Day-dream discernment reason: `{0}`' -f $payload.dayDreamDiscernmentReason),
+    ('- Depth-gate discernment action: `{0}`' -f $payload.depthGateDiscernmentAction),
+    ('- Depth-gate standing surface class: `{0}`' -f $payload.depthGateStandingSurfaceClass),
+    ('- Depth-gate promotion receipt state: `{0}`' -f $payload.depthGatePromotionReceiptState),
+    ('- Depth-gate discernment reason: `{0}`' -f $payload.depthGateDiscernmentReason),
+    ('- Requested standing: `{0}`' -f $payload.requestedStanding),
+    ('- Discernment action: `{0}`' -f $payload.discernmentAction),
+    ('- Standing surface class: `{0}`' -f $payload.standingSurfaceClass),
+    ('- Promotion receipt state: `{0}`' -f $payload.promotionReceiptState),
+    ('- Receipts sufficient for promotion: `{0}`' -f [bool] $payload.receiptsSufficientForPromotion),
+    ('- Category error detected: `{0}`' -f [bool] $payload.categoryErrorDetected),
+    ('- Promotion without receipts detected: `{0}`' -f [bool] $payload.promotionWithoutReceiptsDetected),
+    ('- Discernment reason: `{0}`' -f $payload.discernmentReason),
+    ('- Discernment evaluation: `definedTerms={0}; contextualScope={1}; evidenceSufficiency={2}; nonContradiction={3}; surfaceAppropriateness={4}; promotionWarrant={5}`' -f
+        $payload.discernmentEvaluation.definedTerms,
+        $payload.discernmentEvaluation.contextualScope,
+        $payload.discernmentEvaluation.evidenceSufficiency,
+        $payload.discernmentEvaluation.nonContradiction,
+        $payload.discernmentEvaluation.surfaceAppropriateness,
+        $payload.discernmentEvaluation.promotionWarrant),
     ('- Authorization basis: `{0}`' -f $payload.authorizationBasis),
     ('- Continuity anchor: `{0}`' -f $payload.continuityAnchor),
     ('- Admissibility status: `{0}`' -f $payload.admissibilityStatus),
@@ -351,6 +473,27 @@ $statePayload = [ordered]@{
     currentStateClass = $payload.currentStateClass
     witnessStatus = $payload.witnessStatus
     threadWitnessStatus = $payload.threadWitnessStatus
+    workbenchDiscernmentAction = $payload.workbenchDiscernmentAction
+    workbenchStandingSurfaceClass = $payload.workbenchStandingSurfaceClass
+    workbenchPromotionReceiptState = $payload.workbenchPromotionReceiptState
+    workbenchDiscernmentReason = $payload.workbenchDiscernmentReason
+    dayDreamDiscernmentAction = $payload.dayDreamDiscernmentAction
+    dayDreamStandingSurfaceClass = $payload.dayDreamStandingSurfaceClass
+    dayDreamPromotionReceiptState = $payload.dayDreamPromotionReceiptState
+    dayDreamDiscernmentReason = $payload.dayDreamDiscernmentReason
+    depthGateDiscernmentAction = $payload.depthGateDiscernmentAction
+    depthGateStandingSurfaceClass = $payload.depthGateStandingSurfaceClass
+    depthGatePromotionReceiptState = $payload.depthGatePromotionReceiptState
+    depthGateDiscernmentReason = $payload.depthGateDiscernmentReason
+    requestedStanding = $payload.requestedStanding
+    discernmentAction = $payload.discernmentAction
+    standingSurfaceClass = $payload.standingSurfaceClass
+    promotionReceiptState = $payload.promotionReceiptState
+    receiptsSufficientForPromotion = $payload.receiptsSufficientForPromotion
+    categoryErrorDetected = $payload.categoryErrorDetected
+    promotionWithoutReceiptsDetected = $payload.promotionWithoutReceiptsDetected
+    discernmentReason = $payload.discernmentReason
+    discernmentEvaluation = $payload.discernmentEvaluation
     authorizationBasis = $payload.authorizationBasis
     continuityAnchor = $payload.continuityAnchor
     admissibilityStatus = $payload.admissibilityStatus

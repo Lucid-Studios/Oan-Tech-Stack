@@ -18,6 +18,8 @@ $automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-Cascade
 . $automationCascadePromptHelperPath
 $seededGovernanceAdmissionHelperPath = Join-Path $PSScriptRoot 'Seeded-GovernanceAdmission.ps1'
 . $seededGovernanceAdmissionHelperPath
+$discernmentAdmissionHelperPath = Join-Path $PSScriptRoot 'Discernment-Admission.ps1'
+. $discernmentAdmissionHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -130,12 +132,19 @@ $seedLlmPauseState = 'held-until-production-pre-release-form'
 $seedLlmPauseRequired = $true
 $seedLlmPauseAction = 'pause-and-run-seed-llm-wrinkle-test'
 $externalReleaseState = 'held-awaiting-orchestration'
+$requestedStanding = 'v111-enrichment-path-open'
+$discernmentAction = 'remain-provisional'
+$standingSurfaceClass = 'rhetoric-bearing'
+$promotionReceiptState = 'insufficient-for-closure'
+$receiptsSufficientForPromotion = $false
+$discernmentReason = $reasonCode
 
 $candidateStatus = [string] $cycleState.lastKnownStatus
 $runtimeEnvelopeState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeDeployabilityState -PropertyName 'envelopeState')
 $readinessState = [string] (Get-ObjectPropertyValueOrNull -InputObject $sanctuaryRuntimeReadinessState -PropertyName 'readinessState')
 $workSurfaceState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkSurfaceAdmissibilityState -PropertyName 'admissibilityState')
 $workbenchState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'sessionLedgerState')
+$workbenchDiscernment = Get-DiscernmentAdmissionEnvelope -State $runtimeWorkbenchSessionLedgerState -DefaultRequestedStanding 'runtime-workbench-session-ledger-ready'
 $seedDisposition = [string] $seededGovernanceAdmission.disposition
 $seedReadyState = [string] $seededGovernanceAdmission.readyState
 $seededGovernanceBuildAdmissionState = [string] $seededGovernanceAdmission.buildAdmissionState
@@ -154,6 +163,9 @@ if ($candidateStatus -eq [string] $cyclePolicy.blockedStatus) {
     $reasonCode = 'v111-enrichment-pathway-automation-blocked'
     $nextAction = 'investigate-blocked-state'
     $externalReleaseState = 'withheld'
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = $reasonCode
 } elseif ($null -eq $runtimeDeployabilityState) {
     $pathwayState = 'awaiting-runtime-deployability-envelope'
     $reasonCode = 'v111-enrichment-pathway-runtime-envelope-missing'
@@ -194,16 +206,37 @@ if ($candidateStatus -eq [string] $cyclePolicy.blockedStatus) {
     $pathwayState = 'awaiting-runtime-workbench-session-ledger'
     $reasonCode = 'v111-enrichment-pathway-workbench-session-missing'
     $nextAction = 'emit-runtime-workbench-session-ledger'
-} elseif ($workbenchState -ne 'runtime-workbench-session-ledger-ready') {
+} elseif ($workbenchDiscernment.isRefused) {
+    $pathwayState = 'refused-runtime-workbench-session-ledger'
+    $reasonCode = 'v111-enrichment-pathway-workbench-session-refused'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($workbenchDiscernment.nextAction)) { $workbenchDiscernment.nextAction } else { 'emit-runtime-workbench-session-ledger' }
+    $externalReleaseState = 'withheld'
+    $discernmentAction = 'refuse'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = $workbenchDiscernment.reason
+} elseif ($workbenchDiscernment.isHeld) {
+    $pathwayState = 'held-runtime-workbench-session-ledger'
+    $reasonCode = 'v111-enrichment-pathway-workbench-session-held'
+    $nextAction = if (-not [string]::IsNullOrWhiteSpace($workbenchDiscernment.nextAction)) { $workbenchDiscernment.nextAction } else { 'emit-runtime-workbench-session-ledger' }
+    $externalReleaseState = 'withheld'
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+    $discernmentReason = $workbenchDiscernment.reason
+} elseif (-not $workbenchDiscernment.isAdmitted -or $workbenchState -ne 'runtime-workbench-session-ledger-ready') {
     $pathwayState = 'awaiting-runtime-workbench-session-ledger'
-    $reasonCode = 'v111-enrichment-pathway-workbench-session-not-ready'
+    $reasonCode = if ($workbenchDiscernment.awaitsPromotion) { 'v111-enrichment-pathway-workbench-session-promotion-not-earned' } else { 'v111-enrichment-pathway-workbench-session-not-ready' }
     $nextAction = [string] (Get-ObjectPropertyValueOrNull -InputObject $runtimeWorkbenchSessionLedgerState -PropertyName 'nextAction')
+    $discernmentReason = $workbenchDiscernment.reason
 } else {
     $pathwayState = 'v111-enrichment-path-open'
     $currentPhase = 'bounded-full-body-work'
     $fullBodyWorkState = 'open'
     $productionPreReleaseFormState = 'forming'
     $nextAction = 'continue-v111-enrichment-full-body-work'
+    $discernmentAction = 'admit'
+    $standingSurfaceClass = 'closure-bearing'
+    $promotionReceiptState = 'sufficient'
+    $receiptsSufficientForPromotion = $true
 
     if ($orchestrationState -eq 'awaiting-publishable-master-thread') {
         $reasonCode = 'v111-enrichment-pathway-local-work-open-external-release-held'
@@ -212,6 +245,7 @@ if ($candidateStatus -eq [string] $cyclePolicy.blockedStatus) {
         $reasonCode = 'v111-enrichment-pathway-local-work-open'
         $externalReleaseState = if ([string]::IsNullOrWhiteSpace($orchestrationState)) { 'locally-admissible' } else { 'aligned-to-orchestration-state' }
     }
+    $discernmentReason = $reasonCode
 }
 
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
@@ -243,6 +277,17 @@ $payload = [ordered]@{
     sanctuaryRuntimeReadinessState = $readinessState
     runtimeWorkSurfaceAdmissibilityState = $workSurfaceState
     runtimeWorkbenchSessionLedgerState = $workbenchState
+    runtimeWorkbenchSessionDiscernmentAction = $workbenchDiscernment.action
+    runtimeWorkbenchSessionStandingSurfaceClass = $workbenchDiscernment.standingSurfaceClass
+    runtimeWorkbenchSessionPromotionReceiptState = $workbenchDiscernment.promotionReceiptState
+    runtimeWorkbenchSessionReceiptsSufficientForPromotion = $workbenchDiscernment.receiptsSufficientForPromotion
+    runtimeWorkbenchSessionDiscernmentReason = $workbenchDiscernment.reason
+    requestedStanding = $requestedStanding
+    discernmentAction = $discernmentAction
+    standingSurfaceClass = $standingSurfaceClass
+    promotionReceiptState = $promotionReceiptState
+    receiptsSufficientForPromotion = $receiptsSufficientForPromotion
+    discernmentReason = $discernmentReason
     seededGovernanceDisposition = $seedDisposition
     seededGovernanceReadyState = $seedReadyState
     seededGovernanceBuildAdmissionState = $seededGovernanceBuildAdmissionState
@@ -287,6 +332,17 @@ $markdownLines = @(
     ('- Sanctuary runtime readiness state: `{0}`' -f $(if ($payload.sanctuaryRuntimeReadinessState) { $payload.sanctuaryRuntimeReadinessState } else { 'missing' })),
     ('- Runtime work-surface admissibility state: `{0}`' -f $(if ($payload.runtimeWorkSurfaceAdmissibilityState) { $payload.runtimeWorkSurfaceAdmissibilityState } else { 'missing' })),
     ('- Runtime workbench session-ledger state: `{0}`' -f $(if ($payload.runtimeWorkbenchSessionLedgerState) { $payload.runtimeWorkbenchSessionLedgerState } else { 'missing' })),
+    ('- Runtime workbench session discernment action: `{0}`' -f $payload.runtimeWorkbenchSessionDiscernmentAction),
+    ('- Runtime workbench session standing surface class: `{0}`' -f $payload.runtimeWorkbenchSessionStandingSurfaceClass),
+    ('- Runtime workbench session promotion receipt state: `{0}`' -f $payload.runtimeWorkbenchSessionPromotionReceiptState),
+    ('- Runtime workbench session receipts sufficient for promotion: `{0}`' -f [bool] $payload.runtimeWorkbenchSessionReceiptsSufficientForPromotion),
+    ('- Runtime workbench session discernment reason: `{0}`' -f $payload.runtimeWorkbenchSessionDiscernmentReason),
+    ('- Requested standing: `{0}`' -f $payload.requestedStanding),
+    ('- Discernment action: `{0}`' -f $payload.discernmentAction),
+    ('- Standing surface class: `{0}`' -f $payload.standingSurfaceClass),
+    ('- Promotion receipt state: `{0}`' -f $payload.promotionReceiptState),
+    ('- Receipts sufficient for promotion: `{0}`' -f [bool] $payload.receiptsSufficientForPromotion),
+    ('- Discernment reason: `{0}`' -f $payload.discernmentReason),
     ('- Seeded governance disposition: `{0}`' -f $(if ($payload.seededGovernanceDisposition) { $payload.seededGovernanceDisposition } else { 'missing' })),
     ('- Seeded governance ready state: `{0}`' -f $(if ($payload.seededGovernanceReadyState) { $payload.seededGovernanceReadyState } else { 'missing' })),
     ('- Seeded governance build admission state: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionState) { $payload.seededGovernanceBuildAdmissionState } else { 'missing' })),
@@ -332,6 +388,17 @@ $statePayload = [ordered]@{
     sanctuaryRuntimeReadinessState = $payload.sanctuaryRuntimeReadinessState
     runtimeWorkSurfaceAdmissibilityState = $payload.runtimeWorkSurfaceAdmissibilityState
     runtimeWorkbenchSessionLedgerState = $payload.runtimeWorkbenchSessionLedgerState
+    runtimeWorkbenchSessionDiscernmentAction = $payload.runtimeWorkbenchSessionDiscernmentAction
+    runtimeWorkbenchSessionStandingSurfaceClass = $payload.runtimeWorkbenchSessionStandingSurfaceClass
+    runtimeWorkbenchSessionPromotionReceiptState = $payload.runtimeWorkbenchSessionPromotionReceiptState
+    runtimeWorkbenchSessionReceiptsSufficientForPromotion = $payload.runtimeWorkbenchSessionReceiptsSufficientForPromotion
+    runtimeWorkbenchSessionDiscernmentReason = $payload.runtimeWorkbenchSessionDiscernmentReason
+    requestedStanding = $payload.requestedStanding
+    discernmentAction = $payload.discernmentAction
+    standingSurfaceClass = $payload.standingSurfaceClass
+    promotionReceiptState = $payload.promotionReceiptState
+    receiptsSufficientForPromotion = $payload.receiptsSufficientForPromotion
+    discernmentReason = $payload.discernmentReason
     seededGovernanceDisposition = $payload.seededGovernanceDisposition
     seededGovernanceReadyState = $payload.seededGovernanceReadyState
     seededGovernanceBuildAdmissionState = $payload.seededGovernanceBuildAdmissionState

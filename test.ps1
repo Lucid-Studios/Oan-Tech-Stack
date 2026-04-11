@@ -2,6 +2,8 @@ param(
     [ValidateSet("Debug", "Release")]
     [string] $Configuration = "Release",
 
+    [string] $LineRoot = "OAN Mortalis V1.1.1",
+
     [switch] $NoBuild,
 
     [string] $BuildVersion,
@@ -27,8 +29,28 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$activeBuildRoot = Join-Path $repoRoot "OAN Mortalis V1.1.1"
-$solutionPath = Join-Path $activeBuildRoot "Oan.sln"
+$activeBuildRoot = Join-Path $repoRoot $LineRoot
+$lineManifestPath = Join-Path $activeBuildRoot "build\line-manifest.json"
+$solutionRelativePath = "Oan.sln"
+
+if (Test-Path -LiteralPath $lineManifestPath -PathType Leaf) {
+    $lineManifestText = Get-Content -LiteralPath $lineManifestPath -Raw
+
+    if (-not [string]::IsNullOrWhiteSpace($lineManifestText)) {
+        try {
+            $lineManifest = $lineManifestText | ConvertFrom-Json
+        }
+        catch {
+            throw "Unable to parse line manifest at '$lineManifestPath'."
+        }
+
+        if ($null -ne $lineManifest.solutionPath -and -not [string]::IsNullOrWhiteSpace([string] $lineManifest.solutionPath)) {
+            $solutionRelativePath = [string] $lineManifest.solutionPath
+        }
+    }
+}
+
+$solutionPath = Join-Path $activeBuildRoot $solutionRelativePath
 $hygieneScriptPath = Join-Path $activeBuildRoot "tools\verify-private-corpus.ps1"
 $hopngValidationScriptPath = Join-Path $activeBuildRoot "tools\verify-hopng-toolchain.ps1"
 
@@ -105,6 +127,7 @@ if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
 }
 
 Write-Host "[test] Solution: $solutionPath"
+Write-Host "[test] Line root: $LineRoot"
 Write-Host "[test] Configuration: $Configuration"
 if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
     Write-Host "[test] Build version: $BuildVersion"

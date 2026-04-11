@@ -17,6 +17,10 @@ It works alongside `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`, which governs when
 predicate candidates may move from provisional rhetoric-bearing standing into
 closure-bearing admission.
 
+For the stricter line-local seam between `SLI.Lisp` symbolic emission and
+typed runtime obligation, use
+`SLI_LISP_CSHARP_TRANSLATIONAL_MEMBRANE_LAW.md`.
+
 It does not claim full `SoulFrame` life, full `AgentiCore` habitation,
 engram minting, or outward duplex authority.
 
@@ -87,6 +91,10 @@ The minimum receipt fields for a bound root are:
 
 The runtime workbench-session ledger is the smallest membrane that prevents
 prompt ingress from masquerading as lawful continuation.
+
+That ledger membrane is subordinate to, and may not outrun, the stricter
+translational membrane defined in
+`SLI_LISP_CSHARP_TRANSLATIONAL_MEMBRANE_LAW.md`.
 
 ### Readiness fields
 
@@ -172,6 +180,8 @@ The membrane may classify candidate governed structure.
 
 It may not infer continuity, EC completion, or autobiographical status from
 fluency alone.
+It also may not bypass the passport and decision requirements of
+`SLI_LISP_CSHARP_TRANSLATIONAL_MEMBRANE_LAW.md`.
 
 ## Law 4. First Admitted Workbench Surface
 
@@ -213,7 +223,7 @@ once.
 
 The active inward-first order is:
 
-- `CradleTek -> SLI -> SoulFrame -> ListeningFrame -> Compass -> cOE`
+- `CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`
 
 In `V1.1.1`, that means:
 
@@ -231,8 +241,9 @@ The maximum truthful subset presently implementable is:
 - predicate landing membrane
 - bounded workbench-session ledger
 - provisional `SoulFrame`-like symbolic membrane
-- minimal `ListeningFrame` as observational posture
+- minimal `Listening Frame` as observational posture
 - bounded `Compass`-like evaluation surface
+- bounded `AgentiCore` coordination
 
 The following remain withheld:
 
@@ -247,12 +258,13 @@ The following remain withheld:
 The smallest lawful EC-like loop in `V1.1.1` is:
 
 1. an admitted work item enters the bounded workbench
-2. the item is projected into `ListeningFrame`
-3. bounded cognitive analysis occurs
-4. `Compass` evaluates the result
+2. the item is projected into `Listening Frame`
+3. `Compass` evaluates posture, drift, and admissibility
+4. bounded `AgentiCore` coordination proposes the next lawful action
 5. lawful state resolves
-6. bounded output is emitted
-7. a cycle receipt is persisted
+6. any later issued office remains outside the posture layer
+7. bounded output is emitted
+8. a cycle receipt is persisted
 
 ### First bounded EC receipt requirements
 

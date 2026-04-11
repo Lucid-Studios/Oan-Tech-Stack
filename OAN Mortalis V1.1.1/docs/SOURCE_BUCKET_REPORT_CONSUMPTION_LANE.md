@@ -45,6 +45,15 @@ This means:
   carry-forward
 - no direct shortcut is allowed from raw delta to GEL candidate
 
+This lane also follows `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`.
+
+That means:
+
+- raw appendices remain semantic transport even when they are retained in
+  bundle-shaped form
+- consumed receipts, summaries, and candidate packets keep their semantic class
+  even when they share nearby packaging roots
+
 ## Contract Surface
 
 The lane is governed by:

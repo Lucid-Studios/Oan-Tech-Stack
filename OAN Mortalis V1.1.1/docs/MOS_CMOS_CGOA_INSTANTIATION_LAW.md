@@ -38,6 +38,10 @@ The lawful invocation chain is:
 
 `Prime MoS verified match -> cMoS instantiation -> cGoA handshake -> SoulFrame hydration -> SLI web build -> AgentiCore template -> cOE/cSelfGEL sealed work office -> bonded close-state collapse -> runtime-scoped encrypted cGoA return staging`
 
+The runtime-facing canonical chain inside that invocation path is:
+
+`CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`
+
 That order matters because the stack must not jump directly from verified
 recognition into unbounded live work.
 
@@ -117,6 +121,11 @@ for the live session.
 
 At this stage `AgentiCore` is still below final authority.
 It is a coordinated operational office, not canonical persistence.
+
+In the wider runtime chain, this templated `AgentiCore` layer follows posture
+projection, `Compass` read, and bounded coordination. The later
+`cOE/cSelfGEL` seal issues operative office after that coordination rather than
+replacing it.
 
 ### 6. Seal with `OE/SelfGEL` into `cOE/cSelfGEL`
 

@@ -23,6 +23,7 @@ promotion note.
 Use this note with:
 
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
+- `SLI_LISP_CSHARP_TRANSLATIONAL_MEMBRANE_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
 - `BUILD_READINESS.md`
@@ -43,13 +44,18 @@ not as proof that the full runtime is already standing in code.
 
 The cohesive operational chain is:
 
-`content/substrate field -> Listening Frame projection -> Compass orientation and admissibility work -> AgentiCore coordination -> host-side authority decision`
+`content/substrate field -> Listening Frame projection -> Compass orientation and admissibility work -> AgentiCore coordination -> cOE/cSelfGEL issued office -> host-side authority decision`
+
+The runtime-facing canonical chain inside that wider read is:
+
+`CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`
 
 That chain matters because it prevents a common collapse:
 
 - content is not posture
 - posture is not judgment
 - judgment is not authority
+- coordination is not issued office
 
 ## Definitions
 
@@ -104,6 +110,9 @@ Its office here is:
 
 It does not own final admission, correction authority, persistence, or
 continuity law.
+
+Any later `cOE/cSelfGEL` office issuance follows this coordination layer.
+It does not replace the posture layer and it does not collapse back into it.
 
 ## Minimal Build Rule
 
@@ -204,6 +213,11 @@ The active line already contains a symbolic foothold for `Compass` in the
 hosted `SLI.Lisp` bundle. The minimal build therefore promotes an existing
 foothold into an explicit named seam rather than inventing `Compass` from
 nothing.
+
+The next stricter consequence of that named seam is the translational membrane:
+`SLI.Lisp` may emit symbolic products, but only the passported and
+membrane-decided subset may later reach typed C# routing and bounded runtime
+action.
 
 ## Current Repo Read
 

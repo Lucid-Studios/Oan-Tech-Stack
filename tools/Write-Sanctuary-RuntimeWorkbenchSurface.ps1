@@ -173,6 +173,36 @@ if ([string] $cycleState.lastKnownStatus -eq [string] $cyclePolicy.blockedStatus
     $nextAction = 'emit-amenable-day-dream-tier-admissibility'
 }
 
+$requestedStanding = 'sanctuary-runtime-workbench-ready'
+$discernmentAction = 'remain-provisional'
+$standingSurfaceClass = 'rhetoric-bearing'
+$promotionReceiptState = 'insufficient-for-closure'
+$receiptsSufficientForPromotion = $false
+$categoryErrorDetected = $false
+$promotionWithoutReceiptsDetected = $false
+$discernmentReason = $reasonCode
+$discernmentDefinedTerms = 'pass'
+$discernmentContextualScope = 'pass'
+$discernmentEvidenceSufficiency = 'fail'
+$discernmentNonContradiction = 'pass'
+$discernmentSurfaceAppropriateness = 'pass'
+$discernmentPromotionWarrant = 'fail'
+$sessionPosture = 'bounded-workbench-provisional'
+
+if ($workbenchState -eq 'blocked') {
+    $discernmentAction = 'hold'
+    $standingSurfaceClass = 'refusal-surface'
+    $sessionPosture = 'bounded-workbench-hold'
+} elseif ($workbenchState -eq 'sanctuary-runtime-workbench-ready') {
+    $discernmentAction = 'admit'
+    $standingSurfaceClass = 'closure-bearing'
+    $promotionReceiptState = 'sufficient'
+    $receiptsSufficientForPromotion = $true
+    $discernmentEvidenceSufficiency = 'pass'
+    $discernmentPromotionWarrant = 'pass'
+    $sessionPosture = 'bounded-workbench-ready'
+}
+
 $timestamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
 $bundleKey = if (-not [string]::IsNullOrWhiteSpace([string] $cycleState.lastReleaseCandidateBundle)) {
     [System.IO.Path]::GetFileName([string] $cycleState.lastReleaseCandidateBundle)
@@ -192,11 +222,27 @@ $payload = [ordered]@{
     researchHandOffPending = $researchHandOffTouchPoints.Count -gt 0
     researchHandOffTouchPointIds = @($researchHandOffTouchPoints | ForEach-Object { [string] $_.TouchPointId })
     firstAdmittedSurfaceClass = 'bounded-governance-analysis-workbench'
+    requestedStanding = $requestedStanding
+    discernmentAction = $discernmentAction
+    standingSurfaceClass = $standingSurfaceClass
+    promotionReceiptState = $promotionReceiptState
+    receiptsSufficientForPromotion = $receiptsSufficientForPromotion
+    categoryErrorDetected = $categoryErrorDetected
+    promotionWithoutReceiptsDetected = $promotionWithoutReceiptsDetected
+    discernmentReason = $discernmentReason
+    discernmentEvaluation = [ordered]@{
+        definedTerms = $discernmentDefinedTerms
+        contextualScope = $discernmentContextualScope
+        evidenceSufficiency = $discernmentEvidenceSufficiency
+        nonContradiction = $discernmentNonContradiction
+        surfaceAppropriateness = $discernmentSurfaceAppropriateness
+        promotionWarrant = $discernmentPromotionWarrant
+    }
     runtimeDeployabilityState = $deployabilityState
     sanctuaryRuntimeReadinessState = $runtimeReadinessState
     runtimeWorkAdmissibilityState = $runtimeWorkState
     bondedParticipationLocalityLedgerState = $bondedLedgerState
-    sessionPosture = 'bounded-workbench-ready'
+    sessionPosture = $sessionPosture
     boundedWorkClass = 'bounded-local-candidate-sanctuary-workbench'
     ecHabitationState = 'withheld-pending-bounded-workbench-closure'
     outwardDuplexAuthorityState = 'withheld-pending-mediated-admission'
@@ -229,6 +275,21 @@ $markdownLines = @(
     ('- Research handoff pending: `{0}`' -f [bool] $payload.researchHandOffPending),
     ('- Research handoff touchpoints: `{0}`' -f $(if (@($payload.researchHandOffTouchPointIds).Count -gt 0) { (@($payload.researchHandOffTouchPointIds) -join '`, `') } else { 'none' })),
     ('- First admitted surface class: `{0}`' -f $payload.firstAdmittedSurfaceClass),
+    ('- Requested standing: `{0}`' -f $payload.requestedStanding),
+    ('- Discernment action: `{0}`' -f $payload.discernmentAction),
+    ('- Standing surface class: `{0}`' -f $payload.standingSurfaceClass),
+    ('- Promotion receipt state: `{0}`' -f $payload.promotionReceiptState),
+    ('- Receipts sufficient for promotion: `{0}`' -f [bool] $payload.receiptsSufficientForPromotion),
+    ('- Category error detected: `{0}`' -f [bool] $payload.categoryErrorDetected),
+    ('- Promotion without receipts detected: `{0}`' -f [bool] $payload.promotionWithoutReceiptsDetected),
+    ('- Discernment reason: `{0}`' -f $payload.discernmentReason),
+    ('- Discernment evaluation: `definedTerms={0}; contextualScope={1}; evidenceSufficiency={2}; nonContradiction={3}; surfaceAppropriateness={4}; promotionWarrant={5}`' -f
+        $payload.discernmentEvaluation.definedTerms,
+        $payload.discernmentEvaluation.contextualScope,
+        $payload.discernmentEvaluation.evidenceSufficiency,
+        $payload.discernmentEvaluation.nonContradiction,
+        $payload.discernmentEvaluation.surfaceAppropriateness,
+        $payload.discernmentEvaluation.promotionWarrant),
     ('- Runtime deployability state: `{0}`' -f $(if ($payload.runtimeDeployabilityState) { $payload.runtimeDeployabilityState } else { 'missing' })),
     ('- Sanctuary runtime readiness state: `{0}`' -f $(if ($payload.sanctuaryRuntimeReadinessState) { $payload.sanctuaryRuntimeReadinessState } else { 'missing' })),
     ('- Runtime work admissibility state: `{0}`' -f $(if ($payload.runtimeWorkAdmissibilityState) { $payload.runtimeWorkAdmissibilityState } else { 'missing' })),
@@ -266,6 +327,15 @@ $statePayload = [ordered]@{
     researchHandOffPending = $payload.researchHandOffPending
     researchHandOffTouchPointIds = $payload.researchHandOffTouchPointIds
     firstAdmittedSurfaceClass = $payload.firstAdmittedSurfaceClass
+    requestedStanding = $payload.requestedStanding
+    discernmentAction = $payload.discernmentAction
+    standingSurfaceClass = $payload.standingSurfaceClass
+    promotionReceiptState = $payload.promotionReceiptState
+    receiptsSufficientForPromotion = $payload.receiptsSufficientForPromotion
+    categoryErrorDetected = $payload.categoryErrorDetected
+    promotionWithoutReceiptsDetected = $payload.promotionWithoutReceiptsDetected
+    discernmentReason = $payload.discernmentReason
+    discernmentEvaluation = $payload.discernmentEvaluation
     runtimeDeployabilityState = $payload.runtimeDeployabilityState
     sanctuaryRuntimeReadinessState = $payload.sanctuaryRuntimeReadinessState
     runtimeWorkAdmissibilityState = $payload.runtimeWorkAdmissibilityState

@@ -51,6 +51,7 @@ That admission law is fixed in:
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
+- `AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md`
 
 This means the seed lane may remain `Deferred` for its own advisory posture
 while the active build still treats it as locally admitted, but only when the
@@ -58,6 +59,10 @@ bounded build-admission law says that is lawful.
 
 It also means the first admitted runtime surface before any wider EC claim is
 the bounded governance-and-analysis workbench, not full habitation.
+
+The next bounded posture layer after that workbench remains the minimal
+`Listening Frame + Compass` build, not a widened sovereignty claim inside
+`AgentiCore`.
 
 If seeded governance reaches `ready` while downstream pathway surfaces still
 leave build admission unresolved, that is a `clarify` seam.

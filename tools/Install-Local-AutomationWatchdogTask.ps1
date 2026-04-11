@@ -77,7 +77,6 @@ if (-not (Test-Path -LiteralPath $watchdogScriptPath -PathType Leaf)) {
     throw "Local automation watchdog script not found at '$watchdogScriptPath'."
 }
 
-$desiredStartUtc = $null
 if (-not $PSBoundParameters.ContainsKey('StartAt')) {
     if (Test-Path -LiteralPath $resolvedCyclePolicyPath -PathType Leaf) {
         $policy = Get-Content -Raw -LiteralPath $resolvedCyclePolicyPath | ConvertFrom-Json
@@ -87,21 +86,7 @@ if (-not $PSBoundParameters.ContainsKey('StartAt')) {
         }
     }
 
-    if (Test-Path -LiteralPath $resolvedCycleStatePath -PathType Leaf) {
-        $state = Get-Content -Raw -LiteralPath $resolvedCycleStatePath | ConvertFrom-Json
-        $desiredWatchdogValue = $null
-        if ($state.PSObject.Properties['nextWatchdogRunUtc']) {
-            $desiredWatchdogValue = $state.nextWatchdogRunUtc
-        }
-
-        $desiredStartUtc = Get-OptionalDateTimeUtc -Value $desiredWatchdogValue
-    }
-
-    if ($null -ne $desiredStartUtc) {
-        $StartAt = Get-SafeLocalStartTime -DesiredUtc $desiredStartUtc
-    } else {
-        $StartAt = Get-SafeLocalStartTime -DesiredUtc (Get-NextHourlyAnchorUtc -Minute 0)
-    }
+    $StartAt = Get-SafeLocalStartTime -DesiredUtc (Get-NextHourlyAnchorUtc -Minute 0)
 }
 
 $scheduledPowershellArguments = @(

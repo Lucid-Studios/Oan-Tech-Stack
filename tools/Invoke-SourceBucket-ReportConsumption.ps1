@@ -20,6 +20,8 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $PSScriptRoot 'Resolve-SourceBucket-ThreadContinuity.ps1')
+$discernmentAdmissionHelperPath = Join-Path $PSScriptRoot 'Discernment-Admission.ps1'
+. $discernmentAdmissionHelperPath
 
 function Resolve-PathFromRepo {
     param(
@@ -124,6 +126,24 @@ function ConvertTo-StringArray {
                 [string] $_
             }
         } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
+function Get-ObjectPropertyValueOrNull {
+    param(
+        [object] $InputObject,
+        [string] $PropertyName
+    )
+
+    if ($null -eq $InputObject) {
+        return $null
+    }
+
+    $property = $InputObject.PSObject.Properties[$PropertyName]
+    if ($null -eq $property) {
+        return $null
+    }
+
+    return $property.Value
 }
 
 function Get-ValueBySelector {
@@ -287,6 +307,13 @@ function Get-NextDailyAnchorUtc {
     return $candidateLocal.ToUniversalTime()
 }
 
+function Test-ContradictionStateRequiresReview {
+    param([string] $ContradictionState)
+
+    return -not [string]::IsNullOrWhiteSpace($ContradictionState) -and
+        -not [string]::Equals($ContradictionState, 'none', [System.StringComparison]::OrdinalIgnoreCase)
+}
+
 function Get-ResolvedStateEntries {
     param(
         [string] $BasePath,
@@ -397,7 +424,7 @@ function Get-BucketStatusSummary {
     } else {
         foreach ($field in @('status', 'nextLawfulAction', 'milestone', 'repoWorktreeState', 'contradictionState')) {
             $currentValue = [string] $summaryPayload[$field]
-            $previousValue = [string] $PreviousSummary.$field
+            $previousValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $PreviousSummary -PropertyName $field)
             if (-not [string]::Equals($currentValue, $previousValue, [System.StringComparison]::Ordinal)) {
                 $changedFields.Add($field) | Out-Null
             }
@@ -448,6 +475,7 @@ function Get-OanRootSummary {
     )
 
     $blockers = New-Object System.Collections.Generic.List[string]
+    $returnDiscernment = Get-DiscernmentAdmissionEnvelope -State $ReturnIntegrationState -DefaultRequestedStanding 'source-bucket-return-build-review'
     if ([string] $CycleState.lastKnownStatus -eq 'hitl-required') {
         $blockers.Add('root-posture-remains-hitl-required') | Out-Null
     }
@@ -456,7 +484,13 @@ function Get-OanRootSummary {
     }
     $admittedReturnCount = if ($null -ne $ReturnIntegrationState) { [int] $ReturnIntegrationState.admittedReturnCount } else { 0 }
     if ($null -ne $FederationStatusState -and [int] $FederationStatusState.activeRequestCount -gt 0 -and $admittedReturnCount -lt [int] $FederationStatusState.activeRequestCount) {
-        $blockers.Add('lawful-source-bucket-returns-still-pending') | Out-Null
+        if ($returnDiscernment.isRefused) {
+            $blockers.Add([string] $returnDiscernment.reason) | Out-Null
+        } elseif ($returnDiscernment.isHeld) {
+            $blockers.Add([string] $returnDiscernment.reason) | Out-Null
+        } else {
+            $blockers.Add('lawful-source-bucket-returns-still-pending') | Out-Null
+        }
     }
 
     $recommendedAction = $null
@@ -489,18 +523,21 @@ function Get-OanRootSummary {
         blockerSet = @($blockers)
         milestone = [string] $activeTaskMapId
         repoWorktreeState = Get-GitWorktreeState -Path $RepoRootPath
-        contradictionState = 'none'
+        contradictionState = if ($returnDiscernment.categoryErrorDetected -or $returnDiscernment.promotionWithoutReceiptsDetected) { 'source-bucket-return-discernment-conflict' } else { 'none' }
         activeRequestCount = if ($null -ne $FederationStatusState) { [int] $FederationStatusState.activeRequestCount } else { 0 }
         admittedReturnCount = $admittedReturnCount
+        returnDiscernmentAction = [string] $returnDiscernment.action
+        returnStandingSurfaceClass = [string] $returnDiscernment.standingSurfaceClass
+        returnPromotionReceiptState = [string] $returnDiscernment.promotionReceiptState
     }
     $standingHash = Get-SourceBucketStandingHash -Value $summaryPayload
     $changedFields = New-Object System.Collections.Generic.List[string]
     if ($null -eq $PreviousSummary) {
         $changedFields.Add('initial-observation') | Out-Null
     } else {
-        foreach ($field in @('status', 'nextLawfulAction', 'milestone', 'repoWorktreeState')) {
+        foreach ($field in @('status', 'nextLawfulAction', 'milestone', 'repoWorktreeState', 'contradictionState', 'returnDiscernmentAction', 'returnStandingSurfaceClass', 'returnPromotionReceiptState')) {
             $currentValue = [string] $summaryPayload[$field]
-            $previousValue = [string] $PreviousSummary.$field
+            $previousValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $PreviousSummary -PropertyName $field)
             if (-not [string]::Equals($currentValue, $previousValue, [System.StringComparison]::Ordinal)) {
                 $changedFields.Add($field) | Out-Null
             }
@@ -518,13 +555,16 @@ function Get-OanRootSummary {
         blockerSet = @($summaryPayload.blockerSet)
         milestone = [string] $summaryPayload.milestone
         repoWorktreeState = [string] $summaryPayload.repoWorktreeState
-        contradictionState = 'none'
+        contradictionState = [string] $summaryPayload.contradictionState
         changedFields = @($changedFields)
         materialChange = $changedFields.Count -gt 0
         stabilityWitnessCount = if ($null -ne $PreviousSummary -and [string] $PreviousSummary.standingHash -eq $standingHash) { [int] $PreviousSummary.stabilityWitnessCount + 1 } else { 1 }
         standingHash = $standingHash
         activeRequestCount = [int] $summaryPayload.activeRequestCount
         admittedReturnCount = [int] $summaryPayload.admittedReturnCount
+        returnDiscernmentAction = [string] $summaryPayload.returnDiscernmentAction
+        returnStandingSurfaceClass = [string] $summaryPayload.returnStandingSurfaceClass
+        returnPromotionReceiptState = [string] $summaryPayload.returnPromotionReceiptState
         authoritativeStatePaths = @()
     }
 }
@@ -576,7 +616,8 @@ function Get-CandidateRecord {
     }
 
     $fullResearchBoundaryWitnessed = $IsFullResearchMode -or ($null -ne $PreviousCandidate -and [bool] $PreviousCandidate.fullResearchBoundaryWitnessed)
-    $discernmentStatus = if ($Summary.contradictionState -eq 'contradiction_detected') {
+    $requiresContradictionReview = Test-ContradictionStateRequiresReview -ContradictionState ([string] $Summary.contradictionState)
+    $discernmentStatus = if ($requiresContradictionReview) {
         'withheld'
     } elseif ($stabilityWitnessCount -ge 2 -and @($Summary.blockerSet).Count -lt 6) {
         'stable_enough_for_review'
@@ -586,7 +627,7 @@ function Get-CandidateRecord {
         'unreviewed'
     }
 
-    $consumerStandingClass = if ($Summary.contradictionState -eq 'contradiction_detected') {
+    $consumerStandingClass = if ($requiresContradictionReview) {
         'pinned_for_review'
     } elseif (-not [bool] $Summary.materialChange) {
         'consumed_no_material_change'
@@ -601,7 +642,7 @@ function Get-CandidateRecord {
     if ($discernmentStatus -eq 'stable_enough_for_review' -and
         $stabilityWitnessCount -ge 2 -and
         $fullResearchBoundaryWitnessed -and
-        $Summary.contradictionState -ne 'contradiction_detected') {
+        -not $requiresContradictionReview) {
         $consumerStandingClass = 'gel_research_candidate'
         $formationStage = 'tracked_candidate'
         $carryForwardEligibility = 'simulated_gel_only'
@@ -751,7 +792,7 @@ foreach ($bucket in @($consumptionPolicy.sourceBuckets)) {
         -DiscourseOffice 'report_consumption' `
         -AppendixId $appendixId `
         -StandingHash ([string] $summary.standingHash) `
-        -ContradictionDetected ($summary.contradictionState -eq 'contradiction_detected') `
+        -ContradictionDetected (Test-ContradictionStateRequiresReview -ContradictionState ([string] $summary.contradictionState)) `
         -ContinuityDisposition 'reuse'
 
     $summary | Add-Member -NotePropertyName threadId -NotePropertyValue ([string] $continuityResult.threadId) -Force
