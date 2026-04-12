@@ -79,13 +79,45 @@ The following are currently present:
   witnessed context split while keeping Atlas delta candidacy, Atlas
   mutation, predicate promotion, engram minting, operator realization, and
   runtime withheld
+- the first install-agreement and identity-footing cluster now lives in
+  `docs/` and fixes localized install choice, six-lane agreement predicate
+  formation, install identity candidacy after full assent, and one bounded
+  `CoreCmeUsePostureRecord` while keeping contract view derived rather than
+  canonical identity ownership, service standing withheld, and runtime
+  inactive
+- the first RTME hosted service-lift corridor now lives in `docs/` and fixes
+  refusal-first lift preconditions, hosted-posture authority grammar,
+  Prime/Cryptic lift-time binding, and hosted lift receipt proof while
+  keeping intended service entries disabled, `CmePlacementWithheld` active,
+  and runtime inactive
+- the first site-bound pre-Cradle authorization cluster now lives in `docs/`
+  and fixes site profile, operator training admission, tool-state
+  authorization, final disclosure assent, and scoped IP/content authority
+  while keeping governing placement, CradleTek live authority, and runtime
+  action withheld
+- the first descriptive `SLI` Prime/Cryptic duplex resonance note now lives in
+  `docs/` and records the healthy read in which Prime holds, Cryptic presses,
+  `Compass` sounds, and triadic stability keeps the line from collapsing into
+  dead hold, blind action, or undifferentiated pressure
 - root build/test entrypoints can now select a line root explicitly and resolve
   its solution path from the line manifest
 - the first passive `San.Common` source-family root under `src/San/San.Common/`
+- the first passive install-assent contract family under
+  `src/San/San.Common/`
+- the first passive RTME service-lift contract family under
+  `src/San/San.Common/`
+- the first passive governance-memory-seat contract family under
+  `src/San/San.Common/`
+- the first passive pre-Cradle site-authorization contract family under
+  `src/San/San.Common/`
 - the first governance-bearing sibling project under
   `src/San/San.Nexus.Control/`
 - the first symbolic sibling project under `src/SLI/SLI.Engine/`
 - the first hosted symbolic bundle sibling project under `src/SLI/SLI.Lisp/`
+- the first passive install-agreement action surface beneath `src/SLI/SLI.Lisp/`
+  as an installed-disabled cryptic bundle extension surface
+- the first passive RTME hosted service-lift receipt family beneath
+  `src/SLI/SLI.Lisp/`
 - the first passive `SLI` governance sibling project under
   `src/SLI/SLI.Runtime/`
 - the first line-local solution graph under `San.sln`
@@ -128,6 +160,20 @@ The next carried seams should be:
   discernment but before any promotion-adjacent law
 - `SLI` symbolic transport-form clarification beneath `Sanctuary.GEL`
   rest-state persistence but before any Atlas delta-candidate or mutation law
+- install agreement action surface and identity footing clarification beneath
+  `SLI` symbolic transport form but before any Atlas delta candidate,
+  service-authorization, or runtime-bearing law
+- RTME hosted service-lift corridor clarification beneath install agreement
+  action surface and identity footing but before any live hosted service
+  binding, runtime-bearing law, or governing `CME` placement
+- Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory
+  clarification beneath RTME hosted service-lift corridor but before any
+  pre-Cradle authorization, governing `CME` placement, CradleTek
+  authorization, or runtime governing loop
+- pre-Cradle site-bound operator, tool, disclosure, and content authority
+  clarification beneath Sanctuary.MoS and Sanctuary.cMoS storage-seat and
+  governance memory but before any governing `CME` placement, CradleTek
+  authorization, or runtime action
 - later zero-behavior operator seam stubs only if naming discipline requires them
 - later operator realization beneath preserved-field, candidate-evaluation, and
   withheld-operator-seam law
@@ -136,6 +182,11 @@ The next carried seams should be:
 - later first engine-to-hosted-bundle service binding beneath the issued
   `SanctuaryID.RTME` service law
 - later active runtime binding
+
+`SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md` does not add a new carried seam.
+It records the healthy living-state read in which `Prime` holds, `Cryptic`
+presses, `SLI` harmonizes, `Compass` sounds, and the line returns to hold
+without losing what has not yet resolved.
 
 ## Family Correction
 
@@ -235,6 +286,15 @@ The next install-law surfaces now fixed in this line are:
 - `SUPER_SUBSCRIPT_EXTENSION_FORMATION_LAW.md`
 - `SYMBOLIC_TRANSPORT_LINEAGE_AND_CONTEXT_SPLIT_LAW.md`
 - `SLI_SYMBOLIC_TRANSPORT_FORM_AUDIT.md`
+- `INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md`
+- `AGREEMENT_PREDICATE_BUNDLE_LAW.md`
+- `INSTALL_IDENTITY_SET_LAW.md`
+- `CME_USE_DATA_POSTURE_LAW.md`
+- `INSTALL_ASSENT_AND_IDENTITY_AUDIT.md`
+- `SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md`
+- `RTME_SERVICE_LIFT_AUTHORITY_LAW.md`
+- `PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md`
+- `CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md`
 - `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`
 - `LINE_AUDIT_REPORT_SCHEMA.md`
 
@@ -275,9 +335,11 @@ Their current line-wide read is:
 - `Sanctuary.cGEL` is now named as the cryptic build chamber above
   `Sanctuary.GEL` without becoming bootstrap substrate, service authorization,
   or governing life
-- `Sanctuary.MoS`, later Prime/Cryptic governance service families, and
-  `TriviumForum` are now named as later layers rather than current
-  implementation standing
+- `Sanctuary.MoS` is now fixed as the lawful governance-bearing storage seat
+- `Sanctuary.cMoS` is now fixed as the derivational private/cryptic companion
+  to that seat
+- later Prime/Cryptic governance service families and `TriviumForum` remain
+  later layers rather than current governing standing
 - pre-Lisp and pre-code semantic intake is now fixed from verbatim ingress
   through symbol preservation, Atlas mapping, predicate candidate formation,
   `IUTT`-bounded transformation, membrane landing, and engram-bearing
@@ -303,6 +365,41 @@ Their current line-wide read is:
   witnessed use earn a split
 - Atlas delta candidacy, Atlas mutation, predicate promotion, engram minting,
   operator realization, and runtime remain withheld
+- localized install agreement footing now moves through one passive
+  install-assent action surface seated in `SLI.Lisp` without service
+  activation
+- install identity now derives only from full assented predicate formation
+- `SanctuaryContractProfile` remains a derived deployment view rather than the
+  canonical install identity owner in this slice
+- `CoreCmeUsePostureRecord` now carries exactly
+  `research-attached-default` as the current bounded `CME`-use posture
+- the RTME hosted service-lift corridor now fixes preconditions, authority,
+  Prime/Cryptic lift-time binding, and receipt burden without moving any
+  intended service entry into `authorized`
+- service lift now changes hosted posture only and does not change governing
+  identity or lift `CmePlacementWithheld`
+- the governance-memory-seat corridor now fixes `Sanctuary.MoS` as the lawful
+  legal storage seat and `Sanctuary.cMoS` as its derivational private/cryptic
+  companion
+- `OE` and `SelfGEL` may now stand structurally in `Sanctuary.MoS` without
+  runtime or governing life
+- `cOE` and `cSelfGEL` may now surface derivationally in `Sanctuary.cMoS`
+  without second sovereignty
+- `GEL/cGEL -> MoS/cMoS` handoff is now receipted continuity only and does not
+  imply pre-Cradle authorization, governing `CME` placement, CradleTek
+  authorization, or runtime governing loops
+- the pre-Cradle site-bound authorization corridor now fixes one closed site
+  profile, one site-bound operator training admission, site-bound tool-state
+  authorization, one final `CME` disclosure bundle, and one separate
+  IP/content authority bundle
+- inheritance-scope IP and creation-use IP now remain distinct, and no
+  submitted content becomes `CME` inheritance without scoped, witnessed,
+  role-valid authority
+- custodial customization and brand/campaign preparation now remain distinct
+  authority bases beneath pre-Cradle standing
+- authorized pre-Cradle standing now remains a site-and-operator posture only
+  and does not imply governing `CME` placement, CradleTek live authority, or
+  runtime governing action
 - the line now shares the release-alignment telemetry taxonomy and read-only
   report schema even though its emitted telemetry inventory remains thin
 
@@ -315,8 +412,10 @@ Its current line-wide read is:
 
 - governance root now binds only to already-real Atlas/SLI predicate truth
 - `Sanctuary.cGEL` is the cryptic build chamber
-- `Sanctuary.MoS`, later Prime/Cryptic governance service families, and
-  `TriviumForum` remain later layers
+- `Sanctuary.MoS` and `Sanctuary.cMoS` now form the lawful governance-memory
+  seat corridor below pre-Cradle authorization and governing placement
+- later Prime/Cryptic governance service families and `TriviumForum` remain
+  later layers
 
 This cluster is Sanctuary-side clarification only.
 It does not authorize active governing presence, service authorization, or UI

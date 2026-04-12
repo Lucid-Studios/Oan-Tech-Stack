@@ -30,11 +30,11 @@ The spline answers:
 The current install-first `V1.2.1` doc body is still early, but it is now
 coherent enough to read through this matrix by default.
 
-Audited active docs: `69`
+Audited active docs: `93`
 
 Condensed primary-domain counts:
 
-- `Sanctuary`: `67`
+- `Sanctuary`: `91`
 - `CradleTek`: `1`
 - `SoulFrame`: `1`
 - `AgentiCore`: `0`
@@ -70,8 +70,9 @@ The current line has no admitted `AgentiCore`-owned docs yet.
 - `SanctuaryID.GoA` governance-root law, lower predicate truth boundary,
   default refusal, authority-and-receipt law, and `Sanctuary.cGEL` build
   chamber clarification before any CradleTek-dependent life claim
-- the later Sanctuary stack map through `Sanctuary.MoS`, Prime/Cryptic
-  governance, and downstream `TriviumForum` without present standing claim
+- the Sanctuary stack map through `Sanctuary.cGEL`, `Sanctuary.MoS`,
+  `Sanctuary.cMoS`, later Prime/Cryptic governance, and downstream
+  `TriviumForum` without present governing standing claim
 - pre-Lisp and pre-code semantic intake law from verbatim preservation
   through `RootAtlas` mapping, predicate candidate formation,
   `IUTT`-bounded transformation, membrane landing, and engram-bearing
@@ -86,6 +87,26 @@ The current line has no admitted `AgentiCore`-owned docs yet.
   carrier governance, adjunct-free root transport identity, governed
   super/subscript formation, and witnessed context split without Atlas delta
   candidacy or mutation standing
+- install-assent and identity footing through one passive action surface,
+  six-lane agreement predicate bundle, assent-gated identity candidate, and
+  bounded `CoreCmeUsePostureRecord` without service activation or runtime
+  standing
+- RTME hosted service-lift corridor through refusal-first preconditions,
+  hosted-posture authority, Prime/Cryptic lift-time binding, and hosted lift
+  receipt proof without service activation or governing `CME` placement
+- governance-memory-seat corridor through lawful `Sanctuary.MoS` seat,
+  derivational `Sanctuary.cMoS` companionship, structural `OE`/`SelfGEL`
+  standing, derivational `cOE`/`cSelfGEL` surfacing, and receipted
+  `GEL/cGEL -> MoS/cMoS` continuity without pre-Cradle authorization or
+  governing `CME` placement
+- site-bound pre-Cradle authorization through closed site profile, operator
+  training admission, tool-state authorization, final disclosure assent,
+  scoped inheritance-versus-creation IP authority, and candidate/receipt
+  refusal law without governing `CME` placement or CradleTek live authority
+- one descriptive `SLI` Prime/Cryptic duplex resonance note that records the
+  healthy living-state read in which `Prime` holds, `Cryptic` presses,
+  `Compass` sounds, and triadic stability keeps the line from collapsing into
+  dead hold, blind action, or undifferentiated pressure
 
 ### `CradleTek`
 
@@ -120,13 +141,22 @@ Use `Install` when a note governs:
 - Sanctuary-side governing `CME` set/manifold clarification before active
   office
 - governance-root clarification bound to already-real lower predicate truth
-- `Sanctuary.cGEL` and later Sanctuary stack mapping without active standing
+- `Sanctuary.cGEL` build chamber and Sanctuary stack mapping without active
+  governing standing
 - constructor-class law and language-universe groupoid law for interior
   `GEL` formation without runtime standing
 - canonical held interior object law for `GEL` rest-state persistence without
-  `Sanctuary.MoS` standing
+  `Sanctuary.MoS` or `Sanctuary.cMoS` standing
 - UTF-8 canonical carrier law and adjunct-free root transport form for
   Atlas-derived symbolic material without delta or mutation standing
+- install-agreement action surface law for localized assent and identity
+  footing without service, mutation, or runtime standing
+- refusal-first hosted service-lift preconditions and hosted-posture
+  authority without changing governing identity or activating service motion
+- lawful `Sanctuary.MoS` seat definition and structural `OE`/`SelfGEL`
+  standing without pre-Cradle authorization or governing placement
+- closed site-binding profile and site-bound operator training admission
+  without governing `CME` placement or CradleTek live authority
 
 ### `Build`
 
@@ -145,11 +175,24 @@ Use `Build` when a note governs:
   contradiction handling, posture/refusal law, derived situational awareness,
   and audit of interior `GEL` law without runtime standing
 - held-state persistence, continuity-at-rest linkage, contradiction/posture
-  binding, and audit of resting `GEL` law without promotion or `MoS`
+  binding, and audit of resting `GEL` law without promotion or `MoS/cMoS`
   standing
 - governed super/subscript formation, witnessed context split, and symbolic
   transport audit for Atlas-derived material without Atlas delta candidacy,
   mutation, or runtime standing
+- agreement predicate bundle formation, install identity candidacy after full
+  assent, `CoreCmeUsePostureRecord`, and install assent/identity audit without
+  service authorization or runtime standing
+- Prime/Cryptic lift-time binding and hosted lift receipt proof without
+  service authorization, runtime standing, or governing `CME` placement
+- derivational `cMoS` surfacing, `GEL/cGEL -> MoS/cMoS` handoff receipt,
+  storage-seat refusal boundary, and storage-seat audit without pre-Cradle
+  authorization, governing placement, or runtime standing
+- tool-state authorization, final disclosure assent, scoped IP/content
+  authority, and pre-Cradle site authorization candidate/receipt refusal
+  without governing placement, CradleTek authorization, or runtime action
+- descriptive `SLI` Prime/Cryptic duplex resonance as the healthy living-state
+  read of the line without adding a new install stage or runtime grant
 
 ### `Run`
 
@@ -195,6 +238,13 @@ Use `Exit` when a note governs:
 - `GEL_ADMITTED_INTERIOR_OBJECT_LAW.md`
 - `UTF8_RESERVED_SET_AND_CANONICAL_SYMBOL_LAW.md`
 - `ROOT_SYMBOL_BASE_FORM_LAW.md`
+- `INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md`
+- `SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md`
+- `RTME_SERVICE_LIFT_AUTHORITY_LAW.md`
+- `SANCTUARY_MOS_STORAGE_SEAT_LAW.md`
+- `OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md`
+- `CRADLETEK_SITE_BINDING_PROFILE_LAW.md`
+- `OPERATOR_TRAINING_SET_ADMISSION_LAW.md`
 
 ### `Sanctuary / Build`
 
@@ -229,6 +279,23 @@ Use `Exit` when a note governs:
 - `SUPER_SUBSCRIPT_EXTENSION_FORMATION_LAW.md`
 - `SYMBOLIC_TRANSPORT_LINEAGE_AND_CONTEXT_SPLIT_LAW.md`
 - `SLI_SYMBOLIC_TRANSPORT_FORM_AUDIT.md`
+- `AGREEMENT_PREDICATE_BUNDLE_LAW.md`
+- `INSTALL_IDENTITY_SET_LAW.md`
+- `CME_USE_DATA_POSTURE_LAW.md`
+- `INSTALL_ASSENT_AND_IDENTITY_AUDIT.md`
+- `PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md`
+- `CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md`
+- `CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md`
+- `GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md`
+- `MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md`
+- `MOS_STORAGE_SEAT_AUDIT.md`
+- `TOOL_STATE_AUTHORIZATION_LAW.md`
+- `FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md`
+- `CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md`
+- `CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md`
+- `PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md`
+- `PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md`
+- `SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md`
 
 ### `Sanctuary / Run`
 
@@ -275,6 +342,9 @@ The practical rules are:
 - if a note governs preserved-field cognition, lawful retrieval tension, or
   candidate-only recomposition before operator realization, keep it under
   `Sanctuary` in this line
+- if a note governs site-bound pre-Cradle operator, tool, disclosure, or
+  content authority without governing placement or CradleTek live authority,
+  keep it under `Sanctuary` in this line
 - if a note governs passive candidate evaluation before operator realization or
   form-or-cleave work, keep it under `Sanctuary` in this line
 - if a note governs the withheld operator boundary, witness floor, or
@@ -313,6 +383,15 @@ The practical rules are:
 - if a note governs UTF-8 canonical carrier law or adjunct-free root transport
   form for Atlas-derived symbolic material without delta or mutation
   standing, keep it under `Sanctuary / Install`
+- if a note governs localized install assent through a passive action surface
+  and fixes identity footing before service, mutation, or runtime standing,
+  keep it under `Sanctuary / Install`
+- if a note governs refusal-first hosted service-lift preconditions or fixes
+  hosted-posture authority before activation and without governing `CME`
+  placement, keep it under `Sanctuary / Install`
+- if a note governs lawful `Sanctuary.MoS` seat definition or structural
+  `OE`/`SelfGEL` standing below pre-Cradle authorization and governing
+  placement, keep it under `Sanctuary / Install`
 - if a note governs intended service grammar, disabled service posture, or
   activation gates before any live service starts, keep it under
   `Sanctuary / Run`
@@ -341,6 +420,16 @@ The practical rules are:
 - if a note governs governed super/subscript formation, witnessed context
   split, or symbolic transport audit for Atlas-derived material without Atlas
   delta candidacy or mutation, keep it under `Sanctuary / Build`
+- if a note governs six-lane agreement predicate formation, install identity
+  candidacy after full assent, `CoreCmeUsePostureRecord`, or install
+  assent/identity audit without service authorization or runtime standing,
+  keep it under `Sanctuary / Build`
+- if a note governs Prime/Cryptic lift-time binding or the hosted receipt
+  chain that would later prove service lift without activation or governing
+  `CME` placement, keep it under `Sanctuary / Build`
+- if a note governs derivational `cMoS` surfacing, `GEL/cGEL -> MoS/cMoS`
+  handoff receipt, or storage-seat refusal/audit below pre-Cradle
+  authorization and governing placement, keep it under `Sanctuary / Build`
 - if a note fixes release-alignment telemetry taxonomy or read-only audit
   schema for the install-first sibling, keep it under `Sanctuary / Build`
 - if a note governs cradle-local operator-bonded `CME` spawn authority and

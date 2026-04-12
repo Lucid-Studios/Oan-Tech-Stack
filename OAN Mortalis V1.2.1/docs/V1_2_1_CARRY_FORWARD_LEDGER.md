@@ -616,6 +616,267 @@ delta candidacy is discussed.
 This fixes symbolic transport form for Atlas-derived material while remaining
 non-delta, non-mutating, non-promotional, and non-runtime.
 
+### Install agreement action surface law
+
+Status: `admitted-install-agreement-law`
+
+`V1.2.1` now fixes the first passive install-assent action surface seated as a
+cryptic bundle extension surface beneath `SLI.Lisp`.
+
+This fixes localized install assent while remaining non-mutating,
+non-promotional, non-runtime, and non-service-bearing.
+
+### Agreement predicate bundle law
+
+Status: `admitted-install-agreement-law`
+
+`V1.2.1` now fixes six localized agreement predicate lanes so assent remains
+predicate-bearing, versioned, and distinct from raw template presence.
+
+This fixes localized install assent while remaining non-mutating,
+non-promotional, non-runtime, and non-service-bearing.
+
+### Install identity set law
+
+Status: `admitted-install-agreement-law`
+
+`V1.2.1` now fixes install identity as a versioned assent product that may
+appear only after full assented predicate formation and not from
+acknowledgement alone.
+
+This fixes localized install assent while remaining non-mutating,
+non-promotional, non-runtime, and non-service-bearing.
+
+### CME use data posture law
+
+Status: `admitted-install-agreement-law`
+
+`V1.2.1` now fixes one bounded `CoreCmeUsePostureRecord` with
+`research-attached-default` as the only admitted attachment profile in this
+phase.
+
+This fixes lawful install footing while remaining non-mutating,
+non-promotional, non-runtime, and non-service-bearing.
+
+### Install assent and identity audit
+
+Status: `admitted-install-agreement-law`
+
+`V1.2.1` now fixes one audit proving localized install assent, identity
+derivation, and `CME`-use posture remain bounded and do not self-authorize
+service, runtime, or Atlas mutation standing.
+
+This fixes lawful install footing while remaining non-mutating,
+non-promotional, non-runtime, and non-service-bearing.
+
+### Service lift preconditions and refusal law
+
+Status: `admitted-rtme-service-lift-law`
+
+`V1.2.1` now fixes refusal-first preconditions for any future hosted lift of
+the seated Prime/Cryptic braid.
+
+This fixes lawful hosted motion boundaries while remaining non-activating,
+non-governing, non-mutating, and non-runtime.
+
+### RTME service lift authority law
+
+Status: `admitted-rtme-service-lift-law`
+
+`V1.2.1` now fixes service lift as a later hosted-posture act rather than a
+governing-identity change or runtime consequence.
+
+This fixes lawful hosted motion boundaries while remaining non-activating,
+non-governing, non-mutating, and non-runtime.
+
+### Prime supervision and Cryptic work binding law
+
+Status: `admitted-rtme-service-lift-law`
+
+`V1.2.1` now fixes Prime supervisory witness and Cryptic working posture as a
+bounded lift-time binding without runtime autonomy or governing collapse.
+
+This fixes lawful hosted motion boundaries while remaining non-activating,
+non-governing, non-mutating, and non-runtime.
+
+### Cryptic hosted binding lift receipt law
+
+Status: `admitted-rtme-service-lift-law`
+
+`V1.2.1` now fixes the receipt chain that would later prove hosted posture
+transition while preserving explicit `CmePlacementWithheld` continuation.
+
+This fixes lawful hosted motion boundaries while remaining non-activating,
+non-governing, non-mutating, and non-runtime.
+
+### Sanctuary.MoS storage seat law
+
+Status: `admitted-governance-memory-seat-law`
+
+`V1.2.1` now fixes `Sanctuary.MoS` as the lawful governance-bearing storage
+seat and introduces `Sanctuary.cMoS` as its derivational private/cryptic
+companion surface.
+
+This fixes lawful governance-memory seating while remaining below pre-Cradle
+authorization, governing `CME` placement, CradleTek authorization, and
+runtime governing life.
+
+### OE and SelfGEL structural standing law
+
+Status: `admitted-governance-memory-seat-law`
+
+`V1.2.1` now fixes `OE` and `SelfGEL` as the first structural occupants that
+may stand in `Sanctuary.MoS`.
+
+This fixes lawful governance-memory seating while remaining below pre-Cradle
+authorization, governing `CME` placement, CradleTek authorization, and
+runtime governing life.
+
+### cMoS, cOE, and cSelfGEL surfacing law
+
+Status: `admitted-governance-memory-seat-law`
+
+`V1.2.1` now fixes `Sanctuary.cMoS` and makes `cOE` and `cSelfGEL`
+derivational-only surfaces under lawful parent standing.
+
+This fixes lawful governance-memory seating while remaining below pre-Cradle
+authorization, governing `CME` placement, CradleTek authorization, and
+runtime governing life.
+
+### GEL/cGEL to MoS/cMoS handoff and receipt law
+
+Status: `admitted-governance-memory-seat-law`
+
+`V1.2.1` now fixes receipted continuity from `GEL/cGEL` into `MoS/cMoS`
+without treating persistence or build activity as automatic seat standing.
+
+This fixes lawful governance-memory seating while remaining below pre-Cradle
+authorization, governing `CME` placement, CradleTek authorization, and
+runtime governing life.
+
+### MoS storage seat refusal and boundary law
+
+Status: `admitted-governance-memory-seat-law`
+
+`V1.2.1` now fixes the refusal edges that keep storage-seat standing from
+being overstated into authorization, placement, or second sovereignty.
+
+This fixes lawful governance-memory seating while remaining below pre-Cradle
+authorization, governing `CME` placement, CradleTek authorization, and
+runtime governing life.
+
+### MoS storage seat audit
+
+Status: `admitted-governance-memory-seat-law`
+
+`V1.2.1` now fixes one audit proving lawful seat standing, lawful structural
+occupancy, lawful derivational surfacing, and lawful handoff receipt together.
+
+This fixes lawful governance-memory seating while remaining below pre-Cradle
+authorization, governing `CME` placement, CradleTek authorization, and
+runtime governing life.
+
+### CradleTek site binding profile law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes one closed four-class site-binding grammar so pre-Cradle
+standing remains tied to a concrete personal, co-resident, separate-host, or
+enterprise deployment footing.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### Operator training set admission law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes operator training admission as a required, witnessed,
+site-bound standing surface before pre-Cradle authorization may be discussed
+truthfully.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### Tool state authorization law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes site-bound and operator-bound tool authorization so tool
+presence may support standing without becoming service activation or runtime
+autonomy.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### Final CME disclosure agreement law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes one assented final `CME` disclosure bundle so disclosure
+standing is explicit and remains distinct from service authorization or
+content authority.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### CME IP inheritance and creation scope law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes inheritance-scope IP and creation-use IP as separate,
+scoped, witnessed authority lanes rather than a single generic content act.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### Custodial and brand content authority law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes custodial customization and brand/campaign preparation as
+distinct role-valid authority bases rather than one flattened content
+permission surface.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### Pre-Cradle site authorization candidate law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes the first site-bound pre-Cradle authorization candidate as
+a braid of install identity, `CME`-use posture, lift readiness,
+governance-memory seat readiness, site profile, operator training, tool
+authorization, disclosure assent, and content authority.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### Pre-Cradle authorization receipt and refusal law
+
+Status: `admitted-pre-cradle-site-authorization-law`
+
+`V1.2.1` now fixes one receipt and refusal surface for site-bound pre-Cradle
+standing so the seam may acknowledge authorized posture without overclaiming
+governing event, service activation, or live authority.
+
+This fixes site-bound pre-Cradle standing while remaining below governing
+`CME` placement, CradleTek authorization, and runtime action.
+
+### SLI Prime/Cryptic duplex resonance note
+
+Status: `admitted-duplex-resonance-note`
+
+`V1.2.1` now carries one descriptive invariant note fixing `SLI` as the
+manifold that keeps `Prime` and `Cryptic` in harmonic duplex, with `Prime`
+holding, `Cryptic` pressing, `Compass` sounding, and the line returning to
+hold without losing what has not yet resolved.
+
+This records the healthy living-state read of the line without adding a new
+install-first stage, service grant, runtime grant, or governing `CME`
+placement.
+
 ### Domain-and-spline categorical condensate
 
 Status: `admitted-install-law`

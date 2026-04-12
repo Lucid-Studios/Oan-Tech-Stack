@@ -34,10 +34,16 @@ begins:
 
 The working order for this line is:
 
-`Install State -> Sanctuary State -> Sanctuary.GEL bootstrap -> SanctuaryID.RTME issuance -> SoulFrame cGoA bridge and cryptic seal prerequisites -> local law and onboarding -> first source-family carry forward -> first line-local solution graph -> next sibling project carry forward -> seam-definition batch beneath the first-working-model gate -> RTME admission shell -> first witnessed trace path -> descriptive Lisp/C# carriage schema -> pre-CME substrate clarification -> SanctuaryID.GoA governing-set clarification -> SanctuaryID.GoA governance-root and cGEL stack-map clarification -> Sanctuary.GEL semantic intake clarification -> Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> final working form`
+`Install State -> Sanctuary State -> Sanctuary.GEL bootstrap -> SanctuaryID.RTME issuance -> SoulFrame cGoA bridge and cryptic seal prerequisites -> local law and onboarding -> first source-family carry forward -> first line-local solution graph -> next sibling project carry forward -> seam-definition batch beneath the first-working-model gate -> RTME admission shell -> first witnessed trace path -> descriptive Lisp/C# carriage schema -> pre-CME substrate clarification -> SanctuaryID.GoA governing-set clarification -> SanctuaryID.GoA governance-root and cGEL stack-map clarification -> Sanctuary.GEL semantic intake clarification -> Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form`
 
 This keeps the side-by-side line honest about what exists now and what is
 still withheld.
+
+`SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md` is a descriptive living-state
+note, not a new install-first stage.
+It records the healthy read in which `Prime` holds, `Cryptic` presses,
+`SLI` harmonizes, `Compass` sounds, and the line returns to hold without
+losing what has not yet resolved.
 
 ## Side-By-Side Rule
 
@@ -163,6 +169,9 @@ That means:
   set/manifold without implying active office
 - `MOTHER_FATHER_PRIME_CRYPTIC_BRAID_POSTURE.md` as the first pre-body
   supervisory braid note fixing Mother/Father in Prime/Cryptic duplex terms
+- `SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md` as the first descriptive note
+  keeping Prime/Cryptic harmonic duplex, `Compass` sounding, and healthy
+  living-state resonance legible without adding a new install-first stage
 - `CME_PLACEMENT_WITHHELD_LAW.md` as the first explicit `V1.2.1` note making
   `CmePlacementWithheld` active default law for governing placement
 - `PRE_CRADLETEK_NON_ASSUMPTION_LAW.md` as the first note forbidding implied
@@ -253,6 +262,73 @@ That means:
 - `SLI_SYMBOLIC_TRANSPORT_FORM_AUDIT.md` as the first audit proving symbolic
   transport form remains non-delta, non-mutating, non-promotional, and
   non-runtime before any Atlas delta-candidate law is admitted
+- `INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md` as the first note fixing one
+  passive install-assent action surface seated as a cryptic bundle extension
+  surface beneath `SLI.Lisp` without live hosted service activation
+- `AGREEMENT_PREDICATE_BUNDLE_LAW.md` as the first note fixing localized
+  install agreement predicates as six explicit lanes rather than one
+  monolithic contract blob
+- `INSTALL_IDENTITY_SET_LAW.md` as the first note fixing install identity as a
+  versioned assent product that may appear only after full assented predicate
+  formation
+- `CME_USE_DATA_POSTURE_LAW.md` as the first note fixing one bounded
+  `CoreCmeUsePostureRecord` with `research-attached-default` as the only
+  admitted attachment profile in this phase
+- `INSTALL_ASSENT_AND_IDENTITY_AUDIT.md` as the first audit proving localized
+  install assent, identity derivation, and `CME`-use posture remain
+  non-executive, non-mutating, and below service standing
+- `SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md` as the first note fixing
+  refusal-first preconditions for any future hosted Prime/Cryptic service
+  lift without activating the seated braid
+- `RTME_SERVICE_LIFT_AUTHORITY_LAW.md` as the first note fixing hosted
+  service-lift authority as a later hosted-posture act rather than governing
+  identity change
+- `PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md` as the first note
+  fixing Prime/Cryptic lift-time binding without runtime autonomy or
+  governing collapse
+- `CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md` as the first note fixing the
+  receipt chain that would later prove hosted lift without lifting
+  `CmePlacementWithheld`
+- `SANCTUARY_MOS_STORAGE_SEAT_LAW.md` as the first note fixing
+  `Sanctuary.MoS` as the lawful governance-bearing storage seat and
+  `Sanctuary.cMoS` as its derivational private/cryptic companion
+- `OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md` as the first note fixing `OE`
+  and `SelfGEL` as structural `MoS` occupants without runtime or governing
+  life
+- `CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md` as the first note fixing `cOE` and
+  `cSelfGEL` as derivational `cMoS` surfaces rather than a second sovereign
+  origin
+- `GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md` as the first note fixing
+  receipted continuity from `GEL/cGEL` into `MoS/cMoS` without authorization
+  overread
+- `MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md` as the first note fixing the
+  refusal edges that keep `MoS/cMoS` below pre-Cradle authorization,
+  governing placement, and runtime life
+- `MOS_STORAGE_SEAT_AUDIT.md` as the first audit proving lawful governance
+  memory-seat standing, derivational surfacing, and receipted handoff without
+  placement or authorization overread
+- `CRADLETEK_SITE_BINDING_PROFILE_LAW.md` as the first note fixing one closed
+  four-class site-binding grammar for pre-Cradle standing
+- `OPERATOR_TRAINING_SET_ADMISSION_LAW.md` as the first note fixing
+  site-bound operator training admission before any governing action is
+  discussable
+- `TOOL_STATE_AUTHORIZATION_LAW.md` as the first note fixing site-bound and
+  operator-bound tool authorization beneath intended-service disablement
+- `FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md` as the first note fixing one
+  assented final `CME` disclosure bundle for pre-Cradle standing
+- `CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md` as the first note fixing
+  inheritance-scope IP and creation-use IP as distinct scoped authorities
+- `CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md` as the first note fixing
+  custodial customization and brand/campaign preparation as distinct authority
+  bases
+- `PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md` as the first note
+  fixing one site-bound pre-Cradle authorization candidate beneath
+  storage-seat and lift readiness
+- `PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md` as the first note
+  fixing receipt and refusal grammar for that site-bound pre-Cradle
+  authorization seam
+- the first passive pre-Cradle site-authorization contract family beneath
+  `src/San/San.Common/`
 - the passive membrane corridor and observational organism before any active
   runtime binding claim
 - family-first source ownership
