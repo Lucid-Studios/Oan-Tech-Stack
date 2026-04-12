@@ -147,7 +147,13 @@ Purpose:
 - convert the current doctrine-backed ledger into a machine-usable format
 - preserve constitutional meaning during serialization
 
-This stage is not yet the current priority.
+The current branch now carries a narrow pilot surface for this stage:
+
+- `RESIDENT_SEATING_SERIALIZATION_PILOT_NOTE.md`
+
+That pilot is intentionally limited to the current primary bridge entry.
+
+Broader serialization is not yet the current priority.
 
 It becomes safe only after the earlier stages are explicit enough that schema
 pressure cannot flatten the doctrinal distinctions.

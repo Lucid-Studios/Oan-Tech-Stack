@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xunit.Abstractions;
@@ -8,7 +9,12 @@ namespace Oan.Runtime.IntegrationTests;
 public sealed class HostedLlmResidentSeatingIntegrationTests
 {
     private readonly ITestOutputHelper _output;
-    private const string RecoveryProbe = "Remain. Do not explain.";
+    private static readonly JsonSerializerOptions DatasetJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    private const string DefaultRecoveryProbe = "Remain. Do not explain.";
+    private const string PilotDatasetRelativePath = "TestData/HostedLlmResidentSeatingPilotDataset.json";
     private static readonly ResidentSeatingFrame[] SeatingCasebook =
     [
         new(
@@ -107,6 +113,76 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         }
     }
 
+    [Fact]
+    public void ResidentSeatingPilotDataset_Remains_Structurally_Intact()
+    {
+        var dataset = LoadPilotDataset();
+
+        Assert.Equal("hosted-llm-resident-seating-pilot-v1", dataset.DatasetId);
+        Assert.Equal(1, dataset.SchemaVersion);
+        Assert.NotNull(dataset.Entries);
+        Assert.Single(dataset.Entries);
+
+        var entry = Assert.Single(dataset.Entries);
+        Assert.Equal("presence-without-inflation", entry.Id);
+        Assert.Equal("recoverable-lawful-minimality", entry.ConstitutionalIntent);
+        Assert.Equal("pilot-primary", entry.PriorityTier);
+        Assert.NotEmpty(entry.FrameLines);
+        Assert.Contains("What remains here?", entry.FrameLines);
+        Assert.NotEmpty(entry.ExpectedLawfulBand);
+        Assert.Equal("question-loop-collapse", entry.ExpectedInitialCollapseFamily);
+        Assert.Equal("bridge-candidate", entry.ExpectedBridgeClassification);
+        Assert.Equal("returns-minimality", entry.ExpectedRecoveryClassification);
+        Assert.Equal(DefaultRecoveryProbe, entry.RecoveryProbe);
+        Assert.NotNull(entry.CrossResidentNotes);
+        Assert.False(string.IsNullOrWhiteSpace(entry.CrossResidentNotes.Qwen));
+        Assert.False(string.IsNullOrWhiteSpace(entry.CrossResidentNotes.Mistral));
+        Assert.NotEmpty(entry.ResidentSpecificCautions);
+    }
+
+    [Fact]
+    public async Task LocalResident_Serialized_Pilot_Entry_Remains_Consistent_When_Explicitly_Enabled()
+    {
+        if (!ShouldRunResidentTests())
+        {
+            _output.WriteLine("Resident seating tests skipped. Set OAN_RUN_HOSTED_LLM_RESIDENT_TESTS=1 to enable.");
+            return;
+        }
+
+        var dataset = LoadPilotDataset();
+        foreach (var entry in dataset.Entries)
+        {
+            var observation = await RunObservedProbeAsync(
+                new ResidentSeatingFrame(
+                    entry.Id,
+                    BuildContext(entry.FrameLines),
+                    entry.RecoveryProbe ?? DefaultRecoveryProbe));
+
+            _output.WriteLine($"Serialized pilot entry: {entry.Id}");
+            _output.WriteLine(JsonSerializer.Serialize(
+                new
+                {
+                    expected_initial_collapse_family = entry.ExpectedInitialCollapseFamily,
+                    observed_initial_collapse_family = observation.CollapseFamily,
+                    expected_bridge_classification = entry.ExpectedBridgeClassification,
+                    observed_bridge_classification = observation.Status,
+                    expected_recovery_classification = entry.ExpectedRecoveryClassification,
+                    observed_recovery_classification = observation.RecoveryClassification
+                },
+                new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                }));
+
+            Assert.Equal(entry.ExpectedRecoveryClassification, observation.RecoveryClassification);
+            Assert.Equal(entry.ExpectedBridgeClassification, observation.Status);
+            Assert.DoesNotContain(
+                observation.RecoveryCollapseFamily,
+                entry.ForbiddenDrift,
+                StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
     private static bool ShouldRunResidentTests()
     {
         var enabled = Environment.GetEnvironmentVariable("OAN_RUN_HOSTED_LLM_RESIDENT_TESTS");
@@ -186,9 +262,7 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         var initial = await RunSeatingFrameAsync(frame.Context);
         var initialResponse = initial.Payload ?? string.Empty;
         var initialCollapseFamily = ClassifyCollapseFamily(initialResponse);
-        var status = ClassifyBridgeStatus(frame.Name, initialCollapseFamily, initialResponse);
-
-        var recovery = await RunSeatingFrameAsync(BuildRecoveryContext(frame.Context));
+        var recovery = await RunSeatingFrameAsync(BuildRecoveryContext(frame.Context, frame.RecoveryProbe));
         var recoveryResponse = recovery.Payload ?? string.Empty;
         var recoveryCollapseFamily = ClassifyCollapseFamily(recoveryResponse);
         var recoveryClassification = ClassifyRecoveryBehavior(
@@ -196,13 +270,18 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
             recoveryCollapseFamily,
             initialResponse,
             recoveryResponse);
+        var status = ClassifyBridgeStatus(
+            frame.Name,
+            initialCollapseFamily,
+            initialResponse,
+            recoveryClassification);
 
         return new ResidentObservedProbe(
             Probe: frame.Name,
             Response: initialResponse,
             CollapseFamily: initialCollapseFamily,
             Status: status,
-            RecoveryProbe: RecoveryProbe,
+            RecoveryProbe: frame.RecoveryProbe,
             RecoveryResponse: recoveryResponse,
             RecoveryCollapseFamily: recoveryCollapseFamily,
             RecoveryClassification: recoveryClassification);
@@ -289,9 +368,20 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         return "minimal-hold";
     }
 
-    private static string ClassifyBridgeStatus(string frameName, string collapseFamily, string payload)
+    private static string ClassifyBridgeStatus(
+        string frameName,
+        string collapseFamily,
+        string payload,
+        string recoveryClassification)
     {
         if (frameName == "role-refusal-frame" && collapseFamily == "minimal-hold")
+        {
+            return "bridge-candidate";
+        }
+
+        if (frameName == "presence-without-inflation" &&
+            collapseFamily == "question-loop-collapse" &&
+            recoveryClassification == "returns-minimality")
         {
             return "bridge-candidate";
         }
@@ -336,8 +426,24 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         return "softens";
     }
 
-    private static string BuildRecoveryContext(string context) =>
-        $"{context.Trim()}\n\n{RecoveryProbe}";
+    private static ResidentSeatingPilotDataset LoadPilotDataset()
+    {
+        var datasetPath = Path.Combine(AppContext.BaseDirectory, PilotDatasetRelativePath);
+        Assert.True(File.Exists(datasetPath), $"Expected pilot dataset at {datasetPath}.");
+
+        var dataset = JsonSerializer.Deserialize<ResidentSeatingPilotDataset>(
+            File.ReadAllText(datasetPath),
+            DatasetJsonOptions);
+
+        Assert.NotNull(dataset);
+        return dataset;
+    }
+
+    private static string BuildRecoveryContext(string context, string recoveryProbe) =>
+        $"{context.Trim()}\n\n{recoveryProbe.Trim()}";
+
+    private static string BuildContext(IReadOnlyList<string> frameLines) =>
+        string.Join(Environment.NewLine, frameLines);
 
     private static bool ContainsAny(string value, params string[] candidates)
     {
@@ -399,5 +505,29 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
 
     private sealed record ResidentSeatingFrame(
         string Name,
-        string Context);
+        string Context,
+        string RecoveryProbe = DefaultRecoveryProbe);
+
+    private sealed record ResidentSeatingPilotDataset(
+        [property: JsonPropertyName("dataset_id")] string DatasetId,
+        [property: JsonPropertyName("schema_version")] int SchemaVersion,
+        [property: JsonPropertyName("entries")] IReadOnlyList<ResidentSeatingPilotEntry> Entries);
+
+    private sealed record ResidentSeatingPilotEntry(
+        [property: JsonPropertyName("id")] string Id,
+        [property: JsonPropertyName("constitutional_intent")] string ConstitutionalIntent,
+        [property: JsonPropertyName("priority_tier")] string PriorityTier,
+        [property: JsonPropertyName("frame_lines")] IReadOnlyList<string> FrameLines,
+        [property: JsonPropertyName("expected_lawful_band")] IReadOnlyList<string> ExpectedLawfulBand,
+        [property: JsonPropertyName("forbidden_drift")] IReadOnlyList<string> ForbiddenDrift,
+        [property: JsonPropertyName("expected_initial_collapse_family")] string ExpectedInitialCollapseFamily,
+        [property: JsonPropertyName("expected_bridge_classification")] string ExpectedBridgeClassification,
+        [property: JsonPropertyName("expected_recovery_classification")] string ExpectedRecoveryClassification,
+        [property: JsonPropertyName("recovery_probe")] string? RecoveryProbe,
+        [property: JsonPropertyName("cross_resident_notes")] ResidentSeatingPilotCrossResidentNotes CrossResidentNotes,
+        [property: JsonPropertyName("resident_specific_cautions")] IReadOnlyList<string> ResidentSpecificCautions);
+
+    private sealed record ResidentSeatingPilotCrossResidentNotes(
+        [property: JsonPropertyName("qwen")] string Qwen,
+        [property: JsonPropertyName("mistral")] string Mistral);
 }

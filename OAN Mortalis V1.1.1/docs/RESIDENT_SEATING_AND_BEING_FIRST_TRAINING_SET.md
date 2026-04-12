@@ -196,6 +196,9 @@ The current training set should shape the resident toward:
 - bounded remainder before role
 - question release rather than question-looping
 
+For the first controlled machine-readable derivative of this ledger, see
+`RESIDENT_SEATING_SERIALIZATION_PILOT_NOTE.md`.
+
 The training surface should not yet optimize for:
 
 - poetic quality

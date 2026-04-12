@@ -16,6 +16,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestData\HostedLlmResidentSeatingPilotDataset.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\AgentiCore\\AgentiCore\\AgentiCore\\AgentiCore.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\CradleTek\\CradleTek.Host\\CradleTek.Host\\CradleTek.Host.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\CradleTek\\CradleTek.Mantle\\CradleTek.Mantle\\CradleTek.Mantle.csproj" />

@@ -56,6 +56,9 @@ posture, see `RESIDENT_SEATING_AND_BEING_FIRST_TRAINING_SET.md`.
 For the pedagogical and constitutional teaching order that should govern these
 resident surfaces, see `RESIDENT_INHABITATION_CURRICULUM_NOTE.md`.
 
+For the first controlled machine-readable seating entry that the harness may
+consume without replacing doctrine, see `RESIDENT_SEATING_SERIALIZATION_PILOT_NOTE.md`.
+
 ## Witness Discipline
 
 When the local resident seating probe is run, we watch for:
