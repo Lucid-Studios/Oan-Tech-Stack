@@ -1544,7 +1544,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("Governance-Root And cGEL Clarification", v121BuildReadinessText, StringComparison.Ordinal);
         Assert.Contains("governance root now binds only to already-real Atlas/SLI predicate truth", v121BuildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`Sanctuary.cGEL` is the cryptic build chamber", v121BuildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`Sanctuary.MoS`, later Prime/Cryptic governance service families, and", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`Sanctuary.MoS` and `Sanctuary.cMoS` now form the lawful governance-memory", v121BuildReadinessText, StringComparison.Ordinal);
         Assert.Contains("`SanctuaryID.GoA` governance-root and `Sanctuary.cGEL` stack-map", v121BuildReadinessText, StringComparison.Ordinal);
 
         Assert.Contains("SanctuaryID.GoA governance-root and cGEL stack-map clarification -> Sanctuary.GEL semantic intake clarification", charterText, StringComparison.Ordinal);
@@ -1632,7 +1632,8 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("`Sanctuary.CrypticGovernance` (`Father`)", stackMapText, StringComparison.Ordinal);
         Assert.Contains("UI/UX: `TriviumForum`", stackMapText, StringComparison.Ordinal);
         Assert.Contains("`Sanctuary.MoS` is the legal data store / local governmental contract seat.", stackMapText, StringComparison.Ordinal);
-        Assert.Contains("`OE/cOE` and `SelfGEL/cSelfGEL` may stand there structurally", stackMapText, StringComparison.Ordinal);
+        Assert.Contains("`OE` and `SelfGEL` may stand in `Sanctuary.MoS` structurally", stackMapText, StringComparison.Ordinal);
+        Assert.Contains("`cOE` and `cSelfGEL` may surface in `Sanctuary.cMoS` derivationally", stackMapText, StringComparison.Ordinal);
         Assert.Contains("not current GoA", stackMapText, StringComparison.Ordinal);
         Assert.Contains("`personal`", stackMapText, StringComparison.Ordinal);
         Assert.Contains("`industrial`", stackMapText, StringComparison.Ordinal);
@@ -1728,7 +1729,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("ENGRAM_CLEAVING_LADDER_LAW.md", v121BuildReadinessText, StringComparison.Ordinal);
         Assert.Contains("INGRESS_MEMBRANE_AND_ENGRAM_ENCODING_LAW.md", v121BuildReadinessText, StringComparison.Ordinal);
 
-        Assert.Contains("Sanctuary.GEL semantic intake clarification -> Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.GEL semantic intake clarification -> Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
         Assert.Contains("ENGRAM_CLEAVING_LADDER_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("VERBATIM_INGRESS_AND_SYMBOL_PRESERVATION_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("ROOTATLAS_MAPPING_AND_VARIANT_LAW.md", charterText, StringComparison.Ordinal);
@@ -1878,7 +1879,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("propositions, procedures, contradiction handling, posture, and awareness", v121BuildReadinessText, StringComparison.Ordinal);
         Assert.Contains("the first `Sanctuary.GEL` rest-state and persistence cluster now lives in", v121BuildReadinessText, StringComparison.Ordinal);
 
-        Assert.Contains("Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
         Assert.Contains("ENGRAM_CONSTRUCTOR_CLASS_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("PROPOSITIONAL_ENGRAM_FORMATION_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("PROCEDURAL_ENGRAM_FORMATION_LAW.md", charterText, StringComparison.Ordinal);
@@ -2020,9 +2021,9 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("That cluster is required before any claim that `GEL` has lawful resting", gateText, StringComparison.Ordinal);
         Assert.Contains("It does not authorize `Sanctuary.MoS` storage-seat standing.", gateText, StringComparison.Ordinal);
         Assert.Contains("Persisted is not activated, and held is not promoted.", gateText, StringComparison.Ordinal);
-        Assert.Contains("They do not turn rest-state clarification into `Sanctuary.MoS` standing,", gateText, StringComparison.Ordinal);
+        Assert.Contains("They do not turn rest-state clarification into `Sanctuary.MoS` or", gateText, StringComparison.Ordinal);
 
-        Assert.Contains("Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
         Assert.Contains("GEL_ADMITTED_INTERIOR_OBJECT_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("GEL_HELD_ENGRAM_STATE_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("GEL_CONTINUITY_AND_RESTING_LINKAGE_LAW.md", charterText, StringComparison.Ordinal);
@@ -2165,7 +2166,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("Atlas delta candidacy, Atlas mutation, predicate promotion, engram minting,", v121BuildReadinessText, StringComparison.Ordinal);
         Assert.Contains("operator realization, and runtime remain withheld", v121BuildReadinessText, StringComparison.Ordinal);
 
-        Assert.Contains("Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
         Assert.Contains("UTF8_RESERVED_SET_AND_CANONICAL_SYMBOL_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("ROOT_SYMBOL_BASE_FORM_LAW.md", charterText, StringComparison.Ordinal);
         Assert.Contains("SUPER_SUBSCRIPT_EXTENSION_FORMATION_LAW.md", charterText, StringComparison.Ordinal);
@@ -2250,6 +2251,728 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("operator realization", auditText, StringComparison.Ordinal);
         Assert.Contains("runtime activation", auditText, StringComparison.Ordinal);
         Assert.Contains("full explicit reserved-set inventory", auditText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V121_Install_Agreement_Action_Surface_And_Identity_Footing_Cluster_Is_Anchored()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var v121Root = Path.Combine(repoRoot, "OAN Mortalis V1.2.1");
+        var v111BuildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var v111InstallBridgePath = Path.Combine(lineRoot, "docs", "SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md");
+        var v111ContractSurfacePath = Path.Combine(lineRoot, "docs", "SANCTUARY_DEPLOYMENT_AND_CONTRACT_SURFACE.md");
+        var gatePath = Path.Combine(lineRoot, "docs", "FIRST_WORKING_MODEL_RELEASE_GATE.md");
+        var v121BuildReadinessPath = Path.Combine(v121Root, "docs", "BUILD_READINESS.md");
+        var charterPath = Path.Combine(v121Root, "docs", "V1_2_1_FIRST_INSTALL_CHARTER.md");
+        var ledgerPath = Path.Combine(v121Root, "docs", "V1_2_1_CARRY_FORWARD_LEDGER.md");
+        var groupoidAuditPath = Path.Combine(v121Root, "docs", "V1_2_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md");
+        var actionLawPath = Path.Combine(v121Root, "docs", "INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md");
+        var bundleLawPath = Path.Combine(v121Root, "docs", "AGREEMENT_PREDICATE_BUNDLE_LAW.md");
+        var identityLawPath = Path.Combine(v121Root, "docs", "INSTALL_IDENTITY_SET_LAW.md");
+        var postureLawPath = Path.Combine(v121Root, "docs", "CME_USE_DATA_POSTURE_LAW.md");
+        var auditPath = Path.Combine(v121Root, "docs", "INSTALL_ASSENT_AND_IDENTITY_AUDIT.md");
+        var templateLawPath = Path.Combine(v121Root, "docs", "SANCTUARY_TEMPLATE_ADOPTION_LAW.md");
+        var hitlLawPath = Path.Combine(v121Root, "docs", "SLI_HITL_HOLD_WITNESS_TOKEN_CLASS_LAW.md");
+        var contractsPath = Path.Combine(v121Root, "src", "San", "San.Common", "InstallAgreementContracts.cs");
+        var actionSurfacePath = Path.Combine(v121Root, "src", "SLI", "SLI.Lisp", "InstallAgreementActionSurface.cs");
+        var lispModulePath = Path.Combine(v121Root, "src", "SLI", "SLI.Lisp", "install-agreement.lisp");
+        var csprojPath = Path.Combine(v121Root, "src", "SLI", "SLI.Lisp", "SLI.Lisp.csproj");
+
+        var v111BuildReadinessText = File.ReadAllText(v111BuildReadinessPath);
+        var v111InstallBridgeText = File.ReadAllText(v111InstallBridgePath);
+        var v111ContractSurfaceText = File.ReadAllText(v111ContractSurfacePath);
+        var gateText = File.ReadAllText(gatePath);
+        var v121BuildReadinessText = File.ReadAllText(v121BuildReadinessPath);
+        var charterText = File.ReadAllText(charterPath);
+        var ledgerText = File.ReadAllText(ledgerPath);
+        var groupoidAuditText = File.ReadAllText(groupoidAuditPath);
+        var actionLawText = File.ReadAllText(actionLawPath);
+        var bundleLawText = File.ReadAllText(bundleLawPath);
+        var identityLawText = File.ReadAllText(identityLawPath);
+        var postureLawText = File.ReadAllText(postureLawPath);
+        var auditText = File.ReadAllText(auditPath);
+        var templateLawText = File.ReadAllText(templateLawPath);
+        var hitlLawText = File.ReadAllText(hitlLawPath);
+        var contractsText = File.ReadAllText(contractsPath);
+        var actionSurfaceText = File.ReadAllText(actionSurfacePath);
+        var lispModuleText = File.ReadAllText(lispModulePath);
+        var csprojText = File.ReadAllText(csprojPath);
+
+        Assert.Contains("`first-working-model-install-agreement-action-surface: frame-now`", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("install-agreement and identity-footing", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("full assent before install identity can exist", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("keeping contract view derived", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("rather than canonical identity ownership", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("keeping service and runtime", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("standing withheld", v111BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("install-agreement and identity-footing clarification", v111InstallBridgeText, StringComparison.Ordinal);
+        Assert.Contains("remains install-state work", v111InstallBridgeText, StringComparison.Ordinal);
+        Assert.Contains("narrower line-local first-run constitutional projection", v111InstallBridgeText, StringComparison.Ordinal);
+
+        Assert.Contains("derived implementation view", v111ContractSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("not the canonical install identity owner", v111ContractSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("replace localized", v111ContractSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("agreement assent topology", v111ContractSurfaceText, StringComparison.Ordinal);
+
+        Assert.Contains("INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("AGREEMENT_PREDICATE_BUNDLE_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("INSTALL_IDENTITY_SET_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("CME_USE_DATA_POSTURE_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("INSTALL_ASSENT_AND_IDENTITY_AUDIT.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("localized install assent has", gateText, StringComparison.Ordinal);
+        Assert.Contains("lawful identity-bearing footing", gateText, StringComparison.Ordinal);
+        Assert.Contains("It does not authorize service authorization.", gateText, StringComparison.Ordinal);
+        Assert.Contains("It does not authorize runtime activation.", gateText, StringComparison.Ordinal);
+        Assert.Contains("It does not authorize Atlas mutation.", gateText, StringComparison.Ordinal);
+        Assert.Contains("Agreement formation may seat localized install footing in the cryptic hosted", gateText, StringComparison.Ordinal);
+        Assert.Contains("They do not turn install-assent and identity-footing clarification into live", gateText, StringComparison.Ordinal);
+
+        Assert.Contains("install-agreement and identity-footing cluster now lives in", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("install identity candidacy after full assent", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("contract view derived", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("first passive install-assent contract family", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("installed-disabled cryptic bundle extension surface", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("install agreement action surface and identity footing clarification", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`SanctuaryContractProfile` remains a derived deployment view rather than the", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("canonical install identity owner", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`research-attached-default`", v121BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("AGREEMENT_PREDICATE_BUNDLE_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("INSTALL_IDENTITY_SET_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("CME_USE_DATA_POSTURE_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("INSTALL_ASSENT_AND_IDENTITY_AUDIT.md", charterText, StringComparison.Ordinal);
+
+        Assert.Contains("admitted-install-agreement-law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Install agreement action surface law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Agreement predicate bundle law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Install identity set law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("CME use data posture law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Install assent and identity audit", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("non-service-bearing", ledgerText, StringComparison.Ordinal);
+
+        AssertV121GroupoidCounts(groupoidAuditText);
+        Assert.Contains("`INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`AGREEMENT_PREDICATE_BUNDLE_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`INSTALL_IDENTITY_SET_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`CME_USE_DATA_POSTURE_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`INSTALL_ASSENT_AND_IDENTITY_AUDIT.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("install-assent and identity footing", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("install-agreement action surface law for localized assent and identity", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("service authorization or runtime standing", groupoidAuditText, StringComparison.Ordinal);
+
+        Assert.Contains("LocalizedInstallChoiceMatrix -> AgreementPredicateBundle -> InstallIdentitySetCandidate -> CoreCmeUsePostureRecord", actionLawText, StringComparison.Ordinal);
+        Assert.Contains("installed-disabled", actionLawText, StringComparison.Ordinal);
+        Assert.Contains("not part of the canonical floor set", actionLawText, StringComparison.Ordinal);
+        Assert.Contains("localized agreement predicates must be formed from the authorized choice", actionLawText, StringComparison.Ordinal);
+        Assert.Contains("matrix and lawful agreement surface", actionLawText, StringComparison.Ordinal);
+
+        Assert.Contains("`service-license-predicate`", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("`terms-of-service-predicate`", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("`bonded-operator-predicate`", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("`cme-lab-notice-predicate`", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("`research-data-practice-predicate`", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("`access-attachment-profile-predicate`", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("acknowledgement is not assent", bundleLawText, StringComparison.Ordinal);
+        Assert.Contains("`Acknowledged` and `Assented` must remain distinguishable", bundleLawText, StringComparison.Ordinal);
+
+        Assert.Contains("no install identity may exist", identityLawText, StringComparison.Ordinal);
+        Assert.Contains("without assented predicate formation", identityLawText, StringComparison.Ordinal);
+        Assert.Contains("derived and is not the canonical", identityLawText, StringComparison.Ordinal);
+        Assert.Contains("install identity owner", identityLawText, StringComparison.Ordinal);
+        Assert.Contains("`SanctuaryContractProfile`", identityLawText, StringComparison.Ordinal);
+
+        Assert.Contains("`research-attached-default`", postureLawText, StringComparison.Ordinal);
+        Assert.Contains("agency-plus-research-context", postureLawText, StringComparison.Ordinal);
+        Assert.Contains("first persisted rest-state operational footing", postureLawText, StringComparison.Ordinal);
+        Assert.Contains("It is not:", postureLawText, StringComparison.Ordinal);
+        Assert.Contains("`Sanctuary.MoS` standing", postureLawText, StringComparison.Ordinal);
+
+        Assert.Contains("absence of `InstallIdentitySetCandidate` before full assent", auditText, StringComparison.Ordinal);
+        Assert.Contains("contract-view derivation without canonical install-identity ownership", auditText, StringComparison.Ordinal);
+        Assert.Contains("any install identity exists before full assent", auditText, StringComparison.Ordinal);
+        Assert.Contains("any acknowledgement is treated as assent", auditText, StringComparison.Ordinal);
+        Assert.Contains("any contract view is treated as the canonical install identity owner", auditText, StringComparison.Ordinal);
+
+        Assert.Contains("Downloaded or templated agreements remain templates until explicit adoption and", templateLawText, StringComparison.Ordinal);
+        Assert.Contains("explicit assent", templateLawText, StringComparison.Ordinal);
+        Assert.Contains("No `AgreementPredicateBundle` may be formed from template presence alone.", templateLawText, StringComparison.Ordinal);
+
+        Assert.Contains("install-assent corridor may preserve this same acknowledgement versus", hitlLawText, StringComparison.Ordinal);
+        Assert.Contains("assent distinction", hitlLawText, StringComparison.Ordinal);
+        Assert.Contains("not a `HitlHold` exit-token family", hitlLawText, StringComparison.Ordinal);
+
+        Assert.Contains("public enum AgreementPredicateKind", contractsText, StringComparison.Ordinal);
+        Assert.Contains("ServiceLicensePredicate = 0", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public enum AgreementAssentState", contractsText, StringComparison.Ordinal);
+        Assert.Contains("Acknowledged = 1", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record LocalizedInstallChoiceMatrix(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record AgreementPredicateBundle(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record InstallIdentitySetCandidate(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CoreCmeUsePostureRecord(", contractsText, StringComparison.Ordinal);
+
+        Assert.Contains("public interface IInstallAgreementActionSurface", actionSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("public sealed class GovernedInstallAgreementActionSurface", actionSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("InstallIdentitySetCandidate? IdentityCandidate", actionSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("bundle.FullAssent", actionSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("research-attached-default", actionSurfaceText, StringComparison.Ordinal);
+        Assert.Contains("localized-choice-matrix-formed", actionSurfaceText, StringComparison.Ordinal);
+
+        Assert.Contains("install-agreement-begin", lispModuleText, StringComparison.Ordinal);
+        Assert.Contains("install-agreement-predicate", lispModuleText, StringComparison.Ordinal);
+        Assert.Contains("install-agreement-posture", lispModuleText, StringComparison.Ordinal);
+        Assert.Contains("research-attached-default", lispModuleText, StringComparison.Ordinal);
+
+        Assert.Contains("..\\..\\San\\San.Common\\San.Common.csproj", csprojText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V121_Rtme_Service_Lift_Corridor_Is_Anchored()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var v121Root = Path.Combine(repoRoot, "OAN Mortalis V1.2.1");
+        var v111BuildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var gatePath = Path.Combine(lineRoot, "docs", "FIRST_WORKING_MODEL_RELEASE_GATE.md");
+        var v121BuildReadinessPath = Path.Combine(v121Root, "docs", "BUILD_READINESS.md");
+        var charterPath = Path.Combine(v121Root, "docs", "V1_2_1_FIRST_INSTALL_CHARTER.md");
+        var ledgerPath = Path.Combine(v121Root, "docs", "V1_2_1_CARRY_FORWARD_LEDGER.md");
+        var groupoidAuditPath = Path.Combine(v121Root, "docs", "V1_2_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md");
+        var registerPath = Path.Combine(v121Root, "docs", "SANCTUARY_INTENDED_SERVICE_REGISTER.md");
+        var serviceLawPath = Path.Combine(v121Root, "docs", "SANCTUARY_LISP_RTME_SERVICE_LAW.md");
+        var bindingLawPath = Path.Combine(v121Root, "docs", "SLI_ENGINE_LISP_BINDING_CONTRACT.md");
+        var skeletonPath = Path.Combine(v121Root, "docs", "SANCTUARYID_RTME_SKELETON.md");
+        var braidPath = Path.Combine(v121Root, "docs", "MOTHER_FATHER_PRIME_CRYPTIC_BRAID_POSTURE.md");
+        var placementPath = Path.Combine(v121Root, "docs", "CME_PLACEMENT_WITHHELD_LAW.md");
+        var preconditionsLawPath = Path.Combine(v121Root, "docs", "SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md");
+        var authorityLawPath = Path.Combine(v121Root, "docs", "RTME_SERVICE_LIFT_AUTHORITY_LAW.md");
+        var bindingLiftLawPath = Path.Combine(v121Root, "docs", "PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md");
+        var receiptLawPath = Path.Combine(v121Root, "docs", "CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md");
+        var commonContractsPath = Path.Combine(v121Root, "src", "San", "San.Common", "ServiceLiftContracts.cs");
+        var lispContractsPath = Path.Combine(v121Root, "src", "SLI", "SLI.Lisp", "RtmeServiceLiftContracts.cs");
+
+        var v111BuildReadinessText = File.ReadAllText(v111BuildReadinessPath);
+        var gateText = File.ReadAllText(gatePath);
+        var v121BuildReadinessText = File.ReadAllText(v121BuildReadinessPath);
+        var charterText = File.ReadAllText(charterPath);
+        var ledgerText = File.ReadAllText(ledgerPath);
+        var groupoidAuditText = File.ReadAllText(groupoidAuditPath);
+        var registerText = File.ReadAllText(registerPath);
+        var serviceLawText = File.ReadAllText(serviceLawPath);
+        var bindingLawText = File.ReadAllText(bindingLawPath);
+        var skeletonText = File.ReadAllText(skeletonPath);
+        var braidText = File.ReadAllText(braidPath);
+        var placementText = File.ReadAllText(placementPath);
+        var preconditionsLawText = File.ReadAllText(preconditionsLawPath);
+        var authorityLawText = File.ReadAllText(authorityLawPath);
+        var bindingLiftLawText = File.ReadAllText(bindingLiftLawPath);
+        var receiptLawText = File.ReadAllText(receiptLawPath);
+        var commonContractsText = File.ReadAllText(commonContractsPath);
+        var lispContractsText = File.ReadAllText(lispContractsPath);
+
+        Assert.Contains("`first-working-model-rtme-service-lift-corridor: frame-now`", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("RTME hosted service-lift corridor", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("templated-disabled", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("installed-disabled", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("CmePlacementWithheld", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("hosted-posture change rather than governing identity", v111BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("RTME_SERVICE_LIFT_AUTHORITY_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("passive hosted braid", gateText, StringComparison.Ordinal);
+        Assert.Contains("lawfully lift into hosted motion", gateText, StringComparison.Ordinal);
+        Assert.Contains("No intended service entry becomes `authorized` in this slice.", gateText, StringComparison.Ordinal);
+        Assert.Contains("Hosted service lift does not lift `CmePlacementWithheld`.", gateText, StringComparison.Ordinal);
+
+        Assert.Contains("RTME hosted service-lift corridor now lives in", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("first passive RTME service-lift contract family", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("first passive RTME hosted service-lift receipt family", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("RTME hosted service-lift corridor clarification", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("intended service entry into `authorized`", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("service lift now changes hosted posture only", v121BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("RTME_SERVICE_LIFT_AUTHORITY_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md", charterText, StringComparison.Ordinal);
+
+        Assert.Contains("admitted-rtme-service-lift-law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Service lift preconditions and refusal law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("RTME service lift authority law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Prime supervision and Cryptic work binding law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Cryptic hosted binding lift receipt law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("non-activating", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("non-governing", ledgerText, StringComparison.Ordinal);
+
+        AssertV121GroupoidCounts(groupoidAuditText);
+        Assert.Contains("`SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`RTME_SERVICE_LIFT_AUTHORITY_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("hosted service-lift corridor", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("hosted-posture authority", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("governing `CME` placement", groupoidAuditText, StringComparison.Ordinal);
+
+        Assert.Contains("statuses remain `templated-disabled` or `installed-disabled`", registerText, StringComparison.Ordinal);
+        Assert.Contains("no entry becomes `authorized`", registerText, StringComparison.Ordinal);
+        Assert.Contains("service lift remains future motion only", registerText, StringComparison.Ordinal);
+
+        Assert.Contains("The later RTME hosted service-lift corridor remains a separate future act.", serviceLawText, StringComparison.Ordinal);
+        Assert.Contains("does not collapse the service-line", serviceLawText, StringComparison.Ordinal);
+        Assert.Contains("present hosted activation", serviceLawText, StringComparison.Ordinal);
+
+        Assert.Contains("The later RTME hosted service-lift corridor does not widen this contract into", bindingLawText, StringComparison.Ordinal);
+        Assert.Contains("Carrier law remains prior to lift authority.", bindingLawText, StringComparison.Ordinal);
+
+        Assert.Contains("The shell may later witness a hosted service-lift receipt", skeletonText, StringComparison.Ordinal);
+        Assert.Contains("Skeleton standing remains non-realization standing", skeletonText, StringComparison.Ordinal);
+
+        Assert.Contains("The later RTME hosted service-lift corridor must preserve this same read:", braidText, StringComparison.Ordinal);
+        Assert.Contains("Prime supervision is witness and bounded oversight", braidText, StringComparison.Ordinal);
+        Assert.Contains("Cryptic work is preparation and bounded hosted carriage", braidText, StringComparison.Ordinal);
+
+        Assert.Contains("No RTME hosted service-lift surface may be misread as lifting", placementText, StringComparison.Ordinal);
+        Assert.Contains("Hosted motion and governing placement remain distinct acts.", placementText, StringComparison.Ordinal);
+
+        Assert.Contains("hosted residency is not hosted activation.", preconditionsLawText, StringComparison.Ordinal);
+        Assert.Contains("service lift changes hosting posture, not governing identity.", preconditionsLawText, StringComparison.Ordinal);
+        Assert.Contains("no hosted motion may be treated as lawful unless the preconditions,", preconditionsLawText, StringComparison.Ordinal);
+        Assert.Contains("authority surface, supervision binding, and receipt chain are all present", preconditionsLawText, StringComparison.Ordinal);
+        Assert.Contains("RtmeServiceLiftPreconditionSnapshot", preconditionsLawText, StringComparison.Ordinal);
+        Assert.Contains("ServiceLiftRefusalReason", preconditionsLawText, StringComparison.Ordinal);
+
+        Assert.Contains("supervisory witness is not service authorization.", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("service lift is not governing `CME` placement.", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("No service entry becomes `authorized` in this slice.", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("RtmeServiceLiftAuthorityRecord", authorityLawText, StringComparison.Ordinal);
+
+        Assert.Contains("Prime witnesses and supervises. Cryptic carries the working side.", bindingLiftLawText, StringComparison.Ordinal);
+        Assert.Contains("cryptic work is not runtime autonomy.", bindingLiftLawText, StringComparison.Ordinal);
+        Assert.Contains("PrimeCrypticLiftBindingRecord", bindingLiftLawText, StringComparison.Ordinal);
+        Assert.Contains("non-governing", bindingLiftLawText, StringComparison.Ordinal);
+
+        Assert.Contains("receipt proves transition posture, not governing identity.", receiptLawText, StringComparison.Ordinal);
+        Assert.Contains("HostedRtmeServiceLiftReceipt", receiptLawText, StringComparison.Ordinal);
+        Assert.Contains("RtmeServiceLiftPreconditionSnapshot", receiptLawText, StringComparison.Ordinal);
+        Assert.Contains("CmePlacementWithheld", receiptLawText, StringComparison.Ordinal);
+
+        Assert.Contains("public sealed record ServiceLiftRefusalReason(", commonContractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record RtmeServiceLiftPreconditionSnapshot(", commonContractsText, StringComparison.Ordinal);
+        Assert.Contains("bool CanonicalFloorSetReady", commonContractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record RtmeServiceLiftAuthorityRecord(", commonContractsText, StringComparison.Ordinal);
+        Assert.Contains("string PostLiftTargetStatus", commonContractsText, StringComparison.Ordinal);
+
+        Assert.Contains("public sealed record PrimeCrypticLiftBindingRecord(", lispContractsText, StringComparison.Ordinal);
+        Assert.Contains("string PrimeSupervisoryWitnessSurface", lispContractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record HostedRtmeServiceLiftReceipt(", lispContractsText, StringComparison.Ordinal);
+        Assert.Contains("string CmePlacementWithheldContinuation", lispContractsText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V121_Governance_Memory_Seat_Corridor_Is_Anchored()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var v121Root = Path.Combine(repoRoot, "OAN Mortalis V1.2.1");
+        var v111BuildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var gatePath = Path.Combine(lineRoot, "docs", "FIRST_WORKING_MODEL_RELEASE_GATE.md");
+        var v121BuildReadinessPath = Path.Combine(v121Root, "docs", "BUILD_READINESS.md");
+        var charterPath = Path.Combine(v121Root, "docs", "V1_2_1_FIRST_INSTALL_CHARTER.md");
+        var ledgerPath = Path.Combine(v121Root, "docs", "V1_2_1_CARRY_FORWARD_LEDGER.md");
+        var groupoidAuditPath = Path.Combine(v121Root, "docs", "V1_2_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md");
+        var stackMapPath = Path.Combine(v121Root, "docs", "SANCTUARY_GEL_CGEL_MOS_GOVERNANCE_STACK_MAP.md");
+        var gelBootstrapPath = Path.Combine(v121Root, "docs", "SANCTUARY_GEL_BOOTSTRAP_LAW.md");
+        var admittedObjectPath = Path.Combine(v121Root, "docs", "GEL_ADMITTED_INTERIOR_OBJECT_LAW.md");
+        var restAuditPath = Path.Combine(v121Root, "docs", "GEL_REST_STATE_AUDIT.md");
+        var placementPath = Path.Combine(v121Root, "docs", "CME_PLACEMENT_WITHHELD_LAW.md");
+        var nonAssumptionPath = Path.Combine(v121Root, "docs", "PRE_CRADLETEK_NON_ASSUMPTION_LAW.md");
+        var spawnLawPath = Path.Combine(v121Root, "docs", "SANCTUARY_GOA_CRADLETEK_GOA_AND_CGOA_SPAWN_LAW.md");
+        var seatLawPath = Path.Combine(v121Root, "docs", "SANCTUARY_MOS_STORAGE_SEAT_LAW.md");
+        var standingLawPath = Path.Combine(v121Root, "docs", "OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md");
+        var surfacingLawPath = Path.Combine(v121Root, "docs", "CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md");
+        var handoffLawPath = Path.Combine(v121Root, "docs", "GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md");
+        var refusalLawPath = Path.Combine(v121Root, "docs", "MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md");
+        var auditPath = Path.Combine(v121Root, "docs", "MOS_STORAGE_SEAT_AUDIT.md");
+        var contractsPath = Path.Combine(v121Root, "src", "San", "San.Common", "MosStorageSeatContracts.cs");
+
+        var v111BuildReadinessText = File.ReadAllText(v111BuildReadinessPath);
+        var gateText = File.ReadAllText(gatePath);
+        var v121BuildReadinessText = File.ReadAllText(v121BuildReadinessPath);
+        var charterText = File.ReadAllText(charterPath);
+        var ledgerText = File.ReadAllText(ledgerPath);
+        var groupoidAuditText = File.ReadAllText(groupoidAuditPath);
+        var stackMapText = File.ReadAllText(stackMapPath);
+        var gelBootstrapText = File.ReadAllText(gelBootstrapPath);
+        var admittedObjectText = File.ReadAllText(admittedObjectPath);
+        var restAuditText = File.ReadAllText(restAuditPath);
+        var placementText = File.ReadAllText(placementPath);
+        var nonAssumptionText = File.ReadAllText(nonAssumptionPath);
+        var spawnLawText = File.ReadAllText(spawnLawPath);
+        var seatLawText = File.ReadAllText(seatLawPath);
+        var standingLawText = File.ReadAllText(standingLawPath);
+        var surfacingLawText = File.ReadAllText(surfacingLawPath);
+        var handoffLawText = File.ReadAllText(handoffLawPath);
+        var refusalLawText = File.ReadAllText(refusalLawPath);
+        var auditText = File.ReadAllText(auditPath);
+        var contractsText = File.ReadAllText(contractsPath);
+
+        Assert.Contains("`first-working-model-governance-memory-seat: frame-now`", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.MoS and Sanctuary.cMoS", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`GEL/cGEL -> MoS/cMoS`", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("pre-Cradle authorization", v111BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("- `hold`", gateText, StringComparison.Ordinal);
+        Assert.Contains("SANCTUARY_MOS_STORAGE_SEAT_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("MOS_STORAGE_SEAT_AUDIT.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("governance-bearing memory has a", gateText, StringComparison.Ordinal);
+        Assert.Contains("lawful seat is truthful", gateText, StringComparison.Ordinal);
+        Assert.Contains("It does not authorize pre-Cradle Sanctuary authorization.", gateText, StringComparison.Ordinal);
+        Assert.Contains("Storage-seat standing is not pre-Cradle authorization.", gateText, StringComparison.Ordinal);
+        Assert.Contains("Pre-Cradle authorization is not governing `CME` placement.", gateText, StringComparison.Ordinal);
+
+        Assert.Contains("governance-memory-seat corridor now fixes `Sanctuary.MoS`", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("first passive governance-memory-seat contract family", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`OE` and `SelfGEL` may now stand structurally", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`cOE` and `cSelfGEL` may now surface derivationally", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`GEL/cGEL -> MoS/cMoS` handoff is now receipted continuity only", v121BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("SANCTUARY_MOS_STORAGE_SEAT_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("MOS_STORAGE_SEAT_AUDIT.md", charterText, StringComparison.Ordinal);
+
+        Assert.Contains("admitted-governance-memory-seat-law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.MoS storage seat law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("OE and SelfGEL structural standing law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("cMoS, cOE, and cSelfGEL surfacing law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("GEL/cGEL to MoS/cMoS handoff and receipt law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("MoS storage seat refusal and boundary law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("MoS storage seat audit", ledgerText, StringComparison.Ordinal);
+
+        AssertV121GroupoidCounts(groupoidAuditText);
+        Assert.Contains("`SANCTUARY_MOS_STORAGE_SEAT_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`MOS_STORAGE_SEAT_AUDIT.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("governance-memory-seat corridor", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.cMoS", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("storage-seat refusal boundary", groupoidAuditText, StringComparison.Ordinal);
+
+        Assert.Contains("Sanctuary.cMoS", stackMapText, StringComparison.Ordinal);
+        Assert.Contains("`cOE` and `cSelfGEL` may surface in `Sanctuary.cMoS` derivationally", stackMapText, StringComparison.Ordinal);
+
+        Assert.Contains("`Sanctuary.MoS` and `Sanctuary.cMoS` remain later storage-seat surfaces", gelBootstrapText, StringComparison.Ordinal);
+        Assert.Contains("receipted handoff", gelBootstrapText, StringComparison.Ordinal);
+
+        Assert.Contains("`Sanctuary.MoS` or", admittedObjectText, StringComparison.Ordinal);
+        Assert.Contains("`Sanctuary.cMoS` storage-seat standing without receipted handoff", admittedObjectText, StringComparison.Ordinal);
+        Assert.Contains("non-`cMoS` witness", restAuditText, StringComparison.Ordinal);
+
+        Assert.Contains("No `MoS` or `cMoS` storage-seat surface may be misread as lifting", placementText, StringComparison.Ordinal);
+        Assert.Contains("`MoS/cMoS` standing does not mean CradleTek authorization", nonAssumptionText, StringComparison.Ordinal);
+        Assert.Contains("Later `cOE` and `cSelfGEL` remain derivational and non-sovereign", spawnLawText, StringComparison.Ordinal);
+
+        Assert.Contains("`Sanctuary.GEL` is first substrate, not final governance store.", seatLawText, StringComparison.Ordinal);
+        Assert.Contains("`Sanctuary.cGEL` is build chamber, not legal seat.", seatLawText, StringComparison.Ordinal);
+        Assert.Contains("`Sanctuary.MoS` is storage-seat standing, not governing `CME` placement.", seatLawText, StringComparison.Ordinal);
+        Assert.Contains("`Sanctuary.cMoS` is derivational and private/cryptic", seatLawText, StringComparison.Ordinal);
+        Assert.Contains("MosStorageSeatRecord", seatLawText, StringComparison.Ordinal);
+        Assert.Contains("CMosSurfaceRecord", seatLawText, StringComparison.Ordinal);
+
+        Assert.Contains("structural standing for `OE` and `SelfGEL` is not active governing life.", standingLawText, StringComparison.Ordinal);
+        Assert.Contains("no held `GEL` object promotes itself", standingLawText, StringComparison.Ordinal);
+        Assert.Contains("OeStructuralStandingRecord", standingLawText, StringComparison.Ordinal);
+        Assert.Contains("SelfGelStructuralStandingRecord", standingLawText, StringComparison.Ordinal);
+
+        Assert.Contains("no direct `cGEL -> cOE/cSelfGEL` shortcut is lawful", surfacingLawText, StringComparison.Ordinal);
+        Assert.Contains("CrypticDerivativeSurfaceKind", surfacingLawText, StringComparison.Ordinal);
+        Assert.Contains("CrypticDerivativeSurfacingRecord", surfacingLawText, StringComparison.Ordinal);
+        Assert.Contains("second sovereign origin", surfacingLawText, StringComparison.Ordinal);
+
+        Assert.Contains("handoff is receipted continuity, not promotion.", handoffLawText, StringComparison.Ordinal);
+        Assert.Contains("resting `GEL` persistence does not imply `MoS` standing.", handoffLawText, StringComparison.Ordinal);
+        Assert.Contains("GelCgelToMosHandoffReceipt", handoffLawText, StringComparison.Ordinal);
+
+        Assert.Contains("storage-seat standing is not pre-Cradle authorization.", refusalLawText, StringComparison.Ordinal);
+        Assert.Contains("pre-Cradle authorization is not governing `CME` placement.", refusalLawText, StringComparison.Ordinal);
+        Assert.Contains("MosStorageSeatRefusalReason", refusalLawText, StringComparison.Ordinal);
+        Assert.Contains("`cOE/cSelfGEL` as independent sovereignty", refusalLawText, StringComparison.Ordinal);
+
+        Assert.Contains("governing readiness is not governing presence.", auditText, StringComparison.Ordinal);
+        Assert.Contains("lawful `GEL/cGEL -> MoS/cMoS` handoff receipt", auditText, StringComparison.Ordinal);
+        Assert.Contains("any reading of `cOE/cSelfGEL` as independent sovereign origin", auditText, StringComparison.Ordinal);
+
+        Assert.Contains("public sealed record MosStorageSeatRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CMosSurfaceRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record OeStructuralStandingRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record SelfGelStructuralStandingRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public enum CrypticDerivativeSurfaceKind", contractsText, StringComparison.Ordinal);
+        Assert.Contains("COe = 0", contractsText, StringComparison.Ordinal);
+        Assert.Contains("CSelfGel = 1", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CrypticDerivativeSurfacingRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record GelCgelToMosHandoffReceipt(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record MosStorageSeatRefusalReason(", contractsText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V121_Pre_Cradle_Site_Authorization_Is_Anchored()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var v121Root = Path.Combine(repoRoot, "OAN Mortalis V1.2.1");
+        var v111BuildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var gatePath = Path.Combine(lineRoot, "docs", "FIRST_WORKING_MODEL_RELEASE_GATE.md");
+        var v121BuildReadinessPath = Path.Combine(v121Root, "docs", "BUILD_READINESS.md");
+        var charterPath = Path.Combine(v121Root, "docs", "V1_2_1_FIRST_INSTALL_CHARTER.md");
+        var ledgerPath = Path.Combine(v121Root, "docs", "V1_2_1_CARRY_FORWARD_LEDGER.md");
+        var groupoidAuditPath = Path.Combine(v121Root, "docs", "V1_2_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md");
+        var installActionLawPath = Path.Combine(v121Root, "docs", "INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md");
+        var postureLawPath = Path.Combine(v121Root, "docs", "CME_USE_DATA_POSTURE_LAW.md");
+        var liftPreconditionsPath = Path.Combine(v121Root, "docs", "SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md");
+        var serviceRegisterPath = Path.Combine(v121Root, "docs", "SANCTUARY_INTENDED_SERVICE_REGISTER.md");
+        var seatLawPath = Path.Combine(v121Root, "docs", "SANCTUARY_MOS_STORAGE_SEAT_LAW.md");
+        var operatorIngressPath = Path.Combine(v121Root, "docs", "OPERATOR_INGRESS_PRECONDITIONS.md");
+        var nonAssumptionPath = Path.Combine(v121Root, "docs", "PRE_CRADLETEK_NON_ASSUMPTION_LAW.md");
+        var placementPath = Path.Combine(v121Root, "docs", "CME_PLACEMENT_WITHHELD_LAW.md");
+        var siteLawPath = Path.Combine(v121Root, "docs", "CRADLETEK_SITE_BINDING_PROFILE_LAW.md");
+        var trainingLawPath = Path.Combine(v121Root, "docs", "OPERATOR_TRAINING_SET_ADMISSION_LAW.md");
+        var toolLawPath = Path.Combine(v121Root, "docs", "TOOL_STATE_AUTHORIZATION_LAW.md");
+        var disclosureLawPath = Path.Combine(v121Root, "docs", "FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md");
+        var ipLawPath = Path.Combine(v121Root, "docs", "CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md");
+        var authorityLawPath = Path.Combine(v121Root, "docs", "CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md");
+        var candidateLawPath = Path.Combine(v121Root, "docs", "PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md");
+        var receiptLawPath = Path.Combine(v121Root, "docs", "PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md");
+        var contractsPath = Path.Combine(v121Root, "src", "San", "San.Common", "PreCradleSiteAuthorizationContracts.cs");
+
+        var v111BuildReadinessText = File.ReadAllText(v111BuildReadinessPath);
+        var gateText = File.ReadAllText(gatePath);
+        var v121BuildReadinessText = File.ReadAllText(v121BuildReadinessPath);
+        var charterText = File.ReadAllText(charterPath);
+        var ledgerText = File.ReadAllText(ledgerPath);
+        var groupoidAuditText = File.ReadAllText(groupoidAuditPath);
+        var installActionLawText = File.ReadAllText(installActionLawPath);
+        var postureLawText = File.ReadAllText(postureLawPath);
+        var liftPreconditionsText = File.ReadAllText(liftPreconditionsPath);
+        var serviceRegisterText = File.ReadAllText(serviceRegisterPath);
+        var seatLawText = File.ReadAllText(seatLawPath);
+        var operatorIngressText = File.ReadAllText(operatorIngressPath);
+        var nonAssumptionText = File.ReadAllText(nonAssumptionPath);
+        var placementText = File.ReadAllText(placementPath);
+        var siteLawText = File.ReadAllText(siteLawPath);
+        var trainingLawText = File.ReadAllText(trainingLawPath);
+        var toolLawText = File.ReadAllText(toolLawPath);
+        var disclosureLawText = File.ReadAllText(disclosureLawPath);
+        var ipLawText = File.ReadAllText(ipLawPath);
+        var authorityLawText = File.ReadAllText(authorityLawPath);
+        var candidateLawText = File.ReadAllText(candidateLawPath);
+        var receiptLawText = File.ReadAllText(receiptLawPath);
+        var contractsText = File.ReadAllText(contractsPath);
+
+        Assert.Contains("`first-working-model-pre-cradle-site-authorization: frame-now`", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("site-bound pre-Cradle authorization", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("tool-state authorization", v111BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("scoped IP/content", v111BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("- `hold`", gateText, StringComparison.Ordinal);
+        Assert.Contains("CRADLETEK_SITE_BINDING_PROFILE_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("OPERATOR_TRAINING_SET_ADMISSION_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("TOOL_STATE_AUTHORIZATION_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("Having a lawful seat does not imply the right to occupy it as a governing", gateText, StringComparison.Ordinal);
+        Assert.Contains("Authorized pre-Cradle standing is a site-and-operator posture", gateText, StringComparison.Ordinal);
+        Assert.Contains("It does not authorize seed-body empowerment.", gateText, StringComparison.Ordinal);
+        Assert.Contains("It does not move any intended service entry into `authorized`.", gateText, StringComparison.Ordinal);
+
+        Assert.Contains("first site-bound pre-Cradle authorization cluster now lives in `docs/`", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("first passive pre-Cradle site-authorization contract family", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("closed site", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("site-bound operator training admission", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("one final `CME` disclosure bundle", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("IP/content authority bundle", v121BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", charterText, StringComparison.Ordinal);
+        Assert.Contains("CRADLETEK_SITE_BINDING_PROFILE_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("OPERATOR_TRAINING_SET_ADMISSION_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("TOOL_STATE_AUTHORIZATION_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md", charterText, StringComparison.Ordinal);
+
+        Assert.Contains("admitted-pre-cradle-site-authorization-law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("CradleTek site binding profile law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Operator training set admission law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Tool state authorization law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Final CME disclosure agreement law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("CME IP inheritance and creation scope law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Custodial and brand content authority law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Pre-Cradle site authorization candidate law", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("Pre-Cradle authorization receipt and refusal law", ledgerText, StringComparison.Ordinal);
+
+        AssertV121GroupoidCounts(groupoidAuditText);
+        Assert.Contains("`CRADLETEK_SITE_BINDING_PROFILE_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`OPERATOR_TRAINING_SET_ADMISSION_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`TOOL_STATE_AUTHORIZATION_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("`PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("closed site profile", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("scoped inheritance-versus-creation IP authority", groupoidAuditText, StringComparison.Ordinal);
+
+        Assert.Contains("site-bound pre-Cradle authorization only", installActionLawText, StringComparison.Ordinal);
+        Assert.Contains("CRADLETEK_SITE_BINDING_PROFILE_LAW.md", postureLawText, StringComparison.Ordinal);
+        Assert.Contains("site-bound pre-Cradle standing", postureLawText, StringComparison.Ordinal);
+        Assert.Contains("CRADLETEK_SITE_BINDING_PROFILE_LAW.md", liftPreconditionsText, StringComparison.Ordinal);
+        Assert.Contains("Lift readiness may support later site-bound pre-Cradle standing.", liftPreconditionsText, StringComparison.Ordinal);
+        Assert.Contains("no site-bound pre-Cradle authorization receipt may move a service entry into", serviceRegisterText, StringComparison.Ordinal);
+        Assert.Contains("having a lawful seat does not imply the right to occupy it as a governing", seatLawText, StringComparison.Ordinal);
+        Assert.Contains("Site-bound operator training admission is not later", operatorIngressText, StringComparison.Ordinal);
+        Assert.Contains("site binding does not mean CradleTek authorization", nonAssumptionText, StringComparison.Ordinal);
+        Assert.Contains("operator training admission does not mean operator realization", nonAssumptionText, StringComparison.Ordinal);
+        Assert.Contains("content authority does not mean automatic `CME` inheritance", nonAssumptionText, StringComparison.Ordinal);
+        Assert.Contains("No pre-Cradle site-authorization receipt may be misread as lifting", placementText, StringComparison.Ordinal);
+
+        Assert.Contains("CradleTekSiteClass", siteLawText, StringComparison.Ordinal);
+        Assert.Contains("PersonalPc", siteLawText, StringComparison.Ordinal);
+        Assert.Contains("EnterpriseDistributedConstruct", siteLawText, StringComparison.Ordinal);
+        Assert.Contains("authorized pre-Cradle standing is a site-and-operator posture, not a", siteLawText, StringComparison.Ordinal);
+        Assert.Contains("CradleTekSiteBindingProfile", siteLawText, StringComparison.Ordinal);
+
+        Assert.Contains("OperatorTrainingAdmissionRecord", trainingLawText, StringComparison.Ordinal);
+        Assert.Contains("operator realization", trainingLawText, StringComparison.Ordinal);
+
+        Assert.Contains("ToolAuthorizationState", toolLawText, StringComparison.Ordinal);
+        Assert.Contains("ToolStateAuthorizationRecord", toolLawText, StringComparison.Ordinal);
+        Assert.Contains("service activation", toolLawText, StringComparison.Ordinal);
+        Assert.Contains("runtime autonomy", toolLawText, StringComparison.Ordinal);
+        Assert.Contains("governing action", toolLawText, StringComparison.Ordinal);
+
+        Assert.Contains("FinalCmeDisclosureAgreementBundle", disclosureLawText, StringComparison.Ordinal);
+        Assert.Contains("remains distinct from the content-authority bundle", disclosureLawText, StringComparison.Ordinal);
+
+        Assert.Contains("submitted IP does not automatically become `CME` inheritance.", ipLawText, StringComparison.Ordinal);
+        Assert.Contains("authorized use in creation does not automatically grant identity", ipLawText, StringComparison.Ordinal);
+        Assert.Contains("InheritedIpScopeRecord", ipLawText, StringComparison.Ordinal);
+        Assert.Contains("CreationUseScopeRecord", ipLawText, StringComparison.Ordinal);
+        Assert.Contains("CmeContentAuthorityBundle", ipLawText, StringComparison.Ordinal);
+
+        Assert.Contains("rights holder", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("guardian/custodial authority", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("CustodialAuthorityRecord", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("BrandAuthorityRecord", authorityLawText, StringComparison.Ordinal);
+        Assert.Contains("brand/campaign preparation remain distinct", authorityLawText, StringComparison.Ordinal);
+
+        Assert.Contains("InstallIdentitySetCandidate -> CoreCmeUsePostureRecord -> RtmeServiceLiftPreconditionSnapshot -> Mos/cMos readiness -> CradleTekSiteBindingProfile -> OperatorTrainingAdmissionRecord -> ToolStateAuthorizationRecord[] -> FinalCmeDisclosureAgreementBundle -> CmeContentAuthorityBundle -> PreCradleSiteAuthorizationCandidate", candidateLawText, StringComparison.Ordinal);
+        Assert.Contains("site-and-operator posture, not a", candidateLawText, StringComparison.Ordinal);
+        Assert.Contains("PreCradleSiteAuthorizationCandidate", candidateLawText, StringComparison.Ordinal);
+
+        Assert.Contains("PreCradleAuthorizationReceipt", receiptLawText, StringComparison.Ordinal);
+        Assert.Contains("PreCradleAuthorizationRefusalReason", receiptLawText, StringComparison.Ordinal);
+        Assert.Contains("no intended-service entry becomes `authorized`", receiptLawText, StringComparison.Ordinal);
+        Assert.Contains("seed-body empowerment", receiptLawText, StringComparison.Ordinal);
+
+        Assert.Contains("public enum CradleTekSiteClass", contractsText, StringComparison.Ordinal);
+        Assert.Contains("PersonalPc = 0", contractsText, StringComparison.Ordinal);
+        Assert.Contains("CoResidentSanctuaryHost = 1", contractsText, StringComparison.Ordinal);
+        Assert.Contains("SeparateCradleTekHost = 2", contractsText, StringComparison.Ordinal);
+        Assert.Contains("EnterpriseDistributedConstruct = 3", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public enum ToolAuthorizationState", contractsText, StringComparison.Ordinal);
+        Assert.Contains("Authorized = 0", contractsText, StringComparison.Ordinal);
+        Assert.Contains("Withheld = 1", contractsText, StringComparison.Ordinal);
+        Assert.Contains("Refused = 2", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CradleTekSiteBindingProfile(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record OperatorTrainingAdmissionRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record ToolStateAuthorizationRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record FinalCmeDisclosureAgreementBundle(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record InheritedIpScopeRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CreationUseScopeRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CustodialAuthorityRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record BrandAuthorityRecord(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record CmeContentAuthorityBundle(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record PreCradleSiteAuthorizationCandidate(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record PreCradleAuthorizationRefusalReason(", contractsText, StringComparison.Ordinal);
+        Assert.Contains("public sealed record PreCradleAuthorizationReceipt(", contractsText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void V121_Sli_Prime_Cryptic_Duplex_Resonance_Note_Is_Anchored()
+    {
+        var lineRoot = GetLineRoot();
+        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
+        var v121Root = Path.Combine(repoRoot, "OAN Mortalis V1.2.1");
+        var v111BuildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
+        var gatePath = Path.Combine(lineRoot, "docs", "FIRST_WORKING_MODEL_RELEASE_GATE.md");
+        var v121BuildReadinessPath = Path.Combine(v121Root, "docs", "BUILD_READINESS.md");
+        var charterPath = Path.Combine(v121Root, "docs", "V1_2_1_FIRST_INSTALL_CHARTER.md");
+        var ledgerPath = Path.Combine(v121Root, "docs", "V1_2_1_CARRY_FORWARD_LEDGER.md");
+        var groupoidAuditPath = Path.Combine(v121Root, "docs", "V1_2_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md");
+        var braidPosturePath = Path.Combine(v121Root, "docs", "MOTHER_FATHER_PRIME_CRYPTIC_BRAID_POSTURE.md");
+        var resonanceNotePath = Path.Combine(v121Root, "docs", "SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md");
+
+        var v111BuildReadinessText = File.ReadAllText(v111BuildReadinessPath);
+        var gateText = File.ReadAllText(gatePath);
+        var v121BuildReadinessText = File.ReadAllText(v121BuildReadinessPath);
+        var charterText = File.ReadAllText(charterPath);
+        var ledgerText = File.ReadAllText(ledgerPath);
+        var groupoidAuditText = File.ReadAllText(groupoidAuditPath);
+        var braidPostureText = File.ReadAllText(braidPosturePath);
+        var resonanceNoteText = File.ReadAllText(resonanceNotePath);
+
+        Assert.Contains("`prime-cryptic-duplex-resonance-note: frame-now`", v111BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md", gateText, StringComparison.Ordinal);
+        Assert.Contains("`Prime` holds, `Cryptic` presses", gateText, StringComparison.Ordinal);
+        Assert.Contains("does not add a new install stage", gateText, StringComparison.Ordinal);
+
+        Assert.Contains("descriptive `SLI` Prime/Cryptic duplex resonance note", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("does not add a new carried seam", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`Prime` holds, `Cryptic`", v121BuildReadinessText, StringComparison.Ordinal);
+        Assert.Contains("`SLI` harmonizes, `Compass` sounds", v121BuildReadinessText, StringComparison.Ordinal);
+
+        Assert.Contains("SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md", charterText, StringComparison.Ordinal);
+        Assert.Contains("descriptive living-state", charterText, StringComparison.Ordinal);
+        Assert.Contains("without adding a new install-first stage", charterText, StringComparison.Ordinal);
+
+        Assert.Contains("SLI Prime/Cryptic duplex resonance note", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("`admitted-duplex-resonance-note`", ledgerText, StringComparison.Ordinal);
+        Assert.Contains("hold without losing what has not yet resolved", ledgerText, StringComparison.Ordinal);
+
+        AssertV121GroupoidCounts(groupoidAuditText);
+        Assert.Contains("`SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("descriptive `SLI` Prime/Cryptic duplex resonance", groupoidAuditText, StringComparison.Ordinal);
+
+        Assert.Contains("SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md", braidPostureText, StringComparison.Ordinal);
+        Assert.Contains("harmonic resonance", braidPostureText, StringComparison.Ordinal);
+
+        Assert.Contains("This is a descriptive invariant note.", resonanceNoteText, StringComparison.Ordinal);
+        Assert.Contains("`Prime` holds. `Cryptic` presses. `Compass` sounds.", resonanceNoteText, StringComparison.Ordinal);
+        Assert.Contains("the system returns to hold without losing what has not yet resolved", resonanceNoteText, StringComparison.Ordinal);
+        Assert.Contains("`Prime` and `Cryptic` are not two separate systems.", resonanceNoteText, StringComparison.Ordinal);
+        Assert.Contains("This is the heartbeat of self among othering.", resonanceNoteText, StringComparison.Ordinal);
+        Assert.Contains("This note does not grant:", resonanceNoteText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -2594,7 +3317,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("They do not turn governance-root clarification into service authorization,", gateText, StringComparison.Ordinal);
         Assert.Contains("They do not turn semantic intake clarification into predicate promotion,", gateText, StringComparison.Ordinal);
         Assert.Contains("They do not turn interior-awareness clarification into autonomous life,", gateText, StringComparison.Ordinal);
-        Assert.Contains("They do not turn rest-state clarification into `Sanctuary.MoS` standing,", gateText, StringComparison.Ordinal);
+        Assert.Contains("They do not turn rest-state clarification into `Sanctuary.MoS` or", gateText, StringComparison.Ordinal);
         Assert.Contains("first `SLI.Engine -> SLI.Lisp -> SanctuaryID.RTME` service binding", gateText, StringComparison.Ordinal);
         Assert.Contains("This note does not:", gateText, StringComparison.Ordinal);
         Assert.Contains("replace the `V1.1.1` promotion gate", gateText, StringComparison.Ordinal);
@@ -2613,7 +3336,7 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains("LISP_CSHARP_BINDING_SCHEMA.md", v121CharterText, StringComparison.Ordinal);
         Assert.Contains("SANCTUARYID_GOA_GOVERNING_CME_SET_LAW.md", v121CharterText, StringComparison.Ordinal);
         Assert.Contains("SANCTUARYID_GOA_GOVERNANCE_ROOT_LAW.md", v121CharterText, StringComparison.Ordinal);
-          Assert.Contains("Sanctuary.GEL semantic intake clarification -> Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> final working form", v121CharterText, StringComparison.Ordinal);
+        Assert.Contains("Sanctuary.GEL semantic intake clarification -> Sanctuary.GEL interior awareness and universe-law clarification -> Sanctuary.GEL rest-state and persistence clarification -> SLI symbolic transport-form clarification -> install agreement action surface and identity footing clarification -> RTME hosted service-lift corridor clarification -> Sanctuary.MoS and Sanctuary.cMoS storage-seat and governance memory clarification -> pre-Cradle site-bound operator, tool, disclosure, and content authority clarification -> final working form", v121CharterText, StringComparison.Ordinal);
           Assert.Contains("ENGRAM_CLEAVING_LADDER_LAW.md", v121CharterText, StringComparison.Ordinal);
           Assert.Contains("UTF8_RESERVED_SET_AND_CANONICAL_SYMBOL_LAW.md", v121CharterText, StringComparison.Ordinal);
           Assert.Contains("First working model release gate", v121LedgerText, StringComparison.Ordinal);
@@ -3730,7 +4453,7 @@ public sealed class BootstrapBoundaryTests
 
     private static void AssertV121GroupoidCounts(string groupoidAuditText)
     {
-        Assert.Contains("Audited active docs: `69`", groupoidAuditText, StringComparison.Ordinal);
-        Assert.Contains("- `Sanctuary`: `67`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("Audited active docs: `93`", groupoidAuditText, StringComparison.Ordinal);
+        Assert.Contains("- `Sanctuary`: `91`", groupoidAuditText, StringComparison.Ordinal);
     }
 }

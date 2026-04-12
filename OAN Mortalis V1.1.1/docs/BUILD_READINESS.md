@@ -140,6 +140,10 @@ Current contract-first unlock map:
 - `first-working-model-gel-interior-awareness-and-universe: frame-now`
 - `first-working-model-gel-rest-state: frame-now`
 - `first-working-model-sli-symbolic-transport-form: frame-now`
+- `first-working-model-install-agreement-action-surface: frame-now`
+- `first-working-model-rtme-service-lift-corridor: frame-now`
+- `first-working-model-governance-memory-seat: frame-now`
+- `first-working-model-pre-cradle-site-authorization: frame-now`
 - `source-bucket-federation-cycle: admitted-local-mechanical`
 - `source-bucket-return-intake: admitted-local-mechanical`
 - `v111-enrichment-automation: admitted-local-bounded`
@@ -150,6 +154,7 @@ Current contract-first unlock map:
 - `discernment-admissibility-law: frame-now`
 - `agenticore-listening-frame-compass-minimal-build: frame-now/spec-now`
 - `prime-cryptic-duplex-law: frame-now`
+- `prime-cryptic-duplex-resonance-note: frame-now`
 - `mos-cmos-cgoa-instantiation-law: frame-now/spec-now`
 - `cme-return-audit-promotion-law: frame-now/spec-now`
 - `bounded-ec-loop: frame-now`
@@ -206,6 +211,31 @@ explicitly refusing `Sanctuary.MoS` over-read.
 That same gate now also carries the `SLI` symbolic transport-form cluster
 while preserving UTF-8 carrier integrity, shared root transport lineage,
 governed super/sub expansion only, and explicit non-mutation posture.
+
+That same gate now also carries the install-agreement and identity-footing
+cluster while preserving acknowledgement-versus-assent distinction, requiring
+full assent before install identity can exist, keeping contract view derived
+rather than canonical identity ownership, and keeping service and runtime
+standing withheld.
+
+That same gate now also carries the RTME hosted service-lift corridor while
+keeping intended service statuses in `templated-disabled` and
+`installed-disabled`, preserving `CmePlacementWithheld`, and fixing service
+lift as hosted-posture change rather than governing identity or active
+runtime standing.
+
+That same gate now also carries the Sanctuary.MoS and Sanctuary.cMoS
+governance-memory-seat corridor while fixing `Sanctuary.MoS` as lawful legal
+storage seat, `Sanctuary.cMoS` as derivational private/cryptic companion,
+structural `OE`/`SelfGEL` standing, and receipted `GEL/cGEL -> MoS/cMoS`
+continuity without implying pre-Cradle authorization, governing `CME`
+placement, CradleTek authorization, or runtime standing.
+
+That same gate now also carries the first site-bound pre-Cradle authorization
+cluster across one closed site profile, site-bound operator training,
+tool-state authorization, final disclosure assent, and scoped IP/content
+authority while still withholding governing placement and CradleTek live
+authority.
 
 ## Current Verified State
 

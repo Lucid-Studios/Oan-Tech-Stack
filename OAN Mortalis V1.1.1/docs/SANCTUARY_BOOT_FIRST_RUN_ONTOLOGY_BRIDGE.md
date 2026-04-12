@@ -54,6 +54,9 @@ layer that stands before Sanctuary is first entered as a governed chamber.
 Current repo-local posture:
 
 - upstream doctrine only
+- the new `V1.2.1` install-agreement and identity-footing clarification
+  remains install-state work and does not collapse install state into the
+  narrower line-local first-run constitutional projection
 
 ### `Sanctuary State`
 

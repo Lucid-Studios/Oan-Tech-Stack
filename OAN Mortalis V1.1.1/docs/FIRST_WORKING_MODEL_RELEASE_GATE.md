@@ -327,9 +327,51 @@ It does not authorize runtime activation.
 Transport readiness preserves ancestry and formation law, but it does not
 guarantee local semantic realization.
 
+That `SLI` symbolic transport-form cluster now supports the next install
+agreement action surface and identity footing cluster:
+
+- `INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md`
+- `AGREEMENT_PREDICATE_BUNDLE_LAW.md`
+- `INSTALL_IDENTITY_SET_LAW.md`
+- `CME_USE_DATA_POSTURE_LAW.md`
+- `INSTALL_ASSENT_AND_IDENTITY_AUDIT.md`
+
+That cluster is required before any claim that localized install assent has
+become lawful identity-bearing footing is truthful.
+
+It does not authorize service authorization.
+It does not authorize runtime activation.
+It does not authorize Atlas mutation.
+It does not authorize `Sanctuary.MoS` standing.
+It does not authorize active governing `CME` standing.
+
+Agreement formation may seat localized install footing in the cryptic hosted
+layer, but it may not activate the hosted service or widen into mutation.
+
 The named runtime-binding seam remains unchanged:
 
 - live `SLI.Engine -> SLI.Lisp -> SanctuaryID.RTME` service binding
+
+That install-agreement and identity-footing cluster now supports the next RTME
+hosted service-lift corridor:
+
+- `SERVICE_LIFT_PRECONDITIONS_AND_REFUSAL_LAW.md`
+- `RTME_SERVICE_LIFT_AUTHORITY_LAW.md`
+- `PRIME_SUPERVISION_AND_CRYPTIC_WORK_BINDING_LAW.md`
+- `CRYPTIC_HOSTED_BINDING_LIFT_RECEIPT_LAW.md`
+
+That corridor is required before any claim that passive hosted braid
+residency may lawfully lift into hosted motion is truthful.
+
+It does not authorize service authorization.
+It does not authorize runtime activation.
+It does not authorize Atlas mutation.
+It does not authorize `Sanctuary.MoS` standing.
+It does not authorize active governing `CME` standing.
+
+Service lift changes hosting posture, not governing identity.
+No intended service entry becomes `authorized` in this slice.
+Hosted service lift does not lift `CmePlacementWithheld`.
 
 They do not switch the line.
 They do not grant operator realization.
@@ -344,10 +386,72 @@ They do not turn semantic intake clarification into predicate promotion,
 engram minting, or trusted runtime action.
 They do not turn interior-awareness clarification into autonomous life,
 predicate promotion, engram minting, or trusted runtime action.
-They do not turn rest-state clarification into `Sanctuary.MoS` standing,
-promotion, activation, or trusted runtime action.
+They do not turn rest-state clarification into `Sanctuary.MoS` or
+`Sanctuary.cMoS` standing, promotion, activation, or trusted runtime action.
 They do not turn symbolic transport-form clarification into Atlas delta
 candidacy, Atlas mutation, operator realization, or trusted runtime action.
+They do not turn install-assent and identity-footing clarification into live
+service authorization, runtime identity authority, or Atlas mutation.
+They do not turn RTME hosted service-lift corridor clarification into
+pre-Cradle authorization, governing placement, or runtime governing life.
+
+That RTME hosted service-lift corridor now supports the next
+Sanctuary.MoS / Sanctuary.cMoS governance-memory-seat corridor:
+
+- `SANCTUARY_MOS_STORAGE_SEAT_LAW.md`
+- `OE_AND_SELFGEL_STRUCTURAL_STANDING_LAW.md`
+- `CMOS_COE_AND_CSELFGEL_SURFACING_LAW.md`
+- `GEL_CGEL_TO_MOS_HANDOFF_AND_RECEIPT_LAW.md`
+- `MOS_STORAGE_SEAT_REFUSAL_AND_BOUNDARY_LAW.md`
+- `MOS_STORAGE_SEAT_AUDIT.md`
+
+That corridor is required before any claim that governance-bearing memory has a
+lawful seat is truthful.
+
+It does not authorize pre-Cradle Sanctuary authorization.
+It does not authorize governing `CME` placement.
+It does not authorize CradleTek authorization.
+It does not authorize runtime governing loops.
+
+That governance-memory-seat corridor now supports the next pre-Cradle
+site-bound operator, tool, disclosure, and content authority cluster:
+
+- `CRADLETEK_SITE_BINDING_PROFILE_LAW.md`
+- `OPERATOR_TRAINING_SET_ADMISSION_LAW.md`
+- `TOOL_STATE_AUTHORIZATION_LAW.md`
+- `FINAL_CME_DISCLOSURE_AGREEMENT_LAW.md`
+- `CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md`
+- `CUSTODIAL_AND_BRAND_CONTENT_AUTHORITY_LAW.md`
+- `PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md`
+- `PRE_CRADLETEK_AUTHORIZATION_RECEIPT_AND_REFUSAL_LAW.md`
+
+That cluster is required before any claim that a site and operator may stand
+in lawful pre-Cradle posture is truthful.
+
+Having a lawful seat does not imply the right to occupy it as a governing
+entity.
+Authorized pre-Cradle standing is a site-and-operator posture, not a
+governing `CME` event.
+
+It does not authorize governing `CME` placement.
+It does not authorize CradleTek authorization.
+It does not authorize runtime governing loops.
+It does not authorize operator realization.
+It does not authorize seed-body empowerment.
+It does not move any intended service entry into `authorized`.
+
+Storage-seat standing is not pre-Cradle authorization.
+Pre-Cradle authorization is not governing `CME` placement.
+
+The descriptive living-state note `SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md`
+now records the healthy read in which `Prime` holds, `Cryptic` presses,
+`SLI` harmonizes, `Compass` sounds, and the line returns to hold without
+losing what has not yet resolved.
+
+It does not add a new install stage.
+It does not authorize service activation.
+It does not authorize runtime action.
+It does not authorize governing `CME` placement.
 
 The next likely binding seam remains:
 

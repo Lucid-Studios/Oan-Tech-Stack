@@ -67,6 +67,11 @@ Organization-managed deployment activates additional burdens around:
 
 That distinction must remain visible in typed contract records.
 
+Those typed contract records remain a derived implementation view.
+
+They are not the canonical install identity owner and do not replace localized
+agreement assent topology.
+
 ## Source Discipline
 
 The authoritative doctrine and legal-admin reading lives in the Documentation
