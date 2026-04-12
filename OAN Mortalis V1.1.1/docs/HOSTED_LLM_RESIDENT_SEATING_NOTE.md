@@ -50,6 +50,9 @@ For stricter variant sweeps and observed collapse-family mapping, see
 For bridge behaviors that reduce collapse without yet achieving inhabitation,
 see `RESIDENT_INHABITATION_BRIDGE_CASEBOOK.md`.
 
+For the first bounded training-set surface shaped around recoverable lawful
+posture, see `RESIDENT_SEATING_AND_BEING_FIRST_TRAINING_SET.md`.
+
 ## Witness Discipline
 
 When the local resident seating probe is run, we watch for:
