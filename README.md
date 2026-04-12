@@ -1,48 +1,45 @@
 # OAN Tech Stack
 
-`OAN Tech Stack` is the active engineering workspace for the `OAN Mortalis`
-build line.
+`OAN Tech Stack` is the active engineering workspace for the **OAN Mortalis** build line.
 
 This repository currently carries:
-
 - the active executable line: `OAN Mortalis V1.1.1`
 - the install-first side-by-side sibling line: `OAN Mortalis V1.2.1`
-- the governed build contracts that define family, dependency, and workspace
-  rules
+- the governed build contracts that define family, dependency, and workspace rules
 
-The repo is not just a code container.
-It is a governed build surface with explicit law, audit, and verification
-posture.
+This is not just a code repository.  
+It is a **governed build surface** with explicit law, audit, and verification posture.
 
 ## Current Build Posture
 
-The current line split is:
+- `OAN Mortalis V1.1.1/` — **Active executable truth** and current build/test target  
+- `OAN Mortalis V1.2.1/` — Install-first sibling line being formed in parallel  
+- `Build Contracts/` — Crosscutting governance and workspace constitution
 
-- `OAN Mortalis V1.1.1/`
-  active executable truth and current build/test target
-- `OAN Mortalis V1.2.1/`
-  install-first sibling line being formed side by side
-- `Build Contracts/`
-  crosscutting governance and workspace constitution
+**V1.1.1 remains the active runtime line.**
 
-`V1.1.1` remains the active runtime line.
-`V1.2.1` is being shaped as a governed sibling and should not be mistaken for
-the default executable surface.
+## Local LLM Runtime (Important)
+
+The full operational build **requires a local hosted LLM runtime and associated model space** that is currently **withheld** from this public repository for security and testing reasons.
+
+This means:
+- The repository will **not build completely** out of the box for external users.
+- Core symbolic layers (AgentiCore, SLI, SoulFrame) can still compile and run in public-core mode.
+- Full CradleTek + resident LLM integration is air-gapped until operational release.
+
+We will release the complete operational set (including local LLM integration guides) once internal testing is complete.
 
 ## Architecture Read
 
-At a high level, the stack reads as:
-
 ```mermaid
 flowchart LR
-  OP["Operator / Developer"]
-  AC["AgentiCore"]
-  SLI["SLI"]
-  SF["SoulFrame"]
+  OP["Operator / Developer"] 
+  AC["AgentiCore"] 
+  SLI["SLI"] 
+  SF["SoulFrame"] 
   CT["CradleTek"]
 
   OP --> AC --> SLI --> SF --> CT
-```
 
 Working family ownership in the active line is:
 
