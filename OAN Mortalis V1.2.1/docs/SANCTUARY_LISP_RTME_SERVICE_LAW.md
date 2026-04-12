@@ -120,3 +120,7 @@ The first witnessed non-executive path beneath that shell now lives in:
 The first descriptive carriage note beneath that shell now lives in:
 
 - `LISP_CSHARP_BINDING_SCHEMA.md`
+
+The later RTME hosted service-lift corridor remains a separate future act.
+It may change hosted posture later, but it does not collapse the service-line
+office fixed here into lift authority or present hosted activation.

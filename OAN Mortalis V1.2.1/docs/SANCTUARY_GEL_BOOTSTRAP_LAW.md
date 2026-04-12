@@ -67,10 +67,14 @@ These may not bypass `Sanctuary.GEL`.
   authority
 - `cGoA` and other cryptic work lanes remain later derived surfaces, not the
   first install substrate
+- `Sanctuary.MoS` and `Sanctuary.cMoS` remain later storage-seat surfaces
+  reached only by receipted handoff
 
 `Sanctuary.GEL` is bootstrap substrate, not `Sanctuary.cGEL`.
 `Sanctuary.cGEL` is a later cryptic build chamber, not the first install
 substrate.
+`Sanctuary.MoS` and `Sanctuary.cMoS` are later governance-memory seats, not
+bootstrap substrate.
 
 ## Implementation Consequences
 

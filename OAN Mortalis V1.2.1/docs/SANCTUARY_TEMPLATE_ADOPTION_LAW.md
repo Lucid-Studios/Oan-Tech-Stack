@@ -36,6 +36,11 @@ Adoption must be:
 
 Silent adoption is unlawful.
 
+Downloaded or templated agreements remain templates until explicit adoption and
+explicit assent.
+
+No `AgreementPredicateBundle` may be formed from template presence alone.
+
 ## Adoption Classes
 
 Use exactly one adoption class when a template is offered:

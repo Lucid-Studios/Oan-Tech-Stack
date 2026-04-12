@@ -27,8 +27,13 @@ Use this note with:
 - `OPERATOR_REALIZATION_BOUNDARY_LAW.md`
 - `OPERATOR_REALIZATION_WITNESS_AND_PROHIBITION_LAW.md`
 - `OPERATOR_REALIZATION_ADMISSION_SEQUENCE.md`
+- `OPERATOR_TRAINING_SET_ADMISSION_LAW.md`
 
 This note is the object-level ingress check note beneath that boundary.
+
+Site-bound operator training admission is not later operator realization
+ingress.
+Pre-Cradle standing does not replace this later object-level ingress burden.
 
 ## Governing Objects
 

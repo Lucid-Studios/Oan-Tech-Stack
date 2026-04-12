@@ -93,6 +93,17 @@ Allowed origin values in this first register are:
 - Notes: bundle residency may be described and installed in structure without
   becoming active hosted motion
 
+The RTME hosted service-lift corridor may later describe lawful transition
+between these disabled postures and hosted motion.
+
+In this slice:
+
+- statuses remain `templated-disabled` or `installed-disabled`
+- no entry becomes `authorized`
+- service lift remains future motion only
+- no site-bound pre-Cradle authorization receipt may move a service entry into
+  `authorized`
+
 ## Explicit Exclusions
 
 The following are not service entries in this register:

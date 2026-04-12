@@ -23,6 +23,11 @@ The following assumptions are unlawful in this phase:
 - intended does not mean runnable
 - inheritance does not mean sovereignty
 - Sanctuary readiness does not mean CradleTek authorization
+- `MoS/cMoS` standing does not mean CradleTek authorization
+- site binding does not mean CradleTek authorization
+- operator training admission does not mean operator realization
+- disclosure assent does not mean governing action
+- content authority does not mean automatic `CME` inheritance
 - Mother/Father posture does not mean Steward governance
 - governing-set description does not mean active governing `CME` existence
 

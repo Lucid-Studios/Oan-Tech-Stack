@@ -11,6 +11,7 @@ It exists to name later stack order without implying active standing now.
 
 > `Sanctuary.cGEL` is the cryptic build chamber.
 > `Sanctuary.MoS` is the legal data store / local governmental contract seat.
+> `Sanctuary.cMoS` is the derivational private/cryptic companion to that seat.
 > `TriviumForum` is later UI/UX, not current governance-root standing.
 
 ## Current-vs-Later Rule
@@ -30,14 +31,18 @@ The near-term future-stack order is:
 - building to `Sanctuary.cGEL` (`SLI`, Prime/Cryptic braid,
   `SanctuaryID.GoA` binding)
 - `Sanctuary.MoS`
+- `Sanctuary.cMoS`
 - `Sanctuary.PrimeGovernance` (`Mother`)
 - `Sanctuary.CrypticGovernance` (`Father`)
 - UI/UX: `TriviumForum`
 
 `Sanctuary.MoS` is the legal data store / local governmental contract seat.
+`Sanctuary.cMoS` is its derivational private/cryptic companion surface.
 
-`OE/cOE` and `SelfGEL/cSelfGEL` may stand there structurally before specific
+`OE` and `SelfGEL` may stand in `Sanctuary.MoS` structurally before specific
 operator bounds.
+`cOE` and `cSelfGEL` may surface in `Sanctuary.cMoS` derivationally rather
+than as a second sovereign origin.
 
 Each later Prime/Cryptic governance layer carries its own `cGoA` braid and
 later `SoulFrame` / `AgentiCore` build-out.
@@ -66,6 +71,7 @@ This note does not grant:
 - active governing `CME` standing
 - service authorization
 - CradleTek spawn
+- pre-Cradle authorization
 - Steward governance
 - present `TriviumForum` standing
 - admission of Trivium taxonomy into current governance receipts

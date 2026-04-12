@@ -195,6 +195,8 @@ Examples:
 
 These are not templates and not public issuance surfaces.
 They are hot derived work lanes under issued authority.
+Later `cOE` and `cSelfGEL` remain derivational and non-sovereign rather than
+forming a second governance origin.
 
 ### `ID` rules
 

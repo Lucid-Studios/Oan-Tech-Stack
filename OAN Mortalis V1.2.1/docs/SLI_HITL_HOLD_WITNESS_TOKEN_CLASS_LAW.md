@@ -57,6 +57,12 @@ It does not authorize resumed motion by itself.
 Assent proves that a witness judged one named exit from `HitlHold` to be
 lawfully admissible.
 
+The later install-assent corridor may preserve this same acknowledgement versus
+assent distinction for localized agreement predicates.
+
+It is not a `HitlHold` exit-token family, and no install agreement assent may
+counterfeit a hold-release token.
+
 ## First Token Class Family
 
 The first token family now reads:
@@ -128,4 +134,3 @@ It does not yet claim:
 - live token issuance
 - runtime sufficiency adjudication
 - automatic witness release lanes
-

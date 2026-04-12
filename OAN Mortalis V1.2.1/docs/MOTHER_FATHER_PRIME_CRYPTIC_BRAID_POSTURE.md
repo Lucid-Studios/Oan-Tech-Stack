@@ -51,6 +51,18 @@ This duplex read does not yet imply active governing `CME` life.
 It fixes only how supervisory braid posture should be read before live cradle
 authority exists.
 
+The later RTME hosted service-lift corridor must preserve this same read:
+
+- Prime supervision is witness and bounded oversight
+- Cryptic work is preparation and bounded hosted carriage
+- neither side becomes governing `CME` placement or runtime autonomy by lift
+  proximity alone
+
+For the descriptive living-state invariant that keeps this duplex legible as
+harmonic resonance rather than as a merely sequential staging list, use:
+
+- `SLI_PRIME_CRYPTIC_DUPLEX_RESONANCE_NOTE.md`
+
 ## Mother/Father Obligations
 
 Mother/Father posture in this phase must preserve:

@@ -13,8 +13,8 @@ treated as promotion-ready.
 > lawful discernment must end in a lawful resting object before any later
 > ascent may be discussed.
 >
-> persistence inside `GEL` does not yet admit `Sanctuary.MoS` storage-seat
-> standing.
+> persistence inside `GEL` does not yet admit `Sanctuary.MoS` or
+> `Sanctuary.cMoS` storage-seat standing without receipted handoff.
 
 ## Object Office
 
@@ -79,6 +79,7 @@ This note does not grant:
 - engram minting
 - service authorization
 - `Sanctuary.MoS` storage-seat standing
+- `Sanctuary.cMoS` storage-seat standing
 - active governing `CME` standing
 
 ## Working Summary

@@ -5,7 +5,8 @@
 This note audits the first `Sanctuary.GEL` rest-state and persistence cluster.
 
 It exists to prove that lawful discernment now terminates into one canonical
-resting object without implying promotion, activation, or `MoS` standing.
+resting object without implying promotion, activation, or `MoS/cMoS`
+standing.
 
 ## Governing Compression
 
@@ -33,6 +34,8 @@ The following must fail this cluster:
 - any treatment of persisted state as promoted state
 - any use of resting persistence to imply `Sanctuary.MoS` storage-seat
   standing
+- any use of resting persistence to imply `Sanctuary.cMoS` storage-seat
+  standing
 - any runtime, service, or promotion implication
 
 ## Witness Outputs
@@ -45,6 +48,7 @@ The witness outputs for this audit are:
 - contradiction/posture binding witness
 - non-promotion witness
 - non-`MoS` witness
+- non-`cMoS` witness
 
 ## Explicit Non-Grants
 
@@ -55,6 +59,7 @@ This note does not grant:
 - runtime activation
 - service authorization
 - `Sanctuary.MoS` storage-seat standing
+- `Sanctuary.cMoS` storage-seat standing
 
 ## Working Summary
 

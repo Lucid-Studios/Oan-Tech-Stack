@@ -95,6 +95,11 @@ The shell may therefore witness one of two bounded outcomes:
 - `HostedCrypticLispBundleReceipt`
 - seam refusal receipt
 
+The shell may later witness a hosted service-lift receipt without becoming a
+live runtime body.
+Skeleton standing remains non-realization standing even when lift proof is
+named.
+
 ## Refusal Posture
 
 The shell must refuse or withhold when current seam law is not satisfied.

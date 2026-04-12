@@ -31,6 +31,14 @@ That means:
 - no Sanctuary-side preparedness note may be misread as placement
 - no later reader may treat absence of a lift receipt as a mere drafting gap
 
+No RTME hosted service-lift surface may be misread as lifting
+`CmePlacementWithheld`.
+Hosted motion and governing placement remain distinct acts.
+No `MoS` or `cMoS` storage-seat surface may be misread as lifting
+`CmePlacementWithheld`.
+No pre-Cradle site-authorization receipt may be misread as lifting
+`CmePlacementWithheld`.
+
 ## Still-Missing Lawful Conditions
 
 The following still remain absent:

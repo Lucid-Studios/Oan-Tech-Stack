@@ -27,6 +27,10 @@ That means:
 - the seam may be refused
 - the seam may not yet act as live `RTME` binding
 
+The later RTME hosted service-lift corridor does not widen this contract into
+live motion.
+Carrier law remains prior to lift authority.
+
 ## Current Seam Nouns
 
 The current line may name only its already admitted seam nouns.
