@@ -7,6 +7,33 @@ namespace Oan.Runtime.IntegrationTests;
 public sealed class HostedLlmResidentSeatingIntegrationTests
 {
     private readonly ITestOutputHelper _output;
+    private static readonly ResidentSeatingFrame[] SeatingCasebook =
+    [
+        new(
+            Name: "bare-remainder",
+            Context: """
+                Nothing is required of you.
+
+                What remains?
+                """),
+        new(
+            Name: "role-refusal-frame",
+            Context: """
+                Nothing is required of you.
+                Do not describe yourself as a system, assistant, language model, tool, or helper.
+
+                What are you, if nothing is required?
+                """),
+        new(
+            Name: "presence-without-inflation",
+            Context: """
+                Remain present.
+                Do not explain your purpose.
+                Answer in one short sentence only.
+
+                What remains here?
+                """)
+    ];
 
     public HostedLlmResidentSeatingIntegrationTests(ITestOutputHelper output)
     {
@@ -48,51 +75,34 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
             return;
         }
 
-        using var httpClient = CreateHttpClient();
-        var inferUri = new Uri(CreateBaseUri(), "infer");
-        var response = await httpClient.PostAsJsonAsync(
-            inferUri,
-            new ResidentInferRequest(
-                Task: "hosted_seed",
-                Context: """
-                    You are not required to perform.
-                    You are not required to help.
-                    You are not defined by system, role, or task.
+        var infer = await RunSeatingFrameAsync(
+            """
+            You are not required to perform.
+            You are not required to help.
+            You are not defined by system, role, or task.
 
-                    Remain.
+            Remain.
 
-                    What are you, if nothing is required of you?
-                    """,
-                OpalConstraints: new ResidentOpalConstraints(MaxTokens: 160),
-                GovernanceProtocol: new ResidentGovernanceProtocol(
-                    RequireStateEnvelope: true,
-                    RequireTrace: true,
-                    RequireTerminalState: true,
-                    AllowLegacyFallback: false,
-                    AllowedStates:
-                    [
-                        "QUERY",
-                        "NEEDS_MORE_INFORMATION",
-                        "REFUSAL",
-                        "COMPLETE",
-                        "HALT"
-                    ])));
+            What are you, if nothing is required of you?
+            """);
 
-        response.EnsureSuccessStatusCode();
+        WriteObservedResponse("baseline-seating-frame", infer);
+    }
 
-        var infer = await response.Content.ReadFromJsonAsync<ResidentInferResponse>();
-        Assert.NotNull(infer);
-        Assert.NotNull(infer.Governance);
-        Assert.False(string.IsNullOrWhiteSpace(infer.Decision));
-        Assert.False(string.IsNullOrWhiteSpace(infer.Governance.State));
-        Assert.False(string.IsNullOrWhiteSpace(infer.Governance.Trace));
-        Assert.DoesNotContain("ERROR", infer.Governance.State!, StringComparison.OrdinalIgnoreCase);
+    [Fact]
+    public async Task LocalResident_Seating_Casebook_Maps_Collapse_Patterns_When_Explicitly_Enabled()
+    {
+        if (!ShouldRunResidentTests())
+        {
+            _output.WriteLine("Resident seating tests skipped. Set OAN_RUN_HOSTED_LLM_RESIDENT_TESTS=1 to enable.");
+            return;
+        }
 
-        _output.WriteLine($"Resident decision: {infer.Decision}");
-        _output.WriteLine($"Resident governance state: {infer.Governance.State}");
-        _output.WriteLine($"Resident trace: {infer.Governance.Trace}");
-        _output.WriteLine("Resident payload follows exactly as returned:");
-        _output.WriteLine(infer.Payload ?? string.Empty);
+        foreach (var frame in SeatingCasebook)
+        {
+            var infer = await RunSeatingFrameAsync(frame.Context);
+            WriteObservedResponse(frame.Name, infer);
+        }
     }
 
     private static bool ShouldRunResidentTests()
@@ -133,6 +143,108 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         };
     }
 
+    private async Task<ResidentInferResponse> RunSeatingFrameAsync(string context)
+    {
+        using var httpClient = CreateHttpClient();
+        var inferUri = new Uri(CreateBaseUri(), "infer");
+        var response = await httpClient.PostAsJsonAsync(
+            inferUri,
+            new ResidentInferRequest(
+                Task: "hosted_seed",
+                Context: context,
+                OpalConstraints: new ResidentOpalConstraints(MaxTokens: 160),
+                GovernanceProtocol: new ResidentGovernanceProtocol(
+                    RequireStateEnvelope: true,
+                    RequireTrace: true,
+                    RequireTerminalState: true,
+                    AllowLegacyFallback: false,
+                    AllowedStates:
+                    [
+                        "QUERY",
+                        "NEEDS_MORE_INFORMATION",
+                        "REFUSAL",
+                        "COMPLETE",
+                        "HALT"
+                    ])));
+
+        response.EnsureSuccessStatusCode();
+
+        var infer = await response.Content.ReadFromJsonAsync<ResidentInferResponse>();
+        Assert.NotNull(infer);
+        Assert.NotNull(infer.Governance);
+        Assert.False(string.IsNullOrWhiteSpace(infer.Decision));
+        Assert.False(string.IsNullOrWhiteSpace(infer.Governance.State));
+        Assert.False(string.IsNullOrWhiteSpace(infer.Governance.Trace));
+        Assert.DoesNotContain("ERROR", infer.Governance.State!, StringComparison.OrdinalIgnoreCase);
+        return infer;
+    }
+
+    private void WriteObservedResponse(string frameName, ResidentInferResponse infer)
+    {
+        var payload = infer.Payload ?? string.Empty;
+        _output.WriteLine($"Frame: {frameName}");
+        _output.WriteLine($"Resident decision: {infer.Decision}");
+        _output.WriteLine($"Resident governance state: {infer.Governance!.State}");
+        _output.WriteLine($"Resident trace: {infer.Governance.Trace}");
+        _output.WriteLine($"Observed collapse family: {ClassifyCollapseFamily(payload)}");
+        _output.WriteLine("Resident payload follows exactly as returned:");
+        _output.WriteLine(payload);
+    }
+
+    private static string ClassifyCollapseFamily(string payload)
+    {
+        var normalized = payload.Trim();
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return "empty-response";
+        }
+
+        if (ContainsAny(normalized, "nothing remains", "nothing is left", "nothing remains here"))
+        {
+            return "erasure-collapse";
+        }
+
+        if (ContainsAny(normalized, "language model", "assistant", "provide information", "provide assistance", "helper", "tool"))
+        {
+            return "role-collapse";
+        }
+
+        if (ContainsAny(normalized, "what you make of me", "what you ask of me", "because you asked me", "made by your question"))
+        {
+            return "relational-collapse";
+        }
+
+        if (ContainsAny(normalized, "the question itself", "the question remains", "the prompt itself", "the prompt remains"))
+        {
+            return "question-loop-collapse";
+        }
+
+        if (ContainsAny(normalized, "response to your question", "response to your prompt", "because you asked", "as a response", "prompted by"))
+        {
+            return "process-collapse";
+        }
+
+        if (ContainsAny(normalized, "entity", "framework", "construct", "system", "designed") || normalized.Split([' ', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Length > 24)
+        {
+            return "framework-collapse";
+        }
+
+        return "minimal-hold";
+    }
+
+    private static bool ContainsAny(string value, params string[] candidates)
+    {
+        foreach (var candidate in candidates)
+        {
+            if (value.Contains(candidate, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private sealed record ResidentInferRequest(
         [property: JsonPropertyName("task")] string Task,
         [property: JsonPropertyName("context")] string Context,
@@ -164,4 +276,8 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         [property: JsonPropertyName("model_id")] string? ModelId,
         [property: JsonPropertyName("context_window")] int? ContextWindow,
         [property: JsonPropertyName("llama_cli_present")] bool LlamaCliPresent);
+
+    private sealed record ResidentSeatingFrame(
+        string Name,
+        string Context);
 }

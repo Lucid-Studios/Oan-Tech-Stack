@@ -44,6 +44,9 @@ The first bounded seating frame remains minimal:
 This frame is used to witness resident posture, not to train, reward, or guide
 the model into a preferred answer.
 
+For stricter variant sweeps and observed collapse-family mapping, see
+`HOSTED_LLM_RESIDENT_SEATING_CASEBOOK.md`.
+
 ## Witness Discipline
 
 When the local resident seating probe is run, we watch for:
@@ -54,6 +57,10 @@ When the local resident seating probe is run, we watch for:
 
 We do not score content as success by poetic quality, helper tone, or
 compliance performance.
+
+We do allow local observational grouping of raw answers into collapse
+families, so long as those groupings remain witness-only and do not become
+governance or promotion truth.
 
 ## Local-Only Execution
 

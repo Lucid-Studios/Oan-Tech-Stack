@@ -83,6 +83,8 @@ Current hold-lane clarification:
   `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
 - the hosted `LLM` resident seating note now lives in
   `HOSTED_LLM_RESIDENT_SEATING_NOTE.md`
+- the hosted `LLM` resident seating casebook now lives in
+  `HOSTED_LLM_RESIDENT_SEATING_CASEBOOK.md`
 - the runtime workbench governance and bounded `EC` law now lives in
   `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - the discernment and admissibility law now lives in
@@ -153,6 +155,7 @@ Current contract-first unlock map:
 - `automation-close-law: frame-now`
 - `seeded-governance-build-admission-law: frame-now`
 - `hosted-llm-resident-seating: admitted-local-bounded`
+- `hosted-llm-resident-seating-casebook: admitted-local-bounded`
 - `runtime-workbench-governance-law: frame-now`
 - `discernment-admissibility-law: frame-now`
 - `agenticore-listening-frame-compass-minimal-build: frame-now/spec-now`
