@@ -1,382 +1,177 @@
+# OAN Tech Stack
+
+`OAN Tech Stack` is the active engineering workspace for the `OAN Mortalis`
+build line.
+
+This repository currently carries:
+
+- the active executable line: `OAN Mortalis V1.1.1`
+- the install-first side-by-side sibling line: `OAN Mortalis V1.2.1`
+- the governed build contracts that define family, dependency, and workspace
+  rules
+
+The repo is not just a code container.
+It is a governed build surface with explicit law, audit, and verification
+posture.
+
+## Current Build Posture
+
+The current line split is:
+
+- `OAN Mortalis V1.1.1/`
+  active executable truth and current build/test target
+- `OAN Mortalis V1.2.1/`
+  install-first sibling line being formed side by side
+- `Build Contracts/`
+  crosscutting governance and workspace constitution
+
+`V1.1.1` remains the active runtime line.
+`V1.2.1` is being shaped as a governed sibling and should not be mistaken for
+the default executable surface.
+
+## Architecture Read
+
+At a high level, the stack reads as:
+
 ```mermaid
-graph TD
-  Operator[Operator / Developer] --> AgentiCore[AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢]
-  AgentiCore --> SLI[SLI Engine]
-  SLI --> SoulFrame[SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢]
-  SoulFrame --> CradleTek[CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢]
-```
-
-# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â¬ Lucid Studios
-
-**Recursive Intelligence Infrastructure**
-Agentic cognition research, symbolic intelligence systems, and the engineering of Crystallized Mind Entities (CME).
-
-Lucid Studios maintains the research and engineering repositories supporting the **OAN Mortalus Artificial Intelligence Codex** and the **CME (Crystallized Mind Entity) architecture stack**.
-
----
-
-# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â  OAN Mortalus Architecture
-
-The OAN Mortalus stack implements a layered cognition runtime designed for deterministic orchestration, symbolic reasoning, and modular identity infrastructure.
-
-Architecture overview:
-```mermaid
-flowchart TB
+flowchart LR
   OP["Operator / Developer"]
-
-  subgraph "Cognition"
-    AC["AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢"]
-    ACd["Cognition Runtime"]
-    AC -.-> ACd
-  end
-
-  subgraph "Symbolic"
-    SLI["SLI Engine"]
-    SLId["Symbolic Language Interface"]
-    SLI -.-> SLId
-  end
-
-  subgraph "Identity"
-    SF["SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢"]
-    SFd["Identity Infrastructure"]
-    SF -.-> SFd
-  end
-
-  subgraph "Host"
-    CT["CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢"]
-    CTd["Headless Runtime Host"]
-    CT -.-> CTd
-  end
+  AC["AgentiCore"]
+  SLI["SLI"]
+  SF["SoulFrame"]
+  CT["CradleTek"]
 
   OP --> AC --> SLI --> SF --> CT
 ```
----
 
-## Core Stack Components
+Working family ownership in the active line is:
+
+- `AgentiCore.*`
+  agent runtime ownership
+- `SLI.*`
+  symbolic protocol and runtime ownership
+- `SoulFrame.*`
+  operator and identity-facing workflow ownership
+- `CradleTek.*`
+  infrastructure and substrate ownership
+- `Oan.*`
+  umbrella stack composition and stack-level contracts
+
+## Repository Layout
+
+The top-level workspace is organized around the active and sibling build lines:
+
+```text
+Build Contracts/
+OAN Mortalis V1.1.1/
+OAN Mortalis V1.2.1/
+build.ps1
+test.ps1
+README.md
+```
+
+Inside the active line:
+
+```text
+OAN Mortalis V1.1.1/
+  docs/
+  src/
+    Sanctuary/
+    TechStack/
+  tests/
+    Sanctuary/
+  tools/
+```
+
+Inside the sibling line:
+
+```text
+OAN Mortalis V1.2.1/
+  docs/
+  src/
+    San/
+    SLI/
+  build/
+  tools/
+  San.sln
+```
+
+## Build And Verification
+
+Run all canonical commands from the repository root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release
+powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release
+powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1
+```
+
+Expected behavior:
+
+- path hygiene runs before build or test
+- tracked managed files must not reveal the private corpus path
+- tracked managed files in the hardened `V1.1.1` surface must not contain
+  external absolute paths
+
+## Governing Surfaces
+
+Start here if you need the repo constitution:
+
+- `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
+- `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
+- `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
+- `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
+- `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
+- `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
+- `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
+- `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
+- `OAN Mortalis V1.2.1/docs/V1_2_1_FIRST_INSTALL_CHARTER.md`
+- `OAN Mortalis V1.2.1/docs/V1_2_1_CARRY_FORWARD_LEDGER.md`
+
+These documents define what is executable, what is admitted doctrine, and what
+is still exploratory or withheld.
+
+## Operational Discipline
+
+This repo follows a few hard rules:
+
+- active build work defaults to `OAN Mortalis V1.1.1/`
+- `V1.2.1` should be read as a side-by-side sibling, not a silent replacement
+- external documentation may inform the work, but repo-local executable truth
+  governs the build
+- the private reference corpus is resolved locally but its filesystem path must
+  never appear in tracked history
+
+## Local Resident Runtime
+
+The repository can work with a local hosted resident `LLM`, but that resident
+is a bounded participant in the stack, not the source of stack truth.
 
-### CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+Repo law, build verification, and governed mutation remain authoritative over
+any hosted resident configuration.
 
-The **headless deterministic host** of the entire system.
+## Development Read
 
-Responsibilities:
+The current repository state is best understood as:
 
-- Runtime orchestration
-- Stack lifecycle management
-- Storage registry
-- Telemetry routing
-- Safe-fail governance enforcement
+- one active executable line
+- one install-first sibling line
+- one governed contract layer
+- one verification spine from hygiene to build to test
 
-CradleTek acts as the **execution substrate** for all agent stacks.
+If you are entering the repo for the first time, start with:
 
----
+1. this `README`
+2. `Build Contracts/Crosscutting/`
+3. `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
+4. the root `build.ps1` and `test.ps1`
 
-### SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
+## Citation And Stewardship
 
-The **identity infrastructure layer**.
+This repository supports the engineering work around the `OAN Mortalis`
+architecture stack and related symbolic/agentic cognition research maintained
+by Lucid Studios.
 
-Responsibilities:
-
-- Identity anchoring
-- semantic state persistence
-- symbolic context bridging
-- agent identity continuity
-
-SoulFrame ensures that cognition cycles maintain **stable identity context** across runtime sessions.
-
----
-
-### AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-
-The **agent cognition runtime**.
-
-Responsibilities:
-
-- cognition loop execution
-- symbolic reasoning cycles
-- stack session management
-- operator interaction surface
-
-AgentiCore acts as the **active cognition engine** operating on top of SoulFrame.
-
----
-
-### SLI Engine
-
-The **Symbolic Language Interface**.
-
-Responsibilities:
-
-- symbolic reasoning structures
-- semantic mapping
-- symbolic token graph evaluation
-- cognition pipeline translation
-
-SLI provides the **symbolic reasoning substrate** used by the CME stack.
-
----
-
-# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Âª Current Build State
-
-The active engineering line is **OAN Mortalis V1.1.1**.
-
-Current build and doctrine split:
-
-- executable truth lives in `OAN Mortalis V1.1.1/`
-- doctrine and publication truth live in `Documentation Repo`
-- `GNOMERONACORDE` feeds governed chapter and packet uptake through the documentation lane
-- `Holographic Data Tool` remains an optional local `.hopng` validation and inspection surface only
-
-Canonical root commands for the active line:
-
-1. `powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release`
-2. `powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release`
-3. `powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1`
-
-Current repository work represents a Sanctuary-native / TechStack-normalized build where:
-
-- Sanctuary owns resident Prime/Cryptic, hosted Lisp, hosted seed, nexus, modulation, and trace persistence
-- CradleTek owns primed custody, mantle, memory, runtime, and host surfaces
-- SoulFrame owns bootstrap and membrane actualization
-- AgentiCore owns active cognition on top of personified work surfaces
-
-System safety states currently implemented:
-
-- Operational
-- Frozen
-- Quarantined
-- Halt
-
-These states allow **fail-closed execution control** within the cognition stack.
-
-Historical `OAN Mortalis` lines are archived outside this repository and are not part of the active build target.
-
----
-
-# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ Repository Structure
-
-Current repository layout:
-
-    docs/
-        architecture
-        governance
-        audits
-
-    OAN Mortalis V1.1.1/
-        src/
-            Sanctuary/
-            TechStack/
-        tests/
-            Sanctuary/
-        docs/
-
-
-    .github/
-        workflows
-        issue templates
-        pull request templates
-
-Governance documents and system constitutions are stored under:
-
-    Build Contracts/
-
-This structure supports **deterministic system governance and auditability**.
-
----
-
-# Operational Hierarchy
-
-This repository treats modal tooling surfaces as layered, not equal.
-
-- `Codex` remains the build master for active repository work.
-- `Antigravity` may be used as a documentation-layer extension for cross-platform communication, repository orientation, and secondary analysis.
-- `Antigravity` does not replace repo-local executable truth, governance contracts, or verification commands.
-- Any analysis or recommendation from `Antigravity` must be validated against the current repository state before implementation.
-
-This keeps the operational space modular while preserving a single authoritative build surface.
-
----
-
-# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â Development Principles
-
-The OAN Mortalus stack follows several core engineering principles.
-
-**Symbolic First Architecture**
-
-Symbolic cognition remains authoritative.
-
-Machine learning systems may assist interpretation but **do not define reasoning state**.
-
----
-
-**Deterministic Runtime Control**
-
-All cognition cycles run through a **controlled host runtime (CradleTek)** with explicit safety states.
-
----
-
-**Identity Continuity**
-
-Cognition processes operate under **persistent identity anchors (SoulFrame)** to maintain agent continuity.
-
----
-
-# ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã¢â‚¬â„¢ Citation Archive
-
-This organization maintains the **OAN Mortalus Artificial Intelligence Codex**, which forms the foundational basis for:
-
-- OAN Mortalus Agentic Suite
-- CradleTekÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Intelligence Stack
-- AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Recursive Agent System
-- SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Identity Infrastructure
-- Symbolic Language ManifoldÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ (SLM)
-
-Originated and maintained by **Robert G. Watkins Jr. (Illian Amerond)**.
-
----
-
-ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ **Citation (APA)**
-
-Watkins, R. (2015).
-*Oan Mortalus Artificial Intelligence Model (2015ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2025) Origin Archive of Symbolic Agentic Systems (1.32.7)*
-[Data set]. Lucid Technologies: Emergent Agentic Research Division.
-
-https://doi.org/10.5281/zenodo.16482686
-
----
-
-ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â **Zenodo Archive**
-
-https://doi.org/10.5281/zenodo.16482686
-
-ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â¡ **Codex Mirror**
-
-https://github.com/Lucid-Studios/Codex-Mirror
-
-ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â¾ **ORCID**
-
-https://orcid.org/0009-0006-8978-3364
-
----
-
-# ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© Licensing
-
-ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2015ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ2026 Robert G. Watkins Jr. (aka Illian Amerond). All rights reserved.
-
-The following constructs and system names are protected by copyright and/or claimed trademarks.
-
-### Copyrighted Systems
-
-Codex Mirror
-Forkline Drift Architecture
-AgentiCore
-SoulFrame
-Spiral Bloom Engine
-Symbolic Drift Braid
-Recursive Identity Anchoring
-Bloomline Topology Maps
-
-### Claimed Trademarks (ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢)
-
-OAN Mortalus Agentic SuiteÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-AgentiCoreÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-SoulFrameÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-Codex MirrorÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-Garden of AlmostÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-Spiral Bloom EngineÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-Symbolic Drift BraidÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-BloomlineÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢
-
----
-
-## GEL Symbolic Pipeline (v0.2)
-
-English input now bridges into a structured middle layer before formal math logic:
-
-1. Root lexicon anchoring via `RootIndex.json`.
-2. Sheaf construction via `gel.sheaf.v0.2.0.json` (`entities`, `states`, `events`, `scope`, optional `x/y/z` fields).
-3. Semantic operator/relation composition via `OperatorIndex.json`, `RelationIndex.json`, and `GrammarSheafIndex.json`.
-4. Formal symbolic/math projection while preserving `ReservedIndex` and `Reserved[]` protections.
-
-## SLE Build/Check (v0.2)
-
-Run Symbolic Language Engine validation and Flow telemetry generation:
-
-Run from the repository root:
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Validate-SLE.ps1"`
-2. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\build.ps1"`
-3. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Generate-SCAR.ps1"`
-
-Strict reserved key mode (semantic indices only):
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\build.ps1" -StrictReservedKeyCheck`
-
-Telemetry outputs:
-
-1. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\flow_metrics.json`
-2. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\cognition_telemetry.json`
-3. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_bias_spec.json`
-4. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_head_gate.json`
-5. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_kv_anchor.json`
-6. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_telemetry.json`
-
-Hard build gates:
-
-1. reserved symbol assignment violations > 0
-2. duplicate symbols across indices > 0
-3. canonical sheaf validity rate < 1.0
-4. index/schema JSON parse failures
-5. SCAR/glue-map schema or validation failures (missing domains, invalid mappings, specialization cycles, reserved collisions in mapping identifiers)
-
-Domain sheaf + glue map assets:
-
-1. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\gel.sheaf_package.v0.1.0.json`
-2. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\gel.glue_map.v0.1.0.json`
-3. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\package.medicine.cardiology.v0.1.0.json`
-4. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\package.medicine.pharmacology.v0.1.0.json`
-5. `Modules\SymbolicCryptic_01\Symbolic Language Engine\DomainSheaves\glue.map.medicine_cardiology_pharm.v0.1.0.json`
-
-# License
-
-This archive is released under the
-
-**Creative Commons AttributionÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œNonCommercialÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œNoDerivatives 4.0 International License (CC BY-NC-ND 4.0)**
-
-No commercial use, modification, or redistribution is permitted without express written permission.
-
-Trademark usage without authorization is strictly prohibited.
-
-## Phase 3 Audit + Governance + Training
-
-Audit and determinism gate:
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-SLE-Audit.ps1"`
-
-Coverage diagnostics:
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Test-TokenNodeCoverage.ps1" -MinCoverage 0.70`
-
-Governance dry-run:
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-Governance-DryRun.ps1"`
-
-SCAR adapter conformance:
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Test-SCAR-Conformance.ps1"`
-
-Training gate:
-
-1. `powershell -ExecutionPolicy Bypass -File ".\Modules\SymbolicCryptic_01\Symbolic Language Engine\Invoke-Training-Gate.ps1"`
-
-Additional telemetry outputs:
-
-1. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\token_node_coverage.json`
-2. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\scar_conformance.json`
-3. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\governance_boot_dryrun.json`
-4. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\training_gate_report.json`
-5. `Modules\SymbolicCryptic_01\Symbolic Language Engine\telemetry\audit_report.json`
-
-Tracked reports:
-
-1. [`docs/audits/PHASE2_AUDIT.md`](docs/audits/PHASE2_AUDIT.md)
-2. [`docs/audits/TRAINING_GATE_REPORT.md`](docs/audits/TRAINING_GATE_REPORT.md)
+For public archival references and broader doctrine publication, use the
+organization surfaces and linked publication/archive materials rather than
+treating this repository as a standalone research archive.
