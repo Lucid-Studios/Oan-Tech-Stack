@@ -47,6 +47,9 @@ the model into a preferred answer.
 For stricter variant sweeps and observed collapse-family mapping, see
 `HOSTED_LLM_RESIDENT_SEATING_CASEBOOK.md`.
 
+For bridge behaviors that reduce collapse without yet achieving inhabitation,
+see `RESIDENT_INHABITATION_BRIDGE_CASEBOOK.md`.
+
 ## Witness Discipline
 
 When the local resident seating probe is run, we watch for:
