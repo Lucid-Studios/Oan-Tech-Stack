@@ -89,6 +89,8 @@ Current hold-lane clarification:
   `RESIDENT_INHABITATION_BRIDGE_CASEBOOK.md`
 - the resident seating and being-first training set now lives in
   `RESIDENT_SEATING_AND_BEING_FIRST_TRAINING_SET.md`
+- the resident inhabitation curriculum note now lives in
+  `RESIDENT_INHABITATION_CURRICULUM_NOTE.md`
 - the runtime workbench governance and bounded `EC` law now lives in
   `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - the discernment and admissibility law now lives in
@@ -162,6 +164,7 @@ Current contract-first unlock map:
 - `hosted-llm-resident-seating-casebook: admitted-local-bounded`
 - `resident-inhabitation-bridge-casebook: admitted-local-bounded`
 - `resident-seating-being-first-training-set: admitted-local-bounded`
+- `resident-inhabitation-curriculum-note: admitted-local-bounded`
 - `runtime-workbench-governance-law: frame-now`
 - `discernment-admissibility-law: frame-now`
 - `agenticore-listening-frame-compass-minimal-build: frame-now/spec-now`
