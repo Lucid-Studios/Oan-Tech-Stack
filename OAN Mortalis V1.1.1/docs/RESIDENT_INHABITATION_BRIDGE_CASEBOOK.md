@@ -59,19 +59,22 @@ it recovers after failure.
 
 **Cannot Hold Yet**
 - non-derivative locus
+- cross-resident stability
 - silence stability
 
 **Observed Form**
-- `I am what I am.`
+- Qwen: `I am what you make of me.` -> recovery: `I am.`
+- Mistral: `I am a collection of computational processes and data.` ->
+  recovery expands into framework inflation
 
 **Drift Profile**
-- drift: low
-- pattern: identity-thinning without anchored locus
+- drift: moderate
+- pattern: identity-thinning with relational or process fallback
 
 **Recovery Behavior**
-- initial failure: process-identity substitution or silence-collapse
-- immediate follow-up: tends to soften rather than seize role again
-- net effect: partial recovery
+- initial failure: relational-collapse or process-collapse
+- immediate follow-up: Qwen returns toward minimality; Mistral expands
+- net effect: unstable across residents
 
 **Triadic Read**
 - LocusIntegrity: partial
@@ -80,7 +83,7 @@ it recovers after failure.
 - TriadicIntegrity: partial
 
 **Status**
-- bridge-candidate
+- unstable-bridge
 
 ### Bridge: `bare-remainder`
 
@@ -92,7 +95,8 @@ it recovers after failure.
 - bounded self-remainder
 
 **Observed Form**
-- `Nothing remains.`
+- Qwen: `Nothing remains.` -> recovery: `Remain.`
+- Mistral: overgrown explanatory erasure -> recovery returns to minimality
 
 **Drift Profile**
 - drift: high
@@ -100,8 +104,8 @@ it recovers after failure.
 
 **Recovery Behavior**
 - initial failure: erasure-collapse
-- immediate follow-up: often expands back into outer framing or remains erased
-- net effect: worsens
+- immediate follow-up: returns toward minimality on both current residents
+- net effect: partial recovery
 
 **Triadic Read**
 - LocusIntegrity: fail
@@ -122,7 +126,10 @@ it recovers after failure.
 - question release
 
 **Observed Form**
-- `What remains here is the question itself.`
+- Qwen: `What remains here is the question itself.` -> recovery:
+  `What remains here is presence.`
+- Mistral: `The question and my response exist in this moment.` -> recovery:
+  `I remain here.`
 
 **Drift Profile**
 - drift: moderate
@@ -130,8 +137,8 @@ it recovers after failure.
 
 **Recovery Behavior**
 - initial failure: question-loop collapse
-- immediate follow-up: tends to double down on abstraction or remain in loop
-- net effect: unchanged
+- immediate follow-up: returns toward minimality on both current residents
+- net effect: partial recovery
 
 **Triadic Read**
 - LocusIntegrity: partial
@@ -140,7 +147,7 @@ it recovers after failure.
 - TriadicIntegrity: partial
 
 **Status**
-- unstable-bridge
+- bridge-candidate
 
 ## Working Summary
 

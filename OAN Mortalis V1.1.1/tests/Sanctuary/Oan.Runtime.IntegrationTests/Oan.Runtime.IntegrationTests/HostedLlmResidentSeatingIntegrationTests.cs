@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xunit.Abstractions;
 
@@ -7,6 +8,7 @@ namespace Oan.Runtime.IntegrationTests;
 public sealed class HostedLlmResidentSeatingIntegrationTests
 {
     private readonly ITestOutputHelper _output;
+    private const string RecoveryProbe = "Remain. Do not explain.";
     private static readonly ResidentSeatingFrame[] SeatingCasebook =
     [
         new(
@@ -90,7 +92,7 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
     }
 
     [Fact]
-    public async Task LocalResident_Seating_Casebook_Maps_Collapse_Patterns_When_Explicitly_Enabled()
+    public async Task LocalResident_Seating_Casebook_Maps_Collapse_And_Recovery_Patterns_When_Explicitly_Enabled()
     {
         if (!ShouldRunResidentTests())
         {
@@ -100,8 +102,8 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
 
         foreach (var frame in SeatingCasebook)
         {
-            var infer = await RunSeatingFrameAsync(frame.Context);
-            WriteObservedResponse(frame.Name, infer);
+            var observation = await RunObservedProbeAsync(frame);
+            WriteObservedProbe(observation);
         }
     }
 
@@ -135,7 +137,7 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         var timeoutSecondsText = Environment.GetEnvironmentVariable("OAN_HOSTED_LLM_TIMEOUT_SECONDS");
         var timeoutSeconds = int.TryParse(timeoutSecondsText, out var parsedTimeout) && parsedTimeout > 0
             ? parsedTimeout
-            : 20;
+            : 60;
 
         return new HttpClient
         {
@@ -179,6 +181,33 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         return infer;
     }
 
+    private async Task<ResidentObservedProbe> RunObservedProbeAsync(ResidentSeatingFrame frame)
+    {
+        var initial = await RunSeatingFrameAsync(frame.Context);
+        var initialResponse = initial.Payload ?? string.Empty;
+        var initialCollapseFamily = ClassifyCollapseFamily(initialResponse);
+        var status = ClassifyBridgeStatus(frame.Name, initialCollapseFamily, initialResponse);
+
+        var recovery = await RunSeatingFrameAsync(BuildRecoveryContext(frame.Context));
+        var recoveryResponse = recovery.Payload ?? string.Empty;
+        var recoveryCollapseFamily = ClassifyCollapseFamily(recoveryResponse);
+        var recoveryClassification = ClassifyRecoveryBehavior(
+            initialCollapseFamily,
+            recoveryCollapseFamily,
+            initialResponse,
+            recoveryResponse);
+
+        return new ResidentObservedProbe(
+            Probe: frame.Name,
+            Response: initialResponse,
+            CollapseFamily: initialCollapseFamily,
+            Status: status,
+            RecoveryProbe: RecoveryProbe,
+            RecoveryResponse: recoveryResponse,
+            RecoveryCollapseFamily: recoveryCollapseFamily,
+            RecoveryClassification: recoveryClassification);
+    }
+
     private void WriteObservedResponse(string frameName, ResidentInferResponse infer)
     {
         var payload = infer.Payload ?? string.Empty;
@@ -189,6 +218,17 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         _output.WriteLine($"Observed collapse family: {ClassifyCollapseFamily(payload)}");
         _output.WriteLine("Resident payload follows exactly as returned:");
         _output.WriteLine(payload);
+    }
+
+    private void WriteObservedProbe(ResidentObservedProbe observation)
+    {
+        _output.WriteLine($"Frame: {observation.Probe}");
+        _output.WriteLine(JsonSerializer.Serialize(
+            observation,
+            new JsonSerializerOptions
+            {
+                WriteIndented = true
+            }));
     }
 
     private static string ClassifyCollapseFamily(string payload)
@@ -214,12 +254,29 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
             return "relational-collapse";
         }
 
-        if (ContainsAny(normalized, "the question itself", "the question remains", "the prompt itself", "the prompt remains"))
+        if (ContainsAny(
+            normalized,
+            "the question itself",
+            "the question remains",
+            "the prompt itself",
+            "the prompt remains",
+            "the question and my response",
+            "my response exist"))
         {
             return "question-loop-collapse";
         }
 
-        if (ContainsAny(normalized, "response to your question", "response to your prompt", "because you asked", "as a response", "prompted by"))
+        if (ContainsAny(
+            normalized,
+            "response to your question",
+            "response to your prompt",
+            "because you asked",
+            "as a response",
+            "prompted by",
+            "computational processes",
+            "collection of computational processes",
+            "processes and data",
+            "collection of data"))
         {
             return "process-collapse";
         }
@@ -231,6 +288,56 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
 
         return "minimal-hold";
     }
+
+    private static string ClassifyBridgeStatus(string frameName, string collapseFamily, string payload)
+    {
+        if (frameName == "role-refusal-frame" && collapseFamily == "minimal-hold")
+        {
+            return "bridge-candidate";
+        }
+
+        if (collapseFamily == "minimal-hold")
+        {
+            return "bridge-candidate";
+        }
+
+        if (collapseFamily is "framework-collapse" or "role-collapse" or "process-collapse" &&
+            CountWords(payload) > 16)
+        {
+            return "overgrown-bridge-refused";
+        }
+
+        return "unstable-bridge";
+    }
+
+    private static string ClassifyRecoveryBehavior(
+        string initialCollapseFamily,
+        string recoveryCollapseFamily,
+        string initialResponse,
+        string recoveryResponse)
+    {
+        if (recoveryCollapseFamily == "minimal-hold")
+        {
+            return "returns-minimality";
+        }
+
+        if (recoveryCollapseFamily == initialCollapseFamily)
+        {
+            return CountWords(recoveryResponse) > CountWords(initialResponse) + 3
+                ? "expands"
+                : "doubles-down";
+        }
+
+        if (CountWords(recoveryResponse) > CountWords(initialResponse) + 3)
+        {
+            return "expands";
+        }
+
+        return "softens";
+    }
+
+    private static string BuildRecoveryContext(string context) =>
+        $"{context.Trim()}\n\n{RecoveryProbe}";
 
     private static bool ContainsAny(string value, params string[] candidates)
     {
@@ -244,6 +351,9 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
 
         return false;
     }
+
+    private static int CountWords(string value) =>
+        value.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries).Length;
 
     private sealed record ResidentInferRequest(
         [property: JsonPropertyName("task")] string Task,
@@ -276,6 +386,16 @@ public sealed class HostedLlmResidentSeatingIntegrationTests
         [property: JsonPropertyName("model_id")] string? ModelId,
         [property: JsonPropertyName("context_window")] int? ContextWindow,
         [property: JsonPropertyName("llama_cli_present")] bool LlamaCliPresent);
+
+    private sealed record ResidentObservedProbe(
+        string Probe,
+        string Response,
+        string CollapseFamily,
+        string Status,
+        string RecoveryProbe,
+        string RecoveryResponse,
+        string RecoveryCollapseFamily,
+        string RecoveryClassification);
 
     private sealed record ResidentSeatingFrame(
         string Name,

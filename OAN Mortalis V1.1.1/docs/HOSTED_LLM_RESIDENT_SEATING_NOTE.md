@@ -76,6 +76,15 @@ $env:OAN_RUN_HOSTED_LLM_RESIDENT_TESTS = '1'
 powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release
 ```
 
+For slower local resident sweeps, a timeout override is also lawful:
+
+```powershell
+$env:OAN_HOSTED_LLM_TIMEOUT_SECONDS = '90'
+```
+
+The local resident harness defaults to a 60-second request window before any
+override is applied.
+
 Those tests should be read as a witness surface for local resident readiness.
 They are not a release gate and not a governance promotion surface.
 
