@@ -20,6 +20,35 @@ Assessment date:
 
 - March 31, 2026
 
+## Public Boundary And Contact Preservation
+
+For the active public repository surface:
+
+- the repository is the governed build surface
+- the public repository carries the build minus the hosted seed `LLM`
+- the fully operational installer still depends on the local hosted seed
+  `LLM` and associated resident runtime surfaces that are not carried in the
+  public checkout
+- the fully operational installer is still being built
+
+The public-facing repository contact aliases now fixed across repo-root
+surfaces are:
+
+- `info@lucidtechnologies.tech`
+  - general repository and public information
+- `research@lucidtechnologies.tech`
+  - research-facing and doctrine-facing questions
+- `academic@lucidtechnologies.tech`
+  - academic and institutional inquiries
+- `admin@lucidtechnologies.tech`
+  - repository administration and contribution routing
+- `legal@lucidtechnologies.tech`
+  - conduct, legal, and sensitive private review paths
+
+These aliases are part of the public repository presentation boundary and
+should be preserved as the line moves forward unless superseded by explicit
+repo-local governance.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -81,12 +110,37 @@ Current hold-lane clarification:
   `LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
 - the seeded-governance bounded build-admission law now lives in
   `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
+- the hosted `LLM` resident seating note now lives in
+  `HOSTED_LLM_RESIDENT_SEATING_NOTE.md`
+- the hosted `LLM` resident seating casebook now lives in
+  `HOSTED_LLM_RESIDENT_SEATING_CASEBOOK.md`
+- the resident inhabitation bridge casebook now lives in
+  `RESIDENT_INHABITATION_BRIDGE_CASEBOOK.md`
+- the resident seating and being-first training set now lives in
+  `RESIDENT_SEATING_AND_BEING_FIRST_TRAINING_SET.md`
+- the resident inhabitation curriculum note now lives in
+  `RESIDENT_INHABITATION_CURRICULUM_NOTE.md`
+- the resident seating serialization pilot note now lives in
+  `RESIDENT_SEATING_SERIALIZATION_PILOT_NOTE.md`
 - the runtime workbench governance and bounded `EC` law now lives in
   `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - the discernment and admissibility law now lives in
   `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - the discernment and admissibility casebook now lives in
   `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
+- the `GEL` discernment layering and translative binding note now lives in
+  `GEL_DISCERNMENT_LAYERING_AND_TRANSLATIVE_BINDING_NOTE.md`
+- the `Pre-Lisp`, minimal `IUTT` Lisp, and acting-operator note now lives in
+  `PRE_LISP_IUTT_LISP_AND_LLM_ACTING_OPERATOR_NOTE.md`
+- the Prime root carrier, reduction, decomposition, and anchor emergence note
+  now lives in
+  `PRIME_ROOT_CARRIER_REDUCTION_DECOMPOSITION_AND_ANCHOR_EMERGENCE_NOTE.md`
+- the `A0` `GEL` axiom floor note now lives in
+  `A0_GEL_AXIOM_FLOOR_NOTE.md`
+- the first `GEL` derived growth laws note now lives in
+  `GEL_DERIVED_GROWTH_LAWS_NOTE.md`
+- the `GEL` action basis and composition note now lives in
+  `GEL_ACTION_BASIS_AND_COMPOSITION_NOTE.md`
 - the Sanctuary boot and first-run ontology bridge now lives in
   `SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`
 - the AgentiCore Listening Frame and Compass minimal-build note now lives in
@@ -150,8 +204,20 @@ Current contract-first unlock map:
 - `oan-build-dispatch: admitted-root-automation-bounded`
 - `automation-close-law: frame-now`
 - `seeded-governance-build-admission-law: frame-now`
+- `hosted-llm-resident-seating: admitted-local-bounded`
+- `hosted-llm-resident-seating-casebook: admitted-local-bounded`
+- `resident-inhabitation-bridge-casebook: admitted-local-bounded`
+- `resident-seating-being-first-training-set: admitted-local-bounded`
+- `resident-inhabitation-curriculum-note: admitted-local-bounded`
+- `resident-seating-serialization-pilot-note: admitted-local-bounded`
 - `runtime-workbench-governance-law: frame-now`
 - `discernment-admissibility-law: frame-now`
+- `gel-discernment-layering-and-translative-binding-note: frame-now`
+- `pre-lisp-iutt-lisp-and-llm-acting-operator-note: frame-now`
+- `prime-root-carrier-reduction-decomposition-and-anchor-emergence-note: frame-now`
+- `a0-gel-axiom-floor-note: frame-now`
+- `gel-derived-growth-laws-note: frame-now`
+- `gel-action-basis-and-composition-note: frame-now`
 - `agenticore-listening-frame-compass-minimal-build: frame-now/spec-now`
 - `prime-cryptic-duplex-law: frame-now`
 - `prime-cryptic-duplex-resonance-note: frame-now`

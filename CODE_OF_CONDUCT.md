@@ -51,3 +51,13 @@ This code of conduct applies to:
 If the issue is technical, use the repository issue tracker.
 
 If the issue is sensitive or security-related, follow `SECURITY.md`.
+
+If the issue is sensitive conduct or participation behavior that should not be
+handled in public, contact:
+
+- `legal@lucidtechnologies.tech`
+
+If the issue is about repository administration rather than legal or conduct
+review, contact:
+
+- `admin@lucidtechnologies.tech`

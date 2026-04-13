@@ -59,6 +59,36 @@ Fresh bootstrap surfaces:
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules
 
+## Public Repository Boundary Preservation
+
+The active public repository presentation boundary that must now be carried
+forward with the line is:
+
+- the repository is the governed build surface, not yet the fully operational
+  installer
+- the public repository carries the build minus the hosted seed `LLM`
+- the fully operational installer still depends on the local hosted seed
+  `LLM` and associated resident runtime surfaces that are not carried in the
+  public checkout
+
+The public-facing contact alias map that should now be treated as part of that
+repository boundary is:
+
+- `info@lucidtechnologies.tech`
+  - general public and repository information
+- `research@lucidtechnologies.tech`
+  - research-facing contact
+- `academic@lucidtechnologies.tech`
+  - academic and institutional contact
+- `admin@lucidtechnologies.tech`
+  - repository administration and contribution routing
+- `legal@lucidtechnologies.tech`
+  - legal, conduct, and sensitive private review
+
+This does not change executable runtime law. It preserves the public
+repository-facing contact surfaces and installer-boundary truth so later
+documentation passes do not drift back into ambiguity.
+
 ## Explicitly Excluded
 
 The following prior-line residues are intentionally not carried into `V1.1.1`:

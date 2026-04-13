@@ -29,6 +29,24 @@ The current line split is:
 `V1.2.1` is being shaped as a governed sibling and should not be mistaken for
 the default executable surface.
 
+## Public Build Boundary
+
+This repository is the governed build surface for the stack, but it is not yet
+the fully operational installer.
+
+The active public boundary is:
+
+- the repository carries the build minus the hosted seed `LLM`
+- the full operational installer still depends on a local hosted seed `LLM`
+  and associated resident runtime surfaces that are not carried here
+- the fully operational installer is still being built
+- public repo truth remains the governed code, contracts, docs, and tests that
+  can be carried without shipping the seed `LLM` runtime itself
+
+That means the repository is explicit about seed `LLM` dependence without
+pretending that the public checkout is already the complete install-ready
+operational package.
+
 ## Architecture Read
 
 At a high level, the stack reads as:
@@ -172,3 +190,12 @@ by Lucid Studios.
 For public archival references and broader doctrine publication, use the
 organization surfaces and linked publication/archive materials rather than
 treating this repository as a standalone research archive.
+
+## Contact Surfaces
+
+Use the public-facing aliases that match the surface of the request:
+
+- general repository and public information: `info@lucidtechnologies.tech`
+- research-facing questions and doctrine context: `research@lucidtechnologies.tech`
+- academic and institutional inquiries: `academic@lucidtechnologies.tech`
+- repository administration and contribution coordination: `admin@lucidtechnologies.tech`

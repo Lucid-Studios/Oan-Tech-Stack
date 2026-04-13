@@ -66,3 +66,10 @@ Use the issue templates for:
 - feature requests
 
 If the problem is a security issue, do not open a public issue. Follow `SECURITY.md`.
+
+## Maintainer Contact
+
+For repository administration, contribution routing, or maintainer-side
+coordination that should not start as a public issue, contact:
+
+- `admin@lucidtechnologies.tech`
