@@ -523,3 +523,10 @@ through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER
 - `canonical-condensation-output-law: frame-now`
 - `procedural-basis-condensate-note: frame-now`
 - `first-bounded-ignition-chain-test-protocol: frame-now`
+
+## LLM Test Surface And Local Harness Addendum
+
+- `LLM_TEST_SURFACE_TAXONOMY_NOTE.md`
+- `RESPONSES_API_LOCAL_HARNESS_RECEIPT_SCHEMA_NOTE.md`
+- `llm-test-surface-taxonomy-note: frame-now`
+- `responses-api-local-harness-receipt-schema-note: frame-now`

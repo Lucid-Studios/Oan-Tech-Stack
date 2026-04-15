@@ -159,3 +159,11 @@ build debt. It must move into the explicit refinement split tracked in
 - Heat/resonance expand-before-commit, stability metrics, canonical
   condensation output, procedural basis condensate, and bounded ignition test
   protocol preserved as placeholder-contract condensation substrate.
+
+## LLM Test Surface And Local Harness Evidence
+
+- specialized `LLM` test surface taxonomy with Codex-family and general GPT
+  comparison law preserved as bounded evidence taxonomy.
+- first local Responses API harness receipt schema and evidence landing body
+  preserved as placeholder-contract evidence structure.
+- hosted resident `GEL` layer witness remains local-only and opt-in.

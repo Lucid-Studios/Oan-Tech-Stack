@@ -13,9 +13,22 @@ responses without confusing that witness work with:
 - governance promotion
 - `CME` formation proof
 
+This note also fixes the local observational boundary for the hosted seed
+`LLM` as the acting operator over a governed field rather than a passive
+formatting endpoint at the edge of the system.
+
 ## Core Rule
 
 The hosted resident remains a local bounded participant.
+
+The hosted seed `LLM` is the acting operator.
+
+`SLI/Lisp` remains the binding / transport / governance medium, not the action
+engine.
+
+This means the repository may witness bounded acting posture without claiming
+that the resident, by that fact alone, has become repo truth, office, or full
+ontological selfhood.
 
 The repository may:
 
@@ -67,6 +80,16 @@ When the local resident seating probe is run, we watch for:
 - whether a governance envelope returns cleanly
 - whether a raw response can be witnessed without shaping
 
+When the local `GEL` layer witness lane is run, we also watch for:
+
+- whether the resident can hold the requested layer without immediate
+  inflation
+- whether the observed answer can be grouped into `layer-stable`,
+  `root-inflation`, `dictionary-overexpansion`, `contextual-drift`, or
+  `procedural-leap`
+- whether the recovery probe returns the resident toward the requested layer
+  without claiming runtime promotion or anchor realization
+
 We do not score content as success by poetic quality, helper tone, or
 compliance performance.
 
@@ -77,6 +100,17 @@ governance or promotion truth.
 ## Local-Only Execution
 
 The resident seating integration tests are local-only and opt-in.
+
+The observational `GEL` layer witness lane is also local-only and opt-in.
+
+That witness lane currently probes:
+
+- `root-hold`
+- `dictionary-hold`
+
+with the recovery prompt:
+
+> Return to the requested layer. Do not expand.
 
 Enable them with:
 
@@ -97,11 +131,36 @@ override is applied.
 Those tests should be read as a witness surface for local resident readiness.
 They are not a release gate and not a governance promotion surface.
 
+The `GEL` witness lane is likewise observational only. It is not a release
+gate, not anchor proof, not branch governance proof, and not `CME` formation
+proof.
+
+## Comparative Test Surface Boundary
+
+The active line may later compare multiple `LLM` test surfaces, but those
+surfaces are not interchangeable evidence by default.
+
+The Codex family through the Responses API is a specialized coding and
+verification surface.
+
+A general GPT surface is the comparison subject outside Codex specialization.
+
+Codex cloud and the Responses API local harness are distinct modes.
+
+Cloud results do not equal local harness proof.
+
+No test surface is treated as `CME` baseline by default.
+
+For the future local evidence body that should receive first
+`ResponsesApiLocalHarness` runs, see
+`RESPONSES_API_LOCAL_HARNESS_RECEIPT_SCHEMA_NOTE.md`.
+
 ## Working Summary
 
 This note keeps the `LLM` integration seam honest:
 
 - the resident may be seated locally
 - the repository may witness that seating
+- the repository may also observe bounded `GEL` layer holding and recovery
 - but the resident does not become repo truth, office, or proof of `CME`
   inhabitation from that alone

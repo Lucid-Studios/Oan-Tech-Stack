@@ -177,3 +177,11 @@ The following edges remain beyond this contract-backed substrate slice:
 - stability metrics as executable thresholds
 - procedural basis execution beyond bounded doctrine
 - Prime bonded minting certification and witnessed minting act
+
+## LLM Harness Held Edges
+
+The following edges remain beyond this bounded evidence-surface slice:
+
+- live multi-surface comparative harness execution beyond bounded taxonomy
+- live Responses API harness execution beyond bounded receipt schema
+- treating any test surface as `CME` baseline proof by default
