@@ -217,8 +217,10 @@ Their job is to let the line name late-path structure honestly:
 - chapter seven may frame load law and compression preparation
 - chapter eight may frame the actualization seal and primitive `SelfGEL`
 - chapter nine may frame the living `AgentiCore` surface, a future
-  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame` and
-  `Compass` projection packets, `Zed of Delta`, and tool-use attachment
+  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame`, `Compass`,
+  bounded instrumentation receipts, bounded zed self-basis receipts, bounded
+  theta-ingress receipts, bounded post-ingress discernment receipts,
+  `Zed of Delta`, and tool-use attachment
 
 In this slice, primitive `SelfGEL` may later inherit a `GEL`-owned legal
 orientation root predicate family that establishes legal body, jurisdiction,

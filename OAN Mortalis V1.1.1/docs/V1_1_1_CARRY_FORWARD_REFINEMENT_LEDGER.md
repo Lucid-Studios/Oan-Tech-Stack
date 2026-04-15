@@ -198,3 +198,15 @@ The following edges remain beyond this placeholder legal-orientation packet:
 - `B-Corp` transition seating
 - authority delegation
 - cryptographic custody
+
+## ListeningFrame Ingress Witness Held Edges
+
+The following edges remain beyond this bounded witness layer:
+
+- live pulse and Compass heartbeat initiation or sustain
+- resonance-chamber standing-wave duration proof
+- full dodecahedral executable geometry
+- wider sensory manifold and between-beat contextual ingress
+- persistence admission from instrumentation or ingress receipts
+- semantic rise from post-ingress discernment alone
+- inheritance, self-mutation, or condensation authority from one intake chain

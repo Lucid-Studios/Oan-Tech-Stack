@@ -1,5 +1,7 @@
 namespace Oan.Common;
 
+using San.Common;
+
 public enum CompassDriftState
 {
     Held = 0,
@@ -116,7 +118,11 @@ public sealed record CommunityWeatherPacket(
     CompassVisibilityClass VisibilityClass,
     DateTimeOffset TimestampUtc,
     ListeningFrameProjectionPacket? ListeningFrameProjectionPacket = null,
-    CompassProjectionPacket? CompassProjectionPacket = null);
+    CompassProjectionPacket? CompassProjectionPacket = null,
+    ListeningFrameInstrumentationReceipt? ListeningFrameInstrumentationReceipt = null,
+    ZedDeltaSelfBasisReceipt? ZedDeltaSelfBasisReceipt = null,
+    ThetaIngressSensoryClusterReceipt? ThetaIngressSensoryClusterReceipt = null,
+    PostIngressDiscernmentReceipt? PostIngressDiscernmentReceipt = null);
 
 public sealed record GoverningOfficeAuthorityAssessment(
     string CMEId,

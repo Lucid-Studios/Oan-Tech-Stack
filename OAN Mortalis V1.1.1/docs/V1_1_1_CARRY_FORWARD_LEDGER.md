@@ -185,3 +185,18 @@ The carried meaning is local-only legal evidence orientation, not tracked legal
 identifier payload, runtime authority, first-run state-ladder mutation, trust
 activation, `B-Corp` transition, bonded-operator seating, authority delegation,
 or cryptographic custody.
+
+## ListeningFrame Ingress Witness Layer
+
+The first ListeningFrame ingress witness family is preserved as bounded posture
+and intake evidence rather than pulse or persistence authority.
+
+This slice carries:
+
+- ListeningFrame instrumentation receipt law and evaluator coverage
+- Zed-of-Delta self-orientation basis law and receipt coverage
+- theta-ingress and sensory-cluster uptake law and receipt coverage
+- post-ingress discernment and stable-one sufficiency law and receipt coverage
+- optional threading through first-run living AgentiCore and community-weather packets
+
+The carried meaning is lawful continuity posture and one bounded ingress / post-ingress witness chain. It does not promote heartbeat, resonance, full geometry, persistence, inheritance, semantic rise, self-mutation, or condensation.

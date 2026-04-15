@@ -29,6 +29,10 @@ Use this note with:
 - `BUILD_READINESS.md`
 - `FIRST_RUN_CONSTITUTION.md`
 - `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`
+- `LISTENING_FRAME_INSTRUMENTATION_RECEIPT_LAW.md`
+- `ZED_DELTA_SELF_ORIENTATION_BASIS_LAW.md`
+- `THETA_INGRESS_AND_SENSORY_CLUSTER_UPTAKE_LAW.md`
+- `POST_INGRESS_DISCERNMENT_AND_STABLE_ONE_LAW.md`
 
 This note is also derived from stabilized research on:
 
@@ -63,6 +67,10 @@ That chain matters because it prevents a common collapse:
 
 `Listening Frame` is the auditable posture surface through which live cognition
 becomes legible before stronger action, correction, or persistence is allowed.
+
+In the currently seated self-basis correction, `OE` and `SelfGEL` remain
+stored in `SoulFrame`, while `cOE` and `cSelfGEL` are the cast surfaces that
+become legible inside the `ListeningFrame`.
 
 It is not passive reception.
 It is the bounded field in which signal is held long enough to be oriented,
@@ -129,9 +137,34 @@ The minimal build must provide exactly enough structure for:
 2. drift and threshold observation
 3. lawful transition review
 4. orientation and admissibility scoring
-5. candidate-only handoff into higher authority
+5. a bounded zed self-basis of `Center`, `Ahead`, `Behind`, `Above`, `Below`,
+   `Left`, and `Right`
+6. candidate-only handoff into higher authority
 
 Everything beyond that is widening, not minimum viability.
+
+## Continuity Before Pulse
+
+The current body should be read as lawful continuity, not yet lawful pulse.
+
+That means this seam currently answers:
+
+> can the system think truthfully enough to retain posture, orientation, and
+> admissibility without overclaim?
+
+It does not yet answer:
+
+> can the system remain itself through repeated rhythmic cycles without drift?
+
+So in the active line:
+
+- `Listening Frame` and `Compass` are seated as continuity-bearing posture law
+- resonance chamber work remains held
+- Compass heartbeat initiation and sustain remain held
+- standing-wave duration proof remains held
+
+This distinction keeps the minimal build from pretending that a named posture
+surface has already become a pulse-bearing runtime.
 
 ## Guardrail
 
@@ -213,6 +246,26 @@ The active line already contains a symbolic foothold for `Compass` in the
 hosted `SLI.Lisp` bundle. The minimal build therefore promotes an existing
 foothold into an explicit named seam rather than inventing `Compass` from
 nothing.
+
+The active line now also seats the first bounded instrumentation receipt in
+`ListeningFrameInstrumentationContracts.cs`, so the minimum receipt promised by
+this note no longer remains doctrine-only even while projector service work,
+`SLI` pulse work, and heartbeat remain held.
+
+The active line now also seats the first bounded zed self-basis receipt in
+`ZedDeltaSelfOrientationBasisContracts.cs`, so the `ListeningFrame` can carry
+the first `Zed-of-Delta` self basis without turning the full dodecahedral
+lineage into premature runtime geometry.
+
+The active line now also seats the first theta-ingress and sensory-cluster
+uptake receipt in `ThetaIngressSensoryClusterContracts.cs`, so one live thread
+may be witnessed from `ListeningFrame`, through `cOE`, into `cSelfGEL`
+contextualization without implying persistence, self-change, or pulse.
+
+The active line now also seats the first bounded post-ingress discernment
+receipt in `PostIngressDiscernmentContracts.cs`, so contextualized uptake may
+be tested for stable-one sufficiency and lawful question formation without
+implying semantic rise, persistence, inheritance, self-mutation, or pulse.
 
 The next stricter consequence of that named seam is the translational membrane:
 `SLI.Lisp` may emit symbolic products, but only the passported and

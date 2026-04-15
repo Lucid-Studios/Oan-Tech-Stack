@@ -65,6 +65,10 @@ It is the place where the loomed body is sounded, tested, and read for:
 It remains candidate-bearing and non-sovereign.
 It is not persistence authority, promotion authority, or canonical truth.
 
+Its first bounded runtime-sounding now also has an explicit instrumentation
+receipt, so one current posture read may be carried without pretending that
+the sounding itself has become pulse, memory, or correction authority.
+
 ### `SoulFrame`
 
 `SoulFrame` is the mounted chamber.
@@ -72,6 +76,10 @@ It is not persistence authority, promotion authority, or canonical truth.
 It is the contextual presentation surface that holds the active body in a
 bounded relation strong enough for operator-facing work, telemetry, and
 intermix.
+
+In the current self-basis correction, `OE` and `SelfGEL` remain stored here.
+They are not displaced into the `ListeningFrame`.
+OE and SelfGEL remain stored in SoulFrame.
 
 ### `AgentiCore`
 
@@ -94,6 +102,15 @@ It does not become the owner of canonical promotion or durable persistence law.
 They are the sealed duplex surfaces that let live work actually proceed in
 native `SLI` form during `EC`.
 
+They are also cast surfaces: `OE` and `SelfGEL` remain stored in `SoulFrame`,
+while `cOE` and `cSelfGEL` are cast surfaces that make the first bounded
+`Zed-of-Delta` self basis legible inside the `ListeningFrame`.
+cOE and cSelfGEL are cast surfaces inside the ListeningFrame.
+
+The first bounded intake event now reads this way: a theta thread appears in
+the field, crosses center relative to `Zed of Delta`, is taken at `cOE`, and
+enters `cSelfGEL` for contextualization.
+
 ### `Prime` and `Cryptic`
 
 `Prime` is the canonical witness surface.
@@ -113,8 +130,35 @@ The current line can be read in human language as:
 > `cOE/cSelfGEL` sustain hot cryptic work.
 > `Prime` remembers only what later survives lawful review.
 
+The current bounded self-basis inside that body is:
+
+- `Center`
+- `Ahead`
+- `Behind`
+- `Above`
+- `Below`
+- `Left`
+- `Right`
+
 That compression is useful because it keeps the build legible while preserving
 the harder architectural boundaries.
+
+## Current Phase Read
+
+The current build has seated lawful continuity.
+
+That means these bridge terms are truthful now for:
+
+- posture
+- orientation
+- admissibility
+- bounded coordination
+
+They are not yet proof of lawful pulse.
+
+So resonance chamber, Compass heartbeat, and short-duration standing-wave
+language should still be read as the next held seam rather than as an already
+active runtime capability.
 
 ## Guardrail
 

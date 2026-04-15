@@ -544,3 +544,20 @@ placeholder contract and tracked local-only packet template. It does not admit
 real legal identifiers into tracked history and does not authorize first-run
 state-ladder, runtime, trust, `B-Corp`, bonded-operator, authority-delegation,
 or cryptographic-custody activation.
+
+## ListeningFrame Ingress Witness Addendum
+
+- `LISTENING_FRAME_INSTRUMENTATION_RECEIPT_LAW.md`
+- `ZED_DELTA_SELF_ORIENTATION_BASIS_LAW.md`
+- `THETA_INGRESS_AND_SENSORY_CLUSTER_UPTAKE_LAW.md`
+- `POST_INGRESS_DISCERNMENT_AND_STABLE_ONE_LAW.md`
+- `listening-frame-instrumentation-receipt-law: frame-now/spec-now`
+- `zed-delta-self-orientation-basis-law: frame-now/spec-now`
+- `theta-ingress-sensory-cluster-uptake-law: frame-now/spec-now`
+- `post-ingress-discernment-and-stable-one-law: frame-now/spec-now`
+
+This addendum admits the first bounded ListeningFrame posture, self-basis,
+theta-ingress, and post-ingress discernment witness family. It does not admit
+pulse, heartbeat, resonance-chamber standing, full dodecahedral runtime
+geometry, persistence, inheritance, self-mutation, semantic rise, or
+condensation authority.
