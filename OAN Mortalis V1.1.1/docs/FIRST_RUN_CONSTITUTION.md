@@ -409,3 +409,17 @@ Within that later self split:
 
 - `SelfGEL` is the readable, admissible operator-work self surface
 - `cSelfGEL` is the cryptic, sealed cradle-local witness and control surface
+
+## Prime Seed And Legal Admission Bridge
+
+For the bounded `EC` walk from install to first Prime pre-role standing, see
+`EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md` and
+`EngineeredCognitionFirstPrimeStateReceipt`.
+
+For the Prime seed-bearing state immediately after first Prime pre-role
+standing and before lawfully bonded domain integration or `CME` founding, see
+`PRIME_SEED_STATE_LAW.md` and `PrimeSeedStateContracts.cs`.
+
+For the first legal-admission seam governing domain and role offers beyond
+first Prime pre-role standing, see `DOMAIN_AND_ROLE_ADMISSION_LAW.md` and
+`DomainRoleAdmissionContracts.cs`.

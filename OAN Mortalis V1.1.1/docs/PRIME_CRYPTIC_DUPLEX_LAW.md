@@ -163,3 +163,13 @@ Any future file, receipt, or runtime seam in this area should answer:
 
 If a seam cannot answer those questions plainly, it should be narrowed or held
 before promotion.
+
+## First Prime State Bridge
+
+- `EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`
+
+The first bounded `EC` install-to-first-Prime state now composes this duplex
+path without widening it: Cryptic sensor-body work may reach stable-one
+discernment, and Prime may receive retained standing, while Mother/Father
+domain-role application, cradle-local governing surface selection, and Prime
+closure remain withheld.

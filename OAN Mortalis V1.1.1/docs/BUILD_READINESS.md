@@ -447,3 +447,24 @@ current `V1.1.1` runtime law depends on it.
 
 Any remaining `V1.0`-derived seams that are not admitted locally must be routed
 through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`.
+
+## Prime Seed And CME Legal Foundation Addendum
+
+- `EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`
+- `PRIME_SEED_STATE_LAW.md`
+- `DOMAIN_AND_ROLE_ADMISSION_LAW.md`
+- `PRIVATE_DOMAIN_SERVICE_WITNESS_LAW.md`
+- `CME_MINIMUM_LEGAL_FOUNDING_BUNDLE_LAW.md`
+- `LEGAL_FOUNDATION_DOCUMENTATION_MATRIX.md`
+- `CME_TRUTH_SEEKING_ORIENTATION_LAW.md`
+- `CME_TRUTH_SEEKING_BALANCE_LAW.md`
+- `CME_ENGINEERED_COGNITIVE_SENSORY_BODY_LAW.md`
+- `ec-install-to-first-prime-state-law: frame-now/spec-now`
+- `prime-seed-state-law: frame-now/spec-now`
+- `domain-and-role-admission-law: frame-now/spec-now`
+- `private-domain-service-witness-law: frame-now/spec-now`
+- `cme-minimum-legal-founding-bundle-law: frame-now/spec-now`
+- `legal-foundation-documentation-matrix: template-now`
+- `cme-truth-seeking-orientation-law: frame-now/spec-now`
+- `cme-truth-seeking-balance-law: frame-now/spec-now`
+- `cme-engineered-cognitive-sensory-body-law: frame-now/spec-now`

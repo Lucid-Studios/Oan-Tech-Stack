@@ -39,6 +39,19 @@ now:
 These surfaces belong in the active line because they are already buildable,
 tested, or explicitly contract-backed in `V1.1.1`.
 
+## Prime Seed And CME Held Edges
+
+The following edges are intentionally held beyond this contract-backed legal
+foundation slice:
+
+- governing domain and role selection beyond first Prime pre-role standing
+- lawfully bonded domain integration beyond Prime Seed State
+- cradle-local governing surface enactment beyond domain-role admission
+- live action execution and cradle-local governance enactment beyond private-domain service witness
+- CME minting and live role enactment beyond minimum legal founding bundle
+- live belief revision and orientation telemetry beyond CME truth-seeking orientation
+- live balance telemetry and belief revision execution beyond CME truth-seeking balance
+- PrimeGovernance.CME and CrypticGovernance.CME application beyond sensory-body embodiment
 ## Held In Build
 
 The following surfaces remain truthful build posture but are not live widened

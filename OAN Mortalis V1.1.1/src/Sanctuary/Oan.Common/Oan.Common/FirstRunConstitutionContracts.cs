@@ -1,5 +1,7 @@
 namespace Oan.Common;
 
+using San.Common;
+
 public enum FirstRunConstitutionState
 {
     SanctuaryInitialized = 0,
@@ -121,7 +123,11 @@ public sealed record FirstRunLivingAgentiCorePacket(
     bool WiderPublicWideningWithheld,
     DateTimeOffset TimestampUtc,
     ListeningFrameProjectionPacket? ListeningFrameProjectionPacket = null,
-    CompassProjectionPacket? CompassProjectionPacket = null);
+    CompassProjectionPacket? CompassProjectionPacket = null,
+    ListeningFrameInstrumentationReceipt? ListeningFrameInstrumentationReceipt = null,
+    ZedDeltaSelfBasisReceipt? ZedDeltaSelfBasisReceipt = null,
+    ThetaIngressSensoryClusterReceipt? ThetaIngressSensoryClusterReceipt = null,
+    PostIngressDiscernmentReceipt? PostIngressDiscernmentReceipt = null);
 
 public sealed record FirstRunEquivalentExchangeReview(
     string ReviewHandle,

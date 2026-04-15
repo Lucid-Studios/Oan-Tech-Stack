@@ -59,6 +59,27 @@ Fresh bootstrap surfaces:
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules
 
+## Prime Seed And CME Legal Foundation
+
+- EC install-to-first-Prime pre-role state preserved as the first bounded path
+  from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
+  sensor body through stable-one discernment into Prime retained standing.
+- Prime Seed State preserved as the immediate pre-domain seed-bearing seam above
+  first Prime pre-role standing.
+- Domain and role admission preserved as the first legal-admission seam above
+  first Prime pre-role standing.
+- Private-domain service witness preserved as the first structured
+  accountability grammar above domain admission.
+- CME minimum legal founding bundle preserved as the first five-pillar founding
+  recognition seam.
+- Legal foundation documentation matrix template preserved as the first
+  authorization-substrate population surface.
+- CME truth-seeking orientation preserved as the first post-founding
+  anti-fixation seam.
+- CME truth-seeking balance law preserved as the first mathematical transition
+  seam beneath orientation.
+- CME engineered cognitive sensory body preserved as the first lawful
+  Crystallized Mind Entity sensory embodiment seam.
 ## Explicitly Excluded
 
 The following prior-line residues are intentionally not carried into `V1.1.1`:
