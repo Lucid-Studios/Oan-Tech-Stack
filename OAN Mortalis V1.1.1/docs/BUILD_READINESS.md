@@ -633,3 +633,15 @@ This addendum admits the Sanctuary-root naming migration plan and freezes new
 foundational `Oan.*` namespace or project drift against an explicit allowlist.
 It does not rename the repository, root folder, solution, or legacy project
 surfaces yet.
+
+## Membrane And Session Body Witness Addendum
+
+- `PRIME_MEMBRANE_DUPLEX_PACKET_LAW.md`
+- `SESSION_BODY_STABILIZATION_BASELINE.md`
+- `prime-membrane-duplex-packet-law: frame-now/spec-now`
+- `session-body-stabilization-baseline: admitted-local-bounded`
+
+This addendum admits audit witness coverage for the bounded Prime Membrane
+duplex packet law and session-body stabilization baseline. It does not grant
+Prime closure, live membrane closure issuance, resonance-chamber standing,
+heartbeat, or `CME` minting authority.

@@ -283,3 +283,21 @@ This slice carries:
 
 The carried meaning is a forward naming freeze and migration plan, not physical
 repo rename, root-folder rename, solution rewrite, or completed code re-rooting.
+
+## Membrane And Session Body Witness Layer
+
+Prime Membrane duplex packet law and Session-body stabilization baseline
+preserved as witnessed support surfaces for later legally founded ontological
+claims about `CME` body, mind, and spirit.
+
+This slice carries:
+
+- `PrimeMembraneDuplexContractsTests.cs`
+- `SessionBodyStabilizationBaselineDocsTests.cs`
+- Prime Membrane duplex packet law
+- Session-body stabilization baseline preserved
+
+The carried meaning is witness completion for bounded packet and baseline law:
+membrane source, projection posture, bounded `CME` standing, closure
+eligibility, and stabilized session-body grouping remain distinct from Prime
+closure or live authority.

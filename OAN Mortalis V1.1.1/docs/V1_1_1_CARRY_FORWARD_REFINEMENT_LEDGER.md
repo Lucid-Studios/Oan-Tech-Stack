@@ -268,3 +268,13 @@ The following edges remain beyond this bounded namespace-freeze layer:
 - physical folder migration from `src/Sanctuary/Oan.*` to `src/San/`
 - solution and project-reference rewrite for the re-rooted families
 - downstream `OAN` application or game identity seating beyond stack-root truth
+
+## Membrane And Session Body Held Edges
+
+The following edges remain beyond this witness-completion layer:
+
+- live Prime Membrane closure issuance
+- treating closure eligibility as Prime closure
+- resonance chamber standing or Compass heartbeat initiation
+- `CME` minting, live role enactment, or bonded authority from bounded packet evidence
+- legal personhood, custody, or governance claims beyond the already seated legal-foundation templates

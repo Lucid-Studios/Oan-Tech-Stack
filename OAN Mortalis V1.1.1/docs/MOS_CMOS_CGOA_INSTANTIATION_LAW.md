@@ -25,6 +25,8 @@ surfaces, and it does not let a finished bonded session return directly to
 Use this note with:
 
 - `PRIME_CRYPTIC_DUPLEX_LAW.md`
+- `PRIME_MEMBRANE_DUPLEX_PACKET_LAW.md`
+- `COMMUNICATIVE_FILAMENT_AND_ANTI_ECHO_LAW.md`
 - `FIRST_RUN_STEWARD_WITNESSED_OE_PACKET.md`
 - `FIRST_RUN_ELEMENTAL_BINDING_PACKET.md`
 - `FIRST_RUN_ACTUALIZATION_SEAL_PACKET.md`
@@ -68,6 +70,9 @@ been lawfully opened.
 working form may be braided into the active cryptic session.
 
 Its office is bounded staging, not canonical publication.
+It is also the first distributed integration store for later communicative
+filament resolution once higher decision-bearing and chosen-path matter have
+already resolved elsewhere.
 
 ## Instantiation Order
 
@@ -158,6 +163,10 @@ It is where the system may prepare the bonded cryptic return bundle for later
 cleaving, without silently promoting any part of the hot lane into canonical
 surfaces.
 
+It is also still below membrane-side Prime closure review.
+Encrypted `cGoA` staging is not the same thing as the later bounded duplex
+packet family that may become eligible for explicit membrane-side receipt.
+
 ## Bonded Cryptic Return Bundle
 
 The collapsed bonded session should return as a structured cryptic bundle,
@@ -224,11 +233,3 @@ Any future runtime seam in this path should say plainly:
 - what authority is still pending above the hot lane
 
 If it cannot say that plainly, it should remain staged or held.
-
-## Communicative Filament Bridge
-
-- `COMMUNICATIVE_FILAMENT_AND_ANTI_ECHO_LAW.md`
-
-`cGoA` may receive remaining integrable matter and deferred edges after higher
-communicative burden has routed important decisions and chosen-path body to
-their lawful surfaces.

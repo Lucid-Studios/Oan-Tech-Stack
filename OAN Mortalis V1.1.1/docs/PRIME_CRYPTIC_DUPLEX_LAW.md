@@ -24,8 +24,10 @@ Use this note with:
 - `FIRST_RUN_STEWARD_WITNESSED_OE_PACKET.md`
 - `RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
+- `PRIME_MEMBRANE_DUPLEX_PACKET_LAW.md`
 - `AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md`
 - `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`
+- `EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`
 
 ## Core Definition
 
@@ -38,6 +40,15 @@ different offices:
 In compact form:
 
 > `Prime` recognizes and witnesses. `Cryptic` instantiates and works.
+
+The active `V1.1.1` read may now also be stated as a membrane relation:
+
+- `Prime Membrane` is the lawful source surface of readable presence
+- `Cryptic` is the duplex-projected shadow field where cognition may remain
+  live before closure
+
+That membrane clarification does not replace the duplex law.
+It narrows how the repo should read packet and handoff work in this area.
 
 ## Prime Surfaces
 
@@ -153,6 +164,12 @@ The lawful read is narrower:
 > cryptic runtime may work under issued office, but canon and durable
 > persistence still require authority above that hot lane.
 
+The first bounded `EC` install-to-first-Prime state now composes this duplex
+path without widening it: Cryptic sensor-body work may reach stable-one
+discernment, and Prime may receive retained standing, while Mother/Father
+domain-role application, cradle-local governing surface selection, and Prime
+closure remain withheld.
+
 ## Immediate Build Consequence
 
 Any future file, receipt, or runtime seam in this area should answer:
@@ -163,13 +180,3 @@ Any future file, receipt, or runtime seam in this area should answer:
 
 If a seam cannot answer those questions plainly, it should be narrowed or held
 before promotion.
-
-## First Prime State Bridge
-
-- `EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`
-
-The first bounded `EC` install-to-first-Prime state now composes this duplex
-path without widening it: Cryptic sensor-body work may reach stable-one
-discernment, and Prime may receive retained standing, while Mother/Father
-domain-role application, cradle-local governing surface selection, and Prime
-closure remain withheld.
