@@ -268,3 +268,18 @@ This slice carries:
 The carried meaning is smallest-truthful-next-act formation bookkeeping. It is
 not full `EC` runtime habitation, direct Diamond geometry, dimensional canon,
 peerless standing, or `CME` proof.
+
+## Stack Root Rename Freeze Layer
+
+Sanctuary stack-root correction and forward family-prefix freeze are preserved
+as the first bounded transition layer after the formation buildspace.
+
+This slice carries:
+
+- `STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
+- `build/legacy-oan-namespace-allowlist.json`
+- production topology correction from legacy `Oan.*` foundation toward `San.*`
+- audit witness for exact legacy namespace and project allowlist enforcement
+
+The carried meaning is a forward naming freeze and migration plan, not physical
+repo rename, root-folder rename, solution rewrite, or completed code re-rooting.

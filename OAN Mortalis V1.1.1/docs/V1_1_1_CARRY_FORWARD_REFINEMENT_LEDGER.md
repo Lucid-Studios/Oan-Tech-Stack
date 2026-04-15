@@ -259,3 +259,12 @@ The following edges remain beyond this bounded formation buildspace layer:
 - peerless forms as executable standing classes
 - treating collapse itself as wisdom
 - bonded `CME` standing or authority from formation receipts alone
+
+## Stack Root Rename Held Edges
+
+The following edges remain beyond this bounded namespace-freeze layer:
+
+- governed repository, root-folder, and legacy `Oan.*` rename execution
+- physical folder migration from `src/Sanctuary/Oan.*` to `src/San/`
+- solution and project-reference rewrite for the re-rooted families
+- downstream `OAN` application or game identity seating beyond stack-root truth

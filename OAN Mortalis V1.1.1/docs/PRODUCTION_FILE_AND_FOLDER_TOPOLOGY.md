@@ -31,20 +31,22 @@ This note names where that ownership should live in the file tree.
 
 ## Core Rule
 
-`Sanctuary` is a runtime chamber and governed access layer.
+`Sanctuary` is the constitutional host family and the first lawful runtime
+habitat.
 
-It is not the final production source-owning family root.
+The current folder name `src/Sanctuary/` is still transitional because it does
+not yet tell the same truth as the forward family prefix `San.*`.
 
 That means the source tree should not permanently imply:
 
-- `Sanctuary` owns `Oan.*`
-- `Sanctuary` owns `SLI.*`
-- every project under the governed chamber belongs to one source family because
-  it happens to run inside that chamber
+- `src/Sanctuary/` is the final production root for `San.*`
+- `Oan.*` is the lasting foundational owner of Sanctuary-root services
+- every project under the governed chamber belongs to one final source family
+  merely because it currently stages under the same folder
 
 In compact form:
 
-> runtime chamber is not source ownership.
+> constitutional host truth is not the same thing as a legacy staging root.
 
 ## Current V1.1.1 Layout
 
@@ -72,11 +74,11 @@ OAN Mortalis V1.1.1/
 This layout is lawful for the active line, but it contains one important
 transitional compromise:
 
-- `src/Sanctuary/` is currently a chambered staging root, not a canonical
-  source-family owner
+- `src/Sanctuary/` currently contains legacy `Oan.*` project roots that must be
+  re-rooted toward `San.*`
 
-The projects beneath it are governed by their family prefixes, not by the
-folder name `Sanctuary`.
+The projects beneath it are not proof that `Oan.*` is the enduring
+foundational owner.
 
 ## Production Interpretation
 
@@ -112,13 +114,14 @@ It owns:
 
 Source ownership is determined by family and project role:
 
-- `Oan.*` for umbrella stack composition and stack-level contracts
+- `San.*` for Sanctuary-root constitutional host and stack-level composition
 - `SLI.*` for symbolic grammar and symbolic runtime
-- `CradleTek.*` for infrastructure and substrate ownership
-- `SoulFrame.*` for operator and identity-facing workflow ownership
-- `AgentiCore.*` for agent runtime ownership
+- `Ctk.*` for CradleTek habitation, custody, and extension ownership
+- `Sfr.*` for SoulFrame operator and relational membrane ownership
+- `Acr.*` for AgentiCore runtime-core ownership
 - `GEL.*` remains a bounded supporting domain surface until stronger family
   placement is fixed
+- `Oan.*` remains a legacy migration hold, not a forward foundational family
 
 ### Transitional staging roots
 
@@ -140,41 +143,40 @@ The target production topology for future templating is:
   build/
   docs/
   src/
-    Oan/
-      Oan.Common/
-      Oan.FirstRun/
-      Oan.HostedLlm/
-      Oan.Nexus.Control/
-      Oan.PrimeCryptic.Services/
-      Oan.Runtime.Headless/
-      Oan.Runtime.Materialization/
-      Oan.State.Modulation/
-      Oan.Trace.Persistence/
+    San/
+      San.Common/
+      San.FirstRun/
+      San.HostedLlm/
+      San.Nexus.Control/
+      San.PrimeCryptic.Services/
+      San.Runtime.Headless/
+      San.Runtime.Materialization/
+      San.State.Modulation/
+      San.Trace.Persistence/
     SLI/
       SLI.Engine/
       SLI.Ingestion/
       SLI.Lisp/
-    TechStack/
-      AgentiCore/
-        AgentiCore/
-      CradleTek/
-        CradleTek.Custody/
-        CradleTek.Host/
-        CradleTek.Mantle/
-        CradleTek.Memory/
-        CradleTek.Runtime/
-      GEL/
-        GEL.Contracts/
-      SoulFrame/
-        SoulFrame.Bootstrap/
-        SoulFrame.Membrane/
+    Acr/
+      Acr.Core/
+    Ctk/
+      Ctk.Custody/
+      Ctk.Host/
+      Ctk.Mantle/
+      Ctk.Memory/
+      Ctk.Runtime/
+    GEL/
+      GEL.Contracts/
+    Sfr/
+      Sfr.Bootstrap/
+      Sfr.Membrane/
   tests/
     Sanctuary/
   tools/
 ```
 
-This target keeps the current `TechStack/` grouping where it still helps line
-readability, but it removes `Sanctuary` as a misleading source-owning root.
+This target retires the older `Oan.*` root and the transitional
+`src/Sanctuary/` staging root together.
 
 ## Template Rule For Future Designs
 
@@ -184,12 +186,12 @@ Future line templates should inherit these rules:
 
 Do not default to:
 
-- `src/Sanctuary/...`
+- `src/Sanctuary/...` as a permanent legacy staging root
 - `src/House/...`
 - `src/Chamber/...`
 
-when the projects are really owned by family prefixes like `Oan.*`, `SLI.*`,
-or `CradleTek.*`.
+when the projects are really owned by family prefixes like `San.*`, `SLI.*`,
+`Ctk.*`, `Sfr.*`, or `Acr.*`.
 
 ### 2. Use family-first roots for family-owned code
 
@@ -197,13 +199,17 @@ If the family prefix is stable, the source root should reflect it.
 
 Examples:
 
-- `src/Oan/`
+- `src/San/`
 - `src/SLI/`
+- `src/Ctk/`
+- `src/Sfr/`
+- `src/Acr/`
 
 ### 3. Keep grouped substrate families grouped only when it improves flow
 
-`TechStack/` may remain as a grouping root when it improves substrate and
-runtime readability, but it should not erase family distinction.
+Grouped substrate roots may remain when they improve readability, but they
+should not erase family distinction or continue to imply older foundational
+ownership.
 
 ### 4. Keep tests line-local and chamber-readable
 
@@ -225,10 +231,10 @@ This note does not require an immediate folder move.
 For the current line, the safe order is:
 
 1. fix the production topology contract
-2. treat `src/Sanctuary/` as transitional in doctrine and review
+2. treat `src/Sanctuary/` and legacy `Oan.*` roots as transitional in doctrine
+   and review
 3. avoid creating new long-lived projects under `src/Sanctuary/` unless the
-   project is explicitly a chamber-facing `Oan.*` bridge that will later be
-   re-rooted
+   project is explicitly a migration-facing bridge that will later be re-rooted
 4. move physical folders only when solution/project references can be updated
    as one governed slice
 
@@ -243,9 +249,10 @@ The following should remain stable for the active line right now:
 - `src/TechStack/AgentiCore/`
 - `src/TechStack/GEL/`
 
-The only root that should now be treated as explicitly transitional is:
+The roots that should now be treated as explicitly transitional are:
 
 - `src/Sanctuary/`
+- the legacy `Oan.*` project roots that still live beneath it
 
 ## Immediate Build Consequence
 
@@ -253,12 +260,12 @@ When new projects or folders are added:
 
 - use family ownership first
 - use chamber language only for runtime or test surfaces
-- do not treat `Sanctuary` as the physical owner of `Oan.*` and `SLI.*`
+- do not treat `Oan.*` as the physical owner of Sanctuary-root host code
   forever
 
 If a future move is made, the safest first re-root is:
 
-- `src/Sanctuary/Oan.* -> src/Oan/`
+- `src/Sanctuary/Oan.* -> src/San/`
 - `src/Sanctuary/SLI.* -> src/SLI/`
 
 That move should be performed as one governed migration slice rather than by

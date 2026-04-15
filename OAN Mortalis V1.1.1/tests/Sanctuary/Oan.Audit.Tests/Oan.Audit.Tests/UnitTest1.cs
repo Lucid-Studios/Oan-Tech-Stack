@@ -118,10 +118,10 @@ public sealed class BootstrapBoundaryTests
         var topologyText = File.ReadAllText(topologyPath);
 
         Assert.Contains("PRODUCTION_FILE_AND_FOLDER_TOPOLOGY.md", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("runtime chamber is not source ownership", topologyText, StringComparison.Ordinal);
-        Assert.Contains("`src/Sanctuary/` is currently a chambered staging root", topologyText, StringComparison.Ordinal);
+        Assert.Contains("constitutional host truth is not the same thing as a legacy staging root", topologyText, StringComparison.Ordinal);
+        Assert.Contains("`src/Sanctuary/` currently contains legacy `Oan.*` project roots", topologyText, StringComparison.Ordinal);
         Assert.Contains("The target production topology for future templating is:", topologyText, StringComparison.Ordinal);
-        Assert.Contains("`src/Sanctuary/Oan.* -> src/Oan/`", topologyText, StringComparison.Ordinal);
+        Assert.Contains("`src/Sanctuary/Oan.* -> src/San/`", topologyText, StringComparison.Ordinal);
         Assert.Contains("`src/Sanctuary/SLI.* -> src/SLI/`", topologyText, StringComparison.Ordinal);
     }
 

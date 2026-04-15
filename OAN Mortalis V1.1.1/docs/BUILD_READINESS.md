@@ -621,3 +621,15 @@ zed-locus preservation, delta pressure, and failure-signature disposition. It
 does not admit full OAN Diamond runtime geometry, higher-dimensional cognition,
 live `ListeningFrame` widening, peerless standing, bonded `CME` authority, or
 collapse-as-wisdom promotion.
+
+## Stack Root Rename Freeze Addendum
+
+- `STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
+- `build/legacy-oan-namespace-allowlist.json`
+- `stack-root-renaming-migration-plan: frame-now`
+- `legacy-oan-namespace-freeze: admitted-transition-bounded`
+
+This addendum admits the Sanctuary-root naming migration plan and freezes new
+foundational `Oan.*` namespace or project drift against an explicit allowlist.
+It does not rename the repository, root folder, solution, or legacy project
+surfaces yet.
