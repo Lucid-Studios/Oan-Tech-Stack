@@ -573,3 +573,18 @@ braid, and a repeatable admitted `CradleTek` body may later receive one
 governing surface beneath that braid. It does not implement role selection,
 cradle-local governance enactment, resonance chamber standing, heartbeat, or
 standing-wave proof.
+
+## Constructor Groupoid Cleanup Addendum
+
+- `CONSTRUCTOR_ENGRAM_BURDEN_LAW.md`
+- `GROUPOID_FIBRINOID_COLLECTION_AND_BUNDLE_MAPPING_LAW.md`
+- `SESSION_CLEANUP_AND_BRAIDING_EVENT_MATRIX.md`
+- `constructor-engram-burden-law: frame-now/spec-now`
+- `groupoid-fibrinoid-collection-bundle-mapping: frame-now/spec-now`
+- `session-cleanup-braiding-event-matrix: admitted-local-bounded`
+
+This addendum admits computed constructor-engram burden, candidate-only
+groupoid/fibrinoid bundle mapping, and bounded session cleanup braiding. It
+does not admit temporal near-swamp execution, higher fibrinoid condensation,
+semantic promotion by packaging, inheritance, deletion authority, release gate
+standing, pulse, heartbeat, or resonance-chamber standing.

@@ -223,3 +223,15 @@ The following edges remain beyond this body-map correction:
 - treating a Steward-issued cradle braid as proof of later `CME` actualization
 
 Steward-issued cradle braid, and single `CradleTek` governing surface remain the later governance horizon beyond first Prime pre-role standing.
+
+## Constructor Groupoid Session Cleanup Held Edges
+
+The following edges remain beyond this bounded cleanup/intake family:
+
+- temporal near-swamp pressure and live branch-pruning execution
+- constructor-engram training views or promotion workflows
+- higher fibrinoid condensation and bundle reduction
+- semantic admission or inheritance from bundle packaging
+- cleanup-driven deletion authority
+- release-gate standing from cleanup braiding alone
+- pulse, heartbeat, resonance chamber, or standing-wave proof

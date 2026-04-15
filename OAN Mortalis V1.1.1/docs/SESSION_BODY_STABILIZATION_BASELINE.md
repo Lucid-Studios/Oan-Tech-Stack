@@ -164,3 +164,14 @@ The next seam after this stabilization baseline is:
 
 That later post-body seam should begin from this stabilized baseline rather
 than from a mixed dirty tree.
+
+## Constructor Groupoid Cleanup Baseline Addendum
+
+The current cleanup baseline also carries:
+
+- `CONSTRUCTOR_ENGRAM_BURDEN_LAW.md`
+- `GROUPOID_FIBRINOID_COLLECTION_AND_BUNDLE_MAPPING_LAW.md`
+- `SESSION_CLEANUP_AND_BRAIDING_EVENT_MATRIX.md`
+
+These surfaces are admitted as bounded cleanup and lattice-intake support.
+They do not condense, inherit, delete, or grant release standing by themselves.

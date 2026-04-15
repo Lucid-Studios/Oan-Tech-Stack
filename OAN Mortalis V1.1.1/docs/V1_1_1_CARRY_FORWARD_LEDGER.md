@@ -214,3 +214,19 @@ The carried meaning is:
 - a later cradle-local governing surface belongs beneath the specific braid
 
 This preserves the body map needed by later resonance, heartbeat, and standing-wave work without claiming that those seams are implemented here.
+
+## Constructor Groupoid Session Cleanup Layer
+
+Constructor engram burden, groupoid fibrinoid collection, and session cleanup
+braiding are preserved as the first bounded cleanup/intake family above the
+corrected body map.
+
+This slice carries:
+
+- computed `B/C/D/L/P/O` constructor burden and tier movement
+- candidate-only groupoid/fibrinoid tuple collection and bundle mapping
+- cleanup braiding of admitted body, support body, and ambient weather
+
+The carried meaning is grouping, budgeting, and candidate packaging without
+semantic promotion, inheritance, condensation, pulse, deletion authority, or
+release-gate standing.
