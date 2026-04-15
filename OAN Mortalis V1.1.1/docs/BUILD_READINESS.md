@@ -468,3 +468,16 @@ through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER
 - `cme-truth-seeking-orientation-law: frame-now/spec-now`
 - `cme-truth-seeking-balance-law: frame-now/spec-now`
 - `cme-engineered-cognitive-sensory-body-law: frame-now/spec-now`
+
+## SLI RTME Projected Runtime Addendum
+
+- `SLI_RTME_DUPLEX_POSTURE_ENGINE_NOTE.md`
+- `SLI_RTME_CLUSTERED_SWARMED_BRAID_DISCIPLINE_NOTE.md`
+- `PRIME_MEMBRANE_PROJECTED_BRAID_HISTORY_INTERPRETATION_LAW.md`
+- `PRIME_MEMBRANE_PROJECTED_HISTORY_RECEIPT_LAW.md`
+- `PRIME_RETAINED_WHOLE_EVALUATION_LAW.md`
+- `sli-rtme-duplex-posture-engine: frame-now/spec-now`
+- `sli-rtme-clustered-swarmed-braid-discipline: frame-now/spec-now`
+- `prime-membrane-projected-braid-history-interpretation: frame-now/spec-now`
+- `prime-membrane-projected-history-receipt: frame-now/spec-now`
+- `prime-retained-whole-evaluation: frame-now/spec-now`

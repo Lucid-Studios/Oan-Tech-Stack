@@ -147,3 +147,13 @@ They are either:
 - admitted local build condensate
 - held build posture
 - or explicit research-lane refinement handoffs
+
+## SLI RTME Held Edges
+
+The following edges remain beyond the first projected runtime slice:
+
+- full Lisp-side projected field autonomy beyond the bounded `RTME` posture
+  engine and advisory closure signal
+- Prime closure from receipted projected braid history beyond the bounded
+  retained-whole evaluation seam
+- re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity

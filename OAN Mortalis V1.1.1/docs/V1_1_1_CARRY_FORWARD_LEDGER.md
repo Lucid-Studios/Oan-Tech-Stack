@@ -114,3 +114,17 @@ build debt. It must move into the explicit refinement split tracked in
   posture, stewardship, and bounded projection shaping
 - `AgentiCore` carries chambered cognition: `HighMind` uptake and later EC
   interior work without re-owning body, custody, or projection membrane law
+
+## SLI RTME Projected Runtime
+
+- `SLI/Lisp` `RTME` duplex posture engine preserved as the first projected
+  field motion seam beneath membrane-side retention law.
+- `SLI/Lisp` clustered and swarmed braid discipline preserved as the first
+  plurality-bearing projected field seam beneath membrane-side retention law.
+- Prime Membrane projected braid-history interpretation preserved as the first
+  membrane-side plurality-reading seam without flattening visible line residue.
+- Prime Membrane projected history receipt preserved as the first bounded
+  membrane-visible acknowledgment seam without implying retained wholeness or
+  closure.
+- Prime retained-whole evaluation preserved as the first bounded Prime-side
+  admission seam above membrane receipt and below any explicit closure act.
