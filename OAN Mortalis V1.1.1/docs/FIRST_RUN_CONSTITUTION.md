@@ -67,6 +67,33 @@ The active constitutional first-run model in `V1.1.1` now lives beside it throug
 
 The legacy first-boot contracts are not rewritten in place and are not the projection owner for the new v2 model.
 
+## Sanctuary Biad And Admitted Body Distinction
+
+`ParentStanding` names the singular Sanctuary biad.
+
+It does not mean that every admitted `CradleTek` instance must reseat
+`Mother/Father` as though the constitutional world began again inside the
+extended body.
+
+The current truthful read is:
+
+- `Mother/Father` stand as Sanctuary-facing constitutional supervision
+- `CradleTekInstalled` and `CradleTekAdmitted` occur beneath that standing
+- `StewardStanding` is the first protected operational office inside the
+  admitted body
+- any later cradle-local governance should proceed through one governing
+  surface beneath a specific Steward-issued cryptic braid rather than through
+  a repeated Sanctuary biad
+
+This section is a constitutional reading correction.
+
+It is not proof that the later cradle-local governing-surface selection or
+resonance work is already implemented.
+
+The `EngineeredCognitionFirstPrimeStateReceipt` now lives below that
+correction: it may witness install-to-first-Prime pre-role standing, but it
+does not assign governing domains or roles to `Mother/Father` and does not
+select the later cradle-local governing surface.
 ## Current V1.1.1 Constitutional Projection Order
 
 The v2 constitutional projection order carried by `V1.1.1` is:

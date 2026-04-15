@@ -561,3 +561,15 @@ theta-ingress, and post-ingress discernment witness family. It does not admit
 pulse, heartbeat, resonance-chamber standing, full dodecahedral runtime
 geometry, persistence, inheritance, self-mutation, semantic rise, or
 condensation authority.
+
+## Sanctuary Biad And CradleTek Governing Surface Addendum
+
+- `SANCTUARY_BIAD_AND_CRADLETEK_GOVERNING_SURFACE_NOTE.md`
+- `sanctuary-biad-and-cradletek-governing-surface-note: frame-now`
+
+This addendum admits the body-map correction that Sanctuary holds the singular
+`Mother/Father` biad, Steward witnesses or issues the cradle-specific cryptic
+braid, and a repeatable admitted `CradleTek` body may later receive one
+governing surface beneath that braid. It does not implement role selection,
+cradle-local governance enactment, resonance chamber standing, heartbeat, or
+standing-wave proof.

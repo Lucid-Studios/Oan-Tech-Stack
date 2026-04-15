@@ -200,3 +200,17 @@ This slice carries:
 - optional threading through first-run living AgentiCore and community-weather packets
 
 The carried meaning is lawful continuity posture and one bounded ingress / post-ingress witness chain. It does not promote heartbeat, resonance, full geometry, persistence, inheritance, semantic rise, self-mutation, or condensation.
+
+## Sanctuary Biad And CradleTek Governing Surface Correction
+
+Sanctuary biad and single-surface `CradleTek` governance correction is carried
+forward as a body-map correction for the active line.
+
+The carried meaning is:
+
+- Sanctuary holds the singular `Mother/Father` biad
+- Steward may witness or issue the unique cradle-specific cryptic braid
+- repeatable admitted `CradleTek` bodies do not reseat the Sanctuary biad
+- a later cradle-local governing surface belongs beneath the specific braid
+
+This preserves the body map needed by later resonance, heartbeat, and standing-wave work without claiming that those seams are implemented here.

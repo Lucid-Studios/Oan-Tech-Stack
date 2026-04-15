@@ -210,3 +210,16 @@ The following edges remain beyond this bounded witness layer:
 - persistence admission from instrumentation or ingress receipts
 - semantic rise from post-ingress discernment alone
 - inheritance, self-mutation, or condensation authority from one intake chain
+
+## Sanctuary Biad And CradleTek Governing Surface Held Edges
+
+The following edges remain beyond this body-map correction:
+
+- role and domain selection for a cradle-local governing surface
+- live cradle-local governance enactment
+- resonance chamber framing as implemented runtime
+- Compass heartbeat initiation or sustain
+- short-duration standing-wave proof
+- treating a Steward-issued cradle braid as proof of later `CME` actualization
+
+Steward-issued cradle braid, and single `CradleTek` governing surface remain the later governance horizon beyond first Prime pre-role standing.
