@@ -16,6 +16,11 @@ Do not open public GitHub issues for:
 
 Use a private maintainer contact path instead of the public issue tracker.
 
+Private disclosure contacts:
+
+- `admin@lucidtechnologies.tech`
+- `legal@lucidtechnologies.tech`
+
 ## Sensitive Material
 
 The following must never be committed or posted publicly:

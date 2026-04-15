@@ -29,33 +29,50 @@ The current line split is:
 `V1.2.1` is being shaped as a governed sibling and should not be mistaken for
 the default executable surface.
 
+## Public Build Boundary
+
+This repository is the governed build surface for the stack, but it is not yet
+the fully operational installer.
+
+The active public boundary is:
+
+- the repository carries the build minus the hosted seed `LLM`
+- the full operational installer still depends on a local hosted seed `LLM`
+  and associated resident runtime surfaces that are not carried here
+- the fully operational installer is still being built
+- public repo truth remains the governed code, contracts, docs, and tests that
+  can be carried without shipping the seed `LLM` runtime itself
+
+That means the repository is explicit about seed `LLM` dependence without
+pretending that the public checkout is already the complete install-ready
+operational package.
+
 ## Architecture Read
 
 At a high level, the stack reads as:
 
-```mermaid
-flowchart LR
-  OP["Operator / Developer"]
-  AC["AgentiCore"]
-  SLI["SLI"]
-  SF["SoulFrame"]
-  CT["CradleTek"]
-
-  OP --> AC --> SLI --> SF --> CT
+```text
+Operator / Developer -> Sanctuary -> SLI -> SoulFrame / AgentiCore / CradleTek
 ```
 
-Working family ownership in the active line is:
+This is intentionally kept as plain text so the GitHub repository view, raw
+rendering, and lightweight mirrors all show the same architecture read without
+depending on Mermaid support.
 
-- `AgentiCore.*`
-  agent runtime ownership
+Forward family ownership in the active line is:
+
+- `San.*`
+  Sanctuary-root constitutional host and stack composition ownership
+- `Ctk.*`
+  CradleTek habitation, custody, and extension ownership
+- `Sfr.*`
+  SoulFrame operator and relational membrane ownership
+- `Acr.*`
+  AgentiCore runtime-core ownership
 - `SLI.*`
   symbolic protocol and runtime ownership
-- `SoulFrame.*`
-  operator and identity-facing workflow ownership
-- `CradleTek.*`
-  infrastructure and substrate ownership
 - `Oan.*`
-  umbrella stack composition and stack-level contracts
+  legacy migration hold and downstream application/domain identity only
 
 ## Repository Layout
 
@@ -103,7 +120,7 @@ Run all canonical commands from the repository root:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release
 powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release
-powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1
+& '.\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1'
 ```
 
 Expected behavior:
@@ -175,3 +192,13 @@ by Lucid Studios.
 For public archival references and broader doctrine publication, use the
 organization surfaces and linked publication/archive materials rather than
 treating this repository as a standalone research archive.
+
+## Contact Surfaces
+
+Use the public-facing aliases that match the surface of the request:
+
+- general repository and public information: `info@lucidtechnologies.tech`
+- research-facing questions and doctrine context: `research@lucidtechnologies.tech`
+- academic and institutional inquiries: `academic@lucidtechnologies.tech`
+- repository administration and contribution coordination: `admin@lucidtechnologies.tech`
+- conduct, legal, and sensitive private review paths: `legal@lucidtechnologies.tech`

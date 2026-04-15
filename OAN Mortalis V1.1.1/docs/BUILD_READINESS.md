@@ -645,3 +645,32 @@ This addendum admits audit witness coverage for the bounded Prime Membrane
 duplex packet law and session-body stabilization baseline. It does not grant
 Prime closure, live membrane closure issuance, resonance-chamber standing,
 heartbeat, or `CME` minting authority.
+
+## Public Boundary And Contact Preservation
+
+For the active public repository surface:
+
+- the repository is the governed build surface
+- the public repository carries the build minus the hosted seed `LLM`
+- the fully operational installer still depends on the local hosted seed `LLM`
+  and associated resident runtime surfaces that are not carried in the public
+  checkout
+- the fully operational installer is still being built
+
+The public-facing repository contact aliases now fixed across repo-root
+surfaces are:
+
+- `info@lucidtechnologies.tech`
+  - general repository and public information
+- `research@lucidtechnologies.tech`
+  - research-facing and doctrine-facing questions
+- `academic@lucidtechnologies.tech`
+  - academic and institutional inquiries
+- `admin@lucidtechnologies.tech`
+  - repository administration and contribution routing
+- `legal@lucidtechnologies.tech`
+  - conduct, legal, and sensitive private review paths
+
+These aliases are part of the public repository presentation boundary and
+should be preserved as the line moves forward unless superseded by explicit
+repo-local governance.

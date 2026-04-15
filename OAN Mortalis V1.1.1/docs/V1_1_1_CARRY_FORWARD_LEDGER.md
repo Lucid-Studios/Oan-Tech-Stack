@@ -301,3 +301,33 @@ The carried meaning is witness completion for bounded packet and baseline law:
 membrane source, projection posture, bounded `CME` standing, closure
 eligibility, and stabilized session-body grouping remain distinct from Prime
 closure or live authority.
+
+## Public Repository Boundary Preservation
+
+The active public repository presentation boundary that must now be carried
+forward with the line is:
+
+- the repository is the governed build surface, not yet the fully operational
+  installer
+- the public repository carries the build minus the hosted seed `LLM`
+- the fully operational installer still depends on the local hosted seed `LLM`
+  and associated resident runtime surfaces that are not carried in the public
+  checkout
+
+The public-facing contact alias map that should now be treated as part of that
+repository boundary is:
+
+- `info@lucidtechnologies.tech`
+  - general public and repository information
+- `research@lucidtechnologies.tech`
+  - research-facing contact
+- `academic@lucidtechnologies.tech`
+  - academic and institutional contact
+- `admin@lucidtechnologies.tech`
+  - repository administration and contribution routing
+- `legal@lucidtechnologies.tech`
+  - legal, conduct, and sensitive private review
+
+This does not change executable runtime law. It preserves the public
+repository-facing contact surfaces and installer-boundary truth so later
+documentation passes do not drift back into ambiguity.
