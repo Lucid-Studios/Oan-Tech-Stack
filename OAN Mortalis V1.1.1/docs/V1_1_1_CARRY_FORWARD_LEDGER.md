@@ -167,3 +167,21 @@ build debt. It must move into the explicit refinement split tracked in
 - first local Responses API harness receipt schema and evidence landing body
   preserved as placeholder-contract evidence structure.
 - hosted resident `GEL` layer witness remains local-only and opt-in.
+
+## SelfGEL Legal Orientation Packet
+
+The `SelfGEL` legal orientation predicate family is preserved as a `GEL`-owned
+root family for future lawful civil orientation.
+
+This slice carries:
+
+- `SELFGEL_LEGAL_ORIENTATION_PREDICATE_FAMILY_NOTE.md`
+- `SELFGEL_LEGAL_ORIENTATION_INSTALL_VALIDATOR_BRIDGE_NOTE.md`
+- `templates/legal_orientation_install.packet.template.json`
+- `SanctuarySelfGelLegalOrientationContracts.cs`
+- the local legal-orientation protected-data profile
+
+The carried meaning is local-only legal evidence orientation, not tracked legal
+identifier payload, runtime authority, first-run state-ladder mutation, trust
+activation, `B-Corp` transition, bonded-operator seating, authority delegation,
+or cryptographic custody.

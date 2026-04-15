@@ -1,0 +1,15 @@
+{
+  "legal_name": "logical-source://legal-name",
+  "state_registration_surface": "logical-source://state-registration-surface",
+  "jurisdiction": "logical-source://jurisdiction",
+  "ubi": "logical-source://ubi",
+  "ein": "logical-source://ein",
+  "filing_receipt_handles": [
+    "logical-source://filing-receipt"
+  ],
+  "irs_notice_handle": "logical-source://irs-notice",
+  "governor_surface": "logical-source://governor-surface",
+  "entity_form": "logical-source://entity-form",
+  "reporting_posture": "logical-source://reporting-posture",
+  "evidence_mixture_class": "mixed-legal-surfaces-local-only"
+}

@@ -530,3 +530,17 @@ through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER
 - `RESPONSES_API_LOCAL_HARNESS_RECEIPT_SCHEMA_NOTE.md`
 - `llm-test-surface-taxonomy-note: frame-now`
 - `responses-api-local-harness-receipt-schema-note: frame-now`
+
+## SelfGEL Legal Orientation Addendum
+
+- `SELFGEL_LEGAL_ORIENTATION_PREDICATE_FAMILY_NOTE.md`
+- `SELFGEL_LEGAL_ORIENTATION_INSTALL_VALIDATOR_BRIDGE_NOTE.md`
+- `templates/legal_orientation_install.packet.template.json`
+- `selfgel-legal-orientation-predicate-family-note: frame-now`
+- `selfgel-legal-orientation-install-validator-bridge-note: frame-now`
+
+This addendum admits the `GEL`-owned `SelfGEL` legal-orientation family as a
+placeholder contract and tracked local-only packet template. It does not admit
+real legal identifiers into tracked history and does not authorize first-run
+state-ladder, runtime, trust, `B-Corp`, bonded-operator, authority-delegation,
+or cryptographic-custody activation.

@@ -166,3 +166,20 @@ public sealed record SanctuaryOwnershipProfile
         }
     }
 }
+
+public static class SanctuaryProtectedDataAtlas
+{
+    public static SanctuaryProtectedDataProfile LocalLegalOrientationEvidence { get; } =
+        new(
+            dataClass: SanctuaryProtectedDataClass.OrganizationControlledData,
+            ownershipSurface: SanctuaryOwnershipSurface.OrganizationControlled,
+            telemetryClass: SanctuaryTelemetryClass.OperationalAudit,
+            localOnlyByDefault: true,
+            explicitRemoteActivationRequired: true,
+            governingLayers:
+            [
+                SanctuaryContractLayer.LocalBindingLicense,
+                SanctuaryContractLayer.ProtectedDataAddendum,
+                SanctuaryContractLayer.LocalizationResidencySchedule
+            ]);
+}

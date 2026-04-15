@@ -185,3 +185,16 @@ The following edges remain beyond this bounded evidence-surface slice:
 - live multi-surface comparative harness execution beyond bounded taxonomy
 - live Responses API harness execution beyond bounded receipt schema
 - treating any test surface as `CME` baseline proof by default
+
+## SelfGEL Legal Orientation Held Edges
+
+The following edges remain beyond this placeholder legal-orientation packet:
+
+- real legal-identifier storage in tracked repository history
+- live install-validator packet execution
+- first-run state-ladder mutation from legal evidence alone
+- charitable trust seating
+- bonded operator seating
+- `B-Corp` transition seating
+- authority delegation
+- cryptographic custody

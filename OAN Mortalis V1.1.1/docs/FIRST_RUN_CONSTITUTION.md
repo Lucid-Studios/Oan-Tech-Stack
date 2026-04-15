@@ -220,6 +220,17 @@ Their job is to let the line name late-path structure honestly:
   cognition-facing `Listening Frame` placeholder, typed `ListeningFrame` and
   `Compass` projection packets, `Zed of Delta`, and tool-use attachment
 
+In this slice, primitive `SelfGEL` may later inherit a `GEL`-owned legal
+orientation root predicate family that establishes legal body, jurisdiction,
+lineage, governor binding, and lawful operating surface.
+
+That inheritance remains doctrine-only here.
+It does not alter the first-run state ladder, and it does not authorize live
+first-run receipt changes.
+
+The legal-evidence bridge for that future orientation family is not cryptographic seed entropy.
+It is lawful provenance substrate only, with trust, `B-Corp`, bonded operator,
+authority delegation, and cryptographic custody remaining deferred branches.
 At this stage, all three may still lawfully remain withheld in live receipts.
 
 ## Promotion Gates
