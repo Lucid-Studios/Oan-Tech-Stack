@@ -33,6 +33,17 @@ For the explanatory bridge that maps `ListeningFrame`, `Compass`,
 instrument-body language, see
 `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`.
 
+For the bounded `EC` walk from install to first Prime pre-role standing, see
+`EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`.
+
+For the Prime seed-bearing state immediately after first Prime pre-role
+standing and before lawfully bonded domain integration or `CME` founding, see
+`PRIME_SEED_STATE_LAW.md` and `PrimeSeedStateContracts.cs`.
+
+For the first legal-admission seam governing domain and role offers beyond
+first Prime pre-role standing, see `DOMAIN_AND_ROLE_ADMISSION_LAW.md` and
+`DomainRoleAdmissionContracts.cs`.
+
 For the bridge that separates the wider Sanctuary lifecycle from this narrower
 line-local constitutional projection, see
 `SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`.
@@ -94,6 +105,7 @@ The `EngineeredCognitionFirstPrimeStateReceipt` now lives below that
 correction: it may witness install-to-first-Prime pre-role standing, but it
 does not assign governing domains or roles to `Mother/Father` and does not
 select the later cradle-local governing surface.
+
 ## Current V1.1.1 Constitutional Projection Order
 
 The v2 constitutional projection order carried by `V1.1.1` is:
@@ -244,10 +256,11 @@ Their job is to let the line name late-path structure honestly:
 - chapter seven may frame load law and compression preparation
 - chapter eight may frame the actualization seal and primitive `SelfGEL`
 - chapter nine may frame the living `AgentiCore` surface, a future
-  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame`, `Compass`,
-  bounded instrumentation receipts, bounded zed self-basis receipts, bounded
-  theta-ingress receipts, bounded post-ingress discernment receipts,
-  `Zed of Delta`, and tool-use attachment
+  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame`,
+  `Compass`, bounded instrumentation receipts, bounded zed self-basis receipts,
+  bounded theta-ingress receipts, bounded post-ingress discernment receipts,
+  `Zed of Delta`, and
+  tool-use attachment
 
 In this slice, primitive `SelfGEL` may later inherit a `GEL`-owned legal
 orientation root predicate family that establishes legal body, jurisdiction,
@@ -260,6 +273,7 @@ first-run receipt changes.
 The legal-evidence bridge for that future orientation family is not cryptographic seed entropy.
 It is lawful provenance substrate only, with trust, `B-Corp`, bonded operator,
 authority delegation, and cryptographic custody remaining deferred branches.
+
 At this stage, all three may still lawfully remain withheld in live receipts.
 
 ## Promotion Gates
@@ -449,17 +463,3 @@ Within that later self split:
 
 - `SelfGEL` is the readable, admissible operator-work self surface
 - `cSelfGEL` is the cryptic, sealed cradle-local witness and control surface
-
-## Prime Seed And Legal Admission Bridge
-
-For the bounded `EC` walk from install to first Prime pre-role standing, see
-`EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md` and
-`EngineeredCognitionFirstPrimeStateReceipt`.
-
-For the Prime seed-bearing state immediately after first Prime pre-role
-standing and before lawfully bonded domain integration or `CME` founding, see
-`PRIME_SEED_STATE_LAW.md` and `PrimeSeedStateContracts.cs`.
-
-For the first legal-admission seam governing domain and role offers beyond
-first Prime pre-role standing, see `DOMAIN_AND_ROLE_ADMISSION_LAW.md` and
-`DomainRoleAdmissionContracts.cs`.

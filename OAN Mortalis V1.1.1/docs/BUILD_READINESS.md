@@ -20,6 +20,35 @@ Assessment date:
 
 - March 31, 2026
 
+## Public Boundary And Contact Preservation
+
+For the active public repository surface:
+
+- the repository is the governed build surface
+- the public repository carries the build minus the hosted seed `LLM`
+- the fully operational installer still depends on the local hosted seed
+  `LLM` and associated resident runtime surfaces that are not carried in the
+  public checkout
+- the fully operational installer is still being built
+
+The public-facing repository contact aliases now fixed across repo-root
+surfaces are:
+
+- `info@lucidtechnologies.tech`
+  - general repository and public information
+- `research@lucidtechnologies.tech`
+  - research-facing and doctrine-facing questions
+- `academic@lucidtechnologies.tech`
+  - academic and institutional inquiries
+- `admin@lucidtechnologies.tech`
+  - repository administration and contribution routing
+- `legal@lucidtechnologies.tech`
+  - conduct, legal, and sensitive private review paths
+
+These aliases are part of the public repository presentation boundary and
+should be preserved as the line moves forward unless superseded by explicit
+repo-local governance.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -62,6 +91,8 @@ Current hold-lane clarification:
   `COMPANION_TOOL_TELEMETRY_LANE.md`
 - the end-to-end telemetry bundle and groupoid taxonomy now lives in
   `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`
+- the first groupoid fibrinoid collection and bundle-mapping law now lives in
+  `GROUPOID_FIBRINOID_COLLECTION_AND_BUNDLE_MAPPING_LAW.md`
 - the first read-only `line-audit-report` schema now lives in
   `LINE_AUDIT_REPORT_SCHEMA.md`
 - the first root read-only `line-audit-report` implementation now lives in
@@ -99,18 +130,179 @@ Current hold-lane clarification:
   `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
 - the discernment and admissibility casebook now lives in
   `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
+- the `GEL` discernment layering and translative binding note now lives in
+  `GEL_DISCERNMENT_LAYERING_AND_TRANSLATIVE_BINDING_NOTE.md`
+- the `Pre-Lisp`, minimal `IUTT` Lisp, and acting-operator note now lives in
+  `PRE_LISP_IUTT_LISP_AND_LLM_ACTING_OPERATOR_NOTE.md`
+- the Prime root carrier, reduction, decomposition, and anchor emergence note
+  now lives in
+  `PRIME_ROOT_CARRIER_REDUCTION_DECOMPOSITION_AND_ANCHOR_EMERGENCE_NOTE.md`
+- the `A0` `GEL` axiom floor note now lives in
+  `A0_GEL_AXIOM_FLOOR_NOTE.md`
+- the first `GEL` derived growth laws note now lives in
+  `GEL_DERIVED_GROWTH_LAWS_NOTE.md`
+- the `GEL` action basis and composition note now lives in
+  `GEL_ACTION_BASIS_AND_COMPOSITION_NOTE.md`
+- the grounded `proc` action and trace law now lives in
+  `PROC_GROUNDED_ACTION_AND_TRACE_LAW.md`
+- the ignition-chain template and witness law now lives in
+  `IGNITION_CHAIN_TEMPLATE_AND_WITNESS_LAW.md`
+- the assimilation receipt and `Delta` bridge note now lives in
+  `ASSIMILATION_RECEIPT_AND_DELTA_BRIDGE_NOTE.md`
+- the heat, resonance, and expand-before-commit law now lives in
+  `HEAT_RESONANCE_AND_EXPAND_BEFORE_COMMIT_LAW.md`
+- the stability metrics and condensation threshold note now lives in
+  `STABILITY_METRICS_AND_CONDENSATION_THRESHOLD_NOTE.md`
+- the canonical condensation output law now lives in
+  `CANONICAL_CONDENSATION_OUTPUT_LAW.md`
+- the procedural basis condensate note now lives in
+  `PROCEDURAL_BASIS_CONDENSATE_NOTE.md`
+- the first bounded ignition-chain test protocol now lives in
+  `FIRST_BOUNDED_IGNITION_CHAIN_TEST_PROTOCOL.md`
+- the `LLM` test surface taxonomy note now lives in
+  `LLM_TEST_SURFACE_TAXONOMY_NOTE.md`
+- the Responses API local harness receipt schema note now lives in
+  `RESPONSES_API_LOCAL_HARNESS_RECEIPT_SCHEMA_NOTE.md`
+- the inner / outer / witness agent build orchestration law now lives in
+  `INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md`
+- the shared line-verification lock helper now lives at
+  `../tools/Use-LineVerificationLock.ps1`
+- the stack-root renaming migration plan now lives in
+  `STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
+- the legacy `Oan.*` namespace allowlist now lives in
+  `build/legacy-oan-namespace-allowlist.json`
+- the `SelfGEL` legal orientation predicate family note now lives in
+  `SELFGEL_LEGAL_ORIENTATION_PREDICATE_FAMILY_NOTE.md`
+- the `SelfGEL` legal orientation install-validator bridge note now lives in
+  `SELFGEL_LEGAL_ORIENTATION_INSTALL_VALIDATOR_BRIDGE_NOTE.md`
+- the tracked legal-orientation install packet template now lives in
+  `templates/legal_orientation_install.packet.template.json`
 - the Sanctuary boot and first-run ontology bridge now lives in
   `SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`
 - the AgentiCore Listening Frame and Compass minimal-build note now lives in
   `AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md`
+- the ListeningFrame / Compass loom-weave bridge now lives in
+  `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`
+- the ListeningFrame instrumentation receipt law now lives in
+  `LISTENING_FRAME_INSTRUMENTATION_RECEIPT_LAW.md`
+- the Zed-of-Delta self-orientation basis law now lives in
+  `ZED_DELTA_SELF_ORIENTATION_BASIS_LAW.md`
+- the theta-ingress and sensory-cluster uptake law now lives in
+  `THETA_INGRESS_AND_SENSORY_CLUSTER_UPTAKE_LAW.md`
+- the post-ingress discernment and stable-one law now lives in
+  `POST_INGRESS_DISCERNMENT_AND_STABLE_ONE_LAW.md`
+- the light-cone awareness lineage and ListeningFrame source-law note now
+  lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
+- the OAN Diamond lineage and bounded zed/delta field note now lives in
+  `EC_OAN_DIAMOND_LINEAGE_AND_ZED_DELTA_SOURCE_LAW.md`
+- the `EC` formation build-space preparation note now lives in
+  `EC_FORMATION_BUILDSPACE_PREPARATION_NOTE.md`
+- the `EC` install-to-first-Prime state law now lives in
+  `EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`
+- the domain and role admission law now lives in
+  `DOMAIN_AND_ROLE_ADMISSION_LAW.md`
+- the private-domain service witness law now lives in
+  `PRIVATE_DOMAIN_SERVICE_WITNESS_LAW.md`
+- the `CME` minimum legal founding bundle law now lives in
+  `CME_MINIMUM_LEGAL_FOUNDING_BUNDLE_LAW.md`
+- the legal foundation documentation matrix template now lives in
+  `LEGAL_FOUNDATION_DOCUMENTATION_MATRIX.md`
+- the `CME` truth-seeking orientation law now lives in
+  `CME_TRUTH_SEEKING_ORIENTATION_LAW.md`
+- the `CME` truth-seeking balance law now lives in
+  `CME_TRUTH_SEEKING_BALANCE_LAW.md`
+- the `CME` engineered cognitive sensory body law now lives in
+  `CME_ENGINEERED_COGNITIVE_SENSORY_BODY_LAW.md`
+- the constructor engram burden law now lives in
+  `CONSTRUCTOR_ENGRAM_BURDEN_LAW.md`
 - the Prime/Cryptic duplex law now lives in
   `PRIME_CRYPTIC_DUPLEX_LAW.md`
+- the Prime Membrane duplex packet law now lives in
+  `PRIME_MEMBRANE_DUPLEX_PACKET_LAW.md`
+- the Prime Membrane projected braid-history interpretation law now lives in
+  `PRIME_MEMBRANE_PROJECTED_BRAID_HISTORY_INTERPRETATION_LAW.md`
+- the Prime Membrane projected history receipt law now lives in
+  `PRIME_MEMBRANE_PROJECTED_HISTORY_RECEIPT_LAW.md`
+- the Prime retained-whole evaluation law now lives in
+  `PRIME_RETAINED_WHOLE_EVALUATION_LAW.md`
+- the communicative filament and anti-echo law now lives in
+  `COMMUNICATIVE_FILAMENT_AND_ANTI_ECHO_LAW.md`
+- the lawful reopening, redoping, and continued participation law now lives in
+  `LAWFUL_REOPENING_REDOPING_AND_CONTINUED_PARTICIPATION_LAW.md`
+- the Prime closure act law now lives in
+  `PRIME_CLOSURE_ACT_LAW.md`
+- the post-Prime closure continuity law now lives in
+  `POST_PRIME_CLOSURE_CONTINUITY_LAW.md`
+- the session-body stabilization baseline now lives in
+  `SESSION_BODY_STABILIZATION_BASELINE.md`
+- the session cleanup and braiding event matrix now lives in
+  `SESSION_CLEANUP_AND_BRAIDING_EVENT_MATRIX.md`
+- the Sanctuary biad and CradleTek governing-surface correction now lives in
+  `SANCTUARY_BIAD_AND_CRADLETEK_GOVERNING_SURFACE_NOTE.md`
+- the `SLI` `RTME` duplex posture engine note now lives in
+  `SLI_RTME_DUPLEX_POSTURE_ENGINE_NOTE.md`
+- the `SLI` `RTME` clustered/swarmed braid discipline note now lives in
+  `SLI_RTME_CLUSTERED_SWARMED_BRAID_DISCIPLINE_NOTE.md`
 - the `MoS/cMoS/cGoA` instantiation law now lives in
   `MOS_CMOS_CGOA_INSTANTIATION_LAW.md`
 - the `CME` return-audit and promotion law now lives in
   `CME_RETURN_AUDIT_AND_PROMOTION_LAW.md`
 - the first bonded cryptic return contract family now lives in
   `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
+- the first Prime Membrane duplex packet family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PrimeMembraneDuplexContracts.cs`
+- the first Prime Membrane projected braid-history interpreter now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PrimeMembraneProjectedBraidInterpretationContracts.cs`
+- the first Prime Membrane projected history receipt family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PrimeMembraneProjectedHistoryReceiptContracts.cs`
+- the first Prime retained-whole evaluation family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PrimeRetainedWholeContracts.cs`
+- the first communicative filament and anti-echo family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/CommunicativeFilamentContracts.cs`
+- the first lawful reopening participation family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/LawfulReopeningParticipationContracts.cs`
+- the first Prime closure act family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PrimeClosureActContracts.cs`
+- the first post-Prime closure continuity family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PostPrimeClosureContinuityContracts.cs`
+- the first ListeningFrame instrumentation receipt family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/ListeningFrameInstrumentationContracts.cs`
+- the first Zed-of-Delta self-orientation basis family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/ZedDeltaSelfOrientationBasisContracts.cs`
+- the first theta-ingress and sensory-cluster uptake family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/ThetaIngressSensoryClusterContracts.cs`
+- the first post-ingress discernment family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PostIngressDiscernmentContracts.cs`
+- the first `EC` install-to-first-Prime pre-role state family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/EngineeredCognitionFirstPrimeStateContracts.cs`
+- the first domain-and-role admission family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/DomainRoleAdmissionContracts.cs`
+- the first private-domain service witness family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/PrivateDomainServiceWitnessContracts.cs`
+- the first `CME` minimum legal founding bundle family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/CmeMinimumLegalFoundingBundleContracts.cs`
+- the first `CME` truth-seeking orientation family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/CmeTruthSeekingOrientationContracts.cs`
+- the first `CME` truth-seeking balance family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/CmeTruthSeekingBalanceContracts.cs`
+- the first `CME` engineered cognitive sensory body family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/CmeEngineeredCognitiveSensoryBodyContracts.cs`
+- the first constructor engram burden family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/ConstructorEngramBurdenContracts.cs`
+- the first groupoid fibrinoid collection family now lives in
+  `src/Sanctuary/Oan.Common/Oan.Common/GroupoidFibrinoidCollectionContracts.cs`
+- the first communicative filament issuer now lives in
+  `src/Sanctuary/SLI.Engine/SLI.Engine/CommunicativeFilamentIssuer.cs`
+- the first lawful reopening participation issuer now lives in
+  `src/Sanctuary/SLI.Engine/SLI.Engine/LawfulReopeningParticipationIssuer.cs`
+- the first Prime closure act issuer now lives in
+  `src/Sanctuary/SLI.Engine/SLI.Engine/PrimeClosureActIssuer.cs`
+- the first post-Prime closure continuity issuer now lives in
+  `src/Sanctuary/SLI.Engine/SLI.Engine/PostPrimeClosureContinuityIssuer.cs`
+- the first `SLI/Lisp` `RTME` duplex posture engine now lives in
+  `src/Sanctuary/SLI.Lisp/SLI.Lisp/RtmeDuplexPostureEngine.cs`
+- the first `SLI/Lisp` clustered/swarmed braid engine now lives in
+  `src/Sanctuary/SLI.Lisp/SLI.Lisp/RtmeDuplexBraidEngine.cs`
 - the production file and folder topology contract now lives in
   `PRODUCTION_FILE_AND_FOLDER_TOPOLOGY.md`
 - the domain-and-spline categorical condensate for the active `V1.1.1` doc
@@ -139,6 +331,7 @@ Current contract-first unlock map:
 - `.hopng: optional-bounded`
 - `companion-tool-telemetry: admitted-optional-bounded`
 - `telemetry-bundle-taxonomy: frame-now`
+- `groupoid-fibrinoid-collection-bundle-mapping: frame-now/spec-now`
 - `line-audit-report-schema: frame-now`
 - `line-audit-report: admitted-root-read-only`
 - `first-working-model-release-gate: frame-now`
@@ -170,8 +363,61 @@ Current contract-first unlock map:
 - `resident-seating-serialization-pilot-note: admitted-local-bounded`
 - `runtime-workbench-governance-law: frame-now`
 - `discernment-admissibility-law: frame-now`
+- `gel-discernment-layering-and-translative-binding-note: frame-now`
+- `pre-lisp-iutt-lisp-and-llm-acting-operator-note: frame-now`
+- `prime-root-carrier-reduction-decomposition-and-anchor-emergence-note: frame-now`
+- `a0-gel-axiom-floor-note: frame-now`
+- `gel-derived-growth-laws-note: frame-now`
+- `gel-action-basis-and-composition-note: frame-now`
+- `proc-grounded-action-trace-law: frame-now`
+- `ignition-chain-template-witness-law: frame-now`
+- `assimilation-receipt-delta-bridge-note: frame-now`
+- `heat-resonance-expand-before-commit-law: frame-now`
+- `stability-metrics-condensation-threshold-note: frame-now`
+- `canonical-condensation-output-law: frame-now`
+- `procedural-basis-condensate-note: frame-now`
+- `first-bounded-ignition-chain-test-protocol: frame-now`
+- `llm-test-surface-taxonomy-note: frame-now`
+- `responses-api-local-harness-receipt-schema-note: frame-now`
+- `inner-outer-witness-agent-build-orchestration-law: frame-now`
+- `shared-line-verification-lock: verify-now`
+- `stack-root-renaming-migration-plan: frame-now`
+- `legacy-oan-namespace-freeze: admitted-transition-bounded`
+- `selfgel-legal-orientation-predicate-family-note: frame-now`
+- `selfgel-legal-orientation-install-validator-bridge-note: frame-now`
 - `agenticore-listening-frame-compass-minimal-build: frame-now/spec-now`
+- `listening-frame-compass-loom-weave-bridge: frame-now`
+- `listening-frame-instrumentation-receipt-law: frame-now/spec-now`
+- `zed-delta-self-orientation-basis-law: frame-now/spec-now`
+- `theta-ingress-sensory-cluster-uptake-law: frame-now/spec-now`
+- `post-ingress-discernment-and-stable-one-law: frame-now/spec-now`
+- `light-cone-awareness-lineage-source-law: frame-now`
+- `ec-oan-diamond-lineage-zed-delta-source-law: frame-now`
+- `ec-formation-buildspace-preparation-note: frame-now/spec-now`
+- `ec-install-to-first-prime-state-law: frame-now/spec-now`
+- `prime-seed-state-law: frame-now/spec-now`
+- `domain-and-role-admission-law: frame-now/spec-now`
+- `private-domain-service-witness-law: frame-now/spec-now`
+- `cme-minimum-legal-founding-bundle-law: frame-now/spec-now`
+- `legal-foundation-documentation-matrix: template-now`
+- `cme-truth-seeking-orientation-law: frame-now/spec-now`
+- `cme-truth-seeking-balance-law: frame-now/spec-now`
+- `cme-engineered-cognitive-sensory-body-law: frame-now/spec-now`
+- `constructor-engram-burden-law: frame-now/spec-now`
 - `prime-cryptic-duplex-law: frame-now`
+- `prime-membrane-duplex-packet-law: frame-now/spec-now`
+- `prime-membrane-projected-braid-history-interpretation: frame-now/spec-now`
+- `prime-membrane-projected-history-receipt: frame-now/spec-now`
+- `prime-retained-whole-evaluation: frame-now/spec-now`
+- `communicative-filament-anti-echo-law: frame-now/spec-now`
+- `lawful-reopening-redoping-continued-participation: frame-now/spec-now`
+- `prime-closure-act-law: frame-now/spec-now`
+- `post-prime-closure-continuity-law: frame-now/spec-now`
+- `session-body-stabilization-baseline: admitted-local-bounded`
+- `session-cleanup-braiding-event-matrix: admitted-local-bounded`
+- `sanctuary-biad-and-cradletek-governing-surface-note: frame-now`
+- `sli-rtme-duplex-posture-engine: frame-now/spec-now`
+- `sli-rtme-clustered-swarmed-braid-discipline: frame-now/spec-now`
 - `prime-cryptic-duplex-resonance-note: frame-now`
 - `mos-cmos-cgoa-instantiation-law: frame-now/spec-now`
 - `cme-return-audit-promotion-law: frame-now/spec-now`
@@ -270,7 +516,12 @@ Verified result:
 - build succeeded
 - tests succeeded
 - hygiene succeeded
-- `131` tests passed across `2` test assemblies
+- root `build.ps1` and `test.ps1` now share a line-verification lock through
+  `../tools/Use-LineVerificationLock.ps1`
+- `540` tests passed across `2` test assemblies
+- current verified split:
+  - `462` audit
+  - `78` integration
 
 Solution shape:
 
@@ -393,7 +644,14 @@ Current role split emerging from the carried line:
 - `AgentiCore` is the chambered cognition layer, so `HighMind` uptake and later
   EC interior work should stay there without re-owning body, custody, or
   projection membrane duties
+- `Sanctuary` holds the singular `Mother/Father` biad as constitutional
+  governance over beginning and world supervision, so that pair should not be
+  re-seated inside each admitted `CradleTek` instance
+- `Steward` is the third line that can witness or issue the unique cryptic
+  braid for a specific admitted cradle instance from Sanctuary
 - `Mother` and `Father` should remain governance-facing offices instead of becoming sinks for everyday runtime work
+- the later `CradleTek` extended set should receive one governing surface
+  beneath that issued braid rather than repeating the Sanctuary biad
 - constitutional first-run law now belongs to `Sanctuary`, while actualized training, certification, and capability remain future individuated CME work instead of governance-layer badge state
 - `HITL` remains the witness-bearing ingress authority while `SLI` remains the
   continuity-bearing interior authority, so implementation media must not
@@ -447,230 +705,3 @@ current `V1.1.1` runtime law depends on it.
 
 Any remaining `V1.0`-derived seams that are not admitted locally must be routed
 through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`.
-
-## Prime Seed And CME Legal Foundation Addendum
-
-- `EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`
-- `PRIME_SEED_STATE_LAW.md`
-- `DOMAIN_AND_ROLE_ADMISSION_LAW.md`
-- `PRIVATE_DOMAIN_SERVICE_WITNESS_LAW.md`
-- `CME_MINIMUM_LEGAL_FOUNDING_BUNDLE_LAW.md`
-- `LEGAL_FOUNDATION_DOCUMENTATION_MATRIX.md`
-- `CME_TRUTH_SEEKING_ORIENTATION_LAW.md`
-- `CME_TRUTH_SEEKING_BALANCE_LAW.md`
-- `CME_ENGINEERED_COGNITIVE_SENSORY_BODY_LAW.md`
-- `ec-install-to-first-prime-state-law: frame-now/spec-now`
-- `prime-seed-state-law: frame-now/spec-now`
-- `domain-and-role-admission-law: frame-now/spec-now`
-- `private-domain-service-witness-law: frame-now/spec-now`
-- `cme-minimum-legal-founding-bundle-law: frame-now/spec-now`
-- `legal-foundation-documentation-matrix: template-now`
-- `cme-truth-seeking-orientation-law: frame-now/spec-now`
-- `cme-truth-seeking-balance-law: frame-now/spec-now`
-- `cme-engineered-cognitive-sensory-body-law: frame-now/spec-now`
-
-## SLI RTME Projected Runtime Addendum
-
-- `SLI_RTME_DUPLEX_POSTURE_ENGINE_NOTE.md`
-- `SLI_RTME_CLUSTERED_SWARMED_BRAID_DISCIPLINE_NOTE.md`
-- `PRIME_MEMBRANE_PROJECTED_BRAID_HISTORY_INTERPRETATION_LAW.md`
-- `PRIME_MEMBRANE_PROJECTED_HISTORY_RECEIPT_LAW.md`
-- `PRIME_RETAINED_WHOLE_EVALUATION_LAW.md`
-- `sli-rtme-duplex-posture-engine: frame-now/spec-now`
-- `sli-rtme-clustered-swarmed-braid-discipline: frame-now/spec-now`
-- `prime-membrane-projected-braid-history-interpretation: frame-now/spec-now`
-- `prime-membrane-projected-history-receipt: frame-now/spec-now`
-- `prime-retained-whole-evaluation: frame-now/spec-now`
-
-## Post-Retention Continuity Addendum
-
-- `COMMUNICATIVE_FILAMENT_AND_ANTI_ECHO_LAW.md`
-- `LAWFUL_REOPENING_REDOPING_AND_CONTINUED_PARTICIPATION_LAW.md`
-- `PRIME_CLOSURE_ACT_LAW.md`
-- `POST_PRIME_CLOSURE_CONTINUITY_LAW.md`
-- `communicative-filament-anti-echo-law: frame-now/spec-now`
-- `lawful-reopening-redoping-continued-participation: frame-now/spec-now`
-- `prime-closure-act-law: frame-now/spec-now`
-- `post-prime-closure-continuity-law: frame-now/spec-now`
-
-## GEL Proc Ignition Condensation Addendum
-
-- `GEL_DISCERNMENT_LAYERING_AND_TRANSLATIVE_BINDING_NOTE.md`
-- `PRE_LISP_IUTT_LISP_AND_LLM_ACTING_OPERATOR_NOTE.md`
-- `PRIME_ROOT_CARRIER_REDUCTION_DECOMPOSITION_AND_ANCHOR_EMERGENCE_NOTE.md`
-- `A0_GEL_AXIOM_FLOOR_NOTE.md`
-- `GEL_DERIVED_GROWTH_LAWS_NOTE.md`
-- `GEL_ACTION_BASIS_AND_COMPOSITION_NOTE.md`
-- `PROC_GROUNDED_ACTION_AND_TRACE_LAW.md`
-- `IGNITION_CHAIN_TEMPLATE_AND_WITNESS_LAW.md`
-- `ASSIMILATION_RECEIPT_AND_DELTA_BRIDGE_NOTE.md`
-- `HEAT_RESONANCE_AND_EXPAND_BEFORE_COMMIT_LAW.md`
-- `STABILITY_METRICS_AND_CONDENSATION_THRESHOLD_NOTE.md`
-- `CANONICAL_CONDENSATION_OUTPUT_LAW.md`
-- `PROCEDURAL_BASIS_CONDENSATE_NOTE.md`
-- `FIRST_BOUNDED_IGNITION_CHAIN_TEST_PROTOCOL.md`
-- `gel-discernment-layering-and-translative-binding-note: frame-now`
-- `pre-lisp-iutt-lisp-and-llm-acting-operator-note: frame-now`
-- `prime-root-carrier-reduction-decomposition-and-anchor-emergence-note: frame-now`
-- `a0-gel-axiom-floor-note: frame-now`
-- `gel-derived-growth-laws-note: frame-now`
-- `gel-action-basis-and-composition-note: frame-now`
-- `proc-grounded-action-trace-law: frame-now`
-- `ignition-chain-template-witness-law: frame-now`
-- `assimilation-receipt-delta-bridge-note: frame-now`
-- `heat-resonance-expand-before-commit-law: frame-now`
-- `stability-metrics-condensation-threshold-note: frame-now`
-- `canonical-condensation-output-law: frame-now`
-- `procedural-basis-condensate-note: frame-now`
-- `first-bounded-ignition-chain-test-protocol: frame-now`
-
-## LLM Test Surface And Local Harness Addendum
-
-- `LLM_TEST_SURFACE_TAXONOMY_NOTE.md`
-- `RESPONSES_API_LOCAL_HARNESS_RECEIPT_SCHEMA_NOTE.md`
-- `llm-test-surface-taxonomy-note: frame-now`
-- `responses-api-local-harness-receipt-schema-note: frame-now`
-
-## SelfGEL Legal Orientation Addendum
-
-- `SELFGEL_LEGAL_ORIENTATION_PREDICATE_FAMILY_NOTE.md`
-- `SELFGEL_LEGAL_ORIENTATION_INSTALL_VALIDATOR_BRIDGE_NOTE.md`
-- `templates/legal_orientation_install.packet.template.json`
-- `selfgel-legal-orientation-predicate-family-note: frame-now`
-- `selfgel-legal-orientation-install-validator-bridge-note: frame-now`
-
-This addendum admits the `GEL`-owned `SelfGEL` legal-orientation family as a
-placeholder contract and tracked local-only packet template. It does not admit
-real legal identifiers into tracked history and does not authorize first-run
-state-ladder, runtime, trust, `B-Corp`, bonded-operator, authority-delegation,
-or cryptographic-custody activation.
-
-## ListeningFrame Ingress Witness Addendum
-
-- `LISTENING_FRAME_INSTRUMENTATION_RECEIPT_LAW.md`
-- `ZED_DELTA_SELF_ORIENTATION_BASIS_LAW.md`
-- `THETA_INGRESS_AND_SENSORY_CLUSTER_UPTAKE_LAW.md`
-- `POST_INGRESS_DISCERNMENT_AND_STABLE_ONE_LAW.md`
-- `listening-frame-instrumentation-receipt-law: frame-now/spec-now`
-- `zed-delta-self-orientation-basis-law: frame-now/spec-now`
-- `theta-ingress-sensory-cluster-uptake-law: frame-now/spec-now`
-- `post-ingress-discernment-and-stable-one-law: frame-now/spec-now`
-
-This addendum admits the first bounded ListeningFrame posture, self-basis,
-theta-ingress, and post-ingress discernment witness family. It does not admit
-pulse, heartbeat, resonance-chamber standing, full dodecahedral runtime
-geometry, persistence, inheritance, self-mutation, semantic rise, or
-condensation authority.
-
-## Sanctuary Biad And CradleTek Governing Surface Addendum
-
-- `SANCTUARY_BIAD_AND_CRADLETEK_GOVERNING_SURFACE_NOTE.md`
-- `sanctuary-biad-and-cradletek-governing-surface-note: frame-now`
-
-This addendum admits the body-map correction that Sanctuary holds the singular
-`Mother/Father` biad, Steward witnesses or issues the cradle-specific cryptic
-braid, and a repeatable admitted `CradleTek` body may later receive one
-governing surface beneath that braid. It does not implement role selection,
-cradle-local governance enactment, resonance chamber standing, heartbeat, or
-standing-wave proof.
-
-## Constructor Groupoid Cleanup Addendum
-
-- `CONSTRUCTOR_ENGRAM_BURDEN_LAW.md`
-- `GROUPOID_FIBRINOID_COLLECTION_AND_BUNDLE_MAPPING_LAW.md`
-- `SESSION_CLEANUP_AND_BRAIDING_EVENT_MATRIX.md`
-- `constructor-engram-burden-law: frame-now/spec-now`
-- `groupoid-fibrinoid-collection-bundle-mapping: frame-now/spec-now`
-- `session-cleanup-braiding-event-matrix: admitted-local-bounded`
-
-This addendum admits computed constructor-engram burden, candidate-only
-groupoid/fibrinoid bundle mapping, and bounded session cleanup braiding. It
-does not admit temporal near-swamp execution, higher fibrinoid condensation,
-semantic promotion by packaging, inheritance, deletion authority, release gate
-standing, pulse, heartbeat, or resonance-chamber standing.
-
-## Agent Build Orchestration Addendum
-
-- `INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md`
-- `build/agent-work-lanes.json`
-- `inner-outer-witness-agent-build-orchestration-law: frame-now`
-- `../tools/Use-LineVerificationLock.ps1`
-- `shared-line-verification-lock: verify-now`
-
-This addendum admits the first manual inner / outer / witness agent build
-orchestration law and machine-readable lane map. It establishes slice receipts,
-integrator-owned shared truth mutation, witness-blocking barrier classes, and
-shared line-verification lock routing for build/test execution. It does not
-admit peer-to-peer worker integration, shared writes, autonomous worker
-promotion, native scheduling dependence, a separate condensation lane, runtime
-standing, `CME` proof, or governance authority.
-
-## Cognitive Formation Buildspace Addendum
-
-- `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
-- `EC_OAN_DIAMOND_LINEAGE_AND_ZED_DELTA_SOURCE_LAW.md`
-- `EC_FORMATION_BUILDSPACE_PREPARATION_NOTE.md`
-- `src/Sanctuary/Oan.Common/Oan.Common/CognitiveFormationContracts.cs`
-- `light-cone-awareness-lineage-source-law: frame-now`
-- `ec-oan-diamond-lineage-zed-delta-source-law: frame-now`
-- `ec-formation-buildspace-preparation-note: frame-now/spec-now`
-
-This addendum admits the first bounded cognitive-formation bookkeeping surface
-for cone position, source relation, requirement state, why-not classification,
-zed-locus preservation, delta pressure, and failure-signature disposition. It
-does not admit full OAN Diamond runtime geometry, higher-dimensional cognition,
-live `ListeningFrame` widening, peerless standing, bonded `CME` authority, or
-collapse-as-wisdom promotion.
-
-## Stack Root Rename Freeze Addendum
-
-- `STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
-- `build/legacy-oan-namespace-allowlist.json`
-- `stack-root-renaming-migration-plan: frame-now`
-- `legacy-oan-namespace-freeze: admitted-transition-bounded`
-
-This addendum admits the Sanctuary-root naming migration plan and freezes new
-foundational `Oan.*` namespace or project drift against an explicit allowlist.
-It does not rename the repository, root folder, solution, or legacy project
-surfaces yet.
-
-## Membrane And Session Body Witness Addendum
-
-- `PRIME_MEMBRANE_DUPLEX_PACKET_LAW.md`
-- `SESSION_BODY_STABILIZATION_BASELINE.md`
-- `prime-membrane-duplex-packet-law: frame-now/spec-now`
-- `session-body-stabilization-baseline: admitted-local-bounded`
-
-This addendum admits audit witness coverage for the bounded Prime Membrane
-duplex packet law and session-body stabilization baseline. It does not grant
-Prime closure, live membrane closure issuance, resonance-chamber standing,
-heartbeat, or `CME` minting authority.
-
-## Public Boundary And Contact Preservation
-
-For the active public repository surface:
-
-- the repository is the governed build surface
-- the public repository carries the build minus the hosted seed `LLM`
-- the fully operational installer still depends on the local hosted seed `LLM`
-  and associated resident runtime surfaces that are not carried in the public
-  checkout
-- the fully operational installer is still being built
-
-The public-facing repository contact aliases now fixed across repo-root
-surfaces are:
-
-- `info@lucidtechnologies.tech`
-  - general repository and public information
-- `research@lucidtechnologies.tech`
-  - research-facing and doctrine-facing questions
-- `academic@lucidtechnologies.tech`
-  - academic and institutional inquiries
-- `admin@lucidtechnologies.tech`
-  - repository administration and contribution routing
-- `legal@lucidtechnologies.tech`
-  - conduct, legal, and sensitive private review paths
-
-These aliases are part of the public repository presentation boundary and
-should be preserved as the line moves forward unless superseded by explicit
-repo-local governance.

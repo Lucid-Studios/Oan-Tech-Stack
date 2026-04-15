@@ -39,19 +39,104 @@ now:
 These surfaces belong in the active line because they are already buildable,
 tested, or explicitly contract-backed in `V1.1.1`.
 
-## Prime Seed And CME Held Edges
+## External Doctrine Intake Condensate
 
-The following edges are intentionally held beyond this contract-backed legal
-foundation slice:
+The local external source labeled `GEL formation lab chat logs` is now
+condensed as a research-facing doctrine intake rather than an unbounded text
+dump.
 
-- governing domain and role selection beyond first Prime pre-role standing
-- lawfully bonded domain integration beyond Prime Seed State
-- cradle-local governing surface enactment beyond domain-role admission
+### Already aligned with active `V1.1.1`
+
+The following themes from that lab source are already seated or clearly aligned
+with active repo-local direction:
+
+- the honesty boundary around Theater, Role, Enrichment, and Bounded Form
+- the hosted seed `LLM` as acting operator under `SLI/Lisp` binding
+- hard yes/no through reduction, discernment, anchoring, and posture
+- `GEL` as layered field rather than flat retention store
+- the `A0` axiom floor
+- first derived growth laws
+- minimal action basis and first composition algebra
+- the full canonical object line `root -> def -> rel -> proc` as doctrine and
+  placeholder-contract substrate
+- `proc` grounding, trace, and cryptic integrity law
+- ignition-chain template and witness family
+- receipt-governed assimilation and `Delta` bridge
+- heat, resonance, and expand-before-commit law
+- stability metrics, condensation threshold, and canonical condensation output
+- procedural basis condensate and first bounded ignition-chain test protocol
+
+### Held for next lawful seating
+
+The following themes appear strongly in the lab source but remain held for
+future bounded seating rather than admitted active truth now:
+
+- live `proc` execution and ignition-chain retention
+- the first full canonical chain `r -> d -> e -> p` as runtime-retained form
+- the first `E0` coupling event
+- the live coupling seal
+- `Delta` accumulation and condensation engine
+- stability metrics as executable thresholds
+- procedural basis execution beyond bounded doctrine
+- autobiography and live-state receipt body law
+- skill-module and onboarding-law condensation
+- live multi-surface comparative harness execution beyond bounded taxonomy
+- live Responses API harness execution beyond bounded receipt schema
+- automation-first multi-agent actuation beyond bounded manual orchestration
+- true separate-artifact concurrent build/test execution beyond the bounded
+  shared line-verification lock
+- direct runtime geometry over the full OAN Diamond numbered field beyond the
+  bounded zed/delta formation seam
+- full dodecahedral executable geometry beyond the bounded Zed-of-Delta
+  self-orientation basis
+- live Prime Membrane closure issuance and wider projected field execution
+  beyond the bounded duplex packet law
+- full Lisp-side projected field autonomy beyond the bounded `RTME` posture
+  engine and advisory closure signal
+- Prime closure from receipted projected braid history beyond the bounded
+  retained-whole evaluation seam
+- post-body resonance chamber and Compass heartbeat initiation/sustain
+- wider sensory manifold and between-beat contextual ingress beyond the first
+  bounded theta-ingress and post-ingress discernment receipts
+- governing domain and role selection beyond first Prime pre-role standing,
+  including later Mother/Father domain application and the single `CradleTek`
+  governing surface under Steward-issued braid
+- lawfully bonded domain integration beyond Prime Seed State, including the
+  later seam that turns pre-domain seed readiness into bonded participation
+  only after domain admission and provenance custody stand
 - live action execution and cradle-local governance enactment beyond private-domain service witness
 - CME minting and live role enactment beyond minimum legal founding bundle
 - live belief revision and orientation telemetry beyond CME truth-seeking orientation
 - live balance telemetry and belief revision execution beyond CME truth-seeking balance
 - PrimeGovernance.CME and CrypticGovernance.CME application beyond sensory-body embodiment
+- temporal near-swamp pressure and constructor-engram branch-pruning execution beyond burden law
+- cradle-local governing surface enactment beyond domain-role admission
+- Sanctuary biad truth-holding, Steward-issued cradle braid, and single
+  `CradleTek` governing surface remain the later governance horizon beyond
+  first Prime pre-role standing
+- re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity
+- higher fibrinoid condensation and bundle reduction beyond first
+  candidate-only lattice intake
+- governed repository, root-folder, and legacy `Oan.*` rename execution
+- widened `EC` runtime embodiment beyond bounded formation-state preparation
+- dimensional cognitive geometry canonization before the body can bear it
+- Prime bonded minting certification and witnessed minting act
+
+### Intake refusal boundary
+
+The lab source may not be used to silently claim:
+
+- installer completion
+- first legal run completion
+- legal-governance or regional-seat truth not yet seated in repo-local
+  doctrine
+- runtime implementation merely because a strong doctrinal articulation exists
+
+Repeated rhetoric, duplicate passages, and encoding noise in that source are
+not blocking defects.
+They are an intake condition, and the lawful response is condensation rather
+than wholesale import.
+
 ## Held In Build
 
 The following surfaces remain truthful build posture but are not live widened
@@ -147,134 +232,3 @@ They are either:
 - admitted local build condensate
 - held build posture
 - or explicit research-lane refinement handoffs
-
-## SLI RTME Held Edges
-
-The following edges remain beyond the first projected runtime slice:
-
-- full Lisp-side projected field autonomy beyond the bounded `RTME` posture
-  engine and advisory closure signal
-- Prime closure from receipted projected braid history beyond the bounded
-  retained-whole evaluation seam
-- re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity
-
-## Post-Retention Held Edges
-
-The following edges remain beyond the first post-retention continuation slice:
-
-- re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity
-- full post-body resonance chamber and Compass heartbeat initiation/sustain
-- wider lifecycle continuation after explicit closure and bounded re-entry
-
-## GEL Proc Ignition Held Edges
-
-The following edges remain beyond this contract-backed substrate slice:
-
-- live `proc` execution and ignition-chain retention
-- the first full canonical chain `r -> d -> e -> p` as runtime-retained form
-- the first `E0` coupling event and live coupling seal
-- `Delta` accumulation and condensation engine
-- stability metrics as executable thresholds
-- procedural basis execution beyond bounded doctrine
-- Prime bonded minting certification and witnessed minting act
-
-## LLM Harness Held Edges
-
-The following edges remain beyond this bounded evidence-surface slice:
-
-- live multi-surface comparative harness execution beyond bounded taxonomy
-- live Responses API harness execution beyond bounded receipt schema
-- treating any test surface as `CME` baseline proof by default
-
-## SelfGEL Legal Orientation Held Edges
-
-The following edges remain beyond this placeholder legal-orientation packet:
-
-- real legal-identifier storage in tracked repository history
-- live install-validator packet execution
-- first-run state-ladder mutation from legal evidence alone
-- charitable trust seating
-- bonded operator seating
-- `B-Corp` transition seating
-- authority delegation
-- cryptographic custody
-
-## ListeningFrame Ingress Witness Held Edges
-
-The following edges remain beyond this bounded witness layer:
-
-- live pulse and Compass heartbeat initiation or sustain
-- resonance-chamber standing-wave duration proof
-- full dodecahedral executable geometry
-- wider sensory manifold and between-beat contextual ingress
-- persistence admission from instrumentation or ingress receipts
-- semantic rise from post-ingress discernment alone
-- inheritance, self-mutation, or condensation authority from one intake chain
-
-## Sanctuary Biad And CradleTek Governing Surface Held Edges
-
-The following edges remain beyond this body-map correction:
-
-- role and domain selection for a cradle-local governing surface
-- live cradle-local governance enactment
-- resonance chamber framing as implemented runtime
-- Compass heartbeat initiation or sustain
-- short-duration standing-wave proof
-- treating a Steward-issued cradle braid as proof of later `CME` actualization
-
-Steward-issued cradle braid, and single `CradleTek` governing surface remain the later governance horizon beyond first Prime pre-role standing.
-
-## Constructor Groupoid Session Cleanup Held Edges
-
-The following edges remain beyond this bounded cleanup/intake family:
-
-- temporal near-swamp pressure and live branch-pruning execution
-- constructor-engram training views or promotion workflows
-- higher fibrinoid condensation and bundle reduction
-- semantic admission or inheritance from bundle packaging
-- cleanup-driven deletion authority
-- release-gate standing from cleanup braiding alone
-- pulse, heartbeat, resonance chamber, or standing-wave proof
-
-## Agent Work Lane Held Edges
-
-The following edges remain beyond this bounded manual orchestration layer:
-
-- automation-first multi-agent actuation beyond bounded manual orchestration
-- true separate-artifact concurrent build/test execution
-- peer-to-peer worker integration
-- shared worker writes against readiness, carry-forward, or orchestration truth
-- autonomous worker promotion into governance or identity authority
-- scheduler-first orchestration fabric
-- a separate condensation lane
-- runtime standing or `CME` proof from agent collaboration receipts alone
-
-## Cognitive Formation Held Edges
-
-The following edges remain beyond this bounded formation buildspace layer:
-
-- direct runtime geometry over the full OAN Diamond numbered field
-- higher-dimensional cognitive geometry canonization
-- full `EC` habitation or live `ListeningFrame` widening
-- peerless forms as executable standing classes
-- treating collapse itself as wisdom
-- bonded `CME` standing or authority from formation receipts alone
-
-## Stack Root Rename Held Edges
-
-The following edges remain beyond this bounded namespace-freeze layer:
-
-- governed repository, root-folder, and legacy `Oan.*` rename execution
-- physical folder migration from `src/Sanctuary/Oan.*` to `src/San/`
-- solution and project-reference rewrite for the re-rooted families
-- downstream `OAN` application or game identity seating beyond stack-root truth
-
-## Membrane And Session Body Held Edges
-
-The following edges remain beyond this witness-completion layer:
-
-- live Prime Membrane closure issuance
-- treating closure eligibility as Prime closure
-- resonance chamber standing or Compass heartbeat initiation
-- `CME` minting, live role enactment, or bonded authority from bounded packet evidence
-- legal personhood, custody, or governance claims beyond the already seated legal-foundation templates

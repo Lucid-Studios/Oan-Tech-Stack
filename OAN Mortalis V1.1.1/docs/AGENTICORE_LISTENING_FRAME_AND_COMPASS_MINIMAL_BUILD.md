@@ -28,11 +28,13 @@ Use this note with:
 - `DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md`
 - `BUILD_READINESS.md`
 - `FIRST_RUN_CONSTITUTION.md`
+- `SANCTUARY_BIAD_AND_CRADLETEK_GOVERNING_SURFACE_NOTE.md`
 - `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`
 - `LISTENING_FRAME_INSTRUMENTATION_RECEIPT_LAW.md`
 - `ZED_DELTA_SELF_ORIENTATION_BASIS_LAW.md`
 - `THETA_INGRESS_AND_SENSORY_CLUSTER_UPTAKE_LAW.md`
 - `POST_INGRESS_DISCERNMENT_AND_STABLE_ONE_LAW.md`
+- `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 
 This note is also derived from stabilized research on:
 
@@ -48,11 +50,11 @@ not as proof that the full runtime is already standing in code.
 
 The cohesive operational chain is:
 
-`content/substrate field -> Listening Frame projection -> Compass orientation and admissibility work -> AgentiCore coordination -> cOE/cSelfGEL issued office -> host-side authority decision`
+`Sanctuary biad -> Steward-issued cradle braid -> admitted CradleTek body -> content/substrate field -> Listening Frame projection -> Compass orientation and admissibility work -> AgentiCore coordination -> cOE/cSelfGEL issued office -> host-side authority decision`
 
 The runtime-facing canonical chain inside that wider read is:
 
-`CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`
+`Sanctuary -> Steward-issued cradle braid -> CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`
 
 That chain matters because it prevents a common collapse:
 
@@ -206,7 +208,7 @@ In compact form:
 
 The clean family read for the minimal build is:
 
-- `Oan.*` owns the contract and integration surfaces needed to compose the
+- `San.*` owns the contract and integration surfaces needed to compose the
   posture layer into the line
 - `SLI.*` owns the `Compass`-facing symbolic and evaluative seam
 - `AgentiCore.*` owns bounded coordination and proposal behavior
@@ -232,6 +234,11 @@ The first repo-credible artifact set is:
   - admissibility estimate
   - transition recommendation
   - candidate repair or modulation inputs
+- one bounded zed self-basis receipt carrying:
+  - `OE` anchor
+  - `SoulFrame` storage visibility
+  - `ListeningFrame` cast visibility
+  - center plus six cardinal directions
 - audit guards proving these signals do not themselves authorize persistence or
   continuity admission
 
@@ -285,6 +292,13 @@ What is still missing is an explicit named posture layer between raw
 cognitive movement and stronger coordination.
 
 That is the office this note is fixing.
+
+It is also why the current note must stay below the later pulse seam.
+The repo now has a corrected body map in which Sanctuary holds the biad,
+Steward braids the cradle, and the admitted `CradleTek` body carries the
+later governing surface beneath that issued braid.
+`Listening Frame` and `Compass` sit inside that admitted body.
+They do not replace Sanctuary governance and they do not yet prove heartbeat.
 
 ## Immediate Build Consequence
 

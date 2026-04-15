@@ -3977,7 +3977,7 @@ public sealed class BootstrapBoundaryTests
             "orientation and admissibility scoring",
             "candidate-only handoff into higher authority",
             "The clean family read for the minimal build is:",
-            "`Oan.*` owns the contract and integration surfaces",
+            "`San.*` owns the contract and integration surfaces",
             "`SLI.*` owns the `Compass`-facing symbolic and evaluative seam",
             "`AgentiCore.*` owns bounded coordination and proposal behavior"
         };
@@ -4173,13 +4173,14 @@ public sealed class BootstrapBoundaryTests
 
         Assert.DoesNotContain("The v2 constitutional state order is:", firstRunText, StringComparison.Ordinal);
 
-        var canonicalChain = "`CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`";
+        var cradleCanonicalChain = "`CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`";
+        var sanctuaryCanonicalChain = "`Sanctuary -> Steward-issued cradle braid -> CradleTek -> SLI -> SoulFrame -> Listening Frame -> Compass -> AgentiCore coordination -> cOE/cSelfGEL issued office`";
 
-        Assert.Contains(canonicalChain, workbenchLawText, StringComparison.Ordinal);
+        Assert.Contains(cradleCanonicalChain, workbenchLawText, StringComparison.Ordinal);
         Assert.Contains("the item is projected into `Listening Frame`", workbenchLawText, StringComparison.Ordinal);
         Assert.Contains("bounded `AgentiCore` coordination proposes the next lawful action", workbenchLawText, StringComparison.Ordinal);
-        Assert.Contains(canonicalChain, agentiCoreMinimalBuildText, StringComparison.Ordinal);
-        Assert.Contains(canonicalChain, instantiationLawText, StringComparison.Ordinal);
+        Assert.Contains(sanctuaryCanonicalChain, agentiCoreMinimalBuildText, StringComparison.Ordinal);
+        Assert.Contains(cradleCanonicalChain, instantiationLawText, StringComparison.Ordinal);
         Assert.Contains("coordination is not issued office", agentiCoreMinimalBuildText, StringComparison.Ordinal);
         Assert.Contains("`cOE/cSelfGEL` seal issues operative office after that coordination", instantiationLawText, StringComparison.Ordinal);
     }

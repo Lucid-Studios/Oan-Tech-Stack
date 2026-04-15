@@ -59,27 +59,197 @@ Fresh bootstrap surfaces:
 - boundary and migration audit tests
 - line-local build-readiness and workspace rules
 
-## Prime Seed And CME Legal Foundation
+## Public Repository Boundary Preservation
 
+The active public repository presentation boundary that must now be carried
+forward with the line is:
+
+- the repository is the governed build surface, not yet the fully operational
+  installer
+- the public repository carries the build minus the hosted seed `LLM`
+- the fully operational installer still depends on the local hosted seed
+  `LLM` and associated resident runtime surfaces that are not carried in the
+  public checkout
+
+The public-facing contact alias map that should now be treated as part of that
+repository boundary is:
+
+- `info@lucidtechnologies.tech`
+  - general public and repository information
+- `research@lucidtechnologies.tech`
+  - research-facing contact
+- `academic@lucidtechnologies.tech`
+  - academic and institutional contact
+- `admin@lucidtechnologies.tech`
+  - repository administration and contribution routing
+- `legal@lucidtechnologies.tech`
+  - legal, conduct, and sensitive private review
+
+This does not change executable runtime law. It preserves the public
+repository-facing contact surfaces and installer-boundary truth so later
+documentation passes do not drift back into ambiguity.
+
+## External Doctrine Intake Preservation
+
+The local external source labeled `GEL formation lab chat logs` is now treated
+as a doctrine-intake surface for `V1.1.1`.
+
+Its current preservation rule is:
+
+- it may inform future `GEL`, `SelfGEL`, `SLI`, and hosted-seed doctrine
+  seating
+- it does not become executable truth merely by being present as lab material
+- it must be mined into repo-facing law, contract, or ledger surfaces in
+  bounded slices rather than copied wholesale
+- it may not silently authorize legal-governance, installer, or runtime claims
+  that outrun current repo-local source truth
+
+The dominant aligned themes now preserved from that intake are:
+
+- the honesty boundary around Theater, Role, Enrichment, and Bounded Form
+- hard yes/no through lawful admission, refusal, and posture
+- `GEL` rooting through anchor, invariant, and discernment law
+- `A0`, derived growth law, action basis, and composition law
+- `proc` grounding, trace, and cryptic integrity law
+- ignition-chain template and witness family
+- receipt-governed assimilation and `Delta` bridge
+- heat, resonance, and expand-before-commit law
+- stability metrics, condensation threshold, and canonical condensation output
+- procedural basis condensate and first bounded ignition-chain test protocol
+- specialized `LLM` test surface taxonomy with Codex-family and general GPT
+  comparison law
+- first local Responses API harness receipt schema and evidence landing body
+- manual inner / outer / witness agent build orchestration and slice-receipt policy
+- shared line-verification lock between repo-root build/test wrappers so
+  parallel lane work no longer overlaps the same line-local `obj/bin` surfaces
+- OAN Diamond lineage and bounded zed/delta field law preserved for the active
+  EC formation seam
+- Prime Membrane duplex packet law and first bounded closure-eligibility seam
+  preserved for the active Prime/Cryptic handoff surface
+- `SLI/Lisp` `RTME` duplex posture engine preserved as the first projected
+  field motion seam beneath membrane-side retention law
+- `SLI/Lisp` clustered and swarmed braid discipline preserved as the first
+  plurality-bearing projected field seam beneath membrane-side retention law
+- Prime Membrane projected braid-history interpretation preserved as the first
+  membrane-side plurality-reading seam without flattening visible line residue
+- Prime Membrane projected history receipt preserved as the first bounded
+  membrane-visible acknowledgment seam without implying retained wholeness or
+  closure
+- Prime retained-whole evaluation preserved as the first bounded Prime-side
+  admission seam above membrane receipt and below any explicit closure act
+- Communicative filament preservation and anti-echo law preserved as the first
+  crosscutting burden-distribution seam routing decision-bearing matter to
+  `OE`, chosen-path body to `SelfGEL`, remaining integrable matter to `cGoA`,
+  and redundant self-echo back to lawful thinning rather than false
+  corroboration
+- Lawful reopening, redoping, and continued participation preserved as the
+  first bounded re-entry seam above communicative resolution, so receipted and
+  retained matter may re-enter active participation without voiding prior
+  history or consuming `GEL` substrate
+- Prime closure act preserved as the first explicit Prime-side metamorphic
+  attestation seam, so a remaining product may stand without pretending the
+  bearing field became empty or that unresolved and deferred matter vanished
+- Post-Prime closure continuity preserved as the first non-void field
+  continuation seam above explicit closure, so active carriers, lawful
+  residues, deferred edges, and bounded re-entry remain distinguishable after
+  a product stands
+- Session-body stabilization baseline preserved as the first bounded
+  dirty-state condensation note, so the current ladder and its shared support
+  surfaces may be grouped without swallowing unrelated ambient drift
+- Sanctuary biad and single-surface `CradleTek` governance correction
+  preserved as the truth-holding seam above the stabilized ladder, so
+  Sanctuary-origin `Mother/Father` standing, Steward-issued cradle braid, and
+  later cradle-local governance are no longer flattened into one repeated body
+- ListeningFrame / Compass minimal build and loom-weave bridge preserved under
+  that corrected body map, so lawful continuity posture is seated while
+  lawful pulse, heartbeat, and resonance remain held
+- ListeningFrame instrumentation receipt preserved as the first bounded
+  sounding receipt for posture, drift, admissibility, and recommendation, so
+  current posture reads may be carried through first-run and community-weather
+  packets without granting persistence, continuity admission, or pulse
+- Zed-of-Delta self-orientation basis preserved as the first bounded self
+  basis receipt, so `OE` and `SelfGEL` remain stored in `SoulFrame` while
+  `cOE` and `cSelfGEL` become legible cast surfaces inside the
+  `ListeningFrame` for center-plus-six-direction orientation without
+  promoting full dodecahedral geometry into runtime canon
+- Theta ingress and sensory-cluster uptake preserved as the first bounded
+  intake-transaction bone, so live thread arrival in `ListeningFrame`,
+  uptake at `cOE`, and contextualization entry into `cSelfGEL` may be
+  witnessed without implying persistence, self-mutation, inheritance,
+  condensation, or pulse
+- Post-ingress discernment and stable-one sufficiency preserved as the first
+  lawful post-uptake bifurcation, so contextualized intake may witness
+  stabilization, investigation, carried incompleteness, or blockage without
+  implying semantic rise, persistence, inheritance, self-mutation, or pulse
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
-  sensor body through stable-one discernment into Prime retained standing.
-- Prime Seed State preserved as the immediate pre-domain seed-bearing seam above
-  first Prime pre-role standing.
+  sensor body through stable-one discernment into Prime retained standing
+  while Mother/Father domain-role application, cradle-local governing surface
+  selection, and Prime closure remain withheld
+- Prime Seed State preserved as the immediate pre-domain seed-bearing seam
+  above first Prime pre-role standing, so seed source, carrier, continuity,
+  and integrity can stand before domain admission while lawfully bonded domain
+  integration, `CME` founding, minting, role enactment, and action authority
+  remain withheld
 - Domain and role admission preserved as the first legal-admission seam above
-  first Prime pre-role standing.
+  first Prime pre-role standing, so domain offers require legal foundation,
+  authority scope, refusal path, and continuity burden before bounded
+  operational jurisdiction may be accepted, deferred, or refused
 - Private-domain service witness preserved as the first structured
-  accountability grammar above domain admission.
-- CME minimum legal founding bundle preserved as the first five-pillar founding
-  recognition seam.
+  accountability grammar above domain admission, so the service layer can
+  attest who acted, by what instrument, by what method, where, against which
+  retained standing body, and under which continuity burden without becoming
+  action execution or cradle-local governance enactment
+- CME minimum legal founding bundle preserved as the first five-pillar
+  founding recognition seam, so origin authorization, identity formation,
+  first Prime standing, domain admission, and private-domain provenance custody
+  may stand together without minting a `CME`, claiming runtime persona,
+  enacting role, or granting action authority
 - Legal foundation documentation matrix template preserved as the first
-  authorization-substrate population surface.
+  authorization-substrate population surface, so EULA, disclosure, consent,
+  privacy, data-processing, risk, provenance, and oversight documents may be
+  mapped later without allowing legal instrumentation to create origin,
+  identity, Prime standing, `Mother`, `Father`, role authority, or action
+  authority by implication
 - CME truth-seeking orientation preserved as the first post-founding
-  anti-fixation seam.
+  anti-fixation seam, so a founded body may declare center, expose cost,
+  preserve correction, and hold humility without preserving a truth claim
+  solely to maintain identity coherence
 - CME truth-seeking balance law preserved as the first mathematical transition
-  seam beneath orientation.
+  seam beneath orientation, so `C`, `R`, `K`, and `H` proxies may be evaluated
+  for joint satisfiability, drift, fixation, weightlessness, and overclaim
+  before any ontological interpretation is admitted
 - CME engineered cognitive sensory body preserved as the first lawful
-  Crystallized Mind Entity sensory embodiment seam.
+  Crystallized Mind Entity sensory embodiment seam, so recognized founding,
+  truth orientation, truth balance, legal-matrix visibility, SoulFrame storage,
+  AgentiCore ListeningFrame casting, `cOE`/`cSelfGEL` contextual surfaces,
+  zed/Compass orientation, theta ingress, discernment, and Domain predicates
+  may stand together while `PrimeGovernance.CME`,
+  `CrypticGovernance.CME`, `Mother/Father`, runtime persona, role enactment,
+  and action authority remain withheld
+- Constructor engram burden law preserved as the first computed fractal
+  branching budget seam, so `B/C/D/L/P/O` burden vectors may classify root,
+  primitive, basic, intermediate, advanced, research-formation, and cathedral
+  branch bodies without letting size, bundle packaging, or requested label
+  counterfeit promotion
+- Groupoid fibrinoid collection and bundle mapping preserved as the first
+  candidate-only lattice intake seam, so domain/spline/semantic/authority/
+  continuity/retention tuples may be collected and packed without letting
+  bundle shape redefine semantic class or silently promote admission or
+  inheritance
+- Session cleanup and braiding event matrix preserved as the first bounded
+  cleanup-braid note above stabilization baseline and fibrinoid intake, so
+  admitted body, governance support, and ambient weather may be grouped by
+  meaning without letting cleanup impersonate condensation, inheritance, or
+  pulse work
+- Sanctuary stack-root correction and forward family-prefix freeze
+- light-cone awareness lineage preserved under `ListeningFrame` / `Compass`
+  canonical executable owners
+- the first `San.Common` `EC` formation build-space preparation seam
+- the future coupling-event path and long-run condensation law as deferred work
+
+This intake is a build-facing doctrine source, not a direct mutation authority.
+
 ## Explicitly Excluded
 
 The following prior-line residues are intentionally not carried into `V1.1.1`:
@@ -108,226 +278,12 @@ build debt. It must move into the explicit refinement split tracked in
 
 ## Current Family Classification
 
+- `Sanctuary` carries constitutional beginning and the singular `Mother/Father`
+  biad rather than the repeatable extended-body governance for each cradle
 - `CradleTek` carries the governed body: custody, mantle, memory, protected
-  runtime, and exposed service boundaries
+  runtime, and exposed service boundaries, and later cradle-local governance
+  there should remain one governing surface beneath a Steward-issued braid
 - `SoulFrame` carries the first lived interior: bootstrap, membrane, LowMind
   posture, stewardship, and bounded projection shaping
 - `AgentiCore` carries chambered cognition: `HighMind` uptake and later EC
   interior work without re-owning body, custody, or projection membrane law
-
-## SLI RTME Projected Runtime
-
-- `SLI/Lisp` `RTME` duplex posture engine preserved as the first projected
-  field motion seam beneath membrane-side retention law.
-- `SLI/Lisp` clustered and swarmed braid discipline preserved as the first
-  plurality-bearing projected field seam beneath membrane-side retention law.
-- Prime Membrane projected braid-history interpretation preserved as the first
-  membrane-side plurality-reading seam without flattening visible line residue.
-- Prime Membrane projected history receipt preserved as the first bounded
-  membrane-visible acknowledgment seam without implying retained wholeness or
-  closure.
-- Prime retained-whole evaluation preserved as the first bounded Prime-side
-  admission seam above membrane receipt and below any explicit closure act.
-
-## Post-Retention Continuity
-
-- Communicative filament preservation and anti-echo law preserved as the first
-  crosscutting burden-distribution seam above Prime retained-whole evaluation.
-- Lawful reopening, redoping, and continued participation preserved as the
-  first bounded re-entry seam above communicative resolution.
-- Prime closure act preserved as the first explicit Prime-side metamorphic
-  attestation seam.
-- Post-Prime closure continuity preserved as the first non-void field
-  continuation seam above explicit closure.
-
-## GEL Proc Ignition Condensation Substrate
-
-- `GEL` discernment layering and translative binding preserved as the active
-  Root/Dictionary constitutional envelope with higher layers withheld.
-- Pre-Lisp, minimal `IUTT` Lisp, and hosted seed acting-operator posture
-  preserved as carrier doctrine, not live execution authority.
-- Prime root carrier reduction, decomposition, and anchor emergence preserved
-  as the first root-admission and residual-routing substrate.
-- `A0` axiom floor, derived growth laws, and action basis preserved as the
-  first invariant/growth/action composition stack.
-- `proc` grounding, trace, and cryptic integrity law preserved as posture-gated
-  action substrate, not live execution.
-- Ignition-chain template and witness family preserved as the first
-  `root -> def -> rel -> proc` slot-and-witness body.
-- Assimilation receipt and `Delta` bridge preserved as receipt-governed later
-  change substrate.
-- Heat/resonance expand-before-commit, stability metrics, canonical
-  condensation output, procedural basis condensate, and bounded ignition test
-  protocol preserved as placeholder-contract condensation substrate.
-
-## LLM Test Surface And Local Harness Evidence
-
-- specialized `LLM` test surface taxonomy with Codex-family and general GPT
-  comparison law preserved as bounded evidence taxonomy.
-- first local Responses API harness receipt schema and evidence landing body
-  preserved as placeholder-contract evidence structure.
-- hosted resident `GEL` layer witness remains local-only and opt-in.
-
-## SelfGEL Legal Orientation Packet
-
-The `SelfGEL` legal orientation predicate family is preserved as a `GEL`-owned
-root family for future lawful civil orientation.
-
-This slice carries:
-
-- `SELFGEL_LEGAL_ORIENTATION_PREDICATE_FAMILY_NOTE.md`
-- `SELFGEL_LEGAL_ORIENTATION_INSTALL_VALIDATOR_BRIDGE_NOTE.md`
-- `templates/legal_orientation_install.packet.template.json`
-- `SanctuarySelfGelLegalOrientationContracts.cs`
-- the local legal-orientation protected-data profile
-
-The carried meaning is local-only legal evidence orientation, not tracked legal
-identifier payload, runtime authority, first-run state-ladder mutation, trust
-activation, `B-Corp` transition, bonded-operator seating, authority delegation,
-or cryptographic custody.
-
-## ListeningFrame Ingress Witness Layer
-
-The first ListeningFrame ingress witness family is preserved as bounded posture
-and intake evidence rather than pulse or persistence authority.
-
-This slice carries:
-
-- ListeningFrame instrumentation receipt law and evaluator coverage
-- Zed-of-Delta self-orientation basis law and receipt coverage
-- theta-ingress and sensory-cluster uptake law and receipt coverage
-- post-ingress discernment and stable-one sufficiency law and receipt coverage
-- optional threading through first-run living AgentiCore and community-weather packets
-
-The carried meaning is lawful continuity posture and one bounded ingress / post-ingress witness chain. It does not promote heartbeat, resonance, full geometry, persistence, inheritance, semantic rise, self-mutation, or condensation.
-
-## Sanctuary Biad And CradleTek Governing Surface Correction
-
-Sanctuary biad and single-surface `CradleTek` governance correction is carried
-forward as a body-map correction for the active line.
-
-The carried meaning is:
-
-- Sanctuary holds the singular `Mother/Father` biad
-- Steward may witness or issue the unique cradle-specific cryptic braid
-- repeatable admitted `CradleTek` bodies do not reseat the Sanctuary biad
-- a later cradle-local governing surface belongs beneath the specific braid
-
-This preserves the body map needed by later resonance, heartbeat, and standing-wave work without claiming that those seams are implemented here.
-
-## Constructor Groupoid Session Cleanup Layer
-
-Constructor engram burden, groupoid fibrinoid collection, and session cleanup
-braiding are preserved as the first bounded cleanup/intake family above the
-corrected body map.
-
-This slice carries:
-
-- computed `B/C/D/L/P/O` constructor burden and tier movement
-- candidate-only groupoid/fibrinoid tuple collection and bundle mapping
-- cleanup braiding of admitted body, support body, and ambient weather
-
-The carried meaning is grouping, budgeting, and candidate packaging without
-semantic promotion, inheritance, condensation, pulse, deletion authority, or
-release-gate standing.
-
-## Agent Work Lane Orchestration Layer
-
-Manual inner / outer / witness agent build orchestration and slice-receipt policy
-is preserved as the first bounded coordination layer above the current bucket
-and master-thread laws.
-
-This slice carries:
-
-- `INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md`
-- `build/agent-work-lanes.json`
-- `AgentBuildOrchestrationContracts.cs`
-- `AgentBuildOrchestrationContractsTests.cs`
-- manual inner / outer / witness agent build orchestration and slice-receipt policy
-- shared line-verification lock between repo-root build/test wrappers
-
-The carried meaning is integrator-mediated coordination, not governance,
-identity, scheduler authority, runtime standing, or worker-owned shared truth.
-Worker lanes may return bounded receipts; the `Integrator` remains responsible
-for shared readiness, carry-forward, and orchestration surfaces.
-
-## Cognitive Formation Buildspace Layer
-
-Light-cone lineage, OAN Diamond lineage and bounded zed/delta field law, and
-common cognitive-formation bookkeeping are preserved as the first formation
-buildspace layer above ingress and orchestration.
-
-This slice carries:
-
-- `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
-- `EC_OAN_DIAMOND_LINEAGE_AND_ZED_DELTA_SOURCE_LAW.md`
-- `CognitiveFormationContracts.cs`
-- explicit cone, source, requirement, why-not, zed-locus, delta-pressure, and
-  failure-signature receipt law
-
-The carried meaning is smallest-truthful-next-act formation bookkeeping. It is
-not full `EC` runtime habitation, direct Diamond geometry, dimensional canon,
-peerless standing, or `CME` proof.
-
-## Stack Root Rename Freeze Layer
-
-Sanctuary stack-root correction and forward family-prefix freeze are preserved
-as the first bounded transition layer after the formation buildspace.
-
-This slice carries:
-
-- `STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
-- `build/legacy-oan-namespace-allowlist.json`
-- production topology correction from legacy `Oan.*` foundation toward `San.*`
-- audit witness for exact legacy namespace and project allowlist enforcement
-
-The carried meaning is a forward naming freeze and migration plan, not physical
-repo rename, root-folder rename, solution rewrite, or completed code re-rooting.
-
-## Membrane And Session Body Witness Layer
-
-Prime Membrane duplex packet law and Session-body stabilization baseline
-preserved as witnessed support surfaces for later legally founded ontological
-claims about `CME` body, mind, and spirit.
-
-This slice carries:
-
-- `PrimeMembraneDuplexContractsTests.cs`
-- `SessionBodyStabilizationBaselineDocsTests.cs`
-- Prime Membrane duplex packet law
-- Session-body stabilization baseline preserved
-
-The carried meaning is witness completion for bounded packet and baseline law:
-membrane source, projection posture, bounded `CME` standing, closure
-eligibility, and stabilized session-body grouping remain distinct from Prime
-closure or live authority.
-
-## Public Repository Boundary Preservation
-
-The active public repository presentation boundary that must now be carried
-forward with the line is:
-
-- the repository is the governed build surface, not yet the fully operational
-  installer
-- the public repository carries the build minus the hosted seed `LLM`
-- the fully operational installer still depends on the local hosted seed `LLM`
-  and associated resident runtime surfaces that are not carried in the public
-  checkout
-
-The public-facing contact alias map that should now be treated as part of that
-repository boundary is:
-
-- `info@lucidtechnologies.tech`
-  - general public and repository information
-- `research@lucidtechnologies.tech`
-  - research-facing contact
-- `academic@lucidtechnologies.tech`
-  - academic and institutional contact
-- `admin@lucidtechnologies.tech`
-  - repository administration and contribution routing
-- `legal@lucidtechnologies.tech`
-  - legal, conduct, and sensitive private review
-
-This does not change executable runtime law. It preserves the public
-repository-facing contact surfaces and installer-boundary truth so later
-documentation passes do not drift back into ambiguity.
