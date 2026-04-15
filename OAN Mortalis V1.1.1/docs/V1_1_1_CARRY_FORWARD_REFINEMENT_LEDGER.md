@@ -235,3 +235,16 @@ The following edges remain beyond this bounded cleanup/intake family:
 - cleanup-driven deletion authority
 - release-gate standing from cleanup braiding alone
 - pulse, heartbeat, resonance chamber, or standing-wave proof
+
+## Agent Work Lane Held Edges
+
+The following edges remain beyond this bounded manual orchestration layer:
+
+- automation-first multi-agent actuation beyond bounded manual orchestration
+- true separate-artifact concurrent build/test execution
+- peer-to-peer worker integration
+- shared worker writes against readiness, carry-forward, or orchestration truth
+- autonomous worker promotion into governance or identity authority
+- scheduler-first orchestration fabric
+- a separate condensation lane
+- runtime standing or `CME` proof from agent collaboration receipts alone

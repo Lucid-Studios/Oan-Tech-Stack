@@ -588,3 +588,19 @@ groupoid/fibrinoid bundle mapping, and bounded session cleanup braiding. It
 does not admit temporal near-swamp execution, higher fibrinoid condensation,
 semantic promotion by packaging, inheritance, deletion authority, release gate
 standing, pulse, heartbeat, or resonance-chamber standing.
+
+## Agent Build Orchestration Addendum
+
+- `INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md`
+- `build/agent-work-lanes.json`
+- `inner-outer-witness-agent-build-orchestration-law: frame-now`
+- `../tools/Use-LineVerificationLock.ps1`
+- `shared-line-verification-lock: verify-now`
+
+This addendum admits the first manual inner / outer / witness agent build
+orchestration law and machine-readable lane map. It establishes slice receipts,
+integrator-owned shared truth mutation, witness-blocking barrier classes, and
+shared line-verification lock routing for build/test execution. It does not
+admit peer-to-peer worker integration, shared writes, autonomous worker
+promotion, native scheduling dependence, a separate condensation lane, runtime
+standing, `CME` proof, or governance authority.

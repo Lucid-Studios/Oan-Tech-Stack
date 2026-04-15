@@ -230,3 +230,23 @@ This slice carries:
 The carried meaning is grouping, budgeting, and candidate packaging without
 semantic promotion, inheritance, condensation, pulse, deletion authority, or
 release-gate standing.
+
+## Agent Work Lane Orchestration Layer
+
+Manual inner / outer / witness agent build orchestration and slice-receipt policy
+is preserved as the first bounded coordination layer above the current bucket
+and master-thread laws.
+
+This slice carries:
+
+- `INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md`
+- `build/agent-work-lanes.json`
+- `AgentBuildOrchestrationContracts.cs`
+- `AgentBuildOrchestrationContractsTests.cs`
+- manual inner / outer / witness agent build orchestration and slice-receipt policy
+- shared line-verification lock between repo-root build/test wrappers
+
+The carried meaning is integrator-mediated coordination, not governance,
+identity, scheduler authority, runtime standing, or worker-owned shared truth.
+Worker lanes may return bounded receipts; the `Integrator` remains responsible
+for shared readiness, carry-forward, and orchestration surfaces.
