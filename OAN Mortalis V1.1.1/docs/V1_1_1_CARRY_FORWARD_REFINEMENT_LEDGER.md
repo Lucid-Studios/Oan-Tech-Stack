@@ -165,3 +165,15 @@ The following edges remain beyond the first post-retention continuation slice:
 - re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity
 - full post-body resonance chamber and Compass heartbeat initiation/sustain
 - wider lifecycle continuation after explicit closure and bounded re-entry
+
+## GEL Proc Ignition Held Edges
+
+The following edges remain beyond this contract-backed substrate slice:
+
+- live `proc` execution and ignition-chain retention
+- the first full canonical chain `r -> d -> e -> p` as runtime-retained form
+- the first `E0` coupling event and live coupling seal
+- `Delta` accumulation and condensation engine
+- stability metrics as executable thresholds
+- procedural basis execution beyond bounded doctrine
+- Prime bonded minting certification and witnessed minting act

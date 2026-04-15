@@ -139,3 +139,23 @@ build debt. It must move into the explicit refinement split tracked in
   attestation seam.
 - Post-Prime closure continuity preserved as the first non-void field
   continuation seam above explicit closure.
+
+## GEL Proc Ignition Condensation Substrate
+
+- `GEL` discernment layering and translative binding preserved as the active
+  Root/Dictionary constitutional envelope with higher layers withheld.
+- Pre-Lisp, minimal `IUTT` Lisp, and hosted seed acting-operator posture
+  preserved as carrier doctrine, not live execution authority.
+- Prime root carrier reduction, decomposition, and anchor emergence preserved
+  as the first root-admission and residual-routing substrate.
+- `A0` axiom floor, derived growth laws, and action basis preserved as the
+  first invariant/growth/action composition stack.
+- `proc` grounding, trace, and cryptic integrity law preserved as posture-gated
+  action substrate, not live execution.
+- Ignition-chain template and witness family preserved as the first
+  `root -> def -> rel -> proc` slot-and-witness body.
+- Assimilation receipt and `Delta` bridge preserved as receipt-governed later
+  change substrate.
+- Heat/resonance expand-before-commit, stability metrics, canonical
+  condensation output, procedural basis condensate, and bounded ignition test
+  protocol preserved as placeholder-contract condensation substrate.

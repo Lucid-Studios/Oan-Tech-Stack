@@ -492,3 +492,34 @@ through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER
 - `lawful-reopening-redoping-continued-participation: frame-now/spec-now`
 - `prime-closure-act-law: frame-now/spec-now`
 - `post-prime-closure-continuity-law: frame-now/spec-now`
+
+## GEL Proc Ignition Condensation Addendum
+
+- `GEL_DISCERNMENT_LAYERING_AND_TRANSLATIVE_BINDING_NOTE.md`
+- `PRE_LISP_IUTT_LISP_AND_LLM_ACTING_OPERATOR_NOTE.md`
+- `PRIME_ROOT_CARRIER_REDUCTION_DECOMPOSITION_AND_ANCHOR_EMERGENCE_NOTE.md`
+- `A0_GEL_AXIOM_FLOOR_NOTE.md`
+- `GEL_DERIVED_GROWTH_LAWS_NOTE.md`
+- `GEL_ACTION_BASIS_AND_COMPOSITION_NOTE.md`
+- `PROC_GROUNDED_ACTION_AND_TRACE_LAW.md`
+- `IGNITION_CHAIN_TEMPLATE_AND_WITNESS_LAW.md`
+- `ASSIMILATION_RECEIPT_AND_DELTA_BRIDGE_NOTE.md`
+- `HEAT_RESONANCE_AND_EXPAND_BEFORE_COMMIT_LAW.md`
+- `STABILITY_METRICS_AND_CONDENSATION_THRESHOLD_NOTE.md`
+- `CANONICAL_CONDENSATION_OUTPUT_LAW.md`
+- `PROCEDURAL_BASIS_CONDENSATE_NOTE.md`
+- `FIRST_BOUNDED_IGNITION_CHAIN_TEST_PROTOCOL.md`
+- `gel-discernment-layering-and-translative-binding-note: frame-now`
+- `pre-lisp-iutt-lisp-and-llm-acting-operator-note: frame-now`
+- `prime-root-carrier-reduction-decomposition-and-anchor-emergence-note: frame-now`
+- `a0-gel-axiom-floor-note: frame-now`
+- `gel-derived-growth-laws-note: frame-now`
+- `gel-action-basis-and-composition-note: frame-now`
+- `proc-grounded-action-trace-law: frame-now`
+- `ignition-chain-template-witness-law: frame-now`
+- `assimilation-receipt-delta-bridge-note: frame-now`
+- `heat-resonance-expand-before-commit-law: frame-now`
+- `stability-metrics-condensation-threshold-note: frame-now`
+- `canonical-condensation-output-law: frame-now`
+- `procedural-basis-condensate-note: frame-now`
+- `first-bounded-ignition-chain-test-protocol: frame-now`
