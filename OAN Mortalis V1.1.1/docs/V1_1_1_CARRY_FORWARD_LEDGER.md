@@ -250,3 +250,21 @@ The carried meaning is integrator-mediated coordination, not governance,
 identity, scheduler authority, runtime standing, or worker-owned shared truth.
 Worker lanes may return bounded receipts; the `Integrator` remains responsible
 for shared readiness, carry-forward, and orchestration surfaces.
+
+## Cognitive Formation Buildspace Layer
+
+Light-cone lineage, OAN Diamond lineage and bounded zed/delta field law, and
+common cognitive-formation bookkeeping are preserved as the first formation
+buildspace layer above ingress and orchestration.
+
+This slice carries:
+
+- `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
+- `EC_OAN_DIAMOND_LINEAGE_AND_ZED_DELTA_SOURCE_LAW.md`
+- `CognitiveFormationContracts.cs`
+- explicit cone, source, requirement, why-not, zed-locus, delta-pressure, and
+  failure-signature receipt law
+
+The carried meaning is smallest-truthful-next-act formation bookkeeping. It is
+not full `EC` runtime habitation, direct Diamond geometry, dimensional canon,
+peerless standing, or `CME` proof.

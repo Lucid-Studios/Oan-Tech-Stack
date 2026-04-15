@@ -604,3 +604,20 @@ shared line-verification lock routing for build/test execution. It does not
 admit peer-to-peer worker integration, shared writes, autonomous worker
 promotion, native scheduling dependence, a separate condensation lane, runtime
 standing, `CME` proof, or governance authority.
+
+## Cognitive Formation Buildspace Addendum
+
+- `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
+- `EC_OAN_DIAMOND_LINEAGE_AND_ZED_DELTA_SOURCE_LAW.md`
+- `EC_FORMATION_BUILDSPACE_PREPARATION_NOTE.md`
+- `src/Sanctuary/Oan.Common/Oan.Common/CognitiveFormationContracts.cs`
+- `light-cone-awareness-lineage-source-law: frame-now`
+- `ec-oan-diamond-lineage-zed-delta-source-law: frame-now`
+- `ec-formation-buildspace-preparation-note: frame-now/spec-now`
+
+This addendum admits the first bounded cognitive-formation bookkeeping surface
+for cone position, source relation, requirement state, why-not classification,
+zed-locus preservation, delta pressure, and failure-signature disposition. It
+does not admit full OAN Diamond runtime geometry, higher-dimensional cognition,
+live `ListeningFrame` widening, peerless standing, bonded `CME` authority, or
+collapse-as-wisdom promotion.

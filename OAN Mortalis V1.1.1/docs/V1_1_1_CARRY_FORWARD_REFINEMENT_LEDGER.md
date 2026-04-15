@@ -248,3 +248,14 @@ The following edges remain beyond this bounded manual orchestration layer:
 - scheduler-first orchestration fabric
 - a separate condensation lane
 - runtime standing or `CME` proof from agent collaboration receipts alone
+
+## Cognitive Formation Held Edges
+
+The following edges remain beyond this bounded formation buildspace layer:
+
+- direct runtime geometry over the full OAN Diamond numbered field
+- higher-dimensional cognitive geometry canonization
+- full `EC` habitation or live `ListeningFrame` widening
+- peerless forms as executable standing classes
+- treating collapse itself as wisdom
+- bonded `CME` standing or authority from formation receipts alone
