@@ -1,8 +1,9 @@
-# Glossary Contract: OAN Mortalis v1.0
+# Glossary Contract
 
 ## Purpose
 
-This document is the canonical terminology contract for the active `OAN Mortalis V1.0` build.
+This document is the canonical terminology contract for the active
+Sanctuary-root stack.
 
 It exists to reduce build drift caused by:
 
@@ -49,11 +50,13 @@ Recommended governance fields for important terms:
 - Meaning: the product and governance stack name, `OAN Mortalis`
 - Usage:
   - use `OAN Mortalis` in product-facing and repository-facing prose
-  - use `Oan.*` for umbrella stack composition and stack-level contract ownership
-  - do not treat `Oan.*` as the required replacement prefix for every family in the stack
+  - treat `Oan.*` as downstream application identity or legacy migration hold
+    for foundational surfaces
+  - do not introduce new foundational stack projects under `Oan.*`
 - Notes:
   - `OAN` is an acronym-form product identifier
-  - `Oan` is the preferred CLR namespace casing for the active codebase
+  - `Oan` remains the preferred CLR casing for legacy migration surfaces and
+    later downstream application code
 
 Contract fields:
 - Layer: stack-wide
@@ -67,10 +70,11 @@ Contract fields:
 
 - Status: `canonical`
 - Meaning: the deterministic substrate and base contract layer
-- Current canonical assembly: `Oan.Spinal`
+- Current standing: legacy concept retained from prior line architecture
 - Usage:
   - use `Spinal` when referring to the active deterministic kernel or substrate
-  - use `Oan.Spinal` for the base managed assembly
+  - do not introduce a new foundational `Oan.Spinal` surface in the active
+    Sanctuary-root line
 - Do not collapse with:
   - `Core`
   - `Cryptic`
@@ -88,10 +92,10 @@ Contract fields:
 
 - Status: `canonical`
 - Meaning: `Symbolic Language Interconnect`, the protocol and native morphological Engrammitization surface for deterministic symbolic governance and Engineered Cognition
-- Current canonical assembly: `Oan.Sli`
+- Current canonical family: `SLI.*`
 - Usage:
   - use `SLI` for the protocol name in prose and design language
-  - use `Oan.Sli` for the active managed implementation assembly
+  - use `SLI.*` for active symbolic protocol and runtime implementations
 - SLI defines:
   - canonicalization discipline
   - transform trace discipline
@@ -120,12 +124,14 @@ Contract fields:
 - Status: `canonical`
 - Meaning: the CME-specific mediated self-state constructor and governance membrane before critical halt
 - Current active families:
-  - `Oan.SoulFrame`
   - `SoulFrame.*`
+  - target prefix: `Sfr.*`
 - Usage:
   - use `SoulFrame` for authority, governance, and safe-fail boundary language
-  - use `Oan.SoulFrame` for stack-level or umbrella-governance surfaces
-  - use `SoulFrame.*` for family-owned operator and identity-facing workflow surfaces
+  - use `Sfr.*` for new family-owned relational, membrane, projection, and
+    interface surfaces
+  - treat existing `SoulFrame.*` projects as legacy-named active migration
+    surfaces until the governed rename slice lands
 
 Contract fields:
 - Layer: governance and contextual mediation
@@ -140,12 +146,14 @@ Contract fields:
 - Status: `canonical`
 - Meaning: bounded personification, actualization, and operational cognition surface
 - Current active families:
-  - `Oan.AgentiCore`
   - `AgentiCore.*`
+  - target prefix: `Acr.*`
 - Usage:
   - keep the term `AgentiCore`
-  - use `Oan.AgentiCore` for stack-level or umbrella integration surfaces
-  - use `AgentiCore.*` for family-owned agent runtime behavior
+  - use `Acr.*` for new identity and governance-capable cognition-core
+    machinery
+  - treat existing `AgentiCore.*` surfaces as legacy-named active migration
+    surfaces until the governed rename slice lands
 
 Contract fields:
 - Layer: operational cognition
@@ -160,11 +168,12 @@ Contract fields:
 - Status: `canonical`
 - Meaning: active host orchestration and runtime mediation
 - Current active families:
-  - `Oan.Cradle`
   - `CradleTek.*`
+  - target prefix: `Ctk.*`
 - Usage:
   - use `Cradle` for stack-level orchestration concepts
-  - keep one canonical composition root under `Oan.Runtime.Headless`
+  - keep one canonical foundational composition root, currently held by legacy
+    `Oan.Runtime.Headless` and target-owned by `San.Runtime.Headless`
 
 ### CradleTek
 
@@ -172,7 +181,10 @@ Contract fields:
 - Meaning: infrastructure and substrate family for host-oriented runtime components
 - Usage:
   - use for infrastructure, substrate, hosting, storage, and low-level runtime services
-  - do not treat `CradleTek.*` as a legacy family by default
+  - use `Ctk.*` for new CradleTek habitation, custody, extension, and
+    runtime-distribution surfaces
+  - treat existing `CradleTek.*` projects as active migration surfaces rather
+    than final prefix truth
 
 Contract fields:
 - Layer: runtime substrate
@@ -186,17 +198,21 @@ Contract fields:
 
 - Status: `canonical`
 - Meaning: module boundary and external logic placement layer
-- Current canonical assembly: `Oan.Place`
+- Current standing: legacy concept retained from prior line architecture
 - Usage:
   - use when referring to placement or external module boundary concerns
+  - do not introduce a new foundational `Oan.Place` surface in the active
+    Sanctuary-root line
 
 ### Storage
 
 - Status: `canonical`
 - Meaning: persistence adapter layer
-- Current canonical assembly: `Oan.Storage`
+- Current standing: legacy concept retained from prior line architecture
 - Usage:
   - use for persistence implementations and storage adapters
+  - prefer owning-family storage seams over a new foundational `Oan.Storage`
+    surface
   - do not use as a synonym for `Cryptic`
 
 ### Cryptic
@@ -591,36 +607,46 @@ The following equivalences are forbidden in active documentation, code review la
 Clarification for the last rule:
 
 - `Cradle` is an orchestration layer
-- `Oan.Runtime.Headless` is the current canonical composition root
+- `Oan.Runtime.Headless` is the current legacy migration composition root
+- `San.Runtime.Headless` is the target foundational composition root
 
 ## Namespace And Naming Policy
 
 ### Namespace Families
 
-- Umbrella composition family:
+- Foundational stack-root family:
+  - `San.*`
+- Active target owned families:
+  - `Ctk.*`
+  - `Sfr.*`
+  - `Acr.*`
+  - `SLI.*`
+- Legacy migration or downstream families and roots:
   - `Oan.*`
-- Active owned families:
   - `CradleTek.*`
   - `SoulFrame.*`
   - `AgentiCore.*`
-  - `SLI.*`
-- Compatibility families or roots:
   - `OAN.*`
   - unexplained bare roots such as `GEL`
 
 ### Project Naming
 
-- New stack-level composition projects should prefer `Oan.*`
+- New foundational stack-level composition projects should use `San.*`
 - New family-owned projects should use their owning family prefix
-- New active host entrypoints should not create alternate stack roots alongside `Oan.Runtime.Headless`
+- New active host entrypoints should not create alternate foundational stack
+  roots alongside the current migration root or target `San.Runtime.Headless`
 - compatibility projects should be described as compatibility or migration surfaces in documentation when they do not fit the constitutional family model
 
 ### Acronym Casing
 
 - Product acronym in prose: `OAN`
-- Managed namespace root: `Oan`
+- Legacy managed namespace root: `Oan`
+- Target Sanctuary stack root: `San`
+- Target CradleTek root: `Ctk`
+- Target SoulFrame root: `Sfr`
+- Target AgentiCore root: `Acr`
 - Protocol acronym in prose: `SLI`
-- Assembly name for active managed protocol layer: `Oan.Sli`
+- Assembly prefix for active symbolic protocol layer: `SLI`
 
 ## Data And Syntax Notation Policy
 
@@ -660,17 +686,23 @@ Clarification for the last rule:
 - `Build Contracts/Crosscutting/ARCHITECTURE_FRAME.md`
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
 - `Build Contracts/Crosscutting/NAMING_CONVENTION.md`
-- `OAN Mortalis V1.0/docs/PROJECT_CLASSIFICATION_MATRIX.md`
-- `OAN Mortalis V1.0/docs/BUILD_READINESS.md`
+- `OAN Mortalis V1.1.1/docs/PRODUCTION_FILE_AND_FOLDER_TOPOLOGY.md`
+- `OAN Mortalis V1.1.1/docs/STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
+- `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
 
 ## Current Canonical Family Model
 
 The current preferred family model is:
 
-- `Oan.*` for umbrella composition and stack-level contracts
-- `CradleTek.*` for infrastructure and substrate ownership
-- `SoulFrame.*` for operator and identity-facing workflow ownership
-- `AgentiCore.*` for agent runtime ownership
-- `SLI.*` for symbolic protocol and runtime ownership across the stack
+- `San.*` for Sanctuary constitutional habitat and stack-root composition
+- `Ctk.*` for CradleTek habitation, custody, extension, and runtime-distribution
+  ownership
+- `Sfr.*` for SoulFrame relational, membrane, projection, and interface
+  ownership
+- `Acr.*` for AgentiCore identity and governance-capable core machinery
+  ownership
+- `SLI.*` for symbolic protocol and runtime ownership across families
+- `Oan.*` as downstream application identity or legacy migration hold only
 
-Project-specific placement should follow the owning family rather than forcing all active code into `Oan.*`.
+Project-specific placement should follow the owning family rather than forcing
+active foundational code into `Oan.*`.
