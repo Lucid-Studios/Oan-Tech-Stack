@@ -128,3 +128,14 @@ build debt. It must move into the explicit refinement split tracked in
   closure.
 - Prime retained-whole evaluation preserved as the first bounded Prime-side
   admission seam above membrane receipt and below any explicit closure act.
+
+## Post-Retention Continuity
+
+- Communicative filament preservation and anti-echo law preserved as the first
+  crosscutting burden-distribution seam above Prime retained-whole evaluation.
+- Lawful reopening, redoping, and continued participation preserved as the
+  first bounded re-entry seam above communicative resolution.
+- Prime closure act preserved as the first explicit Prime-side metamorphic
+  attestation seam.
+- Post-Prime closure continuity preserved as the first non-void field
+  continuation seam above explicit closure.

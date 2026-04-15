@@ -224,3 +224,11 @@ Any future runtime seam in this path should say plainly:
 - what authority is still pending above the hot lane
 
 If it cannot say that plainly, it should remain staged or held.
+
+## Communicative Filament Bridge
+
+- `COMMUNICATIVE_FILAMENT_AND_ANTI_ECHO_LAW.md`
+
+`cGoA` may receive remaining integrable matter and deferred edges after higher
+communicative burden has routed important decisions and chosen-path body to
+their lawful surfaces.

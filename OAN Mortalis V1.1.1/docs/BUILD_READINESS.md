@@ -481,3 +481,14 @@ through the explicit refinement split in `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER
 - `prime-membrane-projected-braid-history-interpretation: frame-now/spec-now`
 - `prime-membrane-projected-history-receipt: frame-now/spec-now`
 - `prime-retained-whole-evaluation: frame-now/spec-now`
+
+## Post-Retention Continuity Addendum
+
+- `COMMUNICATIVE_FILAMENT_AND_ANTI_ECHO_LAW.md`
+- `LAWFUL_REOPENING_REDOPING_AND_CONTINUED_PARTICIPATION_LAW.md`
+- `PRIME_CLOSURE_ACT_LAW.md`
+- `POST_PRIME_CLOSURE_CONTINUITY_LAW.md`
+- `communicative-filament-anti-echo-law: frame-now/spec-now`
+- `lawful-reopening-redoping-continued-participation: frame-now/spec-now`
+- `prime-closure-act-law: frame-now/spec-now`
+- `post-prime-closure-continuity-law: frame-now/spec-now`

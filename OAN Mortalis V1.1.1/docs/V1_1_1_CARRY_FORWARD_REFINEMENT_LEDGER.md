@@ -157,3 +157,11 @@ The following edges remain beyond the first projected runtime slice:
 - Prime closure from receipted projected braid history beyond the bounded
   retained-whole evaluation seam
 - re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity
+
+## Post-Retention Held Edges
+
+The following edges remain beyond the first post-retention continuation slice:
+
+- re-entrant path inheritance and deep-store navigation beyond post-Prime closure continuity
+- full post-body resonance chamber and Compass heartbeat initiation/sustain
+- wider lifecycle continuation after explicit closure and bounded re-entry
