@@ -33,7 +33,7 @@ Use this note with:
 
 This law governs transition into consequence, not the content of a claim.
 It is subordinate to bounded discernment and precedes fuller responsibility
-binding, revalidation, and hold-resolution law.
+binding and revalidation law.
 
 ## Action Threshold Problem
 
@@ -253,5 +253,5 @@ The system is considered structurally ready at this seam when it can:
 
 - this law governs movement, not ontology
 - this law is subordinate to bounded discernment
-- this law prepares the seam for later hold-resolution and
-  responsibility-binding work
+- this law binds directly with `HOLD_RESOLUTION_LAW.md`
+- this law prepares the seam for later responsibility-binding work

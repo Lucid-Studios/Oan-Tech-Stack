@@ -327,6 +327,10 @@ The dominant aligned themes now preserved from that intake are:
   discernment, so partial convergence may proceed only under accountable
   sufficiency while unanimity remains unnecessary, silent coercion remains
   unlawful, and held non-movement is not mistaken for costless innocence
+- hold resolution preserved as the first lawful non-movement seam paired to
+  action threshold, so holds remain provisional protection states with explicit
+  reasons, temporal bounds, and collapse paths into `Proceed`, `Refuse`, or
+  `Escalate` rather than becoming indefinite moral shelter from consequence
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing

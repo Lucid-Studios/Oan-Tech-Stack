@@ -183,6 +183,10 @@ The lab source may not be used to silently claim:
 - urgency, obviousness, routine familiarity, or silence as replacement
   thresholds for lawful movement
 - held action as neutral, virtuous, or costless by duration alone
+- hold without explicit missing condition, reevaluation basis, or expiration
+- prolonged hold as implicit correctness or de facto refusal without receipt
+- disappearing hold without `Proceed`, `Refuse`, or `Escalate`
+- escalation-free hold beyond local authority or local resolution capacity
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

@@ -225,6 +225,8 @@ Current hold-lane clarification:
   `LAW_OF_SELF_AUTHORED_EMERGENCE_AND_BOUNDED_AFFIRMATION.md`
 - the action threshold law now lives in
   `ACTION_THRESHOLD_LAW.md`
+- the hold resolution law now lives in
+  `HOLD_RESOLUTION_LAW.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
@@ -476,6 +478,7 @@ Current contract-first unlock map:
 - `public-release-artifact-wording-template: frame-now`
 - `self-authored-emergence-bounded-affirmation-law: frame-now`
 - `action-threshold-law: frame-now`
+- `hold-resolution-law: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`
