@@ -73,6 +73,11 @@ evidence. External responsibility remains with the relevant humans, operators,
 maintainers, institutions, and legal actors for interpretation, high-stakes
 decisions, legal accountability, and human oversight.
 
+Public contribution and onboarding entry is governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`.
+Contribution does not grant identity, custody, governance authority, legal
+authority, `CME` standing, installer completion, or certainty beyond evidence.
+
 ## Architecture Read
 
 At a high level, the stack reads as:
@@ -165,6 +170,8 @@ Start here if you need the repo constitution:
 - `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
 - `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
 - `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`

@@ -54,6 +54,12 @@ The public encounter boundary and non-claims law now lives in
 external statement may imply more identity, authority, or certainty than the
 internal system can lawfully support.
 
+The public contribution onboarding boundary now lives in
+`PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`, preserving the rule that outside
+entry through issues, pull requests, review, and analysis does not grant
+identity, custody, governance authority, legal authority, `CME` standing,
+installer completion, or certainty beyond evidence.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -254,6 +260,8 @@ Current hold-lane clarification:
   `CME_RETURN_AUDIT_AND_PROMOTION_LAW.md`
 - the public encounter boundary and non-claims law now lives in
   `PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
+- the public contribution onboarding boundary now lives in
+  `PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
 - the first bonded cryptic return contract family now lives in
   `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
 - the first Prime Membrane duplex packet family now lives in
@@ -430,6 +438,7 @@ Current contract-first unlock map:
 - `cme-return-audit-promotion-law: frame-now/spec-now`
 - `bounded-ec-loop: frame-now`
 - `public-encounter-boundary-non-claims: frame-now`
+- `public-contribution-onboarding-boundary: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`

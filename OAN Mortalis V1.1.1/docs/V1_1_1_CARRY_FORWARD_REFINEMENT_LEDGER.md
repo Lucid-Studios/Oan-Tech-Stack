@@ -137,6 +137,13 @@ The lab source may not be used to silently claim:
 - final-truth status for public outputs beyond current evidence
 - high-stakes decision authority without external accountability and human
   oversight
+- contribution authorship as custody, governance authority, legal authority,
+  `CME` standing, installer completion, or ontology proof
+- review approval as governance law
+- issue discussion as executable truth
+- public onboarding as access to private corpus paths, hosted seed `LLM`
+  payloads, private runtime payloads, or sensitive legal, identity, custody, or
+  operator material
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

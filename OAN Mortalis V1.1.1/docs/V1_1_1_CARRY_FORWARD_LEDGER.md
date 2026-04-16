@@ -111,6 +111,31 @@ This preserves the outward-facing rule that no external statement may imply
 more identity, authority, or certainty than the internal system can lawfully
 support.
 
+## Public Contribution Onboarding Boundary
+
+The public contribution onboarding boundary now carried forward with the line
+is:
+
+- public contribution is an entry path into a governed engineering workspace
+- issues, pull requests, reviews, and external analysis do not grant identity,
+  custody, governance authority, legal authority, `CME` standing, installer
+  completion, or certainty beyond evidence
+- contribution authority is scoped by `Domain -> Role -> Capacity`
+- `Build Contracts/` remains a controlled governance surface and may be
+  changed only for explicit governance work
+- contributor language must distinguish implemented and verified behavior,
+  contract-backed doctrine, documentation-only framing, held work, and
+  exploratory horizon language
+- exploratory contribution language may be proposed but may not be presented
+  as current executable truth
+- private corpus paths, credentials, hosted seed `LLM` payloads, private
+  runtime payloads, and sensitive legal, identity, custody, or operator
+  material must not enter public discussion or tracked history
+
+This preserves the outward entry rule that public participation may be
+received, evaluated, narrowed, deferred, or refused without creating shadow
+governance or false ontology.
+
 ## External Doctrine Intake Preservation
 
 The local external source labeled `GEL formation lab chat logs` is now treated
