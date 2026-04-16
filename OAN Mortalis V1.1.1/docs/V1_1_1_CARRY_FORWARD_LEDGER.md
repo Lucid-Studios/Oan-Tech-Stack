@@ -318,6 +318,11 @@ The dominant aligned themes now preserved from that intake are:
   lawful post-uptake bifurcation, so contextualized intake may witness
   stabilization, investigation, carried incompleteness, or blockage without
   implying semantic rise, persistence, inheritance, self-mutation, or pulse
+- self-authored emergence and bounded affirmation preserved as the anchor
+  admissibility law above first post-ingress discernment, so emergent patterns
+  may arise endogenously without self-affirming, and only affirmed structures
+  may persist or participate while refusal clears cleanly and hold remains
+  provisional
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing

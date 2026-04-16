@@ -221,6 +221,8 @@ Current hold-lane clarification:
   `THETA_INGRESS_AND_SENSORY_CLUSTER_UPTAKE_LAW.md`
 - the post-ingress discernment and stable-one law now lives in
   `POST_INGRESS_DISCERNMENT_AND_STABLE_ONE_LAW.md`
+- the law of self-authored emergence and bounded affirmation now lives in
+  `LAW_OF_SELF_AUTHORED_EMERGENCE_AND_BOUNDED_AFFIRMATION.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
@@ -470,6 +472,7 @@ Current contract-first unlock map:
 - `public-github-entry-template-boundary: frame-now`
 - `public-cme-explanation-boundary: frame-now`
 - `public-release-artifact-wording-template: frame-now`
+- `self-authored-emergence-bounded-affirmation-law: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`

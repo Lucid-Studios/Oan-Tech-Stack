@@ -172,6 +172,11 @@ The lab source may not be used to silently claim:
   autonomous authority, legal accountability, custody authority, governance
   authority, role enactment, installer completion, hosted seed `LLM` shipment,
   production readiness, or certainty beyond evidence
+- self-authored emergence as self-affirmation, persistence, participation, or
+  identity formation by implication alone
+- hold as implicit affirmation or silent participation
+- refused structures as hidden residue or contextual drift re-entry
+- forced resolution of emergence without lawful `Affirm`, `Refuse`, or `Hold`
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.
