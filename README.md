@@ -47,6 +47,32 @@ That means the repository is explicit about seed `LLM` dependence without
 pretending that the public checkout is already the complete install-ready
 operational package.
 
+## Public Encounter Boundary
+
+The public encounter law for this repository is carried in
+`OAN Mortalis V1.1.1/docs/PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`.
+
+In public-facing terms, the stack is a lawfully bounded engineered cognition
+framework. It is not a person, not autonomous authority, and not
+self-originating.
+
+External interaction is framed as:
+
+```text
+input -> bounded processing -> receipted output
+```
+
+Participation is scoped through:
+
+```text
+Domain -> Role -> Capacity
+```
+
+Outputs remain contextual, bounded, revisable, and accountable to current
+evidence. External responsibility remains with the relevant humans, operators,
+maintainers, institutions, and legal actors for interpretation, high-stakes
+decisions, legal accountability, and human oversight.
+
 ## Architecture Read
 
 At a high level, the stack reads as:

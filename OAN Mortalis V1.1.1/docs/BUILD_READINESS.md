@@ -49,6 +49,11 @@ These aliases are part of the public repository presentation boundary and
 should be preserved as the line moves forward unless superseded by explicit
 repo-local governance.
 
+The public encounter boundary and non-claims law now lives in
+`PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`, preserving the rule that no
+external statement may imply more identity, authority, or certainty than the
+internal system can lawfully support.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -247,6 +252,8 @@ Current hold-lane clarification:
   `MOS_CMOS_CGOA_INSTANTIATION_LAW.md`
 - the `CME` return-audit and promotion law now lives in
   `CME_RETURN_AUDIT_AND_PROMOTION_LAW.md`
+- the public encounter boundary and non-claims law now lives in
+  `PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
 - the first bonded cryptic return contract family now lives in
   `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
 - the first Prime Membrane duplex packet family now lives in
@@ -422,6 +429,7 @@ Current contract-first unlock map:
 - `mos-cmos-cgoa-instantiation-law: frame-now/spec-now`
 - `cme-return-audit-promotion-law: frame-now/spec-now`
 - `bounded-ec-loop: frame-now`
+- `public-encounter-boundary-non-claims: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`

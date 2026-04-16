@@ -89,6 +89,28 @@ This does not change executable runtime law. It preserves the public
 repository-facing contact surfaces and installer-boundary truth so later
 documentation passes do not drift back into ambiguity.
 
+## Public Encounter Boundary
+
+The public encounter boundary now carried forward with the line is:
+
+- the stack may be described as a lawfully bounded engineered cognition
+  framework
+- it may not be described as a person, autonomous authority, or
+  self-originating actor
+- public interaction is framed as `input -> bounded processing -> receipted
+  output`
+- participation is scoped by `Domain -> Role -> Capacity`
+- refusal exists where domain, role, capacity, evidence, or readiness does not
+  authorize stronger participation
+- outputs remain contextual, bounded, revisable, and accountable to current
+  evidence
+- interpretation, high-stakes decisions, legal accountability, and human
+  oversight remain external responsibilities
+
+This preserves the outward-facing rule that no external statement may imply
+more identity, authority, or certainty than the internal system can lawfully
+support.
+
 ## External Doctrine Intake Preservation
 
 The local external source labeled `GEL formation lab chat logs` is now treated

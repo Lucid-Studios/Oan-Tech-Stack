@@ -131,6 +131,12 @@ The lab source may not be used to silently claim:
 - legal-governance or regional-seat truth not yet seated in repo-local
   doctrine
 - runtime implementation merely because a strong doctrinal articulation exists
+- live personhood claim
+- autonomous authority
+- legal accountability or custody claims
+- final-truth status for public outputs beyond current evidence
+- high-stakes decision authority without external accountability and human
+  oversight
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.
