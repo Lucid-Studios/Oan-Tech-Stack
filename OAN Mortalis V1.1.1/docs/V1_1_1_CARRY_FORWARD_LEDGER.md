@@ -160,6 +160,27 @@ This preserves the outward status rule that progress may be described only as
 far as current evidence, release-gate posture, and repo-local governance can
 support.
 
+## Public GitHub Entry Template Boundary
+
+The public GitHub entry template boundary now carried forward with the line is:
+
+- issue, feature request, and pull request templates are intake surfaces, not
+  promotion engines
+- template completion is not admission
+- templates must ask for affected architecture layer, affected stratum or
+  boundary type, witnesses or verification, non-claims, and boundary risk
+- templates must make contributors acknowledge public intake hygiene
+- issue and pull request entry must preserve that participation does not grant
+  identity, custody, governance authority, legal authority, `CME` standing,
+  release readiness, installer completion, or certainty beyond evidence
+- GitHub entry surfaces must point contributors toward the active `V1.1.1`
+  public boundary and build-readiness surfaces rather than retired `V1.0`
+  paths
+
+This preserves the outward intake rule that public contribution can be
+structured before maintainer review without becoming admission, authority, or
+status promotion.
+
 ## External Doctrine Intake Preservation
 
 The local external source labeled `GEL formation lab chat logs` is now treated

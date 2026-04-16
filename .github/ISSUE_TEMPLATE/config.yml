@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Build readiness and workspace rules
-    url: https://github.com/Lucid-Studios/Oan-Tech-Stack/tree/main/OAN%20Mortalis%20V1.0/docs
-    about: Review the active build readiness and workspace rules before opening work items.
+    url: https://github.com/Lucid-Studios/Oan-Tech-Stack/tree/main/OAN%20Mortalis%20V1.1.1/docs
+    about: Review the active build readiness, public boundary, and workspace rules before opening work items.
   - name: Contribution guide
     url: https://github.com/Lucid-Studios/Oan-Tech-Stack/blob/main/CONTRIBUTING.md
     about: Review contribution expectations, active build scope, and local verification commands.

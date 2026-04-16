@@ -52,3 +52,55 @@ body:
     attributes:
       label: Logs and evidence
       description: Paste only sanitized logs. Do not include private corpus paths or local absolute paths outside the repo root.
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Affected architecture layer
+      description: Choose the layer that best matches the observed defect. This is a reporter hypothesis, not an admission decision.
+      options:
+        - Sanctuary
+        - CradleTek
+        - SoulFrame
+        - AgentiCore
+        - SLI Engine
+        - GEL
+        - Hosted LLM
+        - Public Boundary
+        - Infrastructure
+        - Crosscutting
+        - Unknown
+    validations:
+      required: true
+  - type: dropdown
+    id: stratum
+    attributes:
+      label: Affected stratum or boundary type
+      description: Pick the broad stratum that appears affected.
+      options:
+        - Constitutional or governance
+        - Infrastructure or verification
+        - Runtime or executable behavior
+        - Documentation or doctrine
+        - Public boundary
+        - Other bounded stratum
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: non_claims
+    attributes:
+      label: Non-claims and boundary risk
+      description: State whether this report could be mistaken for standing, governance, authority, readiness, or completion. If so, state what it does not claim.
+      placeholder: |
+        This report does not claim CME standing, installer completion, production readiness, custody, governance authority, legal authority, or certainty beyond evidence.
+    validations:
+      required: true
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Public intake hygiene
+      options:
+        - label: I have not included private corpus paths, credentials, tokens, hosted seed LLM payloads, private runtime payloads, or sensitive legal, identity, custody, or operator material.
+          required: true
+        - label: I understand Template completion is not admission, authority, readiness, or completion.
+          required: true

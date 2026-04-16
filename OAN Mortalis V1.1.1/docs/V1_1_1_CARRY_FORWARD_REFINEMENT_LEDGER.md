@@ -150,6 +150,12 @@ The lab source may not be used to silently claim:
 - release tags or milestone summaries as promotion engines
 - green build or test results as complete installer proof or operational
   cognition proof
+- issue, feature request, or pull request template completion as admission,
+  authority, release readiness, installer completion, custody, role enactment,
+  governance standing, legal standing, or `CME` standing
+- GitHub intake templates as permission to post private corpus paths,
+  credentials, hosted seed `LLM` payloads, private runtime payloads, or
+  sensitive legal, identity, custody, or operator material
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

@@ -64,6 +64,11 @@ The public release readiness wording law now lives in
 `PUBLIC_RELEASE_READINESS_WORDING_LAW.md`, preserving the rule that readiness
 may be witnessed only to the level currently supported by repo-local evidence.
 
+The public GitHub entry template boundary now lives in
+`PUBLIC_GITHUB_ENTRY_TEMPLATE_BOUNDARY.md`, preserving the rule that issue,
+feature request, and pull request templates are intake surfaces rather than
+admission, authority, readiness, completion, custody, or `CME` standing.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -268,6 +273,8 @@ Current hold-lane clarification:
   `PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
 - the public release readiness wording law now lives in
   `PUBLIC_RELEASE_READINESS_WORDING_LAW.md`
+- the public GitHub entry template boundary now lives in
+  `PUBLIC_GITHUB_ENTRY_TEMPLATE_BOUNDARY.md`
 - the first bonded cryptic return contract family now lives in
   `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
 - the first Prime Membrane duplex packet family now lives in
@@ -446,6 +453,7 @@ Current contract-first unlock map:
 - `public-encounter-boundary-non-claims: frame-now`
 - `public-contribution-onboarding-boundary: frame-now`
 - `public-release-readiness-wording-law: frame-now`
+- `public-github-entry-template-boundary: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`
