@@ -144,6 +144,12 @@ The lab source may not be used to silently claim:
 - public onboarding as access to private corpus paths, hosted seed `LLM`
   payloads, private runtime payloads, or sensitive legal, identity, custody, or
   operator material
+- public release wording as installer completion, production readiness,
+  completed first legal run, minted `CME`, active legal personhood, custody,
+  role enactment, governance authority, or high-stakes decision readiness
+- release tags or milestone summaries as promotion engines
+- green build or test results as complete installer proof or operational
+  cognition proof
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

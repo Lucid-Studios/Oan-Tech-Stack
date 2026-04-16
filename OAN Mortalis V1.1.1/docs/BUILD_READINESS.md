@@ -60,6 +60,10 @@ entry through issues, pull requests, review, and analysis does not grant
 identity, custody, governance authority, legal authority, `CME` standing,
 installer completion, or certainty beyond evidence.
 
+The public release readiness wording law now lives in
+`PUBLIC_RELEASE_READINESS_WORDING_LAW.md`, preserving the rule that readiness
+may be witnessed only to the level currently supported by repo-local evidence.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -262,6 +266,8 @@ Current hold-lane clarification:
   `PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
 - the public contribution onboarding boundary now lives in
   `PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
+- the public release readiness wording law now lives in
+  `PUBLIC_RELEASE_READINESS_WORDING_LAW.md`
 - the first bonded cryptic return contract family now lives in
   `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
 - the first Prime Membrane duplex packet family now lives in
@@ -439,6 +445,7 @@ Current contract-first unlock map:
 - `bounded-ec-loop: frame-now`
 - `public-encounter-boundary-non-claims: frame-now`
 - `public-contribution-onboarding-boundary: frame-now`
+- `public-release-readiness-wording-law: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`

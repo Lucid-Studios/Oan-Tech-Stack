@@ -136,6 +136,30 @@ This preserves the outward entry rule that public participation may be
 received, evaluated, narrowed, deferred, or refused without creating shadow
 governance or false ontology.
 
+## Public Release Readiness Wording
+
+The public release readiness wording law now carried forward with the line is:
+
+- public release, tag, milestone, status, and readiness language is a witness
+  surface, not a promotion engine
+- readiness may be witnessed only to the level currently supported by
+  repo-local evidence
+- first-working-model status must preserve `pass`, `hold`, and `fail` gate
+  grammar
+- no "mostly ready" reading is lawful public wording
+- public wording may name the repository as a governed build surface and active
+  engineering workspace
+- public wording must not overstate installer completion, hosted seed `LLM`
+  shipment, `CME` standing, legal standing, operational readiness, custody,
+  governance authority, role enactment, or certainty beyond evidence
+- if public wording mentions `CME`, it must preserve that documentation
+  wording does not mint `CME` standing, closure, bonded role enactment,
+  custody, or governance authority
+
+This preserves the outward status rule that progress may be described only as
+far as current evidence, release-gate posture, and repo-local governance can
+support.
+
 ## External Doctrine Intake Preservation
 
 The local external source labeled `GEL formation lab chat logs` is now treated

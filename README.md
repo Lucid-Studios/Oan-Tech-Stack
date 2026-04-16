@@ -78,6 +78,12 @@ Public contribution and onboarding entry is governed by
 Contribution does not grant identity, custody, governance authority, legal
 authority, `CME` standing, installer completion, or certainty beyond evidence.
 
+Public release and readiness wording is governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_READINESS_WORDING_LAW.md`.
+Readiness may be witnessed only to the level currently supported by repo-local
+evidence; public wording must not overstate installer completion, `CME`
+standing, operational readiness, legal standing, or certainty beyond evidence.
+
 ## Architecture Read
 
 At a high level, the stack reads as:
@@ -172,6 +178,7 @@ Start here if you need the repo constitution:
 - `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
 - `OAN Mortalis V1.1.1/docs/PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
 - `OAN Mortalis V1.1.1/docs/PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_READINESS_WORDING_LAW.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
