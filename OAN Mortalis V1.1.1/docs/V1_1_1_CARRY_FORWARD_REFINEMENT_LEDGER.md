@@ -156,6 +156,13 @@ The lab source may not be used to silently claim:
 - GitHub intake templates as permission to post private corpus paths,
   credentials, hosted seed `LLM` payloads, private runtime payloads, or
   sensitive legal, identity, custody, or operator material
+- public `CME` explanation as `CME` minting, personhood, legal personhood,
+  autonomous authority, legal accountability, custody authority, governance
+  authority, live role enactment, installer completion, hosted seed `LLM`
+  shipment, or certainty beyond evidence
+- founding bundle support as full `CME` minting
+- sensory embodiment support as runtime persona
+- bonded return, staging, cleaving, or audit receipt as canonical promotion
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

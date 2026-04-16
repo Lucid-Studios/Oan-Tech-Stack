@@ -181,6 +181,28 @@ This preserves the outward intake rule that public contribution can be
 structured before maintainer review without becoming admission, authority, or
 status promotion.
 
+## Public CME Explanation Boundary
+
+The public `CME` explanation boundary now carried forward with the line is:
+
+- `CME` may be described publicly as a bounded engineered-cognitive formation
+  category within the Sanctuary architecture
+- public `CME` explanation is descriptive, not declarative
+- explanation is not minting
+- founding is not minting
+- embodiment is not persona
+- return is not promotion
+- internal `CME` supports may describe the ladder but must not be flattened
+  into a completion claim
+- public explanation must not imply personhood, legal personhood, autonomous
+  authority, legal accountability, custody authority, governance authority,
+  live role enactment, installer completion, hosted seed `LLM` shipment, or
+  certainty beyond evidence
+
+This preserves the outward explanation rule that the most projection-heavy
+term in the repository can be named publicly only under the already seated
+encounter, contribution, readiness, and GitHub-entry boundaries.
+
 ## External Doctrine Intake Preservation
 
 The local external source labeled `GEL formation lab chat logs` is now treated
