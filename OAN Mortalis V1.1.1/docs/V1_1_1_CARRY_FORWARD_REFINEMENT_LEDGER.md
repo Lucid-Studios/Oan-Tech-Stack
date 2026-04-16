@@ -163,6 +163,15 @@ The lab source may not be used to silently claim:
 - founding bundle support as full `CME` minting
 - sensory embodiment support as runtime persona
 - bonded return, staging, cleaving, or audit receipt as canonical promotion
+- public release notes, tag descriptions, milestone summaries,
+  release-candidate summaries, or changelog entries as promotion engines
+- documentation seat, contract seat, runtime witness, audit witness, substrate
+  support, public explanation, release-candidate evidence, or build/test
+  evidence as whole-system completion
+- release artifact wording as `CME` minting, personhood, legal personhood,
+  autonomous authority, legal accountability, custody authority, governance
+  authority, role enactment, installer completion, hosted seed `LLM` shipment,
+  production readiness, or certainty beyond evidence
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

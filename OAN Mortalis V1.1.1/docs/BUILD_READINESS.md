@@ -74,6 +74,11 @@ The public `CME` explanation boundary now lives in
 bounded engineered-cognitive formation category within the Sanctuary
 architecture and public explanation is not minting.
 
+The public release artifact wording template now lives in
+`PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`, preserving the rule that release
+notes, tag descriptions, milestone summaries, release-candidate summaries, and
+changelog entries are witness summaries rather than promotion engines.
+
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in
@@ -282,6 +287,8 @@ Current hold-lane clarification:
   `PUBLIC_GITHUB_ENTRY_TEMPLATE_BOUNDARY.md`
 - the public `CME` explanation boundary now lives in
   `PUBLIC_CME_EXPLANATION_BOUNDARY.md`
+- the public release artifact wording template now lives in
+  `PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`
 - the first bonded cryptic return contract family now lives in
   `src/Sanctuary/Oan.Common/Oan.Common/BondedCrypticReturnContracts.cs`
 - the first Prime Membrane duplex packet family now lives in
@@ -462,6 +469,7 @@ Current contract-first unlock map:
 - `public-release-readiness-wording-law: frame-now`
 - `public-github-entry-template-boundary: frame-now`
 - `public-cme-explanation-boundary: frame-now`
+- `public-release-artifact-wording-template: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`

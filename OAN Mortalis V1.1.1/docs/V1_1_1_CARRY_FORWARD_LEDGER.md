@@ -203,6 +203,29 @@ This preserves the outward explanation rule that the most projection-heavy
 term in the repository can be named publicly only under the already seated
 encounter, contribution, readiness, and GitHub-entry boundaries.
 
+## Public Release Artifact Wording Template
+
+The public release artifact wording template now carried forward with the line
+is:
+
+- release notes, tag descriptions, milestone summaries, release-candidate
+  summaries, and changelog entries are witness summaries, not promotion
+  engines
+- release artifacts must preserve status, evidence, architecture layer, what
+  changed, non-claims, known holds, and verification
+- public status must preserve `pass`, `hold`, and `fail` gate grammar
+- no "mostly ready" reading is lawful release artifact wording
+- documentation seat, contract seat, runtime witness, audit witness, substrate
+  support, public explanation, release-candidate evidence, and build/test
+  evidence must not be flattened into completion
+- release artifacts must not imply `CME` minting, personhood, legal
+  personhood, autonomous authority, legal accountability, custody authority,
+  governance authority, role enactment, installer completion, hosted seed
+  `LLM` shipment, production readiness, or certainty beyond evidence
+
+This preserves the outward release rule that the project can publish progress
+without allowing release artifacts to become status promotion.
+
 ## External Doctrine Intake Preservation
 
 The local external source labeled `GEL formation lab chat logs` is now treated

@@ -11,6 +11,7 @@ It inherits:
 
 - `PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
 - `PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
+- `PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`
 - `FIRST_WORKING_MODEL_RELEASE_GATE.md`
 
 Public status language is a witness surface.
@@ -107,6 +108,10 @@ avoid the claim.
 If a public release note mentions `CME`, it must also preserve that
 documentation wording does not mint `CME` standing, closure, bonded role
 enactment, custody, or governance authority.
+
+Public release artifacts should use
+`PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md` so status, evidence,
+non-claims, known holds, and verification remain explicit.
 
 ## Evidence Constraint
 

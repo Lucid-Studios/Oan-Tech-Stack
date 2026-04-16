@@ -97,6 +97,12 @@ category within the Sanctuary architecture, not as personhood, autonomous
 authority, legal accountability, installer completion, hosted seed `LLM`
 shipment, custody, governance authority, or certainty beyond evidence.
 
+Public release notes, tag descriptions, milestone summaries, release-candidate
+summaries, and changelog entries are governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`.
+Release wording is not promotion and must preserve status, evidence,
+non-claims, and known holds.
+
 ## Architecture Read
 
 At a high level, the stack reads as:
@@ -194,6 +200,7 @@ Start here if you need the repo constitution:
 - `OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_READINESS_WORDING_LAW.md`
 - `OAN Mortalis V1.1.1/docs/PUBLIC_GITHUB_ENTRY_TEMPLATE_BOUNDARY.md`
 - `OAN Mortalis V1.1.1/docs/PUBLIC_CME_EXPLANATION_BOUNDARY.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
