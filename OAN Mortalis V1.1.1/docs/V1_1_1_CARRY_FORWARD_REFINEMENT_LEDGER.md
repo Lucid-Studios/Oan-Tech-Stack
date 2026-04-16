@@ -177,6 +177,12 @@ The lab source may not be used to silently claim:
 - hold as implicit affirmation or silent participation
 - refused structures as hidden residue or contextual drift re-entry
 - forced resolution of emergence without lawful `Affirm`, `Refuse`, or `Hold`
+- total agreement as a prerequisite for every lawful action
+- partial convergence as consensus by implication rather than accountable
+  sufficiency
+- urgency, obviousness, routine familiarity, or silence as replacement
+  thresholds for lawful movement
+- held action as neutral, virtuous, or costless by duration alone
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

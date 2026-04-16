@@ -323,6 +323,10 @@ The dominant aligned themes now preserved from that intake are:
   may arise endogenously without self-affirming, and only affirmed structures
   may persist or participate while refusal clears cleanly and hold remains
   provisional
+- action threshold preserved as the first lawful movement seam above bounded
+  discernment, so partial convergence may proceed only under accountable
+  sufficiency while unanimity remains unnecessary, silent coercion remains
+  unlawful, and held non-movement is not mistaken for costless innocence
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing
