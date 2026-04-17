@@ -66,7 +66,9 @@ public sealed class GovernedSeedPreDomainHostLoopTests
     {
         var service = new GovernedSeedPreDomainHostLoopService(
             new GovernedSeedCrypticHoldingService(),
-            new GovernedSeedFormOrCleaveService());
+            new GovernedSeedFormOrCleaveService(),
+            new GovernedSeedCandidateSeparationService(),
+            new PrimeSeedPreDomainAdmissionGateService());
         var formationReceipt = CreateFormationReceipt(
             lawfulKnownItems: ["candidate-a"],
             retainedUnknownItems: ["candidate-b"],
@@ -79,12 +81,50 @@ public sealed class GovernedSeedPreDomainHostLoopTests
 
         var result = service.Evaluate(formationReceipt, listeningFrame, compass, firstPrimeReceipt, primeSeedReceipt);
 
+        Assert.NotNull(result.CandidateBoundaryReceipt);
+        Assert.NotNull(result.CandidateSeparationReceipt);
+        Assert.NotNull(result.DuplexGovernanceReceipt);
+        Assert.NotNull(result.AdmissionGateReceipt);
         Assert.False(result.HostLoopReceipt.SeedReady);
         Assert.Equal(GovernedSeedCarryDispositionKind.None, result.HostLoopReceipt.CarryDisposition);
         Assert.Equal(GovernedSeedCollapseDispositionKind.None, result.HostLoopReceipt.CollapseDisposition);
         Assert.True(result.HostLoopReceipt.CandidateOnly);
         Assert.True(result.HostLoopReceipt.DomainAdmissionWithheld);
         Assert.True(result.HostLoopReceipt.ActionAuthorityWithheld);
+        Assert.Equal(PrimeSeedPreDomainAdmissionDisposition.Refuse, result.AdmissionGateReceipt.Disposition);
+    }
+
+    [Fact]
+    public void PreDomainHostLoop_Emits_Full_Witness_Chain_When_Seed_Is_Ready()
+    {
+        var service = new GovernedSeedPreDomainHostLoopService(
+            new GovernedSeedCrypticHoldingService(),
+            new GovernedSeedFormOrCleaveService(),
+            new GovernedSeedCandidateSeparationService(),
+            new PrimeSeedPreDomainAdmissionGateService());
+        var formationReceipt = CreateFormationReceipt(
+            lawfulKnownItems: ["candidate-a"],
+            retainedUnknownItems: ["candidate-b"],
+            deferred: false,
+            refused: false,
+            promoteToKnownLawful: true);
+        var listeningFrame = CreateListeningFrame();
+        var compass = CreateCompass(
+            CompassAdmissibilityEstimate.ProvisionallyAdmissible,
+            CompassTransitionRecommendation.ProceedBounded);
+        var firstPrimeReceipt = CreateFirstPrimeReceipt();
+        var primeSeedReceipt = CreatePrimeSeedReceipt(PrimeSeedStateKind.PrimeSeedPreDomainStanding);
+
+        var result = service.Evaluate(formationReceipt, listeningFrame, compass, firstPrimeReceipt, primeSeedReceipt);
+
+        Assert.NotNull(result.CandidateBoundaryReceipt);
+        Assert.NotNull(result.CandidateSeparationReceipt);
+        Assert.NotNull(result.DuplexGovernanceReceipt);
+        Assert.NotNull(result.AdmissionGateReceipt);
+        Assert.Equal(result.CandidateBoundaryReceipt.ReceiptHandle, result.HostLoopReceipt.CandidateBoundaryReceiptHandle);
+        Assert.Equal(result.CandidateSeparationReceipt.ReceiptHandle, result.HostLoopReceipt.CandidateSeparationReceiptHandle);
+        Assert.Equal(result.DuplexGovernanceReceipt.ReceiptHandle, result.HostLoopReceipt.DuplexGovernanceReceiptHandle);
+        Assert.Equal(result.AdmissionGateReceipt.ReceiptHandle, result.HostLoopReceipt.AdmissionGateReceiptHandle);
     }
 
     private static FormationReceipt CreateFormationReceipt(

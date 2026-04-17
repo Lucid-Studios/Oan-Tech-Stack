@@ -151,8 +151,12 @@ public sealed class GovernedSeedRuntimeService
             nexusHydratedResult,
             preDomainInputs.FirstPrimeReceipt,
             preDomainInputs.PrimeSeedReceipt,
+            hostLoop.CandidateBoundaryReceipt,
             hostLoop.HoldingInspectionReceipt,
             hostLoop.FormOrCleaveAssessment,
+            hostLoop.CandidateSeparationReceipt,
+            hostLoop.DuplexGovernanceReceipt,
+            hostLoop.AdmissionGateReceipt,
             hostLoop.HostLoopReceipt);
         var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, hostLoopHydratedResult);
         var hydratedResult = _materializationService.AttachStateModulation(hostLoopHydratedResult, stateModulationReceipt);

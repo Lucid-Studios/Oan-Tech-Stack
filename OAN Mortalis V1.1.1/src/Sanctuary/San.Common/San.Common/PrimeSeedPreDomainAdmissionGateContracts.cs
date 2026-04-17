@@ -33,6 +33,7 @@ public sealed record DomainRoleEligibilityAssessment(
     string Summary);
 
 public sealed record PrimeSeedPreDomainAdmissionGateReceipt(
+    string ReceiptHandle,
     string CandidateId,
     PrimeSeedPreDomainAdmissionDisposition Disposition,
     bool DomainEligible,

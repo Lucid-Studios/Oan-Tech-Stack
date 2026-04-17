@@ -41,6 +41,24 @@ public sealed class PrimeSeedPreDomainAdmissionGateTests
         Assert.False(result.EligibilityAssessment.RoleEligible);
     }
 
+    [Fact]
+    public void Standing_Consistent_Prime_Surface_Can_Prepare_For_Next_Gate()
+    {
+        var service = new PrimeSeedPreDomainAdmissionGateService();
+
+        var result = service.Evaluate(
+            new GovernedSeedPrimeCandidateView(
+                "candidate://gate/c",
+                [new GovernedSeedPrimeMaterial(GovernedSeedPrimeMaterialKind.AdmissionRelevantStructure, "Eligible")]),
+            new GovernedSeedCrypticCandidateView("candidate://gate/c", []),
+            CreatePrimeSeedReceipt(PrimeSeedStateKind.PrimeSeedPreDomainStanding),
+            CreateRevalidationContext(satisfied: true));
+
+        Assert.Equal(PrimeSeedPreDomainAdmissionDisposition.PrepareForDomainRoleGate, result.AdmissionAssessment.Disposition);
+        Assert.True(result.EligibilityAssessment.DomainEligible);
+        Assert.True(result.EligibilityAssessment.RoleEligible);
+    }
+
     private static PrimeSeedStateReceipt CreatePrimeSeedReceipt(PrimeSeedStateKind state)
     {
         return new PrimeSeedStateReceipt(

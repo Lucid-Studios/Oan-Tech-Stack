@@ -45,8 +45,12 @@ public interface IGovernedSeedRuntimeMaterializationService
         GovernedSeedEvaluationResult result,
         EngineeredCognitionFirstPrimeStateReceipt firstPrimeReceipt,
         PrimeSeedStateReceipt primeSeedReceipt,
+        GovernedSeedCandidateBoundaryReceipt candidateBoundaryReceipt,
         GovernedSeedCrypticHoldingInspectionReceipt holdingInspectionReceipt,
         GovernedSeedFormOrCleaveAssessment formOrCleaveAssessment,
+        GovernedSeedCandidateSeparationReceipt? candidateSeparationReceipt,
+        PrimeCrypticDuplexGovernanceReceipt? duplexGovernanceReceipt,
+        PrimeSeedPreDomainAdmissionGateReceipt? admissionGateReceipt,
         GovernedSeedPreDomainHostLoopReceipt hostLoopReceipt);
 
     EvaluateEnvelope CreateEnvelope(
@@ -341,13 +345,18 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         GovernedSeedEvaluationResult result,
         EngineeredCognitionFirstPrimeStateReceipt firstPrimeReceipt,
         PrimeSeedStateReceipt primeSeedReceipt,
+        GovernedSeedCandidateBoundaryReceipt candidateBoundaryReceipt,
         GovernedSeedCrypticHoldingInspectionReceipt holdingInspectionReceipt,
         GovernedSeedFormOrCleaveAssessment formOrCleaveAssessment,
+        GovernedSeedCandidateSeparationReceipt? candidateSeparationReceipt,
+        PrimeCrypticDuplexGovernanceReceipt? duplexGovernanceReceipt,
+        PrimeSeedPreDomainAdmissionGateReceipt? admissionGateReceipt,
         GovernedSeedPreDomainHostLoopReceipt hostLoopReceipt)
     {
         ArgumentNullException.ThrowIfNull(result);
         ArgumentNullException.ThrowIfNull(firstPrimeReceipt);
         ArgumentNullException.ThrowIfNull(primeSeedReceipt);
+        ArgumentNullException.ThrowIfNull(candidateBoundaryReceipt);
         ArgumentNullException.ThrowIfNull(holdingInspectionReceipt);
         ArgumentNullException.ThrowIfNull(formOrCleaveAssessment);
         ArgumentNullException.ThrowIfNull(hostLoopReceipt);
@@ -366,14 +375,23 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                         FirstPrimeState = firstPrimeReceipt.FirstPrimeState,
                         PrimeSeedReceiptHandle = primeSeedReceipt.ReceiptHandle,
                         PrimeSeedState = primeSeedReceipt.SeedState,
+                        CandidateBoundaryReceiptHandle = candidateBoundaryReceipt.ReceiptHandle,
                         CrypticHoldingInspectionHandle = holdingInspectionReceipt.ReceiptHandle,
                         FormOrCleaveAssessmentHandle = formOrCleaveAssessment.AssessmentHandle,
+                        CandidateSeparationReceiptHandle = candidateSeparationReceipt?.ReceiptHandle,
+                        DuplexGovernanceReceiptHandle = duplexGovernanceReceipt?.ReceiptHandle,
+                        PreDomainAdmissionGateReceiptHandle = admissionGateReceipt?.ReceiptHandle,
                         PreDomainHostLoopReceiptHandle = hostLoopReceipt.ReceiptHandle,
+                        PreDomainAdmissionDisposition = admissionGateReceipt?.Disposition,
                         PreDomainCarryDisposition = hostLoopReceipt.CarryDisposition,
                         PreDomainCollapseDisposition = hostLoopReceipt.CollapseDisposition
                     },
+                CandidateBoundaryReceipt = candidateBoundaryReceipt,
                 CrypticHoldingInspectionReceipt = holdingInspectionReceipt,
                 FormOrCleaveAssessment = formOrCleaveAssessment,
+                CandidateSeparationReceipt = candidateSeparationReceipt,
+                DuplexGovernanceReceipt = duplexGovernanceReceipt,
+                PreDomainAdmissionGateReceipt = admissionGateReceipt,
                 PreDomainHostLoopReceipt = hostLoopReceipt
             }
         };

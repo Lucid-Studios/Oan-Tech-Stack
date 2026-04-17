@@ -35,6 +35,7 @@ public sealed class GovernedSeedCandidateBoundaryTests
             priorContinuityReference: "continuity://seed/a");
 
         var receipt = new GovernedSeedCandidateBoundaryReceipt(
+            ReceiptHandle: "candidate-boundary://boundary/a",
             CandidateId: envelope.CandidateId,
             SourceType: envelope.SourceType,
             SourceChannel: envelope.SourceChannel,

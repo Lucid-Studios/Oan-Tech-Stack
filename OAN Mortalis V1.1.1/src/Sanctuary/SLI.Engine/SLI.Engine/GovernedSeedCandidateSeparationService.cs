@@ -87,6 +87,7 @@ public sealed class GovernedSeedCandidateSeparationService : IGovernedSeedCandid
             Summary: "Candidate separated into Prime and Cryptic governance surfaces.");
 
         var separationReceipt = new GovernedSeedCandidateSeparationReceipt(
+            ReceiptHandle: $"candidate-separation://{candidateEnvelope.CandidateId}",
             candidateEnvelope.CandidateId,
             SeparationSucceeded: true,
             PrimeMaterialCount: primeMaterials.Count,
@@ -95,6 +96,7 @@ public sealed class GovernedSeedCandidateSeparationService : IGovernedSeedCandid
             Summary: assessment.Summary);
 
         var duplexReceipt = new PrimeCrypticDuplexGovernanceReceipt(
+            ReceiptHandle: $"prime-cryptic-duplex://{candidateEnvelope.CandidateId}",
             candidateEnvelope.CandidateId,
             PrimeSurfaceEstablished: primeMaterials.Count > 0,
             CrypticSurfaceEstablished: crypticMaterials.Count > 0,

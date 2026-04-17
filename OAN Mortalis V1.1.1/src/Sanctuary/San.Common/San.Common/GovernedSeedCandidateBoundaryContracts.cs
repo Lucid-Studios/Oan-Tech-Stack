@@ -90,6 +90,7 @@ public sealed record GovernedSeedCandidateEnvelope(
 /// material, without any authority-bearing promotion at intake.
 /// </summary>
 public sealed record GovernedSeedCandidateBoundaryReceipt(
+    string ReceiptHandle,
     string CandidateId,
     GovernedSeedCandidateSourceType SourceType,
     string SourceChannel,

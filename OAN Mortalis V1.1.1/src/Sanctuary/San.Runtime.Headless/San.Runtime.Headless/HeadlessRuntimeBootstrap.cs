@@ -48,9 +48,13 @@ public static class HeadlessRuntimeBootstrap
         var nexusControlService = new GovernedNexusControlService();
         var crypticHoldingService = new GovernedSeedCrypticHoldingService();
         var formOrCleaveService = new GovernedSeedFormOrCleaveService();
+        var candidateSeparationService = new GovernedSeedCandidateSeparationService();
+        var admissionGateService = new PrimeSeedPreDomainAdmissionGateService();
         var preDomainHostLoopService = new GovernedSeedPreDomainHostLoopService(
             crypticHoldingService,
-            formOrCleaveService);
+            formOrCleaveService,
+            candidateSeparationService,
+            admissionGateService);
         var runtimeMaterializationService = new GovernedSeedRuntimeMaterializationService(
             new GovernedFirstRunConstitutionService(),
             new GovernedSeedPreGovernanceService());

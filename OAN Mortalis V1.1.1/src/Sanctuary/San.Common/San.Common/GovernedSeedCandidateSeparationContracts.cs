@@ -47,6 +47,7 @@ public sealed record GovernedSeedCandidateSeparationAssessment(
     string Summary);
 
 public sealed record GovernedSeedCandidateSeparationReceipt(
+    string ReceiptHandle,
     string CandidateId,
     bool SeparationSucceeded,
     int PrimeMaterialCount,
@@ -55,6 +56,7 @@ public sealed record GovernedSeedCandidateSeparationReceipt(
     string Summary);
 
 public sealed record PrimeCrypticDuplexGovernanceReceipt(
+    string ReceiptHandle,
     string CandidateId,
     bool PrimeSurfaceEstablished,
     bool CrypticSurfaceEstablished,

@@ -930,9 +930,14 @@ public sealed record GovernedSeedOperationalContext(
     EngineeredCognitionFirstPrimeStateKind? FirstPrimeState = null,
     string? PrimeSeedReceiptHandle = null,
     PrimeSeedStateKind? PrimeSeedState = null,
+    string? CandidateBoundaryReceiptHandle = null,
     string? CrypticHoldingInspectionHandle = null,
     string? FormOrCleaveAssessmentHandle = null,
+    string? CandidateSeparationReceiptHandle = null,
+    string? DuplexGovernanceReceiptHandle = null,
+    string? PreDomainAdmissionGateReceiptHandle = null,
     string? PreDomainHostLoopReceiptHandle = null,
+    PrimeSeedPreDomainAdmissionDisposition? PreDomainAdmissionDisposition = null,
     GovernedSeedCarryDispositionKind? PreDomainCarryDisposition = null,
     GovernedSeedCollapseDispositionKind? PreDomainCollapseDisposition = null);
 
@@ -1080,9 +1085,14 @@ public sealed record GovernedSeedStateModulationReceipt(
     EngineeredCognitionFirstPrimeStateKind? FirstPrimeState = null,
     string? PrimeSeedReceiptHandle = null,
     PrimeSeedStateKind? PrimeSeedState = null,
+    string? CandidateBoundaryReceiptHandle = null,
     string? CrypticHoldingInspectionHandle = null,
     string? FormOrCleaveAssessmentHandle = null,
+    string? CandidateSeparationReceiptHandle = null,
+    string? DuplexGovernanceReceiptHandle = null,
+    string? PreDomainAdmissionGateReceiptHandle = null,
     string? PreDomainHostLoopReceiptHandle = null,
+    PrimeSeedPreDomainAdmissionDisposition? PreDomainAdmissionDisposition = null,
     GovernedSeedCarryDispositionKind? PreDomainCarryDisposition = null,
     GovernedSeedCollapseDispositionKind? PreDomainCollapseDisposition = null);
 
@@ -1111,8 +1121,12 @@ public sealed record GovernedSeedVerticalSlice(
     CrypticDerivationReceipt? DerivationReceipt,
     PredicateReturnSurface? Predicate,
     string OutcomeCode,
+    GovernedSeedCandidateBoundaryReceipt? CandidateBoundaryReceipt = null,
     GovernedSeedCrypticHoldingInspectionReceipt? CrypticHoldingInspectionReceipt = null,
     GovernedSeedFormOrCleaveAssessment? FormOrCleaveAssessment = null,
+    GovernedSeedCandidateSeparationReceipt? CandidateSeparationReceipt = null,
+    PrimeCrypticDuplexGovernanceReceipt? DuplexGovernanceReceipt = null,
+    PrimeSeedPreDomainAdmissionGateReceipt? PreDomainAdmissionGateReceipt = null,
     GovernedSeedPreDomainHostLoopReceipt? PreDomainHostLoopReceipt = null);
 
 public sealed record GovernedSeedEvaluationResult(

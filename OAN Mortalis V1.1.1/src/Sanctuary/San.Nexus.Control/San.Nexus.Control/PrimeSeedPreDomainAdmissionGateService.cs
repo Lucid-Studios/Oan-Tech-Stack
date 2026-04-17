@@ -69,6 +69,7 @@ public sealed class PrimeSeedPreDomainAdmissionGateService : IPrimeSeedPreDomain
                 : "Candidate is not yet eligible for domain/role gating.");
 
         var receipt = new PrimeSeedPreDomainAdmissionGateReceipt(
+            ReceiptHandle: $"pre-domain-admission-gate://{primeView.CandidateId}",
             primeView.CandidateId,
             disposition,
             domainEligible,

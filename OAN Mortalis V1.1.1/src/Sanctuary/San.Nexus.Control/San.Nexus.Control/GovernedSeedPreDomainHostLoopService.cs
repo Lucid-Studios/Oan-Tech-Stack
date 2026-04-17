@@ -7,10 +7,7 @@ namespace San.Nexus.Control;
 
 public interface IGovernedSeedPreDomainHostLoopService
 {
-    (
-        GovernedSeedCrypticHoldingInspectionReceipt HoldingInspectionReceipt,
-        GovernedSeedFormOrCleaveAssessment FormOrCleaveAssessment,
-        GovernedSeedPreDomainHostLoopReceipt HostLoopReceipt)
+    GovernedSeedPreDomainHostLoopEvaluation
     Evaluate(
         FormationReceipt formationReceipt,
         ListeningFrameProjectionPacket listeningFrame,
@@ -19,23 +16,35 @@ public interface IGovernedSeedPreDomainHostLoopService
         PrimeSeedStateReceipt primeSeedReceipt);
 }
 
+public sealed record GovernedSeedPreDomainHostLoopEvaluation(
+    GovernedSeedCandidateBoundaryReceipt CandidateBoundaryReceipt,
+    GovernedSeedCrypticHoldingInspectionReceipt HoldingInspectionReceipt,
+    GovernedSeedFormOrCleaveAssessment FormOrCleaveAssessment,
+    GovernedSeedCandidateSeparationReceipt? CandidateSeparationReceipt,
+    PrimeCrypticDuplexGovernanceReceipt? DuplexGovernanceReceipt,
+    PrimeSeedPreDomainAdmissionGateReceipt? AdmissionGateReceipt,
+    GovernedSeedPreDomainHostLoopReceipt HostLoopReceipt);
+
 public sealed class GovernedSeedPreDomainHostLoopService : IGovernedSeedPreDomainHostLoopService
 {
     private readonly IGovernedSeedCrypticHoldingService _crypticHoldingService;
     private readonly IGovernedSeedFormOrCleaveService _formOrCleaveService;
+    private readonly IGovernedSeedCandidateSeparationService _candidateSeparationService;
+    private readonly IPrimeSeedPreDomainAdmissionGateService _admissionGateService;
 
     public GovernedSeedPreDomainHostLoopService(
         IGovernedSeedCrypticHoldingService crypticHoldingService,
-        IGovernedSeedFormOrCleaveService formOrCleaveService)
+        IGovernedSeedFormOrCleaveService formOrCleaveService,
+        IGovernedSeedCandidateSeparationService candidateSeparationService,
+        IPrimeSeedPreDomainAdmissionGateService admissionGateService)
     {
         _crypticHoldingService = crypticHoldingService ?? throw new ArgumentNullException(nameof(crypticHoldingService));
         _formOrCleaveService = formOrCleaveService ?? throw new ArgumentNullException(nameof(formOrCleaveService));
+        _candidateSeparationService = candidateSeparationService ?? throw new ArgumentNullException(nameof(candidateSeparationService));
+        _admissionGateService = admissionGateService ?? throw new ArgumentNullException(nameof(admissionGateService));
     }
 
-    public (
-        GovernedSeedCrypticHoldingInspectionReceipt HoldingInspectionReceipt,
-        GovernedSeedFormOrCleaveAssessment FormOrCleaveAssessment,
-        GovernedSeedPreDomainHostLoopReceipt HostLoopReceipt)
+    public GovernedSeedPreDomainHostLoopEvaluation
         Evaluate(
             FormationReceipt formationReceipt,
             ListeningFrameProjectionPacket listeningFrame,
@@ -49,13 +58,44 @@ public sealed class GovernedSeedPreDomainHostLoopService : IGovernedSeedPreDomai
         ArgumentNullException.ThrowIfNull(firstPrimeReceipt);
         ArgumentNullException.ThrowIfNull(primeSeedReceipt);
 
+        var candidateEnvelope = CreateCandidateEnvelope(formationReceipt, compassProjection);
+        var candidateBoundaryReceipt = CreateCandidateBoundaryReceipt(candidateEnvelope);
         var holdingInspection = _crypticHoldingService.Inspect(formationReceipt, listeningFrame, compassProjection);
         var formOrCleave = primeSeedReceipt.SeedState == PrimeSeedStateKind.PrimeSeedPreDomainStanding
             ? _formOrCleaveService.Evaluate(formationReceipt, listeningFrame, compassProjection, holdingInspection)
             : CreateNonReadyAssessment(formationReceipt, listeningFrame, compassProjection, holdingInspection);
+        var separation = _candidateSeparationService.Separate(
+            candidateEnvelope,
+            primeSeedReceipt,
+            holdingInspection,
+            formOrCleave);
+        var separationReceipt = separation.SeparationReceipt;
+        var duplexReceipt = separation.DuplexReceipt;
 
-        var hostLoopReceipt = CreateHostLoopReceipt(firstPrimeReceipt, primeSeedReceipt, holdingInspection, formOrCleave);
-        return (holdingInspection, formOrCleave, hostLoopReceipt);
+        var admissionGate = _admissionGateService.Evaluate(
+            separation.PrimeView,
+            separation.CrypticView,
+            primeSeedReceipt,
+            CreateRevalidationContext(primeSeedReceipt, formOrCleave));
+        var admissionGateReceipt = admissionGate.Receipt;
+
+        var hostLoopReceipt = CreateHostLoopReceipt(
+            firstPrimeReceipt,
+            primeSeedReceipt,
+            candidateBoundaryReceipt,
+            holdingInspection,
+            formOrCleave,
+            separationReceipt,
+            duplexReceipt,
+            admissionGateReceipt);
+        return new GovernedSeedPreDomainHostLoopEvaluation(
+            candidateBoundaryReceipt,
+            holdingInspection,
+            formOrCleave,
+            separationReceipt,
+            duplexReceipt,
+            admissionGateReceipt,
+            hostLoopReceipt);
     }
 
     private static GovernedSeedFormOrCleaveAssessment CreateNonReadyAssessment(
@@ -83,18 +123,115 @@ public sealed class GovernedSeedPreDomainHostLoopService : IGovernedSeedPreDomai
             TimestampUtc: DateTimeOffset.UtcNow);
     }
 
+    private static GovernedSeedCandidateEnvelope CreateCandidateEnvelope(
+        FormationReceipt formationReceipt,
+        CompassProjectionPacket compassProjection)
+    {
+        var candidateProposals = compassProjection.CandidateInputs
+            .Select(static input => (IGovernedSeedCandidateProposal)new CandidateProposal(
+                input.InputHandle,
+                input.InputKind,
+                input.SourceReason))
+            .ToArray();
+        var resonanceObservations = formationReceipt.OrientationEvidenceSignatures
+            .Select(static signature => (IGovernedSeedResonanceObservation)new ResonanceObservation(
+                signature.SignatureHandle,
+                signature.SignatureKind.ToString(),
+                string.Join("; ", signature.Notes)))
+            .ToArray();
+        var descendantProposals = formationReceipt.LawfulKnownItems
+            .Select(static item => (IGovernedSeedDescendantProposal)new DescendantProposal(
+                item,
+                "lawful-known-item",
+                item))
+            .ToArray();
+        var collapseSuggestions = formationReceipt.Refused || formationReceipt.Deferred
+            ? new IGovernedSeedCollapseSuggestion[]
+            {
+                new CollapseSuggestion(
+                    formationReceipt.ReceiptHandle,
+                    formationReceipt.Refused ? "refusal-signal" : "deferred-signal",
+                    formationReceipt.ReasonCode)
+            }
+            : Array.Empty<IGovernedSeedCollapseSuggestion>();
+
+        return new GovernedSeedCandidateEnvelope(
+            CandidateId: CreateHandle(
+                "governed-seed-candidate-envelope://",
+                formationReceipt.ReceiptHandle,
+                compassProjection.PacketHandle),
+            SourceType: GovernedSeedCandidateSourceType.HostGenerated,
+            SourceChannel: "governed-pre-domain-host-loop",
+            ObservedAtUtc: DateTimeOffset.UtcNow,
+            PriorContinuityReference: formationReceipt.ReceiptHandle,
+            CandidateProposals: candidateProposals,
+            HoldingMutationProposals: Array.Empty<IGovernedSeedCrypticHoldingMutationProposal>(),
+            ResonanceObservations: resonanceObservations,
+            DescendantProposals: descendantProposals,
+            CollapseSuggestions: collapseSuggestions);
+    }
+
+    private static GovernedSeedCandidateBoundaryReceipt CreateCandidateBoundaryReceipt(
+        GovernedSeedCandidateEnvelope candidateEnvelope)
+    {
+        return new GovernedSeedCandidateBoundaryReceipt(
+            ReceiptHandle: CreateHandle(
+                "governed-seed-candidate-boundary://",
+                candidateEnvelope.CandidateId,
+                candidateEnvelope.SourceChannel),
+            CandidateId: candidateEnvelope.CandidateId,
+            SourceType: candidateEnvelope.SourceType,
+            SourceChannel: candidateEnvelope.SourceChannel,
+            ObservedAtUtc: candidateEnvelope.ObservedAtUtc,
+            ContainsAuthorityBearingFields: false,
+            CandidateProposalCount: candidateEnvelope.CandidateProposals.Count,
+            HoldingMutationProposalCount: candidateEnvelope.HoldingMutationProposals.Count,
+            ResonanceObservationCount: candidateEnvelope.ResonanceObservations.Count,
+            DescendantProposalCount: candidateEnvelope.DescendantProposals.Count,
+            CollapseSuggestionCount: candidateEnvelope.CollapseSuggestions.Count,
+            Summary: "Candidate envelope entered the pre-domain host loop as candidate-only proposal material.");
+    }
+
+    private static GovernedSeedRevalidationContext CreateRevalidationContext(
+        PrimeSeedStateReceipt primeSeedReceipt,
+        GovernedSeedFormOrCleaveAssessment formOrCleave)
+    {
+        return new GovernedSeedRevalidationContext(
+            ContextHandle: CreateHandle(
+                "governed-seed-revalidation://",
+                primeSeedReceipt.ReceiptHandle,
+                formOrCleave.AssessmentHandle),
+            ContextProfile: "pre-domain-host-loop",
+            RevalidationSatisfied: primeSeedReceipt.SeedState == PrimeSeedStateKind.PrimeSeedPreDomainStanding &&
+                                   formOrCleave.CandidateOnly,
+            Summary: "Pre-domain host loop revalidation remains bounded to candidate-only standing.",
+            TimestampUtc: DateTimeOffset.UtcNow);
+    }
+
     private static GovernedSeedPreDomainHostLoopReceipt CreateHostLoopReceipt(
         EngineeredCognitionFirstPrimeStateReceipt firstPrimeReceipt,
         PrimeSeedStateReceipt primeSeedReceipt,
+        GovernedSeedCandidateBoundaryReceipt boundaryReceipt,
         GovernedSeedCrypticHoldingInspectionReceipt holdingInspection,
-        GovernedSeedFormOrCleaveAssessment formOrCleave)
+        GovernedSeedFormOrCleaveAssessment formOrCleave,
+        GovernedSeedCandidateSeparationReceipt? separationReceipt,
+        PrimeCrypticDuplexGovernanceReceipt? duplexReceipt,
+        PrimeSeedPreDomainAdmissionGateReceipt? admissionGateReceipt)
     {
         var seedReady = primeSeedReceipt.SeedState == PrimeSeedStateKind.PrimeSeedPreDomainStanding;
         var carryDisposition = seedReady
-            ? formOrCleave.CarryDisposition
+            ? admissionGateReceipt?.Disposition switch
+            {
+                PrimeSeedPreDomainAdmissionDisposition.CarryCrypticOnly => GovernedSeedCarryDispositionKind.Carry,
+                PrimeSeedPreDomainAdmissionDisposition.PrepareForDomainRoleGate => formOrCleave.CarryDisposition,
+                PrimeSeedPreDomainAdmissionDisposition.Refuse => GovernedSeedCarryDispositionKind.Refuse,
+                _ => formOrCleave.CarryDisposition
+            }
             : GovernedSeedCarryDispositionKind.None;
         var collapseDisposition = seedReady
-            ? formOrCleave.CollapseDisposition
+            ? admissionGateReceipt?.Disposition == PrimeSeedPreDomainAdmissionDisposition.Refuse
+                ? GovernedSeedCollapseDispositionKind.Refuse
+                : formOrCleave.CollapseDisposition
             : GovernedSeedCollapseDispositionKind.None;
         var candidateHandles = formOrCleave.DescendantCandidates.Select(static candidate => candidate.CandidateHandle).ToArray();
 
@@ -106,8 +243,12 @@ public sealed class GovernedSeedPreDomainHostLoopService : IGovernedSeedPreDomai
                 formOrCleave.AssessmentHandle),
             FirstPrimeReceiptHandle: firstPrimeReceipt.ReceiptHandle,
             PrimeSeedReceiptHandle: primeSeedReceipt.ReceiptHandle,
+            CandidateBoundaryReceiptHandle: boundaryReceipt.ReceiptHandle,
             CrypticHoldingInspectionHandle: holdingInspection.ReceiptHandle,
             FormOrCleaveAssessmentHandle: formOrCleave.AssessmentHandle,
+            CandidateSeparationReceiptHandle: separationReceipt?.ReceiptHandle,
+            DuplexGovernanceReceiptHandle: duplexReceipt?.ReceiptHandle,
+            AdmissionGateReceiptHandle: admissionGateReceipt?.ReceiptHandle,
             CarryDisposition: carryDisposition,
             CollapseDisposition: collapseDisposition,
             CandidateHandles: candidateHandles,
@@ -136,4 +277,24 @@ public sealed class GovernedSeedPreDomainHostLoopService : IGovernedSeedPreDomai
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(material));
         return $"{prefix}{Convert.ToHexString(hash).ToLowerInvariant()[..16]}";
     }
+
+    private sealed record CandidateProposal(
+        string ProposalId,
+        string ProposalKind,
+        string Summary) : IGovernedSeedCandidateProposal;
+
+    private sealed record ResonanceObservation(
+        string ObservationId,
+        string ObservationKind,
+        string Summary) : IGovernedSeedResonanceObservation;
+
+    private sealed record DescendantProposal(
+        string DescendantId,
+        string DescendantKind,
+        string Summary) : IGovernedSeedDescendantProposal;
+
+    private sealed record CollapseSuggestion(
+        string SuggestionId,
+        string SuggestionKind,
+        string Summary) : IGovernedSeedCollapseSuggestion;
 }
