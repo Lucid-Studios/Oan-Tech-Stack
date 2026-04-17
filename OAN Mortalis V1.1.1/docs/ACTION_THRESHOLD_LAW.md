@@ -254,4 +254,4 @@ The system is considered structurally ready at this seam when it can:
 - this law governs movement, not ontology
 - this law is subordinate to bounded discernment
 - this law binds directly with `HOLD_RESOLUTION_LAW.md`
-- this law prepares the seam for later responsibility-binding work
+- this law binds directly with `RESPONSIBILITY_BINDING_LAW.md`

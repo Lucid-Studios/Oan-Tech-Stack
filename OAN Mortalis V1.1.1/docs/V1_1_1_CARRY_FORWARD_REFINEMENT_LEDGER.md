@@ -187,6 +187,11 @@ The lab source may not be used to silently claim:
 - prolonged hold as implicit correctness or de facto refusal without receipt
 - disappearing hold without `Proceed`, `Refuse`, or `Escalate`
 - escalation-free hold beyond local authority or local resolution capacity
+- `Proceed` without a primary bearer, scope, or discernment basis
+- `Refuse` without accountable refusal authority or closure condition
+- `Hold` without a steward and reevaluation obligation
+- `Escalate` as responsibility erasure or anonymous system transfer
+- plural participation as diluted authorship or post-hoc ambiguity
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

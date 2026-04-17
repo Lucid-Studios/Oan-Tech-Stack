@@ -331,6 +331,10 @@ The dominant aligned themes now preserved from that intake are:
   action threshold, so holds remain provisional protection states with explicit
   reasons, temporal bounds, and collapse paths into `Proceed`, `Refuse`, or
   `Escalate` rather than becoming indefinite moral shelter from consequence
+- responsibility binding preserved as the first consequence-attribution seam
+  above lawful movement and lawful waiting, so `Proceed`, `Refuse`, `Hold`,
+  and `Escalate` all name attributable bearers, stewardship, scope, and trace
+  rather than dissolving ownership into plurality, time, or system fog
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing

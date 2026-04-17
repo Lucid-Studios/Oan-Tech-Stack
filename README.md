@@ -204,6 +204,7 @@ Start here if you need the repo constitution:
 - `OAN Mortalis V1.1.1/docs/LAW_OF_SELF_AUTHORED_EMERGENCE_AND_BOUNDED_AFFIRMATION.md`
 - `OAN Mortalis V1.1.1/docs/ACTION_THRESHOLD_LAW.md`
 - `OAN Mortalis V1.1.1/docs/HOLD_RESOLUTION_LAW.md`
+- `OAN Mortalis V1.1.1/docs/RESPONSIBILITY_BINDING_LAW.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`

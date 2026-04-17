@@ -32,8 +32,8 @@ Use this note with:
 - `BUILD_READINESS.md`
 
 This law governs temporal integrity of uncertainty, not ontology.
-It binds directly to action threshold and prepares the seam for fuller
-responsibility binding and revalidation law.
+It binds directly to action threshold and responsibility binding and prepares
+the seam for fuller revalidation law.
 
 ## Legitimate Hold Conditions
 
@@ -210,4 +210,5 @@ It may not wait forever.
 
 - this law governs temporal integrity of uncertainty
 - this law binds directly to `ACTION_THRESHOLD_LAW.md`
+- this law binds directly to `RESPONSIBILITY_BINDING_LAW.md`
 - this law prevents accumulation of unresolved cognitive debt
