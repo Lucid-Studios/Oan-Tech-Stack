@@ -31,6 +31,7 @@ Use this note with:
 - `RESPONSIBILITY_BINDING_LAW.md`
 - `DOMAIN_ISOLATION_LAW.md`
 - `DISCERNMENT_AND_ADMISSIBILITY_LAW.md`
+- `REVALIDATION_LAW.md`
 - `BUILD_READINESS.md`
 
 This note is structural rather than juridical.

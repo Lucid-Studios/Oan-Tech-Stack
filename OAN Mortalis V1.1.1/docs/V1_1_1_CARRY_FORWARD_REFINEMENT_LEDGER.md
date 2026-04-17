@@ -200,6 +200,11 @@ The lab source may not be used to silently claim:
 - freeform drift masquerading as living meaning across turns
 - output slices treated as the whole continuity body
 - persistence treated as permission or identity proof by itself
+- stale truth acting as present authority without revalidation
+- prior evidence treated as current permission after domain, role, or
+  constraint change
+- continuity collapse into forced amnesia during admissibility refresh
+- silent overwrite of prior responsibility during revalidation
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

@@ -343,6 +343,10 @@ The dominant aligned themes now preserved from that intake are:
   above lawful transition and domain-bounded legitimacy, so cryptic meaning
   may remain reconstructable and live across governed turns without collapsing
   into dead storage or drifting into unauthorized form
+- revalidation preserved as the first temporal validity seam above `CCM`, so
+  continuity may remain live without self-authorizing present permission and
+  prior truth may travel as evidence while current admissibility is re-asked
+  whenever time, domain, role, constraint, conflict, or consequence changes
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing
