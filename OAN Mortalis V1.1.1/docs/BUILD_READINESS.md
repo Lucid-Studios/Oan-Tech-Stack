@@ -235,6 +235,8 @@ Current hold-lane clarification:
   `CRYPTIC_CONTINUITY_MEDIUM_NOTE.md`
 - the revalidation law now lives in
   `REVALIDATION_LAW.md`
+- the standing condition note now lives in
+  `STANDING_CONDITION_NOTE.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
@@ -491,6 +493,7 @@ Current contract-first unlock map:
 - `domain-isolation-law: frame-now`
 - `cryptic-continuity-medium-note: frame-now`
 - `revalidation-law: frame-now`
+- `standing-condition-note: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`
