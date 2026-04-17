@@ -218,7 +218,7 @@ public sealed class AgentBuildOrchestrationContractsTests
         var receipt = new AgentWorkReturnReceipt(
             Lane: AgentLaneKind.OuterBuilder,
             SliceId: "slice.outer.001",
-            TouchedSurfaces: ["OAN Mortalis V1.1.1/src/Sanctuary/Oan.HostedLlm/*"],
+            TouchedSurfaces: ["OAN Mortalis V1.1.1/src/Sanctuary/San.HostedLlm/*"],
             WriteScopeSatisfied: true,
             BuildStatus: AgentExecutionStatus.Passed,
             TestStatus: AgentExecutionStatus.Passed,
@@ -252,7 +252,7 @@ public sealed class AgentBuildOrchestrationContractsTests
             Predicate: "runtime-aligned",
             Actions: ["patch"],
             TargetBuckets: ["agenticore-runtime-harness"],
-            OwnedWriteScope: ["OAN Mortalis V1.1.1/src/Sanctuary/Oan.HostedLlm/*"],
+            OwnedWriteScope: ["OAN Mortalis V1.1.1/src/Sanctuary/San.HostedLlm/*"],
             AcceptanceChecks: ["runtime-surface-alignment"]);
 
         Assert.True(AgentBuildOrchestrationContracts.CanRunConcurrently(inner, outer));
@@ -292,7 +292,7 @@ public sealed class AgentBuildOrchestrationContractsTests
             TargetBuckets: ["soulframe-office-governance", "oan-runtime-composition"],
             OwnedWriteScope:
             [
-                "OAN Mortalis V1.1.1/src/Sanctuary/Oan.Common/Oan.Common/CognitiveFormationContracts.cs",
+                "OAN Mortalis V1.1.1/src/Sanctuary/San.Common/San.Common/CognitiveFormationContracts.cs",
                 "OAN Mortalis V1.1.1/docs/LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md",
                 "OAN Mortalis V1.1.1/docs/EC_FORMATION_BUILDSPACE_PREPARATION_NOTE.md"
             ],
@@ -307,7 +307,7 @@ public sealed class AgentBuildOrchestrationContractsTests
             TargetBuckets: ["agenticore-runtime-harness"],
             OwnedWriteScope:
             [
-                "OAN Mortalis V1.1.1/src/Sanctuary/Oan.HostedLlm/Oan.HostedLlm/*"
+                "OAN Mortalis V1.1.1/src/Sanctuary/San.HostedLlm/San.HostedLlm/*"
             ],
             AcceptanceChecks: ["runtime-surface-alignment"]);
 
@@ -356,7 +356,7 @@ public sealed class AgentBuildOrchestrationContractsTests
             TargetBuckets: ["oan-runtime-composition"],
             OwnedWriteScope:
             [
-                "OAN Mortalis V1.1.1/src/Sanctuary/Oan.Common/Oan.Common/CognitiveFormationContracts.cs"
+                "OAN Mortalis V1.1.1/src/Sanctuary/San.Common/San.Common/CognitiveFormationContracts.cs"
             ],
             AcceptanceChecks: ["contract-alignment"]);
 
@@ -369,7 +369,7 @@ public sealed class AgentBuildOrchestrationContractsTests
             TargetBuckets: ["agenticore-runtime-harness"],
             OwnedWriteScope:
             [
-                "OAN Mortalis V1.1.1/src/Sanctuary/Oan.Common/Oan.Common/CognitiveFormationContracts.cs"
+                "OAN Mortalis V1.1.1/src/Sanctuary/San.Common/San.Common/CognitiveFormationContracts.cs"
             ],
             AcceptanceChecks: ["runtime-surface-alignment"]);
 

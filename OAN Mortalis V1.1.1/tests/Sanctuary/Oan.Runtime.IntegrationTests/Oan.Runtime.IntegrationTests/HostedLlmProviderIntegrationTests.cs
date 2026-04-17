@@ -1,5 +1,5 @@
-using Oan.Common;
-using Oan.HostedLlm;
+using San.Common;
+using San.HostedLlm;
 
 namespace Oan.Runtime.IntegrationTests;
 

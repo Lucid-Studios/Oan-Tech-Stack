@@ -68,8 +68,8 @@ public sealed class StackRootRenamingMigrationTests
         var allowedNamespaceFiles = root.GetProperty("legacyNamespaceFiles").EnumerateArray().Select(static item => item.GetString()).ToArray();
         var allowedProjectFiles = root.GetProperty("legacyProjectFiles").EnumerateArray().Select(static item => item.GetString()).ToArray();
 
-        Assert.Equal(94, allowedNamespaceFiles.Length);
-        Assert.Equal(11, allowedProjectFiles.Length);
+        Assert.Equal(46, allowedNamespaceFiles.Length);
+        Assert.Equal(2, allowedProjectFiles.Length);
 
         var lineRoot = Path.Combine(repoRoot, "OAN Mortalis V1.1.1");
         var actualNamespaceFiles = Directory.GetFiles(lineRoot, "*.cs", SearchOption.AllDirectories)
@@ -95,7 +95,7 @@ public sealed class StackRootRenamingMigrationTests
     public void Fresh_Seams_Already_Use_San_Prefixes()
     {
         var repoRoot = GetRepoRoot();
-        var contractsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "src", "Sanctuary", "Oan.Common", "Oan.Common", "AgentBuildOrchestrationContracts.cs");
+        var contractsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "src", "Sanctuary", "San.Common", "San.Common", "AgentBuildOrchestrationContracts.cs");
         var testsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "tests", "Sanctuary", "Oan.Audit.Tests", "Oan.Audit.Tests", "AgentBuildOrchestrationContractsTests.cs");
 
         var contractsText = File.ReadAllText(contractsPath);

@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Nexus.Control\\Oan.Nexus.Control\\Oan.Nexus.Control.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.PrimeCryptic.Services\\Oan.PrimeCryptic.Services\\Oan.PrimeCryptic.Services.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Runtime.Materialization\\Oan.Runtime.Materialization\\Oan.Runtime.Materialization.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.State.Modulation\\Oan.State.Modulation\\Oan.State.Modulation.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Trace.Persistence\\Oan.Trace.Persistence\\Oan.Trace.Persistence.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Nexus.Control\\San.Nexus.Control\\San.Nexus.Control.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Common\\San.Common\\San.Common.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.PrimeCryptic.Services\\San.PrimeCryptic.Services\\San.PrimeCryptic.Services.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Runtime.Materialization\\San.Runtime.Materialization\\San.Runtime.Materialization.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.State.Modulation\\San.State.Modulation\\San.State.Modulation.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Trace.Persistence\\San.Trace.Persistence\\San.Trace.Persistence.csproj" />
     <ProjectReference Include="..\\..\\..\\SoulFrame\\SoulFrame.Bootstrap\\SoulFrame.Bootstrap\\SoulFrame.Bootstrap.csproj" />
     <ProjectReference Include="..\\..\\..\\SoulFrame\\SoulFrame.Membrane\\SoulFrame.Membrane\\SoulFrame.Membrane.csproj" />
   </ItemGroup>

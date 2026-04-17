@@ -1,4 +1,4 @@
-{
+﻿{
   "schemaVersion": 1,
   "matrixOwner": "OAN Mortalis V1.1.1/build/versioned-touchpoint-matrix.json",
   "description": "Maps legacy-derived touch points onto the active V1.1.1 workspace, distinguishing admitted local build surfaces from explicit research-lane refinement handoffs.",
@@ -47,7 +47,7 @@
       "researchReason": "Agenti actualization law is still maturing as chapter-eight and chapter-nine runtime doctrine rather than active build-required code.",
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/AgentiActualizationContracts.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/AgentiActualizationContracts.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/AgentiActualizationContracts.cs"
       ]
     },
     "common.agentiActualizationKeys": {
@@ -57,37 +57,37 @@
       "researchReason": "Agenti actualization keying is held with the same future runtime seam as actualization contracts and should not be counted as active build debt.",
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/AgentiActualizationKeys.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/AgentiActualizationKeys.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/AgentiActualizationKeys.cs"
       ]
     },
     "common.firstBootGovernanceContracts": {
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/FirstBootGovernanceContracts.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/FirstBootGovernanceContracts.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/FirstBootGovernanceContracts.cs"
       ]
     },
     "common.sanctuaryWorkbenchContracts": {
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/SanctuaryWorkbenchContracts.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/SanctuaryWorkbenchContracts.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/SanctuaryWorkbenchContracts.cs"
       ]
     },
     "common.sanctuaryWorkbenchKeys": {
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/SanctuaryWorkbenchKeys.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/SanctuaryWorkbenchKeys.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/SanctuaryWorkbenchKeys.cs"
       ]
     },
     "common.workerGovernanceKeys": {
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/WorkerGovernanceKeys.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/WorkerGovernanceKeys.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/WorkerGovernanceKeys.cs"
       ]
     },
     "common.workerThreadGovernanceContracts": {
       "legacyPath": "OAN Mortalis V1.1.1/src/Oan.Common/WorkerThreadGovernanceContracts.cs",
       "localCandidates": [
-        "{activeBuildRoot}/src/Sanctuary/Oan.Common/Oan.Common/WorkerThreadGovernanceContracts.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Common/San.Common/WorkerThreadGovernanceContracts.cs"
       ]
     },
     "service.governedReachRealization": {
@@ -156,7 +156,7 @@
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/CrypticWebNexusFactory.cs",
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/CrypticWebNexusFactory.cs",
-        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/CrypticWebNexusFactory.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Nexus.Control/San.Nexus.Control/CrypticWebNexusFactory.cs"
       ]
     },
     "sli.crypticWebNexusPortalContracts": {
@@ -168,7 +168,7 @@
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/CrypticWebNexusPortalContracts.cs",
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/CrypticWebNexusPortalContracts.cs",
-        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/CrypticWebNexusPortalContracts.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Nexus.Control/San.Nexus.Control/CrypticWebNexusPortalContracts.cs"
       ]
     },
     "sli.executionSnapshotCrypticWebNexusPortal": {
@@ -180,7 +180,7 @@
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/ExecutionSnapshotCrypticWebNexusPortal.cs",
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/ExecutionSnapshotCrypticWebNexusPortal.cs",
-        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/ExecutionSnapshotCrypticWebNexusPortal.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Nexus.Control/San.Nexus.Control/ExecutionSnapshotCrypticWebNexusPortal.cs"
       ]
     },
     "sli.iCrypticWebNexusPortal": {
@@ -192,7 +192,7 @@
       "localCandidates": [
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/Nexus/ICrypticWebNexusPortal.cs",
         "{activeBuildRoot}/src/Sanctuary/SLI.Engine/SLI.Engine/ICrypticWebNexusPortal.cs",
-        "{activeBuildRoot}/src/Sanctuary/Oan.Nexus.Control/Oan.Nexus.Control/ICrypticWebNexusPortal.cs"
+        "{activeBuildRoot}/src/Sanctuary/San.Nexus.Control/San.Nexus.Control/ICrypticWebNexusPortal.cs"
       ]
     },
     "tests.sanctuaryRuntimeWorkbenchService": {
@@ -304,3 +304,4 @@
     }
   }
 }
+

@@ -2,14 +2,15 @@ using System.Text.Json;
 using CradleTek.Custody;
 using CradleTek.Host;
 using CradleTek.Runtime;
-using Oan.Common;
-using Oan.FirstRun;
-using Oan.Nexus.Control;
-using Oan.PrimeCryptic.Services;
-using Oan.Runtime.Headless;
-using Oan.Runtime.Materialization;
-using Oan.State.Modulation;
-using Oan.Trace.Persistence;
+using San.Common;
+using San.FirstRun;
+using San.Nexus.Control;
+using San.PrimeCryptic.Services;
+using San.Runtime.Headless;
+using San.Runtime.Materialization;
+using San.State.Modulation;
+using San.Trace.Persistence;
+using SLI.Engine;
 using SLI.Ingestion;
 using SoulFrame.Bootstrap;
 using SoulFrame.Membrane;
@@ -870,6 +871,9 @@ public sealed class SeedVerticalSliceIntegrationTests
             new GovernedSeedRuntimeMaterializationService(
                 new GovernedFirstRunConstitutionService(),
                 new GovernedSeedPreGovernanceService()),
+            new GovernedSeedPreDomainHostLoopService(
+                new GovernedSeedCrypticHoldingService(),
+                new GovernedSeedFormOrCleaveService()),
             new GovernedStateModulationService(),
             new GovernedSeedEnvelopeTraceService(
                 new InMemoryGovernedCrypticPointerStore(),

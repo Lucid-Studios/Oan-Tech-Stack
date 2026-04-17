@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Common\\San.Common\\San.Common.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

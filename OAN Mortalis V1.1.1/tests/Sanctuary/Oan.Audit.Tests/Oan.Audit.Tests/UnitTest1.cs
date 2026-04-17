@@ -74,15 +74,15 @@ public sealed class BootstrapBoundaryTests
             "AgentiCore",
             "SLI.Engine",
             "SLI.Ingestion",
-            "Oan.Common",
-            "Oan.FirstRun",
-            "Oan.Nexus.Control",
-            "Oan.HostedLlm",
-            "Oan.PrimeCryptic.Services",
-            "Oan.Runtime.Headless",
-            "Oan.Runtime.Materialization",
-            "Oan.State.Modulation",
-            "Oan.Trace.Persistence",
+            "San.Common",
+            "San.FirstRun",
+            "San.Nexus.Control",
+            "San.HostedLlm",
+            "San.PrimeCryptic.Services",
+            "San.Runtime.Headless",
+            "San.Runtime.Materialization",
+            "San.State.Modulation",
+            "San.Trace.Persistence",
             "Oan.Audit.Tests",
             "Oan.Runtime.IntegrationTests",
             "SLI.Lisp"
@@ -3405,8 +3405,8 @@ public sealed class BootstrapBoundaryTests
         var projectText = File.ReadAllText(projectPath);
 
         Assert.DoesNotContain("AgentiCore.csproj", projectText, StringComparison.Ordinal);
-        Assert.Contains("Oan.Nexus.Control.csproj", projectText, StringComparison.Ordinal);
-        Assert.Contains("Oan.Runtime.Materialization.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Nexus.Control.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Runtime.Materialization.csproj", projectText, StringComparison.Ordinal);
         Assert.Contains("SoulFrame.Membrane.csproj", projectText, StringComparison.Ordinal);
         Assert.Contains("SoulFrame.Bootstrap.csproj", projectText, StringComparison.Ordinal);
     }
@@ -3418,7 +3418,7 @@ public sealed class BootstrapBoundaryTests
         var projectText = File.ReadAllText(projectPath);
 
         Assert.Contains("CradleTek.Runtime.csproj", projectText, StringComparison.Ordinal);
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
     }
@@ -3429,7 +3429,7 @@ public sealed class BootstrapBoundaryTests
         var projectPath = GetProjectPath("SoulFrame.Membrane");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Nexus.Control.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Nexus.Control.csproj", projectText, StringComparison.Ordinal);
         Assert.Contains("AgentiCore.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.Runtime.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.Custody.csproj", projectText, StringComparison.Ordinal);
@@ -3441,7 +3441,7 @@ public sealed class BootstrapBoundaryTests
         var projectPath = GetProjectPath("AgentiCore");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.Contains("SLI.Engine.csproj", projectText, StringComparison.Ordinal);
         Assert.Contains("SLI.Ingestion.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
@@ -3487,7 +3487,7 @@ public sealed class BootstrapBoundaryTests
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.Runtime", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("Oan.Runtime", projectText, StringComparison.Ordinal);
-        Assert.DoesNotContain("Oan.Nexus.Control", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("San.Nexus.Control", projectText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -3553,10 +3553,10 @@ public sealed class BootstrapBoundaryTests
     [Fact]
     public void V111_PrimeCryptic_Services_Must_Remain_Sanctuary_Native()
     {
-        var projectPath = GetProjectPath("Oan.PrimeCryptic.Services");
+        var projectPath = GetProjectPath("San.PrimeCryptic.Services");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
     }
@@ -3564,10 +3564,10 @@ public sealed class BootstrapBoundaryTests
     [Fact]
     public void V111_Hosted_Llm_Must_Remain_Sanctuary_Native()
     {
-        var projectPath = GetProjectPath("Oan.HostedLlm");
+        var projectPath = GetProjectPath("San.HostedLlm");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
     }
@@ -3575,10 +3575,10 @@ public sealed class BootstrapBoundaryTests
     [Fact]
     public void V111_Trace_Persistence_Must_Remain_Sanctuary_Native()
     {
-        var projectPath = GetProjectPath("Oan.Trace.Persistence");
+        var projectPath = GetProjectPath("San.Trace.Persistence");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
@@ -3587,10 +3587,10 @@ public sealed class BootstrapBoundaryTests
     [Fact]
     public void V111_State_Modulation_Must_Not_Depend_On_AgentiCore_Or_CradleTek_Runtime()
     {
-        var projectPath = GetProjectPath("Oan.State.Modulation");
+        var projectPath = GetProjectPath("San.State.Modulation");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.PrimeCryptic.Services.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.PrimeCryptic.Services.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.Runtime", projectText, StringComparison.Ordinal);
     }
@@ -3601,7 +3601,7 @@ public sealed class BootstrapBoundaryTests
         var projectPath = GetProjectPath("SLI.Lisp");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
@@ -3610,10 +3610,10 @@ public sealed class BootstrapBoundaryTests
     [Fact]
     public void V111_Nexus_Control_Must_Remain_Sanctuary_Interface_Layer()
     {
-        var projectPath = GetProjectPath("Oan.Nexus.Control");
+        var projectPath = GetProjectPath("San.Nexus.Control");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
@@ -3622,23 +3622,23 @@ public sealed class BootstrapBoundaryTests
     [Fact]
     public void V111_Runtime_Materialization_Must_Remain_Sanctuary_Helper_Layer()
     {
-        var projectPath = GetProjectPath("Oan.Runtime.Materialization");
+        var projectPath = GetProjectPath("San.Runtime.Materialization");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.Common.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.Common.csproj", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("CradleTek.", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("AgentiCore", projectText, StringComparison.Ordinal);
         Assert.DoesNotContain("SoulFrame.", projectText, StringComparison.Ordinal);
-        Assert.DoesNotContain("Oan.State.Modulation", projectText, StringComparison.Ordinal);
+        Assert.DoesNotContain("San.State.Modulation", projectText, StringComparison.Ordinal);
     }
 
     [Fact]
     public void V111_Runtime_Headless_Must_Compose_FirstRun_Projection()
     {
-        var projectPath = GetProjectPath("Oan.Runtime.Headless");
+        var projectPath = GetProjectPath("San.Runtime.Headless");
         var projectText = File.ReadAllText(projectPath);
 
-        Assert.Contains("Oan.FirstRun.csproj", projectText, StringComparison.Ordinal);
+        Assert.Contains("San.FirstRun.csproj", projectText, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -4073,7 +4073,7 @@ public sealed class BootstrapBoundaryTests
         var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
         var instantiationLawPath = Path.Combine(lineRoot, "docs", "MOS_CMOS_CGOA_INSTANTIATION_LAW.md");
         var returnLawPath = Path.Combine(lineRoot, "docs", "CME_RETURN_AUDIT_AND_PROMOTION_LAW.md");
-        var contractsPath = Path.Combine(lineRoot, "src", "Sanctuary", "Oan.Common", "Oan.Common", "BondedCrypticReturnContracts.cs");
+        var contractsPath = Path.Combine(lineRoot, "src", "Sanctuary", "San.Common", "San.Common", "BondedCrypticReturnContracts.cs");
 
         var buildReadinessText = File.ReadAllText(buildReadinessPath);
         var instantiationLawText = File.ReadAllText(instantiationLawPath);
