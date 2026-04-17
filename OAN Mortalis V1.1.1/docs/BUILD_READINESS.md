@@ -243,6 +243,8 @@ Current hold-lane clarification:
   `PSY_PLUS_MINUS_HOLDING_NOTE.md`
 - the ListeningFrame / Compass / form-or-cleave bridge now lives in
   `LISTENING_FRAME_COMPASS_FORM_OR_CLEAVE_BRIDGE.md`
+- the `EC` lifecycle note now lives in
+  `EC_LIFECYCLE_NOTE.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
@@ -503,6 +505,7 @@ Current contract-first unlock map:
 - `continuous-lawful-correction-axiom: frame-now`
 - `psy-plus-minus-holding-note: frame-now`
 - `listening-frame-compass-form-or-cleave-bridge: frame-now`
+- `ec-lifecycle-note: frame-now`
 
 - `engram-predicate-minting: hold`
 - `single-flight-main-worker: admitted-local-mechanical`
