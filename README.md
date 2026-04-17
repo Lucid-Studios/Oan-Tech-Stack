@@ -209,6 +209,7 @@ Start here if you need the repo constitution:
 - `OAN Mortalis V1.1.1/docs/CRYPTIC_CONTINUITY_MEDIUM_NOTE.md`
 - `OAN Mortalis V1.1.1/docs/REVALIDATION_LAW.md`
 - `OAN Mortalis V1.1.1/docs/STANDING_CONDITION_NOTE.md`
+- `OAN Mortalis V1.1.1/docs/CONTINUOUS_LAWFUL_CORRECTION_AXIOM.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
