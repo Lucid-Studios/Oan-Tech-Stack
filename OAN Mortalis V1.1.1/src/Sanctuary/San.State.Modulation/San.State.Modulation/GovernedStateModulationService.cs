@@ -98,6 +98,7 @@ public sealed class GovernedStateModulationService : IGovernedStateModulationSer
             FirstPrimeState: operationalContext?.FirstPrimeState,
             PrimeSeedReceiptHandle: operationalContext?.PrimeSeedReceiptHandle,
             PrimeSeedState: operationalContext?.PrimeSeedState,
+            PreDomainGovernancePacketHandle: operationalContext?.PreDomainGovernancePacketHandle,
             CandidateBoundaryReceiptHandle: operationalContext?.CandidateBoundaryReceiptHandle,
             CrypticHoldingInspectionHandle: operationalContext?.CrypticHoldingInspectionHandle,
             FormOrCleaveAssessmentHandle: operationalContext?.FormOrCleaveAssessmentHandle,

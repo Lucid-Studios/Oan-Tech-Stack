@@ -243,6 +243,7 @@ public sealed class GovernedSeedPreDomainHostLoopService : IGovernedSeedPreDomai
                 formOrCleave.AssessmentHandle),
             FirstPrimeReceiptHandle: firstPrimeReceipt.ReceiptHandle,
             PrimeSeedReceiptHandle: primeSeedReceipt.ReceiptHandle,
+            PreDomainGovernancePacketHandle: null,
             CandidateBoundaryReceiptHandle: boundaryReceipt.ReceiptHandle,
             CrypticHoldingInspectionHandle: holdingInspection.ReceiptHandle,
             FormOrCleaveAssessmentHandle: formOrCleave.AssessmentHandle,

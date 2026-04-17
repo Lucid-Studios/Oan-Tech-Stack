@@ -29,6 +29,7 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
 
         Assert.NotNull(payload);
         Assert.NotNull(payload.OperationalContext);
+        Assert.NotNull(payload.PreDomainGovernancePacket);
         Assert.NotNull(payload.CandidateBoundaryReceipt);
         Assert.NotNull(payload.CrypticHoldingInspectionReceipt);
         Assert.NotNull(payload.FormOrCleaveAssessment);
@@ -38,6 +39,8 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.NotNull(payload.PreDomainHostLoopReceipt);
 
         Assert.False(payload.CandidateBoundaryReceipt.ContainsAuthorityBearingFields);
+        Assert.Equal(payload.CandidateBoundaryReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
+        Assert.Equal(payload.PreDomainGovernancePacket.PacketHandle, payload.OperationalContext.PreDomainGovernancePacketHandle);
         Assert.True(payload.CrypticHoldingInspectionReceipt.CandidateOnly);
         Assert.True(payload.FormOrCleaveAssessment.CandidateOnly);
         Assert.True(payload.PreDomainHostLoopReceipt.CandidateOnly);
@@ -54,5 +57,6 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.Equal(payload.PreDomainAdmissionGateReceipt.Disposition, payload.OperationalContext.PreDomainAdmissionDisposition);
         Assert.Equal(payload.PreDomainHostLoopReceipt.CarryDisposition, payload.OperationalContext.PreDomainCarryDisposition);
         Assert.Equal(payload.PreDomainHostLoopReceipt.CollapseDisposition, payload.OperationalContext.PreDomainCollapseDisposition);
+        Assert.Equal(payload.PreDomainGovernancePacket.PacketHandle, payload.PreDomainHostLoopReceipt.PreDomainGovernancePacketHandle);
     }
 }

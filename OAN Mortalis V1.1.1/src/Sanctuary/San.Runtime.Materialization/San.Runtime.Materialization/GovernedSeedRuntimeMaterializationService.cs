@@ -63,6 +63,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
 {
     private readonly IFirstRunConstitutionService _firstRunConstitutionService;
     private readonly IGovernedSeedPreGovernanceService _preGovernanceService;
+    private readonly IGovernedSeedPreDomainGovernancePacketMaterializationService _preDomainGovernancePacketMaterializationService;
 
     private static readonly JsonSerializerOptions PayloadJsonOptions = new()
     {
@@ -71,10 +72,12 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
 
     public GovernedSeedRuntimeMaterializationService(
         IFirstRunConstitutionService firstRunConstitutionService,
-        IGovernedSeedPreGovernanceService preGovernanceService)
+        IGovernedSeedPreGovernanceService preGovernanceService,
+        IGovernedSeedPreDomainGovernancePacketMaterializationService preDomainGovernancePacketMaterializationService)
     {
         _firstRunConstitutionService = firstRunConstitutionService ?? throw new ArgumentNullException(nameof(firstRunConstitutionService));
         _preGovernanceService = preGovernanceService ?? throw new ArgumentNullException(nameof(preGovernanceService));
+        _preDomainGovernancePacketMaterializationService = preDomainGovernancePacketMaterializationService ?? throw new ArgumentNullException(nameof(preDomainGovernancePacketMaterializationService));
     }
 
     public GovernedSeedBootstrapAdmissionReceipt CreateBootstrapAdmissionReceipt(
@@ -361,7 +364,25 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         ArgumentNullException.ThrowIfNull(formOrCleaveAssessment);
         ArgumentNullException.ThrowIfNull(hostLoopReceipt);
 
+        var preDomainGovernancePacket = candidateSeparationReceipt is not null &&
+                                        duplexGovernanceReceipt is not null &&
+                                        admissionGateReceipt is not null
+            ? _preDomainGovernancePacketMaterializationService.Materialize(
+                primeSeedReceipt,
+                candidateBoundaryReceipt,
+                holdingInspectionReceipt,
+                formOrCleaveAssessment,
+                candidateSeparationReceipt,
+                duplexGovernanceReceipt,
+                admissionGateReceipt,
+                hostLoopReceipt)
+            : null;
+
         var operationalContext = result.VerticalSlice.OperationalContext;
+        var hostLoopReceiptWithPacket = hostLoopReceipt with
+        {
+            PreDomainGovernancePacketHandle = preDomainGovernancePacket?.PacketHandle
+        };
 
         return result with
         {
@@ -375,24 +396,26 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                         FirstPrimeState = firstPrimeReceipt.FirstPrimeState,
                         PrimeSeedReceiptHandle = primeSeedReceipt.ReceiptHandle,
                         PrimeSeedState = primeSeedReceipt.SeedState,
+                        PreDomainGovernancePacketHandle = preDomainGovernancePacket?.PacketHandle,
                         CandidateBoundaryReceiptHandle = candidateBoundaryReceipt.ReceiptHandle,
                         CrypticHoldingInspectionHandle = holdingInspectionReceipt.ReceiptHandle,
                         FormOrCleaveAssessmentHandle = formOrCleaveAssessment.AssessmentHandle,
                         CandidateSeparationReceiptHandle = candidateSeparationReceipt?.ReceiptHandle,
                         DuplexGovernanceReceiptHandle = duplexGovernanceReceipt?.ReceiptHandle,
                         PreDomainAdmissionGateReceiptHandle = admissionGateReceipt?.ReceiptHandle,
-                        PreDomainHostLoopReceiptHandle = hostLoopReceipt.ReceiptHandle,
+                        PreDomainHostLoopReceiptHandle = hostLoopReceiptWithPacket.ReceiptHandle,
                         PreDomainAdmissionDisposition = admissionGateReceipt?.Disposition,
-                        PreDomainCarryDisposition = hostLoopReceipt.CarryDisposition,
-                        PreDomainCollapseDisposition = hostLoopReceipt.CollapseDisposition
+                        PreDomainCarryDisposition = hostLoopReceiptWithPacket.CarryDisposition,
+                        PreDomainCollapseDisposition = hostLoopReceiptWithPacket.CollapseDisposition
                     },
+                PreDomainGovernancePacket = preDomainGovernancePacket,
                 CandidateBoundaryReceipt = candidateBoundaryReceipt,
                 CrypticHoldingInspectionReceipt = holdingInspectionReceipt,
                 FormOrCleaveAssessment = formOrCleaveAssessment,
                 CandidateSeparationReceipt = candidateSeparationReceipt,
                 DuplexGovernanceReceipt = duplexGovernanceReceipt,
                 PreDomainAdmissionGateReceipt = admissionGateReceipt,
-                PreDomainHostLoopReceipt = hostLoopReceipt
+                PreDomainHostLoopReceipt = hostLoopReceiptWithPacket
             }
         };
     }

@@ -870,7 +870,8 @@ public sealed class SeedVerticalSliceIntegrationTests
             new GovernedNexusControlService(),
             new GovernedSeedRuntimeMaterializationService(
                 new GovernedFirstRunConstitutionService(),
-                new GovernedSeedPreGovernanceService()),
+                new GovernedSeedPreGovernanceService(),
+                new GovernedSeedPreDomainGovernancePacketMaterializationService()),
             new GovernedSeedPreDomainHostLoopService(
                 new GovernedSeedCrypticHoldingService(),
                 new GovernedSeedFormOrCleaveService(),

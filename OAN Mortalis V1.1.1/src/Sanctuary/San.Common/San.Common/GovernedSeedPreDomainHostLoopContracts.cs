@@ -87,6 +87,7 @@ public sealed record GovernedSeedPreDomainHostLoopReceipt(
     string ReceiptHandle,
     string FirstPrimeReceiptHandle,
     string PrimeSeedReceiptHandle,
+    string? PreDomainGovernancePacketHandle,
     string? CandidateBoundaryReceiptHandle,
     string? CrypticHoldingInspectionHandle,
     string? FormOrCleaveAssessmentHandle,

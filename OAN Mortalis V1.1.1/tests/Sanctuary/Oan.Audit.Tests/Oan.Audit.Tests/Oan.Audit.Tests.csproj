@@ -19,6 +19,7 @@
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\San.Common\\San.Common\\San.Common.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\San.FirstRun\\San.FirstRun\\San.FirstRun.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\San.Nexus.Control\\San.Nexus.Control\\San.Nexus.Control.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\San.Runtime.Materialization\\San.Runtime.Materialization\\San.Runtime.Materialization.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\Sanctuary\\SLI.Engine\\SLI.Engine\\SLI.Engine.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\src\\TechStack\\GEL\\GEL.Contracts\\GEL.Contracts.csproj" />
   </ItemGroup>
