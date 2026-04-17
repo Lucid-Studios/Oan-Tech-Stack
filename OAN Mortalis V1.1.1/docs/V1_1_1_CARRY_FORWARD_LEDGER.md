@@ -347,6 +347,11 @@ The dominant aligned themes now preserved from that intake are:
   continuity may remain live without self-authorizing present permission and
   prior truth may travel as evidence while current admissibility is re-asked
   whenever time, domain, role, constraint, conflict, or consequence changes
+- ListeningFrame / Compass / form-or-cleave bridge preserved as the first
+  runtime-safe translation seam for inherited `OCBT` formation grammar, so
+  readiness, motion, inquiry-bearing distinction, resonance testing, and
+  symbolic bloom remain legible without being mistaken for action authority,
+  revalidation, or standing
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing

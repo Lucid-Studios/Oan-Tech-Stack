@@ -205,6 +205,9 @@ The lab source may not be used to silently claim:
   constraint change
 - continuity collapse into forced amnesia during admissibility refresh
 - silent overwrite of prior responsibility during revalidation
+- inherited symbolic formation grammar mythologized into runtime law
+- inquiry-bearing cleave flattened into decorative metaphor or confused with
+  final judgment
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.
