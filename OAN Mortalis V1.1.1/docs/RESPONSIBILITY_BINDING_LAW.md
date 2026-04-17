@@ -35,6 +35,7 @@ Use this note with:
 - `DOMAIN_AND_ROLE_ADMISSION_LAW.md`
 - `PRIVATE_DOMAIN_SERVICE_WITNESS_LAW.md`
 - `PROC_GROUNDED_ACTION_AND_TRACE_LAW.md`
+- `CRYPTIC_CONTINUITY_MEDIUM_NOTE.md`
 - `BUILD_READINESS.md`
 
 This law governs consequence attribution, not ontology.

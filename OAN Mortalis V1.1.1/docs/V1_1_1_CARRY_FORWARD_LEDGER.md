@@ -339,6 +339,10 @@ The dominant aligned themes now preserved from that intake are:
   consequence attribution, so standing, admission, action permission, and
   responsibility remain local until re-discerned rather than leaking across
   neighboring domains by resemblance, shared history, or prior success
+- cryptic continuity medium preserved as the first continuity substrate seam
+  above lawful transition and domain-bounded legitimacy, so cryptic meaning
+  may remain reconstructable and live across governed turns without collapsing
+  into dead storage or drifting into unauthorized form
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing

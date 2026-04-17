@@ -196,6 +196,10 @@ The lab source may not be used to silently claim:
 - prior admission as automatic permission in a receiving domain
 - originating-domain success as authority for neighboring domains
 - transferred evidence masquerading as local standing
+- dead storage masquerading as cryptic continuity
+- freeform drift masquerading as living meaning across turns
+- output slices treated as the whole continuity body
+- persistence treated as permission or identity proof by itself
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.
