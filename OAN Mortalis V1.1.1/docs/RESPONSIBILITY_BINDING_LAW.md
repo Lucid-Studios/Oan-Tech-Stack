@@ -39,7 +39,7 @@ Use this note with:
 
 This law governs consequence attribution, not ontology.
 It binds directly to action threshold and hold resolution and prepares the seam
-for later revalidation, domain isolation, and plural-coordination refinement.
+for later revalidation and plural-coordination refinement.
 
 ## Responsibility Of `Proceed`
 
@@ -216,4 +216,5 @@ That means:
 - this law governs consequence attribution
 - this law binds directly to `ACTION_THRESHOLD_LAW.md`
 - this law binds directly to `HOLD_RESOLUTION_LAW.md`
+- this law binds directly to `DOMAIN_ISOLATION_LAW.md`
 - this law prevents agency laundering and responsibility fog

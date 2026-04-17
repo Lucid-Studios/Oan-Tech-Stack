@@ -335,6 +335,10 @@ The dominant aligned themes now preserved from that intake are:
   above lawful movement and lawful waiting, so `Proceed`, `Refuse`, `Hold`,
   and `Escalate` all name attributable bearers, stewardship, scope, and trace
   rather than dissolving ownership into plurality, time, or system fog
+- domain isolation preserved as the first cross-domain legitimacy seam above
+  consequence attribution, so standing, admission, action permission, and
+  responsibility remain local until re-discerned rather than leaking across
+  neighboring domains by resemblance, shared history, or prior success
 - EC install-to-first-Prime pre-role state preserved as the first bounded path
   from admitted install, Steward-issued cradle braid, and cast `AgentiCore`
   sensor body through stable-one discernment into Prime retained standing

@@ -192,6 +192,10 @@ The lab source may not be used to silently claim:
 - `Hold` without a steward and reevaluation obligation
 - `Escalate` as responsibility erasure or anonymous system transfer
 - plural participation as diluted authorship or post-hoc ambiguity
+- cross-domain reuse as inherited legitimacy without re-discernment
+- prior admission as automatic permission in a receiving domain
+- originating-domain success as authority for neighboring domains
+- transferred evidence masquerading as local standing
 
 Repeated rhetoric, duplicate passages, and encoding noise in that source are
 not blocking defects.

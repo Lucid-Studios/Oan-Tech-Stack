@@ -22,6 +22,7 @@ Use this note with:
 - `SANCTUARY_BIAD_AND_CRADLETEK_GOVERNING_SURFACE_NOTE.md`
 - `PRIME_CRYPTIC_DUPLEX_LAW.md`
 - `PRIVATE_DOMAIN_SERVICE_WITNESS_LAW.md`
+- `DOMAIN_ISOLATION_LAW.md`
 - `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`
 
 The Prime Seed State may feed this law as pre-domain readiness evidence.
@@ -171,3 +172,6 @@ This note must not be used to:
 If later work needs Mother/Father domain application, cradle-local governing
 surface enactment, or role-bound ontology training, those seams should be
 seated explicitly after this admission law.
+
+Cross-domain reuse of any admitted standing remains governed by
+`DOMAIN_ISOLATION_LAW.md`.
