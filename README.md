@@ -156,6 +156,12 @@ OAN Mortalis V1.1.1/
   tools/
 ```
 
+Current near-path implementation descent for `V1.1.1` is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_CANDIDATE_BOUNDARY_AND_DUPLEX_GOVERNANCE.md`,
+which frames the next code seam as candidate-only proposal boundaries,
+Prime/Cryptic duplex separation, and pre-domain admission gating after the
+governed pre-domain host loop seated in `6859b58`.
+
 Inside the sibling line:
 
 ```text

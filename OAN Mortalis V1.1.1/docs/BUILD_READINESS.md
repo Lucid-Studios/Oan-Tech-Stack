@@ -245,6 +245,9 @@ Current hold-lane clarification:
   `LISTENING_FRAME_COMPASS_FORM_OR_CLEAVE_BRIDGE.md`
 - the `EC` lifecycle note now lives in
   `EC_LIFECYCLE_NOTE.md`
+- the next implementation chapter for candidate boundary and duplex governance
+  now lives in
+  `NEXT_IMPLEMENTATION_CHAPTER_CANDIDATE_BOUNDARY_AND_DUPLEX_GOVERNANCE.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
