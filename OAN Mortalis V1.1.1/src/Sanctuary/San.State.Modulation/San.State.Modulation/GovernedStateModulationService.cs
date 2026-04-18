@@ -114,6 +114,7 @@ public sealed class GovernedStateModulationService : IGovernedStateModulationSer
             DomainEligible: operationalContext?.DomainEligible,
             RoleEligible: operationalContext?.RoleEligible,
             DomainRoleGatingPacketHandle: operationalContext?.DomainRoleGatingPacketHandle,
+            DomainAdmissionRoleBindingPacketHandle: operationalContext?.DomainAdmissionRoleBindingPacketHandle,
             DomainAdmissionRoleBindingReceiptHandle: operationalContext?.DomainAdmissionRoleBindingReceiptHandle,
             DomainAdmissionRoleBindingDisposition: operationalContext?.DomainAdmissionRoleBindingDisposition,
             DomainAdmissionGranted: operationalContext?.DomainAdmissionGranted,

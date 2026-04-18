@@ -946,6 +946,7 @@ public sealed record GovernedSeedOperationalContext(
     bool? DomainEligible = null,
     bool? RoleEligible = null,
     string? DomainRoleGatingPacketHandle = null,
+    string? DomainAdmissionRoleBindingPacketHandle = null,
     string? DomainAdmissionRoleBindingReceiptHandle = null,
     GovernedSeedDomainAdmissionRoleBindingDisposition? DomainAdmissionRoleBindingDisposition = null,
     bool? DomainAdmissionGranted = null,
@@ -1111,6 +1112,7 @@ public sealed record GovernedSeedStateModulationReceipt(
     bool? DomainEligible = null,
     bool? RoleEligible = null,
     string? DomainRoleGatingPacketHandle = null,
+    string? DomainAdmissionRoleBindingPacketHandle = null,
     string? DomainAdmissionRoleBindingReceiptHandle = null,
     GovernedSeedDomainAdmissionRoleBindingDisposition? DomainAdmissionRoleBindingDisposition = null,
     bool? DomainAdmissionGranted = null,
@@ -1157,7 +1159,8 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedDomainAdmissionAssessment? DomainAdmissionAssessment = null,
     GovernedSeedRoleBindingAssessment? RoleBindingAssessment = null,
     GovernedSeedDomainAdmissionRoleBindingAssessment? DomainAdmissionRoleBindingAssessment = null,
-    GovernedSeedDomainAdmissionRoleBindingReceipt? DomainAdmissionRoleBindingReceipt = null);
+    GovernedSeedDomainAdmissionRoleBindingReceipt? DomainAdmissionRoleBindingReceipt = null,
+    GovernedSeedDomainAdmissionRoleBindingPacket? DomainAdmissionRoleBindingPacket = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

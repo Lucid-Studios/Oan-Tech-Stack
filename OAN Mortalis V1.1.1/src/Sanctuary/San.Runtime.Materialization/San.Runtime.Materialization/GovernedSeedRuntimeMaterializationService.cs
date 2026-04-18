@@ -79,6 +79,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
     private readonly IGovernedSeedPreGovernanceService _preGovernanceService;
     private readonly IGovernedSeedPreDomainGovernancePacketMaterializationService _preDomainGovernancePacketMaterializationService;
     private readonly IGovernedSeedDomainRoleGatingPacketMaterializationService _domainRoleGatingPacketMaterializationService;
+    private readonly IGovernedSeedDomainAdmissionRoleBindingPacketMaterializationService _domainAdmissionRoleBindingPacketMaterializationService;
 
     private static readonly JsonSerializerOptions PayloadJsonOptions = new()
     {
@@ -89,12 +90,14 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         IFirstRunConstitutionService firstRunConstitutionService,
         IGovernedSeedPreGovernanceService preGovernanceService,
         IGovernedSeedPreDomainGovernancePacketMaterializationService preDomainGovernancePacketMaterializationService,
-        IGovernedSeedDomainRoleGatingPacketMaterializationService domainRoleGatingPacketMaterializationService)
+        IGovernedSeedDomainRoleGatingPacketMaterializationService domainRoleGatingPacketMaterializationService,
+        IGovernedSeedDomainAdmissionRoleBindingPacketMaterializationService domainAdmissionRoleBindingPacketMaterializationService)
     {
         _firstRunConstitutionService = firstRunConstitutionService ?? throw new ArgumentNullException(nameof(firstRunConstitutionService));
         _preGovernanceService = preGovernanceService ?? throw new ArgumentNullException(nameof(preGovernanceService));
         _preDomainGovernancePacketMaterializationService = preDomainGovernancePacketMaterializationService ?? throw new ArgumentNullException(nameof(preDomainGovernancePacketMaterializationService));
         _domainRoleGatingPacketMaterializationService = domainRoleGatingPacketMaterializationService ?? throw new ArgumentNullException(nameof(domainRoleGatingPacketMaterializationService));
+        _domainAdmissionRoleBindingPacketMaterializationService = domainAdmissionRoleBindingPacketMaterializationService ?? throw new ArgumentNullException(nameof(domainAdmissionRoleBindingPacketMaterializationService));
     }
 
     public GovernedSeedBootstrapAdmissionReceipt CreateBootstrapAdmissionReceipt(
@@ -497,6 +500,14 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         ArgumentNullException.ThrowIfNull(domainAdmissionRoleBindingReceipt);
 
         var operationalContext = result.VerticalSlice.OperationalContext;
+        var domainAdmissionRoleBindingPacket = result.VerticalSlice.DomainRoleGatingPacket is null
+            ? null
+            : _domainAdmissionRoleBindingPacketMaterializationService.Materialize(
+                result.VerticalSlice.DomainRoleGatingPacket,
+                domainAdmissionAssessment,
+                roleBindingAssessment,
+                domainAdmissionRoleBindingAssessment,
+                domainAdmissionRoleBindingReceipt);
 
         return result with
         {
@@ -506,6 +517,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                     ? null
                     : operationalContext with
                     {
+                        DomainAdmissionRoleBindingPacketHandle = domainAdmissionRoleBindingPacket?.PacketHandle,
                         DomainAdmissionRoleBindingReceiptHandle = domainAdmissionRoleBindingReceipt.ReceiptHandle,
                         DomainAdmissionRoleBindingDisposition = domainAdmissionRoleBindingReceipt.Disposition,
                         DomainAdmissionGranted = domainAdmissionRoleBindingReceipt.DomainAdmissionGranted,
@@ -514,7 +526,8 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 DomainAdmissionAssessment = domainAdmissionAssessment,
                 RoleBindingAssessment = roleBindingAssessment,
                 DomainAdmissionRoleBindingAssessment = domainAdmissionRoleBindingAssessment,
-                DomainAdmissionRoleBindingReceipt = domainAdmissionRoleBindingReceipt
+                DomainAdmissionRoleBindingReceipt = domainAdmissionRoleBindingReceipt,
+                DomainAdmissionRoleBindingPacket = domainAdmissionRoleBindingPacket
             }
         };
     }
