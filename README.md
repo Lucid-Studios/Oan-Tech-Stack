@@ -102,7 +102,6 @@ summaries, and changelog entries are governed by
 `OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`.
 Release wording is not promotion and must preserve status, evidence,
 non-claims, and known holds.
-
 ## Architecture Read
 
 At a high level, the stack reads as:

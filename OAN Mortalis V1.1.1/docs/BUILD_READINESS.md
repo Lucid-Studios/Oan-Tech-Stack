@@ -78,7 +78,6 @@ The public release artifact wording template now lives in
 `PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`, preserving the rule that release
 notes, tag descriptions, milestone summaries, release-candidate summaries, and
 changelog entries are witness summaries rather than promotion engines.
-
 Current hold-lane clarification:
 
 - chapter-five uptake and first Steward witness formation are tracked in

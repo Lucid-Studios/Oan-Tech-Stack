@@ -420,7 +420,6 @@ The dominant aligned themes now preserved from that intake are:
 - the future coupling-event path and long-run condensation law as deferred work
 
 This intake is a build-facing doctrine source, not a direct mutation authority.
-
 ## Explicitly Excluded
 
 The following prior-line residues are intentionally not carried into `V1.1.1`:
