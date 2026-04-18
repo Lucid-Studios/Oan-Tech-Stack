@@ -189,6 +189,11 @@ which frames downstream occupancy and role-bearing participation as reasoning
 over the carried admission/binding packet rather than over loose admission
 surfaces.
 
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ADMISSION_PARTICIPATION_PACKET.md`,
+which frames occupancy and role participation as a carried body for downstream
+execution and service-behavior work.
+
 Inside the sibling line:
 
 ```text
