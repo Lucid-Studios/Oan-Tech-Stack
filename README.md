@@ -194,6 +194,12 @@ The next packetization descent after that is tracked in
 which frames occupancy and role participation as a carried body for downstream
 execution and service-behavior work.
 
+The next execution-layer descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_PARTICIPATION_EXECUTION_FROM_PARTICIPATION_PACKET.md`,
+which frames post-participation execution and service behavior as reasoning
+over the carried participation packet rather than over loose runtime
+participation surfaces.
+
 Inside the sibling line:
 
 ```text
