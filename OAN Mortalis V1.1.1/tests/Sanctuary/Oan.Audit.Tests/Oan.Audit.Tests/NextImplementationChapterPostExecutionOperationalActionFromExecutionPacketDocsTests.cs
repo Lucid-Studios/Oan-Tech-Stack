@@ -26,6 +26,9 @@ public sealed class NextImplementationChapterPostExecutionOperationalActionFromE
             "no downstream operational action or post-execution reasoning may occur over anything less than a complete post-participation execution packet",
             noteText,
             StringComparison.Ordinal);
+        Assert.Contains("authorized effect is not yet committed effect", noteText, StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedOperationalActionCommitIntent`", noteText, StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedOperationalActionCommitReceipt`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionContracts.cs`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionService.cs`", noteText, StringComparison.Ordinal);
 

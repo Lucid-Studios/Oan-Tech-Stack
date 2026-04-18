@@ -46,6 +46,12 @@ The next question is narrower and more serious:
 
 > what execution-authorized packet may now lawfully externalize, instantiate, invoke, or commit as operational action?
 
+The first critical distinction at this seam is:
+
+> authorized effect is not yet committed effect
+
+That separation must remain explicit.
+
 ---
 
 ## Required Input
@@ -110,6 +116,12 @@ The first unified seam should likely return one of:
 
 These are intentionally narrow and discovery-friendly.
 
+`ServiceEffectAuthorized` and `OperationalActionCommitted` must not collapse
+into one state.
+The first means the packet may lawfully externalize a bounded effect.
+The second means the effect has actually crossed into committed consequence and
+must therefore emit a stronger receipt surface.
+
 ---
 
 ## Invariants
@@ -136,6 +148,12 @@ explicit scope.
 Committed operational action must emit receipt and trace, and must not
 self-expand domain, role, or service scope without a new gate.
 
+### Commitment Boundary Invariant
+
+No irreversible, externally meaningful, or propagated effect may be treated as
+committed merely because execution authorization exists.
+Commitment must remain its own witnessed threshold.
+
 ---
 
 ## Suggested First Contracts
@@ -154,6 +172,16 @@ These should expose only:
 * unified disposition truth
 
 They should not re-perform earlier packet construction or execution logic.
+
+The first pass may also need an explicit commitment-support family, even if it
+remains internal to the unified seam:
+
+* `GovernedSeedOperationalActionCommitIntent`
+* `GovernedSeedOperationalActionCommitAssessment`
+* `GovernedSeedOperationalActionCommitReceipt`
+
+These exist to prevent operational action from silently skipping from
+authorization to committed consequence.
 
 ---
 
@@ -177,6 +205,7 @@ The first pass should remain conservative:
 * no hidden commitment
 * no operational action without execution authorization
 * no externalized effect without explicit service authorization
+* no irreversible action without explicit commitment assessment
 * no silent fallback
 
 ---
