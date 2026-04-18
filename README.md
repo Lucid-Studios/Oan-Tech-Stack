@@ -168,6 +168,11 @@ is tracked in
 which frames domain/role gating as reasoning over the packet-bearing
 pre-domain governance body rather than over scattered receipts.
 
+The next packetization descent for that gate is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ROLE_GATING_PACKET.md`,
+which frames domain/role approachability as a carried body for downstream
+admission and role-binding work.
+
 Inside the sibling line:
 
 ```text

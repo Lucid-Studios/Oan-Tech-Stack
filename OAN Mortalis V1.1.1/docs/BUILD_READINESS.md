@@ -251,6 +251,8 @@ Current hold-lane clarification:
 - the next implementation chapter for domain/role gating from the pre-domain
   governance packet now lives in
   `NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ROLE_GATING_FROM_PREDOMAIN_PACKET.md`
+- the next packetization descent for domain/role gating now lives in
+  `NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ROLE_GATING_PACKET.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
