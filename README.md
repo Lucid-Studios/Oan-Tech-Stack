@@ -178,6 +178,11 @@ The next admission descent after that is tracked in
 which frames actual domain admission and role binding as reasoning over the
 carried gating packet rather than over loose runtime gate surfaces.
 
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ADMISSION_ROLE_BINDING_PACKET.md`,
+which frames actual domain admission and role binding as a carried body for
+downstream participation and post-admission governance work.
+
 Inside the sibling line:
 
 ```text
