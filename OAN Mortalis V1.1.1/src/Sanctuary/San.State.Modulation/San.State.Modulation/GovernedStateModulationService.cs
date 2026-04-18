@@ -119,6 +119,7 @@ public sealed class GovernedStateModulationService : IGovernedStateModulationSer
             DomainAdmissionRoleBindingDisposition: operationalContext?.DomainAdmissionRoleBindingDisposition,
             DomainAdmissionGranted: operationalContext?.DomainAdmissionGranted,
             RoleBound: operationalContext?.RoleBound,
+            PostAdmissionParticipationPacketHandle: operationalContext?.PostAdmissionParticipationPacketHandle,
             PostAdmissionParticipationReceiptHandle: operationalContext?.PostAdmissionParticipationReceiptHandle,
             PostAdmissionParticipationDisposition: operationalContext?.PostAdmissionParticipationDisposition,
             DomainOccupancyAuthorized: operationalContext?.DomainOccupancyAuthorized,

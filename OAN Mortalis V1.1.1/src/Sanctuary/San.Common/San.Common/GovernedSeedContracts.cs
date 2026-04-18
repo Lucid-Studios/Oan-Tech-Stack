@@ -951,6 +951,7 @@ public sealed record GovernedSeedOperationalContext(
     GovernedSeedDomainAdmissionRoleBindingDisposition? DomainAdmissionRoleBindingDisposition = null,
     bool? DomainAdmissionGranted = null,
     bool? RoleBound = null,
+    string? PostAdmissionParticipationPacketHandle = null,
     string? PostAdmissionParticipationReceiptHandle = null,
     GovernedSeedPostAdmissionParticipationDisposition? PostAdmissionParticipationDisposition = null,
     bool? DomainOccupancyAuthorized = null,
@@ -1121,6 +1122,7 @@ public sealed record GovernedSeedStateModulationReceipt(
     GovernedSeedDomainAdmissionRoleBindingDisposition? DomainAdmissionRoleBindingDisposition = null,
     bool? DomainAdmissionGranted = null,
     bool? RoleBound = null,
+    string? PostAdmissionParticipationPacketHandle = null,
     string? PostAdmissionParticipationReceiptHandle = null,
     GovernedSeedPostAdmissionParticipationDisposition? PostAdmissionParticipationDisposition = null,
     bool? DomainOccupancyAuthorized = null,
@@ -1172,7 +1174,8 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedDomainOccupancyAssessment? DomainOccupancyAssessment = null,
     GovernedSeedRoleParticipationAssessment? RoleParticipationAssessment = null,
     GovernedSeedPostAdmissionParticipationAssessment? PostAdmissionParticipationAssessment = null,
-    GovernedSeedPostAdmissionParticipationReceipt? PostAdmissionParticipationReceipt = null);
+    GovernedSeedPostAdmissionParticipationReceipt? PostAdmissionParticipationReceipt = null,
+    GovernedSeedPostAdmissionParticipationPacket? PostAdmissionParticipationPacket = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,
