@@ -205,6 +205,12 @@ The next packetization descent after that is tracked in
 which frames service behavior and execution authorization as a carried body
 for downstream operational action and post-execution work.
 
+The next post-execution descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_EXECUTION_OPERATIONAL_ACTION_FROM_EXECUTION_PACKET.md`,
+which frames actual operational action and service effect as reasoning over
+the carried execution packet rather than over loose runtime execution
+surfaces.
+
 Inside the sibling line:
 
 ```text
