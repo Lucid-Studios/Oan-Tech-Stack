@@ -74,6 +74,13 @@ public interface IGovernedSeedRuntimeMaterializationService
         GovernedSeedPostAdmissionParticipationAssessment postAdmissionParticipationAssessment,
         GovernedSeedPostAdmissionParticipationReceipt postAdmissionParticipationReceipt);
 
+    GovernedSeedEvaluationResult AttachPostParticipationExecution(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedServiceBehaviorAssessment serviceBehaviorAssessment,
+        GovernedSeedExecutionAuthorizationAssessment executionAuthorizationAssessment,
+        GovernedSeedPostParticipationExecutionAssessment postParticipationExecutionAssessment,
+        GovernedSeedPostParticipationExecutionReceipt postParticipationExecutionReceipt);
+
     EvaluateEnvelope CreateEnvelope(
         string agentId,
         string theaterId,
@@ -584,6 +591,42 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 PostAdmissionParticipationAssessment = postAdmissionParticipationAssessment,
                 PostAdmissionParticipationReceipt = postAdmissionParticipationReceipt,
                 PostAdmissionParticipationPacket = postAdmissionParticipationPacket
+            }
+        };
+    }
+
+    public GovernedSeedEvaluationResult AttachPostParticipationExecution(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedServiceBehaviorAssessment serviceBehaviorAssessment,
+        GovernedSeedExecutionAuthorizationAssessment executionAuthorizationAssessment,
+        GovernedSeedPostParticipationExecutionAssessment postParticipationExecutionAssessment,
+        GovernedSeedPostParticipationExecutionReceipt postParticipationExecutionReceipt)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(serviceBehaviorAssessment);
+        ArgumentNullException.ThrowIfNull(executionAuthorizationAssessment);
+        ArgumentNullException.ThrowIfNull(postParticipationExecutionAssessment);
+        ArgumentNullException.ThrowIfNull(postParticipationExecutionReceipt);
+
+        var operationalContext = result.VerticalSlice.OperationalContext;
+
+        return result with
+        {
+            VerticalSlice = result.VerticalSlice with
+            {
+                OperationalContext = operationalContext is null
+                    ? null
+                    : operationalContext with
+                    {
+                        PostParticipationExecutionReceiptHandle = postParticipationExecutionReceipt.ReceiptHandle,
+                        PostParticipationExecutionDisposition = postParticipationExecutionReceipt.Disposition,
+                        ServiceBehaviorAuthorized = postParticipationExecutionReceipt.ServiceBehaviorAuthorized,
+                        ExecutionAuthorized = postParticipationExecutionReceipt.ExecutionAuthorized
+                    },
+                ServiceBehaviorAssessment = serviceBehaviorAssessment,
+                ExecutionAuthorizationAssessment = executionAuthorizationAssessment,
+                PostParticipationExecutionAssessment = postParticipationExecutionAssessment,
+                PostParticipationExecutionReceipt = postParticipationExecutionReceipt
             }
         };
     }

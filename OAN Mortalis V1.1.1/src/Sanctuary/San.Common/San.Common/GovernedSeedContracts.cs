@@ -955,7 +955,11 @@ public sealed record GovernedSeedOperationalContext(
     string? PostAdmissionParticipationReceiptHandle = null,
     GovernedSeedPostAdmissionParticipationDisposition? PostAdmissionParticipationDisposition = null,
     bool? DomainOccupancyAuthorized = null,
-    bool? RoleParticipationAuthorized = null);
+    bool? RoleParticipationAuthorized = null,
+    string? PostParticipationExecutionReceiptHandle = null,
+    GovernedSeedExecutionAuthorizationDisposition? PostParticipationExecutionDisposition = null,
+    bool? ServiceBehaviorAuthorized = null,
+    bool? ExecutionAuthorized = null);
 
 public sealed record GovernedSeedReturnSurfaceContext(
     string ContextHandle,
@@ -1126,7 +1130,11 @@ public sealed record GovernedSeedStateModulationReceipt(
     string? PostAdmissionParticipationReceiptHandle = null,
     GovernedSeedPostAdmissionParticipationDisposition? PostAdmissionParticipationDisposition = null,
     bool? DomainOccupancyAuthorized = null,
-    bool? RoleParticipationAuthorized = null);
+    bool? RoleParticipationAuthorized = null,
+    string? PostParticipationExecutionReceiptHandle = null,
+    GovernedSeedExecutionAuthorizationDisposition? PostParticipationExecutionDisposition = null,
+    bool? ServiceBehaviorAuthorized = null,
+    bool? ExecutionAuthorized = null);
 
 public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt,
@@ -1175,7 +1183,11 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedRoleParticipationAssessment? RoleParticipationAssessment = null,
     GovernedSeedPostAdmissionParticipationAssessment? PostAdmissionParticipationAssessment = null,
     GovernedSeedPostAdmissionParticipationReceipt? PostAdmissionParticipationReceipt = null,
-    GovernedSeedPostAdmissionParticipationPacket? PostAdmissionParticipationPacket = null);
+    GovernedSeedPostAdmissionParticipationPacket? PostAdmissionParticipationPacket = null,
+    GovernedSeedServiceBehaviorAssessment? ServiceBehaviorAssessment = null,
+    GovernedSeedExecutionAuthorizationAssessment? ExecutionAuthorizationAssessment = null,
+    GovernedSeedPostParticipationExecutionAssessment? PostParticipationExecutionAssessment = null,
+    GovernedSeedPostParticipationExecutionReceipt? PostParticipationExecutionReceipt = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

@@ -22,6 +22,7 @@ public sealed class GovernedSeedRuntimeService
     private readonly IGovernedSeedDomainRoleGatingService _domainRoleGatingService;
     private readonly IGovernedSeedDomainAdmissionRoleBindingService _domainAdmissionRoleBindingService;
     private readonly IGovernedSeedPostAdmissionParticipationService _postAdmissionParticipationService;
+    private readonly IGovernedSeedPostParticipationExecutionService _postParticipationExecutionService;
     private readonly IGovernedStateModulationService _stateModulationService;
     private readonly IGovernedSeedEnvelopeTraceService _traceService;
 
@@ -36,6 +37,7 @@ public sealed class GovernedSeedRuntimeService
         IGovernedSeedDomainRoleGatingService domainRoleGatingService,
         IGovernedSeedDomainAdmissionRoleBindingService domainAdmissionRoleBindingService,
         IGovernedSeedPostAdmissionParticipationService postAdmissionParticipationService,
+        IGovernedSeedPostParticipationExecutionService postParticipationExecutionService,
         IGovernedStateModulationService stateModulationService,
         IGovernedSeedEnvelopeTraceService traceService)
     {
@@ -49,6 +51,7 @@ public sealed class GovernedSeedRuntimeService
         _domainRoleGatingService = domainRoleGatingService ?? throw new ArgumentNullException(nameof(domainRoleGatingService));
         _domainAdmissionRoleBindingService = domainAdmissionRoleBindingService ?? throw new ArgumentNullException(nameof(domainAdmissionRoleBindingService));
         _postAdmissionParticipationService = postAdmissionParticipationService ?? throw new ArgumentNullException(nameof(postAdmissionParticipationService));
+        _postParticipationExecutionService = postParticipationExecutionService ?? throw new ArgumentNullException(nameof(postParticipationExecutionService));
         _stateModulationService = stateModulationService ?? throw new ArgumentNullException(nameof(stateModulationService));
         _traceService = traceService ?? throw new ArgumentNullException(nameof(traceService));
     }
@@ -176,8 +179,11 @@ public sealed class GovernedSeedRuntimeService
         var participationHydratedResult = admissionBoundResult.VerticalSlice.DomainAdmissionRoleBindingPacket is null
             ? admissionBoundResult
             : AttachPostAdmissionParticipation(admissionBoundResult, admissionBoundResult.VerticalSlice.DomainAdmissionRoleBindingPacket);
-        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, participationHydratedResult);
-        var hydratedResult = _materializationService.AttachStateModulation(participationHydratedResult, stateModulationReceipt);
+        var executionHydratedResult = participationHydratedResult.VerticalSlice.PostAdmissionParticipationPacket is null
+            ? participationHydratedResult
+            : AttachPostParticipationExecution(participationHydratedResult, participationHydratedResult.VerticalSlice.PostAdmissionParticipationPacket);
+        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, executionHydratedResult);
+        var hydratedResult = _materializationService.AttachStateModulation(executionHydratedResult, stateModulationReceipt);
 
         var envelope = _materializationService.CreateEnvelope(agentId, theaterId, hydratedResult);
         return await _traceService.TraceAsync(envelope, hydratedResult, cancellationToken).ConfigureAwait(false);
@@ -220,6 +226,19 @@ public sealed class GovernedSeedRuntimeService
             participation.RoleParticipationAssessment,
             participation.UnifiedAssessment,
             participation.Receipt);
+    }
+
+    private GovernedSeedEvaluationResult AttachPostParticipationExecution(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedPostAdmissionParticipationPacket packet)
+    {
+        var execution = _postParticipationExecutionService.Evaluate(packet);
+        return _materializationService.AttachPostParticipationExecution(
+            result,
+            execution.ServiceBehaviorAssessment,
+            execution.ExecutionAuthorizationAssessment,
+            execution.UnifiedAssessment,
+            execution.Receipt);
     }
 
     private static PreDomainLifecycleInputs ProjectPreDomainInputs(

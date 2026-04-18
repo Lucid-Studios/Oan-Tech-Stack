@@ -883,6 +883,7 @@ public sealed class SeedVerticalSliceIntegrationTests
             new GovernedSeedDomainRoleGatingService(),
             new GovernedSeedDomainAdmissionRoleBindingService(),
             new GovernedSeedPostAdmissionParticipationService(),
+            new GovernedSeedPostParticipationExecutionService(),
             new GovernedStateModulationService(),
             new GovernedSeedEnvelopeTraceService(
                 new InMemoryGovernedCrypticPointerStore(),
