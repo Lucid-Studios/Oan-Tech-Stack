@@ -19,6 +19,7 @@ public sealed class GovernedSeedRuntimeService
     private readonly IGovernedNexusControlService _nexusControlService;
     private readonly IGovernedSeedRuntimeMaterializationService _materializationService;
     private readonly IGovernedSeedPreDomainHostLoopService _preDomainHostLoopService;
+    private readonly IGovernedSeedDomainRoleGatingService _domainRoleGatingService;
     private readonly IGovernedStateModulationService _stateModulationService;
     private readonly IGovernedSeedEnvelopeTraceService _traceService;
 
@@ -30,6 +31,7 @@ public sealed class GovernedSeedRuntimeService
         IGovernedNexusControlService nexusControlService,
         IGovernedSeedRuntimeMaterializationService materializationService,
         IGovernedSeedPreDomainHostLoopService preDomainHostLoopService,
+        IGovernedSeedDomainRoleGatingService domainRoleGatingService,
         IGovernedStateModulationService stateModulationService,
         IGovernedSeedEnvelopeTraceService traceService)
     {
@@ -40,6 +42,7 @@ public sealed class GovernedSeedRuntimeService
         _nexusControlService = nexusControlService ?? throw new ArgumentNullException(nameof(nexusControlService));
         _materializationService = materializationService ?? throw new ArgumentNullException(nameof(materializationService));
         _preDomainHostLoopService = preDomainHostLoopService ?? throw new ArgumentNullException(nameof(preDomainHostLoopService));
+        _domainRoleGatingService = domainRoleGatingService ?? throw new ArgumentNullException(nameof(domainRoleGatingService));
         _stateModulationService = stateModulationService ?? throw new ArgumentNullException(nameof(stateModulationService));
         _traceService = traceService ?? throw new ArgumentNullException(nameof(traceService));
     }
@@ -158,11 +161,27 @@ public sealed class GovernedSeedRuntimeService
             hostLoop.DuplexGovernanceReceipt,
             hostLoop.AdmissionGateReceipt,
             hostLoop.HostLoopReceipt);
-        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, hostLoopHydratedResult);
-        var hydratedResult = _materializationService.AttachStateModulation(hostLoopHydratedResult, stateModulationReceipt);
+        var packetGatedResult = hostLoopHydratedResult.VerticalSlice.PreDomainGovernancePacket is null
+            ? hostLoopHydratedResult
+            : AttachDomainRoleGating(hostLoopHydratedResult, hostLoopHydratedResult.VerticalSlice.PreDomainGovernancePacket);
+        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, packetGatedResult);
+        var hydratedResult = _materializationService.AttachStateModulation(packetGatedResult, stateModulationReceipt);
 
         var envelope = _materializationService.CreateEnvelope(agentId, theaterId, hydratedResult);
         return await _traceService.TraceAsync(envelope, hydratedResult, cancellationToken).ConfigureAwait(false);
+    }
+
+    private GovernedSeedEvaluationResult AttachDomainRoleGating(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedPreDomainGovernancePacket packet)
+    {
+        var domainRoleGating = _domainRoleGatingService.Evaluate(packet);
+        return _materializationService.AttachDomainRoleGating(
+            result,
+            domainRoleGating.DomainAssessment,
+            domainRoleGating.RoleAssessment,
+            domainRoleGating.GatingAssessment,
+            domainRoleGating.Receipt);
     }
 
     private static PreDomainLifecycleInputs ProjectPreDomainInputs(

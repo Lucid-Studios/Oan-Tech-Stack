@@ -940,7 +940,11 @@ public sealed record GovernedSeedOperationalContext(
     string? PreDomainHostLoopReceiptHandle = null,
     PrimeSeedPreDomainAdmissionDisposition? PreDomainAdmissionDisposition = null,
     GovernedSeedCarryDispositionKind? PreDomainCarryDisposition = null,
-    GovernedSeedCollapseDispositionKind? PreDomainCollapseDisposition = null);
+    GovernedSeedCollapseDispositionKind? PreDomainCollapseDisposition = null,
+    string? DomainRoleGatingReceiptHandle = null,
+    GovernedSeedDomainRoleGatingDisposition? DomainRoleGatingDisposition = null,
+    bool? DomainEligible = null,
+    bool? RoleEligible = null);
 
 public sealed record GovernedSeedReturnSurfaceContext(
     string ContextHandle,
@@ -1096,7 +1100,11 @@ public sealed record GovernedSeedStateModulationReceipt(
     string? PreDomainHostLoopReceiptHandle = null,
     PrimeSeedPreDomainAdmissionDisposition? PreDomainAdmissionDisposition = null,
     GovernedSeedCarryDispositionKind? PreDomainCarryDisposition = null,
-    GovernedSeedCollapseDispositionKind? PreDomainCollapseDisposition = null);
+    GovernedSeedCollapseDispositionKind? PreDomainCollapseDisposition = null,
+    string? DomainRoleGatingReceiptHandle = null,
+    GovernedSeedDomainRoleGatingDisposition? DomainRoleGatingDisposition = null,
+    bool? DomainEligible = null,
+    bool? RoleEligible = null);
 
 public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt,
@@ -1130,7 +1138,11 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedCandidateSeparationReceipt? CandidateSeparationReceipt = null,
     PrimeCrypticDuplexGovernanceReceipt? DuplexGovernanceReceipt = null,
     PrimeSeedPreDomainAdmissionGateReceipt? PreDomainAdmissionGateReceipt = null,
-    GovernedSeedPreDomainHostLoopReceipt? PreDomainHostLoopReceipt = null);
+    GovernedSeedPreDomainHostLoopReceipt? PreDomainHostLoopReceipt = null,
+    GovernedSeedDomainEligibilityAssessment? DomainEligibilityAssessment = null,
+    GovernedSeedRoleEligibilityAssessment? RoleEligibilityAssessment = null,
+    GovernedSeedDomainRoleGatingAssessment? DomainRoleGatingAssessment = null,
+    GovernedSeedDomainRoleGatingReceipt? DomainRoleGatingReceipt = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

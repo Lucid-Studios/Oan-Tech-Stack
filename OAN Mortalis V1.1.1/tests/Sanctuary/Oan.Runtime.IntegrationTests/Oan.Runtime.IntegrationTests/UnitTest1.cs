@@ -877,6 +877,7 @@ public sealed class SeedVerticalSliceIntegrationTests
                 new GovernedSeedFormOrCleaveService(),
                 new GovernedSeedCandidateSeparationService(),
                 new PrimeSeedPreDomainAdmissionGateService()),
+            new GovernedSeedDomainRoleGatingService(),
             new GovernedStateModulationService(),
             new GovernedSeedEnvelopeTraceService(
                 new InMemoryGovernedCrypticPointerStore(),

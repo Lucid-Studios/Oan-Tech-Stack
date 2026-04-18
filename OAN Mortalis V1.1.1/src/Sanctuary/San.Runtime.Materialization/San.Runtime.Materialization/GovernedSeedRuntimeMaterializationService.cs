@@ -53,6 +53,13 @@ public interface IGovernedSeedRuntimeMaterializationService
         PrimeSeedPreDomainAdmissionGateReceipt? admissionGateReceipt,
         GovernedSeedPreDomainHostLoopReceipt hostLoopReceipt);
 
+    GovernedSeedEvaluationResult AttachDomainRoleGating(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainEligibilityAssessment domainEligibilityAssessment,
+        GovernedSeedRoleEligibilityAssessment roleEligibilityAssessment,
+        GovernedSeedDomainRoleGatingAssessment domainRoleGatingAssessment,
+        GovernedSeedDomainRoleGatingReceipt domainRoleGatingReceipt);
+
     EvaluateEnvelope CreateEnvelope(
         string agentId,
         string theaterId,
@@ -416,6 +423,42 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 DuplexGovernanceReceipt = duplexGovernanceReceipt,
                 PreDomainAdmissionGateReceipt = admissionGateReceipt,
                 PreDomainHostLoopReceipt = hostLoopReceiptWithPacket
+            }
+        };
+    }
+
+    public GovernedSeedEvaluationResult AttachDomainRoleGating(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainEligibilityAssessment domainEligibilityAssessment,
+        GovernedSeedRoleEligibilityAssessment roleEligibilityAssessment,
+        GovernedSeedDomainRoleGatingAssessment domainRoleGatingAssessment,
+        GovernedSeedDomainRoleGatingReceipt domainRoleGatingReceipt)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(domainEligibilityAssessment);
+        ArgumentNullException.ThrowIfNull(roleEligibilityAssessment);
+        ArgumentNullException.ThrowIfNull(domainRoleGatingAssessment);
+        ArgumentNullException.ThrowIfNull(domainRoleGatingReceipt);
+
+        var operationalContext = result.VerticalSlice.OperationalContext;
+
+        return result with
+        {
+            VerticalSlice = result.VerticalSlice with
+            {
+                OperationalContext = operationalContext is null
+                    ? null
+                    : operationalContext with
+                    {
+                        DomainRoleGatingReceiptHandle = domainRoleGatingReceipt.ReceiptHandle,
+                        DomainRoleGatingDisposition = domainRoleGatingReceipt.Disposition,
+                        DomainEligible = domainRoleGatingReceipt.DomainEligible,
+                        RoleEligible = domainRoleGatingReceipt.RoleEligible
+                    },
+                DomainEligibilityAssessment = domainEligibilityAssessment,
+                RoleEligibilityAssessment = roleEligibilityAssessment,
+                DomainRoleGatingAssessment = domainRoleGatingAssessment,
+                DomainRoleGatingReceipt = domainRoleGatingReceipt
             }
         };
     }
