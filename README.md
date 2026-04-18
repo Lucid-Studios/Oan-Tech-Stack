@@ -200,6 +200,11 @@ which frames post-participation execution and service behavior as reasoning
 over the carried participation packet rather than over loose runtime
 participation surfaces.
 
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_PARTICIPATION_EXECUTION_PACKET.md`,
+which frames service behavior and execution authorization as a carried body
+for downstream operational action and post-execution work.
+
 Inside the sibling line:
 
 ```text
