@@ -56,6 +56,7 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.NotNull(payload.ExecutionAuthorizationAssessment);
         Assert.NotNull(payload.PostParticipationExecutionAssessment);
         Assert.NotNull(payload.PostParticipationExecutionReceipt);
+        Assert.NotNull(payload.PostParticipationExecutionPacket);
 
         Assert.False(payload.CandidateBoundaryReceipt.ContainsAuthorityBearingFields);
         Assert.Equal(payload.CandidateBoundaryReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
@@ -116,9 +117,13 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.Equal(payload.PostParticipationExecutionReceipt.Disposition, payload.OperationalContext.PostParticipationExecutionDisposition);
         Assert.Equal(payload.PostParticipationExecutionReceipt.ServiceBehaviorAuthorized, payload.OperationalContext.ServiceBehaviorAuthorized);
         Assert.Equal(payload.PostParticipationExecutionReceipt.ExecutionAuthorized, payload.OperationalContext.ExecutionAuthorized);
+        Assert.Equal(payload.PostParticipationExecutionPacket.PacketHandle, payload.OperationalContext.PostParticipationExecutionPacketHandle);
         Assert.Equal(payload.ServiceBehaviorAssessment.PacketHandle, payload.PostAdmissionParticipationPacket.PacketHandle);
         Assert.Equal(payload.ExecutionAuthorizationAssessment.PacketHandle, payload.PostAdmissionParticipationPacket.PacketHandle);
         Assert.Equal(payload.PostParticipationExecutionAssessment.PacketHandle, payload.PostAdmissionParticipationPacket.PacketHandle);
         Assert.Equal(payload.PostParticipationExecutionReceipt.PacketHandle, payload.PostAdmissionParticipationPacket.PacketHandle);
+        Assert.Equal(payload.PostParticipationExecutionPacket.CandidateId, payload.PostAdmissionParticipationPacket.CandidateId);
+        Assert.Equal(payload.PostParticipationExecutionPacket.PostAdmissionParticipationPacket.PacketHandle, payload.PostAdmissionParticipationPacket.PacketHandle);
+        Assert.Equal(payload.PostParticipationExecutionPacket.PostParticipationExecutionReceipt.ReceiptHandle, payload.PostParticipationExecutionReceipt.ReceiptHandle);
     }
 }

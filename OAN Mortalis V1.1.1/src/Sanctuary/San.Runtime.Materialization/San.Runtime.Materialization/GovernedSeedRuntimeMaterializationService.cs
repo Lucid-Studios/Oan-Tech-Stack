@@ -95,6 +95,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
     private readonly IGovernedSeedDomainRoleGatingPacketMaterializationService _domainRoleGatingPacketMaterializationService;
     private readonly IGovernedSeedDomainAdmissionRoleBindingPacketMaterializationService _domainAdmissionRoleBindingPacketMaterializationService;
     private readonly IGovernedSeedPostAdmissionParticipationPacketMaterializationService _postAdmissionParticipationPacketMaterializationService;
+    private readonly IGovernedSeedPostParticipationExecutionPacketMaterializationService _postParticipationExecutionPacketMaterializationService;
 
     private static readonly JsonSerializerOptions PayloadJsonOptions = new()
     {
@@ -107,7 +108,8 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         IGovernedSeedPreDomainGovernancePacketMaterializationService preDomainGovernancePacketMaterializationService,
         IGovernedSeedDomainRoleGatingPacketMaterializationService domainRoleGatingPacketMaterializationService,
         IGovernedSeedDomainAdmissionRoleBindingPacketMaterializationService domainAdmissionRoleBindingPacketMaterializationService,
-        IGovernedSeedPostAdmissionParticipationPacketMaterializationService postAdmissionParticipationPacketMaterializationService)
+        IGovernedSeedPostAdmissionParticipationPacketMaterializationService postAdmissionParticipationPacketMaterializationService,
+        IGovernedSeedPostParticipationExecutionPacketMaterializationService postParticipationExecutionPacketMaterializationService)
     {
         _firstRunConstitutionService = firstRunConstitutionService ?? throw new ArgumentNullException(nameof(firstRunConstitutionService));
         _preGovernanceService = preGovernanceService ?? throw new ArgumentNullException(nameof(preGovernanceService));
@@ -115,6 +117,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         _domainRoleGatingPacketMaterializationService = domainRoleGatingPacketMaterializationService ?? throw new ArgumentNullException(nameof(domainRoleGatingPacketMaterializationService));
         _domainAdmissionRoleBindingPacketMaterializationService = domainAdmissionRoleBindingPacketMaterializationService ?? throw new ArgumentNullException(nameof(domainAdmissionRoleBindingPacketMaterializationService));
         _postAdmissionParticipationPacketMaterializationService = postAdmissionParticipationPacketMaterializationService ?? throw new ArgumentNullException(nameof(postAdmissionParticipationPacketMaterializationService));
+        _postParticipationExecutionPacketMaterializationService = postParticipationExecutionPacketMaterializationService ?? throw new ArgumentNullException(nameof(postParticipationExecutionPacketMaterializationService));
     }
 
     public GovernedSeedBootstrapAdmissionReceipt CreateBootstrapAdmissionReceipt(
@@ -609,6 +612,14 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         ArgumentNullException.ThrowIfNull(postParticipationExecutionReceipt);
 
         var operationalContext = result.VerticalSlice.OperationalContext;
+        var postParticipationExecutionPacket = result.VerticalSlice.PostAdmissionParticipationPacket is null
+            ? null
+            : _postParticipationExecutionPacketMaterializationService.Materialize(
+                result.VerticalSlice.PostAdmissionParticipationPacket,
+                serviceBehaviorAssessment,
+                executionAuthorizationAssessment,
+                postParticipationExecutionAssessment,
+                postParticipationExecutionReceipt);
 
         return result with
         {
@@ -618,6 +629,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                     ? null
                     : operationalContext with
                     {
+                        PostParticipationExecutionPacketHandle = postParticipationExecutionPacket?.PacketHandle,
                         PostParticipationExecutionReceiptHandle = postParticipationExecutionReceipt.ReceiptHandle,
                         PostParticipationExecutionDisposition = postParticipationExecutionReceipt.Disposition,
                         ServiceBehaviorAuthorized = postParticipationExecutionReceipt.ServiceBehaviorAuthorized,
@@ -626,7 +638,8 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 ServiceBehaviorAssessment = serviceBehaviorAssessment,
                 ExecutionAuthorizationAssessment = executionAuthorizationAssessment,
                 PostParticipationExecutionAssessment = postParticipationExecutionAssessment,
-                PostParticipationExecutionReceipt = postParticipationExecutionReceipt
+                PostParticipationExecutionReceipt = postParticipationExecutionReceipt,
+                PostParticipationExecutionPacket = postParticipationExecutionPacket
             }
         };
     }
