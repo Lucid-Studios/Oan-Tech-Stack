@@ -23,6 +23,7 @@ public sealed class GovernedSeedRuntimeService
     private readonly IGovernedSeedDomainAdmissionRoleBindingService _domainAdmissionRoleBindingService;
     private readonly IGovernedSeedPostAdmissionParticipationService _postAdmissionParticipationService;
     private readonly IGovernedSeedPostParticipationExecutionService _postParticipationExecutionService;
+    private readonly IGovernedSeedPostExecutionOperationalActionService _postExecutionOperationalActionService;
     private readonly IGovernedStateModulationService _stateModulationService;
     private readonly IGovernedSeedEnvelopeTraceService _traceService;
 
@@ -38,6 +39,7 @@ public sealed class GovernedSeedRuntimeService
         IGovernedSeedDomainAdmissionRoleBindingService domainAdmissionRoleBindingService,
         IGovernedSeedPostAdmissionParticipationService postAdmissionParticipationService,
         IGovernedSeedPostParticipationExecutionService postParticipationExecutionService,
+        IGovernedSeedPostExecutionOperationalActionService postExecutionOperationalActionService,
         IGovernedStateModulationService stateModulationService,
         IGovernedSeedEnvelopeTraceService traceService)
     {
@@ -52,6 +54,7 @@ public sealed class GovernedSeedRuntimeService
         _domainAdmissionRoleBindingService = domainAdmissionRoleBindingService ?? throw new ArgumentNullException(nameof(domainAdmissionRoleBindingService));
         _postAdmissionParticipationService = postAdmissionParticipationService ?? throw new ArgumentNullException(nameof(postAdmissionParticipationService));
         _postParticipationExecutionService = postParticipationExecutionService ?? throw new ArgumentNullException(nameof(postParticipationExecutionService));
+        _postExecutionOperationalActionService = postExecutionOperationalActionService ?? throw new ArgumentNullException(nameof(postExecutionOperationalActionService));
         _stateModulationService = stateModulationService ?? throw new ArgumentNullException(nameof(stateModulationService));
         _traceService = traceService ?? throw new ArgumentNullException(nameof(traceService));
     }
@@ -182,8 +185,11 @@ public sealed class GovernedSeedRuntimeService
         var executionHydratedResult = participationHydratedResult.VerticalSlice.PostAdmissionParticipationPacket is null
             ? participationHydratedResult
             : AttachPostParticipationExecution(participationHydratedResult, participationHydratedResult.VerticalSlice.PostAdmissionParticipationPacket);
-        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, executionHydratedResult);
-        var hydratedResult = _materializationService.AttachStateModulation(executionHydratedResult, stateModulationReceipt);
+        var operationalActionHydratedResult = executionHydratedResult.VerticalSlice.PostParticipationExecutionPacket is null
+            ? executionHydratedResult
+            : AttachPostExecutionOperationalAction(executionHydratedResult, executionHydratedResult.VerticalSlice.PostParticipationExecutionPacket);
+        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, operationalActionHydratedResult);
+        var hydratedResult = _materializationService.AttachStateModulation(operationalActionHydratedResult, stateModulationReceipt);
 
         var envelope = _materializationService.CreateEnvelope(agentId, theaterId, hydratedResult);
         return await _traceService.TraceAsync(envelope, hydratedResult, cancellationToken).ConfigureAwait(false);
@@ -239,6 +245,21 @@ public sealed class GovernedSeedRuntimeService
             execution.ExecutionAuthorizationAssessment,
             execution.UnifiedAssessment,
             execution.Receipt);
+    }
+
+    private GovernedSeedEvaluationResult AttachPostExecutionOperationalAction(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedPostParticipationExecutionPacket packet)
+    {
+        var operationalAction = _postExecutionOperationalActionService.Evaluate(packet);
+        return _materializationService.AttachPostExecutionOperationalAction(
+            result,
+            operationalAction.ServiceEffectAssessment,
+            operationalAction.CommitIntent,
+            operationalAction.CommitAssessment,
+            operationalAction.CommitReceipt,
+            operationalAction.UnifiedAssessment,
+            operationalAction.Receipt);
     }
 
     private static PreDomainLifecycleInputs ProjectPreDomainInputs(

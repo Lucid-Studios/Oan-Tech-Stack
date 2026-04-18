@@ -10,7 +10,9 @@ public interface IGovernedSeedPostExecutionOperationalActionService
 
 public sealed record GovernedSeedPostExecutionOperationalActionResult(
     GovernedSeedServiceEffectAssessment ServiceEffectAssessment,
-    GovernedSeedOperationalActionCommitAssessment OperationalActionCommitAssessment,
+    GovernedSeedCommitIntent CommitIntent,
+    GovernedSeedOperationalActionCommitAssessment CommitAssessment,
+    GovernedSeedCommitReceipt CommitReceipt,
     GovernedSeedPostExecutionOperationalActionAssessment UnifiedAssessment,
     GovernedSeedPostExecutionOperationalActionReceipt Receipt);
 
@@ -23,82 +25,104 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
         ArgumentNullException.ThrowIfNull(packet);
 
         var packetComplete = PacketIsComplete(packet);
-        var standingConsistent =
-            packet.PostParticipationExecutionAssessment.StandingConsistent &&
-            packet.PostAdmissionParticipationPacket.PostAdmissionParticipationAssessment.StandingConsistent &&
-            packet.PostAdmissionParticipationPacket.DomainAdmissionRoleBindingPacket.DomainAdmissionAssessment.StandingConsistent &&
-            packet.PostAdmissionParticipationPacket.DomainAdmissionRoleBindingPacket.DomainRoleGatingPacket.PreDomainGovernancePacket.PrimeSeedStateReceipt.SeedState ==
-            PrimeSeedStateKind.PrimeSeedPreDomainStanding;
-        var revalidationConsistent =
-            packet.PostParticipationExecutionAssessment.RevalidationConsistent &&
-            packet.PostParticipationExecutionPacketRevalidationConsistent();
-        var serviceBehaviorAuthorized =
-            packet.ServiceBehaviorAssessment.ServiceBehaviorAuthorized &&
-            packet.PostParticipationExecutionAssessment.ServiceBehaviorAuthorized &&
-            packet.PostParticipationExecutionReceipt.ServiceBehaviorAuthorized;
         var executionAuthorized =
             packet.ExecutionAuthorizationAssessment.ExecutionAuthorized &&
             packet.PostParticipationExecutionAssessment.ExecutionAuthorized &&
             packet.PostParticipationExecutionReceipt.ExecutionAuthorized;
-        var attributionPreserved =
-            packet.ServiceBehaviorAssessment.AttributionPreserved &&
-            packet.PostAdmissionParticipationPacket.DomainOccupancyAssessment.AttributionPreserved &&
-            packet.PostAdmissionParticipationPacket.DomainAdmissionRoleBindingPacket.DomainAdmissionAssessment.BurdenAttributableAtDomainScope;
+        var serviceBehaviorAuthorized =
+            packet.ServiceBehaviorAssessment.ServiceBehaviorAuthorized &&
+            packet.PostParticipationExecutionAssessment.ServiceBehaviorAuthorized &&
+            packet.PostParticipationExecutionReceipt.ServiceBehaviorAuthorized;
+        var standingConsistent =
+            packet.ServiceBehaviorAssessment.StandingConsistent &&
+            packet.PostParticipationExecutionAssessment.StandingConsistent;
+        var revalidationConsistent =
+            packet.ServiceBehaviorAssessment.RevalidationConsistent &&
+            packet.PostParticipationExecutionAssessment.RevalidationConsistent;
+        var attributionPreserved = packet.ServiceBehaviorAssessment.AttributionPreserved;
         var explicitScopePreserved =
-            packet.ServiceBehaviorAssessment.ServiceScopeLawful &&
             packet.ExecutionAuthorizationAssessment.ExplicitScopePreserved &&
-            !packet.PostAdmissionParticipationPacket.RoleParticipationAssessment.ScopeExpansionDetected;
+            packet.ServiceBehaviorAssessment.ServiceScopeLawful;
         var serviceEffectAuthorized =
             packetComplete &&
             standingConsistent &&
             revalidationConsistent &&
-            serviceBehaviorAuthorized &&
             attributionPreserved &&
-            explicitScopePreserved;
+            explicitScopePreserved &&
+            serviceBehaviorAuthorized;
 
-        var roleBearingActionRequested = packet.ExecutionAuthorizationAssessment.RoleBearingExecutionRequested;
-        var commitStructurePresent =
-            packet.ExecutionAuthorizationAssessment.ExecutionStructurePresent &&
-            packet.PostAdmissionParticipationPacket.DomainAdmissionRoleBindingPacket.DomainAdmissionAssessment.DomainAdmissionGranted &&
-            packet.PostAdmissionParticipationPacket.DomainAdmissionRoleBindingPacket.DomainRoleGatingPacket.PreDomainGovernancePacket.SeparationReceipt.PrimeMaterialCount > 3;
-        var operationalActionCommitted =
+        var explicitCommitRequested =
+            executionAuthorized &&
+            packet.ExecutionAuthorizationAssessment.ExecutionStructurePresent;
+        var irreversibleEffectRequested =
+            packet.ExecutionAuthorizationAssessment.RoleBearingExecutionRequested;
+        var propagationRequested = false;
+        var commitIntentPresent = explicitCommitRequested;
+        var commitReady =
             packetComplete &&
+            executionAuthorized &&
+            serviceEffectAuthorized &&
             standingConsistent &&
             revalidationConsistent &&
-            serviceEffectAuthorized &&
-            executionAuthorized &&
-            commitStructurePresent &&
+            attributionPreserved &&
             explicitScopePreserved &&
-            (!roleBearingActionRequested || packet.PostAdmissionParticipationPacket.RoleParticipationAssessment.RoleParticipationAuthorized);
+            commitIntentPresent &&
+            !irreversibleEffectRequested &&
+            !propagationRequested;
+        var operationalActionCommitted = commitReady;
 
         var serviceEffectAssessment = new GovernedSeedServiceEffectAssessment(
             PacketHandle: packet.PacketHandle,
             CandidateId: packet.CandidateId,
             PacketComplete: packetComplete,
-            ServiceBehaviorAuthorized: serviceBehaviorAuthorized,
             ExecutionAuthorized: executionAuthorized,
+            ServiceBehaviorAuthorized: serviceBehaviorAuthorized,
             StandingConsistent: standingConsistent,
             RevalidationConsistent: revalidationConsistent,
             AttributionPreserved: attributionPreserved,
             ExplicitScopePreserved: explicitScopePreserved,
             ServiceEffectAuthorized: serviceEffectAuthorized,
             Summary: serviceEffectAuthorized
-                ? "Execution packet supports lawful service effect."
-                : "Execution packet does not yet support lawful service effect.");
+                ? "Execution packet supports lawful externalized service effect."
+                : "Execution packet does not yet support lawful externalized service effect.");
 
-        var operationalActionCommitAssessment = new GovernedSeedOperationalActionCommitAssessment(
+        var commitIntent = new GovernedSeedCommitIntent(
+            PacketHandle: packet.PacketHandle,
+            CandidateId: packet.CandidateId,
+            ServiceEffectAuthorized: serviceEffectAuthorized,
+            ExecutionAuthorized: executionAuthorized,
+            ExplicitCommitRequested: explicitCommitRequested,
+            IrreversibleEffectRequested: irreversibleEffectRequested,
+            PropagationRequested: propagationRequested,
+            CommitIntentPresent: commitIntentPresent,
+            Summary: commitIntentPresent
+                ? "Execution packet carries explicit operational-action commit intent."
+                : "Execution packet does not yet carry explicit operational-action commit intent.");
+
+        var commitAssessment = new GovernedSeedOperationalActionCommitAssessment(
             PacketHandle: packet.PacketHandle,
             CandidateId: packet.CandidateId,
             PacketComplete: packetComplete,
-            ServiceBehaviorAuthorized: serviceBehaviorAuthorized,
             ExecutionAuthorized: executionAuthorized,
-            CommitStructurePresent: commitStructurePresent,
+            ServiceEffectAuthorized: serviceEffectAuthorized,
+            StandingConsistent: standingConsistent,
+            RevalidationConsistent: revalidationConsistent,
+            AttributionPreserved: attributionPreserved,
             ExplicitScopePreserved: explicitScopePreserved,
-            RoleBearingActionRequested: roleBearingActionRequested,
+            ExplicitCommitRequested: explicitCommitRequested,
+            CommitReady: commitReady,
             OperationalActionCommitted: operationalActionCommitted,
             Summary: operationalActionCommitted
-                ? "Execution packet supports lawful committed operational action."
-                : "Execution packet does not yet support lawful committed operational action.");
+                ? "Execution packet supports committed operational action."
+                : "Execution packet does not yet support committed operational action.");
+
+        var commitReceipt = new GovernedSeedCommitReceipt(
+            ReceiptHandle: $"post-execution-commit://{packet.CandidateId}",
+            PacketHandle: packet.PacketHandle,
+            CandidateId: packet.CandidateId,
+            CommitReady: commitReady,
+            OperationalActionCommitted: operationalActionCommitted,
+            Summary: commitAssessment.Summary);
 
         var disposition = DetermineDisposition(
             packet,
@@ -106,18 +130,16 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
             standingConsistent,
             revalidationConsistent,
             serviceEffectAuthorized,
-            operationalActionCommitted,
             executionAuthorized,
-            commitStructurePresent,
-            explicitScopePreserved);
+            explicitScopePreserved,
+            commitIntentPresent,
+            operationalActionCommitted);
 
         var unifiedAssessment = new GovernedSeedPostExecutionOperationalActionAssessment(
             PacketHandle: packet.PacketHandle,
             CandidateId: packet.CandidateId,
             Disposition: disposition,
             PacketComplete: packetComplete,
-            StandingConsistent: standingConsistent,
-            RevalidationConsistent: revalidationConsistent,
             ServiceEffectAuthorized: serviceEffectAuthorized,
             OperationalActionCommitted: operationalActionCommitted,
             Summary: BuildSummary(disposition));
@@ -133,7 +155,9 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
 
         return new GovernedSeedPostExecutionOperationalActionResult(
             serviceEffectAssessment,
-            operationalActionCommitAssessment,
+            commitIntent,
+            commitAssessment,
+            commitReceipt,
             unifiedAssessment,
             receipt);
     }
@@ -144,10 +168,10 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
         bool standingConsistent,
         bool revalidationConsistent,
         bool serviceEffectAuthorized,
-        bool operationalActionCommitted,
         bool executionAuthorized,
-        bool commitStructurePresent,
-        bool explicitScopePreserved)
+        bool explicitScopePreserved,
+        bool commitIntentPresent,
+        bool operationalActionCommitted)
     {
         if (!packetComplete ||
             !standingConsistent ||
@@ -156,16 +180,8 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
             return GovernedSeedOperationalActionDisposition.Refuse;
         }
 
-        if (!packet.ExecutionAuthorizationAssessment.ExecutionAuthorized &&
-            !packet.PostParticipationExecutionReceipt.ExecutionAuthorized)
-        {
-            return packet.PostParticipationExecutionReceipt.Disposition ==
-                   GovernedSeedExecutionAuthorizationDisposition.RemainAtParticipationPacket
-                ? GovernedSeedOperationalActionDisposition.RemainAtExecutionPacket
-                : GovernedSeedOperationalActionDisposition.Refuse;
-        }
-
-        if (!explicitScopePreserved)
+        if (!packet.ExecutionAuthorizationAssessment.ExplicitScopePreserved ||
+            !packet.ServiceBehaviorAssessment.ServiceScopeLawful)
         {
             return GovernedSeedOperationalActionDisposition.ReturnToExecutionPending;
         }
@@ -175,16 +191,20 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
             return GovernedSeedOperationalActionDisposition.OperationalActionCommitted;
         }
 
-        if (serviceEffectAuthorized)
+        if (serviceEffectAuthorized && !executionAuthorized)
         {
-            return commitStructurePresent
-                ? GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized
-                : GovernedSeedOperationalActionDisposition.OperationalActionPending;
+            return GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized;
         }
 
-        return executionAuthorized
-            ? GovernedSeedOperationalActionDisposition.ReturnToExecutionPending
-            : GovernedSeedOperationalActionDisposition.OperationalActionPending;
+        if (executionAuthorized && (!commitIntentPresent || !operationalActionCommitted))
+        {
+            return GovernedSeedOperationalActionDisposition.OperationalActionPending;
+        }
+
+        return packet.PostParticipationExecutionReceipt.Disposition ==
+               GovernedSeedExecutionAuthorizationDisposition.RemainAtParticipationPacket
+            ? GovernedSeedOperationalActionDisposition.RemainAtExecutionPacket
+            : GovernedSeedOperationalActionDisposition.Refuse;
     }
 
     private static bool PacketIsComplete(GovernedSeedPostParticipationExecutionPacket packet)
@@ -217,26 +237,15 @@ public sealed class GovernedSeedPostExecutionOperationalActionService
         {
             GovernedSeedOperationalActionDisposition.OperationalActionCommitted =>
                 "Execution packet may commit lawful operational action.",
-            GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized =>
-                "Execution packet may emit lawful service effect without full operational commitment.",
             GovernedSeedOperationalActionDisposition.OperationalActionPending =>
-                "Execution packet remains execution-authorized but operational-action conditions are still pending.",
+                "Execution packet remains execution-authorized but commit-ready conditions are still pending.",
+            GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized =>
+                "Execution packet may externalize bounded service effect without committed operational action.",
             GovernedSeedOperationalActionDisposition.ReturnToExecutionPending =>
                 "Execution packet must return to execution-pending before operational action may proceed.",
             GovernedSeedOperationalActionDisposition.RemainAtExecutionPacket =>
-                "Execution packet remains at the execution layer without operational action authorization.",
+                "Execution packet remains at the execution layer without operational action.",
             _ =>
                 "Execution packet must be refused for post-execution operational action."
         };
-}
-
-internal static class GovernedSeedPostParticipationExecutionPacketExtensions
-{
-    public static bool PostParticipationExecutionPacketRevalidationConsistent(
-        this GovernedSeedPostParticipationExecutionPacket packet)
-    {
-        return packet.ServiceBehaviorAssessment.RevalidationConsistent &&
-               packet.PostAdmissionParticipationPacket.PostAdmissionParticipationAssessment.RevalidationConsistent &&
-               packet.PostAdmissionParticipationPacket.DomainAdmissionRoleBindingPacket.DomainRoleGatingPacket.DomainEligibilityAssessment.RevalidationConsistent;
-    }
 }

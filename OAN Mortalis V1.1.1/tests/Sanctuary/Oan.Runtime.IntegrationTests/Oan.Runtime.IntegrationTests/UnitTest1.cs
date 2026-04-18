@@ -882,11 +882,12 @@ public sealed class SeedVerticalSliceIntegrationTests
                 new GovernedSeedCandidateSeparationService(),
                 new PrimeSeedPreDomainAdmissionGateService()),
             new GovernedSeedDomainRoleGatingService(),
-            new GovernedSeedDomainAdmissionRoleBindingService(),
-            new GovernedSeedPostAdmissionParticipationService(),
-            new GovernedSeedPostParticipationExecutionService(),
-            new GovernedStateModulationService(),
-            new GovernedSeedEnvelopeTraceService(
+      new GovernedSeedDomainAdmissionRoleBindingService(),
+      new GovernedSeedPostAdmissionParticipationService(),
+      new GovernedSeedPostParticipationExecutionService(),
+      new GovernedSeedPostExecutionOperationalActionService(),
+      new GovernedStateModulationService(),
+      new GovernedSeedEnvelopeTraceService(
                 new InMemoryGovernedCrypticPointerStore(),
                 new InMemoryGovernedGelTelemetrySink()));
 

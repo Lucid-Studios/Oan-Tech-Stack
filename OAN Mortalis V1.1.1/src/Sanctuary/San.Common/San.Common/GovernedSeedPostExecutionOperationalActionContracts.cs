@@ -15,8 +15,8 @@ public sealed record GovernedSeedServiceEffectAssessment(
     string PacketHandle,
     string CandidateId,
     bool PacketComplete,
-    bool ServiceBehaviorAuthorized,
     bool ExecutionAuthorized,
+    bool ServiceBehaviorAuthorized,
     bool StandingConsistent,
     bool RevalidationConsistent,
     bool AttributionPreserved,
@@ -24,15 +24,37 @@ public sealed record GovernedSeedServiceEffectAssessment(
     bool ServiceEffectAuthorized,
     string Summary);
 
+public sealed record GovernedSeedCommitIntent(
+    string PacketHandle,
+    string CandidateId,
+    bool ServiceEffectAuthorized,
+    bool ExecutionAuthorized,
+    bool ExplicitCommitRequested,
+    bool IrreversibleEffectRequested,
+    bool PropagationRequested,
+    bool CommitIntentPresent,
+    string Summary);
+
 public sealed record GovernedSeedOperationalActionCommitAssessment(
     string PacketHandle,
     string CandidateId,
     bool PacketComplete,
-    bool ServiceBehaviorAuthorized,
     bool ExecutionAuthorized,
-    bool CommitStructurePresent,
+    bool ServiceEffectAuthorized,
+    bool StandingConsistent,
+    bool RevalidationConsistent,
+    bool AttributionPreserved,
     bool ExplicitScopePreserved,
-    bool RoleBearingActionRequested,
+    bool ExplicitCommitRequested,
+    bool CommitReady,
+    bool OperationalActionCommitted,
+    string Summary);
+
+public sealed record GovernedSeedCommitReceipt(
+    string ReceiptHandle,
+    string PacketHandle,
+    string CandidateId,
+    bool CommitReady,
     bool OperationalActionCommitted,
     string Summary);
 
@@ -41,8 +63,6 @@ public sealed record GovernedSeedPostExecutionOperationalActionAssessment(
     string CandidateId,
     GovernedSeedOperationalActionDisposition Disposition,
     bool PacketComplete,
-    bool StandingConsistent,
-    bool RevalidationConsistent,
     bool ServiceEffectAuthorized,
     bool OperationalActionCommitted,
     string Summary);

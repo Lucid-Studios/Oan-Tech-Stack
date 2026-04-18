@@ -960,7 +960,14 @@ public sealed record GovernedSeedOperationalContext(
     string? PostParticipationExecutionReceiptHandle = null,
     GovernedSeedExecutionAuthorizationDisposition? PostParticipationExecutionDisposition = null,
     bool? ServiceBehaviorAuthorized = null,
-    bool? ExecutionAuthorized = null);
+    bool? ExecutionAuthorized = null,
+    string? PostExecutionOperationalActionReceiptHandle = null,
+    GovernedSeedOperationalActionDisposition? PostExecutionOperationalActionDisposition = null,
+    bool? ServiceEffectAuthorized = null,
+    bool? CommitIntentPresent = null,
+    bool? CommitReady = null,
+    bool? OperationalActionCommitted = null,
+    string? CommitReceiptHandle = null);
 
 public sealed record GovernedSeedReturnSurfaceContext(
     string ContextHandle,
@@ -1136,7 +1143,14 @@ public sealed record GovernedSeedStateModulationReceipt(
     string? PostParticipationExecutionReceiptHandle = null,
     GovernedSeedExecutionAuthorizationDisposition? PostParticipationExecutionDisposition = null,
     bool? ServiceBehaviorAuthorized = null,
-    bool? ExecutionAuthorized = null);
+    bool? ExecutionAuthorized = null,
+    string? PostExecutionOperationalActionReceiptHandle = null,
+    GovernedSeedOperationalActionDisposition? PostExecutionOperationalActionDisposition = null,
+    bool? ServiceEffectAuthorized = null,
+    bool? CommitIntentPresent = null,
+    bool? CommitReady = null,
+    bool? OperationalActionCommitted = null,
+    string? CommitReceiptHandle = null);
 
 public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt,
@@ -1190,7 +1204,13 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedExecutionAuthorizationAssessment? ExecutionAuthorizationAssessment = null,
     GovernedSeedPostParticipationExecutionAssessment? PostParticipationExecutionAssessment = null,
     GovernedSeedPostParticipationExecutionReceipt? PostParticipationExecutionReceipt = null,
-    GovernedSeedPostParticipationExecutionPacket? PostParticipationExecutionPacket = null);
+    GovernedSeedPostParticipationExecutionPacket? PostParticipationExecutionPacket = null,
+    GovernedSeedServiceEffectAssessment? ServiceEffectAssessment = null,
+    GovernedSeedCommitIntent? CommitIntent = null,
+    GovernedSeedOperationalActionCommitAssessment? OperationalActionCommitAssessment = null,
+    GovernedSeedCommitReceipt? CommitReceipt = null,
+    GovernedSeedPostExecutionOperationalActionAssessment? PostExecutionOperationalActionAssessment = null,
+    GovernedSeedPostExecutionOperationalActionReceipt? PostExecutionOperationalActionReceipt = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

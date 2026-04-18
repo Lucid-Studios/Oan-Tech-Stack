@@ -81,6 +81,15 @@ public interface IGovernedSeedRuntimeMaterializationService
         GovernedSeedPostParticipationExecutionAssessment postParticipationExecutionAssessment,
         GovernedSeedPostParticipationExecutionReceipt postParticipationExecutionReceipt);
 
+    GovernedSeedEvaluationResult AttachPostExecutionOperationalAction(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedServiceEffectAssessment serviceEffectAssessment,
+        GovernedSeedCommitIntent commitIntent,
+        GovernedSeedOperationalActionCommitAssessment operationalActionCommitAssessment,
+        GovernedSeedCommitReceipt commitReceipt,
+        GovernedSeedPostExecutionOperationalActionAssessment postExecutionOperationalActionAssessment,
+        GovernedSeedPostExecutionOperationalActionReceipt postExecutionOperationalActionReceipt);
+
     EvaluateEnvelope CreateEnvelope(
         string agentId,
         string theaterId,
@@ -640,6 +649,51 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 PostParticipationExecutionAssessment = postParticipationExecutionAssessment,
                 PostParticipationExecutionReceipt = postParticipationExecutionReceipt,
                 PostParticipationExecutionPacket = postParticipationExecutionPacket
+            }
+        };
+    }
+
+    public GovernedSeedEvaluationResult AttachPostExecutionOperationalAction(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedServiceEffectAssessment serviceEffectAssessment,
+        GovernedSeedCommitIntent commitIntent,
+        GovernedSeedOperationalActionCommitAssessment operationalActionCommitAssessment,
+        GovernedSeedCommitReceipt commitReceipt,
+        GovernedSeedPostExecutionOperationalActionAssessment postExecutionOperationalActionAssessment,
+        GovernedSeedPostExecutionOperationalActionReceipt postExecutionOperationalActionReceipt)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(serviceEffectAssessment);
+        ArgumentNullException.ThrowIfNull(commitIntent);
+        ArgumentNullException.ThrowIfNull(operationalActionCommitAssessment);
+        ArgumentNullException.ThrowIfNull(commitReceipt);
+        ArgumentNullException.ThrowIfNull(postExecutionOperationalActionAssessment);
+        ArgumentNullException.ThrowIfNull(postExecutionOperationalActionReceipt);
+
+        var operationalContext = result.VerticalSlice.OperationalContext;
+
+        return result with
+        {
+            VerticalSlice = result.VerticalSlice with
+            {
+                OperationalContext = operationalContext is null
+                    ? null
+                    : operationalContext with
+                    {
+                        PostExecutionOperationalActionReceiptHandle = postExecutionOperationalActionReceipt.ReceiptHandle,
+                        PostExecutionOperationalActionDisposition = postExecutionOperationalActionReceipt.Disposition,
+                        ServiceEffectAuthorized = postExecutionOperationalActionReceipt.ServiceEffectAuthorized,
+                        CommitIntentPresent = commitIntent.CommitIntentPresent,
+                        CommitReady = operationalActionCommitAssessment.CommitReady,
+                        OperationalActionCommitted = postExecutionOperationalActionReceipt.OperationalActionCommitted,
+                        CommitReceiptHandle = commitReceipt.ReceiptHandle
+                    },
+                ServiceEffectAssessment = serviceEffectAssessment,
+                CommitIntent = commitIntent,
+                OperationalActionCommitAssessment = operationalActionCommitAssessment,
+                CommitReceipt = commitReceipt,
+                PostExecutionOperationalActionAssessment = postExecutionOperationalActionAssessment,
+                PostExecutionOperationalActionReceipt = postExecutionOperationalActionReceipt
             }
         };
     }
