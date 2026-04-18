@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace San.Common;
 
@@ -96,7 +96,7 @@ public static class AgentBuildOrchestrationContracts
                 "documentation-and-research"
             ],
             [
-                "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+                "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
                 "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -138,7 +138,7 @@ public static class AgentBuildOrchestrationContracts
                 "OAN Mortalis V1.1.1/docs/EC_*"
             ],
             [
-                "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+                "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
                 "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -175,7 +175,7 @@ public static class AgentBuildOrchestrationContracts
                 "OAN Mortalis V1.1.1/docs/RUNTIME_*"
             ],
             [
-                "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+                "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
                 "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -227,7 +227,7 @@ public static class AgentBuildOrchestrationContracts
         IntegrationCadence: "receipt-by-slice",
         IntegratorOwnedSharedSurfaces:
         [
-            "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+            "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
             "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
             "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
             "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",

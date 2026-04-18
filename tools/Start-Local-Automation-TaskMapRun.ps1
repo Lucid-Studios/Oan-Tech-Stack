@@ -1,6 +1,6 @@
-param(
+﻿param(
     [string] $RepoRoot,
-    [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-tasking.json',
+    [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-tasking.json',
     [string] $CycleStatePath = '.audit/state/local-automation-cycle.json',
     [string] $ActiveTaskMapStatePath = '.audit/state/local-automation-active-task-map-selection.json'
 )

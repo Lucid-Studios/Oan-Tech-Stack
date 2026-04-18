@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Oan.Audit.Tests;
 
@@ -13,10 +13,10 @@ public sealed class SourceBucketFederationAutomationTests
         var federationDocPath = Path.Combine(lineRoot, "docs", "SOURCE_BUCKET_FEDERATION_LANE.md");
         var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
         var enrichmentPathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
-        var cyclePolicyPath = Path.Combine(lineRoot, "build", "local-automation-cycle.json");
-        var federationPolicyPath = Path.Combine(lineRoot, "build", "source-bucket-federation.json");
-        var requestContractPath = Path.Combine(lineRoot, "build", "source-bucket-work-request-contract.json");
-        var returnContractPath = Path.Combine(lineRoot, "build", "source-bucket-return-contract.json");
+        var cyclePolicyPath = Path.Combine(lineRoot, "Automation", "local-automation-cycle.json");
+        var federationPolicyPath = Path.Combine(lineRoot, "Automation", "source-bucket-federation.json");
+        var requestContractPath = Path.Combine(lineRoot, "Automation", "source-bucket-work-request-contract.json");
+        var returnContractPath = Path.Combine(lineRoot, "Automation", "source-bucket-return-contract.json");
         var localAutomationCycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1");
         var newRequestScriptPath = Path.Combine(repoRoot, "tools", "New-SourceBucket-WorkRequest.ps1");
         var federationStatusScriptPath = Path.Combine(repoRoot, "tools", "Write-SourceBucket-FederationStatus.ps1");

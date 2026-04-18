@@ -1,9 +1,9 @@
-{
+﻿{
   "schemaVersion": 1,
   "status": "active-v1.1.1",
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md",
-  "appendixContractPath": "OAN Mortalis V1.1.1/build/source-bucket-report-appendix-contract.json",
-  "threadContinuityContractPath": "OAN Mortalis V1.1.1/build/source-bucket-thread-continuity-contract.json",
+  "appendixContractPath": "OAN Mortalis V1.1.1/Automation/source-bucket-report-appendix-contract.json",
+  "threadContinuityContractPath": "OAN Mortalis V1.1.1/Automation/source-bucket-thread-continuity-contract.json",
   "currentStandingSummaryStatePath": ".audit/state/current-source-bucket-standing-summary.json",
   "currentStandingSummaryMarkdownPath": ".audit/state/current-source-bucket-standing-summary.md",
   "currentCandidateGelItemsStatePath": ".audit/state/current-candidate-gel-items.json",

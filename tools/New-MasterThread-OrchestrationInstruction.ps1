@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Mandatory = $true)]
     [string] $ThreadContextLabel,
     [Parameter(Mandatory = $true)]
@@ -13,7 +13,7 @@ param(
     [int] $PollingIntervalSeconds,
     [int] $PollingWindowMinutes,
     [string] $RepoRoot,
-    [string] $OrchestrationPolicyPath = 'OAN Mortalis V1.1.1/build/master-thread-orchestration.json',
+    [string] $OrchestrationPolicyPath = 'OAN Mortalis V1.1.1/Automation/master-thread-orchestration.json',
     [string] $BucketStatusPath = '.audit/state/workspace-bucket-status.json',
     [string] $CycleStatePath = '.audit/state/local-automation-cycle.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'

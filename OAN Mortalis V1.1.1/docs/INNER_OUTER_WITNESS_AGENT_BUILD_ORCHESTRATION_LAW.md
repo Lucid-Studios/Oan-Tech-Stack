@@ -1,4 +1,4 @@
-# INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW
+﻿# INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW
 
 ## Purpose
 
@@ -31,7 +31,7 @@ This law is subordinate to:
 
 The machine-readable policy surface for this law lives at:
 
-- `build/agent-work-lanes.json`
+- `Automation/agent-work-lanes.json`
 
 The active authority remains repo-local executable truth.
 
@@ -114,7 +114,7 @@ At minimum, those shared surfaces include:
 - `V1_1_1_CARRY_FORWARD_LEDGER.md`
 - `V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md`
 - `INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md`
-- `build/agent-work-lanes.json`
+- `Automation/agent-work-lanes.json`
 
 Worker output without a lawful return receipt is not admissible build
 authority.

@@ -1,8 +1,8 @@
-param(
+﻿param(
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest

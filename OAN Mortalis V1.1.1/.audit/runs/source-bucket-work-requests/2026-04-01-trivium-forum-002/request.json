@@ -44,8 +44,8 @@
                                 "tests.sanctuaryRuntimeWorkbenchService"
                             ],
     "bundlePath":  "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests/2026-04-01-trivium-forum-002",
-    "requestContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
-    "federationPolicyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+    "requestContractPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-work-request-contract.json",
+    "federationPolicyPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-federation.json",
     "completionRule":  "A request remains active until a lawful source-bucket return is admitted, superseded, withdrawn, or held by review.",
     "operatorPrompt":  {
                            "schemaVersion":  1,

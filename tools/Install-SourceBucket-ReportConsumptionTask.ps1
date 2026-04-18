@@ -1,4 +1,4 @@
-[CmdletBinding(SupportsShouldProcess = $true)]
+﻿[CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string] $TaskName = 'OAN Mortalis Source-Bucket Report Consumption',
     [ValidateSet('Debug', 'Release')]
@@ -6,7 +6,7 @@ param(
     [int] $CadenceHours = 1,
     [datetime] $StartAt,
     [string] $RepoRoot,
-    [string] $ConsumptionPolicyPath = 'OAN Mortalis V1.1.1/build/source-bucket-report-consumption.json'
+    [string] $ConsumptionPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-report-consumption.json'
 )
 
 Set-StrictMode -Version Latest

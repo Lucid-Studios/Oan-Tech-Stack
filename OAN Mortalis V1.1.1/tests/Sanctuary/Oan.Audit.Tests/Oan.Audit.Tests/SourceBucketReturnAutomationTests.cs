@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Oan.Audit.Tests;
 
@@ -10,13 +10,13 @@ public sealed class SourceBucketReturnAutomationTests
         var lineRoot = GetLineRoot();
         var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
 
-        var federationPolicyPath = Path.Combine(lineRoot, "build", "source-bucket-federation.json");
-        var cyclePolicyPath = Path.Combine(lineRoot, "build", "local-automation-cycle.json");
+        var federationPolicyPath = Path.Combine(lineRoot, "Automation", "source-bucket-federation.json");
+        var cyclePolicyPath = Path.Combine(lineRoot, "Automation", "local-automation-cycle.json");
         var federationDocPath = Path.Combine(lineRoot, "docs", "SOURCE_BUCKET_FEDERATION_LANE.md");
         var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
         var enrichmentPathwayPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
         var dispatchPromptPath = Path.Combine(lineRoot, "docs", "OAN_BUILD_DISPATCH_ROOT_PROMPT.md");
-        var returnContractPath = Path.Combine(lineRoot, "build", "source-bucket-return-contract.json");
+        var returnContractPath = Path.Combine(lineRoot, "Automation", "source-bucket-return-contract.json");
         var returnCycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-SourceBucket-ReturnCycle.ps1");
         var returnStatusScriptPath = Path.Combine(repoRoot, "tools", "Write-SourceBucket-ReturnIntegrationStatus.ps1");
         var localAutomationCycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1");

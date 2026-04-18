@@ -1,6 +1,6 @@
-{
+﻿{
   "schemaVersion": 1,
-  "sourceBucketFederationPolicyPath": "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+  "sourceBucketFederationPolicyPath": "OAN Mortalis V1.1.1/Automation/source-bucket-federation.json",
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
   "requestBundleRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests",
   "requestFileNames": [

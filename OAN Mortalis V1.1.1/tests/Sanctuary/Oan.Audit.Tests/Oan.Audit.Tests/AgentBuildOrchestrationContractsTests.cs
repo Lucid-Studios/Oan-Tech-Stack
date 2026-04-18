@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using San.Common;
 
 namespace San.Audit.Tests;
@@ -111,7 +111,7 @@ public sealed class AgentBuildOrchestrationContractsTests
         Assert.Equal("receipt-by-slice", policy.IntegrationCadence);
         Assert.Equal(
             [
-                "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+                "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
                 "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
                 "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -404,9 +404,9 @@ public sealed class AgentBuildOrchestrationContractsTests
     public void Agent_Work_Lanes_Json_And_Docs_Are_Aligned()
     {
         var lineRoot = GetLineRoot();
-        var buildRoot = Path.Combine(lineRoot, "build");
+        var automationRoot = Path.Combine(lineRoot, "Automation");
         var docsRoot = Path.Combine(lineRoot, "docs");
-        var jsonPath = Path.Combine(buildRoot, "agent-work-lanes.json");
+        var jsonPath = Path.Combine(automationRoot, "agent-work-lanes.json");
         var buildReadinessPath = Path.Combine(docsRoot, "BUILD_READINESS.md");
         var orchestrationLawPath = Path.Combine(docsRoot, "INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md");
         var carryForwardPath = Path.Combine(docsRoot, "V1_1_1_CARRY_FORWARD_LEDGER.md");

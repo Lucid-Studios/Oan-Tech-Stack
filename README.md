@@ -147,6 +147,7 @@ Inside the active line:
 
 ```text
 OAN Mortalis V1.1.1/
+  Automation/
   docs/
   src/
     Sanctuary/

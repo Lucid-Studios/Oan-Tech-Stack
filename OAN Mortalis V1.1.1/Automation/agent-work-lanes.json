@@ -1,4 +1,4 @@
-{
+﻿{
   "schemaVersion": 1,
   "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/INNER_OUTER_WITNESS_AGENT_BUILD_ORCHESTRATION_LAW.md",
   "operationalModel": "manual-integrator-mediated-subagent-orchestration",
@@ -58,7 +58,7 @@
     "RuntimeAuthorityWidening"
   ],
   "sharedTruthIntegratorOwnedSurfaces": [
-    "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+    "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
     "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
     "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
     "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -85,7 +85,7 @@
         "documentation-and-research"
       ],
       "ownedWriteSurfaces": [
-        "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+        "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
         "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
         "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
         "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -128,7 +128,7 @@
         "OAN Mortalis V1.1.1/docs/EC_*"
       ],
       "forbiddenOverlappingSurfaces": [
-        "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+        "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
         "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
         "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
         "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",
@@ -166,7 +166,7 @@
         "OAN Mortalis V1.1.1/docs/RUNTIME_*"
       ],
       "forbiddenOverlappingSurfaces": [
-        "OAN Mortalis V1.1.1/build/agent-work-lanes.json",
+        "OAN Mortalis V1.1.1/Automation/agent-work-lanes.json",
         "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
         "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md",
         "OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_REFINEMENT_LEDGER.md",

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the governed automation conveyor for the active `OAN Mortalis V1.1.1` build while the machine-readable automation policy remains staged under `OAN Mortalis V1.1.1/build/`.
+This document defines the governed automation conveyor for the active `OAN Mortalis V1.1.1` build while the machine-readable automation policy is staged under `OAN Mortalis V1.1.1/Automation/`.
 
 The goal is not to remove human judgment.
 
@@ -45,7 +45,7 @@ The conveyor is grounded in:
 
 The current split around those files is:
 
-- automation policy stays under `OAN Mortalis V1.1.1/build/` until the policy lane is relocated
+- automation policy stays under `OAN Mortalis V1.1.1/Automation/`
 - executable build truth stays under `OAN Mortalis V1.1.1/`
 - `Documentation Repo` remains doctrine and publication truth, not executable authority
 - `GNOMERONACORDE` remains a publication and pedagogy source for build-facing uptake
@@ -118,7 +118,7 @@ The repo now carries a local automation cycle for longer unattended stretches:
 
 This cycle is declared in:
 
-- `build/local-automation-cycle.json`
+- `Automation/local-automation-cycle.json`
 
 The close-law target for the lane is declared in:
 
@@ -204,7 +204,7 @@ The stable status surfaces are:
 
 The formal tasking surface is:
 
-- `build/local-automation-tasking.json`
+- `Automation/local-automation-tasking.json`
 - `docs/LOCAL_AUTOMATION_TASKING_SURFACE.md`
 
 The local cycle is intentionally biased toward continued build progress.

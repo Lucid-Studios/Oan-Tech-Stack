@@ -1,9 +1,9 @@
-param(
+﻿param(
     [string] $RepoRoot,
     [Parameter(Mandatory = $true)]
     [string] $ManifestPath,
     [string] $DigestBundlePath,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'
 )
 

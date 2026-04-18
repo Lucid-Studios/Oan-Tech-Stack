@@ -1,4 +1,4 @@
-# SOURCE_BUCKET_FEDERATION_LANE
+﻿# SOURCE_BUCKET_FEDERATION_LANE
 
 ## Purpose
 
@@ -41,7 +41,7 @@ The mechanical federation cycle now runs inside the active build lane to:
 
 This control plane lives inside:
 
-- `OAN Mortalis V1.1.1/build/`
+- `OAN Mortalis V1.1.1/Automation/`
 - `OAN Mortalis V1.1.1/.audit/`
 
 It reads the existing repo-root automation telemetry as upstream standing, but
@@ -133,7 +133,7 @@ Each bundle should preserve:
 
 The machine request contract lives at:
 
-- `OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json`
+- `OAN Mortalis V1.1.1/Automation/source-bucket-work-request-contract.json`
 
 Each request names at minimum:
 
@@ -159,7 +159,7 @@ receipts rather than through ambient conversation.
 
 The line-local return contract lives at:
 
-- `OAN Mortalis V1.1.1/build/source-bucket-return-contract.json`
+- `OAN Mortalis V1.1.1/Automation/source-bucket-return-contract.json`
 
 The build-local return inbox and status surfaces now live at:
 

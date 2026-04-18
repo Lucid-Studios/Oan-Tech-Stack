@@ -1,4 +1,4 @@
-{
+﻿{
   "schemaVersion": 1,
   "defaultConfiguration": "Release",
   "localAutomationCadenceMinutes": 60,
@@ -116,10 +116,10 @@
   "selfRootedCrypticDepthGateOutputRoot": ".audit/runs/self-rooted-cryptic-depth-gate",
   "runtimeWorkbenchSessionLedgerOutputRoot": ".audit/runs/runtime-workbench-session-ledger",
   "companionToolTelemetryOutputRoot": ".audit/runs/companion-tool-telemetry",
-  "sourceBucketFederationPolicyPath": "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
-  "sourceBucketReportAppendixContractPath": "OAN Mortalis V1.1.1/build/source-bucket-report-appendix-contract.json",
-  "sourceBucketThreadContinuityContractPath": "OAN Mortalis V1.1.1/build/source-bucket-thread-continuity-contract.json",
-  "sourceBucketReportConsumptionPolicyPath": "OAN Mortalis V1.1.1/build/source-bucket-report-consumption.json",
+  "sourceBucketFederationPolicyPath": "OAN Mortalis V1.1.1/Automation/source-bucket-federation.json",
+  "sourceBucketReportAppendixContractPath": "OAN Mortalis V1.1.1/Automation/source-bucket-report-appendix-contract.json",
+  "sourceBucketThreadContinuityContractPath": "OAN Mortalis V1.1.1/Automation/source-bucket-thread-continuity-contract.json",
+  "sourceBucketReportConsumptionPolicyPath": "OAN Mortalis V1.1.1/Automation/source-bucket-report-consumption.json",
   "sourceBucketWorkRequestOutputRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests",
   "sourceBucketReturnInboxRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-returns",
   "sourceBucketReportConsumptionOutputRoot": ".audit/runs/report-consumption",

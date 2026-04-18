@@ -1,7 +1,7 @@
-param(
+﻿param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
-    [string] $FederationPolicyPath = 'OAN Mortalis V1.1.1/build/source-bucket-federation.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
+    [string] $FederationPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-federation.json'
 )
 
 Set-StrictMode -Version Latest

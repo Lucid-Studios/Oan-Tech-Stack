@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Oan.Audit.Tests;
 
@@ -16,7 +16,7 @@ public sealed class BuildDispatchGateReconciliationTests
         var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
         var workflowMilestoneMapPath = Path.Combine(lineRoot, "docs", "V1_1_1_WORKFLOW_MILESTONE_MAP.md");
         var seededGovernanceBuildAdmissionLawPath = Path.Combine(lineRoot, "docs", "SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md");
-        var orchestrationPolicyPath = Path.Combine(lineRoot, "build", "master-thread-orchestration.json");
+        var orchestrationPolicyPath = Path.Combine(lineRoot, "Automation", "master-thread-orchestration.json");
         var masterThreadStatePath = Path.Combine(repoRoot, ".audit", "state", "master-thread-orchestration-status.json");
         var seededGovernanceStatePath = Path.Combine(repoRoot, ".audit", "state", "local-automation-seeded-governance-last-run.json");
         var runIsolatedPathwayStatePath = Path.Combine(repoRoot, ".audit", "state", "local-automation-run-isolated-build-pathway-last-run.json");

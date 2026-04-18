@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines a repo-local bucket grouping system for the active `OAN Mortalis V1.1.1` workspace while the bucket policy remains staged under `OAN Mortalis V1.1.1/build/`.
+This document defines a repo-local bucket grouping system for the active `OAN Mortalis V1.1.1` workspace while the bucket policy remains staged under `OAN Mortalis V1.1.1/Automation/`.
 
 It exists as a build-aware analogue to tool-space folder grouping.
 
@@ -22,7 +22,7 @@ It lets the repo say:
 
 The machine-readable bucket contract lives in:
 
-- `build/workspace-bucket-groups.json`
+- `Automation/workspace-bucket-groups.json`
 
 The live bucket-awareness surfaces are:
 
@@ -126,4 +126,3 @@ This system does not:
 - claim the app tool space already supports cross-folder build awareness natively
 
 It is a repo-local compensating structure until richer tool-space grouping exists.
-

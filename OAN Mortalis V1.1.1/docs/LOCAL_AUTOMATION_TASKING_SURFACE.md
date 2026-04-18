@@ -18,7 +18,7 @@ It must always be possible to say:
 
 The machine-readable contract lives in:
 
-- `build/local-automation-tasking.json`
+- `Automation/local-automation-tasking.json`
 
 The live applied status surfaces are:
 
@@ -30,7 +30,7 @@ Those live surfaces apply the current automation state onto the formal task defi
 
 ## Active Build Alignment
 
-The machine-readable automation policy is still stored under `OAN Mortalis V1.1.1/build/`.
+The machine-readable automation policy is now stored under `OAN Mortalis V1.1.1/Automation/`.
 
 That policy now governs the active executable line at:
 

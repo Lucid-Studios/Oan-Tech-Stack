@@ -1,8 +1,8 @@
 ﻿{
     "schemaVersion":  1,
     "generatedAtUtc":  "2026-04-08T16:33:07.1937184Z",
-    "policyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
-    "returnContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-return-contract.json",
+    "policyPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-federation.json",
+    "returnContractPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-return-contract.json",
     "requestIndexStatePath":  "OAN Mortalis V1.1.1/.audit/state/source-bucket-request-index.json",
     "returnInboxRoot":  "OAN Mortalis V1.1.1/.audit/runs/source-bucket-returns",
     "returnCount":  0,

@@ -1,8 +1,8 @@
-param(
+﻿param(
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
     [string] $RepoRoot,
-    [string] $PolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
+    [string] $PolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
     [string] $BaseRef,
     [string] $RequestedVersion,
     [switch] $ForceReleaseCandidate,

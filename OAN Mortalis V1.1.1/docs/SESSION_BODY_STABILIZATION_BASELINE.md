@@ -1,4 +1,4 @@
-# SESSION BODY STABILIZATION BASELINE
+﻿# SESSION BODY STABILIZATION BASELINE
 
 ## Purpose
 
@@ -99,7 +99,7 @@ Admit now:
 - `test.ps1`
 - `tools/build-serial.ps1`
 - `tools/Use-LineVerificationLock.ps1`
-- `build/agent-work-lanes.json`
+- `Automation/agent-work-lanes.json`
 - `src/Sanctuary/Oan.Common/Oan.Common/AgentBuildOrchestrationContracts.cs`
 - `tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/AgentBuildOrchestrationContractsTests.cs`
 - `tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/BuildVerificationLockTests.cs`

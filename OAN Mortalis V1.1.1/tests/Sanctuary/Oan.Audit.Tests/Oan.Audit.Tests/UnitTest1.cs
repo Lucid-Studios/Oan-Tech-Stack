@@ -1,4 +1,4 @@
-namespace Oan.Audit.Tests;
+﻿namespace Oan.Audit.Tests;
 
 public sealed class BootstrapBoundaryTests
 {
@@ -3715,7 +3715,7 @@ public sealed class BootstrapBoundaryTests
         var unlockReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_HOLD_UNLOCK_READINESS.md");
         var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
         var companionTelemetryDocPath = Path.Combine(lineRoot, "docs", "COMPANION_TOOL_TELEMETRY_LANE.md");
-        var cyclePolicyPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "build", "local-automation-cycle.json");
+        var cyclePolicyPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "Automation", "local-automation-cycle.json");
 
         var buildReadinessText = File.ReadAllText(buildReadinessPath);
         var unlockReadinessText = File.ReadAllText(unlockReadinessPath);

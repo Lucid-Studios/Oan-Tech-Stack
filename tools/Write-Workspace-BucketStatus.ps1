@@ -1,6 +1,6 @@
-param(
+﻿param(
     [string] $RepoRoot,
-    [string] $BucketPolicyPath = 'OAN Mortalis V1.1.1/build/workspace-bucket-groups.json',
+    [string] $BucketPolicyPath = 'OAN Mortalis V1.1.1/Automation/workspace-bucket-groups.json',
     [string] $FamilyMaturityPath = 'OAN Mortalis V1.1.1/build/family-maturity.json',
     [string] $DeployablesPath = 'OAN Mortalis V1.1.1/build/deployables.json',
     [string] $TaskStatusPath = '.audit/state/local-automation-tasking-status.json'

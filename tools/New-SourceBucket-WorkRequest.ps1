@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Mandatory = $true)]
     [string] $TargetBucketLabel,
     [Parameter(Mandatory = $true)]
@@ -18,7 +18,7 @@ param(
     [string[]] $SourceTouchPointIds,
     [string] $RequestKey,
     [string] $RepoRoot,
-    [string] $RequestContractPath = 'OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json'
+    [string] $RequestContractPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-work-request-contract.json'
 )
 
 Set-StrictMode -Version Latest

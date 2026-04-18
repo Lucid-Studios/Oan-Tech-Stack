@@ -1,4 +1,4 @@
-[CmdletBinding(SupportsShouldProcess = $true)]
+﻿[CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string] $TaskName = 'OAN Mortalis Governed HITL Digest',
     [ValidateSet('Debug', 'Release')]
@@ -6,7 +6,7 @@ param(
     [int] $CadenceHours = 24,
     [datetime] $StartAt,
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json'
+    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json'
 )
 
 Set-StrictMode -Version Latest
