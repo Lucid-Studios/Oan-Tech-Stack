@@ -71,6 +71,7 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
     private readonly IFirstRunConstitutionService _firstRunConstitutionService;
     private readonly IGovernedSeedPreGovernanceService _preGovernanceService;
     private readonly IGovernedSeedPreDomainGovernancePacketMaterializationService _preDomainGovernancePacketMaterializationService;
+    private readonly IGovernedSeedDomainRoleGatingPacketMaterializationService _domainRoleGatingPacketMaterializationService;
 
     private static readonly JsonSerializerOptions PayloadJsonOptions = new()
     {
@@ -80,11 +81,13 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
     public GovernedSeedRuntimeMaterializationService(
         IFirstRunConstitutionService firstRunConstitutionService,
         IGovernedSeedPreGovernanceService preGovernanceService,
-        IGovernedSeedPreDomainGovernancePacketMaterializationService preDomainGovernancePacketMaterializationService)
+        IGovernedSeedPreDomainGovernancePacketMaterializationService preDomainGovernancePacketMaterializationService,
+        IGovernedSeedDomainRoleGatingPacketMaterializationService domainRoleGatingPacketMaterializationService)
     {
         _firstRunConstitutionService = firstRunConstitutionService ?? throw new ArgumentNullException(nameof(firstRunConstitutionService));
         _preGovernanceService = preGovernanceService ?? throw new ArgumentNullException(nameof(preGovernanceService));
         _preDomainGovernancePacketMaterializationService = preDomainGovernancePacketMaterializationService ?? throw new ArgumentNullException(nameof(preDomainGovernancePacketMaterializationService));
+        _domainRoleGatingPacketMaterializationService = domainRoleGatingPacketMaterializationService ?? throw new ArgumentNullException(nameof(domainRoleGatingPacketMaterializationService));
     }
 
     public GovernedSeedBootstrapAdmissionReceipt CreateBootstrapAdmissionReceipt(
@@ -441,6 +444,14 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
         ArgumentNullException.ThrowIfNull(domainRoleGatingReceipt);
 
         var operationalContext = result.VerticalSlice.OperationalContext;
+        var domainRoleGatingPacket = result.VerticalSlice.PreDomainGovernancePacket is null
+            ? null
+            : _domainRoleGatingPacketMaterializationService.Materialize(
+                result.VerticalSlice.PreDomainGovernancePacket,
+                domainEligibilityAssessment,
+                roleEligibilityAssessment,
+                domainRoleGatingAssessment,
+                domainRoleGatingReceipt);
 
         return result with
         {
@@ -453,12 +464,14 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                         DomainRoleGatingReceiptHandle = domainRoleGatingReceipt.ReceiptHandle,
                         DomainRoleGatingDisposition = domainRoleGatingReceipt.Disposition,
                         DomainEligible = domainRoleGatingReceipt.DomainEligible,
-                        RoleEligible = domainRoleGatingReceipt.RoleEligible
+                        RoleEligible = domainRoleGatingReceipt.RoleEligible,
+                        DomainRoleGatingPacketHandle = domainRoleGatingPacket?.PacketHandle
                     },
                 DomainEligibilityAssessment = domainEligibilityAssessment,
                 RoleEligibilityAssessment = roleEligibilityAssessment,
                 DomainRoleGatingAssessment = domainRoleGatingAssessment,
-                DomainRoleGatingReceipt = domainRoleGatingReceipt
+                DomainRoleGatingReceipt = domainRoleGatingReceipt,
+                DomainRoleGatingPacket = domainRoleGatingPacket
             }
         };
     }

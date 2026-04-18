@@ -944,7 +944,8 @@ public sealed record GovernedSeedOperationalContext(
     string? DomainRoleGatingReceiptHandle = null,
     GovernedSeedDomainRoleGatingDisposition? DomainRoleGatingDisposition = null,
     bool? DomainEligible = null,
-    bool? RoleEligible = null);
+    bool? RoleEligible = null,
+    string? DomainRoleGatingPacketHandle = null);
 
 public sealed record GovernedSeedReturnSurfaceContext(
     string ContextHandle,
@@ -1104,7 +1105,8 @@ public sealed record GovernedSeedStateModulationReceipt(
     string? DomainRoleGatingReceiptHandle = null,
     GovernedSeedDomainRoleGatingDisposition? DomainRoleGatingDisposition = null,
     bool? DomainEligible = null,
-    bool? RoleEligible = null);
+    bool? RoleEligible = null,
+    string? DomainRoleGatingPacketHandle = null);
 
 public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt,
@@ -1142,7 +1144,8 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedDomainEligibilityAssessment? DomainEligibilityAssessment = null,
     GovernedSeedRoleEligibilityAssessment? RoleEligibilityAssessment = null,
     GovernedSeedDomainRoleGatingAssessment? DomainRoleGatingAssessment = null,
-    GovernedSeedDomainRoleGatingReceipt? DomainRoleGatingReceipt = null);
+    GovernedSeedDomainRoleGatingReceipt? DomainRoleGatingReceipt = null,
+    GovernedSeedDomainRoleGatingPacket? DomainRoleGatingPacket = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

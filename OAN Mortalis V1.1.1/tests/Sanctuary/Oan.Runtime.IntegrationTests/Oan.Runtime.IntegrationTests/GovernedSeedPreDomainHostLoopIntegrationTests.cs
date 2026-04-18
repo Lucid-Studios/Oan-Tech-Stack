@@ -41,6 +41,7 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.NotNull(payload.RoleEligibilityAssessment);
         Assert.NotNull(payload.DomainRoleGatingAssessment);
         Assert.NotNull(payload.DomainRoleGatingReceipt);
+        Assert.NotNull(payload.DomainRoleGatingPacket);
 
         Assert.False(payload.CandidateBoundaryReceipt.ContainsAuthorityBearingFields);
         Assert.Equal(payload.CandidateBoundaryReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
@@ -66,7 +67,11 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.Equal(payload.DomainRoleGatingReceipt.Disposition, payload.OperationalContext.DomainRoleGatingDisposition);
         Assert.Equal(payload.DomainRoleGatingReceipt.DomainEligible, payload.OperationalContext.DomainEligible);
         Assert.Equal(payload.DomainRoleGatingReceipt.RoleEligible, payload.OperationalContext.RoleEligible);
+        Assert.Equal(payload.DomainRoleGatingPacket.PacketHandle, payload.OperationalContext.DomainRoleGatingPacketHandle);
         Assert.Equal(payload.DomainRoleGatingReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
         Assert.Equal(payload.DomainRoleGatingReceipt.PacketHandle, payload.PreDomainGovernancePacket.PacketHandle);
+        Assert.Equal(payload.DomainRoleGatingPacket.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
+        Assert.Equal(payload.DomainRoleGatingPacket.PreDomainGovernancePacket.PacketHandle, payload.PreDomainGovernancePacket.PacketHandle);
+        Assert.Equal(payload.DomainRoleGatingPacket.GatingReceipt.ReceiptHandle, payload.DomainRoleGatingReceipt.ReceiptHandle);
     }
 }
