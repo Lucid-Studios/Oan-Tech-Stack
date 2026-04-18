@@ -945,7 +945,11 @@ public sealed record GovernedSeedOperationalContext(
     GovernedSeedDomainRoleGatingDisposition? DomainRoleGatingDisposition = null,
     bool? DomainEligible = null,
     bool? RoleEligible = null,
-    string? DomainRoleGatingPacketHandle = null);
+    string? DomainRoleGatingPacketHandle = null,
+    string? DomainAdmissionRoleBindingReceiptHandle = null,
+    GovernedSeedDomainAdmissionRoleBindingDisposition? DomainAdmissionRoleBindingDisposition = null,
+    bool? DomainAdmissionGranted = null,
+    bool? RoleBound = null);
 
 public sealed record GovernedSeedReturnSurfaceContext(
     string ContextHandle,
@@ -1106,7 +1110,11 @@ public sealed record GovernedSeedStateModulationReceipt(
     GovernedSeedDomainRoleGatingDisposition? DomainRoleGatingDisposition = null,
     bool? DomainEligible = null,
     bool? RoleEligible = null,
-    string? DomainRoleGatingPacketHandle = null);
+    string? DomainRoleGatingPacketHandle = null,
+    string? DomainAdmissionRoleBindingReceiptHandle = null,
+    GovernedSeedDomainAdmissionRoleBindingDisposition? DomainAdmissionRoleBindingDisposition = null,
+    bool? DomainAdmissionGranted = null,
+    bool? RoleBound = null);
 
 public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt,
@@ -1145,7 +1153,11 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedRoleEligibilityAssessment? RoleEligibilityAssessment = null,
     GovernedSeedDomainRoleGatingAssessment? DomainRoleGatingAssessment = null,
     GovernedSeedDomainRoleGatingReceipt? DomainRoleGatingReceipt = null,
-    GovernedSeedDomainRoleGatingPacket? DomainRoleGatingPacket = null);
+    GovernedSeedDomainRoleGatingPacket? DomainRoleGatingPacket = null,
+    GovernedSeedDomainAdmissionAssessment? DomainAdmissionAssessment = null,
+    GovernedSeedRoleBindingAssessment? RoleBindingAssessment = null,
+    GovernedSeedDomainAdmissionRoleBindingAssessment? DomainAdmissionRoleBindingAssessment = null,
+    GovernedSeedDomainAdmissionRoleBindingReceipt? DomainAdmissionRoleBindingReceipt = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

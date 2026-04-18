@@ -60,6 +60,13 @@ public interface IGovernedSeedRuntimeMaterializationService
         GovernedSeedDomainRoleGatingAssessment domainRoleGatingAssessment,
         GovernedSeedDomainRoleGatingReceipt domainRoleGatingReceipt);
 
+    GovernedSeedEvaluationResult AttachDomainAdmissionRoleBinding(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainAdmissionAssessment domainAdmissionAssessment,
+        GovernedSeedRoleBindingAssessment roleBindingAssessment,
+        GovernedSeedDomainAdmissionRoleBindingAssessment domainAdmissionRoleBindingAssessment,
+        GovernedSeedDomainAdmissionRoleBindingReceipt domainAdmissionRoleBindingReceipt);
+
     EvaluateEnvelope CreateEnvelope(
         string agentId,
         string theaterId,
@@ -472,6 +479,42 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 DomainRoleGatingAssessment = domainRoleGatingAssessment,
                 DomainRoleGatingReceipt = domainRoleGatingReceipt,
                 DomainRoleGatingPacket = domainRoleGatingPacket
+            }
+        };
+    }
+
+    public GovernedSeedEvaluationResult AttachDomainAdmissionRoleBinding(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainAdmissionAssessment domainAdmissionAssessment,
+        GovernedSeedRoleBindingAssessment roleBindingAssessment,
+        GovernedSeedDomainAdmissionRoleBindingAssessment domainAdmissionRoleBindingAssessment,
+        GovernedSeedDomainAdmissionRoleBindingReceipt domainAdmissionRoleBindingReceipt)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(domainAdmissionAssessment);
+        ArgumentNullException.ThrowIfNull(roleBindingAssessment);
+        ArgumentNullException.ThrowIfNull(domainAdmissionRoleBindingAssessment);
+        ArgumentNullException.ThrowIfNull(domainAdmissionRoleBindingReceipt);
+
+        var operationalContext = result.VerticalSlice.OperationalContext;
+
+        return result with
+        {
+            VerticalSlice = result.VerticalSlice with
+            {
+                OperationalContext = operationalContext is null
+                    ? null
+                    : operationalContext with
+                    {
+                        DomainAdmissionRoleBindingReceiptHandle = domainAdmissionRoleBindingReceipt.ReceiptHandle,
+                        DomainAdmissionRoleBindingDisposition = domainAdmissionRoleBindingReceipt.Disposition,
+                        DomainAdmissionGranted = domainAdmissionRoleBindingReceipt.DomainAdmissionGranted,
+                        RoleBound = domainAdmissionRoleBindingReceipt.RoleBound
+                    },
+                DomainAdmissionAssessment = domainAdmissionAssessment,
+                RoleBindingAssessment = roleBindingAssessment,
+                DomainAdmissionRoleBindingAssessment = domainAdmissionRoleBindingAssessment,
+                DomainAdmissionRoleBindingReceipt = domainAdmissionRoleBindingReceipt
             }
         };
     }

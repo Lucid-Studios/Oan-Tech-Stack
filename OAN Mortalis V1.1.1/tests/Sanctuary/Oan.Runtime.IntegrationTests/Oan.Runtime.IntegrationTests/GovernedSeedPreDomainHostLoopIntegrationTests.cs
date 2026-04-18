@@ -42,6 +42,10 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.NotNull(payload.DomainRoleGatingAssessment);
         Assert.NotNull(payload.DomainRoleGatingReceipt);
         Assert.NotNull(payload.DomainRoleGatingPacket);
+        Assert.NotNull(payload.DomainAdmissionAssessment);
+        Assert.NotNull(payload.RoleBindingAssessment);
+        Assert.NotNull(payload.DomainAdmissionRoleBindingAssessment);
+        Assert.NotNull(payload.DomainAdmissionRoleBindingReceipt);
 
         Assert.False(payload.CandidateBoundaryReceipt.ContainsAuthorityBearingFields);
         Assert.Equal(payload.CandidateBoundaryReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
@@ -73,5 +77,14 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.Equal(payload.DomainRoleGatingPacket.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
         Assert.Equal(payload.DomainRoleGatingPacket.PreDomainGovernancePacket.PacketHandle, payload.PreDomainGovernancePacket.PacketHandle);
         Assert.Equal(payload.DomainRoleGatingPacket.GatingReceipt.ReceiptHandle, payload.DomainRoleGatingReceipt.ReceiptHandle);
+        Assert.Equal(payload.DomainAdmissionRoleBindingReceipt.ReceiptHandle, payload.OperationalContext.DomainAdmissionRoleBindingReceiptHandle);
+        Assert.Equal(payload.DomainAdmissionRoleBindingReceipt.Disposition, payload.OperationalContext.DomainAdmissionRoleBindingDisposition);
+        Assert.Equal(payload.DomainAdmissionRoleBindingReceipt.DomainAdmissionGranted, payload.OperationalContext.DomainAdmissionGranted);
+        Assert.Equal(payload.DomainAdmissionRoleBindingReceipt.RoleBound, payload.OperationalContext.RoleBound);
+        Assert.Equal(payload.DomainAdmissionRoleBindingReceipt.PacketHandle, payload.DomainRoleGatingPacket.PacketHandle);
+        Assert.Equal(payload.DomainAdmissionRoleBindingReceipt.CandidateId, payload.DomainRoleGatingPacket.CandidateId);
+        Assert.Equal(payload.DomainAdmissionAssessment.PacketHandle, payload.DomainRoleGatingPacket.PacketHandle);
+        Assert.Equal(payload.RoleBindingAssessment.PacketHandle, payload.DomainRoleGatingPacket.PacketHandle);
+        Assert.Equal(payload.DomainAdmissionRoleBindingAssessment.PacketHandle, payload.DomainRoleGatingPacket.PacketHandle);
     }
 }

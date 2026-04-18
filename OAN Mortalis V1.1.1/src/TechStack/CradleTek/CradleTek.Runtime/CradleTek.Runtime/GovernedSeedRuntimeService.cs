@@ -20,6 +20,7 @@ public sealed class GovernedSeedRuntimeService
     private readonly IGovernedSeedRuntimeMaterializationService _materializationService;
     private readonly IGovernedSeedPreDomainHostLoopService _preDomainHostLoopService;
     private readonly IGovernedSeedDomainRoleGatingService _domainRoleGatingService;
+    private readonly IGovernedSeedDomainAdmissionRoleBindingService _domainAdmissionRoleBindingService;
     private readonly IGovernedStateModulationService _stateModulationService;
     private readonly IGovernedSeedEnvelopeTraceService _traceService;
 
@@ -32,6 +33,7 @@ public sealed class GovernedSeedRuntimeService
         IGovernedSeedRuntimeMaterializationService materializationService,
         IGovernedSeedPreDomainHostLoopService preDomainHostLoopService,
         IGovernedSeedDomainRoleGatingService domainRoleGatingService,
+        IGovernedSeedDomainAdmissionRoleBindingService domainAdmissionRoleBindingService,
         IGovernedStateModulationService stateModulationService,
         IGovernedSeedEnvelopeTraceService traceService)
     {
@@ -43,6 +45,7 @@ public sealed class GovernedSeedRuntimeService
         _materializationService = materializationService ?? throw new ArgumentNullException(nameof(materializationService));
         _preDomainHostLoopService = preDomainHostLoopService ?? throw new ArgumentNullException(nameof(preDomainHostLoopService));
         _domainRoleGatingService = domainRoleGatingService ?? throw new ArgumentNullException(nameof(domainRoleGatingService));
+        _domainAdmissionRoleBindingService = domainAdmissionRoleBindingService ?? throw new ArgumentNullException(nameof(domainAdmissionRoleBindingService));
         _stateModulationService = stateModulationService ?? throw new ArgumentNullException(nameof(stateModulationService));
         _traceService = traceService ?? throw new ArgumentNullException(nameof(traceService));
     }
@@ -164,8 +167,11 @@ public sealed class GovernedSeedRuntimeService
         var packetGatedResult = hostLoopHydratedResult.VerticalSlice.PreDomainGovernancePacket is null
             ? hostLoopHydratedResult
             : AttachDomainRoleGating(hostLoopHydratedResult, hostLoopHydratedResult.VerticalSlice.PreDomainGovernancePacket);
-        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, packetGatedResult);
-        var hydratedResult = _materializationService.AttachStateModulation(packetGatedResult, stateModulationReceipt);
+        var admissionBoundResult = packetGatedResult.VerticalSlice.DomainRoleGatingPacket is null
+            ? packetGatedResult
+            : AttachDomainAdmissionRoleBinding(packetGatedResult, packetGatedResult.VerticalSlice.DomainRoleGatingPacket);
+        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, admissionBoundResult);
+        var hydratedResult = _materializationService.AttachStateModulation(admissionBoundResult, stateModulationReceipt);
 
         var envelope = _materializationService.CreateEnvelope(agentId, theaterId, hydratedResult);
         return await _traceService.TraceAsync(envelope, hydratedResult, cancellationToken).ConfigureAwait(false);
@@ -182,6 +188,19 @@ public sealed class GovernedSeedRuntimeService
             domainRoleGating.RoleAssessment,
             domainRoleGating.GatingAssessment,
             domainRoleGating.Receipt);
+    }
+
+    private GovernedSeedEvaluationResult AttachDomainAdmissionRoleBinding(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainRoleGatingPacket packet)
+    {
+        var admissionRoleBinding = _domainAdmissionRoleBindingService.Evaluate(packet);
+        return _materializationService.AttachDomainAdmissionRoleBinding(
+            result,
+            admissionRoleBinding.DomainAdmissionAssessment,
+            admissionRoleBinding.RoleBindingAssessment,
+            admissionRoleBinding.UnifiedAssessment,
+            admissionRoleBinding.Receipt);
     }
 
     private static PreDomainLifecycleInputs ProjectPreDomainInputs(
