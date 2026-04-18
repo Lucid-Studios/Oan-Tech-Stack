@@ -52,6 +52,7 @@ public static class HeadlessRuntimeBootstrap
         var admissionGateService = new PrimeSeedPreDomainAdmissionGateService();
         var domainRoleGatingService = new GovernedSeedDomainRoleGatingService();
         var domainAdmissionRoleBindingService = new GovernedSeedDomainAdmissionRoleBindingService();
+        var postAdmissionParticipationService = new GovernedSeedPostAdmissionParticipationService();
         var preDomainHostLoopService = new GovernedSeedPreDomainHostLoopService(
             crypticHoldingService,
             formOrCleaveService,
@@ -85,6 +86,7 @@ public static class HeadlessRuntimeBootstrap
             preDomainHostLoopService,
             domainRoleGatingService,
             domainAdmissionRoleBindingService,
+            postAdmissionParticipationService,
             stateModulationService,
             traceService);
 

@@ -67,6 +67,13 @@ public interface IGovernedSeedRuntimeMaterializationService
         GovernedSeedDomainAdmissionRoleBindingAssessment domainAdmissionRoleBindingAssessment,
         GovernedSeedDomainAdmissionRoleBindingReceipt domainAdmissionRoleBindingReceipt);
 
+    GovernedSeedEvaluationResult AttachPostAdmissionParticipation(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainOccupancyAssessment domainOccupancyAssessment,
+        GovernedSeedRoleParticipationAssessment roleParticipationAssessment,
+        GovernedSeedPostAdmissionParticipationAssessment postAdmissionParticipationAssessment,
+        GovernedSeedPostAdmissionParticipationReceipt postAdmissionParticipationReceipt);
+
     EvaluateEnvelope CreateEnvelope(
         string agentId,
         string theaterId,
@@ -528,6 +535,42 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 DomainAdmissionRoleBindingAssessment = domainAdmissionRoleBindingAssessment,
                 DomainAdmissionRoleBindingReceipt = domainAdmissionRoleBindingReceipt,
                 DomainAdmissionRoleBindingPacket = domainAdmissionRoleBindingPacket
+            }
+        };
+    }
+
+    public GovernedSeedEvaluationResult AttachPostAdmissionParticipation(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedDomainOccupancyAssessment domainOccupancyAssessment,
+        GovernedSeedRoleParticipationAssessment roleParticipationAssessment,
+        GovernedSeedPostAdmissionParticipationAssessment postAdmissionParticipationAssessment,
+        GovernedSeedPostAdmissionParticipationReceipt postAdmissionParticipationReceipt)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(domainOccupancyAssessment);
+        ArgumentNullException.ThrowIfNull(roleParticipationAssessment);
+        ArgumentNullException.ThrowIfNull(postAdmissionParticipationAssessment);
+        ArgumentNullException.ThrowIfNull(postAdmissionParticipationReceipt);
+
+        var operationalContext = result.VerticalSlice.OperationalContext;
+
+        return result with
+        {
+            VerticalSlice = result.VerticalSlice with
+            {
+                OperationalContext = operationalContext is null
+                    ? null
+                    : operationalContext with
+                    {
+                        PostAdmissionParticipationReceiptHandle = postAdmissionParticipationReceipt.ReceiptHandle,
+                        PostAdmissionParticipationDisposition = postAdmissionParticipationReceipt.Disposition,
+                        DomainOccupancyAuthorized = postAdmissionParticipationReceipt.OccupancyAuthorized,
+                        RoleParticipationAuthorized = postAdmissionParticipationReceipt.RoleParticipationAuthorized
+                    },
+                DomainOccupancyAssessment = domainOccupancyAssessment,
+                RoleParticipationAssessment = roleParticipationAssessment,
+                PostAdmissionParticipationAssessment = postAdmissionParticipationAssessment,
+                PostAdmissionParticipationReceipt = postAdmissionParticipationReceipt
             }
         };
     }

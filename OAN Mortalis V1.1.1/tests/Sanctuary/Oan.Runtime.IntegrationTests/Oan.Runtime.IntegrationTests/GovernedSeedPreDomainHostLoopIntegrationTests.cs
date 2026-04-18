@@ -47,6 +47,10 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.NotNull(payload.DomainAdmissionRoleBindingAssessment);
         Assert.NotNull(payload.DomainAdmissionRoleBindingReceipt);
         Assert.NotNull(payload.DomainAdmissionRoleBindingPacket);
+        Assert.NotNull(payload.DomainOccupancyAssessment);
+        Assert.NotNull(payload.RoleParticipationAssessment);
+        Assert.NotNull(payload.PostAdmissionParticipationAssessment);
+        Assert.NotNull(payload.PostAdmissionParticipationReceipt);
 
         Assert.False(payload.CandidateBoundaryReceipt.ContainsAuthorityBearingFields);
         Assert.Equal(payload.CandidateBoundaryReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
@@ -91,5 +95,13 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.Equal(payload.DomainAdmissionRoleBindingPacket.CandidateId, payload.DomainRoleGatingPacket.CandidateId);
         Assert.Equal(payload.DomainAdmissionRoleBindingPacket.DomainRoleGatingPacket.PacketHandle, payload.DomainRoleGatingPacket.PacketHandle);
         Assert.Equal(payload.DomainAdmissionRoleBindingPacket.DomainAdmissionRoleBindingReceipt.ReceiptHandle, payload.DomainAdmissionRoleBindingReceipt.ReceiptHandle);
+        Assert.Equal(payload.PostAdmissionParticipationReceipt.ReceiptHandle, payload.OperationalContext.PostAdmissionParticipationReceiptHandle);
+        Assert.Equal(payload.PostAdmissionParticipationReceipt.Disposition, payload.OperationalContext.PostAdmissionParticipationDisposition);
+        Assert.Equal(payload.PostAdmissionParticipationReceipt.OccupancyAuthorized, payload.OperationalContext.DomainOccupancyAuthorized);
+        Assert.Equal(payload.PostAdmissionParticipationReceipt.RoleParticipationAuthorized, payload.OperationalContext.RoleParticipationAuthorized);
+        Assert.Equal(payload.DomainOccupancyAssessment.PacketHandle, payload.DomainAdmissionRoleBindingPacket.PacketHandle);
+        Assert.Equal(payload.RoleParticipationAssessment.PacketHandle, payload.DomainAdmissionRoleBindingPacket.PacketHandle);
+        Assert.Equal(payload.PostAdmissionParticipationAssessment.PacketHandle, payload.DomainAdmissionRoleBindingPacket.PacketHandle);
+        Assert.Equal(payload.PostAdmissionParticipationReceipt.PacketHandle, payload.DomainAdmissionRoleBindingPacket.PacketHandle);
     }
 }
