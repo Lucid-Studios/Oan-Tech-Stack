@@ -211,6 +211,11 @@ which frames actual operational action and service effect as reasoning over
 the carried execution packet rather than over loose runtime execution
 surfaces.
 
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_EXECUTION_OPERATIONAL_ACTION_PACKET.md`,
+which frames service-effect and commit truth as a carried body for downstream
+service enactment and post-action work.
+
 Inside the sibling line:
 
 ```text

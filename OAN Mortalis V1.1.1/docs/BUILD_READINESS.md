@@ -270,6 +270,9 @@ Current hold-lane clarification:
   `NEXT_IMPLEMENTATION_CHAPTER_POST_PARTICIPATION_EXECUTION_PACKET.md`
 - the next post-execution operational-action descent now lives in
   `NEXT_IMPLEMENTATION_CHAPTER_POST_EXECUTION_OPERATIONAL_ACTION_FROM_EXECUTION_PACKET.md`
+- the next packetization descent for post-execution operational action now
+  lives in
+  `NEXT_IMPLEMENTATION_CHAPTER_POST_EXECUTION_OPERATIONAL_ACTION_PACKET.md`
 - the light-cone awareness lineage and ListeningFrame source-law note now
   lives in `LIGHT_CONE_AWARENESS_LINEAGE_AND_LISTENING_FRAME_SOURCE_LAW.md`
 - the OAN Diamond lineage and bounded zed/delta field note now lives in
