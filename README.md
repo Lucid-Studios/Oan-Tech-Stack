@@ -162,6 +162,12 @@ which frames the next code seam as candidate-only proposal boundaries,
 Prime/Cryptic duplex separation, and pre-domain admission gating after the
 governed pre-domain host loop seated in `6859b58`.
 
+With the pre-domain governance packet now materialized, the next gated descent
+is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ROLE_GATING_FROM_PREDOMAIN_PACKET.md`,
+which frames domain/role gating as reasoning over the packet-bearing
+pre-domain governance body rather than over scattered receipts.
+
 Inside the sibling line:
 
 ```text
