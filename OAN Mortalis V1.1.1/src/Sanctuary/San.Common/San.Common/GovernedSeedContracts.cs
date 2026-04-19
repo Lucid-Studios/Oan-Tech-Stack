@@ -957,6 +957,7 @@ public sealed record GovernedSeedOperationalContext(
     bool? DomainOccupancyAuthorized = null,
     bool? RoleParticipationAuthorized = null,
     string? PostParticipationExecutionPacketHandle = null,
+    string? PostExecutionOperationalActionPacketHandle = null,
     string? PostParticipationExecutionReceiptHandle = null,
     GovernedSeedExecutionAuthorizationDisposition? PostParticipationExecutionDisposition = null,
     bool? ServiceBehaviorAuthorized = null,
@@ -1140,6 +1141,7 @@ public sealed record GovernedSeedStateModulationReceipt(
     bool? DomainOccupancyAuthorized = null,
     bool? RoleParticipationAuthorized = null,
     string? PostParticipationExecutionPacketHandle = null,
+    string? PostExecutionOperationalActionPacketHandle = null,
     string? PostParticipationExecutionReceiptHandle = null,
     GovernedSeedExecutionAuthorizationDisposition? PostParticipationExecutionDisposition = null,
     bool? ServiceBehaviorAuthorized = null,
@@ -1210,7 +1212,8 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedOperationalActionCommitAssessment? OperationalActionCommitAssessment = null,
     GovernedSeedCommitReceipt? CommitReceipt = null,
     GovernedSeedPostExecutionOperationalActionAssessment? PostExecutionOperationalActionAssessment = null,
-    GovernedSeedPostExecutionOperationalActionReceipt? PostExecutionOperationalActionReceipt = null);
+    GovernedSeedPostExecutionOperationalActionReceipt? PostExecutionOperationalActionReceipt = null,
+    GovernedSeedPostExecutionOperationalActionPacket? PostExecutionOperationalActionPacket = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

@@ -64,6 +64,7 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.NotNull(payload.CommitReceipt);
         Assert.NotNull(payload.PostExecutionOperationalActionAssessment);
         Assert.NotNull(payload.PostExecutionOperationalActionReceipt);
+        Assert.NotNull(payload.PostExecutionOperationalActionPacket);
 
         Assert.False(payload.CandidateBoundaryReceipt.ContainsAuthorityBearingFields);
         Assert.Equal(payload.CandidateBoundaryReceipt.CandidateId, payload.PreDomainGovernancePacket.CandidateId);
@@ -146,12 +147,18 @@ public sealed class GovernedSeedPreDomainHostLoopIntegrationTests
         Assert.Equal(payload.OperationalActionCommitAssessment.CommitReady, payload.StateModulationReceipt.CommitReady);
         Assert.Equal(payload.PostExecutionOperationalActionReceipt.OperationalActionCommitted, payload.StateModulationReceipt.OperationalActionCommitted);
         Assert.Equal(payload.CommitReceipt.ReceiptHandle, payload.StateModulationReceipt.CommitReceiptHandle);
+        Assert.Equal(payload.PostExecutionOperationalActionPacket.PacketHandle, payload.OperationalContext.PostExecutionOperationalActionPacketHandle);
+        Assert.Equal(payload.PostExecutionOperationalActionPacket.PacketHandle, payload.StateModulationReceipt.PostExecutionOperationalActionPacketHandle);
         Assert.Equal(payload.ServiceEffectAssessment.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
         Assert.Equal(payload.CommitIntent.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
         Assert.Equal(payload.OperationalActionCommitAssessment.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
         Assert.Equal(payload.CommitReceipt.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
         Assert.Equal(payload.PostExecutionOperationalActionAssessment.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
         Assert.Equal(payload.PostExecutionOperationalActionReceipt.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
+        Assert.Equal(payload.PostExecutionOperationalActionPacket.CandidateId, payload.PostParticipationExecutionPacket.CandidateId);
+        Assert.Equal(payload.PostExecutionOperationalActionPacket.PostParticipationExecutionPacket.PacketHandle, payload.PostParticipationExecutionPacket.PacketHandle);
+        Assert.Equal(payload.PostExecutionOperationalActionPacket.CommitReceipt.ReceiptHandle, payload.CommitReceipt.ReceiptHandle);
+        Assert.Equal(payload.PostExecutionOperationalActionPacket.PostExecutionOperationalActionReceipt.ReceiptHandle, payload.PostExecutionOperationalActionReceipt.ReceiptHandle);
         Assert.Equal(payload.ServiceEffectAssessment.CandidateId, payload.PostParticipationExecutionPacket.CandidateId);
         Assert.Equal(payload.CommitIntent.CandidateId, payload.PostParticipationExecutionPacket.CandidateId);
         Assert.Equal(payload.OperationalActionCommitAssessment.CandidateId, payload.PostParticipationExecutionPacket.CandidateId);
