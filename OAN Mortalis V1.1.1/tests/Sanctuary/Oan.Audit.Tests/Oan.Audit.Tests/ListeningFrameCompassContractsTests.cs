@@ -2,7 +2,6 @@ namespace Oan.Audit.Tests;
 
 using System.Text.Json;
 using San.Common;
-using San.Common;
 
 public sealed class ListeningFrameCompassContractsTests
 {

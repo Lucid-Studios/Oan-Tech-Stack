@@ -19,15 +19,17 @@ public sealed class NextImplementationChapterPostExecutionOperationalActionPacke
         Assert.True(File.Exists(notePath), "Post-execution operational-action packet chapter note should exist.");
 
         var noteText = File.ReadAllText(notePath, Encoding.UTF8);
-        Assert.Contains("Status: Proposed - Structural Chapter Candidate", noteText, StringComparison.Ordinal);
-        Assert.Contains("After `68d8a87` and `309cee0`", noteText, StringComparison.Ordinal);
+        Assert.Contains("Status: Seated - Packet Chapter Realized In Runtime", noteText, StringComparison.Ordinal);
+        Assert.Contains("After `68d8a87`, `309cee0`, and `1e4525d`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostParticipationExecutionPacket`", noteText, StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedPostExecutionOperationalActionPacket`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedCommitIntent`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedCommitReceipt`", noteText, StringComparison.Ordinal);
         Assert.Contains(
             "no downstream service enactment, effect emission, or post-action reasoning may occur over anything less than a complete post-execution operational-action packet",
             noteText,
             StringComparison.Ordinal);
+        Assert.DoesNotContain("What is still missing is one stable carried body", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionPacketContracts.cs`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionPacketMaterializationService.cs`", noteText, StringComparison.Ordinal);
 

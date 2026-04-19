@@ -968,7 +968,12 @@ public sealed record GovernedSeedOperationalContext(
     bool? CommitIntentPresent = null,
     bool? CommitReady = null,
     bool? OperationalActionCommitted = null,
-    string? CommitReceiptHandle = null);
+    string? CommitReceiptHandle = null,
+    string? PostActionServiceEnactmentReceiptHandle = null,
+    GovernedSeedServiceEnactmentDisposition? PostActionServiceEnactmentDisposition = null,
+    bool? EffectEmissionAuthorized = null,
+    bool? ServiceEnactmentCommitReady = null,
+    bool? ServiceEnactmentCommitted = null);
 
 public sealed record GovernedSeedReturnSurfaceContext(
     string ContextHandle,
@@ -1152,7 +1157,12 @@ public sealed record GovernedSeedStateModulationReceipt(
     bool? CommitIntentPresent = null,
     bool? CommitReady = null,
     bool? OperationalActionCommitted = null,
-    string? CommitReceiptHandle = null);
+    string? CommitReceiptHandle = null,
+    string? PostActionServiceEnactmentReceiptHandle = null,
+    GovernedSeedServiceEnactmentDisposition? PostActionServiceEnactmentDisposition = null,
+    bool? EffectEmissionAuthorized = null,
+    bool? ServiceEnactmentCommitReady = null,
+    bool? ServiceEnactmentCommitted = null);
 
 public sealed record GovernedSeedVerticalSlice(
     GovernedSeedSoulFrameBootstrapReceipt? BootstrapReceipt,
@@ -1213,7 +1223,11 @@ public sealed record GovernedSeedVerticalSlice(
     GovernedSeedCommitReceipt? CommitReceipt = null,
     GovernedSeedPostExecutionOperationalActionAssessment? PostExecutionOperationalActionAssessment = null,
     GovernedSeedPostExecutionOperationalActionReceipt? PostExecutionOperationalActionReceipt = null,
-    GovernedSeedPostExecutionOperationalActionPacket? PostExecutionOperationalActionPacket = null);
+    GovernedSeedPostExecutionOperationalActionPacket? PostExecutionOperationalActionPacket = null,
+    GovernedSeedEffectEmissionAssessment? EffectEmissionAssessment = null,
+    GovernedSeedServiceEnactmentCommitAssessment? ServiceEnactmentCommitAssessment = null,
+    GovernedSeedPostActionServiceEnactmentAssessment? PostActionServiceEnactmentAssessment = null,
+    GovernedSeedPostActionServiceEnactmentReceipt? PostActionServiceEnactmentReceipt = null);
 
 public sealed record GovernedSeedEvaluationResult(
     string Decision,

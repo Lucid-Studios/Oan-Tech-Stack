@@ -1,14 +1,14 @@
 # Next Implementation Chapter: Post-Execution Operational Action Packet
 
-Status: Proposed - Structural Chapter Candidate
+Status: Seated - Packet Chapter Realized In Runtime
 
 ## Purpose
 
-Advance the governed runtime beyond post-execution operational action as a
-runtime event by materializing a single carried body for that seam.
+Record the now-seated carried body for post-execution operational action and
+fix the lawful handoff point for whatever comes after committed action.
 
 This chapter exists so that downstream service enactment, effect emission,
-operational follow-through, and post-action governance work may reason over one
+operational follow-through, and post-action governance work reason over one
 complete post-execution-operational-action object instead of scattered runtime
 assessments and receipts.
 
@@ -20,8 +20,9 @@ The governing invariant is:
 
 ## Current Achieved State
 
-After `68d8a87` and `309cee0`, the live runtime now carries post-execution
-operational action as a first-class event.
+After `68d8a87`, `309cee0`, and `1e4525d`, the live runtime now carries
+post-execution operational action as both a first-class event and a carried
+packet body.
 
 The running slice can now say:
 
@@ -38,8 +39,9 @@ That runtime truth is now carried through:
 * runtime materialization
 * runtime-readable body and state modulation
 
-What is still missing is one stable carried body for the post-execution
-operational-action result itself.
+The previously missing carried body is now seated as:
+
+* `GovernedSeedPostExecutionOperationalActionPacket`
 
 ---
 
@@ -57,15 +59,13 @@ The unified post-execution operational-action seam now emits:
 These are sufficient to witness the seam, but they are still distributed
 runtime surfaces.
 
-Before opening downstream service enactment, effect emission, externalized
-consequence tracking, or post-action governance work, the runtime should first
-aggregate those operational-action surfaces into one carried body.
+That aggregation step is now complete and available to downstream work.
 
 ---
 
 ## Packet Shape
 
-The initial packet should likely carry:
+The seated packet carries:
 
 * `GovernedSeedPostParticipationExecutionPacket`
 * `GovernedSeedServiceEffectAssessment`
@@ -75,8 +75,7 @@ The initial packet should likely carry:
 * `GovernedSeedPostExecutionOperationalActionAssessment`
 * `GovernedSeedPostExecutionOperationalActionReceipt`
 
-This packet becomes the stable operational-action-layer body for downstream
-use.
+This packet is now the stable operational-action-layer body for downstream use.
 
 ---
 
@@ -91,20 +90,20 @@ result:
 * attributable
 * suitable for carry-forward continuity
 
-It should not add new operational-action logic.
+It does not add new operational-action logic.
 
-It should only aggregate already-seated runtime truth into one stable body.
+It aggregates already-seated runtime truth into one stable body.
 
 ---
 
-## First Descent
+## Seated Descent
 
-The first descent of this chapter should be:
+The realized descent of this chapter is:
 
 * `GovernedSeedPostExecutionOperationalActionPacketContracts.cs`
 * `GovernedSeedPostExecutionOperationalActionPacketMaterializationService.cs`
-
-Then thread that packet through the live runtime body.
+* runtime threading through materialization, state modulation, bootstrap, and
+  integration witnesses
 
 ---
 
@@ -134,7 +133,7 @@ The packet must preserve:
 
 ## What This Enables Next
 
-Once the packet exists, the next clean seam becomes:
+With the packet now seated, the next clean seam becomes:
 
 * actual service enactment
 * effect emission tracking
@@ -167,34 +166,29 @@ fields.
 
 ## Outcome Target
 
-At the end of this chapter, the runtime should carry:
+At the end of this chapter, the runtime now carries:
 
 * the distributed post-execution operational-action seam surfaces
 * and one stable `GovernedSeedPostExecutionOperationalActionPacket`
 
-so that downstream service enactment and post-action work may begin from one
+so that downstream service enactment and post-action work can begin from one
 truthful carried object.
 
 ---
 
 ## Shortest Compression
 
-> effect and commit are now runtime truth; the next step is to give that truth
-> a body before downstream enactment begins.
+> effect and commit are now runtime truth, and that truth now has a carried
+> body for downstream enactment work.
 
 ---
 
-## After That Note
+## After This Chapter
 
-Then the first code pass should be:
+The next honest descent is no longer packetization at this layer.
 
-* `GovernedSeedPostExecutionOperationalActionPacketContracts.cs`
-* `GovernedSeedPostExecutionOperationalActionPacketMaterializationService.cs`
+The next honest descent is the first post-action doctrine seam:
 
-And then thread the packet through:
-
-* runtime materialization
-* runtime service
-* runtime-readable body / state modulation surfaces
-
-That is the right next descent.
+* downstream service enactment
+* effect emission tracking
+* post-action governance work

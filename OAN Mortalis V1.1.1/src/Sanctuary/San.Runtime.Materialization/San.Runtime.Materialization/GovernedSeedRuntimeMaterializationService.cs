@@ -90,6 +90,13 @@ public interface IGovernedSeedRuntimeMaterializationService
         GovernedSeedPostExecutionOperationalActionAssessment postExecutionOperationalActionAssessment,
         GovernedSeedPostExecutionOperationalActionReceipt postExecutionOperationalActionReceipt);
 
+    GovernedSeedEvaluationResult AttachPostActionServiceEnactment(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedEffectEmissionAssessment effectEmissionAssessment,
+        GovernedSeedServiceEnactmentCommitAssessment serviceEnactmentCommitAssessment,
+        GovernedSeedPostActionServiceEnactmentAssessment postActionServiceEnactmentAssessment,
+        GovernedSeedPostActionServiceEnactmentReceipt postActionServiceEnactmentReceipt);
+
     EvaluateEnvelope CreateEnvelope(
         string agentId,
         string theaterId,
@@ -709,6 +716,43 @@ public sealed class GovernedSeedRuntimeMaterializationService : IGovernedSeedRun
                 PostExecutionOperationalActionAssessment = postExecutionOperationalActionAssessment,
                 PostExecutionOperationalActionReceipt = postExecutionOperationalActionReceipt,
                 PostExecutionOperationalActionPacket = postExecutionOperationalActionPacket
+            }
+        };
+    }
+
+    public GovernedSeedEvaluationResult AttachPostActionServiceEnactment(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedEffectEmissionAssessment effectEmissionAssessment,
+        GovernedSeedServiceEnactmentCommitAssessment serviceEnactmentCommitAssessment,
+        GovernedSeedPostActionServiceEnactmentAssessment postActionServiceEnactmentAssessment,
+        GovernedSeedPostActionServiceEnactmentReceipt postActionServiceEnactmentReceipt)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(effectEmissionAssessment);
+        ArgumentNullException.ThrowIfNull(serviceEnactmentCommitAssessment);
+        ArgumentNullException.ThrowIfNull(postActionServiceEnactmentAssessment);
+        ArgumentNullException.ThrowIfNull(postActionServiceEnactmentReceipt);
+
+        var operationalContext = result.VerticalSlice.OperationalContext;
+
+        return result with
+        {
+            VerticalSlice = result.VerticalSlice with
+            {
+                OperationalContext = operationalContext is null
+                    ? null
+                    : operationalContext with
+                    {
+                        PostActionServiceEnactmentReceiptHandle = postActionServiceEnactmentReceipt.ReceiptHandle,
+                        PostActionServiceEnactmentDisposition = postActionServiceEnactmentReceipt.Disposition,
+                        EffectEmissionAuthorized = postActionServiceEnactmentReceipt.EffectEmissionAuthorized,
+                        ServiceEnactmentCommitReady = serviceEnactmentCommitAssessment.EnactmentCommitReady,
+                        ServiceEnactmentCommitted = postActionServiceEnactmentReceipt.ServiceEnactmentCommitted
+                    },
+                EffectEmissionAssessment = effectEmissionAssessment,
+                ServiceEnactmentCommitAssessment = serviceEnactmentCommitAssessment,
+                PostActionServiceEnactmentAssessment = postActionServiceEnactmentAssessment,
+                PostActionServiceEnactmentReceipt = postActionServiceEnactmentReceipt
             }
         };
     }

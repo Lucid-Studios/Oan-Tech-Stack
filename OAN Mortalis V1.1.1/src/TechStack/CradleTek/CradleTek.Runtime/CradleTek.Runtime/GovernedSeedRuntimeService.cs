@@ -21,10 +21,11 @@ public sealed class GovernedSeedRuntimeService
     private readonly IGovernedSeedPreDomainHostLoopService _preDomainHostLoopService;
     private readonly IGovernedSeedDomainRoleGatingService _domainRoleGatingService;
     private readonly IGovernedSeedDomainAdmissionRoleBindingService _domainAdmissionRoleBindingService;
-    private readonly IGovernedSeedPostAdmissionParticipationService _postAdmissionParticipationService;
-    private readonly IGovernedSeedPostParticipationExecutionService _postParticipationExecutionService;
-    private readonly IGovernedSeedPostExecutionOperationalActionService _postExecutionOperationalActionService;
-    private readonly IGovernedStateModulationService _stateModulationService;
+private readonly IGovernedSeedPostAdmissionParticipationService _postAdmissionParticipationService;
+private readonly IGovernedSeedPostParticipationExecutionService _postParticipationExecutionService;
+private readonly IGovernedSeedPostExecutionOperationalActionService _postExecutionOperationalActionService;
+private readonly IGovernedSeedPostActionServiceEnactmentService _postActionServiceEnactmentService;
+private readonly IGovernedStateModulationService _stateModulationService;
     private readonly IGovernedSeedEnvelopeTraceService _traceService;
 
     public GovernedSeedRuntimeService(
@@ -37,11 +38,12 @@ public sealed class GovernedSeedRuntimeService
         IGovernedSeedPreDomainHostLoopService preDomainHostLoopService,
         IGovernedSeedDomainRoleGatingService domainRoleGatingService,
         IGovernedSeedDomainAdmissionRoleBindingService domainAdmissionRoleBindingService,
-        IGovernedSeedPostAdmissionParticipationService postAdmissionParticipationService,
-        IGovernedSeedPostParticipationExecutionService postParticipationExecutionService,
-        IGovernedSeedPostExecutionOperationalActionService postExecutionOperationalActionService,
-        IGovernedStateModulationService stateModulationService,
-        IGovernedSeedEnvelopeTraceService traceService)
+    IGovernedSeedPostAdmissionParticipationService postAdmissionParticipationService,
+    IGovernedSeedPostParticipationExecutionService postParticipationExecutionService,
+    IGovernedSeedPostExecutionOperationalActionService postExecutionOperationalActionService,
+    IGovernedSeedPostActionServiceEnactmentService postActionServiceEnactmentService,
+    IGovernedStateModulationService stateModulationService,
+    IGovernedSeedEnvelopeTraceService traceService)
     {
         _sanctuaryIngressService = sanctuaryIngressService ?? throw new ArgumentNullException(nameof(sanctuaryIngressService));
         _membraneService = membraneService ?? throw new ArgumentNullException(nameof(membraneService));
@@ -52,10 +54,11 @@ public sealed class GovernedSeedRuntimeService
         _preDomainHostLoopService = preDomainHostLoopService ?? throw new ArgumentNullException(nameof(preDomainHostLoopService));
         _domainRoleGatingService = domainRoleGatingService ?? throw new ArgumentNullException(nameof(domainRoleGatingService));
         _domainAdmissionRoleBindingService = domainAdmissionRoleBindingService ?? throw new ArgumentNullException(nameof(domainAdmissionRoleBindingService));
-        _postAdmissionParticipationService = postAdmissionParticipationService ?? throw new ArgumentNullException(nameof(postAdmissionParticipationService));
-        _postParticipationExecutionService = postParticipationExecutionService ?? throw new ArgumentNullException(nameof(postParticipationExecutionService));
-        _postExecutionOperationalActionService = postExecutionOperationalActionService ?? throw new ArgumentNullException(nameof(postExecutionOperationalActionService));
-        _stateModulationService = stateModulationService ?? throw new ArgumentNullException(nameof(stateModulationService));
+    _postAdmissionParticipationService = postAdmissionParticipationService ?? throw new ArgumentNullException(nameof(postAdmissionParticipationService));
+    _postParticipationExecutionService = postParticipationExecutionService ?? throw new ArgumentNullException(nameof(postParticipationExecutionService));
+    _postExecutionOperationalActionService = postExecutionOperationalActionService ?? throw new ArgumentNullException(nameof(postExecutionOperationalActionService));
+    _postActionServiceEnactmentService = postActionServiceEnactmentService ?? throw new ArgumentNullException(nameof(postActionServiceEnactmentService));
+    _stateModulationService = stateModulationService ?? throw new ArgumentNullException(nameof(stateModulationService));
         _traceService = traceService ?? throw new ArgumentNullException(nameof(traceService));
     }
 
@@ -188,8 +191,11 @@ public sealed class GovernedSeedRuntimeService
         var operationalActionHydratedResult = executionHydratedResult.VerticalSlice.PostParticipationExecutionPacket is null
             ? executionHydratedResult
             : AttachPostExecutionOperationalAction(executionHydratedResult, executionHydratedResult.VerticalSlice.PostParticipationExecutionPacket);
-        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, operationalActionHydratedResult);
-        var hydratedResult = _materializationService.AttachStateModulation(operationalActionHydratedResult, stateModulationReceipt);
+        var serviceEnactmentHydratedResult = operationalActionHydratedResult.VerticalSlice.PostExecutionOperationalActionPacket is null
+            ? operationalActionHydratedResult
+            : AttachPostActionServiceEnactment(operationalActionHydratedResult, operationalActionHydratedResult.VerticalSlice.PostExecutionOperationalActionPacket);
+        var stateModulationReceipt = _stateModulationService.CreateReceipt(primeCrypticReceipt, bootstrapReceipt, serviceEnactmentHydratedResult);
+        var hydratedResult = _materializationService.AttachStateModulation(serviceEnactmentHydratedResult, stateModulationReceipt);
 
         var envelope = _materializationService.CreateEnvelope(agentId, theaterId, hydratedResult);
         return await _traceService.TraceAsync(envelope, hydratedResult, cancellationToken).ConfigureAwait(false);
@@ -260,6 +266,19 @@ public sealed class GovernedSeedRuntimeService
             operationalAction.CommitReceipt,
             operationalAction.UnifiedAssessment,
             operationalAction.Receipt);
+    }
+
+    private GovernedSeedEvaluationResult AttachPostActionServiceEnactment(
+        GovernedSeedEvaluationResult result,
+        GovernedSeedPostExecutionOperationalActionPacket packet)
+    {
+        var enactment = _postActionServiceEnactmentService.Evaluate(packet);
+        return _materializationService.AttachPostActionServiceEnactment(
+            result,
+            enactment.EffectEmissionAssessment,
+            enactment.ServiceEnactmentCommitAssessment,
+            enactment.UnifiedAssessment,
+            enactment.Receipt);
     }
 
     private static PreDomainLifecycleInputs ProjectPreDomainInputs(

@@ -216,6 +216,12 @@ The next packetization descent after that is tracked in
 which frames service-effect and commit truth as a carried body for downstream
 service enactment and post-action work.
 
+The next post-action service-enactment descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ACTION_SERVICE_ENACTMENT_FROM_OPERATIONAL_ACTION_PACKET.md`,
+which frames enacted service consequence and effect emission as reasoning over
+the carried operational-action packet rather than over loose runtime action
+surfaces.
+
 Inside the sibling line:
 
 ```text

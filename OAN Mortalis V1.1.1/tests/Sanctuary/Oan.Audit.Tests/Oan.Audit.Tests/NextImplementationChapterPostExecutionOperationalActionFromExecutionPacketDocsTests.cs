@@ -27,8 +27,8 @@ public sealed class NextImplementationChapterPostExecutionOperationalActionFromE
             noteText,
             StringComparison.Ordinal);
         Assert.Contains("authorized effect is not yet committed effect", noteText, StringComparison.Ordinal);
-        Assert.Contains("`GovernedSeedOperationalActionCommitIntent`", noteText, StringComparison.Ordinal);
-        Assert.Contains("`GovernedSeedOperationalActionCommitReceipt`", noteText, StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedCommitIntent`", noteText, StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedCommitReceipt`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionContracts.cs`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionService.cs`", noteText, StringComparison.Ordinal);
 

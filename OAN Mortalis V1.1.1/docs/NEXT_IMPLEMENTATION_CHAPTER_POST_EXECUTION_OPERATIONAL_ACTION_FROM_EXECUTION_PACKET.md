@@ -161,7 +161,7 @@ Commitment must remain its own witnessed threshold.
 Initial contract family:
 
 * `GovernedSeedServiceEffectAssessment`
-* `GovernedSeedOperationalActionAssessment`
+* `GovernedSeedOperationalActionCommitAssessment`
 * `GovernedSeedPostExecutionOperationalActionAssessment`
 * `GovernedSeedPostExecutionOperationalActionReceipt`
 
@@ -176,9 +176,9 @@ They should not re-perform earlier packet construction or execution logic.
 The first pass may also need an explicit commitment-support family, even if it
 remains internal to the unified seam:
 
-* `GovernedSeedOperationalActionCommitIntent`
+* `GovernedSeedCommitIntent`
 * `GovernedSeedOperationalActionCommitAssessment`
-* `GovernedSeedOperationalActionCommitReceipt`
+* `GovernedSeedCommitReceipt`
 
 These exist to prevent operational action from silently skipping from
 authorization to committed consequence.

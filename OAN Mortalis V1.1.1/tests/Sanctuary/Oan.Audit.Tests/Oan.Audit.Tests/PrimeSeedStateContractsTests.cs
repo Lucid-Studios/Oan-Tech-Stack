@@ -1,7 +1,6 @@
 namespace San.Audit.Tests;
 
 using San.Common;
-using San.Common;
 
 public sealed class PrimeSeedStateContractsTests
 {
