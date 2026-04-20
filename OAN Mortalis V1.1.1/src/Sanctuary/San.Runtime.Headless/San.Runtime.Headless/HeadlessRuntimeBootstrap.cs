@@ -69,7 +69,8 @@ public static class HeadlessRuntimeBootstrap
             new GovernedSeedDomainAdmissionRoleBindingPacketMaterializationService(),
             new GovernedSeedPostAdmissionParticipationPacketMaterializationService(),
             new GovernedSeedPostParticipationExecutionPacketMaterializationService(),
-            new GovernedSeedPostExecutionOperationalActionPacketMaterializationService());
+            new GovernedSeedPostExecutionOperationalActionPacketMaterializationService(),
+            new GovernedSeedPostActionServiceEnactmentPacketMaterializationService());
         var stateModulationService = new GovernedStateModulationService();
         var custodySource = new BootstrapCustodySource();
         var soulFrameBootstrap = new GovernedSeedSoulFrameBootstrapService(custodySource);

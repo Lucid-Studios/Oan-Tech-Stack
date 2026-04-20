@@ -20,7 +20,7 @@ public sealed class NextImplementationChapterPostActionServiceEnactmentFromOpera
 
         var noteText = File.ReadAllText(notePath, Encoding.UTF8);
         var normalizedNoteText = noteText.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\n', ' ');
-        Assert.Contains("Status: Proposed - Service Enactment Chapter Candidate", noteText, StringComparison.Ordinal);
+        Assert.Contains("Status: Seated - Runtime Service Enactment Truth Realized", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionPacket`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostActionServiceEnactmentContracts.cs`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostActionServiceEnactmentService.cs`", noteText, StringComparison.Ordinal);
@@ -35,6 +35,8 @@ public sealed class NextImplementationChapterPostActionServiceEnactmentFromOpera
             "Post-action service enactment must not enlarge authority beyond the originating operational-action packet unless a new admission event occurs.",
             normalizedNoteText,
             StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedPostActionServiceEnactmentPacketContracts.cs`", noteText, StringComparison.Ordinal);
+        Assert.Contains("`GovernedSeedPostActionServiceEnactmentPacketMaterializationService.cs`", noteText, StringComparison.Ordinal);
 
         var readmeText = File.ReadAllText(readmePath, Encoding.UTF8);
         Assert.Contains("NEXT_IMPLEMENTATION_CHAPTER_POST_ACTION_SERVICE_ENACTMENT_FROM_OPERATIONAL_ACTION_PACKET.md", readmeText, StringComparison.Ordinal);

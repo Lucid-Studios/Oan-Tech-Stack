@@ -1,12 +1,12 @@
 # Next Implementation Chapter: Post-Action Service Enactment from Operational-Action Packet
 
-Status: Proposed - Service Enactment Chapter Candidate
+Status: Seated - Runtime Service Enactment Truth Realized
 
 ## Purpose
 
-Advance the governed runtime beyond committed operational action by teaching it
-how to evaluate what a complete operational-action packet may now lawfully
-enact, emit, or persist as service consequence.
+Record the now-seated service-enactment seam that evaluates what a complete
+operational-action packet may lawfully enact, emit, or persist as service
+consequence.
 
 This chapter begins only after the runtime carries one stable:
 
@@ -20,31 +20,38 @@ The governing invariant is:
 
 ## Current Achieved State
 
-After `68d8a87`, `309cee0`, and `1e4525d`, the runtime now carries:
+After `68d8a87`, `309cee0`, `1e4525d`, `fdec978`, `bf63d4b`, `14d2ef6`, and
+`f4e802c`, the runtime now carries:
 
-* post-execution operational action as a service seam
-* post-execution operational action as live-slice runtime truth
-* one stable `GovernedSeedPostExecutionOperationalActionPacket`
+* post-execution operational action as a carried packet
+* post-action service enactment as a service seam
+* post-action service enactment as live-slice runtime truth
+* runtime-proven refusal for unlawful authority expansion
+* runtime-proven pending for lawful but insufficient enactment warrant
 
-This means the next seam no longer has to infer from distributed effect and
-commit surfaces. It may reason from one complete operational-action-layer body.
+This means the next carried-body chapter no longer has to infer from
+distributed enactment surfaces. It may reason from one runtime-proven
+enactment layer.
 
 ---
 
 ## Why This Chapter Exists
 
-A candidate that has reached the operational-action packet is still not yet:
+A candidate that has reached the operational-action packet is still not yet at
+carried enactment packet truth.
 
-* service-enacted
-* effect-emitted
-* post-action-persisted
+The enacted seam is now responsible for distinguishing:
 
-It is only packet-confirmed as something that may lawfully approach those
-thresholds.
+* refusal for unlawful widening
+* pending for recoverable insufficiency
+* bounded effect emission
+* committed service enactment
 
-The next question is narrower and more serious:
+The governing question at this chapter was:
 
 > when does an operational-action packet cross from committed action into actual service enactment, lawful effect emission, or durable post-action consequence?
+
+That runtime question is now seated.
 
 ---
 
@@ -69,17 +76,14 @@ The packet is the minimum truthful body because it preserves:
 
 ## First Unified Intent
 
-The first pass should remain unified.
+The first realized pass remained unified.
 
-Initial code seam:
+The realized code seam is:
 
 * `GovernedSeedPostActionServiceEnactmentContracts.cs`
 * `GovernedSeedPostActionServiceEnactmentService.cs`
 
-Service enactment and effect emission should first be discovered in one
-service.
-
-They may later split only if the runtime body demands separate lifecycles.
+Service enactment and effect emission remain discovered in one service for now.
 
 ---
 
@@ -218,27 +222,32 @@ The first pass should remain conservative:
 
 ## Outcome Target
 
-At the end of this chapter, the governed runtime should be able to:
+At the end of this chapter, the governed runtime is now able to:
 
 * accept a `GovernedSeedPostExecutionOperationalActionPacket`
 * determine whether the packet remains at the operational-action layer, returns
   to operational-action-pending, is refused, authorizes bounded effect
   emission, or becomes service-enacted
 * emit a truthful enactment receipt for downstream use
+* preserve refusal and pending as first-class runtime dispositions rather than
+  service-local inference
 
 ---
 
 ## Shortest Compression
 
-> the operational-action packet is now real; the next step is to define what that packet may actually enact or emit as service consequence.
+> the operational-action packet is now real, and service enactment is now
+> runtime truth; the next step is to give that enactment truth its own carried
+> body.
 
 ---
 
-## After the Note
+## After This Chapter
 
-Then the first code pass should be:
+The next honest descent is now packetization at this layer:
 
-* `GovernedSeedPostActionServiceEnactmentContracts.cs`
-* `GovernedSeedPostActionServiceEnactmentService.cs`
+* `GovernedSeedPostActionServiceEnactmentPacketContracts.cs`
+* `GovernedSeedPostActionServiceEnactmentPacketMaterializationService.cs`
 
-That is the clean next descent.
+That packet should carry enacted consequence as witnessed runtime truth, not as
+anticipated future shape.

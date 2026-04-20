@@ -137,6 +137,7 @@ public sealed class GovernedStateModulationService : IGovernedStateModulationSer
         CommitReady: operationalContext?.CommitReady,
         OperationalActionCommitted: operationalContext?.OperationalActionCommitted,
         CommitReceiptHandle: operationalContext?.CommitReceiptHandle,
+        PostActionServiceEnactmentPacketHandle: operationalContext?.PostActionServiceEnactmentPacketHandle,
         PostActionServiceEnactmentReceiptHandle: operationalContext?.PostActionServiceEnactmentReceiptHandle,
         PostActionServiceEnactmentDisposition: operationalContext?.PostActionServiceEnactmentDisposition,
         EffectEmissionAuthorized: operationalContext?.EffectEmissionAuthorized,

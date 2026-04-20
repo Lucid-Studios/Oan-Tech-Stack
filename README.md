@@ -222,6 +222,11 @@ which frames enacted service consequence and effect emission as reasoning over
 the carried operational-action packet rather than over loose runtime action
 surfaces.
 
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ACTION_SERVICE_ENACTMENT_PACKET.md`,
+which frames enactment truth as a carried body while keeping fate, closure, and
+continuity authority downstream of the current seam.
+
 Inside the sibling line:
 
 ```text
