@@ -43,6 +43,9 @@ public sealed class GovernedSeedPostActionServiceEnactmentService
         var explicitScopePreserved =
             packet.ServiceEffectAssessment.ExplicitScopePreserved &&
             packet.OperationalActionCommitAssessment.ExplicitScopePreserved;
+        var authorityExpansionRequested =
+            packet.CommitIntent.PropagationRequested ||
+            packet.CommitIntent.IrreversibleEffectRequested;
         var effectEmissionAuthorized =
             packetComplete &&
             serviceEffectAuthorized &&
@@ -55,10 +58,8 @@ public sealed class GovernedSeedPostActionServiceEnactmentService
             operationalActionCommitted &&
             effectEmissionAuthorized &&
             packet.CommitIntent.CommitIntentPresent &&
-            !packet.CommitIntent.PropagationRequested;
-        var serviceEnactmentCommitted =
-            enactmentCommitReady &&
-            !packet.CommitIntent.IrreversibleEffectRequested;
+            !authorityExpansionRequested;
+        var serviceEnactmentCommitted = enactmentCommitReady;
 
         var effectEmissionAssessment = new GovernedSeedEffectEmissionAssessment(
             PacketHandle: packet.PacketHandle,
@@ -98,6 +99,7 @@ public sealed class GovernedSeedPostActionServiceEnactmentService
             revalidationConsistent,
             attributionPreserved,
             explicitScopePreserved,
+            authorityExpansionRequested,
             effectEmissionAuthorized,
             operationalActionCommitted,
             serviceEnactmentCommitted);
@@ -134,6 +136,7 @@ public sealed class GovernedSeedPostActionServiceEnactmentService
         bool revalidationConsistent,
         bool attributionPreserved,
         bool explicitScopePreserved,
+        bool authorityExpansionRequested,
         bool effectEmissionAuthorized,
         bool operationalActionCommitted,
         bool serviceEnactmentCommitted)
@@ -149,6 +152,16 @@ public sealed class GovernedSeedPostActionServiceEnactmentService
         if (!explicitScopePreserved)
         {
             return GovernedSeedServiceEnactmentDisposition.ReturnToOperationalActionPending;
+        }
+
+        if (authorityExpansionRequested)
+        {
+            return GovernedSeedServiceEnactmentDisposition.Refuse;
+        }
+
+        if (operationalActionCommitted && !effectEmissionAuthorized)
+        {
+            return GovernedSeedServiceEnactmentDisposition.Refuse;
         }
 
         if (serviceEnactmentCommitted)
@@ -227,4 +240,3 @@ public sealed class GovernedSeedPostActionServiceEnactmentService
                 "Operational-action packet must be refused for post-action service enactment."
         };
 }
-

@@ -19,6 +19,7 @@ public sealed class NextImplementationChapterPostActionServiceEnactmentFromOpera
         Assert.True(File.Exists(notePath), "Post-action service enactment chapter note should exist.");
 
         var noteText = File.ReadAllText(notePath, Encoding.UTF8);
+        var normalizedNoteText = noteText.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\n', ' ');
         Assert.Contains("Status: Proposed - Service Enactment Chapter Candidate", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostExecutionOperationalActionPacket`", noteText, StringComparison.Ordinal);
         Assert.Contains("`GovernedSeedPostActionServiceEnactmentContracts.cs`", noteText, StringComparison.Ordinal);
@@ -29,6 +30,10 @@ public sealed class NextImplementationChapterPostActionServiceEnactmentFromOpera
         Assert.Contains(
             "no downstream enactment, effect emission, or post-action reasoning may occur over anything less than a complete operational-action packet",
             noteText,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "Post-action service enactment must not enlarge authority beyond the originating operational-action packet unless a new admission event occurs.",
+            normalizedNoteText,
             StringComparison.Ordinal);
 
         var readmeText = File.ReadAllText(readmePath, Encoding.UTF8);

@@ -56,7 +56,25 @@ public sealed class GovernedSeedPostActionServiceEnactmentTests
 
         var result = service.Evaluate(packet);
 
-        Assert.Equal(GovernedSeedServiceEnactmentDisposition.ServiceEnactmentPending, result.UnifiedAssessment.Disposition);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, result.UnifiedAssessment.Disposition);
+        Assert.True(result.EffectEmissionAssessment.EffectEmissionAuthorized);
+        Assert.False(result.ServiceEnactmentCommitAssessment.ServiceEnactmentCommitted);
+    }
+
+    [Fact]
+    public void Irreversible_Effect_Request_Is_Refused_As_Authority_Expansion()
+    {
+        var service = new GovernedSeedPostActionServiceEnactmentService();
+        var packet = CreateOperationalActionPacket(
+            GovernedSeedOperationalActionDisposition.OperationalActionCommitted,
+            serviceEffectAuthorized: true,
+            operationalActionCommitted: true,
+            irreversibleEffectRequested: true,
+            propagationRequested: false);
+
+        var result = service.Evaluate(packet);
+
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, result.UnifiedAssessment.Disposition);
         Assert.True(result.EffectEmissionAssessment.EffectEmissionAuthorized);
         Assert.False(result.ServiceEnactmentCommitAssessment.ServiceEnactmentCommitted);
     }
@@ -98,10 +116,48 @@ public sealed class GovernedSeedPostActionServiceEnactmentTests
         Assert.False(result.ServiceEnactmentCommitAssessment.ServiceEnactmentCommitted);
     }
 
+    [Fact]
+    public void Committed_Action_Without_Service_Effect_Warrant_Is_Refused()
+    {
+        var service = new GovernedSeedPostActionServiceEnactmentService();
+        var packet = CreateOperationalActionPacket(
+            GovernedSeedOperationalActionDisposition.OperationalActionCommitted,
+            serviceEffectAuthorized: false,
+            operationalActionCommitted: true,
+            irreversibleEffectRequested: false,
+            propagationRequested: false);
+
+        var result = service.Evaluate(packet);
+
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, result.UnifiedAssessment.Disposition);
+        Assert.False(result.EffectEmissionAssessment.EffectEmissionAuthorized);
+        Assert.False(result.ServiceEnactmentCommitAssessment.ServiceEnactmentCommitted);
+    }
+
+    [Fact]
+    public void Missing_Commit_Intent_Keeps_Enactment_Pending()
+    {
+        var service = new GovernedSeedPostActionServiceEnactmentService();
+        var packet = CreateOperationalActionPacket(
+            GovernedSeedOperationalActionDisposition.OperationalActionCommitted,
+            serviceEffectAuthorized: true,
+            operationalActionCommitted: true,
+            commitIntentPresent: false,
+            irreversibleEffectRequested: false,
+            propagationRequested: false);
+
+        var result = service.Evaluate(packet);
+
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.ServiceEnactmentPending, result.UnifiedAssessment.Disposition);
+        Assert.True(result.EffectEmissionAssessment.EffectEmissionAuthorized);
+        Assert.False(result.ServiceEnactmentCommitAssessment.EnactmentCommitReady);
+    }
+
     private static GovernedSeedPostExecutionOperationalActionPacket CreateOperationalActionPacket(
         GovernedSeedOperationalActionDisposition disposition = GovernedSeedOperationalActionDisposition.OperationalActionCommitted,
         bool serviceEffectAuthorized = true,
         bool operationalActionCommitted = true,
+        bool commitIntentPresent = true,
         bool irreversibleEffectRequested = false,
         bool propagationRequested = false,
         bool explicitScopePreserved = true)
@@ -119,7 +175,7 @@ public sealed class GovernedSeedPostActionServiceEnactmentTests
             CreateCommitIntent(
                 executionPacket.PacketHandle,
                 executionPacket.CandidateId,
-                operationalActionCommitted,
+                commitIntentPresent,
                 irreversibleEffectRequested,
                 propagationRequested),
             CreateOperationalActionCommitAssessment(

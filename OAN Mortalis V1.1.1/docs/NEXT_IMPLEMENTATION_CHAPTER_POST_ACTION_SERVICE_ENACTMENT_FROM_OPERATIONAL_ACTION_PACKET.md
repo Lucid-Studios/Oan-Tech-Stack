@@ -142,6 +142,11 @@ truth.
 
 Post-action consequence must not silently widen domain, role, or service scope.
 
+### Authority Boundary Invariant
+
+Post-action service enactment must not enlarge authority beyond the originating
+operational-action packet unless a new admission event occurs.
+
 ---
 
 ## Suggested First Contracts
