@@ -1,7 +1,6 @@
 param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/build/local-automation-cycle.json',
-    [string] $FederationPolicyPath = 'OAN Mortalis V1.1.1/build/source-bucket-federation.json'
+    [string] $FederationPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-federation.json'
 )
 
 Set-StrictMode -Version Latest
@@ -23,7 +22,7 @@ function Get-ChildScriptOutputTail {
 
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
 $statusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-SourceBucket-ReturnIntegrationStatus.ps1'
-$statusOutput = & $statusScriptPath -RepoRoot $resolvedRepoRoot -CyclePolicyPath $CyclePolicyPath -FederationPolicyPath $FederationPolicyPath
+$statusOutput = & $statusScriptPath -RepoRoot $resolvedRepoRoot -FederationPolicyPath $FederationPolicyPath
 $statusPath = Get-ChildScriptOutputTail -Output $statusOutput
 if (-not [string]::IsNullOrWhiteSpace($statusPath)) {
     Write-Host ('[source-bucket-return-cycle] Status: {0}' -f $statusPath)

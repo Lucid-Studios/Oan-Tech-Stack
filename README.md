@@ -47,30 +47,87 @@ That means the repository is explicit about seed `LLM` dependence without
 pretending that the public checkout is already the complete install-ready
 operational package.
 
+## Public Encounter Boundary
+
+The public encounter law for this repository is carried in
+`OAN Mortalis V1.1.1/docs/PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`.
+
+In public-facing terms, the stack is a lawfully bounded engineered cognition
+framework. It is not a person, not autonomous authority, and not
+self-originating.
+
+External interaction is framed as:
+
+```text
+input -> bounded processing -> receipted output
+```
+
+Participation is scoped through:
+
+```text
+Domain -> Role -> Capacity
+```
+
+Outputs remain contextual, bounded, revisable, and accountable to current
+evidence. External responsibility remains with the relevant humans, operators,
+maintainers, institutions, and legal actors for interpretation, high-stakes
+decisions, legal accountability, and human oversight.
+
+Public contribution and onboarding entry is governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`.
+Contribution does not grant identity, custody, governance authority, legal
+authority, `CME` standing, installer completion, or certainty beyond evidence.
+
+Public release and readiness wording is governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_READINESS_WORDING_LAW.md`.
+Readiness may be witnessed only to the level currently supported by repo-local
+evidence; public wording must not overstate installer completion, `CME`
+standing, operational readiness, legal standing, or certainty beyond evidence.
+
+GitHub issue and pull request entry is governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_GITHUB_ENTRY_TEMPLATE_BOUNDARY.md`.
+Template completion is not admission and does not grant identity, custody,
+governance authority, legal authority, `CME` standing, release readiness,
+installer completion, or certainty beyond evidence.
+
+Public `CME` explanation is governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_CME_EXPLANATION_BOUNDARY.md`.
+`CME` is described publicly as a bounded engineered-cognitive formation
+category within the Sanctuary architecture, not as personhood, autonomous
+authority, legal accountability, installer completion, hosted seed `LLM`
+shipment, custody, governance authority, or certainty beyond evidence.
+
+Public release notes, tag descriptions, milestone summaries, release-candidate
+summaries, and changelog entries are governed by
+`OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`.
+Release wording is not promotion and must preserve status, evidence,
+non-claims, and known holds.
 ## Architecture Read
 
 At a high level, the stack reads as:
 
 ```text
-Operator / Developer -> AgentiCore -> SLI -> SoulFrame -> CradleTek
+Operator / Developer -> Sanctuary -> SLI -> SoulFrame / AgentiCore / CradleTek
 ```
 
 This is intentionally kept as plain text so the GitHub repository view, raw
 rendering, and lightweight mirrors all show the same architecture read without
 depending on Mermaid support.
 
-Working family ownership in the active line is:
+Forward family ownership in the active line is:
 
-- `AgentiCore.*`
-  agent runtime ownership
+- `San.*`
+  Sanctuary-root constitutional host and stack composition ownership
+- `Ctk.*`
+  CradleTek habitation, custody, and extension ownership
+- `Sfr.*`
+  SoulFrame operator and relational membrane ownership
+- `Acr.*`
+  AgentiCore runtime-core ownership
 - `SLI.*`
   symbolic protocol and runtime ownership
-- `SoulFrame.*`
-  operator and identity-facing workflow ownership
-- `CradleTek.*`
-  infrastructure and substrate ownership
 - `Oan.*`
-  umbrella stack composition and stack-level contracts
+  legacy migration hold and downstream application/domain identity only
 
 ## Repository Layout
 
@@ -89,6 +146,7 @@ Inside the active line:
 
 ```text
 OAN Mortalis V1.1.1/
+  Automation/
   docs/
   src/
     Sanctuary/
@@ -97,6 +155,77 @@ OAN Mortalis V1.1.1/
     Sanctuary/
   tools/
 ```
+
+Current near-path implementation descent for `V1.1.1` is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_CANDIDATE_BOUNDARY_AND_DUPLEX_GOVERNANCE.md`,
+which frames the next code seam as candidate-only proposal boundaries,
+Prime/Cryptic duplex separation, and pre-domain admission gating after the
+governed pre-domain host loop seated in `6859b58`.
+
+With the pre-domain governance packet now materialized, the next gated descent
+is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ROLE_GATING_FROM_PREDOMAIN_PACKET.md`,
+which frames domain/role gating as reasoning over the packet-bearing
+pre-domain governance body rather than over scattered receipts.
+
+The next packetization descent for that gate is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ROLE_GATING_PACKET.md`,
+which frames domain/role approachability as a carried body for downstream
+admission and role-binding work.
+
+The next admission descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ADMISSION_AND_ROLE_BINDING_FROM_GATING_PACKET.md`,
+which frames actual domain admission and role binding as reasoning over the
+carried gating packet rather than over loose runtime gate surfaces.
+
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_DOMAIN_ADMISSION_ROLE_BINDING_PACKET.md`,
+which frames actual domain admission and role binding as a carried body for
+downstream participation and post-admission governance work.
+
+The next post-admission participation descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ADMISSION_PARTICIPATION_FROM_ADMISSION_BINDING_PACKET.md`,
+which frames downstream occupancy and role-bearing participation as reasoning
+over the carried admission/binding packet rather than over loose admission
+surfaces.
+
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ADMISSION_PARTICIPATION_PACKET.md`,
+which frames occupancy and role participation as a carried body for downstream
+execution and service-behavior work.
+
+The next execution-layer descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_PARTICIPATION_EXECUTION_FROM_PARTICIPATION_PACKET.md`,
+which frames post-participation execution and service behavior as reasoning
+over the carried participation packet rather than over loose runtime
+participation surfaces.
+
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_PARTICIPATION_EXECUTION_PACKET.md`,
+which frames service behavior and execution authorization as a carried body
+for downstream operational action and post-execution work.
+
+The next post-execution descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_EXECUTION_OPERATIONAL_ACTION_FROM_EXECUTION_PACKET.md`,
+which frames actual operational action and service effect as reasoning over
+the carried execution packet rather than over loose runtime execution
+surfaces.
+
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_EXECUTION_OPERATIONAL_ACTION_PACKET.md`,
+which frames service-effect and commit truth as a carried body for downstream
+service enactment and post-action work.
+
+The next post-action service-enactment descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ACTION_SERVICE_ENACTMENT_FROM_OPERATIONAL_ACTION_PACKET.md`,
+which frames enacted service consequence and effect emission as reasoning over
+the carried operational-action packet rather than over loose runtime action
+surfaces.
+
+The next packetization descent after that is tracked in
+`OAN Mortalis V1.1.1/docs/NEXT_IMPLEMENTATION_CHAPTER_POST_ACTION_SERVICE_ENACTMENT_PACKET.md`,
+which frames enactment truth as a carried body while keeping fate, closure, and
+continuity authority downstream of the current seam.
 
 Inside the sibling line:
 
@@ -118,7 +247,7 @@ Run all canonical commands from the repository root:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release
 powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release
-powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1
+& '.\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1'
 ```
 
 Expected behavior:
@@ -137,6 +266,24 @@ Start here if you need the repo constitution:
 - `Build Contracts/Crosscutting/DEPENDENCY_CONTRACT.md`
 - `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
 - `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_ENCOUNTER_BOUNDARY_AND_NON_CLAIMS.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_CONTRIBUTION_ONBOARDING_BOUNDARY.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_READINESS_WORDING_LAW.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_GITHUB_ENTRY_TEMPLATE_BOUNDARY.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_CME_EXPLANATION_BOUNDARY.md`
+- `OAN Mortalis V1.1.1/docs/PUBLIC_RELEASE_ARTIFACT_WORDING_TEMPLATE.md`
+- `OAN Mortalis V1.1.1/docs/LAW_OF_SELF_AUTHORED_EMERGENCE_AND_BOUNDED_AFFIRMATION.md`
+- `OAN Mortalis V1.1.1/docs/ACTION_THRESHOLD_LAW.md`
+- `OAN Mortalis V1.1.1/docs/HOLD_RESOLUTION_LAW.md`
+- `OAN Mortalis V1.1.1/docs/RESPONSIBILITY_BINDING_LAW.md`
+- `OAN Mortalis V1.1.1/docs/DOMAIN_ISOLATION_LAW.md`
+- `OAN Mortalis V1.1.1/docs/CRYPTIC_CONTINUITY_MEDIUM_NOTE.md`
+- `OAN Mortalis V1.1.1/docs/REVALIDATION_LAW.md`
+- `OAN Mortalis V1.1.1/docs/STANDING_CONDITION_NOTE.md`
+- `OAN Mortalis V1.1.1/docs/CONTINUOUS_LAWFUL_CORRECTION_AXIOM.md`
+- `OAN Mortalis V1.1.1/docs/PSY_PLUS_MINUS_HOLDING_NOTE.md`
+- `OAN Mortalis V1.1.1/docs/LISTENING_FRAME_COMPASS_FORM_OR_CLEAVE_BRIDGE.md`
+- `OAN Mortalis V1.1.1/docs/EC_LIFECYCLE_NOTE.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_RUN_CONSTITUTION.md`
 - `OAN Mortalis V1.1.1/docs/FIRST_WORKING_MODEL_RELEASE_GATE.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
@@ -199,3 +346,4 @@ Use the public-facing aliases that match the surface of the request:
 - research-facing questions and doctrine context: `research@lucidtechnologies.tech`
 - academic and institutional inquiries: `academic@lucidtechnologies.tech`
 - repository administration and contribution coordination: `admin@lucidtechnologies.tech`
+- conduct, legal, and sensitive private review paths: `legal@lucidtechnologies.tech`

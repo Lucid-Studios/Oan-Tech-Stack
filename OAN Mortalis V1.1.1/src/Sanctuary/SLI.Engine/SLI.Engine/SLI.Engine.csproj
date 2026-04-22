@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\\..\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
+    <ProjectReference Include="..\\..\\San.Common\\San.Common\\San.Common.csproj" />
     <ProjectReference Include="..\\..\\SLI.Ingestion\\SLI.Ingestion\\SLI.Ingestion.csproj" />
     <ProjectReference Include="..\\..\\SLI.Lisp\\SLI.Lisp\\SLI.Lisp.csproj" />
   </ItemGroup>

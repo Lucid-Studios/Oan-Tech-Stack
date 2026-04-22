@@ -200,6 +200,28 @@ The active repo should therefore be read this way:
 - current runtime and telemetry evidence proves bounded constitutional and
   runtime posture, not the whole Sanctuary lifecycle
 
+## Legal Orientation Bridge
+
+Primitive `SelfGEL` may later inherit a `GEL`-owned legal-orientation root
+predicate family.
+
+That family establishes future-facing truth about:
+
+- legal body
+- jurisdiction
+- entity lineage
+- governor binding
+- lawful operating surface
+
+In this slice:
+
+- GEL owns that family
+- first-run references it doctrine-only
+- the legal-evidence bridge remains local/private only
+- the bridge is not cryptographic seed entropy
+- charitable trust, `B-Corp`, bonded operator, authority delegation, and
+  cryptographic custody remain downstream branches
+
 ## Anti-Collapse Rule
 
 The active line must not collapse:

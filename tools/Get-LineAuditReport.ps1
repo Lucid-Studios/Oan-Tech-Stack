@@ -311,20 +311,6 @@ function Get-LineTelemetryInventoryDescriptors {
     if ([string]::Equals($LineName, "OAN Mortalis V1.1.1", [System.StringComparison]::OrdinalIgnoreCase)) {
         return @(
             [ordered]@{
-                surfaceName = "companion-tool-telemetry-last-run"
-                domain = "Sanctuary"
-                spline = "Run"
-                semanticClass = "standing_surface"
-                authorityClass = "evidence"
-                continuityClass = "line"
-                retentionClass = "rolling_state"
-                packageClass = "state_surface"
-                declaredBy = "docs\COMPANION_TOOL_TELEMETRY_LANE.md"
-                stateSurfacePath = ".audit\state\local-automation-companion-tool-telemetry-last-run.json"
-                runSurfacePath = ".audit\runs\companion-tool-telemetry\"
-                notes = @("bounded audit evidence", "companion telemetry does not widen runtime authority")
-            }
-            [ordered]@{
                 surfaceName = "source-bucket-federation-status"
                 domain = "Sanctuary"
                 spline = "Build"
@@ -491,7 +477,6 @@ function Get-LineAuditReportObject {
 
     $taxonomyPath = Join-Path $lineRootPath "docs\TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md"
     $schemaPath = Join-Path $lineRootPath "docs\LINE_AUDIT_REPORT_SCHEMA.md"
-    $companionTelemetryPath = Join-Path $lineRootPath "docs\COMPANION_TOOL_TELEMETRY_LANE.md"
     $sourceBucketFederationPath = Join-Path $lineRootPath "docs\SOURCE_BUCKET_FEDERATION_LANE.md"
     $sourceBucketConsumptionPath = Join-Path $lineRootPath "docs\SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md"
 

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\\..\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
+    <ProjectReference Include="..\\..\\San.Common\\San.Common\\San.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="*.lisp" />

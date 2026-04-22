@@ -194,6 +194,15 @@ internal static class SanctuaryContractGuard
         return normalized;
     }
 
+    public static IReadOnlyList<string> TextListOrEmpty(IReadOnlyList<string>? values)
+    {
+        return (values ?? Array.Empty<string>())
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Select(static item => item.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
     public static IReadOnlyList<T> RequiredDistinctList<T>(IReadOnlyList<T> values, string parameterName)
     {
         var normalized = (values ?? throw new ArgumentNullException(parameterName))
@@ -206,5 +215,12 @@ internal static class SanctuaryContractGuard
         }
 
         return normalized;
+    }
+
+    public static IReadOnlyList<T> DistinctListOrEmpty<T>(IReadOnlyList<T>? values)
+    {
+        return (values ?? Array.Empty<T>())
+            .Distinct()
+            .ToArray();
     }
 }

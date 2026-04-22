@@ -1,16 +1,20 @@
 using System.Text.Json;
+using AgentiCore;
 using CradleTek.Custody;
 using CradleTek.Host;
 using CradleTek.Runtime;
-using Oan.Common;
-using Oan.FirstRun;
-using Oan.Nexus.Control;
-using Oan.PrimeCryptic.Services;
-using Oan.Runtime.Headless;
-using Oan.Runtime.Materialization;
-using Oan.State.Modulation;
-using Oan.Trace.Persistence;
+using San.Common;
+using San.FirstRun;
+using San.HostedLlm;
+using San.Nexus.Control;
+using San.PrimeCryptic.Services;
+using San.Runtime.Headless;
+using San.Runtime.Materialization;
+using San.State.Modulation;
+using San.Trace.Persistence;
+using SLI.Engine;
 using SLI.Ingestion;
+using SLI.Lisp;
 using SoulFrame.Bootstrap;
 using SoulFrame.Membrane;
 
@@ -869,9 +873,27 @@ public sealed class SeedVerticalSliceIntegrationTests
             new GovernedNexusControlService(),
             new GovernedSeedRuntimeMaterializationService(
                 new GovernedFirstRunConstitutionService(),
-                new GovernedSeedPreGovernanceService()),
-            new GovernedStateModulationService(),
-            new GovernedSeedEnvelopeTraceService(
+                new GovernedSeedPreGovernanceService(),
+                new GovernedSeedPreDomainGovernancePacketMaterializationService(),
+                new GovernedSeedDomainRoleGatingPacketMaterializationService(),
+                new GovernedSeedDomainAdmissionRoleBindingPacketMaterializationService(),
+                new GovernedSeedPostAdmissionParticipationPacketMaterializationService(),
+                new GovernedSeedPostParticipationExecutionPacketMaterializationService(),
+          new GovernedSeedPostExecutionOperationalActionPacketMaterializationService(),
+          new GovernedSeedPostActionServiceEnactmentPacketMaterializationService()),
+            new GovernedSeedPreDomainHostLoopService(
+                new GovernedSeedCrypticHoldingService(),
+                new GovernedSeedFormOrCleaveService(),
+                new GovernedSeedCandidateSeparationService(),
+                new PrimeSeedPreDomainAdmissionGateService()),
+            new GovernedSeedDomainRoleGatingService(),
+      new GovernedSeedDomainAdmissionRoleBindingService(),
+      new GovernedSeedPostAdmissionParticipationService(),
+      new GovernedSeedPostParticipationExecutionService(),
+      new GovernedSeedPostExecutionOperationalActionService(),
+      new GovernedSeedPostActionServiceEnactmentService(),
+      new GovernedStateModulationService(),
+      new GovernedSeedEnvelopeTraceService(
                 new InMemoryGovernedCrypticPointerStore(),
                 new InMemoryGovernedGelTelemetrySink()));
 
@@ -1301,6 +1323,95 @@ public sealed class SeedVerticalSliceIntegrationTests
         Assert.Equal(expectedOutboundLaneKind, outboundLane.LaneKind);
     }
 
+    [Fact]
+    public async Task Evaluate_Bonded_Formation_Refuses_Post_Action_Service_Enactment_End_To_End()
+    {
+        var runtime = CreateRuntime(new AuthorityExpansionOperationalActionService());
+        var prompt = """
+            Standing:
+            - aggregate_correlation_a_b
+            Incomplete / uncertain:
+            - causal_direction_unknown
+            Contradiction:
+            - bounded_subset_reversal
+            Protected / non-disclosable:
+            - raw_shards
+            Permitted derivation:
+            - aggregate_metrics
+            """;
+
+        var result = await runtime.EvaluateAsync("agent-enactment-refuse", "theater-enactment-refuse", prompt);
+        var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(result.Payload!);
+
+        Assert.NotNull(payload);
+        Assert.NotNull(payload.CommitIntent);
+        Assert.NotNull(payload.PostExecutionOperationalActionAssessment);
+        Assert.NotNull(payload.PostExecutionOperationalActionReceipt);
+        Assert.NotNull(payload.PostActionServiceEnactmentAssessment);
+        Assert.NotNull(payload.PostActionServiceEnactmentReceipt);
+        Assert.NotNull(payload.ServiceEnactmentCommitAssessment);
+        Assert.NotNull(payload.OperationalContext);
+        Assert.NotNull(payload.StateModulationReceipt);
+
+        Assert.Equal(GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized, payload.PostExecutionOperationalActionReceipt!.Disposition);
+        Assert.True(payload.CommitIntent.IrreversibleEffectRequested);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, payload.PostActionServiceEnactmentAssessment.Disposition);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, payload.PostActionServiceEnactmentReceipt.Disposition);
+        Assert.True(payload.PostActionServiceEnactmentReceipt.EffectEmissionAuthorized);
+        Assert.False(payload.PostActionServiceEnactmentReceipt.ServiceEnactmentCommitted);
+        Assert.False(payload.ServiceEnactmentCommitAssessment.EnactmentCommitReady);
+        Assert.False(payload.ServiceEnactmentCommitAssessment.ServiceEnactmentCommitted);
+        Assert.Equal(payload.PostActionServiceEnactmentReceipt.ReceiptHandle, payload.OperationalContext.PostActionServiceEnactmentReceiptHandle);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, payload.OperationalContext.PostActionServiceEnactmentDisposition);
+        Assert.Equal(payload.PostActionServiceEnactmentReceipt.ReceiptHandle, payload.StateModulationReceipt.PostActionServiceEnactmentReceiptHandle);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.Refuse, payload.StateModulationReceipt.PostActionServiceEnactmentDisposition);
+    }
+
+    [Fact]
+    public async Task Evaluate_Bonded_Formation_Pends_Post_Action_Service_Enactment_End_To_End()
+    {
+        var runtime = CreateRuntime(new DeferredOperationalActionService());
+        var prompt = """
+            Standing:
+            - aggregate_correlation_a_b
+            Incomplete / uncertain:
+            - causal_direction_unknown
+            Contradiction:
+            - bounded_subset_reversal
+            Protected / non-disclosable:
+            - raw_shards
+            Permitted derivation:
+            - aggregate_metrics
+            """;
+
+        var result = await runtime.EvaluateAsync("agent-enactment-pending", "theater-enactment-pending", prompt);
+        var payload = JsonSerializer.Deserialize<GovernedSeedVerticalSlice>(result.Payload!);
+
+        Assert.NotNull(payload);
+        Assert.NotNull(payload.CommitIntent);
+        Assert.NotNull(payload.PostExecutionOperationalActionAssessment);
+        Assert.NotNull(payload.PostExecutionOperationalActionReceipt);
+        Assert.NotNull(payload.PostActionServiceEnactmentAssessment);
+        Assert.NotNull(payload.PostActionServiceEnactmentReceipt);
+        Assert.NotNull(payload.ServiceEnactmentCommitAssessment);
+        Assert.NotNull(payload.OperationalContext);
+        Assert.NotNull(payload.StateModulationReceipt);
+
+        Assert.Equal(GovernedSeedOperationalActionDisposition.OperationalActionPending, payload.PostExecutionOperationalActionReceipt!.Disposition);
+        Assert.False(payload.CommitIntent.IrreversibleEffectRequested);
+        Assert.False(payload.CommitIntent.PropagationRequested);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.ServiceEnactmentPending, payload.PostActionServiceEnactmentAssessment.Disposition);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.ServiceEnactmentPending, payload.PostActionServiceEnactmentReceipt.Disposition);
+        Assert.False(payload.PostActionServiceEnactmentReceipt.EffectEmissionAuthorized);
+        Assert.False(payload.PostActionServiceEnactmentReceipt.ServiceEnactmentCommitted);
+        Assert.False(payload.ServiceEnactmentCommitAssessment.EnactmentCommitReady);
+        Assert.False(payload.ServiceEnactmentCommitAssessment.ServiceEnactmentCommitted);
+        Assert.Equal(payload.PostActionServiceEnactmentReceipt.ReceiptHandle, payload.OperationalContext.PostActionServiceEnactmentReceiptHandle);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.ServiceEnactmentPending, payload.OperationalContext.PostActionServiceEnactmentDisposition);
+        Assert.Equal(payload.PostActionServiceEnactmentReceipt.ReceiptHandle, payload.StateModulationReceipt.PostActionServiceEnactmentReceiptHandle);
+        Assert.Equal(GovernedSeedServiceEnactmentDisposition.ServiceEnactmentPending, payload.StateModulationReceipt.PostActionServiceEnactmentDisposition);
+    }
+
     private static GovernedSeedCrypticReturnClass DetermineExpectedCrypticReturnClass(GovernedSeedVerticalSlice payload)
     {
         if (payload.Predicate is not null)
@@ -1358,4 +1469,244 @@ public sealed class SeedVerticalSliceIntegrationTests
                 TimestampUtc: DateTimeOffset.UtcNow);
         }
     }
+
+    private sealed class StableMemoryContextService : IGovernedSeedMemoryContextService
+    {
+        public Task<GovernedSeedMemoryContext> CreateContextAsync(
+            GovernedSeedEvaluationRequest request,
+            GovernedSeedSoulFrameBootstrapReceipt bootstrapReceipt,
+            CancellationToken cancellationToken = default)
+        {
+            var context = new GovernedSeedMemoryContext(
+                ContextHandle: $"memory-context://{request.AgentId}",
+                ContextProfile: "integration-test-memory-context",
+                ResolverSource: "integration-test-resolver",
+                AtlasSource: "integration-test-atlas",
+                ValidationReferenceHandle: $"validation://{bootstrapReceipt.CustodySnapshot.CrypticSelfGelHandle}",
+                RelevantEngramIds: ["engram-001"],
+                RelevantConceptTags: ["integration-test"],
+                RootSymbolicIds: ["root-symbolic-001"],
+                UnknownRootCount: 0,
+                SelfResolutionDisposition: "cooled-validated",
+                ContextStability: "stable",
+                ConceptDensity: "bounded",
+                TimestampUtc: DateTimeOffset.UtcNow);
+            return Task.FromResult(context);
+        }
+    }
+
+    private static GovernedSeedRuntimeService CreateRuntime(
+        IGovernedSeedPostExecutionOperationalActionService postExecutionOperationalActionService)
+    {
+        var lispBundleService = new GovernedCrypticLispBundleService();
+        var parser = new SeedEvidencePacketParser();
+        var cognition = new GovernedSeedCognitionService(
+            new GovernedHostedLlmSeedService(new GovernedHostedLlmLocalRuntimeProvider()),
+            new GovernedSeedHighMindUptakeService(),
+            new CrypticFloorEvaluator(parser, lispBundleService),
+            new DefaultPredicateMintProjector(),
+            new DefaultCrypticDerivationPolicy());
+        var nexusControlService = new GovernedNexusControlService();
+
+        return new GovernedSeedRuntimeService(
+            new GovernedSeedSanctuaryIngressEngrammitizationService(),
+            new GovernedSeedMembraneService(
+                cognition,
+                new GovernedSeedProjectionService(),
+                new GovernedSeedReturnIntakeService(),
+                new GovernedSeedProtectedHoldRoutingService(nexusControlService),
+                new GovernedSeedStewardshipService(nexusControlService),
+                new StableMemoryContextService(),
+                new GovernedSeedLowMindSfRoutingService(),
+                new GovernedSeedSituationalContextService()),
+            new GovernedSeedSoulFrameBootstrapService(new BootstrapCustodySource()),
+            new PrimeCrypticServiceBroker(lispBundleService),
+            nexusControlService,
+            new GovernedSeedRuntimeMaterializationService(
+                new GovernedFirstRunConstitutionService(),
+                new GovernedSeedPreGovernanceService(),
+                new GovernedSeedPreDomainGovernancePacketMaterializationService(),
+                new GovernedSeedDomainRoleGatingPacketMaterializationService(),
+                new GovernedSeedDomainAdmissionRoleBindingPacketMaterializationService(),
+                new GovernedSeedPostAdmissionParticipationPacketMaterializationService(),
+                new GovernedSeedPostParticipationExecutionPacketMaterializationService(),
+                new GovernedSeedPostExecutionOperationalActionPacketMaterializationService(),
+                new GovernedSeedPostActionServiceEnactmentPacketMaterializationService()),
+            new GovernedSeedPreDomainHostLoopService(
+                new GovernedSeedCrypticHoldingService(),
+                new GovernedSeedFormOrCleaveService(),
+                new GovernedSeedCandidateSeparationService(),
+                new PrimeSeedPreDomainAdmissionGateService()),
+            new GovernedSeedDomainRoleGatingService(),
+            new GovernedSeedDomainAdmissionRoleBindingService(),
+            new GovernedSeedPostAdmissionParticipationService(),
+            new GovernedSeedPostParticipationExecutionService(),
+            postExecutionOperationalActionService,
+            new GovernedSeedPostActionServiceEnactmentService(),
+            new GovernedStateModulationService(),
+            new GovernedSeedEnvelopeTraceService(
+                new InMemoryGovernedCrypticPointerStore(),
+                new InMemoryGovernedGelTelemetrySink()));
+    }
+
+    private sealed class AuthorityExpansionOperationalActionService : IGovernedSeedPostExecutionOperationalActionService
+    {
+        public GovernedSeedPostExecutionOperationalActionResult Evaluate(
+            GovernedSeedPostParticipationExecutionPacket packet)
+        {
+            var serviceEffectAssessment = new GovernedSeedServiceEffectAssessment(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                PacketComplete: true,
+                ExecutionAuthorized: false,
+                ServiceBehaviorAuthorized: true,
+                StandingConsistent: true,
+                RevalidationConsistent: true,
+                AttributionPreserved: true,
+                ExplicitScopePreserved: true,
+                ServiceEffectAuthorized: true,
+                Summary: "Execution packet supports bounded service effect for enactment refusal witnessing.");
+
+            var commitIntent = new GovernedSeedCommitIntent(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                ServiceEffectAuthorized: true,
+                ExecutionAuthorized: false,
+                ExplicitCommitRequested: false,
+                IrreversibleEffectRequested: true,
+                PropagationRequested: false,
+                CommitIntentPresent: true,
+                Summary: "Execution packet requests an irreversible effect beyond the originating operational packet.");
+
+            var commitAssessment = new GovernedSeedOperationalActionCommitAssessment(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                PacketComplete: true,
+                ExecutionAuthorized: false,
+                ServiceEffectAuthorized: true,
+                StandingConsistent: true,
+                RevalidationConsistent: true,
+                AttributionPreserved: true,
+                ExplicitScopePreserved: true,
+                ExplicitCommitRequested: false,
+                CommitReady: false,
+                OperationalActionCommitted: false,
+                Summary: "Execution packet remains uncommitted while carrying an unlawful authority-expansion request.");
+
+            var commitReceipt = new GovernedSeedCommitReceipt(
+                ReceiptHandle: $"post-execution-commit://{packet.CandidateId}",
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                CommitReady: false,
+                OperationalActionCommitted: false,
+                Summary: commitAssessment.Summary);
+
+            var unifiedAssessment = new GovernedSeedPostExecutionOperationalActionAssessment(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                Disposition: GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized,
+                PacketComplete: true,
+                ServiceEffectAuthorized: true,
+                OperationalActionCommitted: false,
+                Summary: "Execution packet may expose bounded effect, but downstream enactment must still evaluate authority limits.");
+
+            var receipt = new GovernedSeedPostExecutionOperationalActionReceipt(
+                ReceiptHandle: $"post-execution-operational-action://{packet.CandidateId}",
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                Disposition: GovernedSeedOperationalActionDisposition.ServiceEffectAuthorized,
+                ServiceEffectAuthorized: true,
+                OperationalActionCommitted: false,
+                Summary: unifiedAssessment.Summary);
+
+            return new GovernedSeedPostExecutionOperationalActionResult(
+                serviceEffectAssessment,
+                commitIntent,
+                commitAssessment,
+                commitReceipt,
+                unifiedAssessment,
+                receipt);
+        }
+    }
+
+    private sealed class DeferredOperationalActionService : IGovernedSeedPostExecutionOperationalActionService
+    {
+        public GovernedSeedPostExecutionOperationalActionResult Evaluate(
+            GovernedSeedPostParticipationExecutionPacket packet)
+        {
+            var serviceEffectAssessment = new GovernedSeedServiceEffectAssessment(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                PacketComplete: true,
+                ExecutionAuthorized: true,
+                ServiceBehaviorAuthorized: true,
+                StandingConsistent: true,
+                RevalidationConsistent: true,
+                AttributionPreserved: true,
+                ExplicitScopePreserved: true,
+                ServiceEffectAuthorized: false,
+                Summary: "Execution packet remains lawful but effect emission is not yet warranted.");
+
+            var commitIntent = new GovernedSeedCommitIntent(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                ServiceEffectAuthorized: false,
+                ExecutionAuthorized: true,
+                ExplicitCommitRequested: false,
+                IrreversibleEffectRequested: false,
+                PropagationRequested: false,
+                CommitIntentPresent: false,
+                Summary: "Execution packet does not yet carry a commit intent sufficient for service enactment.");
+
+            var commitAssessment = new GovernedSeedOperationalActionCommitAssessment(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                PacketComplete: true,
+                ExecutionAuthorized: true,
+                ServiceEffectAuthorized: false,
+                StandingConsistent: true,
+                RevalidationConsistent: true,
+                AttributionPreserved: true,
+                ExplicitScopePreserved: true,
+                ExplicitCommitRequested: false,
+                CommitReady: false,
+                OperationalActionCommitted: false,
+                Summary: "Execution packet remains recoverably short of committed operational action.");
+
+            var commitReceipt = new GovernedSeedCommitReceipt(
+                ReceiptHandle: $"post-execution-commit://{packet.CandidateId}",
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                CommitReady: false,
+                OperationalActionCommitted: false,
+                Summary: commitAssessment.Summary);
+
+            var unifiedAssessment = new GovernedSeedPostExecutionOperationalActionAssessment(
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                Disposition: GovernedSeedOperationalActionDisposition.OperationalActionPending,
+                PacketComplete: true,
+                ServiceEffectAuthorized: false,
+                OperationalActionCommitted: false,
+                Summary: "Execution packet remains lawfully pending before operational action may commit.");
+
+            var receipt = new GovernedSeedPostExecutionOperationalActionReceipt(
+                ReceiptHandle: $"post-execution-operational-action://{packet.CandidateId}",
+                PacketHandle: packet.PacketHandle,
+                CandidateId: packet.CandidateId,
+                Disposition: GovernedSeedOperationalActionDisposition.OperationalActionPending,
+                ServiceEffectAuthorized: false,
+                OperationalActionCommitted: false,
+                Summary: unifiedAssessment.Summary);
+
+            return new GovernedSeedPostExecutionOperationalActionResult(
+                serviceEffectAssessment,
+                commitIntent,
+                commitAssessment,
+                commitReceipt,
+                unifiedAssessment,
+                receipt);
+        }
+    }
+
 }

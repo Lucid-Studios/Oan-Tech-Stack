@@ -7,17 +7,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{690CBEA5-AB5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sanctuary", "Sanctuary", "{87A0BA2C-E91B-412F-8A1C-AE0B88124EA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.Common", "src\Sanctuary\Oan.Common\Oan.Common\Oan.Common.csproj", "{7560098D-1C89-4DC5-880A-0BEFF09FF387}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.Common", "src\Sanctuary\San.Common\San.Common\San.Common.csproj", "{7560098D-1C89-4DC5-880A-0BEFF09FF387}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.Nexus.Control", "src\Sanctuary\Oan.Nexus.Control\Oan.Nexus.Control\Oan.Nexus.Control.csproj", "{0F6D4D17-6877-4A6E-8074-FA609DBCDAA5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.Nexus.Control", "src\Sanctuary\San.Nexus.Control\San.Nexus.Control\San.Nexus.Control.csproj", "{0F6D4D17-6877-4A6E-8074-FA609DBCDAA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.PrimeCryptic.Services", "src\Sanctuary\Oan.PrimeCryptic.Services\Oan.PrimeCryptic.Services\Oan.PrimeCryptic.Services.csproj", "{509840B8-188A-4AB2-8962-4C2E056A85BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.PrimeCryptic.Services", "src\Sanctuary\San.PrimeCryptic.Services\San.PrimeCryptic.Services\San.PrimeCryptic.Services.csproj", "{509840B8-188A-4AB2-8962-4C2E056A85BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.Runtime.Headless", "src\Sanctuary\Oan.Runtime.Headless\Oan.Runtime.Headless\Oan.Runtime.Headless.csproj", "{69D34E04-1691-4315-B9F7-B8958B35F9B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.Runtime.Headless", "src\Sanctuary\San.Runtime.Headless\San.Runtime.Headless\San.Runtime.Headless.csproj", "{69D34E04-1691-4315-B9F7-B8958B35F9B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.Runtime.Materialization", "src\Sanctuary\Oan.Runtime.Materialization\Oan.Runtime.Materialization\Oan.Runtime.Materialization.csproj", "{444CCFD5-F301-483D-AC22-10E64D9E4181}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.Runtime.Materialization", "src\Sanctuary\San.Runtime.Materialization\San.Runtime.Materialization\San.Runtime.Materialization.csproj", "{444CCFD5-F301-483D-AC22-10E64D9E4181}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.State.Modulation", "src\Sanctuary\Oan.State.Modulation\Oan.State.Modulation\Oan.State.Modulation.csproj", "{E2EBC513-B37D-41CF-AC5D-D3D5CF2D80F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.State.Modulation", "src\Sanctuary\San.State.Modulation\San.State.Modulation\San.State.Modulation.csproj", "{E2EBC513-B37D-41CF-AC5D-D3D5CF2D80F2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SLI", "SLI", "{B4096FE5-F4E9-487A-B9A2-06F6DCE219DF}"
 EndProject
@@ -67,17 +67,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SLI.Lisp", "SLI.Lisp", "{80
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLI.Lisp", "src\Sanctuary\SLI.Lisp\SLI.Lisp\SLI.Lisp.csproj", "{AE4643EB-9FC7-4C92-8793-BB333923B358}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oan.HostedLlm", "Oan.HostedLlm", "{75F31C43-CB2D-4741-8D6F-D63C98B0796E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "San.HostedLlm", "San.HostedLlm", "{75F31C43-CB2D-4741-8D6F-D63C98B0796E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.HostedLlm", "src\Sanctuary\Oan.HostedLlm\Oan.HostedLlm\Oan.HostedLlm.csproj", "{74DBDCAC-E5C4-436F-8873-1D647EDE6EF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.HostedLlm", "src\Sanctuary\San.HostedLlm\San.HostedLlm\San.HostedLlm.csproj", "{74DBDCAC-E5C4-436F-8873-1D647EDE6EF4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oan.Trace.Persistence", "Oan.Trace.Persistence", "{0F9126ED-BE47-40D5-B786-CDB98FD28FD3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "San.Trace.Persistence", "San.Trace.Persistence", "{0F9126ED-BE47-40D5-B786-CDB98FD28FD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.Trace.Persistence", "src\Sanctuary\Oan.Trace.Persistence\Oan.Trace.Persistence\Oan.Trace.Persistence.csproj", "{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.Trace.Persistence", "src\Sanctuary\San.Trace.Persistence\San.Trace.Persistence\San.Trace.Persistence.csproj", "{A1C77C05-D6F6-497E-B68C-96C3F0C9BA23}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oan.FirstRun", "Oan.FirstRun", "{A2C11B61-B6A6-4253-8AD8-FBC06CB979F5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "San.FirstRun", "San.FirstRun", "{A2C11B61-B6A6-4253-8AD8-FBC06CB979F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oan.FirstRun", "src\Sanctuary\Oan.FirstRun\Oan.FirstRun\Oan.FirstRun.csproj", "{66FAC028-97EA-457C-B394-52886DB75E54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "San.FirstRun", "src\Sanctuary\San.FirstRun\San.FirstRun\San.FirstRun.csproj", "{66FAC028-97EA-457C-B394-52886DB75E54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

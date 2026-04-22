@@ -1,0 +1,59 @@
+﻿{
+  "schemaVersion": 1,
+  "formalSurfaceMarkdownPath": "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
+  "buildReadinessMarkdownPath": "OAN Mortalis V1.1.1/docs/BUILD_READINESS.md",
+  "versionedTouchPointMatrixPath": "OAN Mortalis V1.1.1/build/versioned-touchpoint-matrix.json",
+  "requestContractPath": "OAN Mortalis V1.1.1/Automation/source-bucket-work-request-contract.json",
+  "returnContractPath": "OAN Mortalis V1.1.1/Automation/source-bucket-return-contract.json",
+  "requestOutboxRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests",
+  "returnInboxRoot": "OAN Mortalis V1.1.1/.audit/runs/source-bucket-returns",
+  "requestIndexStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-request-index.json",
+  "returnIndexStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-return-index.json",
+  "returnIntegrationStatusStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-return-integration-status.json",
+  "federationStatusStatePath": "OAN Mortalis V1.1.1/.audit/state/source-bucket-federation-status.json",
+  "documentationSourceLabels": [
+    "Documentation Repo"
+  ],
+  "sourceBucketLabels": [
+    "IUTT SLI & Lisp",
+    "Latex Styles",
+    "Trivium Forum",
+    "Holographic Data Tool"
+  ],
+  "listenerStates": [
+    "received",
+    "understood",
+    "admissible",
+    "actionable",
+    "withheld_or_escalated"
+  ],
+  "neededReturnClasses": [
+    "frame-now",
+    "spec-now",
+    "implement-now",
+    "hold"
+  ],
+  "integrationDispositions": [
+    "frame-now",
+    "spec-now",
+    "implement-now",
+    "hold"
+  ],
+  "executionLayers": [
+    "federation",
+    "integration",
+    "execution"
+  ],
+  "activeExecutableTarget": {
+    "project": "Oan.Runtime.Headless",
+    "path": "OAN Mortalis V1.1.1/src/Sanctuary/Oan.Runtime.Headless/Oan.Runtime.Headless",
+    "posture": "first-bounded-executable-target"
+  },
+  "nonGoals": [
+    "cross-repo mutation by Build",
+    "direct runtime widening from source-bucket output",
+    "automatic CME placement",
+    "live ListeningFrame widening beyond current admitted law",
+    "publication pedagogy treated as executable truth"
+  ]
+}

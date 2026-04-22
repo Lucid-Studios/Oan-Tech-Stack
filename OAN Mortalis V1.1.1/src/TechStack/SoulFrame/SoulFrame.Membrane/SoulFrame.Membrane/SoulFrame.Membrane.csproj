@@ -3,8 +3,8 @@
     <ProjectReference Include="..\\..\\..\\AgentiCore\\AgentiCore\\AgentiCore\\AgentiCore.csproj" />
     <ProjectReference Include="..\\..\\..\\CradleTek\\CradleTek.Mantle\\CradleTek.Mantle\\CradleTek.Mantle.csproj" />
     <ProjectReference Include="..\\..\\..\\CradleTek\\CradleTek.Memory\\CradleTek.Memory\\CradleTek.Memory.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Nexus.Control\\Oan.Nexus.Control\\Oan.Nexus.Control.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Common\\San.Common\\San.Common.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Nexus.Control\\San.Nexus.Control\\San.Nexus.Control.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

@@ -1,6 +1,6 @@
 namespace Oan.Audit.Tests;
 
-using Oan.Common;
+using San.Common;
 
 public sealed class PersonificationStandingEvaluatorTests
 {

@@ -28,6 +28,12 @@ That means:
 
 No "mostly ready" reading is lawful here.
 
+Public release, readiness, tag, milestone, and status wording is governed by
+`PUBLIC_RELEASE_READINESS_WORDING_LAW.md`.
+
+Readiness may be witnessed only to the level currently supported by repo-local
+evidence.
+
 ## Gate Status Grammar
 
 ### `pass`

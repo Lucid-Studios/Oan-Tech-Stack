@@ -18,7 +18,6 @@ It is not a runtime unlock.
 The current unlock reconciliation is grounded in:
 
 - `BUILD_READINESS.md`
-- `AUTOMATION_HITL_VERIFICATION_AID.md`
 - chapter-five through chapter-nine uptake and hold notes already carried in
   `V1.1.1`
 - the first-run packet notes already carried in `V1.1.1`
@@ -41,9 +40,6 @@ The current contract-first unlock map is:
 - `chapter-8: frame-now/spec-now`
 - `chapter-9: hold`
 - `.hopng: optional-bounded`
-- `companion-tool-telemetry: admitted-optional-bounded`
-- `v111-enrichment-automation: admitted-local-bounded`
-- `automation-hitl-verification-aid: admitted-operator-aid-bounded`
 - `oan-build-dispatch: admitted-root-automation-bounded`
 
 Those statuses mean:
@@ -117,14 +113,6 @@ That means:
 - build may proceed with chapter-seven and chapter-eight runtime-spec planning
 - build may keep chapter-nine law visible without pretending it is ready for
   runtime uptake
-- build may use the first bounded `V1.1.1` enrichment automation lane for
-  local full-body work while still holding the seed-LLM pause seam
-- build may use the shared `hitlVerificationAid` packet across bucket, tasking,
-  notification, and orchestration surfaces as operator aid only
-- build may admit bounded companion-tool telemetry from `Holographic Data Tool`
-  and `Trivium Forum` now that both lanes emit truthful local audit state
-- the companion-tool telemetry bot wrapper now lives in
-  `tools/Invoke-CompanionToolTelemetry.ps1`
 - the root requester-and-admitter automation prompt now lives in
   `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
 - the next implementation cycle can move cleanly without rediscovering the

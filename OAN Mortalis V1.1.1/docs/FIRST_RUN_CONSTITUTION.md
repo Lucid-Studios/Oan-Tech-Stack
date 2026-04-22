@@ -33,6 +33,17 @@ For the explanatory bridge that maps `ListeningFrame`, `Compass`,
 instrument-body language, see
 `LISTENING_FRAME_COMPASS_LOOM_WEAVE_BRIDGE.md`.
 
+For the bounded `EC` walk from install to first Prime pre-role standing, see
+`EC_INSTALL_TO_FIRST_PRIME_STATE_LAW.md`.
+
+For the Prime seed-bearing state immediately after first Prime pre-role
+standing and before lawfully bonded domain integration or `CME` founding, see
+`PRIME_SEED_STATE_LAW.md` and `PrimeSeedStateContracts.cs`.
+
+For the first legal-admission seam governing domain and role offers beyond
+first Prime pre-role standing, see `DOMAIN_AND_ROLE_ADMISSION_LAW.md` and
+`DomainRoleAdmissionContracts.cs`.
+
 For the bridge that separates the wider Sanctuary lifecycle from this narrower
 line-local constitutional projection, see
 `SANCTUARY_BOOT_FIRST_RUN_ONTOLOGY_BRIDGE.md`.
@@ -66,6 +77,34 @@ The active constitutional first-run model in `V1.1.1` now lives beside it throug
 - `Oan.FirstRun/GovernedFirstRunConstitutionService.cs`
 
 The legacy first-boot contracts are not rewritten in place and are not the projection owner for the new v2 model.
+
+## Sanctuary Biad And Admitted Body Distinction
+
+`ParentStanding` names the singular Sanctuary biad.
+
+It does not mean that every admitted `CradleTek` instance must reseat
+`Mother/Father` as though the constitutional world began again inside the
+extended body.
+
+The current truthful read is:
+
+- `Mother/Father` stand as Sanctuary-facing constitutional supervision
+- `CradleTekInstalled` and `CradleTekAdmitted` occur beneath that standing
+- `StewardStanding` is the first protected operational office inside the
+  admitted body
+- any later cradle-local governance should proceed through one governing
+  surface beneath a specific Steward-issued cryptic braid rather than through
+  a repeated Sanctuary biad
+
+This section is a constitutional reading correction.
+
+It is not proof that the later cradle-local governing-surface selection or
+resonance work is already implemented.
+
+The `EngineeredCognitionFirstPrimeStateReceipt` now lives below that
+correction: it may witness install-to-first-Prime pre-role standing, but it
+does not assign governing domains or roles to `Mother/Father` and does not
+select the later cradle-local governing surface.
 
 ## Current V1.1.1 Constitutional Projection Order
 
@@ -217,8 +256,23 @@ Their job is to let the line name late-path structure honestly:
 - chapter seven may frame load law and compression preparation
 - chapter eight may frame the actualization seal and primitive `SelfGEL`
 - chapter nine may frame the living `AgentiCore` surface, a future
-  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame` and
-  `Compass` projection packets, `Zed of Delta`, and tool-use attachment
+  cognition-facing `Listening Frame` placeholder, typed `ListeningFrame`,
+  `Compass`, bounded instrumentation receipts, bounded zed self-basis receipts,
+  bounded theta-ingress receipts, bounded post-ingress discernment receipts,
+  `Zed of Delta`, and
+  tool-use attachment
+
+In this slice, primitive `SelfGEL` may later inherit a `GEL`-owned legal
+orientation root predicate family that establishes legal body, jurisdiction,
+lineage, governor binding, and lawful operating surface.
+
+That inheritance remains doctrine-only here.
+It does not alter the first-run state ladder, and it does not authorize live
+first-run receipt changes.
+
+The legal-evidence bridge for that future orientation family is not cryptographic seed entropy.
+It is lawful provenance substrate only, with trust, `B-Corp`, bonded operator,
+authority delegation, and cryptographic custody remaining deferred branches.
 
 At this stage, all three may still lawfully remain withheld in live receipts.
 

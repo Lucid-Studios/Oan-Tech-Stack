@@ -8,15 +8,15 @@
 
 ---
 
-## 2) v0.1 archive is read-only reference
-**Folder:** `OAN Mortalis V0.1 Archive/`  
+## 2) Historical archives are read-only reference
+**Folders:** external historical lines and archives when available
 **Rule:** This is a **reference dataset** only. No edits, no builds, no "quick fixes," no refactors.  
-It exists for concept/prototype mining, migration mapping, and provenance checks.
+Historical lines exist for concept/prototype mining, migration mapping, and provenance checks.
 
-When info is needed from v0.1:
+When info is needed from a historical line:
 - Quote file paths
 - Extract minimal relevant snippets
-- Propose a v1.0-native reimplementation
+- Propose a `V1.1.1`-native reimplementation
 
 ---
 
@@ -27,11 +27,10 @@ When info is needed from v0.1:
 ---
 
 ## Path Allowlist
-- **Allowed write paths:** `OAN Mortalis V1.1.1/**`
-- **Allowed read paths:** `Build Contracts/**`, `OAN Mortalis V1.0/**`, `OAN Mortalis V0.1 Archive/**`
+- **Allowed implementation write paths:** `OAN Mortalis V1.1.1/**`
+- **Allowed governance write paths:** `Build Contracts/**` only when the task is explicitly architecture, naming, layering, dependency, determinism, persistence, or governance work
+- **Allowed read paths:** `Build Contracts/**`, `OAN Mortalis V1.1.1/**`, available historical lines for reference only
 
 ## Forbidden write paths
-- `Build Contracts/**`
-- `OAN Mortalis V1.0/**`
-- `OAN Mortalis V0.1 Archive/**`
+- historical lines and external archives
 - Anything else in `Unity Projects/**` outside the active build line

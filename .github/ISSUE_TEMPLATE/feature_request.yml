@@ -23,12 +23,30 @@ body:
     attributes:
       label: Architecture layer
       options:
+        - Sanctuary
         - CradleTek
         - SoulFrame
         - AgentiCore
         - SLI Engine
+        - GEL
+        - Hosted LLM
+        - Public Boundary
         - Infrastructure
         - Crosscutting
+    validations:
+      required: true
+  - type: dropdown
+    id: stratum
+    attributes:
+      label: Stratum or boundary type
+      description: Pick the broad stratum this request appears to touch.
+      options:
+        - Constitutional or governance
+        - Infrastructure or verification
+        - Runtime or executable behavior
+        - Documentation or doctrine
+        - Public boundary
+        - Other bounded stratum
     validations:
       required: true
   - type: textarea
@@ -43,3 +61,32 @@ body:
     attributes:
       label: Constraints and contracts
       description: Note any Build Contract, workspace, or governance constraints that apply.
+  - type: textarea
+    id: witnesses
+    attributes:
+      label: Expected witnesses or verification
+      description: Name the tests, audit witnesses, docs, ledgers, reproduction evidence, or verification commands that should support this request.
+      placeholder: |
+        Expected witnesses:
+        Verification:
+        Affected docs or ledgers:
+    validations:
+      required: true
+  - type: textarea
+    id: non_claims
+    attributes:
+      label: Non-claims and boundary risk
+      description: State what this request does not claim if it touches standing, governance, authority, readiness, completion, legal posture, or CME language.
+      placeholder: |
+        This request does not claim CME standing, installer completion, production readiness, custody, governance authority, legal authority, role enactment, or certainty beyond evidence.
+    validations:
+      required: true
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Public intake hygiene
+      options:
+        - label: I have not included private corpus paths, credentials, tokens, hosted seed LLM payloads, private runtime payloads, or sensitive legal, identity, custody, or operator material.
+          required: true
+        - label: I understand Template completion is not admission, authority, readiness, or completion.
+          required: true

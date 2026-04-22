@@ -26,6 +26,10 @@ The packet carries:
 - `WiderPublicWideningWithheld`
 - optional `ListeningFrameProjectionPacket`
 - optional `CompassProjectionPacket`
+- optional `ListeningFrameInstrumentationReceipt`
+- optional `ZedDeltaSelfBasisReceipt`
+- optional `ThetaIngressSensoryClusterReceipt`
+- optional `PostIngressDiscernmentReceipt`
 
 ## First-Run Reading
 
@@ -36,6 +40,12 @@ Within first run, the packet currently means:
 - `ListeningFrame` may be reserved and described correctly
 - typed `ListeningFrame` and `Compass` posture packets may be carried without
   implying runtime authority, persistence, or wider public widening
+- bounded zed self-basis receipts may be carried without implying full
+  dodecahedral runtime geometry, pulse, or displaced `SoulFrame` storage
+- bounded theta-ingress receipts may be carried without implying persistence,
+  self mutation, inheritance, condensation, or pulse
+- bounded post-ingress discernment receipts may be carried without implying
+  semantic rise, persistence, inheritance, self-mutation, or pulse
 - wider public/runtime widening must remain explicitly withheld
 
 The current pre-publication bridge also clarifies that later chapter-nine work

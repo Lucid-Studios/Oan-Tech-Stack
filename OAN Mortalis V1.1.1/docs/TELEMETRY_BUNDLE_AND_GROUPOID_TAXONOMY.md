@@ -138,10 +138,10 @@ These optional fields do not replace the required identity tuple.
 
 ## Current Crosswalk
 
-### Companion-Tool Telemetry
+### Source-Bucket Report Consumption
 
-The current companion-tool lane in
-`COMPANION_TOOL_TELEMETRY_LANE.md` already distinguishes:
+The current source-bucket report-consumption lane in
+`SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md` already distinguishes:
 
 - emitted `.audit/state` surfaces
 - emitted bundle surfaces under `.audit/runs/`

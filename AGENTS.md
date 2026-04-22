@@ -37,10 +37,6 @@ Follow these governing documents before inventing new structure:
 - `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
 - `OAN Mortalis V1.1.1/docs/V1_1_1_CARRY_FORWARD_LEDGER.md`
 - `OAN Mortalis V1.1.1/docs/V1_0_RETIREMENT_GATE.md`
-- `OAN Mortalis V1.1.1/docs/GOVERNED_BUILD_AUTOMATION_CONVEYOR.md`
-- `OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md`
-- `OAN Mortalis V1.1.1/docs/MASTER_THREAD_BUCKET_ORCHESTRATION_LAW.md`
-- `OAN Mortalis V1.1.1/docs/WORKSPACE_BUCKET_GROUP_SYSTEM.md`
 - `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
 
 
@@ -97,7 +93,6 @@ For agent work in this repository:
 - ground implementation in current repo-local executable truth first
 - consult the `Documentation Repo` for stabilized conceptual truth and theory digestion when available
 - when work touches automation, seeded governance, or CME office formation, consult current repo-local telemetry under `.audit/state/` when it exists before inferring office, continuity, or readiness
-- when work touches bucket orchestration or delayed automation handoff, consult the master-thread orchestration surfaces under `.audit/state/master-thread-orchestration-*.json` before issuing new instruction intent
 - never hard-code an external documentation-repo path into tracked files
 - state plainly when the external documentation surface is unavailable in a working session
 

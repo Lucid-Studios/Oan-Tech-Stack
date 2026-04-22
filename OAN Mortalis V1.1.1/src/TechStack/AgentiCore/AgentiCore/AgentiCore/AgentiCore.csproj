@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\Oan.Common\\Oan.Common\\Oan.Common.csproj" />
+    <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\San.Common\\San.Common\\San.Common.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\SLI.Engine\\SLI.Engine\\SLI.Engine.csproj" />
     <ProjectReference Include="..\\..\\..\\..\\Sanctuary\\SLI.Ingestion\\SLI.Ingestion\\SLI.Ingestion.csproj" />
   </ItemGroup>

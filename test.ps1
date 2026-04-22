@@ -4,6 +4,9 @@ param(
 
     [string] $LineRoot = "OAN Mortalis V1.1.1",
 
+    [ValidateRange(1, 7200)]
+    [int] $VerificationLockTimeoutSeconds = 900,
+
     [switch] $NoBuild,
 
     [string] $BuildVersion,
@@ -29,9 +32,16 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$verificationLockScriptPath = Join-Path $repoRoot "tools\Use-LineVerificationLock.ps1"
 $activeBuildRoot = Join-Path $repoRoot $LineRoot
 $lineManifestPath = Join-Path $activeBuildRoot "build\line-manifest.json"
 $solutionRelativePath = "Oan.sln"
+
+if (-not (Test-Path -LiteralPath $verificationLockScriptPath -PathType Leaf)) {
+    throw "Line verification lock helper not found at '$verificationLockScriptPath'."
+}
+
+. $verificationLockScriptPath
 
 if (Test-Path -LiteralPath $lineManifestPath -PathType Leaf) {
     $lineManifestText = Get-Content -LiteralPath $lineManifestPath -Raw
@@ -129,6 +139,7 @@ if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
 Write-Host "[test] Solution: $solutionPath"
 Write-Host "[test] Line root: $LineRoot"
 Write-Host "[test] Configuration: $Configuration"
+Write-Host "[test] Verification lock timeout seconds: $VerificationLockTimeoutSeconds"
 if (-not [string]::IsNullOrWhiteSpace($BuildVersion)) {
     Write-Host "[test] Build version: $BuildVersion"
 }
@@ -136,7 +147,14 @@ if (-not [string]::IsNullOrWhiteSpace($AssemblyVersion)) {
     Write-Host "[test] Assembly version: $AssemblyVersion"
 }
 
-& dotnet @testArgs
-if ($LASTEXITCODE -ne 0) {
-    throw "dotnet test failed with exit code $LASTEXITCODE."
-}
+Use-LineVerificationLock `
+    -RepositoryRoot $repoRoot `
+    -LineRoot $LineRoot `
+    -OperationName "test" `
+    -TimeoutSeconds $VerificationLockTimeoutSeconds `
+    -ScriptBlock {
+        & dotnet @testArgs
+        if ($LASTEXITCODE -ne 0) {
+            throw "dotnet test failed with exit code $LASTEXITCODE."
+        }
+    }

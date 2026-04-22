@@ -1,8 +1,8 @@
 ﻿{
     "schemaVersion":  1,
     "generatedAtUtc":  "2026-04-08T16:33:07.1617219Z",
-    "policyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
-    "requestContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
+    "policyPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-federation.json",
+    "requestContractPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-work-request-contract.json",
     "lastRequestId":  "source-bucket-request://2026-04-01/trivium-forum-002",
     "lastRequestBundle":  "OAN Mortalis V1.1.1/.audit/runs/source-bucket-work-requests/2026-04-01-trivium-forum-002",
     "activeRequestCount":  2,

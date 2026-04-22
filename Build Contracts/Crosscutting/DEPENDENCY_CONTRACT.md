@@ -1,8 +1,9 @@
-# Dependency Contract: OAN Mortalis v1.0
+# Dependency Contract
 
 ## Purpose
 
-This document defines the allowed dependency directions for the active `OAN Mortalis V1.0` stack.
+This document defines the allowed dependency directions for the active
+Sanctuary-root stack.
 
 It exists to enforce the family constitution in build-maintainable terms.
 
@@ -18,18 +19,22 @@ This contract governs:
 - `Build Contracts/Crosscutting/FAMILY_CONSTITUTION.md`
 - `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
 - `Build Contracts/Crosscutting/ARCHITECTURE_FRAME.md`
-- `OAN Mortalis V1.0/docs/PROJECT_CLASSIFICATION_MATRIX.md`
-- `OAN Mortalis V1.0/docs/NAMESPACE_CONVERGENCE_PLAN.md`
+- `OAN Mortalis V1.1.1/docs/PRODUCTION_FILE_AND_FOLDER_TOPOLOGY.md`
+- `OAN Mortalis V1.1.1/docs/STACK_ROOT_RENAMING_MIGRATION_PLAN.md`
 
 ## Constitutional Summary
 
-The stack is governed as:
+The active stack is governed as:
 
-- `Oan.*` for umbrella composition and stack-level contracts
-- `CradleTek.*` for infrastructure and substrate ownership
-- `SoulFrame.*` for operator and identity-facing workflow ownership
-- `AgentiCore.*` for agent runtime ownership
+- `San.*` for Sanctuary constitutional habitat and stack-root composition
+- `Ctk.*` for CradleTek habitation, custody, extension, and runtime-distribution
+  ownership
+- `Sfr.*` for SoulFrame relational, membrane, projection, and interface
+  ownership
+- `Acr.*` for AgentiCore identity and governance-capable core machinery
+  ownership
 - `SLI.*` for symbolic protocol and runtime ownership across families
+- `Oan.*` as downstream application identity or legacy migration hold only
 
 This means dependency rules must preserve:
 
@@ -37,78 +42,89 @@ This means dependency rules must preserve:
 - sibling-family independence
 - stack composition clarity
 - cross-cutting symbolic reuse without upward capture
+- explicit handling of legacy `Oan.*` migration surfaces
 
 ## Family Dependency Rules
 
-### Rule 1. `Oan.*` may compose, but should not absorb family-local implementation casually
+### Rule 1. `San.*` owns foundational composition
 
 Allowed:
 
-- `Oan.*` may reference:
-  - `CradleTek.*`
-  - `SoulFrame.*`
-  - `AgentiCore.*`
+- `San.*` may reference:
+  - `Ctk.*`
+  - `Sfr.*`
+  - `Acr.*`
   - `SLI.*`
-  - other `Oan.*` stack-level contracts
+  - other `San.*` stack-level contracts and host services
+  - legacy `Oan.*` surfaces only while governed by the line-local migration
+    allowlist
 
 Constraint:
 
-- `Oan.*` should primarily own:
+- `San.*` should primarily own:
   - composition roots
   - stack-wide contracts
-  - stack integration facades
+  - constitutional host services
+  - governed outward service-origin surfaces
 
 It should not become a dumping ground for family-owned implementation code.
 
-### Rule 2. `CradleTek.*` is foundational
+### Rule 2. `Ctk.*` is habitation, custody, and extension ownership
 
 Allowed:
 
-- `CradleTek.*` may reference:
-  - `CradleTek.*`
+- `Ctk.*` may reference:
+  - `Ctk.*`
+  - `San.*` through lawful host or service seams
   - `SLI.*`
-  - stack-level contract surfaces from `Oan.*` when the contract is truly umbrella-owned
 
 Restricted:
 
-- `CradleTek.*` should not reference `SoulFrame.*` unless explicitly justified
-- `CradleTek.*` should not reference `AgentiCore.*` unless explicitly justified
-- `CradleTek.*` must not depend on `Oan.Runtime.Headless`
+- `Ctk.*` should not re-own `Sfr.*` responsibilities
+- `Ctk.*` should not re-own `Acr.*` responsibilities
+- `Ctk.*` must not depend on `San.Runtime.Headless` or legacy
+  `Oan.Runtime.Headless`
 
 Interpretation:
 
-- infrastructure may expose services upward
-- it should not depend upward on sibling domain families for normal operation
+- habitation and custody may expose services upward
+- distribution and extension surfaces must not become a second foundational
+  composition root
 
-### Rule 3. `SoulFrame.*` is a sibling domain family over infrastructure
-
-Allowed:
-
-- `SoulFrame.*` may reference:
-  - `CradleTek.*`
-  - `SLI.*`
-  - stack-level contract surfaces from `Oan.*`
-  - other `SoulFrame.*`
-
-Restricted:
-
-- `SoulFrame.*` should avoid direct dependency on `AgentiCore.*` unless the interaction is unavoidable and documented
-- `SoulFrame.*` must not depend on `Oan.Runtime.Headless`
-
-### Rule 4. `AgentiCore.*` is a sibling domain family over infrastructure
+### Rule 3. `Sfr.*` is relational, membrane, and projection ownership
 
 Allowed:
 
-- `AgentiCore.*` may reference:
-  - `CradleTek.*`
+- `Sfr.*` may reference:
+  - `San.*`
   - `SLI.*`
-  - stack-level contract surfaces from `Oan.*`
-  - other `AgentiCore.*`
+  - other `Sfr.*`
+  - `Ctk.*` only through explicit custody, mantle, or substrate seams
 
 Restricted:
 
-- `AgentiCore.*` should avoid direct dependency on `SoulFrame.*` unless the interaction is unavoidable and documented
-- `AgentiCore.*` must not depend on `Oan.Runtime.Headless`
+- `Sfr.*` should avoid direct dependency on `Acr.*` unless the interaction is
+  unavoidable and documented
+- `Sfr.*` must not depend on `San.Runtime.Headless` or legacy
+  `Oan.Runtime.Headless`
+
+### Rule 4. `Acr.*` is cognition-core machinery ownership
+
+Allowed:
+
+- `Acr.*` may reference:
+  - `San.*`
+  - `Sfr.*`
+  - `SLI.*`
+  - other `Acr.*`
+  - `Ctk.*` only through explicit custody, memory, or runtime service seams
+
+Restricted:
+
+- `Acr.*` should not own `Sfr.*` membrane responsibilities
+- `Acr.*` should not own `Ctk.*` custody or hosting responsibilities
+- `Acr.*` must not depend on `San.Runtime.Headless` or legacy
+  `Oan.Runtime.Headless`
 
 ### Rule 5. `SLI.*` is transversal and should not depend upward into sibling families
 
@@ -116,64 +132,79 @@ Allowed:
 
 - `SLI.*` may reference:
   - `SLI.*`
-  - `CradleTek.*`
-  - stack-level contract surfaces from `Oan.*` when the contract is symbolic or truly umbrella-owned
+  - low-level `San.*` contract surfaces when the contract is symbolic or truly
+    stack-root owned
+  - `Ctk.*` only through explicit symbolic transport or substrate seams
 
 Restricted:
 
-- `SLI.*` should not reference `SoulFrame.*` except through explicit adapter or contract seams
-- `SLI.*` should not reference `AgentiCore.*` except through explicit adapter or contract seams
-- `SLI.*` must not depend on `Oan.Runtime.Headless`
+- `SLI.*` should not reference `Sfr.*` except through explicit adapter or
+  contract seams
+- `SLI.*` should not reference `Acr.*` except through explicit adapter or
+  contract seams
+- `SLI.*` must not depend on `San.Runtime.Headless` or legacy
+  `Oan.Runtime.Headless`
 
 Interpretation:
 
 - `SLI.*` serves multiple families
-- it should not become owned by one sibling family through upward reference pressure
+- it should not become owned by one sibling family through upward reference
+  pressure
+
+### Rule 6. `Oan.*` is a legacy migration hold for foundational code
+
+Allowed:
+
+- existing `Oan.*` projects may remain while they are listed in the line-local
+  legacy allowlist and continue to build
+- `Oan.*` may later own downstream application, game, or domain composition
+
+Restricted:
+
+- new foundational stack code should not use `Oan.*`
+- new foundational project identities should not use `Oan.*`
+- legacy `Oan.*` surfaces must not expand their foundational authority beyond
+  the allowlisted migration posture
 
 ## Project-Level Contract Baseline
 
-### Stack Composition
+### Current Transitional Stack Composition
 
-| Project | Allowed Direction |
+| Current Project | Constitutional Standing |
 | --- | --- |
-| `Oan.Runtime.Headless` | may compose all active families |
-| `Oan.Cradle` | may depend on stack contracts and family services needed for orchestration |
-| `Oan.Common` | should remain dependency-light and safe for broad reuse |
+| `Oan.Runtime.Headless` | legacy migration composition root for the current line; target owner is `San.Runtime.Headless` |
+| `Oan.Common` | legacy migration contract surface; target owner is `San.Common` |
+| `Oan.FirstRun` | legacy migration first-run service; target owner is `San.FirstRun` |
+| `Oan.HostedLlm` | legacy migration hosted-LLM surface; target owner is `San.HostedLlm` |
+| `Oan.Nexus.Control` | legacy migration nexus/control surface; target owner is `San.Nexus.Control` |
+| `Oan.Runtime.Materialization` | legacy migration materialization surface; target owner is `San.Runtime.Materialization` |
+| `Oan.State.Modulation` | legacy migration modulation surface; target owner is `San.State.Modulation` |
+| `Oan.Trace.Persistence` | legacy migration trace surface; target owner is `San.Trace.Persistence` |
 
-### Stack Contracts And Facades
+### Family Runtime Surfaces
 
-| Project | Allowed Direction |
+| Current Project | Constitutional Standing |
 | --- | --- |
-| `Oan.Spinal` | should remain low-dependency and contract-like |
-| `Oan.SoulFrame` | should depend on stack contracts, not family-local runtime internals by default |
-| `Oan.AgentiCore` | should depend on stack contracts, not family-local runtime internals by default |
-| `Oan.Sli` | should depend on stack contracts and symbolic-facing contracts |
-| `Oan.Storage` | should clarify whether it is a facade or implementation boundary before dependency spread increases |
-| `Oan.Place` | should remain a boundary layer rather than a second composition root |
-
-### Transitional Or Unresolved Surfaces
-
-The following require explicit ownership decisions before stronger automation is added:
-
-- `OAN.Core`
-- `GEL`
-- `Telemetry.GEL`
-- `EngramGovernance`
-- `Data.Cryptic`
-- `Oan.Fgs`
+| `CradleTek.*` | legacy-named current CradleTek surfaces; target prefix is `Ctk.*` |
+| `SoulFrame.*` | legacy-named current SoulFrame surfaces; target prefix is `Sfr.*` |
+| `AgentiCore` / `AgentiCore.*` | legacy-named current AgentiCore surfaces; target prefix is `Acr.*` |
+| `SLI.*` | active transversal symbolic family; prefix remains valid |
+| `GEL.Contracts` | bounded supporting domain surface pending stronger final placement |
 
 ## Forbidden Dependency Patterns
 
-The following patterns are constitutionally invalid unless explicitly documented as temporary migration exceptions:
+The following patterns are constitutionally invalid unless explicitly
+documented as temporary migration exceptions:
 
 - foundational infrastructure depending upward on stack composition roots
-- `CradleTek.*` taking routine dependencies on `SoulFrame.*`
-- `CradleTek.*` taking routine dependencies on `AgentiCore.*`
-- `SLI.*` taking routine dependencies on `SoulFrame.*`
-- `SLI.*` taking routine dependencies on `AgentiCore.*`
-- sibling-family cycles between `SoulFrame.*` and `AgentiCore.*`
-- multiple stack composition roots
+- `Ctk.*` taking routine dependencies on `Sfr.*`
+- `Ctk.*` taking routine dependencies on `Acr.*`
+- `SLI.*` taking routine dependencies on `Sfr.*`
+- `SLI.*` taking routine dependencies on `Acr.*`
+- sibling-family cycles between `Sfr.*` and `Acr.*`
+- multiple foundational stack composition roots
 - family-local runtimes presenting themselves as stack-level hosts
+- new foundational `Oan.*` projects
 
 ## Shim Policy
 
@@ -231,14 +262,15 @@ If a dependency must violate the baseline rules temporarily, document:
 - the exit condition
 - the target family or contract after migration
 
-Temporary exceptions should be tracked as migration work, not normalized as permanent design.
+Temporary exceptions should be tracked as migration work, not normalized as
+permanent design.
 
 ## Enforcement Path
 
 ### Immediate
 
 - use this contract in architecture review and project placement decisions
-- reject new projects that violate family ownership by default
+- reject new foundational projects that use legacy `Oan.*` by default
 - reject new ambiguous stack roots
 
 ### Near-Term
@@ -259,7 +291,8 @@ Temporary exceptions should be tracked as migration work, not normalized as perm
 
 This contract is working when:
 
-- `Oan.Runtime.Headless` remains the only stack composition root
+- `San.Runtime.Headless` is the only foundational stack composition root
+- current legacy `Oan.*` foundational surfaces shrink under a governed allowlist
 - family-local runtime services remain family-local
 - sibling-family cycles are rare and justified
 - `SLI.*` remains cross-cutting without being captured by one sibling family

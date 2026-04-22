@@ -1,10 +1,10 @@
 ﻿{
     "schemaVersion":  1,
     "generatedAtUtc":  "2026-04-02T13:58:09.1553533Z",
-    "policyPath":  "OAN Mortalis V1.1.1/build/source-bucket-federation.json",
+    "policyPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-federation.json",
     "formalSurfaceMarkdownPath":  "OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_FEDERATION_LANE.md",
-    "requestContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-work-request-contract.json",
-    "returnContractPath":  "OAN Mortalis V1.1.1/build/source-bucket-return-contract.json",
+    "requestContractPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-work-request-contract.json",
+    "returnContractPath":  "OAN Mortalis V1.1.1/Automation/source-bucket-return-contract.json",
     "federationState":  "requests-published-awaiting-returns",
     "reasonCode":  "source-bucket-federation-review-before-requesting",
     "nextAction":  "wait-for-lawful-source-bucket-returns-or-operator-review",

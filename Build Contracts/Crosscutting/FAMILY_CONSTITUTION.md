@@ -1,8 +1,9 @@
-# Family Constitution: OAN Mortalis v1.0
+# Family Constitution
 
 ## Purpose
 
-This document defines the canonical family model for the active `OAN Mortalis V1.0` stack.
+This document defines the canonical family model for the active Sanctuary-root
+stack.
 
 It exists to stabilize:
 
@@ -15,115 +16,126 @@ This is a constitutional document, not a temporary migration note.
 
 ## Constitutional Model
 
-The active stack is not modeled as several equivalent top-level namespace families competing for ownership.
+The active stack is not modeled as one umbrella `Oan.*` code family over all
+foundational ownership.
 
 It is modeled as:
 
-- one umbrella composition family
-- three owned service or infrastructure families
+- one constitutional habitat and host family
+- three owned deployable families
 - one transversal symbolic protocol and runtime family
 
 Canonical family structure:
 
 ```text
-Oan.*
-  composes
-  - CradleTek.*
-  - SoulFrame.*
-  - AgentiCore.*
+San.*
+  hosts and composes
+  - Ctk.*
+  - Sfr.*
+  - Acr.*
   - SLI.*   (cross-cutting symbolic family)
 ```
 
+`OAN` remains a valid technology and product label.
+
+It is no longer the canonical foundational code-family root for the active
+stack.
+
+`OAN` is now treated as a downstream application, game, or domain identity
+built from the Sanctuary-root stack.
+
 ## Canonical Family Roles
 
-### `Oan.*`
+### `San.*`
 
 Role:
 
-- Sanctuary and full-stack application family
+- Sanctuary constitutional habitat and local host family
 
 Owns:
 
-- executable composition roots
+- executable habitat roots
 - stack-level contracts
 - stack-level integration surfaces
-- umbrella runtime composition
-- Sanctuary-level application products
+- first local constitutional services
+- governed outward host and service-origin surfaces
 
 Examples:
 
-- `Oan.Runtime.Headless`
-- future stack-level hosts, contracts, and integration surfaces
+- `San.Common`
+- `San.FirstRun`
+- `San.HostedLlm`
+- `San.Runtime.Headless`
 
 Rule:
 
-- `Oan.*` is the umbrella composition family
-- it is not the required replacement prefix for all domain or infrastructure code
+- `San.*` is the canonical foundational stack root
+- it may host and compose all stack families
+- it should not be replaced by a product-facing `OAN` prefix in new
+  foundational code
 
-### `CradleTek.*`
+### `Ctk.*`
 
 Role:
 
-- primary application, orchestration, and infrastructure family
+- CradleTek habitation, custody, extension, and runtime-distribution family
 
 Owns:
 
-- application composition for active services
-- swarm coordination
-- system hosting
-- storage substrates
-- infrastructure services
-- low-level runtime support
-- infrastructure-bound operational services
+- custody and mantle surfaces
+- runtime distribution and hosting extension
+- storage substrates and distributed embodiment seams
+- remote, local-network, or outward service embodiment under lawful admission
 
 Rule:
 
-- `CradleTek.*` is a first-class active family, not a compatibility-only family by default
+- `Ctk.*` is a first-class active family
+- it is not the universal prerequisite for all meaningful local operation
+- it appears as a major extension family rather than the sole base habitat
 
-### `SoulFrame.*`
+### `Sfr.*`
 
 Role:
 
-- self-state membrane and identity-facing workflow family
+- SoulFrame relational, membrane, projection, and interface substrate family
 
 Owns:
 
-- mitigated self-state projection
-- collapse and return intake shaping
-- identity-safe service mediation
-- review surfaces
-- approval surfaces
-- operator interaction layers
-- identity-facing workflow surfaces
-- experiential mission surfaces
+- low-mind and situational shaping
+- membrane and stewardship surfaces
+- relational and projection mediation
+- bounded outward interface shaping
 
 Rule:
 
-- `SoulFrame.*` is a first-class active family, not merely a compatibility label
+- `Sfr.*` is a first-class active family
+- it may operate natively within `San.*` without requiring `Ctk.*` as an
+  intermediate owner
 
-### `AgentiCore.*`
+### `Acr.*`
 
 Role:
 
-- extended cognitive workspace and bounded agent runtime family
+- AgentiCore identity and governance-capable core machinery family
 
 Owns:
 
-- policy-bound task execution
-- cognitive runtime operations
-- agent labor routing
-- local reflective and private operational cognition space
+- higher-order cognition machinery
+- EC-bearing internal machinery
+- governance-capable runtime core behavior
+- capability and derivation posture over lawful mediated state
 
 Rule:
 
-- `AgentiCore.*` is a first-class active family and should own agent runtime behavior directly
-- it should operate on SoulFrame-mediated state rather than sovereign custody directly
+- `Acr.*` is a first-class active family
+- it may operate natively within `San.*` without requiring `Ctk.*` as an
+  intermediate owner
 
 ### `SLI.*`
 
 Role:
 
-- symbolic interoperability family
+- symbolic interoperability and symbolic runtime family
 
 Owns:
 
@@ -136,96 +148,92 @@ Owns:
 Rule:
 
 - `SLI.*` is transversal across the stack
-- it is not owned exclusively by `CradleTek.*`, `SoulFrame.*`, or `AgentiCore.*`
+- it is not owned exclusively by `San.*`, `Ctk.*`, `Sfr.*`, or `Acr.*`
+
+### `Oan.*`
+
+Role:
+
+- reserved downstream application, game, or domain namespace
+
+Current Standing:
+
+- legacy migration hold inside the active line
+- not admissible as the root for new foundational stack code
+
+Rule:
+
+- no new foundational `Oan.*` namespaces or project names should be admitted
+- existing `Oan.*` source and project surfaces remain temporary migration
+  holds until a governed rename slice retires them
 
 ## Dependency Constitution
 
 ### Allowed High-Level Flow
 
-- `Oan.*` may compose all families
-- `CradleTek.*` is the application and orchestration fabric over infrastructure
-- `SoulFrame.*` may depend on `CradleTek.*`
-- `AgentiCore.*` may depend on `SoulFrame.*`
-- `AgentiCore.*` may depend on `CradleTek.*` through lawful service and substrate seams
-- `CradleTek.*` may consume `SLI.*`
-- `SoulFrame.*` may consume `SLI.*`
-- `AgentiCore.*` may consume `SLI.*`
+- `San.*` may host and compose all families
+- `Sfr.*` may depend on `San.*`
+- `Acr.*` may depend on `San.*`
+- `Acr.*` may depend on `Sfr.*`
+- `Ctk.*` may depend on `San.*` through lawful host or service seams
+- `Ctk.*` may consume `SLI.*`
+- `Sfr.*` may consume `SLI.*`
+- `Acr.*` may consume `SLI.*`
 
 ### Restricted Flow
 
-- `SLI.*` should avoid upward dependence on `SoulFrame.*`
-- `SLI.*` should avoid upward dependence on `AgentiCore.*`
-- `CradleTek.*` should avoid depending on `SoulFrame.*` unless the dependency is explicitly justified
-- `CradleTek.*` should avoid depending on `AgentiCore.*` unless the dependency is explicitly justified
+- `SLI.*` should avoid upward dependence on `Sfr.*` or `Acr.*`
+- `Ctk.*` should avoid re-owning `Sfr.*` or `Acr.*` responsibilities
 - sibling family coupling should be minimized and documented
 
 ### Composition Rule
 
-- only `Oan.*` owns stack composition roots
-- family-local runtime services may exist inside each family
-- family-local runtime services must not present themselves as stack-level composition roots
-- `CradleTek.*` may act as the primary application and swarm fabric without becoming the sovereign source of identity law
-- `SoulFrame.*` may provision and mediate AgentiCore runtime self-state without becoming a generic everything-service host
+- only `San.*` owns foundational stack composition roots
+- `Sfr.*` and `Acr.*` may be activated natively inside `San.*`
+- `Ctk.*` may be templated or service-exposed without implying local bonded
+  activation
+- `Oan.*` may later own downstream application composition, but not the
+  foundational stack root
 
 ## Naming Constitution
 
 ### Family Prefixes
 
-- `Oan.*` means umbrella stack composition or stack-level contract ownership
-- `CradleTek.*` means infrastructure or substrate ownership
-- `SoulFrame.*` means operator and identity-facing workflow ownership
-- `AgentiCore.*` means agent runtime ownership
+- `San.*` means Sanctuary constitutional habitat or stack-root ownership
+- `Ctk.*` means CradleTek habitation, custody, or extension ownership
+- `Sfr.*` means SoulFrame relational and interface ownership
+- `Acr.*` means AgentiCore core machinery ownership
 - `SLI.*` means symbolic protocol or symbolic runtime ownership
+- `Oan.*` is reserved for downstream application or legacy migration hold only
 
-### Ambiguous Terms
+### Forward Freeze
 
-The following names require family qualification:
+From this point forward:
 
-- `Runtime`
-- `Host`
-- `Engine`
-- `Core`
+- no new foundational code should use `Oan.*`
+- no new foundational project should use an `Oan.*` project identity
+- new stack-root surfaces should use `San.*`
+- new CradleTek surfaces should use `Ctk.*`
+- new SoulFrame surfaces should use `Sfr.*`
+- new AgentiCore surfaces should use `Acr.*`
 
-Examples:
+The line-local legacy `Oan.*` allowlist is governed by:
 
-- `Oan.Runtime.Headless` is a stack composition root
-- `CradleTek.Runtime` is an infrastructure runtime service
-- `AgentiCore.Runtime` is an agent runtime service
-- `SLI.Engine` is a symbolic engine service
-
-These names are acceptable only when the family context makes the ownership unambiguous.
-
-## Current Interpretation Of Existing Projects
-
-The presence of:
-
-- `CradleTek.*`
-- `SoulFrame.*`
-- `AgentiCore.*`
-- `SLI.*`
-
-should not be interpreted as evidence of uncontrolled naming drift by itself.
-
-The actual governance problem is narrower:
-
-- family boundaries are not yet documented rigorously enough
-- some projects may sit in the wrong family
-- some `Oan.*` projects may currently own work that belongs in a family-specific namespace
-- stack composition and family-local runtime naming are not yet distinguished sharply enough
+- `OAN Mortalis V1.1.1/build/legacy-oan-namespace-allowlist.json`
 
 ## Success Criteria
 
 The family model is healthy when:
 
-- `Oan.*` owns composition and stack-level contracts
-- `CradleTek.*`, `SoulFrame.*`, and `AgentiCore.*` own their proper domains
+- `San.*` owns foundational stack composition and constitutional host surfaces
+- `Ctk.*`, `Sfr.*`, and `Acr.*` own their proper domains
 - `SLI.*` remains cross-cutting without depending upward on sibling families
-- project names clearly communicate family ownership
-- dependency rules reflect family lineage rather than accidental coupling
+- `Oan.*` no longer accumulates new foundational ownership
+- project names communicate family truth instead of legacy drift
 
 ## Reference Documents
 
 - `Build Contracts/Crosscutting/ARCHITECTURE_FRAME.md`
 - `Build Contracts/Crosscutting/GLOSSARY_CONTRACT.md`
-- `OAN Mortalis V1.0/docs/PROJECT_CLASSIFICATION_MATRIX.md`
-- `OAN Mortalis V1.0/docs/NAMESPACE_CONVERGENCE_PLAN.md`
+- `OAN Mortalis V1.1.1/docs/PRODUCTION_FILE_AND_FOLDER_TOPOLOGY.md`
+- `OAN Mortalis V1.1.1/docs/STACK_ROOT_RENAMING_MIGRATION_PLAN.md`

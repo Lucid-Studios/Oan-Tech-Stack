@@ -1,4 +1,4 @@
-[CmdletBinding(SupportsShouldProcess = $true)]
+﻿[CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string] $TaskName = 'OAN Mortalis Source-Bucket Report Consumption',
     [ValidateSet('Debug', 'Release')]
@@ -6,7 +6,7 @@ param(
     [int] $CadenceHours = 1,
     [datetime] $StartAt,
     [string] $RepoRoot,
-    [string] $ConsumptionPolicyPath = 'OAN Mortalis V1.1.1/build/source-bucket-report-consumption.json'
+    [string] $ConsumptionPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-report-consumption.json'
 )
 
 Set-StrictMode -Version Latest
@@ -112,11 +112,6 @@ $description = 'Consumes hourly source-bucket appendices into bounded standing s
 
 if ($PSCmdlet.ShouldProcess($TaskName, 'Register scheduled task')) {
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Description $description -Force | Out-Null
-}
-
-$taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
-if (Test-Path -LiteralPath $taskStatusScriptPath -PathType Leaf) {
-    & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot | Out-Null
 }
 
 $registeredTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop

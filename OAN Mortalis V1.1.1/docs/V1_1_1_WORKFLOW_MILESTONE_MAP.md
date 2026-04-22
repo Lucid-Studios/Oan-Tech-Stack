@@ -20,7 +20,6 @@ The workflow must be read through the current active surfaces:
 
 - `BUILD_READINESS.md`
 - `BUILD_HOLD_UNLOCK_READINESS.md`
-- `V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md`
 - `SOURCE_BUCKET_FEDERATION_LANE.md`
 - `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
 - `LATE_PATH_RUNTIME_PROJECTION_SPEC.md`
@@ -153,7 +152,7 @@ It is now governed by live `V1.1.1` admission and release posture.
 - Evidence:
   `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
   `local-automation-seeded-governance-last-run.json`
-  `local-automation-v111-enrichment-pathway-last-run.json`
+  `tools/Write-V111-EnrichmentPathway.ps1`
   `local-automation-run-isolated-build-pathway-last-run.json`
 
 ### M5. Runtime Readiness Chain
@@ -199,8 +198,7 @@ It is now governed by live `V1.1.1` admission and release posture.
   the lane is structurally ready, but it is still waiting on the runtime
   workbench-session ledger gate before bounded full-body work may open
 - Evidence:
-  `V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md`
-  `local-automation-v111-enrichment-pathway-last-run.json`
+  `tools/Write-V111-EnrichmentPathway.ps1`
 
 ### M7. Source-Bucket Request And Return Loop
 
