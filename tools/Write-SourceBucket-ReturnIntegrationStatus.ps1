@@ -1,6 +1,5 @@
-﻿param(
+param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
     [string] $FederationPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-federation.json'
 )
 
@@ -179,26 +178,16 @@ function Get-RequestLifecycleStateFromReturn {
     )
 
     switch ($ReturnStanding) {
-        'admitted-for-build-review' {
-            return 'returned'
-        }
-        'held-or-escalated' {
-            return 'held'
-        }
-        'invalid-return' {
-            return 'held'
-        }
-        default {
-            return 'published-awaiting-return'
-        }
+        'admitted-for-build-review' { return 'returned' }
+        'held-or-escalated' { return 'held' }
+        'invalid-return' { return 'held' }
+        default { return 'published-awaiting-return' }
     }
 }
 
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
-$resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $resolvedFederationPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $FederationPolicyPath
 
-$cyclePolicy = Read-JsonFile -Path $resolvedCyclePolicyPath
 $federationPolicy = Read-JsonFile -Path $resolvedFederationPolicyPath
 $resolvedRequestContractPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.requestContractPath)
 $resolvedReturnContractPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.returnContractPath)
@@ -210,29 +199,10 @@ $returnIndexStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -Candid
 $returnIntegrationStatusStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.returnIntegrationStatusStatePath)
 $returnIntegrationStatusMarkdownPath = [System.IO.Path]::ChangeExtension($returnIntegrationStatusStatePath, '.md')
 $requestIndexStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.requestIndexStatePath)
-$masterThreadStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[0])
-$taskStatusStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[1])
-$v111EnrichmentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[2])
-$companionTelemetryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[3])
-$runIsolatedPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runIsolatedBuildPathwayStatePath)
-$seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
 
 New-Item -ItemType Directory -Force -Path $returnInboxRoot | Out-Null
 
 $requestIndex = Read-JsonFileOrNull -Path $requestIndexStatePath
-$masterThreadState = Read-JsonFileOrNull -Path $masterThreadStatePath
-$taskStatus = Read-JsonFileOrNull -Path $taskStatusStatePath
-$v111EnrichmentState = Read-JsonFileOrNull -Path $v111EnrichmentStatePath
-$companionTelemetryState = Read-JsonFileOrNull -Path $companionTelemetryStatePath
-$runIsolatedPathwayState = Read-JsonFileOrNull -Path $runIsolatedPathwayStatePath
-$seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
-
-$currentPosture = Get-ObjectPropertyValueOrNull -InputObject $taskStatus -PropertyName 'currentPosture'
-$taskStatusValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $taskStatus -PropertyName 'lastKnownStatus')
-if ([string]::IsNullOrWhiteSpace($taskStatusValue)) {
-    $taskStatusValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $currentPosture -PropertyName 'status')
-}
-
 $requestEntries = if ($null -ne $requestIndex) { @($requestIndex.requests) } else { @() }
 $requestMap = @{}
 foreach ($requestEntry in @($requestEntries)) {
@@ -390,7 +360,7 @@ $returnEntries = foreach ($returnFile in @($returnFiles)) {
         hitlRequired = $hitlRequired
         requestMatchState = $requestMatchState
         triadComplete = $triadComplete
-        requestedStanding = $returnClass
+        requestedStanding = 'source-bucket-return-build-review'
         discernmentAction = $discernmentAction
         standingSurfaceClass = $standingSurfaceClass
         promotionReceiptState = $promotionReceiptState
@@ -648,13 +618,6 @@ $statusPayload = [ordered]@{
         surfaceAppropriateness = $discernmentSurfaceAppropriateness
         promotionWarrant = $discernmentPromotionWarrant
     }
-    masterThreadOrchestrationState = [string] (Get-ObjectPropertyValueOrNull -InputObject $masterThreadState -PropertyName 'orchestrationState')
-    currentAutomationPosture = $taskStatusValue
-    v111EnrichmentPathwayState = [string] (Get-ObjectPropertyValueOrNull -InputObject $v111EnrichmentState -PropertyName 'pathwayState')
-    runIsolatedBuildPathwayState = [string] (Get-ObjectPropertyValueOrNull -InputObject $runIsolatedPathwayState -PropertyName 'pathwayState')
-    seededGovernanceDisposition = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'disposition')
-    seededGovernanceReadyState = [string] (Get-ObjectPropertyValueOrNull -InputObject $seededGovernanceState -PropertyName 'readyState')
-    companionTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionTelemetryState -PropertyName 'companionToolTelemetryState')
     bucketStates = $bucketStates
     listenerStates = @($returnContract.listenerStates)
     governanceActions = @($returnContract.governanceActions)
@@ -699,8 +662,6 @@ $markdownLines = @(
         $statusPayload.discernmentEvaluation.nonContradiction,
         $statusPayload.discernmentEvaluation.surfaceAppropriateness,
         $statusPayload.discernmentEvaluation.promotionWarrant),
-    ('- Master-thread orchestration state: `{0}`' -f $(if ($statusPayload.masterThreadOrchestrationState) { $statusPayload.masterThreadOrchestrationState } else { 'missing' })),
-    ('- Current automation posture: `{0}`' -f $(if ($statusPayload.currentAutomationPosture) { $statusPayload.currentAutomationPosture } else { 'missing' })),
     ''
 )
 

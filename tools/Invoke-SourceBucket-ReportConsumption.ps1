@@ -2,7 +2,6 @@
     [ValidateSet('Debug', 'Release')]
     [string] $Configuration = 'Release',
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
     [string] $ConsumptionPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-report-consumption.json',
     [switch] $FullResearchMode,
     [switch] $SkipPruning
@@ -718,16 +717,11 @@ function Invoke-RawAppendixCompaction {
 }
 
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
-$cyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $consumptionPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $ConsumptionPolicyPath
-$cyclePolicy = Get-Content -Raw -LiteralPath $cyclePolicyPath | ConvertFrom-Json
 $consumptionPolicy = Get-Content -Raw -LiteralPath $consumptionPolicyPath | ConvertFrom-Json
 
-$cycleStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.statePath)
-$taskingStatusPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath '.audit/state/local-automation-tasking-status.json'
-$masterThreadStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.masterThreadOrchestrationStatePath)
-$federationStatusPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketFederationStatusStatePath)
-$returnIntegrationPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.sourceBucketReturnIntegrationStatusStatePath)
+$federationStatusPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $consumptionPolicy.federationStatusStatePath)
+$returnIntegrationPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $consumptionPolicy.returnIntegrationStatusStatePath)
 
 $currentStandingSummaryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $consumptionPolicy.currentStandingSummaryStatePath)
 $currentStandingSummaryMarkdownPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $consumptionPolicy.currentStandingSummaryMarkdownPath)
@@ -740,9 +734,9 @@ $reportConsumptionDailyOutputRoot = Resolve-PathFromRepo -BasePath $resolvedRepo
 
 $previousStandingSummary = Read-JsonFileOrNull -Path $currentStandingSummaryStatePath
 $previousCandidateItemsState = Read-JsonFileOrNull -Path $currentCandidateGelItemsStatePath
-$cycleState = Read-JsonFileOrNull -Path $cycleStatePath
-$taskingStatusState = Read-JsonFileOrNull -Path $taskingStatusPath
-$masterThreadState = Read-JsonFileOrNull -Path $masterThreadStatePath
+$cycleState = [pscustomobject]@{ lastKnownStatus = 'research-lane-only' }
+$taskingStatusState = $null
+$masterThreadState = $null
 $federationStatusState = Read-JsonFileOrNull -Path $federationStatusPath
 $returnIntegrationState = Read-JsonFileOrNull -Path $returnIntegrationPath
 

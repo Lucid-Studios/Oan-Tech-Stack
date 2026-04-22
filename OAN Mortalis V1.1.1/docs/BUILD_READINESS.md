@@ -108,16 +108,10 @@ Current hold-lane clarification:
   `BUILD_HOLD_UNLOCK_READINESS.md`
 - the next-cycle late-path runtime source plan now lives in
   `LATE_PATH_RUNTIME_PROJECTION_SPEC.md`
-- the first bounded `V1.1.1` automation lane now lives in
-  `V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md`
-- the operator-side scheduler resume helper now lives in
-  `tools/Resume-Local-AutomationCycleTask.ps1`
 - the end-to-end active workflow spine now lives in
   `V1_1_1_WORKFLOW_MILESTONE_MAP.md`
 - the root requester-and-admitter automation prompt now lives in
   `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
-- the bounded companion-tool telemetry lane now lives in
-  `COMPANION_TOOL_TELEMETRY_LANE.md`
 - the end-to-end telemetry bundle and groupoid taxonomy now lives in
   `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`
 - the first groupoid fibrinoid collection and bundle-mapping law now lives in
@@ -128,8 +122,6 @@ Current hold-lane clarification:
   `tools/Get-LineAuditReport.ps1`
 - the first working-model release admissibility surface now lives in
   `FIRST_WORKING_MODEL_RELEASE_GATE.md`
-- the companion-tool telemetry bot wrapper lives in
-  `tools/Invoke-CompanionToolTelemetry.ps1`
 - the source-bucket federation control plane now lives in
   `SOURCE_BUCKET_FEDERATION_LANE.md`
 - the source-bucket federation cycle wrapper lives in
@@ -137,8 +129,8 @@ Current hold-lane clarification:
 - the source-bucket return intake wrappers now live in
   `tools/Write-SourceBucket-ReturnIntegrationStatus.ps1` and
   `tools/Invoke-SourceBucket-ReturnCycle.ps1`
-- the local automation temporal close law now lives in
-  `LOCAL_AUTOMATION_END_STATE_TRANSITION_LAW.md`
+- the source-bucket report-consumption wrapper now lives in
+  `tools/Invoke-SourceBucket-ReportConsumption.ps1`
 - the seeded-governance bounded build-admission law now lives in
   `SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md`
 - the hosted `LLM` resident seating note now lives in

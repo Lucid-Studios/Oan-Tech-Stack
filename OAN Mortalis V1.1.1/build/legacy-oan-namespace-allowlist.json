@@ -9,8 +9,6 @@
                             "SLI"
                         ],
     "legacyNamespaceFiles":  [
-                                 "OAN Mortalis V1.1.1/tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/AutomationHitlVerificationAidTests.cs",
-                                 "OAN Mortalis V1.1.1/tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/BuildDispatchGateReconciliationTests.cs",
                                  "OAN Mortalis V1.1.1/tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/CarryForwardRefinementTests.cs",
                                  "OAN Mortalis V1.1.1/tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/CrypticDerivationContractsTests.cs",
                                  "OAN Mortalis V1.1.1/tests/Sanctuary/Oan.Audit.Tests/Oan.Audit.Tests/DiscernmentAdmissibilityAutomationTests.cs",

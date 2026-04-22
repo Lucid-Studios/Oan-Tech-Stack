@@ -6,7 +6,8 @@ This note defines the first repo-seated multi-agent build topology for the
 active `OAN Mortalis V1.1.1` line.
 
 It exists so bounded agent collaboration can plug into the current
-master-thread dispatch law rather than bypassing it.
+repo-local build-dispatch and source-bucket request law rather than bypassing
+it.
 
 The working model is:
 
@@ -24,14 +25,14 @@ claim.
 
 This law is subordinate to:
 
-- `MASTER_THREAD_BUCKET_ORCHESTRATION_LAW.md`
-- `WORKSPACE_BUCKET_GROUP_SYSTEM.md`
-- `LOCAL_AUTOMATION_TASKING_SURFACE.md`
-- `GOVERNED_BUILD_AUTOMATION_CONVEYOR.md`
+- `BUILD_READINESS.md`
+- `OAN_BUILD_DISPATCH_ROOT_PROMPT.md`
+- `SOURCE_BUCKET_FEDERATION_LANE.md`
+- `SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md`
 
-The machine-readable policy surface for this law lives at:
-
-- `Automation/agent-work-lanes.json`
+The machine-readable policy surface for this law is now carried through the
+repo-local source-bucket and build-dispatch surfaces rather than a dedicated
+agent-lane automation file.
 
 The active authority remains repo-local executable truth.
 

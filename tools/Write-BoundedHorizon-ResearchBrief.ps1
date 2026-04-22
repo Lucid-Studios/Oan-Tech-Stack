@@ -2,7 +2,7 @@
     [string] $RepoRoot,
     [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
     [string] $TaskingPolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-tasking.json',
-    [string] $FormalSurfaceMarkdownPath = 'OAN Mortalis V1.1.1/docs/LOCAL_AUTOMATION_TASKING_SURFACE.md'
+    [string] $FormalSurfaceMarkdownPath = 'OAN Mortalis V1.1.1/docs/SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md'
 )
 
 Set-StrictMode -Version Latest

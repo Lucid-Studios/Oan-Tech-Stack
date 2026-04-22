@@ -3019,14 +3019,12 @@ public sealed class BootstrapBoundaryTests
         var groupoidAuditPath = Path.Combine(lineRoot, "docs", "V1_1_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md");
         var taxonomyPath = Path.Combine(lineRoot, "docs", "TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md");
         var schemaPath = Path.Combine(lineRoot, "docs", "LINE_AUDIT_REPORT_SCHEMA.md");
-        var companionTelemetryPath = Path.Combine(lineRoot, "docs", "COMPANION_TOOL_TELEMETRY_LANE.md");
         var sourceBucketConsumptionPath = Path.Combine(lineRoot, "docs", "SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md");
 
         var buildReadinessText = File.ReadAllText(buildReadinessPath);
         var groupoidAuditText = File.ReadAllText(groupoidAuditPath);
         var taxonomyText = File.ReadAllText(taxonomyPath);
         var schemaText = File.ReadAllText(schemaPath);
-        var companionTelemetryText = File.ReadAllText(companionTelemetryPath);
         var sourceBucketConsumptionText = File.ReadAllText(sourceBucketConsumptionPath);
 
         Assert.Contains("TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md", buildReadinessText, StringComparison.Ordinal);
@@ -3078,10 +3076,6 @@ public sealed class BootstrapBoundaryTests
         }
 
         Assert.Contains("`line-audit-report` is now schema-defined as a read-only line witness.", schemaText, StringComparison.Ordinal);
-
-        Assert.Contains("This lane follows `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`.", companionTelemetryText, StringComparison.Ordinal);
-        Assert.Contains("the `.audit/state` file is a packaging surface", companionTelemetryText, StringComparison.Ordinal);
-        Assert.Contains("the `.audit/runs` directory is a packaging surface", companionTelemetryText, StringComparison.Ordinal);
 
         Assert.Contains("This lane also follows `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`.", sourceBucketConsumptionText, StringComparison.Ordinal);
         Assert.Contains("raw appendices remain semantic transport", sourceBucketConsumptionText, StringComparison.Ordinal);
@@ -3677,8 +3671,7 @@ public sealed class BootstrapBoundaryTests
             "`chapter-6: frame-now`",
             "`chapter-7: frame-now/spec-now`",
             "`chapter-8: frame-now/spec-now`",
-            "`chapter-9: hold`",
-            "`companion-tool-telemetry: admitted-optional-bounded`"
+            "`chapter-9: hold`"
         };
 
         foreach (var marker in sharedMarkers)
@@ -3703,99 +3696,6 @@ public sealed class BootstrapBoundaryTests
         foreach (var marker in runtimeSpecMarkers)
         {
             Assert.Contains(marker, runtimeSpecText, StringComparison.Ordinal);
-        }
-    }
-
-    [Fact]
-    public void V111_Enrichment_Automation_Pathway_Is_Aligned_Across_Docs_And_Policy()
-    {
-        var lineRoot = GetLineRoot();
-        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
-        var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
-        var unlockReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_HOLD_UNLOCK_READINESS.md");
-        var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
-        var companionTelemetryDocPath = Path.Combine(lineRoot, "docs", "COMPANION_TOOL_TELEMETRY_LANE.md");
-        var cyclePolicyPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "Automation", "local-automation-cycle.json");
-
-        var buildReadinessText = File.ReadAllText(buildReadinessPath);
-        var unlockReadinessText = File.ReadAllText(unlockReadinessPath);
-        var pathwayDocText = File.ReadAllText(pathwayDocPath);
-        var companionTelemetryDocText = File.ReadAllText(companionTelemetryDocPath);
-        var cyclePolicyText = File.ReadAllText(cyclePolicyPath);
-
-        Assert.Contains("`v111-enrichment-automation: admitted-local-bounded`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`v111-enrichment-automation: admitted-local-bounded`", unlockReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`companion-tool-telemetry: admitted-optional-bounded`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`companion-tool-telemetry: admitted-optional-bounded`", unlockReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`automation-close-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`seeded-governance-build-admission-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`runtime-workbench-governance-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`discernment-admissibility-law: frame-now`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`bounded-ec-loop: frame-now`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`engram-predicate-minting: hold`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`single-flight-main-worker: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`hourly-watchdog-reflection: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
-        Assert.Contains("`daily-hitl-digest-office: admitted-local-mechanical`", buildReadinessText, StringComparison.Ordinal);
-
-        var pathwayMarkers = new[]
-        {
-            "`v111-enrichment-automation: admitted-local-bounded`",
-            "`companion-tool-telemetry: admitted-optional-bounded`",
-            "seed-LLM",
-            "production-pre-release",
-            "`.hopng: optional-bounded`",
-            "COMPANION_TOOL_TELEMETRY_LANE.md",
-            "SEEDED_GOVERNANCE_BUILD_ADMISSION_LAW.md",
-            "RUNTIME_WORKBENCH_GOVERNANCE_AND_BOUNDED_EC_LAW.md",
-            "DISCERNMENT_AND_ADMISSIBILITY_LAW.md",
-            "`buildAdmissionState = admitted-local-bounded`"
-        };
-
-        foreach (var marker in pathwayMarkers)
-        {
-            Assert.Contains(marker, pathwayDocText, StringComparison.Ordinal);
-        }
-
-        var companionTelemetryDocMarkers = new[]
-        {
-            "`companion-tool-telemetry: admitted-optional-bounded`",
-            "Holographic Data Tool",
-            "Trivium Forum",
-            "Write-CompanionToolTelemetry.ps1"
-        };
-
-        foreach (var marker in companionTelemetryDocMarkers)
-        {
-            Assert.Contains(marker, companionTelemetryDocText, StringComparison.Ordinal);
-        }
-
-        var policyMarkers = new[]
-        {
-            "\"localAutomationCadenceMinutes\"",
-            "\"targetTemporalConstitution\"",
-            "\"single-flight-close-governed\"",
-            "\"watchdogReflectionCadenceHours\"",
-            "\"fault-recoverable\"",
-            "\"optionalTriviumForumToolRoot\"",
-            "\"companionToolTelemetryOutputRoot\"",
-            "\"companionToolTelemetryStatePath\"",
-            "\"v111EnrichmentPathwayOutputRoot\"",
-            "\"v111EnrichmentPathwayStatePath\"",
-            "\"schedulerTaskTopology\"",
-            "\"mainWorkerTaskName\"",
-            "\"watchdogTaskName\"",
-            "\"dailyDigestTaskName\"",
-            "\"pauseMainWorkerOnTerminalStates\"",
-            "\"pauseMainWorkerOnBlocked\"",
-            "\"watchdogOutputRoot\"",
-            "\"watchdogStatePath\"",
-            "\"keepCompanionToolTelemetryBundles\"",
-            "\"keepV111EnrichmentPathwayBundles\""
-        };
-
-        foreach (var marker in policyMarkers)
-        {
-            Assert.Contains(marker, cyclePolicyText, StringComparison.Ordinal);
         }
     }
 
@@ -3882,22 +3782,18 @@ public sealed class BootstrapBoundaryTests
         var lineRoot = GetLineRoot();
         var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
         var workflowMapPath = Path.Combine(lineRoot, "docs", "V1_1_1_WORKFLOW_MILESTONE_MAP.md");
-        var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
         var discernmentLawPath = Path.Combine(lineRoot, "docs", "DISCERNMENT_AND_ADMISSIBILITY_LAW.md");
         var discernmentCasebookPath = Path.Combine(lineRoot, "docs", "DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md");
 
         var buildReadinessText = File.ReadAllText(buildReadinessPath);
         var workflowMapText = File.ReadAllText(workflowMapPath);
-        var pathwayDocText = File.ReadAllText(pathwayDocPath);
         var discernmentLawText = File.ReadAllText(discernmentLawPath);
         var discernmentCasebookText = File.ReadAllText(discernmentCasebookPath);
 
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", workflowMapText, StringComparison.Ordinal);
-        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_LAW.md", pathwayDocText, StringComparison.Ordinal);
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md", workflowMapText, StringComparison.Ordinal);
-        Assert.Contains("DISCERNMENT_AND_ADMISSIBILITY_CASEBOOK.md", pathwayDocText, StringComparison.Ordinal);
 
         var doctrineMarkers = new[]
         {
@@ -3951,17 +3847,14 @@ public sealed class BootstrapBoundaryTests
         var lineRoot = GetLineRoot();
         var buildReadinessPath = Path.Combine(lineRoot, "docs", "BUILD_READINESS.md");
         var workflowMapPath = Path.Combine(lineRoot, "docs", "V1_1_1_WORKFLOW_MILESTONE_MAP.md");
-        var pathwayDocPath = Path.Combine(lineRoot, "docs", "V1_1_1_ENRICHMENT_AUTOMATION_PATHWAY.md");
         var minimalBuildPath = Path.Combine(lineRoot, "docs", "AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md");
 
         var buildReadinessText = File.ReadAllText(buildReadinessPath);
         var workflowMapText = File.ReadAllText(workflowMapPath);
-        var pathwayDocText = File.ReadAllText(pathwayDocPath);
         var minimalBuildText = File.ReadAllText(minimalBuildPath);
 
         Assert.Contains("AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md", buildReadinessText, StringComparison.Ordinal);
         Assert.Contains("AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md", workflowMapText, StringComparison.Ordinal);
-        Assert.Contains("AGENTICORE_LISTENING_FRAME_AND_COMPASS_MINIMAL_BUILD.md", pathwayDocText, StringComparison.Ordinal);
 
         var doctrineMarkers = new[]
         {
@@ -4183,203 +4076,6 @@ public sealed class BootstrapBoundaryTests
         Assert.Contains(cradleCanonicalChain, instantiationLawText, StringComparison.Ordinal);
         Assert.Contains("coordination is not issued office", agentiCoreMinimalBuildText, StringComparison.Ordinal);
         Assert.Contains("`cOE/cSelfGEL` seal issues operative office after that coordination", instantiationLawText, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void V111_Enrichment_Automation_Scripts_Are_Wired_Into_Cycle_And_Retention()
-    {
-        var lineRoot = GetLineRoot();
-        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
-        var cycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1");
-        var companionTelemetryScriptPath = Path.Combine(repoRoot, "tools", "Write-CompanionToolTelemetry.ps1");
-        var companionTelemetryWrapperPath = Path.Combine(repoRoot, "tools", "Invoke-CompanionToolTelemetry.ps1");
-        var writerScriptPath = Path.Combine(repoRoot, "tools", "Write-V111-EnrichmentPathway.ps1");
-        var wrapperScriptPath = Path.Combine(repoRoot, "tools", "Invoke-V111-EnrichmentPathway.ps1");
-        var retentionScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Automation-RetentionPruning.ps1");
-        var seededBuildGovernanceScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Seeded-Build-Governance.ps1");
-
-        var cycleScriptText = File.ReadAllText(cycleScriptPath);
-        var companionTelemetryScriptText = File.ReadAllText(companionTelemetryScriptPath);
-        var companionTelemetryWrapperText = File.ReadAllText(companionTelemetryWrapperPath);
-        var writerScriptText = File.ReadAllText(writerScriptPath);
-        var wrapperScriptText = File.ReadAllText(wrapperScriptPath);
-        var retentionScriptText = File.ReadAllText(retentionScriptPath);
-        var seededBuildGovernanceScriptText = File.ReadAllText(seededBuildGovernanceScriptPath);
-
-        var cycleMarkers = new[]
-        {
-            "Resolve-OanWorkspacePath.ps1",
-            "Write-CompanionToolTelemetry.ps1",
-            "Write-V111-EnrichmentPathway.ps1",
-            "lastCompanionToolTelemetryBundle",
-            "companionToolTelemetryStatePath",
-            "lastV111EnrichmentPathwayBundle",
-            "v111EnrichmentPathwayStatePath",
-            "[local-automation-cycle] CompanionToolTelemetry",
-            "[local-automation-cycle] V111EnrichmentPathway"
-        };
-
-        foreach (var marker in cycleMarkers)
-        {
-            Assert.Contains(marker, cycleScriptText, StringComparison.Ordinal);
-        }
-
-        var companionTelemetryMarkers = new[]
-        {
-            "companion-tool-telemetry",
-            "Holographic Data Tool",
-            "Trivium Forum",
-            "awaiting-audit-lane",
-            "partial-companion-tool-telemetry"
-        };
-
-        foreach (var marker in companionTelemetryMarkers)
-        {
-            Assert.Contains(marker, companionTelemetryScriptText, StringComparison.Ordinal);
-        }
-
-        var companionTelemetryWrapperMarkers = new[]
-        {
-            "Invoke-Local-Automation-Cycle.ps1",
-            "Write-CompanionToolTelemetry.ps1",
-            "companionToolTelemetryStatePath"
-        };
-
-        foreach (var marker in companionTelemetryWrapperMarkers)
-        {
-            Assert.Contains(marker, companionTelemetryWrapperText, StringComparison.Ordinal);
-        }
-
-        var writerMarkers = new[]
-        {
-            "v111-enrichment-pathway",
-            "continue-v111-enrichment-full-body-work",
-            "pause-and-run-seed-llm-wrinkle-test",
-            "optional-bounded",
-            "companionToolTelemetryState",
-            "holographicDataToolTelemetryState",
-            "triviumForumTelemetryState"
-        };
-
-        foreach (var marker in writerMarkers)
-        {
-            Assert.Contains(marker, writerScriptText, StringComparison.Ordinal);
-        }
-
-        var wrapperMarkers = new[]
-        {
-            "Invoke-Local-Automation-Cycle.ps1",
-            "Write-CompanionToolTelemetry.ps1",
-            "Write-V111-EnrichmentPathway.ps1",
-            "v111EnrichmentPathwayStatePath"
-        };
-
-        foreach (var marker in wrapperMarkers)
-        {
-            Assert.Contains(marker, wrapperScriptText, StringComparison.Ordinal);
-        }
-
-        var retentionMarkers = new[]
-        {
-            "lastCompanionToolTelemetryBundle",
-            "companionToolTelemetryOutputRoot",
-            "keepCompanionToolTelemetryBundles",
-            "lastV111EnrichmentPathwayBundle",
-            "v111EnrichmentPathwayOutputRoot",
-            "keepV111EnrichmentPathwayBundles"
-        };
-
-        foreach (var marker in retentionMarkers)
-        {
-            Assert.Contains(marker, retentionScriptText, StringComparison.Ordinal);
-        }
-
-        var seededGovernanceMarkers = new[]
-        {
-            "Resolve-OanWorkspacePath.ps1",
-            "Resolve-OanWorkspaceTouchPoint",
-            "tool.localLlmPreflight"
-        };
-
-        foreach (var marker in seededGovernanceMarkers)
-        {
-            Assert.Contains(marker, seededBuildGovernanceScriptText, StringComparison.Ordinal);
-        }
-    }
-
-    [Fact]
-    public void V111_LocalAutomationCycle_Reconciles_Scheduler_After_Close_State_Is_Written()
-    {
-        var lineRoot = GetLineRoot();
-        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
-        var cycleScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1");
-        var cycleScriptText = File.ReadAllText(cycleScriptPath);
-
-        var pauseDecisionIndex = cycleScriptText.LastIndexOf("$pauseForExplicitHitl = ", StringComparison.Ordinal);
-        var summaryWriteIndex = cycleScriptText.LastIndexOf("Write-JsonFile -Path $summaryPath -Value $summary", StringComparison.Ordinal);
-        var schedulerSyncIndex = cycleScriptText.LastIndexOf("$schedulerSyncScriptPath = Join-Path $resolvedRepoRoot 'tools\\Sync-Local-AutomationScheduler.ps1'", StringComparison.Ordinal);
-        var schedulerReceiptIndex = cycleScriptText.LastIndexOf("$schedulerExecutionReceiptScriptPath = Join-Path $resolvedRepoRoot 'tools\\Write-SchedulerExecution-Receipt.ps1'", StringComparison.Ordinal);
-        var taskStatusIndex = cycleScriptText.LastIndexOf("$taskStatusOutput = Invoke-ChildPowershellScript", StringComparison.Ordinal);
-
-        Assert.True(pauseDecisionIndex >= 0);
-        Assert.True(summaryWriteIndex >= 0);
-        Assert.True(schedulerSyncIndex >= 0);
-        Assert.True(schedulerReceiptIndex >= 0);
-        Assert.True(taskStatusIndex >= 0);
-
-        Assert.True(summaryWriteIndex > pauseDecisionIndex);
-        Assert.True(schedulerSyncIndex > summaryWriteIndex);
-        Assert.True(schedulerReceiptIndex > schedulerSyncIndex);
-        Assert.True(taskStatusIndex > schedulerReceiptIndex);
-    }
-
-    [Fact]
-    public void V111_LocalAutomation_ThreeOffice_Scheduler_Scripts_Are_Wired()
-    {
-        var lineRoot = GetLineRoot();
-        var repoRoot = Directory.GetParent(lineRoot)?.FullName ?? throw new InvalidOperationException("Unable to resolve the repo root.");
-        var installMainWorkerPath = Path.Combine(repoRoot, "tools", "Install-Local-AutomationCycleTask.ps1");
-        var installWatchdogPath = Path.Combine(repoRoot, "tools", "Install-Local-AutomationWatchdogTask.ps1");
-        var installDigestPath = Path.Combine(repoRoot, "tools", "Install-Local-AutomationDigestTask.ps1");
-        var watchdogScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Watchdog.ps1");
-        var digestScriptPath = Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-HitlDigest.ps1");
-        var schedulerSyncPath = Path.Combine(repoRoot, "tools", "Sync-Local-AutomationScheduler.ps1");
-        var taskStatusPath = Path.Combine(repoRoot, "tools", "Write-Local-Automation-TaskStatus.ps1");
-
-        var installMainWorkerText = File.ReadAllText(installMainWorkerPath);
-        var installWatchdogText = File.ReadAllText(installWatchdogPath);
-        var installDigestText = File.ReadAllText(installDigestPath);
-        var watchdogScriptText = File.ReadAllText(watchdogScriptPath);
-        var digestScriptText = File.ReadAllText(digestScriptPath);
-        var schedulerSyncText = File.ReadAllText(schedulerSyncPath);
-        var taskStatusText = File.ReadAllText(taskStatusPath);
-
-        Assert.Contains("Mode: one-shot-main-worker", installMainWorkerText, StringComparison.Ordinal);
-        Assert.DoesNotContain("-RepetitionInterval", installMainWorkerText, StringComparison.Ordinal);
-
-        Assert.Contains("Invoke-Local-Automation-Watchdog.ps1", installWatchdogText, StringComparison.Ordinal);
-        Assert.Contains("-RepetitionInterval", installWatchdogText, StringComparison.Ordinal);
-        Assert.DoesNotContain("nextWatchdogRunUtc", installWatchdogText, StringComparison.Ordinal);
-        Assert.Contains("Get-NextHourlyAnchorUtc -Minute 0", installWatchdogText, StringComparison.Ordinal);
-
-        Assert.Contains("Invoke-Local-Automation-HitlDigest.ps1", installDigestText, StringComparison.Ordinal);
-        Assert.Contains("-RepetitionInterval", installDigestText, StringComparison.Ordinal);
-
-        Assert.Contains("Sync-Local-AutomationScheduler.ps1", watchdogScriptText, StringComparison.Ordinal);
-        Assert.Contains("watchdogState", watchdogScriptText, StringComparison.Ordinal);
-
-        Assert.Contains("Write-Release-Candidate-Digest.ps1", digestScriptText, StringComparison.Ordinal);
-        Assert.Contains("nextDailyHitlDigestRunUtc", digestScriptText, StringComparison.Ordinal);
-
-        Assert.Contains("mainWorkerTaskName", schedulerSyncText, StringComparison.Ordinal);
-        Assert.Contains("watchdogTaskName", schedulerSyncText, StringComparison.Ordinal);
-        Assert.Contains("dailyDigestTaskName", schedulerSyncText, StringComparison.Ordinal);
-        Assert.Contains("$desiredWatchdogRunUtc = Get-NextHourlyAnchorUtc -Minute 0", schedulerSyncText, StringComparison.Ordinal);
-        Assert.Contains("nextWatchdogRunUtc = $nextWatchdogRunUtc.ToString('o')", File.ReadAllText(Path.Combine(repoRoot, "tools", "Invoke-Local-Automation-Cycle.ps1")), StringComparison.Ordinal);
-
-        Assert.Contains("'main-worker-cycle'", taskStatusText, StringComparison.Ordinal);
-        Assert.Contains("'hourly-watchdog'", taskStatusText, StringComparison.Ordinal);
-        Assert.Contains("'daily-hitl-digest'", taskStatusText, StringComparison.Ordinal);
     }
 
     private static IReadOnlyList<string> FindTokenViolations(IEnumerable<string> forbiddenTokens)

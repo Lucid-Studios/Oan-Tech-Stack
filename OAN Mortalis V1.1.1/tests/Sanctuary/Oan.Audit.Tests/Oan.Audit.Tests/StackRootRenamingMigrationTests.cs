@@ -68,7 +68,7 @@ public sealed class StackRootRenamingMigrationTests
         var allowedNamespaceFiles = root.GetProperty("legacyNamespaceFiles").EnumerateArray().Select(static item => item.GetString()).ToArray();
         var allowedProjectFiles = root.GetProperty("legacyProjectFiles").EnumerateArray().Select(static item => item.GetString()).ToArray();
 
-        Assert.Equal(46, allowedNamespaceFiles.Length);
+        Assert.Equal(44, allowedNamespaceFiles.Length);
         Assert.Equal(2, allowedProjectFiles.Length);
 
         var lineRoot = Path.Combine(repoRoot, "OAN Mortalis V1.1.1");
@@ -95,14 +95,14 @@ public sealed class StackRootRenamingMigrationTests
     public void Fresh_Seams_Already_Use_San_Prefixes()
     {
         var repoRoot = GetRepoRoot();
-        var contractsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "src", "Sanctuary", "San.Common", "San.Common", "AgentBuildOrchestrationContracts.cs");
-        var testsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "tests", "Sanctuary", "Oan.Audit.Tests", "Oan.Audit.Tests", "AgentBuildOrchestrationContractsTests.cs");
+        var contractsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "src", "Sanctuary", "San.Common", "San.Common", "GovernedSeedPostActionServiceEnactmentPacketContracts.cs");
+        var testsPath = Path.Combine(repoRoot, "OAN Mortalis V1.1.1", "tests", "Sanctuary", "Oan.Audit.Tests", "Oan.Audit.Tests", "SourceBucketFederationAutomationTests.cs");
 
         var contractsText = File.ReadAllText(contractsPath);
         var testsText = File.ReadAllText(testsPath);
 
         Assert.Contains("namespace San.Common;", contractsText, StringComparison.Ordinal);
-        Assert.Contains("namespace San.Audit.Tests;", testsText, StringComparison.Ordinal);
+        Assert.Contains("namespace Oan.Audit.Tests;", testsText, StringComparison.Ordinal);
         Assert.DoesNotContain("namespace Oan.Common;", contractsText, StringComparison.Ordinal);
     }
 

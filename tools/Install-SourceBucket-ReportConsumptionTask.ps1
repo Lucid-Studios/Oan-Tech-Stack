@@ -114,11 +114,6 @@ if ($PSCmdlet.ShouldProcess($TaskName, 'Register scheduled task')) {
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Description $description -Force | Out-Null
 }
 
-$taskStatusScriptPath = Join-Path $resolvedRepoRoot 'tools\Write-Local-Automation-TaskStatus.ps1'
-if (Test-Path -LiteralPath $taskStatusScriptPath -PathType Leaf) {
-    & powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File $taskStatusScriptPath -RepoRoot $resolvedRepoRoot | Out-Null
-}
-
 $registeredTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
 $registeredTaskInfo = Get-ScheduledTaskInfo -TaskName $TaskName -ErrorAction Stop
 Write-Host ('[source-bucket-report-consumption-task] TaskName: {0}' -f $TaskName)

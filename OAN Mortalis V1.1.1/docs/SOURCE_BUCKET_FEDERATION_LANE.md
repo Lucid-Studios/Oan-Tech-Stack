@@ -216,11 +216,7 @@ It does not silently authorize later embodiment claims.
 
 ## HITL Boundary
 
-The shared `HITL` verification aid remains fixed in:
-
-- `AUTOMATION_HITL_VERIFICATION_AID.md`
-
-That means source-bucket returns may prepare:
+Source-bucket returns may prepare:
 
 - `received`
 - `understood`

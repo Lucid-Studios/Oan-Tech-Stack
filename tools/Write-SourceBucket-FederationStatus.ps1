@@ -1,6 +1,5 @@
-﻿param(
+param(
     [string] $RepoRoot,
-    [string] $CyclePolicyPath = 'OAN Mortalis V1.1.1/Automation/local-automation-cycle.json',
     [string] $FederationPolicyPath = 'OAN Mortalis V1.1.1/Automation/source-bucket-federation.json'
 )
 
@@ -17,8 +16,6 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 $automationCascadePromptHelperPath = Join-Path $PSScriptRoot 'Automation-CascadePrompt.ps1'
 . $automationCascadePromptHelperPath
-$seededGovernanceAdmissionHelperPath = Join-Path $PSScriptRoot 'Seeded-GovernanceAdmission.ps1'
-. $seededGovernanceAdmissionHelperPath
 $oanWorkspaceResolverPath = Join-Path $PSScriptRoot 'Resolve-OanWorkspacePath.ps1'
 if (Test-Path -LiteralPath $oanWorkspaceResolverPath -PathType Leaf) {
     . $oanWorkspaceResolverPath
@@ -141,10 +138,8 @@ function Test-RequestStillActive {
 }
 
 $resolvedRepoRoot = [System.IO.Path]::GetFullPath($RepoRoot)
-$resolvedCyclePolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $CyclePolicyPath
 $resolvedFederationPolicyPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath $FederationPolicyPath
 
-$cyclePolicy = Read-JsonFile -Path $resolvedCyclePolicyPath
 $federationPolicy = Read-JsonFile -Path $resolvedFederationPolicyPath
 $resolvedRequestContractPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.requestContractPath)
 $resolvedReturnContractPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.returnContractPath)
@@ -154,22 +149,8 @@ $returnContract = Read-JsonFile -Path $resolvedReturnContractPath
 $requestIndexStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.requestIndexStatePath)
 $federationStatusStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.federationStatusStatePath)
 $federationStatusMarkdownPath = [System.IO.Path]::ChangeExtension($federationStatusStatePath, '.md')
-$masterThreadStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[0])
-$taskStatusStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[1])
-$v111EnrichmentStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[2])
-$companionTelemetryStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.readOnlyUpstreamTelemetryPaths[3])
-$runIsolatedPathwayStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.runIsolatedBuildPathwayStatePath)
-$seededGovernanceStatePath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.seededGovernanceStatePath)
-$matrixPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $cyclePolicy.versionedTouchPointMatrixPath)
-
 $requestIndex = Read-JsonFileOrNull -Path $requestIndexStatePath
-$masterThreadState = Read-JsonFileOrNull -Path $masterThreadStatePath
-$taskStatus = Read-JsonFileOrNull -Path $taskStatusStatePath
-$v111EnrichmentState = Read-JsonFileOrNull -Path $v111EnrichmentStatePath
-$companionTelemetryState = Read-JsonFileOrNull -Path $companionTelemetryStatePath
-$runIsolatedPathwayState = Read-JsonFileOrNull -Path $runIsolatedPathwayStatePath
-$seededGovernanceState = Read-JsonFileOrNull -Path $seededGovernanceStatePath
-$seededGovernanceAdmission = Get-SeededGovernanceBuildAdmission -SeededGovernanceState $seededGovernanceState -CyclePolicy $cyclePolicy
+$matrixPath = Resolve-PathFromRepo -BasePath $resolvedRepoRoot -CandidatePath ([string] $federationPolicy.versionedTouchPointMatrixPath)
 $matrix = Read-JsonFile -Path $matrixPath
 
 $touchPointGroups = @{}
@@ -192,54 +173,6 @@ foreach ($touchPointProperty in $matrix.touchPoints.PSObject.Properties) {
     })
 }
 
-$seedDisposition = [string] $seededGovernanceAdmission.disposition
-$seedReadyState = [string] $seededGovernanceAdmission.readyState
-$seededGovernanceBuildAdmissionState = [string] $seededGovernanceAdmission.buildAdmissionState
-$seededGovernanceBuildAdmissionReason = [string] $seededGovernanceAdmission.buildAdmissionReason
-$seededGovernanceBuildAdmitted = [bool] $seededGovernanceAdmission.buildAdmissionIsAdmitted
-$seededGovernanceClarifyRequired = [bool] $seededGovernanceAdmission.buildAdmissionClarifyRequired
-$currentPosture = Get-ObjectPropertyValueOrNull -InputObject $taskStatus -PropertyName 'currentPosture'
-$taskStatusValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $taskStatus -PropertyName 'lastKnownStatus')
-if ([string]::IsNullOrWhiteSpace($taskStatusValue)) {
-    $taskStatusValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $currentPosture -PropertyName 'status')
-}
-$gateReconciliation = Get-ObjectPropertyValueOrNull -InputObject $masterThreadState -PropertyName 'gateReconciliation'
-$gateMismatchDetected = [bool] (Get-ObjectPropertyValueOrNull -InputObject $gateReconciliation -PropertyName 'gateMismatchDetected')
-$v111PathwayState = [string] (Get-ObjectPropertyValueOrNull -InputObject $v111EnrichmentState -PropertyName 'pathwayState')
-$runIsolatedPathwayStateValue = [string] (Get-ObjectPropertyValueOrNull -InputObject $runIsolatedPathwayState -PropertyName 'pathwayState')
-
-$requestPublicationGateState = 'review-before-requesting'
-$gateActionClass = 'frame-now'
-$reasonCode = 'source-bucket-federation-review-before-requesting'
-$nextAction = 'review-current-build-need-before-publishing-requests'
-
-if ($taskStatusValue -eq 'blocked') {
-    $requestPublicationGateState = 'blocked'
-    $gateActionClass = 'hold'
-    $reasonCode = 'source-bucket-federation-automation-blocked'
-    $nextAction = 'preserve-bounded-state-until-blocked-review'
-} elseif ($gateMismatchDetected) {
-    $requestPublicationGateState = 'clarify-before-requesting'
-    $gateActionClass = 'clarify'
-    $reasonCode = 'source-bucket-federation-gate-truth-mismatch'
-    $nextAction = 'refresh-gate-truth-before-publishing-downstream-requests'
-} elseif ($seededGovernanceClarifyRequired) {
-    $requestPublicationGateState = 'clarify-bounded-requesting-admitted'
-    $gateActionClass = 'clarify'
-    $reasonCode = 'source-bucket-federation-build-admission-unresolved'
-    $nextAction = 'continue-bounded-source-bucket-requesting-without-runtime-widening'
-} elseif ($v111PathwayState -eq 'v111-enrichment-path-open') {
-    $requestPublicationGateState = 'bounded-requesting-open'
-    $gateActionClass = 'spec-now'
-    $reasonCode = 'source-bucket-federation-build-need-open'
-    $nextAction = 'publish-or-maintain-bounded-source-bucket-requests'
-} elseif ($runIsolatedPathwayStateValue -eq 'clarify-seeded-governance-admission') {
-    $requestPublicationGateState = 'clarify-bounded-requesting-admitted'
-    $gateActionClass = 'clarify'
-    $reasonCode = 'source-bucket-federation-isolated-build-ready-clarify-held'
-    $nextAction = 'continue-bounded-source-bucket-requesting-without-runtime-widening'
-}
-
 $requestEntries = if ($null -ne $requestIndex) { @($requestIndex.requests) } else { @() }
 $activeRequests = @($requestEntries | Where-Object { Test-RequestStillActive -RequestEntry $_ })
 $activeRequestIds = @($activeRequests | ForEach-Object { [string] (Get-ObjectPropertyValueOrNull -InputObject $_ -PropertyName 'requestId') })
@@ -254,48 +187,24 @@ $bucketStates = foreach ($bucketLabel in @($federationPolicy.sourceBucketLabels)
     )
     $latestBucketRequest = @($bucketRequests | Sort-Object { [string] (Get-ObjectPropertyValueOrNull -InputObject $_ -PropertyName 'generatedAtUtc') } -Descending | Select-Object -First 1)
 
-    $listenerTelemetryState = 'untracked-by-build'
-    switch ($bucketLabel) {
-        'Holographic Data Tool' {
-            $listenerTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionTelemetryState -PropertyName 'holographicDataToolTelemetryState')
-            if ([string]::IsNullOrWhiteSpace($listenerTelemetryState)) {
-                $listenerTelemetryState = 'untracked-by-build'
-            }
-        }
-        'Trivium Forum' {
-            $listenerTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionTelemetryState -PropertyName 'triviumForumTelemetryState')
-            if ([string]::IsNullOrWhiteSpace($listenerTelemetryState)) {
-                $listenerTelemetryState = 'untracked-by-build'
-            }
-        }
-    }
-
-    $touchPointCount = @($touchPoints).Count
-    $bucketRequestCount = @($bucketRequests).Count
-    $latestBucketRequestCount = @($latestBucketRequest).Count
-
     $bucketState = 'no-build-need'
-    if ($bucketRequestCount -gt 0) {
+    if ($bucketRequests.Count -gt 0) {
         $bucketState = 'request-published-awaiting-return'
-    } elseif ($touchPointCount -gt 0 -and $requestPublicationGateState -in @('blocked', 'clarify-before-requesting')) {
-        $bucketState = 'build-need-held-by-gate'
-    } elseif ($touchPointCount -gt 0) {
+    } elseif ($touchPoints.Count -gt 0) {
         $bucketState = 'build-need-detected-request-missing'
-    } elseif ($listenerTelemetryState -ne 'untracked-by-build') {
-            $bucketState = 'listening-no-build-need'
     }
 
     [pscustomobject] [ordered]@{
         targetBucketLabel = $bucketKey
         bucketState = $bucketState
-        listenerTelemetryState = $listenerTelemetryState
-        requestedTouchPointCount = $touchPointCount
+        listenerTelemetryState = 'research-lane-only'
+        requestedTouchPointCount = @($touchPoints).Count
         requestedTouchPointIds = @($touchPoints | ForEach-Object { [string] $_.touchPointId })
         researchReasons = New-UniqueStringArray -Values @($touchPoints | ForEach-Object { [string] $_.researchReason })
-        activeRequestCount = $bucketRequestCount
-        latestRequestId = if ($latestBucketRequestCount -gt 0) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestBucketRequest[0] -PropertyName 'requestId') } else { $null }
-        latestBundlePath = if ($latestBucketRequestCount -gt 0) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestBucketRequest[0] -PropertyName 'bundlePath') } else { $null }
-        latestNeededReturnClass = if ($latestBucketRequestCount -gt 0) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestBucketRequest[0] -PropertyName 'neededReturnClass') } else { $null }
+        activeRequestCount = @($bucketRequests).Count
+        latestRequestId = if ($latestBucketRequest.Count -gt 0) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestBucketRequest[0] -PropertyName 'requestId') } else { $null }
+        latestBundlePath = if ($latestBucketRequest.Count -gt 0) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestBucketRequest[0] -PropertyName 'bundlePath') } else { $null }
+        latestNeededReturnClass = if ($latestBucketRequest.Count -gt 0) { [string] (Get-ObjectPropertyValueOrNull -InputObject $latestBucketRequest[0] -PropertyName 'neededReturnClass') } else { $null }
     }
 }
 
@@ -303,16 +212,20 @@ $totalResearchHandOffCount = 0
 foreach ($bucketStateEntry in @($bucketStates)) {
     $totalResearchHandOffCount += [int] (Get-ObjectPropertyValueOrNull -InputObject $bucketStateEntry -PropertyName 'requestedTouchPointCount')
 }
+
 $federationState = 'idle-no-build-needs'
+$reasonCode = 'source-bucket-federation-idle'
+$nextAction = 'wait-for-research-handoff-touchpoints'
+$requestPublicationGateState = 'bounded-requesting-open'
+$gateActionClass = 'spec-now'
+
 if ($activeRequests.Count -gt 0) {
     $federationState = 'requests-published-awaiting-returns'
+    $reasonCode = 'source-bucket-federation-requests-published'
     $nextAction = 'wait-for-lawful-source-bucket-returns-or-operator-review'
-} elseif ($requestPublicationGateState -eq 'blocked') {
-    $federationState = 'held-by-blocked-automation'
-} elseif ($requestPublicationGateState -eq 'clarify-before-requesting') {
-    $federationState = 'held-by-gate-clarify'
 } elseif ($totalResearchHandOffCount -gt 0) {
     $federationState = 'ready-to-publish-bounded-requests'
+    $reasonCode = 'source-bucket-federation-build-need-open'
     $nextAction = 'publish-bounded-source-bucket-requests'
 }
 
@@ -334,17 +247,6 @@ $payload = [ordered]@{
     activeRequestCount = $activeRequests.Count
     activeRequestIds = @($activeRequestIds)
     totalResearchHandOffCount = $totalResearchHandOffCount
-    companionTelemetryState = [string] (Get-ObjectPropertyValueOrNull -InputObject $companionTelemetryState -PropertyName 'companionToolTelemetryState')
-    masterThreadOrchestrationState = [string] (Get-ObjectPropertyValueOrNull -InputObject $masterThreadState -PropertyName 'orchestrationState')
-    v111EnrichmentPathwayState = $v111PathwayState
-    runIsolatedBuildPathwayState = $runIsolatedPathwayStateValue
-    seededGovernanceDisposition = $seedDisposition
-    seededGovernanceReadyState = $seedReadyState
-    seededGovernanceBuildAdmissionState = $seededGovernanceBuildAdmissionState
-    seededGovernanceBuildAdmissionReason = $seededGovernanceBuildAdmissionReason
-    seededGovernanceBuildAdmitted = $seededGovernanceBuildAdmitted
-    seededGovernanceClarifyRequired = $seededGovernanceClarifyRequired
-    gateMismatchDetected = $gateMismatchDetected
     bucketStates = $bucketStates
     listenerStates = @($returnContract.listenerStates)
 }
@@ -364,17 +266,6 @@ $markdownLines = @(
     ('- Gate action class: `{0}`' -f $payload.gateActionClass),
     ('- Active request count: `{0}`' -f $payload.activeRequestCount),
     ('- Total research handoff count: `{0}`' -f $payload.totalResearchHandOffCount),
-    ('- Master-thread orchestration state: `{0}`' -f $(if ($payload.masterThreadOrchestrationState) { $payload.masterThreadOrchestrationState } else { 'missing' })),
-    ('- V1.1.1 enrichment pathway state: `{0}`' -f $(if ($payload.v111EnrichmentPathwayState) { $payload.v111EnrichmentPathwayState } else { 'missing' })),
-    ('- Run-isolated build pathway state: `{0}`' -f $(if ($payload.runIsolatedBuildPathwayState) { $payload.runIsolatedBuildPathwayState } else { 'missing' })),
-    ('- Seeded governance disposition: `{0}`' -f $(if ($payload.seededGovernanceDisposition) { $payload.seededGovernanceDisposition } else { 'missing' })),
-    ('- Seeded governance ready state: `{0}`' -f $(if ($payload.seededGovernanceReadyState) { $payload.seededGovernanceReadyState } else { 'missing' })),
-    ('- Seeded governance build admission state: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionState) { $payload.seededGovernanceBuildAdmissionState } else { 'missing' })),
-    ('- Seeded governance build admission reason: `{0}`' -f $(if ($payload.seededGovernanceBuildAdmissionReason) { $payload.seededGovernanceBuildAdmissionReason } else { 'missing' })),
-    ('- Seeded governance build admitted: `{0}`' -f [bool] $payload.seededGovernanceBuildAdmitted),
-    ('- Seeded governance clarify required: `{0}`' -f [bool] $payload.seededGovernanceClarifyRequired),
-    ('- Gate mismatch detected: `{0}`' -f [bool] $payload.gateMismatchDetected),
-    ('- Companion telemetry state: `{0}`' -f $(if ($payload.companionTelemetryState) { $payload.companionTelemetryState } else { 'missing' })),
     ''
 )
 

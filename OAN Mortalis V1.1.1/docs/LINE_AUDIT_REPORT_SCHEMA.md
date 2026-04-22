@@ -71,7 +71,7 @@ The report may read from declared line-local surfaces such as:
 - `BUILD_READINESS.md`
 - `TELEMETRY_BUNDLE_AND_GROUPOID_TAXONOMY.md`
 - `V1_1_1_DOMAIN_AND_SPLINE_GROUPOID_AUDIT.md`
-- `COMPANION_TOOL_TELEMETRY_LANE.md`
+- `SOURCE_BUCKET_FEDERATION_LANE.md`
 - `SOURCE_BUCKET_REPORT_CONSUMPTION_LANE.md`
 - `.audit/state/*.json`
 - `.audit/state/*.md`
