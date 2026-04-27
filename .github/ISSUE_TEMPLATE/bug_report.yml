@@ -1,0 +1,32 @@
+name: Public documentation correction
+description: Report an error in the public descriptive materials.
+title: "[Docs]: "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What public wording appears incorrect, unclear, or unsafe?
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Link to the public page or file section. Do not paste sensitive excerpts.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested_change
+    attributes:
+      label: Suggested correction
+      description: Propose safer public wording if you have it.
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Public intake hygiene
+      options:
+        - label: I have not included private corpus paths, credentials, tokens, logs, local absolute paths, model payloads, runtime payloads, or sensitive identity, custody, operator, or implementation material.
+          required: true

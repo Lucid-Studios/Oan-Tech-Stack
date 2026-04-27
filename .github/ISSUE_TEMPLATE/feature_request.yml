@@ -1,0 +1,33 @@
+name: Public explanation request
+description: Request a clearer public explanation or non-executable example.
+title: "[Public Explanation]: "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Public question
+      description: What should the public repository explain more clearly?
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Audience
+      description: Who is the explanation for?
+      placeholder: Researchers, partners, reviewers, users, maintainers...
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Boundary concern
+      description: Note any detail that should stay private or non-executable.
+    validations:
+      required: true
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Public intake hygiene
+      options:
+        - label: I am asking for public descriptive material only, not source code, build instructions, datasets, private architecture, or deployment detail.
+          required: true
