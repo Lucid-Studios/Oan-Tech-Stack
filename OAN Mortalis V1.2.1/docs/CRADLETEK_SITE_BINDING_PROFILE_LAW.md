@@ -1,81 +1,30 @@
-# CRADLETEK SITE BINDING PROFILE LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the first lawful site-binding profile for pre-Cradle
-standing in `V1.2.1`.
+## Public Abstract
 
-It exists so operator readiness, local deployment shape, and later CradleTek
-discussion stay tied to one concrete site footing rather than an ambient host
-assumption.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> having a lawful seat does not imply the right to occupy it as a governing
-> entity.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-> authorized pre-Cradle standing is a site-and-operator posture, not a
-> governing `CME` event.
+## Withheld Elements
 
-## Closed Site Class Grammar
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-The first site-binding grammar is closed in this slice.
+## Access Rule
 
-The bounded passive class enum now lives in:
-
-- `CradleTekSiteClass`
-
-The only admitted site classes are:
-
-- `PersonalPc`
-- `CoResidentSanctuaryHost`
-- `SeparateCradleTekHost`
-- `EnterpriseDistributedConstruct`
-
-No free-form topology class is admitted in this slice.
-
-## Site Binding Profile Office
-
-The bounded passive site profile record now lives in:
-
-- `CradleTekSiteBindingProfile`
-
-That profile must preserve:
-
-- one site class
-- one site summary
-- one Sanctuary-host footing
-- one CradleTek-host footing
-- one jurisdiction profile
-- one localization profile
-- one witness chain
-
-## Existing Seam Dependence
-
-Use this note together with:
-
-- `INSTALL_AGREEMENT_ACTION_SURFACE_LAW.md`
-- `CME_USE_DATA_POSTURE_LAW.md`
-- `SANCTUARY_MOS_STORAGE_SEAT_LAW.md`
-- `PRE_CRADLETEK_NON_ASSUMPTION_LAW.md`
-
-Install identity and `CME`-use posture may support this site profile.
-They do not replace it.
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- governing `CME` placement
-- CradleTek authorization
-- service activation
-- runtime autonomy
-- operator realization
-
-## Working Summary
-
-`V1.2.1` now fixes a closed four-class site-binding profile grammar for
-pre-Cradle standing.
-
-Site footing is now concrete and inspectable, but it remains below governing
-placement, CradleTek live authority, and runtime action.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

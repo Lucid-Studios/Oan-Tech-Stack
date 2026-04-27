@@ -1,75 +1,30 @@
-# INSTALL_IDENTITY_SET_LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the first identity-bearing derivative of the install
-agreement corridor in `V1.2.1`.
+## Public Abstract
 
-It exists so install identity is derived from exact lawful assent footing
-rather than ambient install presence.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> assent capture is not identity minting, but no install identity may exist
-> without assented predicate formation.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Identity Formation Rule
+## Withheld Elements
 
-`InstallIdentitySetCandidate` may exist only after full assent across every
-required agreement lane in the emitted `AgreementPredicateBundle`.
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-Before that point it must remain absent.
+## Access Rule
 
-## Required Derivation Inputs
-
-The first identity set candidate must be derived from:
-
-- licensing agent identity
-- user identity
-- per-lane assent witnesses
-- language dataset id
-- locale and jurisdiction profile
-- agreement template/version lineage
-- `cme-lab-notice` lineage
-
-## Contract-View Boundary
-
-The deployment/localization contract view is derived and is not the canonical
-install identity owner in this slice.
-
-`SanctuaryContractProfile` may mirror install footing later, but it does not
-replace `InstallIdentitySetCandidate` as the canonical identity-bearing
-derivative.
-
-## Candidate Boundary
-
-The current object is:
-
-- a candidate
-- versioned by assent topology
-- below mutation warrant
-
-It is not:
-
-- a runtime actor
-- a service authorization
-- an Atlas mutation warrant
-- a `Sanctuary.MoS` handoff object
-
-## Explicit Non-Grants
-
-This note does not authorize:
-
-- identity creation from acknowledgement only
-- contract-view substitution for assent topology
-- paid-access divergence
-- Atlas mutation
-- runtime activation
-
-## Working Summary
-
-`InstallIdentitySetCandidate` is now the first identity-bearing derivative of
-localized install assent.
-
-It appears only after full assent and remains below mutation, runtime, and
-service authorization.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

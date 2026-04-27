@@ -1,70 +1,30 @@
-# GEL_REST_STATE_AUDIT
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note audits the first `Sanctuary.GEL` rest-state and persistence cluster.
+## Public Abstract
 
-It exists to prove that lawful discernment now terminates into one canonical
-resting object without implying promotion, activation, or `MoS/cMoS`
-standing.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> lawful discernment must end in a lawful resting object before any later
-> ascent may be discussed.
->
-> held is not promoted, and persisted is not activated.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Audit Matrix
+## Withheld Elements
 
-The audit must witness:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- creation of the canonical `Held Interior Engram Object`
-- lawful held-state vocabulary
-- continuity linkage at rest
-- contradiction and posture binding
-- refusal to over-ascent into promotion, activation, or `Sanctuary.MoS`
+## Access Rule
 
-## Failure Conditions
-
-The following must fail this cluster:
-
-- any second competing canonical rest object
-- any missing witness chain on an admitted resting object
-- any treatment of persisted state as promoted state
-- any use of resting persistence to imply `Sanctuary.MoS` storage-seat
-  standing
-- any use of resting persistence to imply `Sanctuary.cMoS` storage-seat
-  standing
-- any runtime, service, or promotion implication
-
-## Witness Outputs
-
-The witness outputs for this audit are:
-
-- rest-object witness
-- held-state witness
-- continuity-at-rest witness
-- contradiction/posture binding witness
-- non-promotion witness
-- non-`MoS` witness
-- non-`cMoS` witness
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- promotion
-- engram minting
-- runtime activation
-- service authorization
-- `Sanctuary.MoS` storage-seat standing
-- `Sanctuary.cMoS` storage-seat standing
-
-## Working Summary
-
-`Sanctuary.GEL` now has a first audited rest-state and persistence cluster.
-
-That cluster keeps persistence inside `GEL`, fixes one canonical resting
-object, and refuses over-ascent into storage-seat, promotion, or runtime
-standing.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

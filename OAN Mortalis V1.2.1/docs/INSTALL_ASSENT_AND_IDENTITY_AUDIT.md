@@ -1,64 +1,30 @@
-# INSTALL_ASSENT_AND_IDENTITY_AUDIT
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note audits the first install-assent and identity-footing cluster in
-`V1.2.1`.
+## Public Abstract
 
-It exists so localized install footing, predicate formation, identity
-derivation, and `CME`-use posture are witnessed together under one bounded
-read.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-Install assent may be formed, witnessed, and held without becoming runtime
-life, service activation, or Atlas mutation.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Audit Matrix
+## Withheld Elements
 
-This audit must witness:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- one passive `InstallAgreementActionSurface`
-- six-lane `AgreementPredicateBundle` formation
-- acknowledgement versus assent distinction
-- absence of `InstallIdentitySetCandidate` before full assent
-- first `CoreCmeUsePostureRecord` with `research-attached-default`
-- contract-view derivation without canonical install-identity ownership
+## Access Rule
 
-## Failure Conditions
-
-The cluster fails if any of the following are true:
-
-- any install identity exists before full assent
-- any acknowledgement is treated as assent
-- any template presence without adoption or assent is treated as binding
-- any contract view is treated as the canonical install identity owner
-- any live hosted service standing is implied
-- any Atlas mutation standing is implied
-- any `Sanctuary.MoS` handoff standing is implied
-
-## Witness Outputs
-
-The current witness outputs are:
-
-- localized choice matrix admitted as input
-- agreement predicate bundle emitted as semantic product
-- identity set candidate emitted only after full assent
-- `CoreCmeUsePostureRecord` emitted in all cases
-
-## Explicit Non-Grants
-
-This note does not authorize:
-
-- service activation
-- live assent routing automation
-- Atlas mutation
-- paid-access divergence
-- runtime identity authority
-
-## Working Summary
-
-The install-assent corridor now has one audit surface.
-
-It proves that assent, identity, and `CME`-use posture remain bounded,
-localized, and non-executive in this phase.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

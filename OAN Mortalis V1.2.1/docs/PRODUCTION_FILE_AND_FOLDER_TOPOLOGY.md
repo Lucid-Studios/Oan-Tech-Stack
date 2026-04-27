@@ -1,89 +1,30 @@
-# PRODUCTION_FILE_AND_FOLDER_TOPOLOGY
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note fixes the production-facing file and folder flow for
-`OAN Mortalis V1.2.1`.
+## Public Abstract
 
-It also corrects the umbrella family at the beginning of the new line so the
-production form does not inherit a naming claim that belongs to a later tool.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Core Rule
+## Safe Release Claim
 
-For `V1.2.1`:
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-- `San.*` is the umbrella stack composition and stack-level contract family
-- `Sanctuary` is the parent container in the architectural sense
-- `OAN.*` is reserved for the future `OAN` tool and must not be used early as
-  the umbrella family of the line
+## Withheld Elements
 
-In compact form:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-> Sanctuary is the parent container.  
-> `San.*` is the umbrella family of the line.  
-> `OAN.*` is reserved for the later tool.
+## Access Rule
 
-## Production Target Topology
-
-The target production topology for `V1.2.1` is:
-
-```text
-<LineRoot>/
-  .audit/
-  build/
-  docs/
-  src/
-    San/
-      San.Common/
-      San.FirstRun/
-      San.HostedLlm/
-      San.Nexus.Control/
-      San.PrimeCryptic.Services/
-      San.Runtime.Headless/
-      San.Runtime.Materialization/
-      San.State.Modulation/
-      San.Trace.Persistence/
-    SLI/
-      SLI.Engine/
-      SLI.Ingestion/
-      SLI.Lisp/
-    TechStack/
-      AgentiCore/
-        AgentiCore/
-      CradleTek/
-        CradleTek.Custody/
-        CradleTek.Host/
-        CradleTek.Mantle/
-        CradleTek.Memory/
-        CradleTek.Runtime/
-      GEL/
-        GEL.Contracts/
-      SoulFrame/
-        SoulFrame.Bootstrap/
-        SoulFrame.Membrane/
-  tests/
-    Sanctuary/
-  tools/
-```
-
-## Migration Read
-
-This means the first family correction for the new line is:
-
-- `src/Sanctuary/Oan.* -> src/San/`
-- `namespace Oan.* -> namespace San.*`
-
-while:
-
-- `SLI.*`, `CradleTek.*`, `SoulFrame.*`, `AgentiCore.*`, and `GEL.*` keep
-  their family truth
-- `OAN.*` remains withheld until the actual `OAN` tool exists
-
-## Immediate Consequence
-
-When the first real source-family carry forward begins in `V1.2.1`:
-
-- do not create new `Oan.*` projects
-- create `San.*` stack-level projects instead
-- treat the older `Oan.*` family as historical carry-forward debt from
-  `V1.1.1`, not as the naming truth of the new line
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

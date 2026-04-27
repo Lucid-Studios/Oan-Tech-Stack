@@ -1,74 +1,30 @@
-# PRIME SUPERVISION AND CRYPTIC WORK BINDING LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the bounded Prime/Cryptic binding that must remain visible
-during any future RTME service lift.
+## Public Abstract
 
-It exists to keep supervisory witness, working preparation, and service motion
-from collapsing into one another.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> Prime witnesses and supervises. Cryptic carries the working side.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-> cryptic work is not runtime autonomy.
+## Withheld Elements
 
-> supervisory witness is not service authorization.
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-## Binding Office
+## Access Rule
 
-During any future hosted service-lift corridor:
-
-- Prime remains the supervisory witness side
-- Cryptic remains the bounded working side
-- supervision may witness and constrain motion
-- work may prepare and carry lawful hosted binding material
-
-Neither side may self-authorize hosted motion by nearby presence alone.
-
-The bounded passive binding record for this read now lives in:
-
-- `PrimeCrypticLiftBindingRecord`
-
-## Non-Collapse Rule
-
-The following collapses remain unlawful:
-
-- supervision into control chatter
-- work into runtime autonomy
-- lift witness into service authorization
-- Prime/Cryptic braid into governing `CME` placement
-
-This slice therefore keeps the braid:
-
-- non-governing
-- non-`CME`-placing
-- below active hosted motion
-
-## Existing Seam Dependence
-
-Use this note with:
-
-- `MOTHER_FATHER_PRIME_CRYPTIC_BRAID_POSTURE.md`
-- `SANCTUARY_LISP_RTME_SERVICE_LAW.md`
-- `SLI_ENGINE_LISP_BINDING_CONTRACT.md`
-
-This note clarifies bounded lift-time binding only.
-It does not replace the existing supervisory braid posture.
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- service authorization
-- runtime autonomy
-- Atlas mutation
-- governing `CME` placement
-- active governing `CME` standing
-
-## Working Summary
-
-`V1.2.1` now fixes the Prime/Cryptic lift-time binding as supervisory witness
-plus bounded work, without collapsing either side into hosted authority or
-governing life.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

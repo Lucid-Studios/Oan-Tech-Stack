@@ -1,79 +1,30 @@
-# GEL_CONTINUITY_AND_RESTING_LINKAGE_LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines continuity at rest for `Sanctuary.GEL`.
+## Public Abstract
 
-It exists to keep ancestry, witness, contradiction, posture, and later
-possible synthesis linked across time without implying promotion or motion.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> continuity at rest is lawful persistence shape, not motion.
->
-> continuity links may point toward later master eligibility without
-> authorizing ascent.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Continuity Office
+## Withheld Elements
 
-Continuity at rest means:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- ancestry persists
-- witness persists
-- posture persists
-- linkage persists
+## Access Rule
 
-without implying:
-
-- promotion
-- runtime transition
-- `Sanctuary.MoS` standing
-
-## Resting Linkage Classes
-
-The admitted `link_class` values in this phase are:
-
-- `ancestral`
-- `derivational`
-- `posture-carrying`
-- `contradiction-carrying`
-- `rest-update`
-- `later-master-eligible`
-
-## Canonical Fields
-
-Every continuity linkage should carry at minimum:
-
-- `continuity_id`
-- `source_object_ref`
-- `target_object_ref`
-- `link_class`
-- `link_reason`
-- `witness_refs[]`
-- `continuity_state`
-
-## Refusal Rules
-
-The following must force refusal, hold, or non-linkage:
-
-- ancestry without witness
-- continuity presented as motion
-- later-master eligibility presented as actual ascent
-- linkage used to imply promotion or storage-seat standing
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- motion
-- promotion
-- activation
-- `Sanctuary.MoS` admission
-- master standing by linkage alone
-
-## Working Summary
-
-`Sanctuary.GEL` now has a first lawful continuity-and-resting-linkage law.
-
-That law keeps the resting object continuity-bearing without letting
-continuity impersonate motion or ascent.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

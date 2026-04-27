@@ -1,71 +1,30 @@
-# CRYPTIC HOSTED BINDING LIFT RECEIPT LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the receipt proving any future hosted binding lift for the
-Prime/Cryptic corridor.
+## Public Abstract
 
-It exists so hosted motion, if later admitted, is proven by explicit receipt
-rather than inferred from posture, code presence, or residency.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> receipt proves transition posture, not governing identity.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-> service lift is not governing `CME` placement.
+## Withheld Elements
 
-> receipt does not replace the prior requirement for lawful authority.
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-## Receipt Office
+## Access Rule
 
-Any future hosted binding lift must witness:
-
-- pre-lift posture
-- authority surface invoked
-- Prime/Cryptic supervision binding attached
-- resulting hosted posture
-- explicit continuation of `CmePlacementWithheld`
-
-The bounded passive hosted receipt for this read now lives in:
-
-- `HostedRtmeServiceLiftReceipt`
-
-## Receipt Chain
-
-The later receipt chain must remain legible across:
-
-- `RtmeServiceLiftPreconditionSnapshot`
-- `RtmeServiceLiftAuthorityRecord`
-- `PrimeCrypticLiftBindingRecord`
-- `HostedRtmeServiceLiftReceipt`
-
-No single receipt may silently erase the others.
-The chain must remain composite and explicit.
-
-## Shell Witness Boundary
-
-The present `SanctuaryID.RTME` shell may witness hosted lift receipts without
-becoming a live runtime body.
-
-Receipt standing therefore remains:
-
-- witnessed
-- receipted
-- non-realizing
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- live hosted activation
-- runtime autonomy
-- Atlas mutation
-- governing `CME` placement
-- active governing `CME` standing
-
-## Working Summary
-
-`V1.2.1` now fixes the proof burden for any future hosted service lift.
-
-The receipt chain may prove a hosted posture transition later, while still
-carrying forward explicit `CmePlacementWithheld` continuation in this phase.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

@@ -1,84 +1,30 @@
-# SANCTUARY GEL CGEL MOS GOVERNANCE STACK MAP
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the near-term future-stack order for Sanctuary-side
-governance formation in `V1.2.1`.
+## Public Abstract
 
-It exists to name later stack order without implying active standing now.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> `Sanctuary.cGEL` is the cryptic build chamber.
-> `Sanctuary.MoS` is the legal data store / local governmental contract seat.
-> `Sanctuary.cMoS` is the derivational private/cryptic companion to that seat.
-> `TriviumForum` is later UI/UX, not current governance-root standing.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Current-vs-Later Rule
+## Withheld Elements
 
-This note is a stack map, not an active-standing claim.
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-It may name later service-family order.
-It may not rewrite current live doctrine that still holds Mother/Father as
-pre-body supervisory posture.
+## Access Rule
 
-## Stack Order
-
-The near-term future-stack order is:
-
-- `Install`
-- templating to `Sanctuary.GEL`
-- building to `Sanctuary.cGEL` (`SLI`, Prime/Cryptic braid,
-  `SanctuaryID.GoA` binding)
-- `Sanctuary.MoS`
-- `Sanctuary.cMoS`
-- `Sanctuary.PrimeGovernance` (`Mother`)
-- `Sanctuary.CrypticGovernance` (`Father`)
-- UI/UX: `TriviumForum`
-
-`Sanctuary.MoS` is the legal data store / local governmental contract seat.
-`Sanctuary.cMoS` is its derivational private/cryptic companion surface.
-
-`OE` and `SelfGEL` may stand in `Sanctuary.MoS` structurally before specific
-operator bounds.
-`cOE` and `cSelfGEL` may surface in `Sanctuary.cMoS` derivationally rather
-than as a second sovereign origin.
-
-Each later Prime/Cryptic governance layer carries its own `cGoA` braid and
-later `SoulFrame` / `AgentiCore` build-out.
-
-## Downstream Trivium Deferral
-
-`TriviumForum` is later and is not part of the current governance-root
-implementation.
-
-The standing-class taxonomy:
-
-- `personal`
-- `industrial`
-- `commercial`
-- `private`
-- `governmental`
-- `special cases`
-
-belongs first to later Trivium onboarding/HITL selection, not current GoA
-receipt law.
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- active governing `CME` standing
-- service authorization
-- CradleTek spawn
-- pre-Cradle authorization
-- Steward governance
-- present `TriviumForum` standing
-- admission of Trivium taxonomy into current governance receipts
-
-## Working Summary
-
-The Sanctuary-side future stack is now named as a later order from install,
-through `Sanctuary.GEL`, `Sanctuary.cGEL`, and `Sanctuary.MoS`, into later
-Prime/Cryptic governance layers and eventual `TriviumForum`.
-That map names later family order without overstating current implementation.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

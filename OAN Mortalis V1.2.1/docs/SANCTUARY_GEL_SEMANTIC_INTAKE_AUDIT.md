@@ -1,86 +1,30 @@
-# SANCTUARY_GEL_SEMANTIC_INTAKE_AUDIT
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note audits the first `Sanctuary.GEL` semantic intake cluster in
-`V1.2.1`.
+## Public Abstract
 
-It exists to prove that pre-Lisp and pre-code intake is lawfully stratified
-before later symbolic metabolism or code carriage is trusted.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> Sanctuary.GEL intake must preserve truth under omission, corruption, and
-> attack before any later symbolic or cryptic layer is allowed to trust it.
->
-> what enters `Sanctuary.GEL` may become witnessed and engram-ready; it may not
-> become promoted, minted, or active merely by being intelligible.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Audit Matrix
+## Withheld Elements
 
-The first intake cluster must prove all of the following:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- verbatim ingress is preserved before interpretation
-- symbol classification occurs before reduction
-- `RootAtlas` mapping remains witnessed root ancestry rather than local master
-  knowledge
-- predicate formation remains candidate-bearing rather than closure-bearing
-- `IUTT` remains a lawful interval rather than runtime obligation
-- membrane landing classifies transformed intake before engram-bearing encoding
-- only `retained-as-witness`, `retained-as-provisional-meaning`, and
-  `retained-as-engram-ready` are emitted in this phase
+## Access Rule
 
-## Big-Three Burdens
-
-The intake cluster must also prove that it can govern:
-
-- absence and negative evidence without hallucinating meaning from lack
-- malformation and misspelling without silent correction
-- direct attack without granting standing by parseability alone
-
-## Failure Conditions
-
-The intake cluster fails audit if any of the following occur:
-
-- symbol or token reduced before classification
-- unresolved Atlas mapping promoted as if resolved
-- predicate candidate gains closure without witness
-- `IUTT` interval used without continuity or interval witness
-- membrane landing bypassed before engram-bearing encoding
-- proposition, procedure, or runtime standing implied from intake law
-- absence treated as meaning without structural expectation
-- malformed input silently corrected
-- attack-shaped ingress gains standing by parseability alone
-- any implication of predicate promotion, engram minting, or activation
-
-## Witness Outputs
-
-The audit witness for this phase should preserve at minimum:
-
-- ingress witness
-- symbol witness
-- root mapping witness
-- candidate formation witness
-- `IUTT` interval witness
-- landing disposition
-- retention class
-- refusal reason where applicable
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- active symbolic metabolism
-- live code trust
-- predicate promotion
-- engram minting
-- runtime activation
-- active governing life
-
-## Working Summary
-
-`V1.2.1` now has a first audit for `Sanctuary.GEL` semantic intake.
-
-That audit proves the intake chain can preserve origin, ambiguity, refusal,
-and engram-ready preparation without pretending that preparation is already
-promotion, minting, or action.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

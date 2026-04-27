@@ -1,107 +1,30 @@
-# INGRESS_MEMBRANE_AND_ENGRAM_ENCODING_LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the membrane landing and engram-bearing encoding law for
-`Sanctuary.GEL` intake.
+## Public Abstract
 
-It exists to govern the point where transformed candidate structure is
-classified, retained, and only then encoded for later cryptic use.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> hostile input may be preserved and classified, but it may not gain standing
-> by merely being parseable.
->
-> engram-bearing encoding follows admissibility landing; it does not precede
-> it.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Membrane Landing Office
+## Withheld Elements
 
-Every transformed intake candidate must land on a bounded membrane that can
-classify it as:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- `admitted`
-- `provisional`
-- `refused`
-- `hold`
+## Access Rule
 
-This membrane may classify and retain structure.
-It may not infer promoted predicate authority, engram minting, or runtime
-activation from fluency alone.
-
-## Required Landing Fields
-
-Every landing record should carry at minimum:
-
-- `origin`
-- `intendedScope`
-- `burdenClass`
-- `admissibilityClass`
-- `witnessRequirement`
-- `continuityRelation`
-- `requestedNextActionClass`
-- `landingDisposition`
-
-## Engram-Bearing Encoding Rule
-
-Only after membrane landing may intake be encoded into engram-bearing form.
-
-The only lawful retained outputs in this phase are:
-
-- `retained-as-witness`
-- `retained-as-provisional-meaning`
-- `retained-as-engram-ready`
-
-`retained-as-engram-ready` means:
-
-- witnessed enough for later cryptic use
-- still non-runtime
-- still non-minted
-- still non-promoted
-
-## Malformation And Attack Discipline
-
-The membrane must be able to distinguish at minimum:
-
-- malformed input
-- misspelling or corrupted form
-- unresolved ambiguity
-- homoglyph or substitution pressure
-- contradiction flooding
-- stuffing or overloading
-- direct promotion pressure
-
-These may be preserved and receipted.
-They may not gain standing merely because they passed a parser.
-
-## Refusal Law
-
-The following must force refusal, hold, or non-promotion:
-
-- symbol reduction before classification
-- unresolved Atlas ambiguity advanced as admitted meaning
-- predicate candidate promoted without witness
-- malformed input silently corrected
-- attack-shaped ingress granted standing by parseability
-- any attempt to move from intake directly into predicate promotion, engram
-  minting, or runtime consequence
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- predicate promotion
-- engram minting
-- procedure execution
-- service authorization
-- active governing `CME` standing
-- runtime activation
-
-## Working Summary
-
-`Sanctuary.GEL` intake now has a lawful membrane landing and engram-bearing
-encoding office.
-
-That office keeps admissibility, refusal, and cryptic preparation distinct
-from promotion, minting, and activation.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

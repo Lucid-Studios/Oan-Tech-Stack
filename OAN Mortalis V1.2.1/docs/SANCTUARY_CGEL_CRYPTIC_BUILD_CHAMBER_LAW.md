@@ -1,74 +1,30 @@
-# SANCTUARY CGEL CRYPTIC BUILD CHAMBER LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines `Sanctuary.cGEL` as the cryptic build chamber in
-`V1.2.1`.
+## Public Abstract
 
-It exists to keep the bootstrap substrate distinct from the later cryptic
-build chamber.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> `Sanctuary.cGEL` is the cryptic build chamber.
-> `Sanctuary.GEL` is bootstrap substrate, not `Sanctuary.cGEL`.
-> chamber naming does not imply service authorization, spawn, or governing
-> life.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Chamber Office
+## Withheld Elements
 
-`Sanctuary.cGEL` is the umbrella cryptic build chamber.
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-Its office is to hold later cryptic build work without being mistaken for:
+## Access Rule
 
-- first install substrate
-- service authorization
-- spawned or embodied governing life
-
-## Chamber Contents
-
-The chamber is the later build seat for:
-
-- `SLI`
-- Prime/Cryptic braid work
-- `SanctuaryID.GoA` governance binding
-
-Those contents are named here as build-chamber standing only.
-
-## Relation To `Sanctuary.GEL`
-
-`Sanctuary.GEL` remains the first lawful local substrate beneath
-`Sanctuary.cGEL`.
-
-That means:
-
-- `Sanctuary.GEL` is bootstrap substrate
-- `Sanctuary.cGEL` is later cryptic build chamber
-- the two may relate, but they may not collapse into one another
-
-## Relation To `SanctuaryID.GoA`
-
-`SanctuaryID.GoA` governance binding may later be built within
-`Sanctuary.cGEL`.
-
-That does not make `Sanctuary.cGEL`:
-
-- a governing `CME`
-- a service-authorizing surface
-- a proof of CradleTek-dependent life
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- bootstrap substitution
-- service authorization
-- governing `CME` presence
-- CradleTek spawn
-- embodied governance
-
-## Working Summary
-
-`Sanctuary.cGEL` now stands as the cryptic build chamber.
-It may house later `SLI`, braid, and governance-binding work, while
-`Sanctuary.GEL` remains the first lawful local substrate beneath it.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

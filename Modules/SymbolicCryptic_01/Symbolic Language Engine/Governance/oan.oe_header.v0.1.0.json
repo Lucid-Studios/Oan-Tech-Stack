@@ -1,97 +1,17 @@
 ﻿{
-  "schema": "oan.oe_header.v0.1.0",
-  "session_id": "sanctuary-seed-session-001",
-  "policy_version": "v0.1.0",
-  "prime_commit_hash": "sha256:prime_commit_placeholder",
-  "cryptic_commit_hash": "sha256:cryptic_commit_placeholder",
-  "chain_head_hash": "sha256:bonding_chain_head_placeholder",
-  "operator_profile_ref": {
-    "store": "selfgel",
-    "locator": "Governance/oan.operator_selection_manifest.v0.1.0.json",
-    "sha256": "sha256:operator_manifest_placeholder",
-    "schema": "oan.operator_selection_manifest.v0.1.0",
-    "access_tier": "prime"
-  },
-  "operator_identity_record_ref": {
-    "store": "selfgel",
-    "locator": "Governance/oan.operator_identity_record.v0.1.0.json",
-    "sha256": "sha256:operator_identity_placeholder",
-    "schema": "oan.operator_identity_record.v0.1.0",
-    "access_tier": "prime"
-  },
-  "operator_bonding_set_ref": {
-    "store": "selfgel",
-    "locator": "Governance/oan.operator_bonding_set.v0.1.0.json",
-    "sha256": "sha256:operator_bonding_set_placeholder",
-    "schema": "oan.operator_bonding_set.v0.1.0",
-    "access_tier": "prime"
-  },
-  "founding_event_ref": {
-    "store": "selfgel",
-    "locator": "Governance/oan.sanctuary_founding_event.v0.1.0.json",
-    "sha256": "sha256:founding_event_placeholder",
-    "schema": "oan.sanctuary_founding_event.v0.1.0",
-    "access_tier": "prime"
-  },
-  "continuous_use_reentry_ref": {
-    "store": "selfgel",
-    "locator": "Governance/oan.continuous_use_reentry.v0.1.0.json",
-    "sha256": "sha256:reentry_policy_placeholder",
-    "schema": "oan.continuous_use_reentry.v0.1.0",
-    "access_tier": "prime"
-  },
-  "activation_selectors": {
-    "active_career_id": "career.steward",
-    "active_job_id": "job.sanctuary_watch",
-    "enabled_trades": [
-      "trade.audit",
-      "trade.telemetry",
-      "trade.security_sentinel"
-    ],
-    "capability_lease_profile": "lease_profile.seed_default",
-    "policy_profile": "policy.prime_pointer_only",
-    "domain_sheaf_packages": [
-      "medicine.cardiology",
-      "medicine.pharmacology",
-      "physics.mechanics"
-    ],
-    "attached_repo_classes": [
-      "internal",
-      "verified_external"
-    ],
-    "unsigned_repo_count": 0
-  },
-  "exposure_policy": {
-    "prime_mode": "pointer_only_cryptic",
-    "cryptic_payload_in_prime_forbidden": true
-  },
-  "seal_admission": {
-    "seal_present": true,
-    "seal_id": "sanctuary-dev-seal-001"
-  },
-  "prime_refs": [
-    {
-      "store": "selfgel",
-      "locator": "profiles/prime_summary/session_001.json",
-      "sha256": "sha256:prime_ref_placeholder",
-      "schema": "gel.sheaf.v0.2.0",
-      "access_tier": "prime"
-    }
-  ],
-  "cryptic_refs": [
-    {
-      "store": "cselfgel",
-      "locator": "sealed/session_001/cryptic_trace.cid",
-      "sha256": "sha256:cryptic_ref_placeholder",
-      "schema": "sli.cryptic.trace.v0.1.0",
-      "access_tier": "cryptic"
-    }
-  ],
-  "cert_registry_ref": {
-    "store": "cert_registry",
-    "locator": "tsa/capabilities/steward_profile_001.json",
-    "sha256": "sha256:tsa_ref_placeholder",
-    "schema": "tsa.capability.registry.v0.1.0",
-    "access_tier": "prime"
-  }
+    "release_posture":  "controlled_academic_abstract",
+    "status":  "public_repo_redaction_applied_2026_04_26",
+    "original_path":  "Modules/SymbolicCryptic_01/Symbolic Language Engine/Governance/oan.oe_header.v0.1.0.json",
+    "risk_class":  "reconstruction_enabling_detail_withheld",
+    "public_abstract":  "This tracked artifact is retained as a provenance marker. The original body has been withheld from the public repository because it contained sensitive architecture, corpus, fixture, model, environment, or implementation detail.",
+    "safe_release_claim":  "The public record may acknowledge governance and review posture without publishing instructions, schemas, payloads, private topology, or reproducible operating sequences.",
+    "withheld_elements":  [
+                              "implementation_recipe",
+                              "private_topology",
+                              "corpus_lineage",
+                              "fixture_payload",
+                              "model_or_environment_specifics",
+                              "operational_sequence"
+                          ],
+    "access_rule":  "private_release_review_required_before_republication"
 }
