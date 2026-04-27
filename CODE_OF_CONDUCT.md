@@ -2,62 +2,56 @@
 
 ## Purpose
 
-This repository is maintained as a professional engineering workspace for `Oan-Tech-Stack`.
+This repository is maintained as a public documentation and disclosure-boundary
+surface for OAN technology.
 
 Participation is expected to remain:
 
-- respectful
-- technically grounded
-- focused on the work
-- safe for contributors and maintainers
+- respectful;
+- technically grounded;
+- focused on public documentation scope;
+- safe for contributors and maintainers.
 
 ## Expected Behavior
 
 Contributors should:
 
-- discuss technical issues in clear and factual terms
-- challenge ideas without attacking people
-- keep issue and PR discussion tied to repository scope
-- respect repository hygiene rules, security boundaries, and private corpus protections
-- avoid posting sensitive local paths, credentials, or private data
+- discuss public wording in clear and factual terms;
+- challenge ideas without attacking people;
+- keep issue and PR discussion tied to documentation scope;
+- respect security boundaries and private review channels;
+- avoid posting sensitive paths, credentials, logs, private data, or
+  implementation detail.
 
 ## Unacceptable Behavior
 
 The following are not acceptable:
 
-- harassment or personal attacks
-- abusive, discriminatory, or threatening behavior
-- deliberate disclosure of private or sensitive material
-- spamming issues or pull requests outside repository scope
-- intentionally bypassing build, hygiene, or governance controls
+- harassment or personal attacks;
+- abusive, discriminatory, or threatening behavior;
+- deliberate disclosure of private or sensitive material;
+- spamming issues or pull requests outside repository scope;
+- attempts to use public channels to reconstruct private implementation
+  material.
 
 ## Enforcement
 
-Repository maintainers may edit, lock, close, or remove content that violates this standard.
+Repository maintainers may edit, lock, close, or remove content that violates
+this standard.
 
 Repeated or serious violations may result in loss of repository participation.
 
-## Scope
-
-This code of conduct applies to:
-
-- issues
-- pull requests
-- code review discussion
-- repository documentation discussion
-
 ## Reporting
 
-If the issue is technical, use the repository issue tracker.
+If the issue is documentation-related, use the repository issue tracker.
 
-If the issue is sensitive or security-related, follow `SECURITY.md`.
+If the issue is sensitive or security-related, follow [SECURITY.md](SECURITY.md).
 
-If the issue is sensitive conduct or participation behavior that should not be
-handled in public, contact:
+For sensitive conduct or participation behavior that should not be handled in
+public, contact:
 
 - `legal@lucidtechnologies.tech`
 
-If the issue is about repository administration rather than legal or conduct
-review, contact:
+For repository administration, contact:
 
 - `admin@lucidtechnologies.tech`

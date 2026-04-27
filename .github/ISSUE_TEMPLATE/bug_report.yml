@@ -1,106 +1,32 @@
-name: Bug report
-description: Report a defect in the active OAN Tech Stack build or workflow surface.
-title: "[Bug]: "
+name: Public documentation correction
+description: Report an error in the public descriptive materials.
+title: "[Docs]: "
 labels:
-  - bug
+  - documentation
 body:
   - type: textarea
     id: summary
     attributes:
       label: Summary
-      description: Describe the defect and its user-visible impact.
-      placeholder: Build/test/runtime behavior is incorrect because...
+      description: What public wording appears incorrect, unclear, or unsafe?
     validations:
       required: true
   - type: textarea
-    id: environment
+    id: location
     attributes:
-      label: Environment
-      description: Include branch, SDK version, OS, and any relevant runtime context.
-      placeholder: |
-        Branch:
-        SDK:
-        OS:
-        Runtime root:
+      label: Location
+      description: Link to the public page or file section. Do not paste sensitive excerpts.
     validations:
       required: true
   - type: textarea
-    id: steps
+    id: suggested_change
     attributes:
-      label: Reproduction steps
-      description: Provide the exact commands or actions needed to reproduce the issue.
-      placeholder: |
-        1. Run...
-        2. Open...
-        3. Observe...
-    validations:
-      required: true
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected behavior
-    validations:
-      required: true
-  - type: textarea
-    id: actual
-    attributes:
-      label: Actual behavior
-    validations:
-      required: true
-  - type: textarea
-    id: evidence
-    attributes:
-      label: Logs and evidence
-      description: Paste only sanitized logs. Do not include private corpus paths or local absolute paths outside the repo root.
-  - type: dropdown
-    id: layer
-    attributes:
-      label: Affected architecture layer
-      description: Choose the layer that best matches the observed defect. This is a reporter hypothesis, not an admission decision.
-      options:
-        - Sanctuary
-        - CradleTek
-        - SoulFrame
-        - AgentiCore
-        - SLI Engine
-        - GEL
-        - Hosted LLM
-        - Public Boundary
-        - Infrastructure
-        - Crosscutting
-        - Unknown
-    validations:
-      required: true
-  - type: dropdown
-    id: stratum
-    attributes:
-      label: Affected stratum or boundary type
-      description: Pick the broad stratum that appears affected.
-      options:
-        - Constitutional or governance
-        - Infrastructure or verification
-        - Runtime or executable behavior
-        - Documentation or doctrine
-        - Public boundary
-        - Other bounded stratum
-        - Unknown
-    validations:
-      required: true
-  - type: textarea
-    id: non_claims
-    attributes:
-      label: Non-claims and boundary risk
-      description: State whether this report could be mistaken for standing, governance, authority, readiness, or completion. If so, state what it does not claim.
-      placeholder: |
-        This report does not claim CME standing, installer completion, production readiness, custody, governance authority, legal authority, or certainty beyond evidence.
-    validations:
-      required: true
+      label: Suggested correction
+      description: Propose safer public wording if you have it.
   - type: checkboxes
     id: hygiene
     attributes:
       label: Public intake hygiene
       options:
-        - label: I have not included private corpus paths, credentials, tokens, hosted seed LLM payloads, private runtime payloads, or sensitive legal, identity, custody, or operator material.
-          required: true
-        - label: I understand Template completion is not admission, authority, readiness, or completion.
+        - label: I have not included private corpus paths, credentials, tokens, logs, local absolute paths, model payloads, runtime payloads, or sensitive identity, custody, operator, or implementation material.
           required: true

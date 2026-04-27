@@ -1,0 +1,49 @@
+name: Public Surface Check
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-surface:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Reject implementation-bearing public surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          forbidden_paths='(^|/)(src|tests|tools|datasets|Modules|Build Contracts|runtime|\.audit)(/|$)|(^|/)OAN Mortalis V[0-9]'
+          forbidden_files='(^|/)(build|test)\.ps1$|(^|/)global\.json$|\.(cs|csproj|sln|ps1|lisp|jsonl|xlsx|zip)$'
+
+          path_hits="$(git ls-files | grep -E "$forbidden_paths|$forbidden_files" || true)"
+          if [[ -n "$path_hits" ]]; then
+            echo "Implementation-bearing files are not allowed in the public descriptive repository:"
+            echo "$path_hits"
+            exit 1
+          fi
+
+      - name: Reject private or reconstruction-oriented terms
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          term_hits="$(git grep -n -I -E 'ChatGPT Archive|Lab Context|D:\\|C:\\Users\\Rober|Qwen|RTME|SLI\.Lisp|RootAtlas|RootIndex|SymbolicIndex|SanctuaryID' -- . ':!.github/workflows/public-surface-check.yml' || true)"
+          if [[ -n "$term_hits" ]]; then
+            echo "Public tree contains terms reserved for private review:"
+            echo "$term_hits"
+            exit 1
+          fi

@@ -2,32 +2,20 @@
 
 ## Use The Right Channel
 
-For normal repository work:
+For public documentation clarity:
 
-- open a bug report for defects
-- open a feature request for planned improvements
+- open a public documentation correction;
+- open a public explanation request.
 
-For contribution expectations:
+For security-sensitive or reconstruction-sensitive disclosures, do not use the
+public issue tracker. Follow [SECURITY.md](SECURITY.md).
 
-- see `CONTRIBUTING.md`
+## Repository Scope
 
-For workspace/build rules:
+This repository is documentation-only. It does not provide build support,
+runtime support, deployment support, model configuration support, or private
+implementation assistance.
 
-- see `Build Contracts/Crosscutting/WORKSPACE_RULES.md`
-- see `OAN Mortalis V1.1.1/docs/BUILD_READINESS.md`
+## Maintainer Contact
 
-## Before Opening A Support Request
-
-Verify locally:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\build.ps1 -Configuration Release
-powershell -ExecutionPolicy Bypass -File .\test.ps1 -Configuration Release
-powershell -ExecutionPolicy Bypass -File .\OAN Mortalis V1.1.1\tools\verify-private-corpus.ps1
-```
-
-## Security Issues
-
-Do not use public support or issue channels for security-sensitive disclosures.
-
-Follow `SECURITY.md`.
+- `admin@lucidtechnologies.tech`

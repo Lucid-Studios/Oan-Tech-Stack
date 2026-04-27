@@ -1,4 +1,0 @@
-Solution: Oan.sln
-Expected build command: .\build.ps1 -Configuration Release
-Notice: This is the V1.1.1 sibling build line. Use the line-local build and test wrappers until promotion.
-Rules: See docs/WORKSPACE_RULES.md

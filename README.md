@@ -1,30 +1,42 @@
-﻿# Release-Controlled Placeholder
+# OAN Tech Stack
 
-Release posture: controlled academic abstract
-Status: public repo redaction applied 2026-04-26
-Original path: $f
-Risk class: reconstruction-enabling detail withheld
+This repository is the public description surface for OAN technology.
 
-## Public Abstract
+It is intentionally not a build repository. It does not publish source code,
+internal architecture contracts, private datasets, corpus material, release
+automation, test fixtures, model-specific operating detail, or deployment
+instructions.
 
-This tracked artifact is retained as a provenance marker. The original body has
-been withheld from the public repository because it contained sensitive
-architecture, corpus, fixture, model, environment, or implementation detail.
+## Public Scope
 
-## Safe Release Claim
+The public repository may describe:
 
-The public record may acknowledge governance and review posture without
-publishing instructions, schemas, payloads, private topology, or reproducible
-operating sequences.
+- high-level technology purpose;
+- safety, governance, and accountability principles;
+- public release boundaries;
+- non-executable examples of review language and disclosure posture;
+- contact paths for responsible coordination.
 
-## Withheld Elements
+The public repository must not provide:
 
-- Implementation recipes and build sequences.
-- Private topology, source lineage, and local-environment assumptions.
-- Corpus payloads, fixture structures, and test expectations.
-- Model- or environment-specific evaluation and operating detail.
+- implementation recipes or working source;
+- build, test, release, or deployment scripts;
+- internal topology, private vocabulary maps, or reproducible schemas;
+- private corpus lineage or local environment details;
+- model, operator, identity, custody, or runtime payload material.
 
-## Access Rule
+## Reading Path
 
-Detailed content remains in private custody and requires rights, safety,
-privacy, and dual-use release review before republication.
+- [Public Technology Overview](docs/PUBLIC_TECHNOLOGY_OVERVIEW.md)
+- [Public Release Boundary](docs/PUBLIC_RELEASE_BOUNDARY.md)
+- [Controlled Disclosure Model](docs/CONTROLLED_DISCLOSURE_MODEL.md)
+- [Example: Public Claim Patterns](examples/public-claim-patterns.md)
+- [Example: Review Gate Summary](examples/review-gate-summary.md)
+
+## Release Posture
+
+The public record is descriptive and review-oriented. Detailed build materials
+remain in private custody and require rights, privacy, safety, and dual-use
+review before any future excerpt is published.
+
+See [Release Control Redaction Notice](RELEASE_CONTROL_REDACTION_NOTICE.md).

@@ -2,46 +2,38 @@
 
 ## Purpose
 
-This document locks the minimum repository hardening rules required before live protected human or corporate intake may be introduced into the repository's test and runtime surfaces.
+This document defines the public repository hardening posture.
 
-## Immutable CI Sources
+## Public Surface Rule
 
-- Reusable GitHub workflows must be pinned to immutable refs such as reviewed commit SHAs or signed tags.
-- Moving refs such as `@main` must not be used for CI execution.
+The public repository must remain descriptive and non-executable. It should not
+contain implementation material, build recipes, datasets, fixtures, automation,
+runtime payloads, private topology, or local environment assumptions.
 
-## Live Hardened Surface
+## CI Sources
 
-The live hardened surface includes tracked files under:
+Reusable GitHub workflows should be pinned to reviewed immutable refs when used.
+Repository-local checks should enforce the public surface rule.
 
-- `.github/`
-- `Build Contracts/`
-- `docs/`
-- `Modules/`
-- `OAN Mortalis V1.1.1/`
-- top-level build, test, and security policy files
+## Intake Rule
 
-Rules:
+Public issues and pull requests must not include sensitive private material. If
+a disclosure requires technical detail that could help reconstruct the private
+build, route it to private maintainer review instead.
 
-- tracked files in the live hardened surface must not contain workstation-specific absolute filesystem paths
-- tracked files in the live hardened surface must not contain secrets, private corpus roots, or raw protected intake artifacts
-- placeholder/example files must remain obviously placeholder-only
+## Current Public Surface
 
-## Protected Intake Gate
+Allowed tracked surfaces:
 
-Live protected intake may not be introduced until:
+- `.github/` metadata and documentation checks;
+- `docs/` public overview and release boundary documents;
+- `examples/` non-executable examples;
+- top-level security, support, conduct, contribution, and release posture files.
 
-- reusable workflow refs are pinned to immutable refs
-- live-surface path hygiene is green
-- the private-corpus hygiene check is green
+Disallowed tracked surfaces:
 
-Private human and corporate intake must remain Cryptic-masked by default and must not be disclosed through tracked files, CI output, or harness logs without explicit lawful reveal policy.
-
-## Archive Boundary
-
-Historical `OAN Mortalis` archives are outside this repository and inert with respect to the active build.
-
-Rules:
-
-- archive content is excluded from live protected-intake surfaces
-- automation, CI, and LLM harnesses must not treat the archive as live runtime or admissible protected-intake source material unless explicitly requested
-- historical path artifacts may exist in external archives, but they do not satisfy live-surface hygiene standards and must not be imported into active surfaces
+- source code and project files;
+- build, test, release, deployment, or automation scripts;
+- datasets, fixtures, symbolic payloads, generated audit material, or runtime
+  artifacts;
+- internal architecture contracts and working ledgers.

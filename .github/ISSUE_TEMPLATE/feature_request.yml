@@ -1,84 +1,27 @@
-name: Feature request
-description: Propose a capability, subsystem improvement, or governance enhancement.
-title: "[Feature]: "
+name: Public explanation request
+description: Request a clearer public explanation or non-executable example.
+title: "[Public Explanation]: "
 labels:
-  - enhancement
+  - documentation
 body:
   - type: textarea
-    id: problem
+    id: question
     attributes:
-      label: Problem or opportunity
-      description: What gap does this feature address?
+      label: Public question
+      description: What should the public repository explain more clearly?
     validations:
       required: true
   - type: textarea
-    id: proposal
+    id: audience
     attributes:
-      label: Proposed change
-      description: Describe the proposed implementation at a high level.
-    validations:
-      required: true
-  - type: dropdown
-    id: layer
-    attributes:
-      label: Architecture layer
-      options:
-        - Sanctuary
-        - CradleTek
-        - SoulFrame
-        - AgentiCore
-        - SLI Engine
-        - GEL
-        - Hosted LLM
-        - Public Boundary
-        - Infrastructure
-        - Crosscutting
-    validations:
-      required: true
-  - type: dropdown
-    id: stratum
-    attributes:
-      label: Stratum or boundary type
-      description: Pick the broad stratum this request appears to touch.
-      options:
-        - Constitutional or governance
-        - Infrastructure or verification
-        - Runtime or executable behavior
-        - Documentation or doctrine
-        - Public boundary
-        - Other bounded stratum
-    validations:
-      required: true
+      label: Audience
+      description: Who is the explanation for?
+      placeholder: Researchers, partners, reviewers, users, maintainers...
   - type: textarea
-    id: impact
+    id: boundary
     attributes:
-      label: Expected impact
-      description: Describe build, runtime, governance, or developer workflow impact.
-    validations:
-      required: true
-  - type: textarea
-    id: constraints
-    attributes:
-      label: Constraints and contracts
-      description: Note any Build Contract, workspace, or governance constraints that apply.
-  - type: textarea
-    id: witnesses
-    attributes:
-      label: Expected witnesses or verification
-      description: Name the tests, audit witnesses, docs, ledgers, reproduction evidence, or verification commands that should support this request.
-      placeholder: |
-        Expected witnesses:
-        Verification:
-        Affected docs or ledgers:
-    validations:
-      required: true
-  - type: textarea
-    id: non_claims
-    attributes:
-      label: Non-claims and boundary risk
-      description: State what this request does not claim if it touches standing, governance, authority, readiness, completion, legal posture, or CME language.
-      placeholder: |
-        This request does not claim CME standing, installer completion, production readiness, custody, governance authority, legal authority, role enactment, or certainty beyond evidence.
+      label: Boundary concern
+      description: Note any detail that should stay private or non-executable.
     validations:
       required: true
   - type: checkboxes
@@ -86,7 +29,5 @@ body:
     attributes:
       label: Public intake hygiene
       options:
-        - label: I have not included private corpus paths, credentials, tokens, hosted seed LLM payloads, private runtime payloads, or sensitive legal, identity, custody, or operator material.
-          required: true
-        - label: I understand Template completion is not admission, authority, readiness, or completion.
+        - label: I am asking for public descriptive material only, not source code, build instructions, datasets, private architecture, or deployment detail.
           required: true
