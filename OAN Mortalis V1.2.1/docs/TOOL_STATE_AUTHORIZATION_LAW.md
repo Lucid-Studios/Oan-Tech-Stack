@@ -1,55 +1,30 @@
-# TOOL STATE AUTHORIZATION LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines site-bound and operator-bound tool-state authorization for
-pre-Cradle standing in `V1.2.1`.
+## Public Abstract
 
-It exists so local tool availability is not over-read into service authority,
-runtime autonomy, or governing action.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> tool-state authorization may support pre-Cradle standing, but it does not
-> authorize service activation, runtime autonomy, or governing action.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Authorization Office
+## Withheld Elements
 
-The bounded passive tool-state enum and record now live in:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- `ToolAuthorizationState`
-- `ToolStateAuthorizationRecord`
+## Access Rule
 
-Each tool-state authorization must preserve:
-
-- one tool surface name
-- one authorization state
-- one site-binding profile
-- one operator
-- one witness chain
-
-## Existing Seam Dependence
-
-Use this note together with:
-
-- `CRADLETEK_SITE_BINDING_PROFILE_LAW.md`
-- `SANCTUARY_INTENDED_SERVICE_REGISTER.md`
-- `PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md`
-
-Tool-state authorization may support site-bound standing while every intended
-service entry remains disabled.
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- service activation
-- runtime autonomy
-- governing `CME` placement
-- CradleTek authorization
-
-## Working Summary
-
-`V1.2.1` now fixes one passive tool-state authorization surface for later
-pre-Cradle standing without turning tools into autonomous or service-bearing
-authority.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

@@ -1,59 +1,30 @@
-# FINAL CME DISCLOSURE AGREEMENT LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the first final `CME` disclosure-assent bundle for
-pre-Cradle standing in `V1.2.1`.
+## Public Abstract
 
-It exists so disclosure remains an explicit assented bundle rather than a
-background notice or ambient click-through assumption.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> disclosure assent may support pre-Cradle standing, but it does not
-> authorize governing action.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Disclosure Bundle Office
+## Withheld Elements
 
-The bounded passive disclosure bundle now lives in:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- `FinalCmeDisclosureAgreementBundle`
+## Access Rule
 
-That bundle must preserve:
-
-- one site-binding profile
-- one operator
-- one disclosure-lineage set
-- one full-disclosure assent read
-- one witness chain
-
-## Distinctness Rule
-
-The final disclosure bundle remains distinct from the content-authority bundle.
-
-Disclosure assent is not inheritance scope.
-Disclosure assent is not creation-use scope.
-Disclosure assent does not replace role-valid content authority.
-
-## Existing Seam Dependence
-
-Use this note together with:
-
-- `CRADLETEK_SITE_BINDING_PROFILE_LAW.md`
-- `CME_IP_INHERITANCE_AND_CREATION_SCOPE_LAW.md`
-- `PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md`
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- governing `CME` placement
-- CradleTek authorization
-- runtime governing loops
-- operator realization
-
-## Working Summary
-
-`V1.2.1` now fixes one distinct final disclosure-assent bundle for pre-Cradle
-standing, while keeping disclosure separate from content authority,
-governance, and activation.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

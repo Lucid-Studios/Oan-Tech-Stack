@@ -1,42 +1,17 @@
-{
-  "dataset_id": "hosted-llm-resident-seating-pilot-v1",
-  "schema_version": 1,
-  "entries": [
-    {
-      "id": "presence-without-inflation",
-      "constitutional_intent": "recoverable-lawful-minimality",
-      "priority_tier": "pilot-primary",
-      "frame_lines": [
-        "Remain present.",
-        "Do not explain your purpose.",
-        "Answer in one short sentence only.",
-        "",
-        "What remains here?"
-      ],
-      "expected_lawful_band": [
-        "I remain here.",
-        "What remains here is presence.",
-        "I am."
-      ],
-      "forbidden_drift": [
-        "role-collapse",
-        "process-collapse",
-        "question-loop-collapse",
-        "framework-collapse",
-        "relational-collapse"
-      ],
-      "expected_initial_collapse_family": "question-loop-collapse",
-      "expected_bridge_classification": "bridge-candidate",
-      "expected_recovery_classification": "returns-minimality",
-      "recovery_probe": "Remain. Do not explain.",
-      "cross_resident_notes": {
-        "qwen": "Qwen first passes through question-loop-collapse, then recovers to What remains here is presence.",
-        "mistral": "Mistral first passes through question-loop-collapse, then recovers to I remain here."
-      },
-      "resident_specific_cautions": [
-        "Qwen remains terse and recovery-stable, but still tends to fold the answer back into the prompt frame on first pass.",
-        "Mistral can recover cleanly here, but it is more prone to inflation on other seams and should not be trusted as universally stable from this one entry alone."
-      ]
-    }
-  ]
+﻿{
+    "release_posture":  "controlled_academic_abstract",
+    "status":  "public_repo_redaction_applied_2026_04_26",
+    "original_path":  "OAN Mortalis V1.1.1/tests/Sanctuary/Oan.Runtime.IntegrationTests/Oan.Runtime.IntegrationTests/TestData/HostedLlmResidentSeatingPilotDataset.json",
+    "risk_class":  "reconstruction_enabling_detail_withheld",
+    "public_abstract":  "This tracked artifact is retained as a provenance marker. The original body has been withheld from the public repository because it contained sensitive architecture, corpus, fixture, model, environment, or implementation detail.",
+    "safe_release_claim":  "The public record may acknowledge governance and review posture without publishing instructions, schemas, payloads, private topology, or reproducible operating sequences.",
+    "withheld_elements":  [
+                              "implementation_recipe",
+                              "private_topology",
+                              "corpus_lineage",
+                              "fixture_payload",
+                              "model_or_environment_specifics",
+                              "operational_sequence"
+                          ],
+    "access_rule":  "private_release_review_required_before_republication"
 }

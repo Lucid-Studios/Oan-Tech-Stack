@@ -1,87 +1,30 @@
-# FIRST_RUN_STEWARD_WITNESSED_OE_PACKET
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the phase-one chapter-six Steward-witnessed `OE/cOE` packet
-for the `V1.1.1` first-run constitutional surface.
+## Public Abstract
 
-It exists to keep chapter-six office differentiation and build authorization
-visible in first-run contracts without claiming runtime placement that the line
-has not yet earned.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Build Posture
+## Safe Release Claim
 
-The active line treats this packet as:
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-- a subordinate packet, not a new top-level first-run state
-- a chapter-six enrichment that sits after chapter-five protocolization
-- a descriptive staging packet for office-family and authorization truth
-- explicitly non-authorizing for `CME` placement on its own
+## Withheld Elements
 
-## Packet Fields
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-The phase-one packet carries:
+## Access Rule
 
-- `OfficeIndexHandle`
-- `OfficeKinds`
-- `PrimeOeFormationHandle`
-- `CrypticCoeFormationHandle`
-- `CradleTekPrimeHashKeyHandle`
-- `CradleTekCrypticHashKeyHandle`
-- `StewardWitnessAuthorizationHandle`
-- `SoulFrameBuildAuthorizationHandle`
-- `AgentiCoreBuildAuthorizationHandle`
-- `CmePlacementWithheld`
-
-Together they name the first chapter-six staging truths:
-
-- office-family differentiation
-- first gathered `OE/cOE` formation
-- Prime/Cryptic authorization at the `CradleTek` key seam
-- Steward witness and downstream build authorization
-- explicit withholding of bounded `CME` placement
-
-## First-Run Reading
-
-Within first run, the packet currently means:
-
-- `StewardStanding` is the first lawful seat that may carry this packet
-- the packet may project that office-family and build authorization are
-  truthfully staged
-- the packet does not imply `BondProcessOpen`
-- the packet does not imply `OpalActualized`
-- the packet must explicitly preserve `CmePlacementWithheld`
-
-This keeps the line truthful while chapter-six runtime projection and
-construction work remain downstream.
-
-## Relation To Chapter Five
-
-The chapter-five and chapter-six packets are related but distinct:
-
-- chapter five packet
-  names vessel, calibration, archive, consent, rupture/return, and seal
-- chapter six packet
-  names office family, `OE/cOE` formation, Prime/Cryptic key authorization,
-  and later construction authorization
-
-So chapter five prepares inhabitable protocol.
-Chapter six prepares differentiated office and lawful build staging inside that
-protocol.
-
-## Relation To Later Runtime
-
-This packet should eventually inform later runtime work around:
-
-- Steward-mediated `SoulFrame` construction
-- chapter-seven `AgentiCore` extension
-- lawful refusal of premature `CME` placement
-
-In this milestone it is still descriptive.
-No runtime code currently acts on these packet fields.
-
-## Working Summary
-
-The first-run Steward-witnessed `OE/cOE` packet is the chapter-six subordinate
-packet that lets `V1.1.1` name office-family differentiation and build
-authorization while preserving the no-placement rule.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

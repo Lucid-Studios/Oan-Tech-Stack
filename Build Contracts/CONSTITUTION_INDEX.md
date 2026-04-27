@@ -136,7 +136,7 @@ All links MUST be relative paths.
 ### Sovereign Governance Layer (Highest Precedence)
 - [SPINE_CONSTITUTION.md](./Crosscutting/spine/SPINE_CONSTITUTION.md)
 - [AUTHORITY_CONTRACTS.md](./Crosscutting/authority/AUTHORITY_CONTRACTS.md)
-- [Audit Boundary Definition](../OAN%20Mortalis%20V1.0/docs/audits/README.md)
+- Audit boundary definition: controlled archive reference withheld from the public link surface
 
 ### Plane Governance & Component Buckets
 - [ROUTING_CONSTITUTION.md](./Crosscutting/routing/ROUTING_CONSTITUTION.md)

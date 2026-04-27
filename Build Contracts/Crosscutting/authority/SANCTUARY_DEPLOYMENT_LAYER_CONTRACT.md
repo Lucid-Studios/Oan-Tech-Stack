@@ -1,63 +1,30 @@
-# Sanctuary Deployment Layer Contract
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This contract fixes the authority split for Sanctuary deployment, contract
-layering, and formation-bearing deployment posture.
+## Public Abstract
 
-## Authority Split
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-The authoritative surfaces are:
+## Safe Release Claim
 
-- Documentation Repo architecture notes for doctrinal deployment and formation
-  reading
-- Documentation Repo legal-admin notes for contract-stack, protected-data, IP,
-  and localization baseline
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-The inheriting implementation surfaces are:
+## Withheld Elements
 
-- `OAN Mortalis V1.1.1` implementation-facing Sanctuary deployment note
-- `GEL.Contracts` typed contract records
-- tests that prove those records remain truthful to the upstream doctrine
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-## Controlled Inheritance Rule
+## Access Rule
 
-`V1.1.1` may inherit only:
-
-- the executable subset needed by build and test work
-- typed contract records
-- implementation-facing summaries
-
-`V1.1.1` must not silently inherit:
-
-- counsel-facing clause language as executable truth
-- wider legal theory than the build can currently represent
-- runtime enforcement claims that doctrine has not yet stabilized
-
-## Runtime Restraint Rule
-
-For the current milestone:
-
-- runtime enforcement in `CradleTek.Host`, `CradleTek.Runtime`,
-  `Oan.HostedLlm`, `SoulFrame`, and `AgentiCore` is out of scope
-- typed contracts may be added
-- documentation and tests may be added
-- enforcement must wait until the doctrine and typed contract surface have
-  settled
-
-## Path Discipline
-
-Tracked files inside the active build repo must not hard-code an external
-Documentation Repo path.
-
-Logical source naming is allowed.
-External absolute-path dependence in tracked managed files is not.
-
-## Working Summary
-
-The current law is:
-
-- doctrine and legal-admin remain upstream
-- `V1.1.1` inherits only the executable subset
-- `GEL.Contracts` is the first machine-readable Sanctuary contract home
-- runtime behavior must not outpace contract and doctrine stabilization
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

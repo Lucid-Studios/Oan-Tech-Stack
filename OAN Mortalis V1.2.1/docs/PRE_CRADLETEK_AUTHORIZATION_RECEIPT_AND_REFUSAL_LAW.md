@@ -1,67 +1,30 @@
-# PRE CRADLETEK AUTHORIZATION RECEIPT AND REFUSAL LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines receipt and refusal grammar for the first site-bound
-pre-Cradle authorization seam in `V1.2.1`.
+## Public Abstract
 
-It exists so authorization standing can be witnessed or refused without being
-misread as governing event, runtime lift, or service activation.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> receipt proves standing posture, not governing placement.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-> refusal preserves the withheld state whenever any required standing is
-> missing, implied, or over-read.
+## Withheld Elements
 
-## Receipt And Refusal Offices
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-The bounded passive receipt and refusal types now live in:
+## Access Rule
 
-- `PreCradleAuthorizationReceipt`
-- `PreCradleAuthorizationRefusalReason`
-
-`PreCradleAuthorizationReceipt` may acknowledge only:
-
-- authorized pre-Cradle standing
-- one site-binding profile
-- one operator
-- one candidate reference
-- one non-grant summary
-- one witness chain
-
-## Withheld Continuation Rule
-
-Any receipt in this slice must preserve that:
-
-- no intended-service entry becomes `authorized`
-- governing `CME` placement remains withheld
-- CradleTek authorization remains absent
-- runtime governing loops remain absent
-- operator realization remains absent
-- seed-body empowerment remains absent
-
-## Existing Seam Dependence
-
-Use this note together with:
-
-- `SANCTUARY_INTENDED_SERVICE_REGISTER.md`
-- `PRE_CRADLETEK_NON_ASSUMPTION_LAW.md`
-- `CME_PLACEMENT_WITHHELD_LAW.md`
-- `PRE_CRADLETEK_SITE_AUTHORIZATION_CANDIDATE_LAW.md`
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- governing `CME` placement
-- CradleTek authorization
-- runtime governing action
-- service activation
-- operator realization
-
-## Working Summary
-
-`V1.2.1` now fixes receipt and refusal grammar for site-bound pre-Cradle
-standing while preserving every later withheld act as withheld.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

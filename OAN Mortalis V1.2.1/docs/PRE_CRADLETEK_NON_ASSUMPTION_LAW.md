@@ -1,62 +1,30 @@
-# PRE CRADLETEK NON ASSUMPTION LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note forbids implied cradle authority before CradleTek is
-constitutionally running.
+## Public Abstract
 
-It exists to keep convenience from widening prepared Sanctuary-side standing
-into unauthorized governing or cradle claims.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> Sanctuary readiness is not CradleTek authorization.
-> governing-set description is not active governing `CME` existence.
-> Any uncertainty must resolve to explicit refusal.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Forbidden Assumptions
+## Withheld Elements
 
-The following assumptions are unlawful in this phase:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- installed does not mean editable or spawn-capable
-- templated does not mean adopted
-- intended does not mean runnable
-- inheritance does not mean sovereignty
-- Sanctuary readiness does not mean CradleTek authorization
-- `MoS/cMoS` standing does not mean CradleTek authorization
-- site binding does not mean CradleTek authorization
-- operator training admission does not mean operator realization
-- disclosure assent does not mean governing action
-- content authority does not mean automatic `CME` inheritance
-- Mother/Father posture does not mean Steward governance
-- governing-set description does not mean active governing `CME` existence
+## Access Rule
 
-No surface may infer permissions from nearby presence alone.
-
-## Required Refusal Posture
-
-When interpretation is uncertain, the lawful posture is:
-
-- refuse implied authority
-- preserve the prior withheld state
-- require an explicit, receipted act before any transition is named
-
-No convenience inference may replace refusal here.
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- CradleTek spawn authorization
-- governing `CME` placement
-- Steward governance
-- template adoption
-- service activation
-- best-effort execution
-
-## Working Summary
-
-Before CradleTek is running, no Sanctuary-side surface may be over-read into
-cradle authority.
-Prepared standing remains prepared standing, and uncertainty resolves to
-explicit refusal.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

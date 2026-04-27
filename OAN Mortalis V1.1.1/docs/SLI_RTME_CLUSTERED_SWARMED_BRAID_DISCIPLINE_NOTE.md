@@ -1,112 +1,30 @@
-# SLI RTME CLUSTERED SWARMED BRAID DISCIPLINE NOTE
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the first bounded clustered and swarmed braid discipline for
-the projected `SLI/Lisp` side of the active `V1.1.1` line.
+## Public Abstract
 
-It exists to keep five things distinct:
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-- per-line origin
-- per-line projected posture residue
-- clustered versus swarmed participation
-- braid stability
-- non-closure status
+## Safe Release Claim
 
-This note does not authorize Prime closure.
-It only seats the first living plurality discipline by which multiple projected
-lines may coexist, compose, and emit one bounded braid snapshot.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Governing Read
+## Withheld Elements
 
-Use this note with:
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-- `SLI_RTME_DUPLEX_POSTURE_ENGINE_NOTE.md`
-- `PRIME_MEMBRANE_PROJECTED_BRAID_HISTORY_INTERPRETATION_LAW.md`
-- `PRIME_MEMBRANE_DUPLEX_PACKET_LAW.md`
-- `PRIME_CRYPTIC_DUPLEX_LAW.md`
-- `EC_FORMATION_BUILDSPACE_PREPARATION_NOTE.md`
+## Access Rule
 
-## Core Read
-
-The active stack should now read clustered and swarmed braid this way:
-
-- multiple projected lines may enter one bounded braid session
-- those lines must remain distinct even while they contribute together
-- the braid may become more or less stable without becoming closure
-- the emitted braid snapshot must carry per-line residue rather than a single
-  flattened stream
-- Prime may only receive an advisory return signal, never a self-authorized
-  closure act
-
-In compact form:
-
-> the projected field may compose plurality, but it must preserve line
-> distinction and may not turn composition into closure.
-
-## First Line Participation Kinds
-
-The first per-line participation family is:
-
-- `Clustered`
-- `Swarmed`
-
-These are not synonyms.
-
-They preserve whether a line is participating as a tighter grouped
-contributor or as part of a broader distributed field.
-
-## First Braid States
-
-The first bounded braid-state family is:
-
-- `Dispersed`
-- `Clustered`
-- `Swarmed`
-- `CoherentBraid`
-- `UnstableBraid`
-
-This family is not the final braid ontology.
-It is the smallest lawful state set that lets the projected field represent
-plurality without flattening it.
-
-## First Invariant
-
-The projected braid engine must preserve this invariant:
-
-> projected braid may compose participation across multiple surfaces, but must
-> preserve per-line distinction and may not self-authorize closure,
-> retention, or membrane receipt.
-
-That means:
-
-- each line keeps its own source surface
-- each line keeps its own posture residue
-- bounded `CME` standing remains separate from braid plurality
-- Prime closure remains withheld
-- advisory return remains only advisory
-
-## First Lisp Carrier Surface
-
-The first symbolic carrier for this slice is the embedded Lisp module:
-
-- `duplex-braid.lisp`
-
-Its office is to mark symbolic ownership of clustered and swarmed braid
-discipline while the active `RTME` braid engine remains a bounded C# service
-inside the `SLI.Lisp` project.
-
-## Immediate Build Consequence
-
-Any future plurality seam in this area should say plainly:
-
-- which projected lines entered the braid session
-- which lines were clustered and which were swarmed
-- what braid state resulted
-- what per-line residues were preserved
-- what bounded snapshot was emitted
-- how the later membrane-side read should still preserve visible line residue
-- that Prime still received only an advisory return signal, not closure
-
-If it cannot say that plainly, it should remain a dispersed or unstable braid
-state rather than pretending coherence.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

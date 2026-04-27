@@ -1,31 +1,17 @@
-{
-  "schemaVersion": 1,
-  "lineName": "OAN Mortalis V1.2.1",
-  "lineVersion": "1.2.1",
-  "posture": "install-first-side-by-side",
-  "stateClass": "InstallState",
-  "umbrellaFamily": "San.*",
-  "reservedFutureToolFamily": "OAN.*",
-  "solutionPath": "San.sln",
-  "parentLine": "OAN Mortalis V1.1.1",
-  "archivedParent": false,
-  "activeExecutableTruth": "OAN Mortalis V1.1.1",
-  "buildable": true,
-  "sourceMaterialized": true,
-  "runtimeMaterialized": false,
-  "notes": [
-    "V1.2.1 begins as a first-install side-by-side line.",
-    "V1.1.1 remains active while V1.2.1 forms.",
-    "The first governed build-out target is production file release form.",
-    "The first passive membrane-facing San.Common source batch is now admitted under the install spine.",
-    "The passive membrane corridor and observational organism now exist in San.Common without claiming active runtime binding.",
-    "The first line-local solution graph now hangs San.Common as a buildable sibling body.",
-    "San.Nexus.Control now gives the sibling line a first governance-bearing connective control project beneath the sovereignty ladder.",
-    "SLI.Engine now gives the sibling line a first symbolic engine project for passported predicate-landing readiness beneath the membrane law.",
-    "SLI.Lisp now gives the sibling line a first hosted symbolic bundle project for canonical module residency beneath SanctuaryID.RTME service law.",
-    "SLI.Runtime now gives the sibling line a first passive SLI governance project for escalation state, HitlHold witness tokens, and governed return receipt families.",
-    "SLI.Runtime now also gives the sibling line a first passive preserved-field query and recomposition family that keeps query non-sovereign and provenance-bearing.",
-    "SLI.Runtime now also gives the sibling line a first passive candidate-evaluation family that judges recomposition candidates without realizing or promoting them.",
-    "The line now carries a withheld operator-realization seam with explicit boundary, witness, and admission-order law before any live operator flow."
-  ]
+﻿{
+    "release_posture":  "controlled_academic_abstract",
+    "status":  "public_repo_redaction_applied_2026_04_26",
+    "original_path":  "OAN Mortalis V1.2.1/build/line-manifest.json",
+    "risk_class":  "reconstruction_enabling_detail_withheld",
+    "public_abstract":  "This tracked artifact is retained as a provenance marker. The original body has been withheld from the public repository because it contained sensitive architecture, corpus, fixture, model, environment, or implementation detail.",
+    "safe_release_claim":  "The public record may acknowledge governance and review posture without publishing instructions, schemas, payloads, private topology, or reproducible operating sequences.",
+    "withheld_elements":  [
+                              "implementation_recipe",
+                              "private_topology",
+                              "corpus_lineage",
+                              "fixture_payload",
+                              "model_or_environment_specifics",
+                              "operational_sequence"
+                          ],
+    "access_rule":  "private_release_review_required_before_republication"
 }

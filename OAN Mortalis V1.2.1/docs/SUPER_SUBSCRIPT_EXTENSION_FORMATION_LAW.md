@@ -1,103 +1,30 @@
-# SUPER_SUBSCRIPT_EXTENSION_FORMATION_LAW
+﻿# Release-Controlled Placeholder
 
-## Purpose
+Release posture: controlled academic abstract
+Status: public repo redaction applied 2026-04-26
+Original path: $f
+Risk class: reconstruction-enabling detail withheld
 
-This note defines the only admitted extension grammar for symbolic transport
-formation in this phase.
+## Public Abstract
 
-It exists to ensure that complexity enters through governed formation rather
-than ad hoc decoration.
+This tracked artifact is retained as a provenance marker. The original body has
+been withheld from the public repository because it contained sensitive
+architecture, corpus, fixture, model, environment, or implementation detail.
 
-## Governing Compression
+## Safe Release Claim
 
-> Complexity enters through governed formation, not ad hoc decoration.
->
-> Transport readiness preserves root ancestry and formation law; it does not
-> guarantee local semantic realization.
+The public record may acknowledge governance and review posture without
+publishing instructions, schemas, payloads, private topology, or reproducible
+operating sequences.
 
-## Formation Office
+## Withheld Elements
 
-This office governs how a canonical root carrier may extend while remaining
-transport-stable.
+- Implementation recipes and build sequences.
+- Private topology, source lineage, and local-environment assumptions.
+- Corpus payloads, fixture structures, and test expectations.
+- Model- or environment-specific evaluation and operating detail.
 
-Its work is to preserve:
+## Access Rule
 
-- lineage back to one canonical root carrier
-- constructor-class discipline
-- witnessed extension order
-- governed super/sub formation only
-
-It is not allowed to:
-
-- add free ornament
-- add operator layers
-- admit affix creep as transport formation
-- widen transport formation into contextual semantic split
-
-## Constructor Eligibility
-
-`Root` remains adjunct-free and may not carry extension.
-
-`Basic` permits exactly one governed extension:
-
-- one super
-- or one sub
-
-`Intermediate` permits exactly one governed composed extension:
-
-- one super plus one sub
-
-That composed extension must preserve witnessed order.
-
-`Advanced` and `Master` are outside symbolic transport formation scope in this
-phase.
-
-## Admitted Formation Classes
-
-The only admitted extension grammar in this phase is super/subscript
-formation.
-
-Canonical fields:
-
-- `formation_id`
-- `root_symbol_ref`
-- `constructor_class`
-- `extension_form`
-- `super_ref`
-- `sub_ref`
-- `lineage_refs[]`
-- `witness_refs[]`
-
-Extension must preserve lineage back to one canonical root carrier.
-
-## Refusal Rules
-
-The following must force refusal, hold, or non-promotion:
-
-- any `Root` formation carrying extension
-- any `Basic` formation carrying more than one extension
-- any `Intermediate` formation lacking one super and one sub
-- witnessed order omitted for composed extension
-- operator layer admitted as formation
-- affix creep, ornament, or free decoration admitted as formation
-- lineage broken from the canonical root carrier
-
-## Explicit Non-Grants
-
-This note does not grant:
-
-- local semantic realization
-- Atlas delta candidacy
-- Atlas mutation
-- predicate promotion
-- engram minting
-- operator realization
-- runtime activation
-
-## Working Summary
-
-`SLI` now has a governed extension grammar for symbolic transport.
-
-That grammar keeps `Root` adjunct-free, limits `Basic` and `Intermediate` to
-super/subscript formation only, and preserves one lineage back to the
-canonical root carrier.
+Detailed content remains in private custody and requires rights, safety,
+privacy, and dual-use release review before republication.

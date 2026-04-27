@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "deployables": [
     {
-      "name": "Oan.Runtime.Headless",
-      "projectPath": "src/Sanctuary/Oan.Runtime.Headless/Oan.Runtime.Headless/Oan.Runtime.Headless.csproj",
+      "name": "San.Runtime.Headless",
+      "projectPath": "src/Sanctuary/San.Runtime.Headless/San.Runtime.Headless/San.Runtime.Headless.csproj",
       "family": "Sanctuary",
       "artifactKind": "dotnet-publish",
       "publishLane": "runtime-host",
