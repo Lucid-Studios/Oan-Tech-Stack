@@ -1,6 +1,6 @@
-name: Public documentation correction
-description: Report an error in the public descriptive materials.
-title: "[Docs]: "
+name: Public documentation concern
+description: Report a public documentation, boundary, or repository hygiene concern.
+title: "[Public]: "
 labels:
   - documentation
 body:
@@ -8,25 +8,40 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: What public wording appears incorrect, unclear, or unsafe?
+      description: What public wording, repository metadata, or boundary language appears unclear, incorrect, or unsafe?
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Public surface
+      description: Choose the public surface that best matches the concern.
+      options:
+        - Public documentation
+        - Contribution process
+        - Issue or pull request template
+        - Release-boundary wording
+        - Responsible disclosure routing
+        - Repository hygiene
+        - Other public surface
     validations:
       required: true
   - type: textarea
     id: location
     attributes:
       label: Location
-      description: Link to the public page or file section. Do not paste sensitive excerpts.
-    validations:
-      required: true
+      description: Link to the public file or section. Do not paste sensitive excerpts.
   - type: textarea
     id: suggested_change
     attributes:
-      label: Suggested correction
-      description: Propose safer public wording if you have it.
+      label: Suggested public-safe correction
+      description: Propose safer wording if you have it. Keep the suggestion descriptive and non-executable.
   - type: checkboxes
     id: hygiene
     attributes:
       label: Public intake hygiene
       options:
-        - label: I have not included private corpus paths, credentials, tokens, logs, local absolute paths, model payloads, runtime payloads, or sensitive identity, custody, operator, or implementation material.
+        - label: I have not included private corpus paths, credentials, tokens, logs, local absolute paths, runtime payloads, model payloads, or sensitive operator material.
+          required: true
+        - label: I am not requesting build, install, test, release, deployment, or reconstruction instructions.
           required: true

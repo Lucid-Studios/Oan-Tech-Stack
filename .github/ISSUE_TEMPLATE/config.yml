@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Contribution guide
     url: https://github.com/Lucid-Studios/Oan-Tech-Stack/blob/main/CONTRIBUTING.md
-    about: Review public documentation contribution expectations.
+    about: Review public contribution expectations before opening work items.
   - name: Security policy
-    url: https://github.com/Lucid-Studios/Oan-Tech-Stack/blob/main/SECURITY.md
+    url: https://github.com/Lucid-Studios/Oan-Tech-Stack/security/policy
     about: Use this for security-sensitive reporting guidance instead of filing a public issue.

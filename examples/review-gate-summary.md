@@ -10,6 +10,7 @@ This is a non-executable example of how a public release gate can be summarized.
 | Does it include private data or model payloads? | No |
 | Does it make claims beyond evidence? | No |
 | Does it need private review before expansion? | Yes |
+| Does operational uptake require education, certification, approval, and stewardship review? | Yes |
 
 ## Example Decision
 

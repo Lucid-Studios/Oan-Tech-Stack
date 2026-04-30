@@ -7,6 +7,10 @@ The project uses a staged disclosure model.
 Public material is descriptive and non-executable. It explains purpose,
 boundaries, and accountability without publishing reconstructive detail.
 
+Public material may also support citizen science education and stewardship
+literacy when it stays non-operational and does not imply approval to build,
+deploy, or operate private systems.
+
 ## Private Review
 
 Private review may include implementation details, private documents, or

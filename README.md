@@ -13,6 +13,7 @@ The public repository may describe:
 
 - high-level technology purpose;
 - safety, governance, and accountability principles;
+- citizen science education and stewardship posture;
 - public release boundaries;
 - non-executable examples of review language and disclosure posture;
 - contact paths for responsible coordination.
@@ -28,6 +29,8 @@ The public repository must not provide:
 ## Reading Path
 
 - [Public Technology Overview](docs/PUBLIC_TECHNOLOGY_OVERVIEW.md)
+- [Scientific Posture Review](docs/SCIENTIFIC_POSTURE_REVIEW.md)
+- [Prime Citizen Science Access Model](docs/PRIME_CITIZEN_SCIENCE_ACCESS.md)
 - [Public Release Boundary](docs/PUBLIC_RELEASE_BOUNDARY.md)
 - [Controlled Disclosure Model](docs/CONTROLLED_DISCLOSURE_MODEL.md)
 - [Example: Public Claim Patterns](examples/public-claim-patterns.md)

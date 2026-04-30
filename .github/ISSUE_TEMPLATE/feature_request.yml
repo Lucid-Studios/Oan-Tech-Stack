@@ -1,5 +1,5 @@
 name: Public explanation request
-description: Request a clearer public explanation or non-executable example.
+description: Request a clearer public explanation, non-claim, or release-boundary improvement.
 title: "[Public Explanation]: "
 labels:
   - documentation
@@ -11,23 +11,38 @@ body:
       description: What should the public repository explain more clearly?
     validations:
       required: true
-  - type: textarea
+  - type: dropdown
     id: audience
     attributes:
       label: Audience
-      description: Who is the explanation for?
-      placeholder: Researchers, partners, reviewers, users, maintainers...
+      description: Who would benefit from the public explanation?
+      options:
+        - Researchers
+        - Reviewers
+        - Partners
+        - Maintainers
+        - Public readers
+        - Other public audience
+    validations:
+      required: true
   - type: textarea
     id: boundary
     attributes:
       label: Boundary concern
-      description: Note any detail that should stay private or non-executable.
+      description: Note any detail that should remain private, non-executable, or non-claiming.
     validations:
       required: true
+  - type: textarea
+    id: suggested_shape
+    attributes:
+      label: Suggested public-safe shape
+      description: Describe the explanation at a high level. Do not include private implementation details.
   - type: checkboxes
     id: hygiene
     attributes:
       label: Public intake hygiene
       options:
-        - label: I am asking for public descriptive material only, not source code, build instructions, datasets, private architecture, or deployment detail.
+        - label: I am asking for public descriptive material only, not source code, build instructions, datasets, private architecture, runtime payloads, or deployment detail.
+          required: true
+        - label: I have not included private corpus paths, credentials, tokens, logs, local absolute paths, or sensitive operator material.
           required: true

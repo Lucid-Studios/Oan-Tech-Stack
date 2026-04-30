@@ -6,6 +6,7 @@ The public repository is a descriptive boundary, not an engineering workspace.
 
 - plain-language purpose;
 - safety and accountability principles;
+- citizen science education and stewardship posture;
 - disclosure rules;
 - non-executable examples of acceptable public wording;
 - contact paths and contribution hygiene.
@@ -28,6 +29,7 @@ A public artifact should answer:
 2. What boundaries govern the claim?
 3. What is intentionally not being published?
 4. Who should be contacted for private review?
+5. What education or stewardship boundary applies?
 
 It should not answer:
 
