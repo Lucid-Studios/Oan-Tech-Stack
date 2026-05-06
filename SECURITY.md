@@ -27,6 +27,17 @@ The public repository should contain only high-level description, governance
 posture, non-executable examples, and disclosure guidance. Buildable materials
 belong outside this public surface.
 
+## Boundary Reports
+
+Please report privately if public material appears to expose:
+
+- private source or reconstruction detail;
+- internal control mechanisms;
+- private data, model, or runtime payloads;
+- local path or machine-specific information;
+- claims that imply deployment readiness, legal authority, custody authority, or
+  personified operation.
+
 ## Temporary Mitigation
 
 If you discover a live exposure:

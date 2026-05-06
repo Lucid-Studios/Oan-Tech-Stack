@@ -9,9 +9,18 @@ This is a non-executable example of how a public release gate can be summarized.
 | Does it include build or deployment steps? | No |
 | Does it include private data or model payloads? | No |
 | Does it make claims beyond evidence? | No |
+| Does it separate familiarity from personhood or authority claims? | Yes |
+| Does it avoid implementation-bearing control details? | Yes |
 | Does it need private review before expansion? | Yes |
 | Does operational uptake require education, certification, approval, and stewardship review? | Yes |
 
 ## Example Decision
 
 Approved for public description only. Implementation details remain withheld.
+
+## Example Public Summary
+
+Approved for public orientation as a descriptive release-boundary update. The
+material may discuss custodial cognition safety, non-claims, and contribution
+hygiene. It may not disclose private source, build instructions, runtime
+payloads, internal control details, or claims of deployment readiness.

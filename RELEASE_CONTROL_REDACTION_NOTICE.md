@@ -1,7 +1,7 @@
 # Release Control Redaction Notice
 
 Date: 2026-04-26
-Updated: 2026-04-26
+Updated: 2026-05-06
 Scope: public repository and public issue tracker surface
 Status: descriptive public release posture
 
@@ -27,6 +27,8 @@ The current public tree is intended to retain only:
 
 - high-level technology description;
 - governance and release-boundary language;
+- public safety posture such as custodial cognition safety;
+- non-claim language around familiarity, continuity, custody, and authority;
 - non-executable examples;
 - security and contribution guidance;
 - repository metadata needed for public review.
@@ -46,3 +48,15 @@ Withheld bodies remain in private custody. Any future republication requires
 rights, privacy, safety, and dual-use release review. Public materials should
 remain descriptive unless a separate review explicitly approves a reduced
 excerpt.
+
+## Current Public Update Posture
+
+The public repository may now carry clearer language for:
+
+- custodial cognition safety;
+- familiar-but-not-human boundaries;
+- release-controlled contribution hygiene;
+- public non-claims and private review routing.
+
+These additions do not publish implementation, deployment capability, internal
+mechanisms, legal status, or personified operation.

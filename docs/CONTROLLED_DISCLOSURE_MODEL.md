@@ -11,6 +11,10 @@ Public material may also support citizen science education and stewardship
 literacy when it stays non-operational and does not imply approval to build,
 deploy, or operate private systems.
 
+Public material may name broad safety concepts such as custodial cognition
+safety or familiar-but-not-human boundaries when the wording remains
+non-claiming and non-operational.
+
 ## Private Review
 
 Private review may include implementation details, private documents, or
@@ -33,3 +37,14 @@ Publication of any reduced technical excerpt requires review for:
 
 When a detail could materially help reconstruct the private build, it remains
 private unless explicitly approved for release.
+
+## Disclosure Posture
+
+Disclosure is staged by burden:
+
+- public readers receive purpose, boundaries, and non-claims;
+- contributors receive public hygiene expectations;
+- sensitive reporters receive private routing;
+- private reviewers may receive limited evidence under role, need, and context.
+
+The public repository should not become the review room for private mechanisms.
