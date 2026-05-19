@@ -2,23 +2,23 @@
 
 ## Public Surface Instruction
 
-This repository is handled as a public descriptive release surface. Agents
-working here must preserve the difference between public orientation and
-private build truth.
+This repository is handled as a bare public release shell. Agents working here
+must preserve the difference between the current sparse release floor, archived
+lineage, and private build truth.
 
-The correct posture is: explain the work safely, do not reconstruct the work for
-public execution.
+The correct posture is: keep the shell clean until a deliberate release gate
+admits new public material.
 
 ## Allowed Work
 
 Allowed changes are limited to:
 
-- public descriptive documentation;
+- release-shell hygiene;
 - release-boundary wording;
 - non-claim clarification;
 - responsible disclosure routing;
 - issue and pull request hygiene;
-- repository metadata that supports public documentation review.
+- repository metadata that supports future public release review.
 
 ## Disallowed Work
 
@@ -37,9 +37,9 @@ Do not add or restore:
 
 ## Review Standard
 
-A public change is acceptable when it helps a reader understand purpose,
-governance, safety posture, disclosure boundary, or stewardship without giving
-enough detail to reconstruct private implementation.
+A public change is acceptable when it preserves the clean release shell, clarifies
+boundary posture, or prepares for a future reviewed public release without
+giving enough detail to reconstruct private implementation.
 
 When uncertain, reduce specificity and route the material to private maintainer
 review.

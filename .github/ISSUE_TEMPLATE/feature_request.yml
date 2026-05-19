@@ -1,14 +1,14 @@
-name: Public explanation request
-description: Request a clearer public explanation, non-claim, or release-boundary improvement.
+name: Public release-boundary request
+description: Request a clearer public boundary, non-claim, or future-release improvement.
 title: "[Public Explanation]: "
 labels:
-  - documentation
+  - repository
 body:
   - type: textarea
     id: question
     attributes:
       label: Public question
-      description: What should the public repository explain more clearly?
+      description: What should the bare public release shell explain more clearly?
     validations:
       required: true
   - type: dropdown
@@ -36,13 +36,13 @@ body:
     id: suggested_shape
     attributes:
       label: Suggested public-safe shape
-      description: Describe the explanation at a high level. Do not include private implementation details.
+      description: Describe the public-safe shape at a high level. Do not include private implementation details or request archived-folder restoration.
   - type: checkboxes
     id: hygiene
     attributes:
       label: Public intake hygiene
       options:
-        - label: I am asking for public descriptive material only, not source code, build instructions, datasets, private architecture, runtime payloads, or deployment detail.
+        - label: I am asking for release-shell or boundary material only, not source code, build instructions, datasets, private architecture, runtime payloads, or deployment detail.
           required: true
         - label: I have not included private corpus paths, credentials, tokens, logs, local absolute paths, or sensitive operator material.
           required: true

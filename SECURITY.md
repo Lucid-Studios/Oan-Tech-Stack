@@ -2,7 +2,7 @@
 
 ## Scope
 
-This policy applies to the public descriptive repository
+This policy applies to the bare public release shell
 `Lucid-Studios/Oan-Tech-Stack`.
 
 ## Report Privately
@@ -23,9 +23,10 @@ Private disclosure contacts:
 
 ## Public Repository Rule
 
-The public repository should contain only high-level description, governance
-posture, non-executable examples, and disclosure guidance. Buildable materials
-belong outside this public surface.
+The public repository should currently contain only release-shell custody,
+governance posture, contribution/security routing, non-claims, and disclosure
+guidance. Historical public material belongs in archive custody. Buildable
+materials belong outside this public surface.
 
 ## Boundary Reports
 

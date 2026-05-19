@@ -2,23 +2,23 @@
 
 ## Purpose
 
-This repository is maintained as a public documentation and disclosure-boundary
-surface for OAN technology.
+This repository is maintained as a bare public release shell and
+disclosure-boundary surface for OAN technology.
 
 Participation is expected to remain:
 
 - respectful;
 - technically grounded;
-- focused on public documentation scope;
+- focused on current release-shell scope;
 - safe for contributors and maintainers.
 
 ## Expected Behavior
 
 Contributors should:
 
-- discuss public wording in clear and factual terms;
+- discuss release-shell wording in clear and factual terms;
 - challenge ideas without attacking people;
-- keep issue and PR discussion tied to documentation scope;
+- keep issue and PR discussion tied to release-boundary scope;
 - respect security boundaries and private review channels;
 - avoid posting sensitive paths, credentials, logs, private data, or
   implementation detail.
@@ -43,7 +43,8 @@ Repeated or serious violations may result in loss of repository participation.
 
 ## Reporting
 
-If the issue is documentation-related, use the repository issue tracker.
+If the issue is release-shell or public-boundary related, use the repository
+issue tracker.
 
 If the issue is sensitive or security-related, follow [SECURITY.md](SECURITY.md).
 

@@ -1,116 +1,67 @@
 # OAN Tech Stack
 
-OAN Tech Stack is the public descriptive surface for Lucid Studios research
-into governed symbolic and engineered-cognition systems.
+OAN Tech Stack is currently held as a bare public release shell.
 
-This repository is release-controlled. It helps readers understand the public
-purpose, governance posture, contribution boundary, disclosure model, and
-non-claim language around the work. It is not a complete product checkout,
-installer, reconstruction guide, runtime payload, private corpus release, or
-operational build manual.
+The prior public documentation surface has been archived out of this repository
+so future releases are not polluted by older explanatory files, stale public
+framing, or historical folder structure.
 
-## Public Scope
+## Current Posture
 
-This repository may carry:
+- This repository is not currently a playable harness.
+- This repository is not currently a documentation archive.
+- This repository is not currently an implementation checkout.
+- This repository is reserved for the next clean public release surface.
 
-- high-level technology orientation;
-- safety, governance, and accountability principles;
-- citizen science education and stewardship posture;
-- public governance and stewardship language;
-- responsible disclosure and contribution boundaries;
-- non-executable examples of public review language;
-- release-boundary notices and public-facing documentation hygiene.
+## Archive Location
 
-This repository must not carry:
+Historical public materials and the broader inspected OAN body have been moved
+to Codex Mirror for archive review:
 
-- private build corpus material;
-- private memory, raw logs, or unpublished research payloads;
-- hosted model payloads or local runtime secrets;
-- exact local filesystem paths or machine-specific configuration;
-- operational build, install, release, or deployment recipes;
-- implementation-bearing schemas, datasets, fixtures, scripts, or
-  reconstruction sequences.
+<https://github.com/Lucid-Studios/Codex-Mirror>
 
-## Public Architecture Posture
+The archive move is intended to preserve lineage without forcing future readers
+to treat older material as part of the current release.
 
-At a public level, the project concerns bounded engineered-cognition systems
-with:
+## What Remains Here
 
-- governed inputs and outputs;
-- traceable receipts and review gates;
-- human stewardship and accountability;
-- release controls around private, dual-use, or implementation-bearing
-  material;
-- clear separation between descriptive research language and executable build
-  truth.
+This repository retains only the minimum public custody layer:
 
-Any architecture term in this repository should be read as a controlled public
-description, not as proof of production readiness, legal authority, custody,
-personhood, autonomous standing, or completed deployment.
+- repository identity;
+- contribution and security posture;
+- release-control notice;
+- public issue and pull request hygiene;
+- automation that prevents accidental reintroduction of implementation-bearing
+  or private material before a deliberate release gate.
 
-## Current Public Research Frame
+## Release Rule
 
-The current public frame is custodial cognition safety: advanced AI-assisted
-systems should separate model capability from authority, continuity, custody,
-and publication eligibility.
+Future public release material should enter this repository only through a clean
+review pass. Do not restore old folders merely because they existed here before.
 
-In this frame, a system may become familiar through continuity, reviewable
-behavior, and shared work history without counterfeiting humanity or claiming
-standing beyond evidence. Familiarity is treated as a boundary-managed
-interaction effect, not as proof of consciousness, legal status, or identity
-authority.
+Allowed future release additions must be intentional, bounded, documented, and
+reviewed for:
 
-The public repository therefore explains direction and review posture. The
-local lab remains responsible for proving machinery under private custody
-before any narrower excerpt is considered for release.
-
-## Reading Path
-
-- [Public Technology Overview](docs/PUBLIC_TECHNOLOGY_OVERVIEW.md)
-- [Scientific Posture Review](docs/SCIENTIFIC_POSTURE_REVIEW.md)
-- [Prime Citizen Science Access Model](docs/PRIME_CITIZEN_SCIENCE_ACCESS.md)
-- [Public Release Boundary](docs/PUBLIC_RELEASE_BOUNDARY.md)
-- [Controlled Disclosure Model](docs/CONTROLLED_DISCLOSURE_MODEL.md)
-- [End-User Mini CME Surface](docs/END_USER_MINI_CME_SURFACE.md)
-- [Release Control Redaction Notice](RELEASE_CONTROL_REDACTION_NOTICE.md)
-- [Example: Public Claim Patterns](examples/public-claim-patterns.md)
-- [Example: Review Gate Summary](examples/review-gate-summary.md)
+- reader clarity;
+- non-claim discipline;
+- release safety;
+- absence of private paths, secrets, logs, corpora, model payloads, and
+  machine-local assumptions;
+- separation between archive lineage and current release truth.
 
 ## Non-Claims
 
-Public materials in this repository do not claim:
+This bare shell does not claim:
 
 - production readiness;
-- installer completeness;
-- autonomous authority;
-- legal authority;
-- custody or identity authority;
-- private corpus publication;
+- autonomous agency;
+- diagnostic, medical, legal, or safety authority;
+- CME.Actual or Sanctuary.Actual;
 - complete implementation disclosure;
-- certainty beyond the public evidence shown here.
-
-## Contribution Boundary
-
-Public contributions should improve clarity, safety, reviewability, and
-release-boundary discipline. Suitable changes include wording improvements,
-documentation hygiene, public issue-template refinement, non-claim
-clarification, and responsible disclosure routing.
-
-Implementation-bearing work, private corpus interpretation, runtime design,
-internal architecture extraction, or build-enabling detail belongs in
-maintainer-controlled private review, not in this public repository.
-
-## Security And Sensitive Reports
-
-Do not file public issues containing secrets, private data, raw logs, private
-paths, exploit details, sensitive operator material, or implementation-bearing
-reconstruction steps. Use the repository security policy or maintainer contact
-path for sensitive reports.
+- active release availability.
 
 ## Stewardship
 
-Lucid Studios maintains this repository as a public boundary surface. The
-intent is to communicate enough for public understanding and accountability
-while withholding material that would collapse private research, local build
-capability, sensitive data, or controlled release posture into an uncontrolled
-public recipe.
+Lucid Studios maintains this repository as the future public release home for
+OAN Tech Stack. The current sparse state is deliberate: it is a clean floor for
+the next release, not a loss of lineage.

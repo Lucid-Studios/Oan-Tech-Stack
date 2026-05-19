@@ -2,21 +2,22 @@
 
 ## Scope
 
-This repository accepts public documentation and release-boundary work only. It
-is not the place to submit implementation-bearing pull requests, private build
-materials, runtime payloads, or reconstruction guides.
+This repository currently accepts release-shell hygiene and release-boundary work
+only. It is not the place to restore archived documentation, submit
+implementation-bearing pull requests, private build materials, runtime payloads,
+or reconstruction guides.
 
 ## Suitable Contributions
 
 Suitable public contributions include:
 
-- clearer public explanations;
+- clearer release-shell wording;
 - safer non-claim language;
-- documentation hygiene;
 - issue and pull request template improvements;
 - responsible disclosure routing;
 - public release-boundary clarification;
-- non-executable examples that do not reveal private implementation.
+- future-release preparation that does not restore old public folders by
+  default.
 
 ## Out Of Scope
 
@@ -42,10 +43,10 @@ Each pull request should state:
 
 ## Issues
 
-Use public issues for documentation clarity, public boundary questions, and
+Use public issues for release-shell clarity, public boundary questions, and
 repository hygiene. Do not use public issues to request private build
-instructions, internal file maps, local runtime details, or executable
-reproduction steps.
+instructions, internal file maps, local runtime details, archived-material
+restoration, or executable reproduction steps.
 
 Security concerns and sensitive disclosure should be reported through the
 repository security policy rather than a public issue.

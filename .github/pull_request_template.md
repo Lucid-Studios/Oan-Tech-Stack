@@ -1,6 +1,6 @@
 # Public-Surface Summary
 
-Briefly describe the public documentation or repository-boundary change.
+Briefly describe the release-shell or repository-boundary change.
 
 # Public Purpose
 
@@ -15,7 +15,8 @@ disclosure posture, or accountability.
       audit material, or private architecture contracts were added.
 - [ ] No private corpus paths, local absolute paths, secrets, tokens, logs,
       model payloads, or operator-sensitive material were added.
-- [ ] The change remains descriptive, non-executable, and public-safe.
+- [ ] The change preserves the bare release shell unless an explicit release
+      gate admits new public material.
 
 # Non-Claims
 

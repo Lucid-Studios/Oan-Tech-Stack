@@ -6,9 +6,10 @@ This document defines the public repository hardening posture.
 
 ## Public Surface Rule
 
-The public repository must remain descriptive and non-executable. It should not
-contain implementation material, build recipes, datasets, fixtures, automation,
-runtime payloads, private topology, or local environment assumptions.
+The public repository must remain a sparse, non-executable release shell until a
+deliberate release gate admits new public material. It should not contain
+implementation material, build recipes, datasets, fixtures, automation, runtime
+payloads, private topology, or local environment assumptions.
 
 ## CI Sources
 
@@ -26,8 +27,6 @@ build, route it to private maintainer review instead.
 Allowed tracked surfaces:
 
 - `.github/` metadata and documentation checks;
-- `docs/` public overview and release boundary documents;
-- `examples/` non-executable examples;
 - top-level security, support, conduct, contribution, and release posture files.
 
 Disallowed tracked surfaces:
