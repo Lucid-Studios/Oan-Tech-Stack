@@ -2,21 +2,21 @@
 
 ## Purpose
 
-This repository is maintained as a bare public release shell and
-disclosure-boundary surface for OAN technology.
+This repository is maintained as the public test-release shell and
+disclosure-boundary surface for Project Sanctuary.
 
 Participation is expected to remain:
 
 - respectful;
 - technically grounded;
-- focused on current release-shell scope;
+- focused on current release-page scope;
 - safe for contributors and maintainers.
 
 ## Expected Behavior
 
 Contributors should:
 
-- discuss release-shell wording in clear and factual terms;
+- discuss Project Sanctuary wording in clear and factual terms;
 - challenge ideas without attacking people;
 - keep issue and PR discussion tied to release-boundary scope;
 - respect security boundaries and private review channels;
@@ -43,7 +43,7 @@ Repeated or serious violations may result in loss of repository participation.
 
 ## Reporting
 
-If the issue is release-shell or public-boundary related, use the repository
+If the issue is release-page or public-boundary related, use the repository
 issue tracker.
 
 If the issue is sensitive or security-related, follow [SECURITY.md](SECURITY.md).

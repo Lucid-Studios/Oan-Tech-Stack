@@ -2,8 +2,7 @@
 
 ## Scope
 
-This policy applies to the bare public release shell
-`Lucid-Studios/Oan-Tech-Stack`.
+This policy applies to the public test-release shell for Project Sanctuary.
 
 ## Report Privately
 
@@ -23,10 +22,11 @@ Private disclosure contacts:
 
 ## Public Repository Rule
 
-The public repository should currently contain only release-shell custody,
-governance posture, contribution/security routing, non-claims, and disclosure
-guidance. Historical public material belongs in archive custody. Buildable
-materials belong outside this public surface.
+The public repository should currently contain only Project Sanctuary
+release-page custody, governance posture, contribution/security routing,
+non-claims, and disclosure guidance. Historical public material belongs in
+archive custody. Buildable materials belong outside this public surface until a
+deliberate release gate admits them.
 
 ## Boundary Reports
 

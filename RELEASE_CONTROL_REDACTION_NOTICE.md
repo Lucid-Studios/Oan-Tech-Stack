@@ -1,16 +1,22 @@
-# Release Control Redaction Notice
+# Release Control Notice
 
 Date: 2026-04-26
 Updated: 2026-05-19
+Project: Project Sanctuary
+Maintainer body: Lucid Studios, Department of Agentic Research and Development
 Scope: public repository and public issue tracker surface
-Status: bare release shell
+Status: public test-release preparation shell
 
 ## Summary
 
-The public OAN Tech Stack repository has been reduced to a minimal release
-shell. Older public documentation, examples, and descriptive strata have been
-removed from this repository so they do not confuse future readers or appear to
-be part of the next current release.
+Project Sanctuary is the renamed public release surface for the former OAN Tech
+Stack repository. The repository has been reduced and restyled so it can serve
+as a clean product test-release page for Sanctuary without carrying stale public
+documentation or implementation-bearing material forward by accident.
+
+Older public documentation, examples, and descriptive strata were removed from
+this repository so they do not confuse future readers or appear to be part of
+the next current release.
 
 Those materials were preserved through Codex Mirror archive custody rather than
 left intermingled with the release home.
@@ -19,7 +25,7 @@ left intermingled with the release home.
 
 The current public tree intentionally retains only:
 
-- root repository identity;
+- root project identity;
 - contribution and security guidance;
 - public issue and pull request hygiene;
 - release-control notice;
@@ -36,6 +42,29 @@ The current public tree intentionally excludes:
 - datasets, fixtures, corpora, symbolic payloads, and generated audit material;
 - private topology, corpus lineage, model-specific operations, local paths, and
   machine-specific assumptions.
+
+## Public Identity
+
+Project Sanctuary is presented as a software service layer for extended
+cognitive management. The project organizes CME tooling through Cradle
+Technology, Soul Frame, and Agentic Core surfaces, with Engineered Cognition as
+the working term for governed cognition-on-demand cycles.
+
+This public identity is release framing. It is not an implementation disclosure,
+runtime authority grant, or metaphysical claim.
+
+## Lineage Treatment
+
+Sanctuary's public language may reference:
+
+- Carl Gustav Jung-inspired and theological mind, body, and spirit constructs as
+  architectural inspiration;
+- IUTT-inspired distinction discipline as governance methodology;
+- Lisp-form symbolic practice as a design influence for Engineered Cognition.
+
+These references are permitted as bounded lineage statements. They must not be
+used to claim theological proof, IUTT proof transfer, personhood,
+consciousness, production readiness, or automatic authority.
 
 ## Archive Treatment
 
@@ -62,6 +91,6 @@ Future release candidates must preserve:
 
 ## Non-Claims
 
-This repository's sparse state does not publish an implementation, grant
-runtime authority, assert CME.Actual, assert Sanctuary.Actual, or certify
+This repository's sparse test-release state does not publish an implementation,
+grant runtime authority, assert CME.Actual, assert Sanctuary.Actual, or certify
 production readiness.

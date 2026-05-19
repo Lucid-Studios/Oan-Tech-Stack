@@ -1,5 +1,5 @@
-name: Public release-shell concern
-description: Report a public release-shell, boundary, or repository hygiene concern.
+name: Project Sanctuary public concern
+description: Report a Project Sanctuary public release-page, boundary, or repository hygiene concern.
 title: "[Public]: "
 labels:
   - repository
@@ -8,7 +8,7 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: What release-shell wording, repository metadata, or boundary language appears unclear, incorrect, or unsafe?
+      description: What Project Sanctuary wording, repository metadata, or boundary language appears unclear, incorrect, or unsafe?
     validations:
       required: true
   - type: dropdown
@@ -17,7 +17,7 @@ body:
       label: Public surface
       description: Choose the public surface that best matches the concern.
       options:
-        - Public release shell
+        - Project Sanctuary release page
         - Contribution process
         - Issue or pull request template
         - Release-boundary wording
@@ -35,7 +35,7 @@ body:
     id: suggested_change
     attributes:
       label: Suggested public-safe correction
-      description: Propose safer wording if you have it. Keep the suggestion non-executable and release-shell safe.
+      description: Propose safer wording if you have it. Keep the suggestion non-executable and public-release safe.
   - type: checkboxes
     id: hygiene
     attributes:

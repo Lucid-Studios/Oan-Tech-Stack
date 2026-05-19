@@ -1,11 +1,12 @@
 # Public-Surface Summary
 
-Briefly describe the release-shell or repository-boundary change.
+Briefly describe the Project Sanctuary release-page or repository-boundary
+change.
 
 # Public Purpose
 
 Explain how this improves public understanding, safety, release control,
-disclosure posture, or accountability.
+disclosure posture, product test-release clarity, or accountability.
 
 # Boundary Check
 
@@ -15,8 +16,8 @@ disclosure posture, or accountability.
       audit material, or private architecture contracts were added.
 - [ ] No private corpus paths, local absolute paths, secrets, tokens, logs,
       model payloads, or operator-sensitive material were added.
-- [ ] The change preserves the bare release shell unless an explicit release
-      gate admits new public material.
+- [ ] The change preserves the public test-release shell unless an explicit
+      release gate admits new public material.
 
 # Non-Claims
 

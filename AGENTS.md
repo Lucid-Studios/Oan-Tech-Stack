@@ -2,18 +2,37 @@
 
 ## Public Surface Instruction
 
-This repository is handled as a bare public release shell. Agents working here
-must preserve the difference between the current sparse release floor, archived
-lineage, and private build truth.
+This repository is handled as the public test-release shell for Project
+Sanctuary. Agents working here must preserve the difference between:
 
-The correct posture is: keep the shell clean until a deliberate release gate
-admits new public material.
+- public product identity;
+- archived OAN Tech Stack lineage;
+- future release candidates;
+- private build truth.
+
+The correct posture is: make the release page clear, coherent, and safe without
+reconstructing the private implementation.
+
+## Style Standard
+
+Use the same public language across root documents:
+
+- project name: Project Sanctuary;
+- maintainer body: Lucid Studios, Department of Agentic Research and
+  Development;
+- product role: software service layer for extended cognitive management;
+- core surfaces: Cradle Technology, Soul Frame, Agentic Core;
+- cognition term: Engineered Cognition;
+- lineage posture: Carl Gustav Jung-inspired/theological framing and
+  IUTT-inspired distinction discipline, both bounded as methodology rather than
+  proof.
 
 ## Allowed Work
 
 Allowed changes are limited to:
 
-- release-shell hygiene;
+- release-page polish;
+- project-scope clarification;
 - release-boundary wording;
 - non-claim clarification;
 - responsible disclosure routing;
@@ -37,9 +56,9 @@ Do not add or restore:
 
 ## Review Standard
 
-A public change is acceptable when it preserves the clean release shell, clarifies
-boundary posture, or prepares for a future reviewed public release without
-giving enough detail to reconstruct private implementation.
+A public change is acceptable when it improves Project Sanctuary's release-page
+clarity, preserves non-claim discipline, and avoids giving enough detail to
+reconstruct private implementation.
 
 When uncertain, reduce specificity and route the material to private maintainer
 review.
@@ -47,8 +66,8 @@ review.
 ## Local Build Truth
 
 Local folders on the maintainer machine are private unless explicitly published.
-Do not infer that local working organization, private corpora, or runtime folders
-should be exposed here.
+Do not infer that local working organization, private corpora, or runtime
+folders should be exposed here.
 
 This public repository should not be used as a map of the maintainer's private
 workspace.

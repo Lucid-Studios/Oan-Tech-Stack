@@ -2,8 +2,8 @@
 
 ## Scope
 
-This repository currently accepts release-shell hygiene and release-boundary work
-only. It is not the place to restore archived documentation, submit
+Project Sanctuary currently accepts release-page polish and release-boundary
+work only. It is not the place to restore archived documentation, submit
 implementation-bearing pull requests, private build materials, runtime payloads,
 or reconstruction guides.
 
@@ -11,7 +11,7 @@ or reconstruction guides.
 
 Suitable public contributions include:
 
-- clearer release-shell wording;
+- clearer Project Sanctuary release-page wording;
 - safer non-claim language;
 - issue and pull request template improvements;
 - responsible disclosure routing;
@@ -43,10 +43,10 @@ Each pull request should state:
 
 ## Issues
 
-Use public issues for release-shell clarity, public boundary questions, and
-repository hygiene. Do not use public issues to request private build
-instructions, internal file maps, local runtime details, archived-material
-restoration, or executable reproduction steps.
+Use public issues for Project Sanctuary release-page clarity, public boundary
+questions, and repository hygiene. Do not use public issues to request private
+build instructions, internal file maps, local runtime details,
+archived-material restoration, or executable reproduction steps.
 
 Security concerns and sensitive disclosure should be reported through the
 repository security policy rather than a public issue.
